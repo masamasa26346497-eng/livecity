@@ -1,0 +1,69 @@
+{
+ "_readme": [
+  "PLATEAU配布元の定義。tools/fetch-plateau.js が参照する。",
+  "配布URLや命名規則が変わった場合は、このファイルだけを更新すればコード変更は不要。",
+  "URL解決の優先順位: ①--url 指定 → ②このファイル → ③CKAN API検索（自動探索）",
+  "このファイルに該当エントリが無くても、③のCKAN検索だけで動作する。",
+  "cities.{市コード}.query に検索語ヒントを書くと、CKAN検索で最優先に使われる。",
+  "url を埋めると CKAN検索を経由せず直接ダウンロードする（最も確実）。"
+ ],
+ "version": 1,
+ "patterns": {
+  "_comment": "ZIP内エントリの判定。配列で複数候補を指定でき、いずれかに一致すれば採用する。年度や命名規則が変わっても追記だけで対応できる。",
+  "_detection": "①GML拡張子かつbldgPatterns一致 → ②GML拡張子すべて → ③入れ子ZIPを展開して再判定、の順に自動検出する。",
+  "gmlPatterns": [
+   "\\.gml$",
+   "\\.xml$"
+  ],
+  "bldgPatterns": [
+   "bldg",
+   "building",
+   "建築物",
+   "建物"
+  ],
+  "_legacy_note": "旧形式の gmlPattern / bldgPattern（単一文字列）も後方互換で読み込む。"
+ },
+ "cities": {
+  "_comment": "市区町村コード(5桁の上位3桁+100)をキーにした市単位の配布ZIP。urlは判明している場合のみ記載する。",
+  "27100": {
+   "name": "大阪市",
+   "query": "27100 大阪市",
+   "note": "urlがnullの場合はCKAN検索で自動解決。--list で候補を確認し、確定したURLをここへ記載すると以後は検索を経由しない。",
+   "url": null,
+   "wardCodeInGml": true
+  }
+ },
+ "wards": {
+  "_comment": "区単位で個別配布がある場合のみ記載。無ければ cities のZIPから区コードで絞り込む。",
+  "27114": {
+   "name": "東住吉区",
+   "cityCode": "27100",
+   "url": null
+  },
+  "27115": {
+   "name": "住吉区",
+   "cityCode": "27100",
+   "url": null
+  },
+  "27116": {
+   "name": "東淀川区",
+   "cityCode": "27100",
+   "url": null
+  },
+  "27120": {
+   "name": "阿倍野区",
+   "cityCode": "27100",
+   "url": null
+  },
+  "27122": {
+   "name": "住之江区",
+   "cityCode": "27100",
+   "url": null
+  },
+  "27123": {
+   "name": "西成区",
+   "cityCode": "27100",
+   "url": null
+  }
+ }
+}

@@ -1,0 +1,175 @@
+{
+ "_readme": [
+  "references.template.json — 原点逆推定用の参照点テンプレート。",
+  "このファイルをコピーして references.json を作成し、3点以上（推奨5点、区の東西端を含む）の",
+  "lat / lon へ権威ソースの実在座標(10進度)を記入し、source へ取得元と取得日を記録すること。",
+  "取得元の例: 国土地理院地図(地理院タイル)で施設代表点を読み取る / 自治体・施設の公式資料。",
+  "推測・記憶に基づく座標は記入しないこと（残差検証で不整合として検出されるが、そもそも入れない）。",
+  "記入後: node tools/estimate-origin.js --refs data/buildings/references.json",
+  "localX/localZ は既存OSM_LABELS(HTML埋め込み)の確定値であり変更しないこと。"
+ ],
+ "references": [
+  {
+   "name": "市立苅田北小学校",
+   "category": "school",
+   "localX": -404.23,
+   "localZ": -55.33,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪府教育センター附属高等学校",
+   "category": "school",
+   "localX": -341.59,
+   "localZ": -292.2,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "市立東我孫子中学校",
+   "category": "school",
+   "localX": -522.52,
+   "localZ": -130.27,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪市立南住吉小学校",
+   "category": "school",
+   "localX": -1972.65,
+   "localZ": 46.79,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪市立南住吉大空小学校",
+   "category": "school",
+   "localX": -1546.56,
+   "localZ": 133.03,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪市立我孫子中学校",
+   "category": "school",
+   "localX": -1176.63,
+   "localZ": 84.49,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪市立長居小学校",
+   "category": "school",
+   "localX": -962.62,
+   "localZ": 508.09,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "市立苅田小学校",
+   "category": "school",
+   "localX": -762.31,
+   "localZ": -264.36,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "市立三稜中学校",
+   "category": "school",
+   "localX": -2273.33,
+   "localZ": 356.97,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪市立住吉図書館",
+   "category": "library",
+   "localX": -2222.06,
+   "localZ": 67.59,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "住吉区役所",
+   "category": "government",
+   "localX": -2228.79,
+   "localZ": -12.99,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "あびこ病院",
+   "category": "hospital",
+   "localX": -1407.02,
+   "localZ": -404.98,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "大阪府立大阪南視覚支援学校",
+   "category": "school",
+   "localX": -1964.39,
+   "localZ": -374.04,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "錦秀会阪和住吉総合病院",
+   "category": "hospital",
+   "localX": -1799,
+   "localZ": 123.68,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "錦秀会阪和病院",
+   "category": "hospital",
+   "localX": -1829.51,
+   "localZ": 15.47,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "錦秀会阪和第二病院",
+   "category": "hospital",
+   "localX": -1808.71,
+   "localZ": -307.91,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "我孫子町",
+   "category": "station",
+   "localX": -1690.88,
+   "localZ": -243.18,
+   "lat": null,
+   "lon": null,
+   "source": null
+  },
+  {
+   "name": "沢之町公園",
+   "category": "park",
+   "localX": -2152.16,
+   "localZ": 25.13,
+   "lat": null,
+   "lon": null,
+   "source": null
+  }
+ ]
+}

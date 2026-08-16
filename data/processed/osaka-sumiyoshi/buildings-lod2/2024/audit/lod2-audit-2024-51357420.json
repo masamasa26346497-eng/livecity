@@ -1,0 +1,55 @@
+{
+  "areaId": "osaka-sumiyoshi",
+  "year": 2024,
+  "mesh": "51357420",
+  "analyzedFiles": [
+    "data/raw/osaka-sumiyoshi/plateau/buildings-lod2/2024/gml/51357420_bldg_6697_op.gml"
+  ],
+  "audit": {
+    "buildingCount": 3189,
+    "lod1SolidCount": 3189,
+    "lod1MultiSurfaceCount": 0,
+    "lod2SolidCount": 0,
+    "lod2MultiSurfaceCount": 0,
+    "lod2AnyCount": 0,
+    "lod3AnyCount": 0,
+    "roofSurfaceTotal": 0,
+    "wallSurfaceTotal": 0,
+    "groundSurfaceTotal": 0,
+    "boundedByTotal": 0,
+    "openingTotal": 0,
+    "buildingsWithNullId": 0,
+    "appearancePresent": false,
+    "parameterizedTextureCount": 0,
+    "imageUriCount": 0
+  },
+  "coordinateSystem": {
+    "srsName": "http://www.opengis.net/def/crs/EPSG/0/6697",
+    "srsDimension": 3,
+    "epsgCode": 6697,
+    "epsgKind": "geographic",
+    "lowerCorner": [
+      34.599890261737706,
+      135.4999320105774,
+      0
+    ],
+    "upperCorner": [
+      34.60841806196204,
+      135.5126797347536,
+      57.02000000001
+    ],
+    "firstCoordSample": [
+      34.60281944292487,
+      135.51192651236164,
+      0,
+      34.60286289619725,
+      135.51193101178254,
+      0
+    ],
+    "detectedCrsKind": "geographic",
+    "detectedAxisOrder": "lat-lon",
+    "isProjectedPlaneRectangular": false,
+    "epsgVsValueMismatch": false
+  },
+  "analyzedAt": "2026-07-07T12:22:19.528Z"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "osaka-estimated-population-monthly",
+  "title": "推計人口（毎月1日現在）・人口異動",
+  "provider": "大阪市計画調整局企画振興部統計調査担当",
+  "sourcePage": "https://www.city.osaka.lg.jp/toshikeikaku/page/0000541634.html",
+  "downloadUrl": null,
+  "downloadUrlPattern": "page-link-detection",
+  "linkDetection": {
+    "strategy": "find-link-by-text-pattern",
+    "textPattern": "推計人口（令和.*?～.*?）\\(CSV形式",
+    "note": "累積CSVのファイル名は最新月に応じて変わる（例: R2.11-R8.4_suikei.csv）。固定URLを仮定せず、配布ページのHTMLから該当リンクのhrefを抽出するアダプターとして実装する。"
+  },
+  "format": "csv",
+  "referenceDate": null,
+  "geographicLevel": "ward",
+  "license": "CC BY 4.0",
+  "attribution": "大阪市「推計人口（毎月1日現在）・人口異動」",
+  "updateInterval": "monthly",
+  "acquisitionMode": "page-link-detection",
+  "classification": "C",
+  "valueType": "official-estimate",
+  "enabled": true,
+  "notes": "重要な制約: 本データの地域粒度は行政区単位までであり、町丁目別の値は存在しない。区別値を町丁目へ機械的に配分することは禁止。"
+}

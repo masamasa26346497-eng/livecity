@@ -1,0 +1,103 @@
+{
+  "areaId": "osaka-sumiyoshi",
+  "areaName": "大阪市住吉区・東住吉区・平野区エリア",
+  "domain": "demographics",
+  "generatedAt": "2026-07-04T13:03:03.419Z",
+  "results": {
+    "populationHouseholds": {
+      "status": "processed",
+      "recordCount": 203,
+      "unmatchedCount": 139,
+      "validation": {
+        "population": "pass",
+        "populationIssues": [],
+        "ratio": "pass",
+        "ratioIssues": []
+      },
+      "boundaryJoin": {
+        "boundarySourceType": "official-estat-boundaries",
+        "boundaryDataStatus": "official-attributes-with-legacy-geometry",
+        "officialBoundary": false,
+        "officialAttributeRecords": 206,
+        "officialBoundaryRecords": 0,
+        "legacyGeometryRecords": 201,
+        "recordsWithoutGeometry": 5,
+        "totalStatisticsRecords": 342,
+        "matchedByOfficialCode": 203,
+        "matchedByFallbackName": 0,
+        "unmatched": 139,
+        "multipleCandidates": 0
+      },
+      "outPublicSummary": "public/map-data/osaka-sumiyoshi/demographics/summary.json",
+      "outPublicMetadata": "public/map-data/osaka-sumiyoshi/demographics/metadata.json"
+    },
+    "ageStructure": {
+      "status": "processed",
+      "recordCount": 203,
+      "unmatchedCount": 139,
+      "validation": {
+        "negativeValues": "pass",
+        "negativeValueIssues": [],
+        "ratio": "pass",
+        "ratioIssues": []
+      },
+      "boundaryJoin": {
+        "boundarySourceType": "official-estat-boundaries",
+        "boundaryDataStatus": "official-attributes-with-legacy-geometry",
+        "officialBoundary": false,
+        "officialAttributeRecords": 206,
+        "officialBoundaryRecords": 0,
+        "legacyGeometryRecords": 201,
+        "recordsWithoutGeometry": 5,
+        "totalStatisticsRecords": 342,
+        "matchedByOfficialCode": 0,
+        "matchedByFallbackName": 203,
+        "unmatched": 139,
+        "multipleCandidates": 0
+      },
+      "outPublicData": "public/map-data/osaka-sumiyoshi/demographics/age-structure.json",
+      "outPublicMetadata": "public/map-data/osaka-sumiyoshi/demographics/age-structure-metadata.json"
+    },
+    "householdComposition": {
+      "status": "processed",
+      "recordCount": 203,
+      "unmatchedCount": 139,
+      "rateCalculableCount": 200,
+      "validationIssueCount": 0,
+      "boundaryJoin": {
+        "boundarySourceType": "official-estat-boundaries",
+        "boundaryDataStatus": "official-attributes-with-legacy-geometry",
+        "officialBoundary": false,
+        "totalStatisticsRecords": 342,
+        "matchedByOfficialCode": 203,
+        "matchedByFallbackName": 0,
+        "unmatched": 139,
+        "multipleCandidates": 0
+      },
+      "outPublicData": "public/map-data/osaka-sumiyoshi/demographics/household-composition.json",
+      "outPublicMetadata": "public/map-data/osaka-sumiyoshi/demographics/household-composition-metadata.json"
+    },
+    "populationChange": {
+      "status": "processed",
+      "recordCount2015": 342,
+      "stats": {
+        "totalRecords2020": 203,
+        "matchedByCompositeCode": 0,
+        "matchedByName": 203,
+        "unmatched2020Only": 0,
+        "suppressed": 1,
+        "unmatched2015Only": 139,
+        "totalRecords2015": 342,
+        "comparable": 202,
+        "increasing": 91,
+        "decreasing": 106,
+        "flat": 5
+      },
+      "anomalyCount": 0,
+      "outPublicData": "public/map-data/osaka-sumiyoshi/demographics/population-change.json"
+    },
+    "townStats": {
+      "recordCount": 203
+    }
+  }
+}

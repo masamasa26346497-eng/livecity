@@ -1,0 +1,813 @@
+{
+  "areaId": "osaka-sumiyoshi",
+  "generatedAt": "2026-07-04T13:03:04.207Z",
+  "recordCount": 149,
+  "skippedDuringConversion": [
+    {
+      "sourceId": "node/9787277485",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10755313212",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10755313213",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/13738186567",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/160552850",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.60873458571429,
+      "lon": 135.53787737142858
+    },
+    {
+      "sourceId": "way/160552852",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.6087508,
+      "lon": 135.53656214285712
+    },
+    {
+      "sourceId": "way/160552966",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/160552967",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/160553126",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/172351022",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/172352655",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.60873980909091,
+      "lon": 135.51453985454546
+    },
+    {
+      "sourceId": "way/172355193",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/173055634",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/304194331",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/358269326",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/358269328",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/393077990",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/448742088",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/448742089",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586155113",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586763005",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586763015",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586763040",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586763052",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586763069",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586767456",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586767497",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/586767502",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587072534",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587072643",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587077608",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587077627",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587077654",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587360552",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587360553",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587978344",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587978375",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587978376",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/587997437",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/588264212",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/588264278",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5997050368421,
+      "lon": 135.50743334210526
+    },
+    {
+      "sourceId": "way/588308969",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/589190789",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590641300",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590642037",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590900943",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590900944",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590942381",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/590942388",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591467608",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591467818",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591689277",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591699448",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591764012",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591764013",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591939110",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591943074",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/591943094",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592023676",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592222213",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592241971",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592281809",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592281810",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592281811",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/592281838",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/593564277",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/593564279",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/593573796",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/593573874",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/594397597",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/594400884",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/596264136",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/596267896",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/597137450",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/597137496",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598233101",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598233102",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598411423",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598411424",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423916",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.608621883333335,
+      "lon": 135.5108144333333
+    },
+    {
+      "sourceId": "way/598423918",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423921",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423923",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423924",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423934",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/598423937",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/599101132",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/602820217",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/605130307",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606251525",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606251534",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606251542",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606582061",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606582064",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606582069",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606670877",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606900666",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606922411",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/606922413",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/607557122",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/608490712",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/608490758",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/610363587",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/610439894",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/610439920",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/610439923",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/611377817",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/611437216",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/611493699",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/611493700",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/612128800",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/612128801",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/612469780",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/612472548",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.59978158,
+      "lon": 135.52280492
+    },
+    {
+      "sourceId": "way/615670417",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/615670423",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/619103501",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/749085255",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/749085257",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/749085258",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/749085259",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/749085265",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/828688355",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.59979808000001,
+      "lon": 135.51613378
+    },
+    {
+      "sourceId": "way/828694902",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/828694903",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.59949054,
+      "lon": 135.50990101333335
+    },
+    {
+      "sourceId": "way/828700263",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/828721415",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1131858984",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1131869756",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1169524146",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1169524173",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1187621787",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1187621794",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806604",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806608",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806609",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806610",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806611",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806612",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806613",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806614",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806615",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806616",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806617",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806618",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806619",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806620",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1188806621",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243468923",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642158",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642159",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642160",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642161",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642170",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642185",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642188",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642196",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243642206",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243680720",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1243690672",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1273237139",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1307645984",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1307645985",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1307645986",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1307645987",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1307645989",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421360808",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421360811",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421360814",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421360817",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421757218",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1421757221",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1422275094",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1500299792",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1500299793",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1500299794",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1500299797",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "way/1514060588",
+      "reason": "no-name"
+    }
+  ],
+  "issueCount": 15,
+  "issues": [
+    {
+      "id": "osm-node-1422994718",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-way-172351666"
+    },
+    {
+      "id": "osm-node-7274181239",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7274181244"
+    },
+    {
+      "id": "osm-node-7274181241",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7274181244"
+    },
+    {
+      "id": "osm-node-7274181244",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7274181239, osm-node-7274181241"
+    },
+    {
+      "id": "osm-node-7276126308",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7276126309"
+    },
+    {
+      "id": "osm-node-7276126309",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7276126308"
+    },
+    {
+      "id": "osm-node-7686875327",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-way-588299177"
+    },
+    {
+      "id": "osm-node-8366725211",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-8366725212"
+    },
+    {
+      "id": "osm-node-8366725212",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-8366725211"
+    },
+    {
+      "id": "osm-node-8373723568",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-8373723569"
+    },
+    {
+      "id": "osm-node-8373723569",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-8373723568"
+    },
+    {
+      "id": "osm-node-10249981514",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-10249981519"
+    },
+    {
+      "id": "osm-node-10249981519",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-10249981514"
+    },
+    {
+      "id": "osm-way-172351666",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-1422994718"
+    },
+    {
+      "id": "osm-way-588299177",
+      "reasonCode": "duplicate-candidate",
+      "detail": "候補: osm-node-7686875327"
+    }
+  ]
+}

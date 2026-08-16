@@ -1,0 +1,245 @@
+{
+  "fetchedAt": "2026-01-01T00:00:00.000Z",
+  "area": "osaka-sumiyoshi",
+  "bbox": { "south": 34.599824, "west": 135.499929, "north": 34.608592, "east": 135.550111 },
+  "source": "osm-overpass",
+  "queryGroups": ["parking", "landuse", "natural_and_water"],
+  "groups": {
+    "parking": [
+      {
+        "type": "way",
+        "id": 1001,
+        "tags": { "amenity": "parking", "parking": "surface" },
+        "geometry": [
+          { "lat": 34.6040, "lon": 135.5250 },
+          { "lat": 34.6040, "lon": 135.5252 },
+          { "lat": 34.6042, "lon": 135.5252 },
+          { "lat": 34.6042, "lon": 135.5250 },
+          { "lat": 34.6040, "lon": 135.5250 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 1002,
+        "tags": { "amenity": "parking", "parking": "multi-storey" },
+        "geometry": [
+          { "lat": 34.6050, "lon": 135.5260 },
+          { "lat": 34.6050, "lon": 135.5262 },
+          { "lat": 34.6052, "lon": 135.5262 },
+          { "lat": 34.6052, "lon": 135.5260 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 1003,
+        "tags": { "amenity": "parking" },
+        "geometry": [
+          { "lat": 34.6060, "lon": 135.5270 },
+          { "lat": 34.6060, "lon": 135.5272 },
+          { "lat": 34.6062, "lon": 135.5272 },
+          { "lat": 34.6060, "lon": 135.5270 }
+        ]
+      },
+      {
+        "type": "node",
+        "id": 1004,
+        "lat": 34.6055,
+        "lon": 135.5265,
+        "tags": { "amenity": "parking" }
+      },
+      {
+        "type": "node",
+        "id": 1005,
+        "lat": 34.6056,
+        "lon": 135.5266,
+        "tags": { "amenity": "parking", "parking": "underground" }
+      }
+    ],
+    "landuse": [
+      {
+        "type": "way",
+        "id": 2001,
+        "tags": { "leisure": "park", "name": "テスト公園" },
+        "geometry": [
+          { "lat": 34.6000, "lon": 135.5000 },
+          { "lat": 34.6000, "lon": 135.5010 },
+          { "lat": 34.6010, "lon": 135.5010 },
+          { "lat": 34.6010, "lon": 135.5000 },
+          { "lat": 34.6000, "lon": 135.5000 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 2002,
+        "tags": { "landuse": "industrial" },
+        "geometry": [
+          { "lat": 34.6020, "lon": 135.5100 },
+          { "lat": 34.6020, "lon": 135.5110 },
+          { "lat": 34.6030, "lon": 135.5110 },
+          { "lat": 34.6030, "lon": 135.5100 },
+          { "lat": 34.6020, "lon": 135.5100 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 2003,
+        "tags": { "landuse": "commercial" },
+        "geometry": [
+          { "lat": 34.6035, "lon": 135.5120 },
+          { "lat": 34.6035, "lon": 135.5130 },
+          { "lat": 34.6045, "lon": 135.5130 },
+          { "lat": 34.6045, "lon": 135.5120 },
+          { "lat": 34.6035, "lon": 135.5120 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 2004,
+        "tags": { "landuse": "cemetery" },
+        "geometry": [
+          { "lat": 34.6070, "lon": 135.5300 },
+          { "lat": 34.6070, "lon": 135.5310 },
+          { "lat": 34.6075, "lon": 135.5310 },
+          { "lat": 34.6075, "lon": 135.5300 },
+          { "lat": 34.6070, "lon": 135.5300 }
+        ]
+      },
+      {
+        "type": "relation",
+        "id": 3001,
+        "tags": { "type": "multipolygon", "landuse": "grass" },
+        "members": [
+          {
+            "type": "way",
+            "ref": 30011,
+            "role": "outer",
+            "geometry": [
+              { "lat": 34.6080, "lon": 135.5400 },
+              { "lat": 34.6080, "lon": 135.5420 },
+              { "lat": 34.6090, "lon": 135.5420 },
+              { "lat": 34.6090, "lon": 135.5400 },
+              { "lat": 34.6080, "lon": 135.5400 }
+            ]
+          },
+          {
+            "type": "way",
+            "ref": 30012,
+            "role": "inner",
+            "geometry": [
+              { "lat": 34.6083, "lon": 135.5405 },
+              { "lat": 34.6083, "lon": 135.5410 },
+              { "lat": 34.6087, "lon": 135.5410 },
+              { "lat": 34.6087, "lon": 135.5405 },
+              { "lat": 34.6083, "lon": 135.5405 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "relation",
+        "id": 3002,
+        "tags": { "type": "multipolygon", "landuse": "retail" },
+        "members": [
+          {
+            "type": "way",
+            "ref": 30021,
+            "role": "outer",
+            "geometry": [
+              { "lat": 34.6010, "lon": 135.5450 },
+              { "lat": 34.6010, "lon": 135.5460 },
+              { "lat": 34.6015, "lon": 135.5460 }
+            ]
+          },
+          {
+            "type": "way",
+            "ref": 30022,
+            "role": "outer",
+            "geometry": [
+              { "lat": 34.6015, "lon": 135.5460 },
+              { "lat": 34.6015, "lon": 135.5450 },
+              { "lat": 34.6010, "lon": 135.5450 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "relation",
+        "id": 3003,
+        "tags": { "type": "multipolygon", "landuse": "construction" },
+        "members": [
+          {
+            "type": "way",
+            "ref": 30031,
+            "role": "inner",
+            "geometry": [
+              { "lat": 34.6001, "lon": 135.5480 },
+              { "lat": 34.6001, "lon": 135.5485 },
+              { "lat": 34.6005, "lon": 135.5485 },
+              { "lat": 34.6001, "lon": 135.5480 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 2005,
+        "tags": { "landuse": "industrial" },
+        "geometry": [
+          { "lat": 34.6002, "lon": 135.5490 },
+          null,
+          { "lat": 34.6006, "lon": 135.5495 },
+          { "lat": 34.6002, "lon": 135.5490 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 2006,
+        "tags": { "building": "house" },
+        "geometry": [
+          { "lat": 34.6003, "lon": 135.5496 },
+          { "lat": 34.6003, "lon": 135.5497 },
+          { "lat": 34.6004, "lon": 135.5497 },
+          { "lat": 34.6003, "lon": 135.5496 }
+        ]
+      }
+    ],
+    "natural_and_water": [
+      {
+        "type": "way",
+        "id": 4001,
+        "tags": { "natural": "water", "name": "テスト池" },
+        "geometry": [
+          { "lat": 34.6065, "lon": 135.5350 },
+          { "lat": 34.6065, "lon": 135.5360 },
+          { "lat": 34.6070, "lon": 135.5360 },
+          { "lat": 34.6070, "lon": 135.5350 },
+          { "lat": 34.6065, "lon": 135.5350 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 4002,
+        "tags": { "natural": "wood" },
+        "geometry": [
+          { "lat": 34.6045, "lon": 135.5380 },
+          { "lat": 34.6045, "lon": 135.5390 },
+          { "lat": 34.6055, "lon": 135.5390 },
+          { "lat": 34.6055, "lon": 135.5380 },
+          { "lat": 34.6045, "lon": 135.5380 }
+        ]
+      },
+      {
+        "type": "way",
+        "id": 4003,
+        "tags": { "waterway": "riverbank" },
+        "geometry": [
+          { "lat": 34.6025, "lon": 135.5420 },
+          { "lat": 34.6025, "lon": 135.5430 },
+          { "lat": 34.6028, "lon": 135.5430 },
+          { "lat": 34.6028, "lon": 135.5420 },
+          { "lat": 34.6025, "lon": 135.5420 }
+        ]
+      }
+    ]
+  }
+}

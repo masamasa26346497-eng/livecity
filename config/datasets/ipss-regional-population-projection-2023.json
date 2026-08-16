@@ -1,0 +1,24 @@
+{
+  "id": "ipss-regional-population-projection-2023",
+  "title": "日本の地域別将来推計人口（令和5年推計）都道府県・市区町村別の男女･年齢（5歳）階級別将来推計人口",
+  "provider": "国立社会保障・人口問題研究所",
+  "sourcePage": "https://www.ipss.go.jp/pp-shicyoson/j/shicyoson23/t-page.asp",
+  "downloadUrl": null,
+  "downloadUrlPattern": "page-link-detection",
+  "linkDetection": {
+    "strategy": "find-link-by-text-pattern",
+    "textPattern": "全都道府県・市区町村一括ファイル.*?男女･年齢（5歳）階級別将来推計人口",
+    "note": "ページ構成変更時にリンクテキストが変わる可能性があるため、固定URLではなく検出方式を採用する。"
+  },
+  "format": "xlsx",
+  "referenceDate": "2020-10-01",
+  "geographicLevel": "ward",
+  "license": "出典の明記が必要（研究所サイトの利用規約に準拠、商用利用可否は要確認）",
+  "attribution": "国立社会保障・人口問題研究所「日本の地域別将来推計人口（令和5年推計）」",
+  "updateInterval": "5-year-census-cycle",
+  "acquisitionMode": "page-link-detection",
+  "classification": "A/C",
+  "valueType": "official-estimate",
+  "enabled": true,
+  "notes": "重要な制約: 政令指定都市は行政区別推計まで存在するが、町丁目別の公式将来人口は存在しない。町丁目別推計をLive City側で独自に作成する場合は predictionType:'livecity-estimate' として完全に分離して保存し、公式値と混同しないこと。"
+}

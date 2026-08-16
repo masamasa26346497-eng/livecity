@@ -1,0 +1,148 @@
+{
+  "_readme": [
+    "PLATEAU配布元の定義。tools/fetch-plateau.js が参照する。",
+    "配布URLや命名規則が変わった場合は、このファイルだけを更新すればコード変更は不要。",
+    "URL解決の優先順位: ①--url 指定 → ②このファイル → ③CKAN API検索（自動探索）",
+    "このファイルに該当エントリが無くても、③のCKAN検索だけで動作する。",
+    "cities.{市コード}.query に検索語ヒントを書くと、CKAN検索で最優先に使われる。",
+    "url を埋めると CKAN検索を経由せず直接ダウンロードする（最も確実）。"
+  ],
+  "version": 2,
+  "patterns": {
+    "_comment": "ZIP内エントリの判定に使う正規表現。",
+    "gmlPattern": "\\.gml$",
+    "bldgPattern": "(^|/)[^/]*bldg[^/]*\\.gml$"
+  },
+  "cities": {
+    "_comment": "市単位の配布ZIP。",
+    "27100": {
+      "name": "大阪市",
+      "query": "27100 大阪市",
+      "url": null,
+      "wardCodeInGml": true
+    }
+  },
+  "wards": {
+    "_comment": "大阪市24区。区名・区コード整合性検証と市単位ZIPの絞り込みに使用。",
+    "27102": {
+      "name": "都島区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27103": {
+      "name": "福島区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27104": {
+      "name": "此花区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27106": {
+      "name": "西区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27107": {
+      "name": "港区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27108": {
+      "name": "大正区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27109": {
+      "name": "天王寺区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27111": {
+      "name": "浪速区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27113": {
+      "name": "西淀川区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27114": {
+      "name": "東淀川区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27115": {
+      "name": "東成区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27116": {
+      "name": "生野区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27117": {
+      "name": "旭区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27118": {
+      "name": "城東区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27119": {
+      "name": "阿倍野区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27120": {
+      "name": "住吉区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27121": {
+      "name": "東住吉区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27122": {
+      "name": "西成区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27123": {
+      "name": "淀川区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27124": {
+      "name": "鶴見区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27125": {
+      "name": "住之江区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27126": {
+      "name": "平野区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27127": {
+      "name": "北区",
+      "cityCode": "27100",
+      "url": null
+    },
+    "27128": {
+      "name": "中央区",
+      "cityCode": "27100",
+      "url": null
+    }
+  }
+}

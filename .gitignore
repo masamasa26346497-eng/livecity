@@ -1,0 +1,58 @@
+# Live City - Git ignore
+
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large raw datasets
+data/raw/
+
+# Temporary/generated working data
+temp/
+
+# Archives
+*.zip
+
+# Backup files
+*.bak
+*.tmp
+
+# Python cache
+__pycache__/
+*.pyc
+# Live City generated building datasets
+public/data/buildings/releases/
+public/data/buildings/osaka-higashisumiyoshi/
+
+# Local backups / temporary output
+backup/
+public/temp/
+# Local cache
+.cache/
+# Old manual backup copies
+*.backup-*
+*_backup.*
+*_bkup.*
+# Duplicate handoff copy
+handoff/
+
+# Old / diagnostic HTML variants
+public/osaka_3d_buildings.wardtest*.html
+public/osaka_3d_buildings_memorytest.html
+public/osaka_3d_buildings_perfhud_test.html
+public/osaka_3d_buildings_streetscape-debug.html
+public/osaka_3d_buildings_znorth_test.html

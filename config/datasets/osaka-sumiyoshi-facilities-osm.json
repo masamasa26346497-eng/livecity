@@ -1,0 +1,15 @@
+{
+  "id": "osaka-sumiyoshi-facilities-osm",
+  "title": "OpenStreetMap 施設・観光地データ（住吉区・東住吉区・平野区）",
+  "provider": "OpenStreetMap contributors",
+  "sourceType": "osm-overpass",
+  "sourcePage": "https://www.openstreetmap.org/",
+  "format": "json",
+  "license": "ODbL 1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "acquisitionMode": "overpass-api",
+  "classification": "B",
+  "valueType": "official",
+  "enabled": true,
+  "notes": "対象範囲はconfig/areas/{areaId}.jsonのbboxを使用する(区名・緯度経度をコードへ直接埋め込まない)。施設と観光地は同一のOverpassクエリで一括取得し、不要なAPIリクエストの重複を避ける(取得後にtools/convert/facilities-extended.jsの分類ルールでcategory:'tourism'とその他を振り分ける)。referenceDateはOSMデータに公式な「基準日」が存在しないため、データ取得日時(downloadedAt)をそのまま使う。"
+}

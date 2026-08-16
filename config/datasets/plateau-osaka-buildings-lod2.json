@@ -1,0 +1,26 @@
+{
+  "datasetId": "plateau-osaka-buildings-lod2",
+  "provider": "国土交通省 Project PLATEAU",
+  "title": "3D都市モデル（Project PLATEAU）大阪市 建築物モデル（LOD2）",
+  "sourcePage": "https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024",
+  "license": "CC BY 4.0 / 政府標準利用規約2.0",
+  "attribution": "国土交通省 Project PLATEAU「3D都市モデル 大阪市」",
+  "cityCode": "27100",
+  "citySlug": "osaka-shi",
+  "geographicLevel": "building",
+  "valueType": "official",
+  "note": "LOD2建築物モデルの自動取得・監査パイプライン用のデータセット定義。配布はG空間情報センター(CKAN)。年度ごとにパッケージが分かれる(plateau-27100-osaka-shi-<year>)。CityGMLは3次メッシュ単位でファイル分割されており、対象メッシュのbldg GMLのみ抽出する。この定義自体はネットワークURLの解決規則を持つのみで、URLは実行時にCKAN APIから解決する(ハードコードした配布URLが年度更新で陳腐化するのを避けるため)。",
+  "targetArea": "osaka-sumiyoshi",
+  "targetMeshes": ["51357420", "51357421", "51357422", "51357423"],
+  "primaryVerificationMesh": "51357422",
+  "supportedYears": [2020, 2022, 2024, 2025],
+  "defaultYear": 2024,
+  "ckanApiBase": "https://www.geospatial.jp/ckan/api/3/action",
+  "download": {
+    "timeoutMs": 120000,
+    "maxRetries": 4,
+    "retryBackoffMs": 3000,
+    "useRangeResume": true,
+    "userAgent": "LiveCity-DataPipeline/0.1 (+https://livecity.example; PLATEAU LOD2 fetcher)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "osaka-census-2020-population-households",
+  "title": "令和2年国勢調査 第2表 男女別人口，外国人人口及び世帯数－町丁・字等",
+  "provider": "大阪市計画調整局企画振興部統計調査担当",
+  "sourcePage": "https://www.city.osaka.lg.jp/toshikeikaku/page/0000562515.html",
+  "downloadUrl": "https://www.city.osaka.lg.jp/toshikeikaku/cmsfiles/contents/0000562/562515/01_R2jinkousetai(chochoaza).xlsx",
+  "format": "xlsx",
+  "referenceDate": "2020-10-01",
+  "geographicLevel": "chocho",
+  "license": "CC BY 4.0",
+  "attribution": "大阪市「令和2年国勢調査 小地域集計・独自集計」",
+  "updateInterval": "census",
+  "acquisitionMode": "direct-download",
+  "classification": "A",
+  "valueType": "official",
+  "enabled": true,
+  "notes": "2026年6月、実際にダウンロードしたXLSXを直接調査して構造を確認済み。シート構成は['【利用上の注意】','第2表']の2シートで、データは2番目のシート'第2表'にある（1番目のシートではない点に注意）。ヘッダーは4-5行目の2行構成、6行目以降がデータで、列5(地域階層レベル)の値が4の行のみが町丁目単位の最小粒度レコード。"
+}

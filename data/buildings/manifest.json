@@ -1,0 +1,20 @@
+{
+ "version": 1,
+ "city": "osaka",
+ "coordinateSystem": "city-shared local XZ meters (same origin/scale as osaka-sumiyoshi embedded BLDGS; converted upstream from PLATEAU CityGML)",
+ "tileSize": 500,
+ "origin": {
+  "x": 0,
+  "z": 0
+ },
+ "datasets": [
+  {
+   "id": "osaka-sumiyoshi",
+   "ward": "住吉区",
+   "manifest": "./osaka-sumiyoshi/manifest.json",
+   "enabled": true,
+   "buildings": 12029,
+   "tiles": 20
+  }
+ ]
+}

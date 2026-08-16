@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "city": "osaka-ward-poc",
+  "coordinateSystem": "meters-local",
+  "coordinateConvention": "znorth-neg-v1",
+  "tileSize": 500,
+  "origin": null,
+  "datasets": [
+    {
+      "id": "osaka-sumiyoshi",
+      "ward": "住吉区",
+      "wardCode": null,
+      "manifest": "./osaka-sumiyoshi/manifest.json",
+      "enabled": true,
+      "buildings": 33594,
+      "tiles": 50
+    },
+    {
+      "id": "osaka-higashisumiyoshi",
+      "ward": "東住吉区",
+      "wardCode": "27121",
+      "manifest": "./osaka-higashisumiyoshi/manifest.json",
+      "enabled": true,
+      "buildings": 38266,
+      "tiles": 56
+    }
+  ]
+}

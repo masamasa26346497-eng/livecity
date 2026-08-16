@@ -1,0 +1,77 @@
+{
+  "categories": {
+    "shopping": { "label": "買い物", "color": "#e8a33d", "icon": "shopping" },
+    "medical": { "label": "医療・福祉", "color": "#d65a5a", "icon": "medical" },
+    "education": { "label": "教育・子育て", "color": "#5a9fd6", "icon": "education" },
+    "public": { "label": "公共・生活", "color": "#9b6fd6", "icon": "public" },
+    "transport": { "label": "交通", "color": "#4a90d9", "icon": "transport" },
+    "park": { "label": "公園・運動", "color": "#5a9b5a", "icon": "park" },
+    "tourism": { "label": "観光", "color": "#d68fb0", "icon": "tourism" },
+    "welfare": { "label": "福祉", "color": "#8a7256", "icon": "welfare" },
+    "unknown": { "label": "分類不明", "color": "#888888", "icon": "unknown" }
+  },
+  "rules": [
+    { "tag": "shop", "value": "supermarket", "category": "shopping", "subcategory": "supermarket" },
+    { "tag": "shop", "value": "convenience", "category": "shopping", "subcategory": "convenience" },
+    { "tag": "shop", "value": "chemist", "category": "shopping", "subcategory": "drugstore" },
+    { "tag": "shop", "value": "mall", "category": "shopping", "subcategory": "shopping_center" },
+    { "tag": "shop", "value": "department_store", "category": "shopping", "subcategory": "department_store" },
+
+    { "tag": "amenity", "value": "hospital", "category": "medical", "subcategory": "hospital" },
+    { "tag": "amenity", "value": "clinic", "category": "medical", "subcategory": "clinic" },
+    { "tag": "amenity", "value": "dentist", "category": "medical", "subcategory": "dentist" },
+    { "tag": "amenity", "value": "pharmacy", "category": "medical", "subcategory": "pharmacy" },
+    { "tag": "healthcare", "value": "*", "category": "medical", "subcategory": "healthcare_other" },
+
+    { "tag": "amenity", "value": "kindergarten", "category": "education", "subcategory": "kindergarten" },
+    { "tag": "amenity", "value": "childcare", "category": "education", "subcategory": "childcare" },
+    { "tag": "amenity", "value": "school", "category": "education", "subcategory": "school" },
+    { "tag": "amenity", "value": "college", "category": "education", "subcategory": "college" },
+    { "tag": "amenity", "value": "university", "category": "education", "subcategory": "university" },
+
+    { "tag": "amenity", "value": "townhall", "category": "public", "subcategory": "government" },
+    { "tag": "office", "value": "government", "category": "public", "subcategory": "government" },
+    { "tag": "amenity", "value": "police", "category": "public", "subcategory": "police" },
+    { "tag": "amenity", "value": "fire_station", "category": "public", "subcategory": "fire_station" },
+    { "tag": "amenity", "value": "post_office", "category": "public", "subcategory": "post_office" },
+    { "tag": "amenity", "value": "library", "category": "public", "subcategory": "library" },
+    { "tag": "amenity", "value": "community_centre", "category": "public", "subcategory": "community_centre" },
+    { "tag": "amenity", "value": "toilets", "category": "public", "subcategory": "toilets" },
+    { "tag": "amenity", "value": "bank", "category": "public", "subcategory": "bank" },
+    { "tag": "amenity", "value": "atm", "category": "public", "subcategory": "atm" },
+
+    { "tag": "public_transport", "value": "station", "category": "transport", "subcategory": "station" },
+    { "tag": "public_transport", "value": "platform", "category": "transport", "subcategory": "platform" },
+    { "tag": "railway", "value": "station", "category": "transport", "subcategory": "station" },
+    { "tag": "railway", "value": "halt", "category": "transport", "subcategory": "station" },
+    { "tag": "highway", "value": "bus_stop", "category": "transport", "subcategory": "bus_stop" },
+    { "tag": "amenity", "value": "bicycle_parking", "category": "transport", "subcategory": "bicycle_parking" },
+    { "tag": "amenity", "value": "parking", "category": "transport", "subcategory": "parking" },
+    { "tag": "amenity", "value": "taxi", "category": "transport", "subcategory": "taxi" },
+
+    { "tag": "leisure", "value": "park", "category": "park", "subcategory": "park" },
+    { "tag": "leisure", "value": "playground", "category": "park", "subcategory": "playground" },
+    { "tag": "leisure", "value": "sports_centre", "category": "park", "subcategory": "sports_centre" },
+    { "tag": "leisure", "value": "pitch", "category": "park", "subcategory": "pitch" },
+    { "tag": "leisure", "value": "garden", "category": "park", "subcategory": "garden" },
+
+    { "tag": "tourism", "value": "attraction", "category": "tourism", "subcategory": "attraction" },
+    { "tag": "tourism", "value": "museum", "category": "tourism", "subcategory": "museum" },
+    { "tag": "tourism", "value": "gallery", "category": "tourism", "subcategory": "art_gallery" },
+    { "tag": "tourism", "value": "viewpoint", "category": "tourism", "subcategory": "viewpoint" },
+    { "tag": "tourism", "value": "information", "category": "tourism", "subcategory": "information" },
+    { "tag": "amenity", "value": "theatre", "category": "tourism", "subcategory": "theatre" },
+    { "tag": "shop", "value": "gift", "category": "tourism", "subcategory": "landmark" }
+  ],
+  "religiousFacilityRules": {
+    "note": "神社・寺院はamenity=place_of_worshipだけでなく、religion/denomination/nameの組み合わせで判定する（ご指示通り、単一タグだけで決めつけない）。",
+    "shrineNamePatterns": ["神社", "大社", "神宮", "宮$"],
+    "templeNamePatterns": ["寺$", "寺院", "院$", "庵$"],
+    "religionToSubcategory": { "shinto": "shrine", "buddhist": "temple" }
+  },
+  "historicRules": {
+    "note": "historic=*は値の種類が多いため、値そのものをsubcategoryとして保持する(historic_site等への安易な単純化を避ける)。",
+    "categoryFor": "tourism",
+    "subcategoryPrefix": "historic_"
+  }
+}

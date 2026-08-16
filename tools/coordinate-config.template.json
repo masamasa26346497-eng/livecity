@@ -1,0 +1,33 @@
+{
+  "_readme": [
+    "coordinate-config.template.json — 都市共通座標系の設定テンプレート。",
+    "このファイルをコピーして data/buildings/coordinate-config.json を作成し、",
+    "null の項目へ『住吉区の既存変換パイプライン(tools/convert/等)で実際に使用した値』を転記すること。",
+    "推測値・例示値を入れてはならない。null のままでは convert-plateau-buildings.js はエラー停止する。",
+    "不足している再現情報(いずれも本環境のHTML/landuse.json/manifestには記録がない):",
+    "  1. coordinateMode: posListを投影座標(m)として扱うか、緯度経度から平面直角座標へ変換するか",
+    "  2. jprectZone: 平面直角座標系の系番号(大阪は通常VI=6だが、実際に使用した系を確認すること)",
+    "  3. localOrigin.projectedE/projectedN: 住吉区変換時の基準原点の投影座標(m)の実測値",
+    "  4. axisMapping.sceneXSign/sceneZSign: three.jsのX/Z軸と東/北方向の対応符号",
+    "  5. axisOrder: CityGML posListの座標並び(JGD2011地理座標なら通常 'lat lon')",
+    "値の特定方法: (a)既存パイプラインの設定/ソースから転記する、または",
+    "(b)住吉区の実在建物1棟についてPLATEAU元データの投影座標とBLDGS内ローカルXZを突き合わせ、",
+    "   E-N→X-Zの原点と符号を実測で逆算する(2棟以上で検算すること)。"
+  ],
+  "version": 1,
+  "city": "osaka",
+  "sourceCRS": null,
+  "coordinateMode": null,
+  "jprectZone": null,
+  "axisOrder": null,
+  "localOrigin": {
+    "projectedE": null,
+    "projectedN": null
+  },
+  "axisMapping": {
+    "sceneXSign": null,
+    "sceneZSign": null
+  },
+  "unit": "meter",
+  "tileSize": 500
+}

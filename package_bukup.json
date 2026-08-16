@@ -1,0 +1,34 @@
+{
+  "name": "livecity-data-pipeline",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Live City向け再利用可能データ取り込み基盤。対象地域を指定するだけでOSM・人口統計・移動統計・防災等のデータを取得し、Three.js表示用形式へ変換・検証・配信フォルダへ出力する。",
+  "type": "module",
+  "scripts": {
+    "data:download": "node tools/download/index.js",
+    "data:process": "node tools/convert/index.js",
+    "data:validate": "node tools/validate/index.js",
+    "data:import": "node tools/orchestrate.js urban",
+    "data:import:urban": "node tools/orchestrate.js urban",
+    "data:download:demographics": "node tools/orchestrate.js demographics --step download",
+    "data:process:demographics": "node tools/orchestrate.js demographics --step process",
+    "data:import:demographics": "node tools/orchestrate.js demographics",
+    "data:catalog": "node tools/catalog.js",
+    "data:check-sources": "node tools/check-sources.js",
+    "data:ingest:boundaries": "node tools/ingest/official-boundaries-from-geojson.js",
+    "data:compare:boundaries": "node tools/compare/boundary-comparison.js",
+    "data:update:households": "node tools/update-dataset.js osaka-census-2020-household-composition --area osaka-sumiyoshi",
+    "data:update:population-change": "node tools/update-dataset.js osaka-census-2015-population-households --area osaka-sumiyoshi",
+    "data:update:demographics": "node tools/orchestrate.js demographics --area osaka-sumiyoshi",
+    "data:download:facilities": "node tools/orchestrate.js facilities --step download",
+    "data:process:facilities": "node tools/orchestrate.js facilities --step process",
+    "data:import:facilities": "node tools/orchestrate.js facilities",
+    "test": "node --test tests/demographics.test.js tests/paths.test.js tests/html-regression.test.js tests/boundary-master.test.js tests/household-composition.test.js tests/population-2015.test.js tests/population-change.test.js tests/demographics-pipeline-isolation.test.js tests/facilities-extended.test.js",
+    "test:integration:estat": "node --test tests/integration/estat-download.integration.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

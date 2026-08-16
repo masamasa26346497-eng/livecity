@@ -1,0 +1,27 @@
+{
+ "_generated": "tools/estimate-origin.js による自動生成（手入力なし）",
+ "generatedAt": "2026-07-20T04:43:15.467Z",
+ "version": 1,
+ "city": "osaka",
+ "sourceCRS": "JGD2011 / 平面直角座標系 第7系（残差最小で自動選択）",
+ "coordinateMode": "geographic-jprect",
+ "jprectZone": 7,
+ "axisOrder": "lat lon",
+ "localOrigin": {
+  "projectedE": -150573.671,
+  "projectedN": -153599.466
+ },
+ "axisMapping": {
+  "sceneXSign": 1,
+  "sceneZSign": 1
+ },
+ "unit": "meter",
+ "tileSize": 500,
+ "calibration": {
+  "references": 60,
+  "inliers": 9,
+  "outliers": 51,
+  "maxResidualM": 4.47,
+  "refsFile": "data/buildings/references.auto.json"
+ }
+}

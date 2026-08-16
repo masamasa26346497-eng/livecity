@@ -1,0 +1,99 @@
+{
+  "id": "osaka-sumiyoshi",
+  "name": "大阪市住吉区・東住吉区・平野区エリア",
+  "description": "Live City初期対象エリア。住吉区・東住吉区・平野区の建物データ(PLATEAU)が既に存在する範囲に合わせている。",
+  "bbox": {
+    "south": 34.599824,
+    "west": 135.499929,
+    "north": 34.608592,
+    "east": 135.550111
+  },
+  "projection": {
+    "type": "local-equirectangular",
+    "centerLat": 34.604208,
+    "centerLon": 135.52502,
+    "metersPerDegree": 111320,
+    "note": "既存のLiveCity HTML内 geoToThree()と完全に同一の変換式。x=(lon-centerLon)*cos(centerLat)*metersPerDegree, z=(lat-centerLat)*metersPerDegree。この値を変更すると既存の建物データと座標系がズレるため変更禁止。"
+  },
+  "layers": {
+    "roads": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"highway\"~\"^(motorway|trunk|primary|secondary|tertiary|residential)$\"]",
+      "outputFile": "roads.json"
+    },
+    "parks": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"leisure\"=\"park\"];way[\"landuse\"=\"grass\"];way[\"landuse\"=\"recreation_ground\"]",
+      "outputFile": "parks.json"
+    },
+    "railways": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"railway\"~\"^(rail|light_rail|subway)$\"];node[\"railway\"=\"station\"]",
+      "outputFile": "railways.json"
+    },
+    "waterways": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"natural\"=\"water\"];way[\"waterway\"=\"river\"];way[\"waterway\"=\"canal\"]",
+      "outputFile": "waterways.json"
+    },
+    "facilities": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "node[\"railway\"=\"station\"];node[\"amenity\"=\"townhall\"];node[\"office\"=\"government\"];node[\"amenity\"=\"school\"];node[\"amenity\"=\"college\"];node[\"amenity\"=\"university\"];node[\"amenity\"=\"hospital\"];node[\"amenity\"=\"library\"];way[\"railway\"=\"station\"];way[\"amenity\"=\"townhall\"];way[\"office\"=\"government\"];way[\"amenity\"=\"school\"];way[\"amenity\"=\"college\"];way[\"amenity\"=\"university\"];way[\"amenity\"=\"hospital\"];way[\"amenity\"=\"library\"]",
+      "outputFile": "facilities.json"
+    },
+    "landuse": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "outputFile": "landuse.json",
+      "note": "土地利用の面データ(駐車場/公園・緑地/工業・商業等/自然・水域)。OSMフィルタはクエリ群が大きくJSONへ書き下すと保守しづらいため、tools/download/landuse.js の LANDUSE_QUERY_GROUPS で定義する。leisure=park と landuse=recreation_ground は既存 parks レイヤーと重複するが、landuse.json 側にも保持したうえで duplicateWithExistingParkLayer:true を付与し、描画側で重複排除できるようにする。",
+      "queryGroups": ["parking", "landuse", "natural_and_water"]
+    },
+    "administrativeBoundaries": {
+      "enabled": true,
+      "source": "manual-upload",
+      "note": "e-Statの小地域(町丁・字)境界Shapefileは自動取得不可。手動アップロード方式を継続する（data/raw/osaka-sumiyoshi/administrative-boundaries/に配置）。",
+      "outputFile": "administrative-boundaries.json"
+    }
+  },
+  "demographics": {
+    "enabled": true,
+    "note": "OSM由来のlayersとは異なり、人口統計は大阪市全域を対象としたファイル(町丁目別または行政区別)として配布されるため、bbox単位のクエリではなく、対象行政区・町丁目名のフィルタで本エリア分を抽出する。",
+    "targetWards": [
+      "住吉区",
+      "東住吉区",
+      "平野区"
+    ],
+    "datasets": [
+      "osaka-census-2020-population-households",
+      "osaka-census-2020-age-structure",
+      "osaka-census-2020-household-composition",
+      "osaka-census-2015-population-households",
+      "osaka-estimated-population-monthly",
+      "ipss-regional-population-projection-2023"
+    ],
+    "outputFiles": {
+      "populationHouseholds": "demographics/population-households.json",
+      "ageStructure": "demographics/age-structure.json",
+      "estimatedPopulation": "demographics/estimated-population.json",
+      "populationProjection": "demographics/population-projection.json",
+      "householdComposition": "demographics/household-composition.json",
+      "populationChange": "demographics/population-change.json"
+    }
+  },
+  "tiling": {
+    "enabled": false,
+    "note": "現在のエリア規模(約4km x 1km)ではタイル分割不要。大阪市全域への拡張時にzoomLevelsを設定して有効化する想定。",
+    "zoomLevels": [],
+    "tileSizeMeters": 1000
+  },
+  "createdAt": "2026-06-23",
+  "license": {
+    "osm": "ODbL 1.0 (OpenStreetMap contributors)",
+    "estat": "政府標準利用規約2.0"
+  }
+}
