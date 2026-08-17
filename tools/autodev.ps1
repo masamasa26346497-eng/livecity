@@ -105,6 +105,8 @@ foreach ($t in ($AllowedToolsList + $DisallowedToolsList)) {
 $script:LogFilePath = $null
 $script:LockStream = $null
 $script:FinalExitCode = 0
+$script:CancelRequested = $false
+$script:CancelHandler = $null
 
 # ══════════════════════════════════════════════════════════════
 # ログ (secretらしき文字列は簡易マスキングしてから書き出す)
@@ -220,6 +222,32 @@ function Exit-AutoDevLock {
 }
 
 # ══════════════════════════════════════════════════════════════
+# Ctrl+C(中断)対応
+# ══════════════════════════════════════════════════════════════
+# Claude実行中に限定してConsole.CancelKeyPressを捕捉する。$e.Cancel=$trueで既定の即時終了を
+# 止め、$script:CancelRequestedフラグだけを立てる。実際の子プロセス終了・後片付けは
+# Start-StreamedExternalProcess側のポーリングループが responsible に行う。
+# Claude実行区間の外(git操作・npm test等)ではこのハンドラは登録しない
+# (登録したままだとCtrl+Cが「効かなくなったように見える」区間を作ってしまうため、
+#  Claude実行の直前で登録し、直後に必ず解除する)。
+function Register-AutoDevCancelHandler {
+    $script:CancelRequested = $false
+    $script:CancelHandler = [System.ConsoleCancelEventHandler]{
+        param($sender, $e)
+        $script:CancelRequested = $true
+        $e.Cancel = $true
+    }
+    [Console]::add_CancelKeyPress($script:CancelHandler)
+}
+
+function Unregister-AutoDevCancelHandler {
+    if ($script:CancelHandler) {
+        try { [Console]::remove_CancelKeyPress($script:CancelHandler) } catch { }
+        $script:CancelHandler = $null
+    }
+}
+
+# ══════════════════════════════════════════════════════════════
 # ブランチ管理 (PowerShell側の責任。Claudeには一切行わせない)
 # ══════════════════════════════════════════════════════════════
 function Set-DailyAutoDevBranch {
@@ -247,12 +275,201 @@ function Set-DailyAutoDevBranch {
 }
 
 # ══════════════════════════════════════════════════════════════
-# Claude Code 呼び出し (完全非対話モード)
+# claude CLI解決 (claude.exe / claude.cmd / claude.ps1 shim等、環境依存の実行形式を吸収する)
+# ══════════════════════════════════════════════════════════════
+# Get-Commandは、PowerShellの&演算子が内部的に使うのと同じコマンド解決ロジックを使うため、
+# 「現在すでに正常に起動できているclaude解決」をそのまま踏襲できる(パスを独自に推測しない)。
+# 実機確認の結果、npmグローバルインストールでは claude.ps1 (ExternalScript) として解決される
+# ケースがあることを確認済み(claude.cmd/claude.exeとは別に扱う必要がある。
+# cmd.exeは.ps1を直接解決できないため、.cmd/.batと同じフォールバックには乗せられない)。
+# .exeはCreateProcessで直接起動できるが、.cmd/.bat/.ps1のshimは直接起動できないため、
+# それぞれ対応するインタプリタ(cmd.exe / powershell.exe)経由で起動する。
+function Resolve-ClaudeInvocation {
+    $cmd = Get-Command claude -ErrorAction SilentlyContinue
+    if (-not $cmd) { throw 'claude CLI が見つかりません(PATH上に存在しません)。' }
+
+    $source = $null
+    try { $source = $cmd.Source } catch { $source = $null }
+
+    if ([string]::IsNullOrWhiteSpace($source)) {
+        # function/alias等、実行ファイルパスを直接持たない場合の安全側フォールバック。
+        # cmd.exe自身のPATH/PATHEXT解決に任せる(通常のコンソールで`claude`と打つのと同じ経路)。
+        return [PSCustomObject]@{ FileName = $env:ComSpec; PrefixArgs = @('/c', 'claude') }
+    }
+
+    $ext = [System.IO.Path]::GetExtension($source).ToLowerInvariant()
+    if ($ext -eq '.exe') {
+        return [PSCustomObject]@{ FileName = $source; PrefixArgs = @() }
+    }
+    elseif ($ext -eq '.cmd' -or $ext -eq '.bat') {
+        return [PSCustomObject]@{ FileName = $env:ComSpec; PrefixArgs = @('/c', $source) }
+    }
+    elseif ($ext -eq '.ps1') {
+        $psExeCmd = Get-Command powershell.exe -ErrorAction SilentlyContinue
+        $psExe = if ($psExeCmd) { $psExeCmd.Source } else { 'powershell.exe' }
+        return [PSCustomObject]@{ FileName = $psExe; PrefixArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $source) }
+    }
+    else {
+        # 未知のその他の形式は、安全側にcmd.exe経由のPATH解決へフォールバックする。
+        return [PSCustomObject]@{ FileName = $env:ComSpec; PrefixArgs = @('/c', 'claude') }
+    }
+}
+
+# ══════════════════════════════════════════════════════════════
+# コマンドライン引数の組み立て (Win32標準のargvクォート規則)
+# ══════════════════════════════════════════════════════════════
+# 【実機確認による重要な注意】ProcessStartInfo.ArgumentListは.NET Core/最新.NETでは
+# 自動初期化された空Collectionだが、このスクリプトが動くWindows PowerShell 5.1(.NET Framework)の
+# 実機では取得時に$null・代入時にプロパティが見つからないエラーとなり、実際には使用できないことを
+# 実機テストで確認した。そのため、従来からある単一文字列のProcessStartInfo.Argumentsへ、
+# 標準的なWin32コマンドライン引数エスケープ規則(CommandLineToArgvW互換)で自前組み立てする。
+function ConvertTo-WindowsCommandLineArgument {
+    param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Arg)
+    if ($Arg.Length -gt 0 -and $Arg.IndexOfAny([char[]]@(' ', '"', "`t")) -lt 0) {
+        return $Arg
+    }
+    $sb = New-Object System.Text.StringBuilder
+    [void]$sb.Append('"')
+    $len = $Arg.Length
+    for ($i = 0; $i -lt $len; $i++) {
+        $numBackslashes = 0
+        while ($i -lt $len -and $Arg[$i] -eq '\') { $numBackslashes++; $i++ }
+        if ($i -eq $len) {
+            [void]$sb.Append('\', ($numBackslashes * 2))
+            break
+        }
+        elseif ($Arg[$i] -eq '"') {
+            [void]$sb.Append('\', ($numBackslashes * 2 + 1))
+            [void]$sb.Append('"')
+        }
+        else {
+            [void]$sb.Append('\', $numBackslashes)
+            [void]$sb.Append($Arg[$i])
+        }
+    }
+    [void]$sb.Append('"')
+    return $sb.ToString()
+}
+
+function Get-WindowsCommandLine {
+    param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$Arguments)
+    return (($Arguments | ForEach-Object { ConvertTo-WindowsCommandLineArgument $_ }) -join ' ')
+}
+
+# ══════════════════════════════════════════════════════════════
+# 汎用: 子プロセスをリアルタイムでstream実行するヘルパー
+# ══════════════════════════════════════════════════════════════
+# System.Diagnostics.Process(UseShellExecute=false、標準出力/エラーをリダイレクト)で子プロセスを
+# 起動し、stdout/stderrを行単位の非同期イベントでスレッドセーフなConcurrentQueueへ積む。
+# 呼び出し元のポーリングループがそれを取り出してConsole表示・ログ保存を行うため、
+# 実行完了まで全出力をメモリへ溜め込んでから表示する方式にはならない。
+# $script:CancelRequestedがtrueになった場合、taskkillで子プロセスをプロセスツリーごと終了する。
+function Start-StreamedExternalProcess {
+    param(
+        [Parameter(Mandatory = $true)][string]$FileName,
+        [Parameter(Mandatory = $true)][string[]]$ArgumentList,
+        [Parameter(Mandatory = $true)][string]$WorkingDirectory,
+        [string]$InputText,
+        [Parameter(Mandatory = $true)][scriptblock]$OnStdOutLine,
+        [Parameter(Mandatory = $true)][scriptblock]$OnStdErrLine,
+        [int]$PollIntervalMs = 100
+    )
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $FileName
+    $psi.Arguments = Get-WindowsCommandLine -Arguments $ArgumentList
+    $psi.WorkingDirectory = $WorkingDirectory
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.RedirectStandardInput = $true
+    $psi.CreateNoWindow = $true
+    $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $psi
+    $process.EnableRaisingEvents = $true
+
+    $stdoutQueue = New-Object System.Collections.Concurrent.ConcurrentQueue[string]
+    $stderrQueue = New-Object System.Collections.Concurrent.ConcurrentQueue[string]
+
+    $outSub = Register-ObjectEvent -InputObject $process -EventName OutputDataReceived -MessageData $stdoutQueue -Action {
+        if ($null -ne $EventArgs.Data) { $Event.MessageData.Enqueue($EventArgs.Data) }
+    }
+    $errSub = Register-ObjectEvent -InputObject $process -EventName ErrorDataReceived -MessageData $stderrQueue -Action {
+        if ($null -ne $EventArgs.Data) { $Event.MessageData.Enqueue($EventArgs.Data) }
+    }
+
+    $cancelled = $false
+    try {
+        [void]$process.Start()
+        $process.BeginOutputReadLine()
+        $process.BeginErrorReadLine()
+
+        if ($InputText) {
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($InputText)
+            $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
+            $process.StandardInput.BaseStream.Flush()
+        }
+        $process.StandardInput.Close()
+
+        # [重要] & $OnStdOutLine 等のハンドラ呼び出しは[void](...)で必ず包む。ハンドラ内部が
+        # (Write-Hostではなく)Write-Output等でパイプラインへ出力してしまった場合でも、それが
+        # この関数自身の戻り値(最後のreturn文のPSCustomObject)を汚染しないようにするため。
+        while (-not $process.HasExited) {
+            $line = $null
+            while ($stdoutQueue.TryDequeue([ref]$line)) { [void](& $OnStdOutLine $line) }
+            while ($stderrQueue.TryDequeue([ref]$line)) { [void](& $OnStdErrLine $line) }
+            if ($script:CancelRequested) {
+                $cancelled = $true
+                break
+            }
+            Start-Sleep -Milliseconds $PollIntervalMs
+        }
+
+        if ($cancelled) {
+            try {
+                if (-not $process.HasExited) {
+                    # .NET Framework(Windows PowerShell 5.1)のProcess.Kill()にはプロセスツリー一括
+                    # 終了オプションが無い。claudeがcmd.exe/.cmd shim経由の場合、直下だけkillしても
+                    # 実体(node.exe等)の孫プロセスが残留しうるため、taskkillでツリーごと確実に終了する。
+                    & taskkill /PID $process.Id /T /F *> $null
+                }
+            }
+            catch { }
+            try { $process.WaitForExit(5000) | Out-Null } catch { }
+        }
+        else {
+            [void]$process.WaitForExit()
+        }
+
+        # 終了直後、イベント配信が遅延している可能性があるため少し待ってから最終ドレインする。
+        Start-Sleep -Milliseconds 150
+        $line = $null
+        while ($stdoutQueue.TryDequeue([ref]$line)) { [void](& $OnStdOutLine $line) }
+        while ($stderrQueue.TryDequeue([ref]$line)) { [void](& $OnStdErrLine $line) }
+
+        $exitCode = if ($cancelled) { 130 } else { $process.ExitCode }
+        return [PSCustomObject]@{ ExitCode = $exitCode; Cancelled = $cancelled; ProcessId = $process.Id }
+    }
+    finally {
+        try { Unregister-Event -SourceIdentifier $outSub.Name -ErrorAction SilentlyContinue } catch { }
+        try { Unregister-Event -SourceIdentifier $errSub.Name -ErrorAction SilentlyContinue } catch { }
+        try { Remove-Job -Id $outSub.Id -Force -ErrorAction SilentlyContinue } catch { }
+        try { Remove-Job -Id $errSub.Id -Force -ErrorAction SilentlyContinue } catch { }
+        try { $process.Dispose() } catch { }
+    }
+}
+
+# ══════════════════════════════════════════════════════════════
+# Claude Code 呼び出し (完全非対話モード、リアルタイム出力表示)
 # ══════════════════════════════════════════════════════════════
 function Invoke-ClaudeAutoDev {
     param(
         [Parameter(Mandatory = $true)][string]$PromptText,
         [Parameter(Mandatory = $true)][int]$MaxTurnsValue,
+        [Parameter(Mandatory = $true)][string]$WorkingDirectory,
         [Parameter(Mandatory = $true)][string]$StdErrLogPath
     )
     # -p (print/非対話) + acceptEdits(ファイル編集は自動承認、Bashはallow/denyリストに従う)。
@@ -264,14 +481,37 @@ function Invoke-ClaudeAutoDev {
         throw 'internal error: dangerously-skip-permissions が混入しています。処理を中止します。'
     }
 
-    # stdinでpromptを渡す(コマンドライン引数長の制限を回避するため)。
-    # stderrは2>&1で合流させず、別ファイルへリダイレクトする(ネイティブコマンドのstderr合流による
-    # $LASTEXITCODE誤判定を避けるため)。
-    $output = $PromptText | & claude @claudeArgs 2>$StdErrLogPath
-    $exitCode = $LASTEXITCODE
+    $resolved = Resolve-ClaudeInvocation
+    $fullArgs = @($resolved.PrefixArgs) + $claudeArgs
+    Write-AutoDevLog "claude 解決先: $($resolved.FileName) $($resolved.PrefixArgs -join ' ')"
+
+    # AUTODEV_RESULT等の最終出力解析用に、直近N行だけを保持する(全出力の無制限保持はしない)。
+    $maxBufferLines = 500
+    $stdoutBuffer = New-Object System.Collections.Generic.List[string]
+
+    $onStdOut = {
+        param($line)
+        $redacted = Get-RedactedText -Text $line
+        Write-Host "[claude] $redacted"
+        if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value "[claude][stdout] $redacted" -Encoding utf8 }
+        $stdoutBuffer.Add($line)
+        if ($stdoutBuffer.Count -gt $maxBufferLines) { $stdoutBuffer.RemoveAt(0) }
+    }.GetNewClosure()
+
+    $onStdErr = {
+        param($line)
+        $redacted = Get-RedactedText -Text $line
+        Write-Host "[claude:stderr] $redacted" -ForegroundColor Yellow
+        Add-Content -LiteralPath $StdErrLogPath -Value $redacted -Encoding utf8
+    }.GetNewClosure()
+
+    $result = Start-StreamedExternalProcess -FileName $resolved.FileName -ArgumentList $fullArgs -WorkingDirectory $WorkingDirectory `
+        -InputText $PromptText -OnStdOutLine $onStdOut -OnStdErrLine $onStdErr
+
     return [PSCustomObject]@{
-        Output   = $output
-        ExitCode = $exitCode
+        ExitCode    = $result.ExitCode
+        Cancelled   = $result.Cancelled
+        OutputLines = $stdoutBuffer.ToArray()
     }
 }
 
@@ -513,28 +753,39 @@ PowerShell側が行います。
 "@
             $fullPrompt = $basePrompt + $wrapperNote
 
-            # ── Claude Code 実行 (完全非対話) ──
-            Write-AutoDevLog "claude -p 実行開始 (MaxTurns=$MaxTurns)"
-            $claudeResult = Invoke-ClaudeAutoDev -PromptText $fullPrompt -MaxTurnsValue $MaxTurns -StdErrLogPath $stderrLogPath
-            Write-AutoDevLog "claude 終了 (exit=$($claudeResult.ExitCode))"
-
-            $stdoutText = ($claudeResult.Output -join "`n")
-            Add-Content -LiteralPath $script:LogFilePath -Value "----- claude stdout -----" -Encoding utf8
-            Add-Content -LiteralPath $script:LogFilePath -Value (Get-RedactedText -Text $stdoutText) -Encoding utf8
-            if (Test-Path -LiteralPath $stderrLogPath) {
-                $stderrText = Get-Content -LiteralPath $stderrLogPath -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
-                if ($stderrText) {
-                    Add-Content -LiteralPath $script:LogFilePath -Value "----- claude stderr -----" -Encoding utf8
-                    Add-Content -LiteralPath $script:LogFilePath -Value (Get-RedactedText -Text $stderrText) -Encoding utf8
-                }
+            # ── Claude Code 実行 (完全非対話、リアルタイム出力表示) ──
+            # Ctrl+CハンドラはClaude実行区間だけに限定して登録する(区間外はPowerShell既定の
+            # Ctrl+C挙動のままにするため、必ずfinallyで解除する)。
+            Write-AutoDevLog '[AutoDev] Claude起動'
+            Register-AutoDevCancelHandler
+            try {
+                Write-AutoDevLog "[AutoDev] Claude実行中 (MaxTurns=$MaxTurns)"
+                $claudeResult = Invoke-ClaudeAutoDev -PromptText $fullPrompt -MaxTurnsValue $MaxTurns -WorkingDirectory $ProjectRoot -StdErrLogPath $stderrLogPath
             }
+            finally {
+                Unregister-AutoDevCancelHandler
+            }
+            Write-AutoDevLog "[AutoDev] Claude終了 ExitCode=$($claudeResult.ExitCode)"
 
-            $parsed = Get-AutoDevResultFromOutput -OutputLines $claudeResult.Output
+            if ($claudeResult.Cancelled) {
+                # Ctrl+C: commit/push/git addは一切行わない。working treeもrestoreしない。
+                Write-AutoDevLog 'ユーザーによる中断(Ctrl+C)を検出しました。commit/push/git addは行わず終了します。' -Level 'WARN'
+                Write-FinalWrapperResult -Result 'CANCELLED' -Branch $dailyBranch -Reason 'USER_CANCELLED'
+                $script:FinalExitCode = 130
+            }
+            elseif ($claudeResult.ExitCode -ne 0) {
+                Write-AutoDevLog "claudeプロセスが異常終了しました(exit=$($claudeResult.ExitCode))。commitしません。" -Level 'ERROR'
+                Write-FinalWrapperResult -Result 'FAILED' -Branch $dailyBranch -Reason "CLAUDE_EXIT_$($claudeResult.ExitCode)"
+                $script:FinalExitCode = 5
+            }
+            else {
+
+            $parsed = Get-AutoDevResultFromOutput -OutputLines $claudeResult.OutputLines
             Write-AutoDevLog "解析結果: RESULT=$($parsed.Result) TASK=$($parsed.Task)"
 
             if ([string]::IsNullOrWhiteSpace($parsed.Result)) {
                 Write-AutoDevLog 'claude出力からAUTODEV_RESULTを解析できませんでした。commitしません。' -Level 'ERROR'
-                Write-FinalWrapperResult -Result 'FAILED' -Task $(if ($parsed.Task) { $parsed.Task } else { 'NONE' }) -Branch $dailyBranch -Reason 'AUTODEV_RESULTを出力から解析できませんでした'
+                Write-FinalWrapperResult -Result 'FAILED' -Task $(if ($parsed.Task) { $parsed.Task } else { 'NONE' }) -Branch $dailyBranch -Reason 'CLAUDE_RESULT_MISSING'
                 $script:FinalExitCode = 5
             }
             elseif ($parsed.Result -ne 'SUCCESS') {
@@ -549,6 +800,7 @@ PowerShell側が行います。
             }
             else {
                 # ── SUCCESS: PowerShell側で独立に安全検証してからでないとcommitしない ──
+                Write-AutoDevLog '[AutoDev] SUCCESS後安全チェック開始'
                 $unstagedCheck = Test-GitDiffCheckClean
                 $baselineOk = Test-BaselineUnchanged -BaselinePath $BaselineRelativePath
                 $changedPaths = Get-ChangedPaths
@@ -568,7 +820,7 @@ PowerShell側が行います。
                     $script:FinalExitCode = 5
                 }
                 else {
-                    Write-AutoDevLog '安全検証PASS。最終npm testを再実行します。'
+                    Write-AutoDevLog '[AutoDev] npm test開始'
                     $testOutput = Invoke-FinalNpmTest
                     $testExit = $LASTEXITCODE
                     Add-Content -LiteralPath $script:LogFilePath -Value "----- npm test (final) -----" -Encoding utf8
@@ -580,7 +832,7 @@ PowerShell側が行います。
                         $script:FinalExitCode = 5
                     }
                     else {
-                        Write-AutoDevLog 'npm test PASS。commitを実行します。'
+                        Write-AutoDevLog '[AutoDev] commit開始'
                         $commitHash = Invoke-AutoDevCommit -TaskId $parsed.Task
 
                         $pushed = $false
@@ -603,6 +855,7 @@ PowerShell側が行います。
                     }
                 }
             }
+            } # Cancelled/ExitCode!=0 チェックのelse(=claudeが正常終了しAUTODEV_RESULT解析へ進むケース)を閉じる
         }
         finally {
             Pop-Location
