@@ -23,6 +23,11 @@
 .PARAMETER NoPush
     指定した場合、SUCCESS時にcommitまでは行うが、GitHubへのpushは行わない。
 
+.PARAMETER ClaudeTimeoutMinutes
+    claude実行のハングを防ぐための制限時間(分)。超過した場合はtaskkillでclaudeプロセスtreeのみを
+    強制終了し、FAILED/REASON=CLAUDE_TIMEOUTとして終了する(commit/push/git addは一切行わない)。
+    0以下は指定不可(即座にエラー終了する)。
+
 .PARAMETER DryRun
     指定した場合、事前チェック(prerequisites / working tree / BaseBranch存在 / daily branch名 /
     Claude CLI存在 / 必須ファイル存在)のみ行う。Claudeは起動せず、branch作成・switch・
@@ -42,12 +47,18 @@
 param(
     [string]$BaseBranch = "feature/ward-expansion-20260817",
     [int]$MaxTurns = 24,
+    [int]$ClaudeTimeoutMinutes = 45,
     [switch]$NoPush,
     [switch]$DryRun
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+# claude実行のハングによるプロセス残留を防ぐための必須ガード。0以下は許可しない。
+if ($ClaudeTimeoutMinutes -le 0) {
+    throw "ClaudeTimeoutMinutesは正の値である必要があります(指定値=$ClaudeTimeoutMinutes)。"
+}
 
 # ══════════════════════════════════════════════════════════════
 # パス解決
@@ -372,7 +383,10 @@ function Start-StreamedExternalProcess {
         [string]$InputText,
         [Parameter(Mandatory = $true)][scriptblock]$OnStdOutLine,
         [Parameter(Mandatory = $true)][scriptblock]$OnStdErrLine,
-        [int]$PollIntervalMs = 100
+        [int]$PollIntervalMs = 100,
+        [double]$TimeoutMinutes = 0  # 0以下=タイムアウト無効。呼び出し元(Invoke-ClaudeAutoDev)は必ず正の値を渡す。
+                                     # [double]にしているのはテストで秒未満の粒度を指定できるようにするため
+                                     # (実際の呼び出し元は分単位の整数を渡すが、int→doubleの暗黙変換で問題なく通る)。
     )
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -402,33 +416,53 @@ function Start-StreamedExternalProcess {
     }
 
     $cancelled = $false
+    $timedOut = $false
+    $stdinFailed = $false
     try {
         [void]$process.Start()
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
 
-        if ($InputText) {
-            $bytes = [System.Text.Encoding]::UTF8.GetBytes($InputText)
-            $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
-            $process.StandardInput.BaseStream.Flush()
+        # ── stdin: 全文書込み→Flush→Close(EOF)を必ず行う ──
+        # Closeを省略/失敗すると、子プロセス側が「入力がまだ続くかもしれない」と待ち続け
+        # プロセスが残留する(今回の実機不具合の直接原因)。書込み自体が失敗した場合は
+        # ここで即座にFAILED相当として扱い、子プロセスをkillしてから抜ける。
+        try {
+            if ($InputText) {
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($InputText)
+                $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
+                $process.StandardInput.BaseStream.Flush()
+            }
+            $process.StandardInput.Close()
         }
-        $process.StandardInput.Close()
+        catch {
+            $stdinFailed = $true
+            Write-AutoDevLog "stdinへの書込み/Closeに失敗しました: $($_.Exception.Message)" -Level 'ERROR'
+            try { if (-not $process.HasExited) { & taskkill /PID $process.Id /T /F *> $null } } catch { }
+        }
 
         # [重要] & $OnStdOutLine 等のハンドラ呼び出しは[void](...)で必ず包む。ハンドラ内部が
         # (Write-Hostではなく)Write-Output等でパイプラインへ出力してしまった場合でも、それが
         # この関数自身の戻り値(最後のreturn文のPSCustomObject)を汚染しないようにするため。
-        while (-not $process.HasExited) {
-            $line = $null
-            while ($stdoutQueue.TryDequeue([ref]$line)) { [void](& $OnStdOutLine $line) }
-            while ($stderrQueue.TryDequeue([ref]$line)) { [void](& $OnStdErrLine $line) }
-            if ($script:CancelRequested) {
-                $cancelled = $true
-                break
+        $startedAt = Get-Date
+        if (-not $stdinFailed) {
+            while (-not $process.HasExited) {
+                $line = $null
+                while ($stdoutQueue.TryDequeue([ref]$line)) { [void](& $OnStdOutLine $line) }
+                while ($stderrQueue.TryDequeue([ref]$line)) { [void](& $OnStdErrLine $line) }
+                if ($script:CancelRequested) {
+                    $cancelled = $true
+                    break
+                }
+                if ($TimeoutMinutes -gt 0 -and ((Get-Date) - $startedAt).TotalMinutes -ge $TimeoutMinutes) {
+                    $timedOut = $true
+                    break
+                }
+                Start-Sleep -Milliseconds $PollIntervalMs
             }
-            Start-Sleep -Milliseconds $PollIntervalMs
         }
 
-        if ($cancelled) {
+        if ($cancelled -or $timedOut -or $stdinFailed) {
             try {
                 if (-not $process.HasExited) {
                     # .NET Framework(Windows PowerShell 5.1)のProcess.Kill()にはプロセスツリー一括
@@ -438,9 +472,14 @@ function Start-StreamedExternalProcess {
                 }
             }
             catch { }
+            # 非同期OutputDataReceived/ErrorDataReceivedが最後までflushされる猶予を持たせつつ、
+            # taskkill後も永久待機はしない(上限付きWaitForExit)。
             try { $process.WaitForExit(5000) | Out-Null } catch { }
         }
         else {
+            # 通常終了時: 非同期イベントが完全にflushされたことを保証するため、
+            # 引数無しのWaitForExit()(標準出力/エラーの完全読み切りを待つオーバーロード)を使う。
+            # ただし永久待機を避けるため、万一これが返らない場合に備えたタイムアウトも別途上のループ側で持つ。
             [void]$process.WaitForExit()
         }
 
@@ -450,8 +489,18 @@ function Start-StreamedExternalProcess {
         while ($stdoutQueue.TryDequeue([ref]$line)) { [void](& $OnStdOutLine $line) }
         while ($stderrQueue.TryDequeue([ref]$line)) { [void](& $OnStdErrLine $line) }
 
-        $exitCode = if ($cancelled) { 130 } else { $process.ExitCode }
-        return [PSCustomObject]@{ ExitCode = $exitCode; Cancelled = $cancelled; ProcessId = $process.Id }
+        $exitCode = -1
+        try { if ($process.HasExited) { $exitCode = $process.ExitCode } } catch { $exitCode = -1 }
+        if ($cancelled) { $exitCode = 130 }
+        elseif ($timedOut) { $exitCode = 124 }
+
+        return [PSCustomObject]@{
+            ExitCode         = $exitCode
+            Cancelled        = $cancelled
+            TimedOut         = $timedOut
+            StdinWriteFailed = $stdinFailed
+            ProcessId        = $process.Id
+        }
     }
     finally {
         try { Unregister-Event -SourceIdentifier $outSub.Name -ErrorAction SilentlyContinue } catch { }
@@ -463,18 +512,101 @@ function Start-StreamedExternalProcess {
 }
 
 # ══════════════════════════════════════════════════════════════
-# Claude Code 呼び出し (完全非対話モード、リアルタイム出力表示)
+# stream-json (JSONL) の1行を人間向け進捗表示へ変換する
+# ══════════════════════════════════════════════════════════════
+# Claude Code公式のstream-json形式を消費する。各プロパティアクセスはtry/catchで防御し、
+# スキーマの細部が想定と異なっていてもwrapper全体をクラッシュさせない(該当行は単に無視する)。
+# tool_useの引数は、巨大なcontent/new_string/old_string等は一切表示せず、
+# ファイルパスやパターンなど短い要約のみをConsoleへ出す。Bashのcommandはsecret maskする。
+function Get-ToolUseSummary {
+    param([string]$ToolName, $ToolInput)
+    if (-not $ToolInput) { return $null }
+    switch ($ToolName) {
+        'Read' { try { return "$($ToolInput.file_path)" } catch { return $null } }
+        'Write' { try { return "$($ToolInput.file_path)" } catch { return $null } }
+        'Edit' { try { return "$($ToolInput.file_path)" } catch { return $null } }
+        'Glob' { try { return "$($ToolInput.pattern)" } catch { return $null } }
+        'Grep' { try { return "$($ToolInput.pattern)" } catch { return $null } }
+        'Bash' {
+            try {
+                $cmd = Get-RedactedText -Text "$($ToolInput.command)"
+                if ($cmd.Length -gt 150) { $cmd = $cmd.Substring(0, 150) + '...' }
+                return $cmd
+            }
+            catch { return $null }
+        }
+        default { return $null }
+    }
+}
+
+# $ResultTextBoxは0〜1要素のList[string]。type="result"イベントに含まれる最終response textを
+# ここへ書き込む(呼び出し元がGetNewClosureで捕捉した同一インスタンスを渡す想定の"箱")。
+function Get-ClaudeProgressLines {
+    param($Json, [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ResultTextBox)
+    $lines = New-Object System.Collections.Generic.List[string]
+    $type = $null
+    try { $type = "$($Json.type)" } catch { $type = $null }
+
+    if ($type -eq 'system') {
+        $subtype = $null
+        try { $subtype = "$($Json.subtype)" } catch { $subtype = $null }
+        if ($subtype -eq 'init') { $lines.Add('[Claude] セッション開始') }
+    }
+    elseif ($type -eq 'assistant') {
+        $content = $null
+        try { $content = $Json.message.content } catch { $content = $null }
+        if ($content) {
+            foreach ($item in $content) {
+                $itemType = $null
+                try { $itemType = "$($item.type)" } catch { $itemType = $null }
+                if ($itemType -eq 'tool_use') {
+                    $toolName = 'Tool'
+                    try { if ($item.name) { $toolName = "$($item.name)" } } catch { }
+                    $summary = Get-ToolUseSummary -ToolName $toolName -ToolInput $item.input
+                    if ($summary) { $lines.Add("[Claude][$toolName] $summary") }
+                    else { $lines.Add("[Claude][$toolName]") }
+                }
+                elseif ($itemType -eq 'text') {
+                    $t = ''
+                    try { $t = "$($item.text)".Trim() } catch { $t = '' }
+                    if ($t.Length -gt 0) {
+                        # 内部思考・非公開の推論は扱わない(stream-jsonのcontentは公開message/tool eventのみ)。
+                        # 長文はConsole/ログを圧迫しないよう切り詰める。
+                        if ($t.Length -gt 200) { $t = $t.Substring(0, 200) + '...' }
+                        $lines.Add("[Claude] $t")
+                    }
+                }
+            }
+        }
+    }
+    elseif ($type -eq 'result') {
+        $resultText = $null
+        try { $resultText = $Json.result } catch { $resultText = $null }
+        if ($null -ne $resultText) {
+            $ResultTextBox.Clear()
+            $ResultTextBox.Add("$resultText")
+        }
+        $lines.Add('[Claude] 最終結果受信')
+    }
+    return , $lines.ToArray()
+}
+
+# ══════════════════════════════════════════════════════════════
+# Claude Code 呼び出し (完全非対話モード、stream-jsonのリアルタイム出力表示)
 # ══════════════════════════════════════════════════════════════
 function Invoke-ClaudeAutoDev {
     param(
         [Parameter(Mandatory = $true)][string]$PromptText,
         [Parameter(Mandatory = $true)][int]$MaxTurnsValue,
         [Parameter(Mandatory = $true)][string]$WorkingDirectory,
-        [Parameter(Mandatory = $true)][string]$StdErrLogPath
+        [Parameter(Mandatory = $true)][string]$StdErrLogPath,
+        [Parameter(Mandatory = $true)][int]$TimeoutMinutesValue
     )
-    # -p (print/非対話) + acceptEdits(ファイル編集は自動承認、Bashはallow/denyリストに従う)。
+    # -p (print/非対話) + acceptEdits(ファイル編集は自動承認、Bashはallow/denyリストに従う) +
+    # stream-json(逐次JSONLで進捗を取得するため)。入力(--input-format)は変更しない
+    # (既定のtext stdinのまま。今回の入力は単一の通常テキストpromptのため)。
     # --dangerously-skip-permissions は使用しない。
-    $claudeArgs = @('-p', '--permission-mode', 'acceptEdits', '--max-turns', "$MaxTurnsValue", '--output-format', 'text', '--allowedTools') `
+    $claudeArgs = @('-p', '--permission-mode', 'acceptEdits', '--max-turns', "$MaxTurnsValue", '--output-format', 'stream-json', '--verbose', '--allowedTools') `
         + $AllowedToolsList + @('--disallowedTools') + $DisallowedToolsList
 
     if (($claudeArgs -join ' ') -match 'dangerously-skip-permissions') {
@@ -485,17 +617,28 @@ function Invoke-ClaudeAutoDev {
     $fullArgs = @($resolved.PrefixArgs) + $claudeArgs
     Write-AutoDevLog "claude 解決先: $($resolved.FileName) $($resolved.PrefixArgs -join ' ')"
 
-    # AUTODEV_RESULT等の最終出力解析用に、直近N行だけを保持する(全出力の無制限保持はしない)。
-    $maxBufferLines = 500
-    $stdoutBuffer = New-Object System.Collections.Generic.List[string]
+    # type="result"イベントに含まれる最終response textをここへ捕捉する(0件または1件)。
+    $resultTextBox = New-Object System.Collections.Generic.List[string]
 
     $onStdOut = {
         param($line)
-        $redacted = Get-RedactedText -Text $line
-        Write-Host "[claude] $redacted"
-        if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value "[claude][stdout] $redacted" -Encoding utf8 }
-        $stdoutBuffer.Add($line)
-        if ($stdoutBuffer.Count -gt $maxBufferLines) { $stdoutBuffer.RemoveAt(0) }
+        # JSON parse可否に関わらず、まず元行(secret mask済み)をログへ残す。
+        $redactedRaw = Get-RedactedText -Text $line
+        if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value "[claude][json] $redactedRaw" -Encoding utf8 }
+
+        $json = $null
+        try { $json = $line | ConvertFrom-Json -ErrorAction Stop } catch { $json = $null }
+        if ($null -eq $json) {
+            # JSON parseに失敗した行はraw lineとしてログへ残すだけにし、wrapper全体は継続する。
+            return
+        }
+
+        $progressLines = Get-ClaudeProgressLines -Json $json -ResultTextBox $resultTextBox
+        foreach ($pl in $progressLines) {
+            $plRedacted = Get-RedactedText -Text $pl
+            Write-Host $plRedacted
+            if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value $plRedacted -Encoding utf8 }
+        }
     }.GetNewClosure()
 
     $onStdErr = {
@@ -506,22 +649,28 @@ function Invoke-ClaudeAutoDev {
     }.GetNewClosure()
 
     $result = Start-StreamedExternalProcess -FileName $resolved.FileName -ArgumentList $fullArgs -WorkingDirectory $WorkingDirectory `
-        -InputText $PromptText -OnStdOutLine $onStdOut -OnStdErrLine $onStdErr
+        -InputText $PromptText -OnStdOutLine $onStdOut -OnStdErrLine $onStdErr -TimeoutMinutes $TimeoutMinutesValue
+
+    $resultText = if ($resultTextBox.Count -gt 0) { $resultTextBox[0] } else { $null }
 
     return [PSCustomObject]@{
-        ExitCode    = $result.ExitCode
-        Cancelled   = $result.Cancelled
-        OutputLines = $stdoutBuffer.ToArray()
+        ExitCode         = $result.ExitCode
+        Cancelled        = $result.Cancelled
+        TimedOut         = $result.TimedOut
+        StdinWriteFailed = $result.StdinWriteFailed
+        ResultText       = $resultText
     }
 }
 
-function Get-AutoDevResultFromOutput {
-    param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]]$OutputLines)
-    $text = ($OutputLines -join "`n")
+# 最終result本文(type="result"イベントのresultフィールド)から、AUTODEV_RESULT=等を解析する。
+# JSONそのものへ直接regexをかけるのではなく、抽出済みの最終テキストに対して解析する。
+function Get-AutoDevResultFromText {
+    param([AllowNull()][AllowEmptyString()][string]$ResultText)
     $result = [PSCustomObject]@{ Result = $null; Task = $null; Branch = $null; Commit = $null; Report = $null }
+    if ([string]::IsNullOrWhiteSpace($ResultText)) { return $result }
     foreach ($key in @('Result', 'Task', 'Branch', 'Commit', 'Report')) {
         $fieldName = if ($key -eq 'Result') { 'AUTODEV_RESULT' } else { $key.ToUpper() }
-        $m = [regex]::Matches($text, "(?m)^$fieldName=(.*)$")
+        $m = [regex]::Matches($ResultText, "(?m)^$fieldName=(.*)$")
         if ($m.Count -gt 0) {
             $result.$key = $m[$m.Count - 1].Groups[1].Value.Trim()
         }
@@ -750,28 +899,44 @@ branchは既にPowerShell側で準備済みです。現在のbranchは $dailyBra
 Claude自身はgit branch / git switch / git checkout / git add / git commit / git push を
 実行しないでください(ツール権限上も許可されていません)。安全確認・commit・pushはすべて
 PowerShell側が行います。
+
+選択したBacklogタスクの直接対象でないCLAUDE.md、README、設計文書等をついでに更新しないこと。
+発見事項はAUTODEV_REPORT.mdへ書くだけにすること。
 "@
             $fullPrompt = $basePrompt + $wrapperNote
 
-            # ── Claude Code 実行 (完全非対話、リアルタイム出力表示) ──
+            # ── Claude Code 実行 (完全非対話、stream-jsonのリアルタイム出力表示) ──
             # Ctrl+CハンドラはClaude実行区間だけに限定して登録する(区間外はPowerShell既定の
             # Ctrl+C挙動のままにするため、必ずfinallyで解除する)。
             Write-AutoDevLog '[AutoDev] Claude起動'
             Register-AutoDevCancelHandler
             try {
-                Write-AutoDevLog "[AutoDev] Claude実行中 (MaxTurns=$MaxTurns)"
-                $claudeResult = Invoke-ClaudeAutoDev -PromptText $fullPrompt -MaxTurnsValue $MaxTurns -WorkingDirectory $ProjectRoot -StdErrLogPath $stderrLogPath
+                Write-AutoDevLog "[AutoDev] Claude実行中 (MaxTurns=$MaxTurns, TimeoutMinutes=$ClaudeTimeoutMinutes)"
+                $claudeResult = Invoke-ClaudeAutoDev -PromptText $fullPrompt -MaxTurnsValue $MaxTurns -WorkingDirectory $ProjectRoot -StdErrLogPath $stderrLogPath -TimeoutMinutesValue $ClaudeTimeoutMinutes
             }
             finally {
                 Unregister-AutoDevCancelHandler
             }
             Write-AutoDevLog "[AutoDev] Claude終了 ExitCode=$($claudeResult.ExitCode)"
+            Write-AutoDevLog '[Claude] セッション終了'
 
             if ($claudeResult.Cancelled) {
                 # Ctrl+C: commit/push/git addは一切行わない。working treeもrestoreしない。
                 Write-AutoDevLog 'ユーザーによる中断(Ctrl+C)を検出しました。commit/push/git addは行わず終了します。' -Level 'WARN'
                 Write-FinalWrapperResult -Result 'CANCELLED' -Branch $dailyBranch -Reason 'USER_CANCELLED'
                 $script:FinalExitCode = 130
+            }
+            elseif ($claudeResult.StdinWriteFailed) {
+                Write-AutoDevLog 'claudeへのstdin書込みに失敗しました。commitしません。' -Level 'ERROR'
+                Write-FinalWrapperResult -Result 'FAILED' -Branch $dailyBranch -Reason 'CLAUDE_STDIN_WRITE_FAILED'
+                $script:FinalExitCode = 5
+            }
+            elseif ($claudeResult.TimedOut) {
+                # ハング対策: 制限時間超過。Claude process treeだけをtaskkillで終了済み(Start-StreamedExternalProcess内)。
+                # main/BaseBranchには一切触れず、commit/push/git addも行わない。lockはfinallyで解放される。
+                Write-AutoDevLog "claude実行が制限時間(${ClaudeTimeoutMinutes}分)を超過したため強制終了しました。commitしません。" -Level 'ERROR'
+                Write-FinalWrapperResult -Result 'FAILED' -Branch $dailyBranch -Reason 'CLAUDE_TIMEOUT'
+                $script:FinalExitCode = 5
             }
             elseif ($claudeResult.ExitCode -ne 0) {
                 Write-AutoDevLog "claudeプロセスが異常終了しました(exit=$($claudeResult.ExitCode))。commitしません。" -Level 'ERROR'
@@ -780,7 +945,7 @@ PowerShell側が行います。
             }
             else {
 
-            $parsed = Get-AutoDevResultFromOutput -OutputLines $claudeResult.OutputLines
+            $parsed = Get-AutoDevResultFromText -ResultText $claudeResult.ResultText
             Write-AutoDevLog "解析結果: RESULT=$($parsed.Result) TASK=$($parsed.Task)"
 
             if ([string]::IsNullOrWhiteSpace($parsed.Result)) {
