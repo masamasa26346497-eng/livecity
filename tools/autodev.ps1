@@ -540,7 +540,8 @@ function Get-ToolUseSummary {
 }
 
 # $ResultTextBoxは0〜1要素のList[string]。type="result"イベントに含まれる最終response textを
-# ここへ書き込む(呼び出し元がGetNewClosureで捕捉した同一インスタンスを渡す想定の"箱")。
+# ここへ書き込む(呼び出し元のInvoke-ClaudeAutoDevがローカル変数として持つ同一インスタンスを、
+# ダイナミックスコープ経由ではなく明示的にパラメータとして渡す想定の"箱")。
 function Get-ClaudeProgressLines {
     param($Json, [Parameter(Mandatory = $true)][AllowEmptyCollection()][System.Collections.Generic.List[string]]$ResultTextBox)
     $lines = New-Object System.Collections.Generic.List[string]
@@ -620,6 +621,16 @@ function Invoke-ClaudeAutoDev {
     # type="result"イベントに含まれる最終response textをここへ捕捉する(0件または1件)。
     $resultTextBox = New-Object System.Collections.Generic.List[string]
 
+    # [callback scope修正] .GetNewClosure()は付けない。
+    # GetNewClosure()はスクリプトブロックへ変数の値を"キャプチャ"して独立させる一方、
+    # このスクリプト内でfunctionとして定義済みのGet-RedactedText/Get-ClaudeProgressLines等の
+    # コマンド名解決を壊すことを実機・単体テストの両方で確認した(closure化すると
+    # 「Get-RedactedText はコマンドレット、関数、スクリプトとして認識されません」で失敗する)。
+    # GetNewClosure()を外しても、Start-StreamedExternalProcessが
+    # `& $OnStdOutLine $line` を同期実行するのはInvoke-ClaudeAutoDevがまだcall stack上に
+    # 存在する間だけであるため、PowerShellの通常のダイナミックスコープにより
+    # $resultTextBox / $StdErrLogPath 等のこの関数のローカル変数は問題なく参照できる
+    # (単体テストで検証済み)。
     $onStdOut = {
         param($line)
         # JSON parse可否に関わらず、まず元行(secret mask済み)をログへ残す。
@@ -639,14 +650,14 @@ function Invoke-ClaudeAutoDev {
             Write-Host $plRedacted
             if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value $plRedacted -Encoding utf8 }
         }
-    }.GetNewClosure()
+    }
 
     $onStdErr = {
         param($line)
         $redacted = Get-RedactedText -Text $line
         Write-Host "[claude:stderr] $redacted" -ForegroundColor Yellow
         Add-Content -LiteralPath $StdErrLogPath -Value $redacted -Encoding utf8
-    }.GetNewClosure()
+    }
 
     $result = Start-StreamedExternalProcess -FileName $resolved.FileName -ArgumentList $fullArgs -WorkingDirectory $WorkingDirectory `
         -InputText $PromptText -OnStdOutLine $onStdOut -OnStdErrLine $onStdErr -TimeoutMinutes $TimeoutMinutesValue
