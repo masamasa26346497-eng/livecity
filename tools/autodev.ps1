@@ -607,7 +607,7 @@ function Invoke-ClaudeAutoDev {
     # stream-json(逐次JSONLで進捗を取得するため)。入力(--input-format)は変更しない
     # (既定のtext stdinのまま。今回の入力は単一の通常テキストpromptのため)。
     # --dangerously-skip-permissions は使用しない。
-    $claudeArgs = @('-p', '--permission-mode', 'acceptEdits', '--max-turns', "$MaxTurnsValue", '--output-format', 'stream-json', '--verbose', '--allowedTools') `
+    $claudeArgs = @('-p', '--permission-mode', 'dontAsk', '--max-turns', "$MaxTurnsValue", '--output-format', 'stream-json', '--verbose', '--allowedTools') `
         + $AllowedToolsList + @('--disallowedTools') + $DisallowedToolsList
 
     if (($claudeArgs -join ' ') -match 'dangerously-skip-permissions') {
@@ -913,6 +913,17 @@ PowerShell側が行います。
 
 選択したBacklogタスクの直接対象でないCLAUDE.md、README、設計文書等をついでに更新しないこと。
 発見事項はAUTODEV_REPORT.mdへ書くだけにすること。
+
+選択タスクについて必要な調査・実装・必須テストが完了し、受入条件を満たした時点で追加調査を停止すること。
+その後は直ちに
+1. AUTODEV_BACKLOG.mdを完了[x]へ更新
+2. AUTODEV_REPORT.mdを更新
+3. git diff --check等の必須最終確認
+4. AUTODEV_RESULTを含む最終回答
+へ進むこと。
+関連コードや別課題を追加で探索し続けないこと。
+新しい問題を発見しても、現在タスクの完了を妨げない場合はAUTODEV_REPORT.mdの残課題へ記録するだけにして終了すること。
+CLAUDE.md、README、設計文書等のタスク外ファイルは変更しないこと。
 "@
             $fullPrompt = $basePrompt + $wrapperNote
 
