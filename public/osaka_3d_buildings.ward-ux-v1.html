@@ -6685,7 +6685,13 @@ const TOWN_POLYGONS = {"住吉区我孫子4丁目":[[[-1509.04,439.52],[-1554.43
 function pickHit(e){mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;
   ray.setFromCamera(mouse,camera);const hits=ray.intersectObjects(bMesh,false);
   if(!hits.length) return null;
-  const d = resolveBuildingFromHit(hits[0]);
+  // [AutoDev P0-2] bMeshにはloaded-hidden(WARM)タイルのメッシュも含まれ、three.jsのraycastは
+  // mesh.visible=falseでも自動除外しない。hits[0]をそのまま使うと画面上に見えていない
+  // (hide()済みの)建物が手前に判定され、実際にクリックした場所の建物より優先されてしまう。
+  // 現在visible(=画面に描画中)なメッシュへの最初のヒットのみを採用する。
+  const hit = hits.find(h => h.object.visible !== false);
+  if (!hit) return null;
+  const d = resolveBuildingFromHit(hit);
   return d ? {d} : null;}
 function showTip(e,h){const d=h.d;
   tip.style.cssText=`display:block;left:${e.clientX+16}px;top:${e.clientY-12}px`;
