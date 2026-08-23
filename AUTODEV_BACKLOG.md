@@ -1,4 +1,4 @@
-# Live City Auto Development Backlog
+﻿# Live City Auto Development Backlog
 
 ## 運用原則
 
@@ -49,7 +49,7 @@ Ward lifecycleそのものを変更しないこと。
 
 ## P0-2 WARM / picking問題の調査
 
-[ ] hidden/disposed datasetとbuilding picking/raycastの現在の挙動を調査する
+[x] hidden/disposed datasetとbuilding picking/raycastの現在の挙動を調査する
 
 目的:
 
