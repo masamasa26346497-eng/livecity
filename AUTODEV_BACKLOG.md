@@ -70,7 +70,7 @@ NEEDS_USER_DECISION
 
 ## P0-3 superseded load cleanup調査
 
-[ ] FullWardManagerのsuperseded loadで残るhidden tile/metadataについて調査する
+[x] FullWardManagerのsuperseded loadで残るhidden tile/metadataについて調査する
 
 目的:
 
