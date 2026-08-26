@@ -130,6 +130,38 @@ function Get-RedactedText {
     return $safe
 }
 
+function Add-AutoDevLogContentSafe {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Value,
+        [int]$MaxAttempts = 5,
+        [int]$InitialDelayMs = 75
+    )
+
+    $delayMs = [Math]::Max(1, $InitialDelayMs)
+
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        try {
+            Add-Content -LiteralPath $Path -Value $Value -Encoding utf8 -ErrorAction Stop
+            return
+        }
+        catch [System.IO.IOException] {
+            if ($attempt -lt $MaxAttempts) {
+                Start-Sleep -Milliseconds $delayMs
+                $delayMs = [Math]::Min($delayMs * 2, 1200)
+                continue
+            }
+
+            Write-Host "[AutoDev][WARN] ログ書込みを継続できませんでした(IO retry exhausted): $Path" -ForegroundColor Yellow
+            return
+        }
+        catch {
+            Write-Host "[AutoDev][WARN] ログ書込みをスキップしました: $Path ($($_.Exception.Message))" -ForegroundColor Yellow
+            return
+        }
+    }
+}
+
 function Write-AutoDevLog {
     param(
         [Parameter(Mandatory = $true)][string]$Message,
@@ -140,7 +172,7 @@ function Write-AutoDevLog {
     $line = "[$ts][$Level] $safe"
     Write-Host $line
     if ($script:LogFilePath) {
-        Add-Content -LiteralPath $script:LogFilePath -Value $line -Encoding utf8
+        Add-AutoDevLogContentSafe -Path $script:LogFilePath -Value $line
     }
 }
 
@@ -418,8 +450,10 @@ function Start-StreamedExternalProcess {
     $cancelled = $false
     $timedOut = $false
     $stdinFailed = $false
+    $processStarted = $false
     try {
         [void]$process.Start()
+        $processStarted = $true
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
 
@@ -503,6 +537,14 @@ function Start-StreamedExternalProcess {
         }
     }
     finally {
+        try {
+            if ($processStarted -and -not $process.HasExited) {
+                & taskkill /PID $process.Id /T /F *> $null
+                try { $process.WaitForExit(5000) | Out-Null } catch { }
+            }
+        }
+        catch { }
+
         try { Unregister-Event -SourceIdentifier $outSub.Name -ErrorAction SilentlyContinue } catch { }
         try { Unregister-Event -SourceIdentifier $errSub.Name -ErrorAction SilentlyContinue } catch { }
         try { Remove-Job -Id $outSub.Id -Force -ErrorAction SilentlyContinue } catch { }
@@ -635,7 +677,7 @@ function Invoke-ClaudeAutoDev {
         param($line)
         # JSON parse可否に関わらず、まず元行(secret mask済み)をログへ残す。
         $redactedRaw = Get-RedactedText -Text $line
-        if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value "[claude][json] $redactedRaw" -Encoding utf8 }
+        if ($script:LogFilePath) { Add-AutoDevLogContentSafe -Path $script:LogFilePath -Value "[claude][json] $redactedRaw" }
 
         $json = $null
         try { $json = $line | ConvertFrom-Json -ErrorAction Stop } catch { $json = $null }
@@ -648,7 +690,7 @@ function Invoke-ClaudeAutoDev {
         foreach ($pl in $progressLines) {
             $plRedacted = Get-RedactedText -Text $pl
             Write-Host $plRedacted
-            if ($script:LogFilePath) { Add-Content -LiteralPath $script:LogFilePath -Value $plRedacted -Encoding utf8 }
+            if ($script:LogFilePath) { Add-AutoDevLogContentSafe -Path $script:LogFilePath -Value $plRedacted }
         }
     }
 
@@ -656,7 +698,7 @@ function Invoke-ClaudeAutoDev {
         param($line)
         $redacted = Get-RedactedText -Text $line
         Write-Host "[claude:stderr] $redacted" -ForegroundColor Yellow
-        Add-Content -LiteralPath $StdErrLogPath -Value $redacted -Encoding utf8
+        Add-AutoDevLogContentSafe -Path $StdErrLogPath -Value $redacted
     }
 
     $result = Start-StreamedExternalProcess -FileName $resolved.FileName -ArgumentList $fullArgs -WorkingDirectory $WorkingDirectory `
@@ -1010,8 +1052,8 @@ CLAUDE.md、README、設計文書等のタスク外ファイルは変更しな�
                     Write-AutoDevLog '[AutoDev] npm test開始'
                     $testOutput = Invoke-FinalNpmTest
                     $testExit = $LASTEXITCODE
-                    Add-Content -LiteralPath $script:LogFilePath -Value "----- npm test (final) -----" -Encoding utf8
-                    Add-Content -LiteralPath $script:LogFilePath -Value (Get-RedactedText -Text ($testOutput -join "`n")) -Encoding utf8
+                    Add-AutoDevLogContentSafe -Path $script:LogFilePath -Value "----- npm test (final) -----"
+                    Add-AutoDevLogContentSafe -Path $script:LogFilePath -Value (Get-RedactedText -Text ($testOutput -join "`n"))
 
                     if ($testExit -ne 0) {
                         Write-AutoDevLog "最終npm testがfailしました(exit=$testExit)。commitしません。" -Level 'ERROR'
@@ -1055,15 +1097,15 @@ catch {
         $parts = $msg -split '\|', 3
         $code = $parts[1]
         $reason = if ($parts.Count -ge 3) { $parts[2] } else { '' }
+        $script:FinalExitCode = 2
         Write-AutoDevLog "AUTODEV_ABORTED=$code $reason" -Level 'WARN'
         Write-Host "AUTODEV_ABORTED=$code"
         Write-FinalWrapperResult -Result 'FAILED' -Reason $reason
-        $script:FinalExitCode = 2
     }
     else {
+        $script:FinalExitCode = 1
         Write-AutoDevLog "予期しないエラー: $msg" -Level 'ERROR'
         Write-FinalWrapperResult -Result 'FAILED' -Reason $msg
-        $script:FinalExitCode = 1
     }
 }
 finally {
