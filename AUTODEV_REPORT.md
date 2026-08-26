@@ -176,3 +176,45 @@ P1-1の追加判断を以下で確定する。
 判断が足りない場合は質問文で終了せず、
 AUTODEV_RESULT=NEEDS_USER_DECISION
 を必ず出力し、判断事項をAUTODEV_REPORT.mdへ記録すること。
+
+## REAL_N03_VALIDATION 2026-08-27
+
+実N03 2026大阪府GeoJSONで以下を確認した。
+
+- 大阪市の行政区数: 24
+- 大阪市に該当するsource Feature数: 39
+- geometry: MultiPolygon 39件
+- N03_004 = "大阪市"
+- N03_005 = 行政区名（例: "都島区"）
+- N03_007 = 5桁の全国地方公共団体コード
+
+P1-1の実装を以下の通り修正する。
+
+1. N03属性対応
+   - N03_005 は ward name として扱う。
+   - N03_007 は ward code として扱う。
+   - N03_005 と config/wards/registry.json の ward.name を照合する。
+   - N03_007 と registry の ward.code を照合する。
+   - name/codeのどちらか一方でも不一致ならfail-fastする。
+
+2. 複数Feature
+   - 同一wardCodeの複数Feature出現は正常データとして扱う。
+   - 重複エラーにしてはならない。
+   - 同一区の複数Polygon/MultiPolygonを1 ward recordへ安全に統合する。
+   - source feature数もmetadataへ保持する。
+   - 最終結果は大阪市24 ward recordsになることを検証する。
+
+3. fixture/test
+   - synthetic N03 fixtureを実N03 schemaに合わせて修正する。
+   - N03_005に区名、N03_007に5桁codeを格納する。
+   - 同一区が複数Featureに分割されるfixtureを追加する。
+   - 24区/39 Feature相当の構造を扱えることをテストする。
+   - name/code mismatchはfail-fastすることをテストする。
+
+4. production保護
+   - 実N03原本は変更しない。
+   - 既存3区datasetおよびprotected HTMLは変更しない。
+   - config/areas/osaka-city.jsonはまだproduction確定しない。
+   - WGS84構造検証を先に完了する。
+
+この実データ確認結果はユーザー判断済みとして扱い、対話質問せず修正を進める。
