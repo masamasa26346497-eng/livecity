@@ -156,3 +156,23 @@ P1-1のユーザー判断を以下で確定する。
    - validatorを通してから段階的にregistryのdataReadyを更新する。
 
 この決定を前提にP1-1を再開する。
+
+## USER_DECISION 2026-08-26 P1-1 continuation
+
+P1-1の追加判断を以下で確定する。
+
+- Option 2を採用する。
+- 実N03データの取得を待たず、まずN03 ingestion toolを実装する。
+- synthetic fixtureを使用したテストを許可する。
+- fixtureは国土交通省「国土数値情報 N03 行政区域データ 2026年版」の公式schemaを根拠に作成する。
+- 少なくとも N03_001, N03_004, N03_005, N03_007 と Polygon/MultiPolygon geometry を検証対象にする。
+- 大阪府 / 大阪市 / 24行政区以外を誤って採用しないようfail-fastで検証する。
+- 実データ投入時にschema不一致があれば推測で補正せずエラー終了する。
+- productionデータ、既存3区、config/areas/osaka-sumiyoshi.jsonはこの段階では変更しない。
+- config/areas/osaka-city.jsonのproduction確定も実N03検証後とする。
+- 実N03ファイル取得後、synthetic fixtureとのschema整合性を必ず再検証する。
+
+またAutoDev無人実行中はユーザーへ対話質問を出さないこと。
+判断が足りない場合は質問文で終了せず、
+AUTODEV_RESULT=NEEDS_USER_DECISION
+を必ず出力し、判断事項をAUTODEV_REPORT.mdへ記録すること。
