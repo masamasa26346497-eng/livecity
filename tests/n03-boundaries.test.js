@@ -6,6 +6,12 @@
 // - N03_001, N03_004, N03_005, N03_007 + Polygon/MultiPolygon geometryを検証対象にする。
 // - schema不一致・大阪府/大阪市24区以外の誤採用はfail-fastで例外にする(推測補正しない)。
 // - productionデータ・既存3区・config/areas/osaka-sumiyoshi.jsonはこの段階では変更しない。
+//
+// AUTODEV_REPORT.md 2026-08-27 REAL_N03_VALIDATION(実N03 2026大阪府GeoJSONで確認済みのスキーマ):
+// - N03_004 = 市区町村名("大阪市"。区名は含まない)
+// - N03_005 = 行政区名(例: "都島区")、N03_007 = 5桁全国地方公共団体コード
+// - 同一区が複数Featureに分かれて出現するのは正常(大阪市24区が39 Featureで出現することを確認済み)。
+//   重複エラーにはせず、1 ward recordへ統合する。
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'fs';
@@ -32,6 +38,19 @@ test('N03取り込み: fixtureの大阪市3区(住吉区/東住吉区/平野区)
   assert.equal(result.outOfScopeCount, 2); // 京都市中京区、堺市堺区
   const wardIds = result.records.map((r) => r.wardId).sort();
   assert.deepEqual(wardIds, ['higashisumiyoshi', 'hirano', 'sumiyoshi']);
+});
+
+test('N03取り込み: 同一区が複数Featureに分かれて出現する場合(平野区)、エラーにせず1 ward recordへ統合する', () => {
+  const result = ingestN03FeatureCollection(FIXTURE, REGISTRY);
+  const hirano = result.records.find((r) => r.wardId === 'hirano');
+  assert.equal(hirano.sourceFeatureCount, 2);
+  assert.equal(hirano.geometryType, 'MultiPolygon');
+  assert.equal(hirano.geometry.raw.type, 'MultiPolygon');
+  assert.equal(hirano.geometry.raw.coordinates.length, 2);
+
+  const sumiyoshi = result.records.find((r) => r.wardId === 'sumiyoshi');
+  assert.equal(sumiyoshi.sourceFeatureCount, 1);
+  assert.equal(sumiyoshi.geometryType, 'Polygon');
 });
 
 test('N03取り込み: 未取得の21区がmissingWardsとして報告される', () => {
@@ -71,7 +90,7 @@ test('N03取り込み: projectionを渡した場合、既存projection.jsの式�
 test('N03取り込み: 出典データ(sourceProperties)にN03_001/004/005/007が原文のまま保持される', () => {
   const result = ingestN03FeatureCollection(FIXTURE, REGISTRY);
   const sumiyoshi = result.records.find((r) => r.wardId === 'sumiyoshi');
-  assert.deepEqual(sumiyoshi.sourceProperties, { N03_001: '大阪府', N03_004: '大阪市住吉区', N03_005: '27120', N03_007: '27120' });
+  assert.deepEqual(sumiyoshi.sourceProperties, { N03_001: '大阪府', N03_004: '大阪市', N03_005: '住吉区', N03_007: '27120' });
 });
 
 test('N03スキーマ検証: 必須フィールド(N03_007)が欠落しているとfail-fastで例外を投げる', () => {
@@ -104,26 +123,53 @@ test('N03スキーマ検証: geometry座標にNaN相当(数値でない値)が�
   assert.throws(() => ingestN03FeatureCollection(bad, REGISTRY));
 });
 
-test('N03スキーマ検証: N03_005が登録区codeと一致するがN03_004に区名が含まれない場合、コード/名称不一致としてfail-fastになる', () => {
-  const props = { N03_001: '大阪府', N03_004: '大阪市天王寺区', N03_005: '27120', N03_007: '27120' };
+test('N03スキーマ検証: N03_007のコードとN03_005の名称が別々の区を指す場合、コード/名称不一致としてfail-fastになる', () => {
+  const props = { N03_001: '大阪府', N03_004: '大阪市', N03_005: '天王寺区', N03_007: '27120' }; // code=住吉区, name=天王寺区
   assert.throws(() => resolveWardScope(props, REGISTRY, { properties: props }, 0), /コードと名称が不一致/);
 });
 
-test('N03スキーマ検証: 大阪市を含むがどの区codeとも一致しない場合、未知の区としてfail-fastになる', () => {
-  const props = { N03_001: '大阪府', N03_004: '大阪市どこか区', N03_005: '99999', N03_007: '99999' };
-  assert.throws(() => resolveWardScope(props, REGISTRY, { properties: props }, 0), /どの区codeとも一致しません/);
+test('N03スキーマ検証: 大阪市所属だがN03_007・N03_005のどちらもどの登録区とも一致しない場合、未知の区としてfail-fastになる', () => {
+  const props = { N03_001: '大阪府', N03_004: '大阪市', N03_005: 'どこか区', N03_007: '99999' };
+  assert.throws(() => resolveWardScope(props, REGISTRY, { properties: props }, 0), /どの区とも一致しません/);
 });
 
 test('N03スキーマ検証: 大阪市に無関係な大阪府内市町村はスコープ外として正常に除外される(例外にしない)', () => {
-  const props = { N03_001: '大阪府', N03_004: '豊中市', N03_005: '27203', N03_007: '27203' };
+  const props = { N03_001: '大阪府', N03_004: '豊中市', N03_005: '豊中市', N03_007: '27203' };
   const scope = resolveWardScope(props, REGISTRY, { properties: props }, 0);
   assert.equal(scope.inScope, false);
 });
 
-test('N03スキーマ検証: 同じ区codeが複数回出現する場合はfail-fastで例外を投げる', () => {
-  const bad = clone(FIXTURE);
-  bad.features.push(clone(FIXTURE.features[0]));
-  assert.throws(() => ingestN03FeatureCollection(bad, REGISTRY), /複数回出現/);
+test('N03取り込み: 大阪市24区・39 Feature相当のデータを取り込むと24 ward recordsに統合される(複数Featureは同一区として統合)', () => {
+  const features = [];
+  REGISTRY.wards.forEach((ward, i) => {
+    const splitCount = i < 15 ? 2 : 1; // 24区中15区を2Featureに分割 => 15*2 + 9*1 = 39 features
+    for (let j = 0; j < splitCount; j++) {
+      features.push({
+        type: 'Feature',
+        properties: { N03_001: '大阪府', N03_004: '大阪市', N03_005: ward.name, N03_007: ward.code },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[135 + i * 0.02, 34 + j * 0.02], [135 + i * 0.02 + 0.01, 34 + j * 0.02], [135 + i * 0.02 + 0.01, 34 + j * 0.02 + 0.01], [135 + i * 0.02, 34 + j * 0.02 + 0.01], [135 + i * 0.02, 34 + j * 0.02]]],
+        },
+      });
+    }
+  });
+  const fc = { type: 'FeatureCollection', name: 'synthetic-full-city-24ward-39feature', features };
+  assert.equal(fc.features.length, 39);
+
+  const result = ingestN03FeatureCollection(fc, REGISTRY);
+  assert.equal(result.recordCount, 24);
+  assert.equal(result.missingWards.length, 0);
+  assert.equal(result.outOfScopeCount, 0);
+
+  const splitRecords = result.records.filter((r) => r.sourceFeatureCount === 2);
+  const singleRecords = result.records.filter((r) => r.sourceFeatureCount === 1);
+  assert.equal(splitRecords.length, 15);
+  assert.equal(singleRecords.length, 9);
+  for (const r of splitRecords) {
+    assert.equal(r.geometryType, 'MultiPolygon');
+    assert.equal(r.geometry.raw.coordinates.length, 2);
+  }
 });
 
 test('N03スキーマ検証: registryにwards配列が無い場合はfail-fastで例外を投げる', () => {

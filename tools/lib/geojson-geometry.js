@@ -91,3 +91,26 @@ export function convertGeometryToRings(geometry, projection) {
   }
   return rings;
 }
+
+/**
+ * 同一行政区が複数Feature(複数Polygon/MultiPolygon)に分かれて出現する場合に、
+ * 1つのMultiPolygon geometryへ統合する(N03行政区域データでは同一区が複数Featureに
+ * 分割されて出現するのが正常なデータ形であり、飛び地の扱いと同様にフラットな
+ * Polygon群として扱う)。
+ * @param {object[]} geometries 検証済みのPolygon/MultiPolygon geometryの配列
+ */
+export function mergeGeometriesToMultiPolygon(geometries) {
+  const polygons = [];
+  for (const geometry of geometries) {
+    if (geometry.type === 'Polygon') {
+      polygons.push(geometry.coordinates);
+    } else if (geometry.type === 'MultiPolygon') {
+      for (const polygonCoords of geometry.coordinates) {
+        polygons.push(polygonCoords);
+      }
+    } else {
+      throw new Error(`mergeGeometriesToMultiPolygon: 未対応のgeometry.type "${geometry.type}"(Polygon/MultiPolygonのみ対応)`);
+    }
+  }
+  return { type: 'MultiPolygon', coordinates: polygons };
+}

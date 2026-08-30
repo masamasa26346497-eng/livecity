@@ -6,21 +6,29 @@
 // まずschema検証・取り込みロジック自体をsynthetic fixtureで検証する段階（P1-1 continuation）。
 //
 // 【検証対象フィールド(ユーザー確定)】N03_001, N03_004, N03_005, N03_007 + Polygon/MultiPolygon geometry。
-// N03_007の意味論はこの時点では未確認のため、値の存在・非空文字列であることのみ検証し、
-// 意味を持つフィールド名へは変換しない(sourcePropertiesとして原文のまま保持する)。
-// N03_005(5桁行政区域コード)は config/wards/registry.json の各区の code フィールドと同じ
-// JIS行政区域コードをそのまま指すため、この一致判定で大阪市24区を安全に判定できる。
+//
+// 【REAL_N03_VALIDATION 2026-08-27で確定した実スキーマ】実N03 2026大阪府GeoJSONで確認済み:
+// - N03_004 = 市区町村名("大阪市"等。区名は含まない)
+// - N03_005 = 行政区名(例: "都島区"。config/wards/registry.jsonのward.nameと照合する)
+// - N03_007 = 5桁の全国地方公共団体コード(config/wards/registry.jsonのward.codeと照合する)
+// N03_005/N03_007のどちらか一方でも登録区と一致しない場合はコード/名称不一致としてfail-fastする。
+//
+// 【複数Feature】同一区(同一N03_005/N03_007)が複数Featureに分かれて出現するのは正常なデータ形
+// (実データで大阪市24区が39 Featureに分かれて出現することを確認済み)。重複エラーにはせず、
+// 同一区のPolygon/MultiPolygonを1つのward recordへ統合する(mergeGeometriesToMultiPolygon)。
 //
 // 実データ投入時にこのスキーマと一致しない場合は、推測で補正せず例外を投げて処理を中止する
 // (fail-fast。1件だけスキップして処理を続行する既存のe-Stat取り込みツールとは意図的に方針を変えている)。
-import { validateGeometryStructure, convertGeometryToRings } from './geojson-geometry.js';
+import { validateGeometryStructure, convertGeometryToRings, mergeGeometriesToMultiPolygon } from './geojson-geometry.js';
 
 export const REQUIRED_N03_PROPS = ['N03_001', 'N03_004', 'N03_005', 'N03_007'];
 export const TARGET_PREFECTURE = '大阪府';
 
 function describeFeature(feature, index) {
-  const code = feature?.properties?.N03_005;
-  return `feature[${index}]${code ? ` (N03_005=${code})` : ''}`;
+  const name = feature?.properties?.N03_005;
+  const code = feature?.properties?.N03_007;
+  if (!name && !code) return `feature[${index}]`;
+  return `feature[${index}] (N03_005=${name ?? ''}, N03_007=${code ?? ''})`;
 }
 
 /**
@@ -48,34 +56,39 @@ export function validateN03Properties(feature, index) {
 /**
  * 大阪府/大阪市24区の対象範囲を判定する。
  * - N03_001が「大阪府」以外 → スコープ外(正常。全国データの大部分はこれに該当する)
- * - N03_001が「大阪府」かつN03_005がregistryのいずれかの区codeと一致 → 対象区
- *   (ただしN03_004にその区名が含まれていない場合は、コードと名称の不一致としてfail-fast)
- * - N03_001が「大阪府」かつN03_004に「大阪市」を含むがN03_005がどの区codeとも一致しない
- *   → 想定外のデータとしてfail-fast(黙って除外しない)
- * - N03_001が「大阪府」だが大阪市に無関係(他市町村) → スコープ外(正常)
+ * - N03_004がregistry.city(「大阪市」)と一致しない → スコープ外(正常。大阪府内の他市町村)
+ * - N03_004が「大阪市」かつN03_007(区code)・N03_005(区名)が同一のregistry区を指す → 対象区
+ * - N03_004が「大阪市」だがN03_007・N03_005のどちらか一方だけが登録区と一致(コード/名称の
+ *   指す区が食い違う、または片方だけ一致) → コード/名称不一致としてfail-fast
+ * - N03_004が「大阪市」だがN03_007・N03_005のどちらもどの登録区とも一致しない
+ *   → 未知の区としてfail-fast(黙って除外しない)
  */
 export function resolveWardScope(props, registry, feature, index) {
   if (props.N03_001 !== TARGET_PREFECTURE) {
     return { inScope: false };
   }
-  const ward = registry.wards.find((w) => w.code === props.N03_005);
-  if (ward) {
-    if (!props.N03_004.includes(ward.name)) {
-      throw new Error(
-        `${describeFeature(feature, index)}: N03_005="${props.N03_005}" はregistry上「${ward.name}」だが、` +
-        `N03_004="${props.N03_004}" に区名が含まれていません。コードと名称が不一致のため取り込みを中止します。`
-      );
-    }
-    return { inScope: true, wardId: ward.id, wardCode: ward.code, wardName: ward.name };
+  if (props.N03_004 !== registry.city) {
+    return { inScope: false };
   }
-  if (props.N03_004.includes(registry.city)) {
+
+  const wardByCode = registry.wards.find((w) => w.code === props.N03_007);
+  const wardByName = registry.wards.find((w) => w.name === props.N03_005);
+
+  if (wardByCode && wardByName && wardByCode.id === wardByName.id) {
+    return { inScope: true, wardId: wardByCode.id, wardCode: wardByCode.code, wardName: wardByCode.name };
+  }
+  if (wardByCode || wardByName) {
     throw new Error(
-      `${describeFeature(feature, index)}: N03_004="${props.N03_004}" は${registry.city}を含みますが、` +
-      `N03_005="${props.N03_005}" はconfig/wards/registry.jsonのどの区codeとも一致しません。` +
-      `未知の区、またはコード不一致のため取り込みを中止します。`
+      `${describeFeature(feature, index)}: N03_007="${props.N03_007}"(registry一致先: ${wardByCode ? wardByCode.name : 'なし'}) と` +
+      `N03_005="${props.N03_005}"(registry一致先: ${wardByName ? wardByName.name : 'なし'}) が指す区が一致しません。` +
+      `コードと名称が不一致のため取り込みを中止します。`
     );
   }
-  return { inScope: false };
+  throw new Error(
+    `${describeFeature(feature, index)}: N03_004="${props.N03_004}"は${registry.city}ですが、` +
+    `N03_007="${props.N03_007}"・N03_005="${props.N03_005}" はconfig/wards/registry.jsonの` +
+    `どの区とも一致しません。未知の区、またはコード/名称不一致のため取り込みを中止します。`
+  );
 }
 
 /**
@@ -95,8 +108,7 @@ export function ingestN03FeatureCollection(geojson, registry, options = {}) {
   }
 
   const { projection } = options;
-  const records = [];
-  const seenWardCodes = new Map();
+  const groups = new Map(); // wardId -> { wardId, wardCode, wardName, sourceProperties, geometries: [] }
   let outOfScopeCount = 0;
 
   geojson.features.forEach((feature, index) => {
@@ -113,36 +125,53 @@ export function ingestN03FeatureCollection(geojson, registry, options = {}) {
       return;
     }
 
-    if (seenWardCodes.has(scope.wardCode)) {
-      throw new Error(
-        `区code "${scope.wardCode}"(${scope.wardName}) が複数回出現しています` +
-        `(feature[${seenWardCodes.get(scope.wardCode)}] と feature[${index}])。重複データのため取り込みを中止します。`
-      );
+    let group = groups.get(scope.wardId);
+    if (!group) {
+      group = {
+        wardId: scope.wardId,
+        wardCode: scope.wardCode,
+        wardName: scope.wardName,
+        sourceProperties: {
+          N03_001: props.N03_001,
+          N03_004: props.N03_004,
+          N03_005: props.N03_005,
+          N03_007: props.N03_007,
+        },
+        geometries: [],
+      };
+      groups.set(scope.wardId, group);
     }
-    seenWardCodes.set(scope.wardCode, index);
+    group.geometries.push(feature.geometry);
+  });
+
+  const records = [];
+  for (const group of groups.values()) {
+    const isSplit = group.geometries.length > 1;
+    const rawGeometry = isSplit ? mergeGeometriesToMultiPolygon(group.geometries) : group.geometries[0];
+    const geometryType = rawGeometry.type;
 
     const geometry = projection
-      ? { coordinatesConverted: true, coordinateConvention: 'znorth-neg-v1', rings: convertGeometryToRings(feature.geometry, projection) }
-      : { coordinatesConverted: false, coordinateConvention: null, raw: feature.geometry };
+      ? {
+          coordinatesConverted: true,
+          coordinateConvention: 'znorth-neg-v1',
+          rings: group.geometries.flatMap((g) => convertGeometryToRings(g, projection)),
+        }
+      : { coordinatesConverted: false, coordinateConvention: null, raw: rawGeometry };
 
     records.push({
-      wardId: scope.wardId,
-      wardCode: scope.wardCode,
-      wardName: scope.wardName,
-      geometryType: feature.geometry.type,
+      wardId: group.wardId,
+      wardCode: group.wardCode,
+      wardName: group.wardName,
+      geometryType,
       geometry,
-      sourceProperties: {
-        N03_001: props.N03_001,
-        N03_004: props.N03_004,
-        N03_005: props.N03_005,
-        N03_007: props.N03_007,
-      },
+      sourceFeatureCount: group.geometries.length,
+      sourceProperties: group.sourceProperties,
       boundarySourceType: 'official-n03-administrative-boundaries',
       officialAttributes: true,
       officialBoundary: true,
       boundaryDataStatus: 'official',
     });
-  });
+  }
 
   const foundWardIds = new Set(records.map((r) => r.wardId));
   const missingWards = registry.wards
