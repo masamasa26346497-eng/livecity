@@ -240,3 +240,84 @@ N03_005がnullになる正常ケースを確認した。
 - production dataset、既存3区、protected HTMLには触れない。
 - scope外でN03_005=nullとなるfixture/testを必ず追加する。
 
+---
+
+# AutoDev Run
+
+実行日時: 2026-08-30
+タスクID: P1-1
+タスク名: N03 out-of-scope null handling実装(直前のREAL_N03_OUT_OF_SCOPE_NULL_VALIDATION 2026-08-30エントリで記録した修正方針の実装)
+
+RESULT:
+SUCCESS
+
+## 実装内容
+直前のセッションでは調査結果と修正方針の記録のみでコード変更が無かったため、今回その方針を実装した。
+
+- tools/lib/n03-boundaries.js
+  - `REQUIRED_N03_SCOPE_PROPS`(N03_001・N03_004のみ)を新設。scope判定に使う最小限フィールドとした。
+  - `validateN03ScopeProperties()`を新設。全Featureに対してN03_001・N03_004のみを検証する
+    (N03_005・N03_007は要求しない)。
+  - `ingestN03FeatureCollection()`の処理順を変更: まず`validateN03ScopeProperties()`でN03_001/N03_004を
+    検証し、大阪府かつ大阪市(=registry.city)かどうかの粗いscope判定を行う。scope外なら即座に
+    outOfScopeCountへ計上してスキップする(N03_005/N03_007の検証・geometry構造検証は行わない)。
+    粗いscope内(大阪市所属)と判定された場合のみ、既存の`validateN03Properties()`(N03_005・N03_007を
+    含む4フィールド必須・fail-fast)とgeometry構造検証・`resolveWardScope()`による正式な区特定
+    (コード/名称不一致・未知区はfail-fast)を実施する。
+  - `validateN03Properties()`自体の挙動(4フィールド必須・fail-fast)・`resolveWardScope()`は変更していない
+    (既存の直接呼び出しテストとの互換性を維持)。
+- tools/lib/__fixtures__/boundaries/n03-osaka-sample.geojson
+  - 大阪府内の通常市町村(豊中市)でN03_005=nullとなる実データパターンのFeatureを追加した
+    (実例のfeature[56]はN03_007=27202だったが、fixtureでは既存の別テストと区別するためN03_007=27203を使用)。
+- tests/n03-boundaries.test.js
+  - 新規fixtureに合わせてoutOfScopeCountの期待値を2→3へ更新。
+  - 「大阪市外の通常市町村はN03_005=nullでも例外にならず正常にscope外として除外される」テストを追加。
+  - `validateN03ScopeProperties()`単体のテスト(N03_005/N03_007無しでも成功、N03_001欠落でfail-fast)を追加。
+  - CLI出力の対象外件数アサーションを2→3へ更新。
+
+## 実行したテスト
+- node --test tests/n03-boundaries.test.js
+- npm test
+- node --check tools/lib/n03-boundaries.js / tools/ingest/n03-administrative-boundaries.js / tests/n03-boundaries.test.js
+- git diff --check
+
+## テスト結果
+- tests/n03-boundaries.test.js: 22 pass / 0 fail(新規2件含む)
+- npm test: 116 tests / 101 pass / 0 fail / 15 skip(既存の期待どおりのskip。html-regression.test.jsは
+  osaka_3d_buildings.htmlが標準候補パスに無いため全skip。CLAUDE.md記載どおりで新規failなし)
+- syntax check: 全ファイルOK
+- git diff --check: PASS(空白・改行問題なし)
+
+## 変更ファイル
+- tools/lib/n03-boundaries.js
+- tools/lib/__fixtures__/boundaries/n03-osaka-sample.geojson
+- tests/n03-boundaries.test.js
+
+## 結論
+REAL_N03_OUT_OF_SCOPE_NULL_VALIDATION(2026-08-30)で確定した修正方針を実装した。scope判定を
+N03_001/N03_004のみで先に行うようにしたことで、大阪市外の通常市町村がN03_005=nullでも
+fail-fastせず正常にスキップされるようになった。大阪市所属Featureに対する既存のfail-fast検証
+(N03_005/N03_007必須・コード名称不一致・未知区)は変更していない。既存3区・複数Feature統合ロジック
+(3397049)・production dataset・protected HTML(fullward-v3)は変更していない。
+
+## 残っている問題
+- P1-1本体(実N03ファイルの取得・config/areas/osaka-city.jsonの新設・21区分の実ポリゴン取り込み)は
+  未着手のまま。実N03ファイルの入手はネットワーク接続が必要なためローカルPC側の作業が前提
+  (CLAUDE.mdの実行環境分離方針どおり)。
+- tests/n03-boundaries.test.jsは現状npm testのスクリプト(package.json)に含まれていない
+  (CLAUDE.md記載の9ファイルにも含まれていない)。個別に`node --test tests/n03-boundaries.test.js`で
+  実行する必要がある。これは今回のタスクスコープ外のため変更していないが、ユーザーが意図した構成か
+  確認の余地がある。
+
+## ユーザーが実機確認すべき内容
+なし(データ取得・座標変換・production面への影響なし)。
+
+## Git
+
+branch: autodev/2026-08-30
+commit: (wrapper側で付与)
+push: (wrapper側で判断)
+
+## 次の課題
+P1-1: 実N03ファイル取得後のschema再検証、config/areas/osaka-city.jsonの設計、21区分の実ポリゴン取り込み。
+

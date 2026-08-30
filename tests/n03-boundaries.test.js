@@ -20,7 +20,7 @@ import { tmpdir } from 'os';
 import path from 'path';
 import { execFileSync } from 'child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
-import { ingestN03FeatureCollection, validateN03Properties, resolveWardScope } from '../tools/lib/n03-boundaries.js';
+import { ingestN03FeatureCollection, validateN03Properties, validateN03ScopeProperties, resolveWardScope } from '../tools/lib/n03-boundaries.js';
 
 function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -32,12 +32,27 @@ const FIXTURE = JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8'));
 
 const SUMIYOSHI_AREA_PROJECTION = { type: 'local-equirectangular', centerLat: 34.604208, centerLon: 135.52502, metersPerDegree: 111320 };
 
-test('N03取り込み: fixtureの大阪市3区(住吉区/東住吉区/平野区)のみ抽出し、他府県・堺市は対象外になる', () => {
+test('N03取り込み: fixtureの大阪市3区(住吉区/東住吉区/平野区)のみ抽出し、他府県・堺市・大阪府内の通常市町村は対象外になる', () => {
   const result = ingestN03FeatureCollection(FIXTURE, REGISTRY);
   assert.equal(result.recordCount, 3);
-  assert.equal(result.outOfScopeCount, 2); // 京都市中京区、堺市堺区
+  assert.equal(result.outOfScopeCount, 3); // 京都市中京区、堺市堺区、豊中市(N03_005=null)
   const wardIds = result.records.map((r) => r.wardId).sort();
   assert.deepEqual(wardIds, ['higashisumiyoshi', 'hirano', 'sumiyoshi']);
+});
+
+test('N03取り込み: 大阪市外の通常市町村はN03_005=nullでも例外にならず正常にscope外として除外される', () => {
+  const result = ingestN03FeatureCollection(FIXTURE, REGISTRY);
+  assert.equal(result.recordCount, 3);
+  assert.ok(!result.records.some((r) => r.sourceProperties.N03_004 === '豊中市'));
+});
+
+test('N03スキーマ検証: scope判定にはN03_001/N03_004のみ必須で、N03_005/N03_007が無くても例外にならない', () => {
+  const props = validateN03ScopeProperties({ properties: { N03_001: '大阪府', N03_004: '豊中市', N03_005: null, N03_007: '27203' } }, 0);
+  assert.equal(props.N03_004, '豊中市');
+});
+
+test('N03スキーマ検証: scope判定用のN03_001が欠落しているとfail-fastで例外を投げる', () => {
+  assert.throws(() => validateN03ScopeProperties({ properties: { N03_004: '大阪市' } }, 0), /N03_001/);
 });
 
 test('N03取り込み: 同一区が複数Featureに分かれて出現する場合(平野区)、エラーにせず1 ward recordへ統合する', () => {
@@ -190,7 +205,7 @@ test('N03取り込みCLI: fixtureに対して実行すると3区分を取り込�
       { cwd: PROJECT_ROOT, encoding: 'utf-8' }
     );
     assert.match(stdout, /取り込み件数\(大阪市24区分\): 3/);
-    assert.match(stdout, /対象外\(大阪市24区以外\)件数: 2/);
+    assert.match(stdout, /対象外\(大阪市24区以外\)件数: 3/);
 
     const saved = JSON.parse(await readFile(outputPath, 'utf-8'));
     assert.equal(saved.records.length, 3);

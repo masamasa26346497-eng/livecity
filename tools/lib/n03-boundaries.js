@@ -22,6 +22,11 @@
 import { validateGeometryStructure, convertGeometryToRings, mergeGeometriesToMultiPolygon } from './geojson-geometry.js';
 
 export const REQUIRED_N03_PROPS = ['N03_001', 'N03_004', 'N03_005', 'N03_007'];
+// 大阪市24区以外の通常市町村では、行政区が存在しないためN03_005(区名)がnullになるのが正常データ
+// (REAL_N03_OUT_OF_SCOPE_NULL_VALIDATION 2026-08-30で実N03データにて確認済み)。scope判定に
+// 必要なのはN03_001(都道府県)・N03_004(市区町村)のみであり、この2フィールドのみを全Feature共通の
+// 必須項目とする。N03_005/N03_007は大阪市所属と判明したFeatureに対してのみ必須とする。
+export const REQUIRED_N03_SCOPE_PROPS = ['N03_001', 'N03_004'];
 export const TARGET_PREFECTURE = '大阪府';
 
 function describeFeature(feature, index) {
@@ -31,17 +36,12 @@ function describeFeature(feature, index) {
   return `feature[${index}] (N03_005=${name ?? ''}, N03_007=${code ?? ''})`;
 }
 
-/**
- * N03の必須属性(4フィールド)が全て存在し、非空文字列であることを検証する。
- * 1件でも不正ならこの関数は即座に例外を投げる(呼び出し側でスキップせず全体を止める=fail-fast)。
- * @returns {object} feature.properties(検証済み)
- */
-export function validateN03Properties(feature, index) {
+function validateRequiredStringProps(feature, index, keys) {
   const props = feature?.properties;
   if (!props || typeof props !== 'object') {
     throw new Error(`${describeFeature(feature, index)}: propertiesが存在しません。N03スキーマ不一致のため取り込みを中止します。`);
   }
-  for (const key of REQUIRED_N03_PROPS) {
+  for (const key of keys) {
     const value = props[key];
     if (typeof value !== 'string' || value.trim() === '') {
       throw new Error(
@@ -51,6 +51,25 @@ export function validateN03Properties(feature, index) {
     }
   }
   return props;
+}
+
+/**
+ * N03の必須属性(4フィールド)が全て存在し、非空文字列であることを検証する。
+ * 1件でも不正ならこの関数は即座に例外を投げる(呼び出し側でスキップせず全体を止める=fail-fast)。
+ * 大阪市所属と判明したFeatureに対してのみ呼び出すこと(scope外はN03_005がnullで正常)。
+ * @returns {object} feature.properties(検証済み)
+ */
+export function validateN03Properties(feature, index) {
+  return validateRequiredStringProps(feature, index, REQUIRED_N03_PROPS);
+}
+
+/**
+ * scope判定に必要な最小限のフィールド(N03_001・N03_004)のみを検証する。
+ * 全Featureに対して呼び出す(N03_005/N03_007はここでは要求しない)。
+ * @returns {object} feature.properties(N03_001・N03_004のみ検証済み)
+ */
+export function validateN03ScopeProperties(feature, index) {
+  return validateRequiredStringProps(feature, index, REQUIRED_N03_SCOPE_PROPS);
 }
 
 /**
@@ -112,6 +131,14 @@ export function ingestN03FeatureCollection(geojson, registry, options = {}) {
   let outOfScopeCount = 0;
 
   geojson.features.forEach((feature, index) => {
+    const scopeProps = validateN03ScopeProperties(feature, index);
+    const coarseInScope = scopeProps.N03_001 === TARGET_PREFECTURE && scopeProps.N03_004 === registry.city;
+    if (!coarseInScope) {
+      // 大阪市外(通常市町村・他都道府県)。N03_005は行政区が無いためnullが正常であり、要求しない。
+      outOfScopeCount++;
+      return;
+    }
+
     const props = validateN03Properties(feature, index);
     try {
       validateGeometryStructure(feature.geometry, { allowPoint: false });
