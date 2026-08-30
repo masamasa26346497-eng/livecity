@@ -218,3 +218,25 @@ P1-1の実装を以下の通り修正する。
    - WGS84構造検証を先に完了する。
 
 この実データ確認結果はユーザー判断済みとして扱い、対話質問せず修正を進める。
+
+## REAL_N03_OUT_OF_SCOPE_NULL_VALIDATION 2026-08-30
+
+実N03 2026大阪府GeoJSONで、大阪市外の通常市町村Featureでは
+N03_005がnullになる正常ケースを確認した。
+
+実例:
+- feature[56]
+- N03_005 = null
+- N03_007 = 27202
+
+修正方針:
+- 全FeatureにN03_005を必須要求してはならない。
+- まずN03_001 / N03_004で大阪市24区のscopeか判定する。
+- 大阪市外FeatureはN03_005=nullでも正常にout-of-scopeとしてスキップする。
+- 大阪市Featureに入ってからN03_005/N03_007を厳密検証する。
+- 大阪市ではN03_005=区名、N03_007=5桁区codeをregistryと照合する。
+- 大阪市FeatureでN03_005またはN03_007が欠落・不一致ならfail-fastする。
+- 既存の3397049の複数Feature統合ロジックを壊さない。
+- production dataset、既存3区、protected HTMLには触れない。
+- scope外でN03_005=nullとなるfixture/testを必ず追加する。
+
