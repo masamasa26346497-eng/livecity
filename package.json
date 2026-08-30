@@ -29,7 +29,8 @@
     "data:update:all": "node tools/update-all.js --area osaka-sumiyoshi",
     "preview": "node tools/preview.js --area osaka-sumiyoshi",
     "dev": "node tools/preview.js --area osaka-sumiyoshi",
-    "test": "node --test tests/demographics.test.js tests/paths.test.js tests/html-regression.test.js tests/boundary-master.test.js tests/household-composition.test.js tests/population-2015.test.js tests/population-change.test.js tests/demographics-pipeline-isolation.test.js tests/facilities-extended.test.js",
+    "test": "node --test tests/demographics.test.js tests/paths.test.js tests/html-regression.test.js tests/boundary-master.test.js tests/household-composition.test.js tests/population-2015.test.js tests/population-change.test.js tests/demographics-pipeline-isolation.test.js tests/facilities-extended.test.js tests/n03-boundaries.test.js tests/boundary-ingestion-validator.test.js",
+    "data:validate:boundaries": "node tools/validate/boundary-ingestion.js",
     "test:integration:estat": "node --test tests/integration/estat-download.integration.test.js"
   },
   "engines": {

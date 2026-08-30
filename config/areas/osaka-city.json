@@ -1,0 +1,95 @@
+{
+  "id": "osaka-city",
+  "name": "大阪市24区エリア",
+  "description": "大阪市24行政区の共通エリア定義（P1: 大阪市24区化）。projection原点とznorth-neg-v1座標規約は既存のosaka-sumiyoshiエリアと完全に同一に保ち、bboxのみ大阪市24区全域へ拡張している。これにより住吉区・東住吉区・平野区の既存建物データ座標は一切変化しない。",
+  "status": "staged",
+  "statusNote": [
+    "このエリア定義はまだproduction確定ではない（AUTODEV_REPORT.md 2026-08-26 USER_DECISION 5・6）。",
+    "行政区境界のcanonical sourceである国土数値情報 N03 のライセンス・出典・基準年月日を記録した",
+    "再取り込み（tools/ingest/n03-administrative-boundaries.js を --license/--reference-date/--retrieved-url",
+    "付きでローカルPCから実行）と、tools/validate/boundary-ingestion.js による検証を通過した時点で",
+    "status を production へ引き上げる。それまでは既存の orchestrate/registry からは参照されない。"
+  ],
+  "bbox": {
+    "south": 34.585,
+    "west": 135.342,
+    "north": 34.77,
+    "east": 135.601,
+    "note": "国土数値情報 N03 2026 大阪府データから抽出した大阪市24区ポリゴンの外接矩形（S34.586154 / W135.343508 / N34.768849 / E135.599350）を外側へ丸めた値。西端は此花区の夢洲・舞洲、南西端は住之江区の咲洲を含むため、陸域の中心部より大きく西へ広がる。"
+  },
+  "projection": {
+    "type": "local-equirectangular",
+    "centerLat": 34.604208,
+    "centerLon": 135.52502,
+    "metersPerDegree": 111320,
+    "note": "osaka-sumiyoshi.json と完全に同一の変換式・原点。x=(lon-centerLon)*cos(centerLat)*metersPerDegree, z=(lat-centerLat)*metersPerDegree。既存の建物データ(BLDGS)・TOWN_POLYGONS と座標系を一致させるため、この値は変更禁止（AUTODEV_RULES.md 4条: znorth-neg-v1）。24区全域では原点から数kmオーダーの局所平面近似となるが、既存座標との整合を最優先する。"
+  },
+  "wards": {
+    "source": "config/wards/registry.json",
+    "note": "24区の識別子(id/name/code/townPrefix/datasetId)は config/wards/registry.json を唯一のソースとする。ここでは重複定義しない。"
+  },
+  "layers": {
+    "roads": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"highway\"~\"^(motorway|trunk|primary|secondary|tertiary|residential)$\"]",
+      "outputFile": "roads.json",
+      "note": "24区全域ではbbox一括クエリはOverpassのタイムアウト・データ量の両面で非現実的。tiling を有効化し、タイル単位でダウンロード・変換・結合する運用を前提とする（P1-3）。"
+    },
+    "parks": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"leisure\"=\"park\"];way[\"landuse\"=\"grass\"];way[\"landuse\"=\"recreation_ground\"]",
+      "outputFile": "parks.json"
+    },
+    "railways": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"railway\"~\"^(rail|light_rail|subway)$\"];node[\"railway\"=\"station\"]",
+      "outputFile": "railways.json"
+    },
+    "waterways": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "osmFilter": "way[\"natural\"=\"water\"];way[\"waterway\"=\"river\"];way[\"waterway\"=\"canal\"];relation[\"natural\"=\"water\"];relation[\"waterway\"=\"riverbank\"]",
+      "outputFile": "waterways.json",
+      "note": "河川・河岸はOSMのmultipolygon relationとして提供されることが多く、outerメンバーwayの連結・inner ring（中州）の保持が必須。tools/convert/waterways.js / tools/fetch-water.js のリング組み立てが未対応だと、川を横断する巨大な三角形が生成される既知の不具合がある（P1後続タスクで対応予定）。"
+    },
+    "landuse": {
+      "enabled": true,
+      "source": "osm-overpass",
+      "outputFile": "landuse.json",
+      "queryGroups": ["parking", "landuse", "natural_and_water"]
+    },
+    "administrativeBoundaries": {
+      "enabled": true,
+      "source": "kokudo-suchi-joho-n03",
+      "outputFile": "boundaries/administrative-boundaries.json",
+      "canonicalSource": "国土数値情報 N03 行政区域データ 2026年版（国土交通省）",
+      "ingestTool": "tools/ingest/n03-administrative-boundaries.js",
+      "note": "24区の行政区外周ポリゴンおよびWard classificationの基準。町丁目ポリゴンは別系統（e-Stat 令和2年国勢調査 町丁・字等境界データ）。AUTODEV_REPORT.md 2026-08-26 USER_DECISION 1・2 を参照。"
+    }
+  },
+  "demographics": {
+    "enabled": true,
+    "note": "人口統計は大阪市全域を対象としたファイルとして配布されるため、bbox単位ではなく対象行政区名でフィルタする。24区分の町丁目別配分は段階的に整備する。",
+    "targetWards": [
+      "北区", "都島区", "福島区", "此花区", "中央区", "西区", "港区", "大正区",
+      "天王寺区", "浪速区", "西淀川区", "淀川区", "東淀川区", "東成区", "生野区",
+      "旭区", "城東区", "鶴見区", "阿倍野区", "住之江区", "住吉区", "東住吉区",
+      "平野区", "西成区"
+    ]
+  },
+  "tiling": {
+    "enabled": false,
+    "note": "大阪市24区全域（約23km x 20km）ではOSM都市レイヤーのタイル分割が必須。zoomLevels/tileSizeMeters を確定し次第 enabled:true にする（P1-3）。現時点では administrativeBoundaries の取り込み・検証のみを対象とし、都市レイヤーの24区展開は着手していない。",
+    "zoomLevels": [],
+    "tileSizeMeters": 2000
+  },
+  "createdAt": "2026-08-31",
+  "license": {
+    "n03": "国土数値情報の利用約款に従う（出典明記。測量法上の位置精度に関する注記あり）",
+    "osm": "ODbL 1.0 (OpenStreetMap contributors)",
+    "estat": "政府標準利用規約2.0"
+  }
+}
