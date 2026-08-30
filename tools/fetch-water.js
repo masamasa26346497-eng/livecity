@@ -23,6 +23,7 @@
 
 // ── ES Module形式（package.jsonの "type": "module" に対応）──
 import fs from 'node:fs';
+import { assembleMultipolygon } from './lib/osm-multipolygon.js';
 
 const ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 const RETRY = 3, RETRY_WAIT_MS = 3000;
@@ -98,7 +99,8 @@ async function main() {
   const htmlPath = args.html || 'public/osaka_3d_buildings.html';
   const out = [];
   const stats = { fromLanduse: 0, fromOverpass: 0, fromHtml: 0, areas: 0, lines: 0,
-    skippedSmall: 0, skippedInvalid: 0, byKind: {} };
+    skippedSmall: 0, skippedInvalid: 0, skippedUnclosed: 0, holesKept: 0, holesOrphan: 0,
+    byKind: {}, unclosedReport: [] };
 
   // ── 既存のHTML埋め込みデータを引き継ぐ（再実行しても既存分が消えない）──
   if (fs.existsSync(htmlPath) && !args['no-merge']) {
@@ -183,24 +185,41 @@ async function main() {
       way["landuse"~"^(reservoir|basin)$"](${bbox});
       way["water"~"^(pond|reservoir|lake)$"](${bbox});
       relation["natural"="water"](${bbox});
+      relation["waterway"="riverbank"](${bbox});
     );out geom;`;
     console.log('河川・水域をOverpassから取得中…');
     const data = await overpass(q);
     const seen = new Set(out.map(o => o.id));
+
+    const trimClose = (pts) =>
+      (pts.length > 2 && pts[0][0] === pts[pts.length - 1][0] && pts[0][1] === pts[pts.length - 1][1])
+        ? pts.slice(0, -1) : pts;
+    // 面レコードを push する共通処理（way由来・relation由来で同じ検証を通す）。
+    const pushArea = (id, name, sub, outerLocal, holesLocal) => {
+      let pts = trimClose(outerLocal);
+      if (pts.length < 3) { stats.skippedInvalid++; return; }
+      if (areaOf(pts) < MIN_AREA) { stats.skippedSmall++; return; }
+      const rec = { id, name: name || '', kind: 'area', subtype: sub, p: pts };
+      const holes = (holesLocal || [])
+        .map(trimClose)
+        .filter(h => h.length >= 3 && areaOf(h) >= MIN_AREA);
+      if (holes.length) { rec.holes = holes; stats.holesKept += holes.length; }
+      out.push(rec);
+      stats.areas++; stats.fromOverpass++;
+      stats.byKind[sub] = (stats.byKind[sub] || 0) + 1;
+    };
+
     for (const el of (data.elements || [])) {
       const tags = el.tags || {};
       const id = el.type + '/' + el.id;
       if (seen.has(id)) continue;
+      seen.add(id);
       const ww = tags.waterway;
       const isLine = ww === 'river' || ww === 'canal' || ww === 'stream';
-      let rings = [];
-      if (el.type === 'way' && Array.isArray(el.geometry)) rings = [el.geometry];
-      else if (el.type === 'relation' && Array.isArray(el.members)) {
-        rings = el.members.filter(m => m.role === 'outer' && Array.isArray(m.geometry)).map(m => m.geometry);
-      }
-      if (!rings.length) { stats.skippedInvalid++; continue; }
-      for (const g of rings) {
-        let pts = g.map(p => toLocal(p.lat, p.lon));
+      const sub = ww === 'riverbank' ? 'riverbank' : (tags.water || tags.landuse || tags.natural || 'water');
+
+      if (el.type === 'way' && Array.isArray(el.geometry)) {
+        const pts = el.geometry.map(p => toLocal(p.lat, p.lon));
         if (isLine) {
           if (pts.length < 2) { stats.skippedInvalid++; continue; }
           const w = parseFloat(tags.width);
@@ -210,23 +229,44 @@ async function main() {
           stats.lines++; stats.fromOverpass++;
           stats.byKind[ww] = (stats.byKind[ww] || 0) + 1;
         } else {
-          if (pts.length > 2 && pts[0][0] === pts[pts.length - 1][0] && pts[0][1] === pts[pts.length - 1][1]) pts = pts.slice(0, -1);
-          if (pts.length < 3) { stats.skippedInvalid++; continue; }
-          if (areaOf(pts) < MIN_AREA) { stats.skippedSmall++; continue; }
-          const sub = ww === 'riverbank' ? 'riverbank' : (tags.water || tags.landuse || tags.natural || 'water');
-          out.push({ id, name: tags.name || '', kind: 'area', subtype: sub, p: pts });
-          stats.areas++; stats.fromOverpass++;
-          stats.byKind[sub] = (stats.byKind[sub] || 0) + 1;
+          pushArea(id, tags.name, sub, pts, []);
         }
+        continue;
       }
-      seen.add(id);
+
+      if (el.type === 'relation' && Array.isArray(el.members)) {
+        // multipolygon relation: outer member way を端点一致で連結して閉リングを作る。
+        // 個別 outer way をそのまま閉ポリゴン化しない（川面を横断する巨大三角形の原因）。
+        const asm = assembleMultipolygon(el.members);
+        if (!asm.polygons.length && !asm.unclosed.length) { stats.skippedInvalid++; continue; }
+        asm.polygons.forEach((poly, pi) => {
+          const outerLocal = poly.outer.map(([lon, lat]) => toLocal(lat, lon));
+          const holesLocal = poly.holes.map(h => h.map(([lon, lat]) => toLocal(lat, lon)));
+          pushArea(asm.polygons.length > 1 ? `${id}#${pi}` : id, tags.name, sub, outerLocal, holesLocal);
+        });
+        stats.holesOrphan += asm.stats.holesOrphan;
+        if (asm.unclosed.length) {
+          stats.skippedUnclosed += asm.unclosed.length;
+          stats.unclosedReport.push({ id, name: tags.name || '', fragments: asm.unclosed.map(f => ({ role: f.role, points: f.points })) });
+          console.warn(`[fetch-water] ${id}(${tags.name || 'name無し'}): outer/inner member way が閉じず ` +
+            `${asm.unclosed.length} フラグメント未連結。三角形分割せずスキップした。`);
+        }
+        continue;
+      }
+
+      stats.skippedInvalid++;
     }
-    console.log('Overpassから:', stats.fromOverpass, '件');
+    console.log('Overpassから:', stats.fromOverpass, '件 / 未連結スキップ', stats.skippedUnclosed,
+      '/ 保持した中州(inner ring)', stats.holesKept);
   }
 
   console.log('合計:', out.length, '件（面', stats.areas, '/ 線', stats.lines, '）',
     '/ 内訳:', JSON.stringify(stats.byKind));
-  console.log('除外: 面積過小', stats.skippedSmall, '/ 無効', stats.skippedInvalid);
+  console.log('除外: 面積過小', stats.skippedSmall, '/ 無効', stats.skippedInvalid,
+    '/ 未連結フラグメント', stats.skippedUnclosed, '/ 孤立inner ring', stats.holesOrphan);
+  if (stats.unclosedReport.length) {
+    console.log('未連結だった relation:', JSON.stringify(stats.unclosedReport));
+  }
   const totalArea = Math.round(out.filter(o => o.kind === 'area').reduce((s, o) => s + areaOf(o.p), 0));
   console.log('水域面の総面積:', totalArea, 'm²');
 

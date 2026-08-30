@@ -4,6 +4,105 @@
 
 ---
 
+## 2026-08-31 セッション2: 河川geometry修正（OSM multipolygon連結）
+
+### 実行したタスク
+`tools/fetch-water.js` / `tools/convert/waterways.js` を調査し、OSM multipolygon relation の
+outer member way を端点一致で連結して閉リングを構成するよう修正した。
+
+### 調査結果（確定した原因）
+- 旧 `tools/fetch-water.js` は relation の outer member way を **1本ずつ独立した閉ポリゴン**として
+  `THREE.ShapeUtils.triangulateShape` に渡していた。member way は単独では閉じていないため、
+  三角形分割時に**終点→始点をむすぶ暗黙の閉合辺**が生成される。
+- 埋め込み済み `OSM_WATER` を実測したところ、`relation/18530061`〜`18530063`（大和川河岸）が
+  それぞれ複数の `area` レコードに分裂し、各レコードの暗黙閉合辺が **4466m / 4879m / 5843m** と
+  地物全体（約2km幅の河岸）を横断していた。これが「川面を横切る巨大三角形」の正体。
+- `tools/validate/water-geometry.js --html public/osaka_3d_buildings.html` で現行ビルドを検証すると
+  この6レコードが `no-oversized-segments` FAIL として検出される（`data/reports/water-geometry-validation.json`）。
+
+### 修正内容
+- **`tools/lib/osm-multipolygon.js`（新規）**: `stitchWays()` / `assembleMultipolygon()`。
+  - outer/inner を role で分け、端点一致で way を連結（逆順wayも吸収）。
+  - 連結しても閉じないリング片は `unclosed` として返す（黙って三角形分割しない）。
+  - inner ring（中州）を保持し、内包する outer へ point-in-polygon で割り当てる。
+- **`tools/lib/geometry-anomaly.js`（新規）**: `analyzeRing()`。巨大セグメント（中央値×20 かつ >800m、
+  または bbox対角比指定時はその比）・自己交差（O(n²)）・非有限・退化・**暗黙閉合辺**を検出。
+  `tools/lib/boundary-ingestion-validator.js` の重複ロジックをここへ集約（挙動は不変、テスト14件green）。
+- **`tools/lib/water-geometry-validator.js` / `tools/validate/water-geometry.js`（新規）**: OSM_WATER形式
+  （JSON または HTML埋め込み）の幾何異常検証CLI。`npm run data:validate:water`。
+- **`tools/fetch-water.js`（変更）**: `--overpass` の relation 分岐を `assembleMultipolygon` ベースへ。
+  面レコードに `holes` を追加。未連結フラグメントは `stats.skippedUnclosed` に計上し警告出力、描画に出さない。
+  クエリに `relation["waterway"="riverbank"]` を追加。way / line の既存挙動は不変。
+- **`tools/convert/waterways.js`（変更）**: relation 分岐を追加（同じ共通libを使用）。`convertWaterwaysWithReport()`
+  で `unclosed` も返す。既存の way→line / 閉way→area の出力契約（`{type,name,p}`）は維持し `kind`/`holes` を追加。
+- **`public/osaka_3d_buildings.html` WaterLayer（変更）**:
+  - `appendArea` が `holes`（中州）を `triangulateShape` へ渡すよう対応。
+  - `ringHasSpanningEdge()` ガードを追加。地物を横断する巨大な辺（暗黙閉合辺含む）を持つリングは
+    三角形分割せずスキップ。これにより**データ再生成前の現行ビルドでも大和川の巨大三角形が描画されなくなる**。
+  - protected baseline `osaka_3d_buildings.fullward-v3.html` は変更していない。
+- **`tools/lib/area.js`（変更）**: `loadAreaConfig` が UTF-8 BOM 付き area config も読めるよう先頭BOM除去
+  （下記「未解決/注意」参照）。
+
+### 変更ファイル一覧
+```
+新規: tools/lib/osm-multipolygon.js
+新規: tools/lib/geometry-anomaly.js
+新規: tools/lib/water-geometry-validator.js
+新規: tools/validate/water-geometry.js
+新規: tools/lib/__fixtures__/water/overpass-water-sample.json
+新規: tests/osm-multipolygon.test.js         (8 tests)
+新規: tests/water-geometry.test.js           (7 tests)
+新規: data/reports/water-geometry-validation.json  (現行ビルドの検出結果=6件FAIL、修正前の記録)
+変更: tools/fetch-water.js
+変更: tools/convert/waterways.js
+変更: tools/lib/boundary-ingestion-validator.js  (共通libへ委譲。挙動不変)
+変更: public/osaka_3d_buildings.html            (WaterLayer のみ)
+変更: tools/lib/area.js                          (BOM許容)
+変更: package.json                               (test へ2ファイル追加、data:validate:water 追加)
+```
+
+### テスト結果
+- `npm test`: **167 tests / 152 pass / 0 fail / 15 skip**（セッション1の 152/137 から +15）。
+- `tests/osm-multipolygon.test.js` 8/8、`tests/water-geometry.test.js` 7/7。
+- `LIVECITY_HTML_PATH=public/osaka_3d_buildings.html node --test tests/html-regression.test.js`: **15/15 pass**
+  （WaterLayer変更後も RoadLayer/ParkLayer/BLDGS/LabelLayer/行政区境界の重複・消失なし、JS構文OK）。
+- 「大和川の巨大三角形が消えることの確認」: fixture（大和川を模した細長い河岸relation、outer 3本＋
+  逆順1本＋中州1本）を新パイプラインに通すと `validateWaterGeometry` が `oversizedSegments: 0` で PASS。
+  旧挙動を再現した3点レコード（暗黙閉合辺≒2km）は `no-oversized-segments` FAIL として検出される。
+- `git diff --check`: 空白・改行問題なし（CRLF警告のみ。既存ファイルと同じ扱い）。
+
+### 未解決 / 注意
+1. **git index.lock**: 作業中 `.git/index.lock` が別プロセス（ユーザー側のgit / OneDrive）に掴まれており、
+   Claude Code 側から git 操作ができなかった。今回のセッション2の変更はコミットしていない（未ステージ）。
+2. **worktree から2ファイルが消えている**: `data/processed/osaka-city/boundaries/administrative-boundaries.json`
+   と `data/reports/boundary-ingestion-validation.json`（どちらもコミット `94868ef` に含まれる）が
+   作業ツリーから欠落し `deleted` 表示になっている。Claude は削除していない（OneDrive同期ずれか
+   index.lock の影響と推定）。**コミットしないこと。`git restore <この2ファイル>` で復元できる**。
+   参考: HEAD版の administrative-boundaries.json を検証したところ、24区・znorth-neg-v1変換済み・
+   出典metadata完備で `tools/validate/boundary-ingestion.js` は全項目 PASS（P1-2の実データ検証は完了）。
+3. **`config/areas/osaka-city.json` の BOM**: ユーザーがエディタで status を production へ変更した際に
+   UTF-8 BOM 付き＋CRLF で保存され、`JSON.parse` が落ちるようになっていた。BOMなし・LF で書き直し、
+   併せて `loadAreaConfig` に BOM 除去を追加した。**このファイルは BOMなし・LF で保存すること**。
+   なお status は `staged` に戻した（BOM修正で書き直しが必要だったため）。コミット `94868ef` は
+   `production` にしていたので、実データ検証が済んでいる以上 production へ戻して良い（1語変更）。
+4. **`tools/convert/index.js` は `unclosed` を surface しない**: `convertWaterways()` は後方互換のため
+   items のみ返す。オーケストレータで未連結relationを警告したい場合は `convertWaterwaysWithReport()` へ
+   切り替える小改修が必要（今回スコープ外）。
+5. 河川ライン（大和川など複数wayに分割された長い川の中心線）の way 連結は未実装。断片化・隙間は
+   残る可能性があるが、「巨大三角形」は area 側の問題であり本修正で解消。line stitching は別タスク。
+6. 実 `OSM_WATER` の再生成（`node tools/fetch-water.js --overpass ...`）はネットワーク必須のためローカルPC作業。
+
+### 次に進むべき作業
+- **A（ユーザー、ローカルPC）**: `git restore` で欠落2ファイルを復元 → セッション2の変更をレビュー・コミット →
+  `node tools/fetch-water.js --overpass --coordinate-config data/buildings/coordinate-config.json --html public/osaka_3d_buildings.html`
+  で `OSM_WATER` を再生成 → `npm run data:validate:water -- --html public/osaka_3d_buildings.html` が PASS することを確認 →
+  ブラウザ（`npm run preview`）で大和川周辺の巨大三角形が消えていること、中州が抜けていることを目視確認。
+- **B（次セッション）**: 河川ライン（waterway=river/canal の複数way）の端点連結。同 `tools/lib/osm-multipolygon.js`
+  の `stitchWays` を line 用に流用できる。
+- **C（次セッション）**: P1-3 — N03 24区ポリゴンから point-in-polygon 用 Ward polygon を生成するパイプライン設計。
+
+---
+
 ## 2026-08-31 セッション1: N03エリア基盤 + 境界validator（P1-1/P1-2の一部）
 
 ### 実行したタスク

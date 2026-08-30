@@ -19,6 +19,7 @@
 // この関数は例外を投げず、常に構造化された結果を返す（fail-fastが必要な取り込み側とは責務が別）。
 
 import { convertCoordsArray } from './projection.js';
+import { analyzeRing, DEFAULT_OVERSIZED_SEG_MEDIAN_MULT, DEFAULT_OVERSIZED_SEG_ABS, DEFAULT_SELF_INTERSECTION_MAX_POINTS } from './geometry-anomaly.js';
 
 // 既存 osaka-sumiyoshi エリア（住吉区・東住吉区・平野区の建物データに合わせたbbox）。
 // 24区取り込みでこの3区が消える／座標系がズレていないことの回帰チェックに使う。
@@ -28,105 +29,15 @@ const KNOWN_WARD_IDS = ['sumiyoshi', 'higashisumiyoshi', 'hirano'];
 // 大阪市の妥当な緯度経度レンジ（此花区の夢洲・住之江区の咲洲を含む広めの窓）。
 const OSAKA_CITY_LATLON_WINDOW = { south: 34.55, west: 135.30, north: 34.80, east: 135.65 };
 
-// 「1セグメントが異常に長い」= 同一リング内の中央値セグメント長のこの倍数を超え、かつ絶対長も超える。
-// multipolygon の outer メンバー way を連結し損ねた場合や、閉じていないリングを閉ポリゴンとして
-// 扱った場合、行政界の細かいジグザグの中に「地物を横断する1本の巨大な辺」が混じる。行政界は
-// 通常セグメント長が比較的均一なため、中央値の20倍を超える辺は連結漏れ・座標破損を強く示唆する。
-const OVERSIZED_SEG_MEDIAN_MULT = 20;
-const OVERSIZED_SEG_ABS_METERS = 800;
-const OVERSIZED_SEG_MIN_POINTS = 5;
-
-// 自己交差スキャンは O(n^2)。行政区リングは最大でも千点オーダーのため実用上問題ないが、
-// 想定外に巨大なリングでCIが固まらないよう上限を設ける（超過時は warning として報告）。
-const SELF_INTERSECTION_MAX_POINTS = 6000;
-
-function isFinitePair(pt) {
-  return Array.isArray(pt) && pt.length >= 2 && Number.isFinite(pt[0]) && Number.isFinite(pt[1]);
-}
-
-function ringBbox(points) {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const [x, y] of points) {
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
-  }
-  return { minX, minY, maxX, maxY, diag: Math.hypot(maxX - minX, maxY - minY) };
-}
-
-function segmentsIntersect(p1, p2, p3, p4) {
-  const d = (ax, ay, bx, by, cx, cy) => (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
-  const d1 = d(p3[0], p3[1], p4[0], p4[1], p1[0], p1[1]);
-  const d2 = d(p3[0], p3[1], p4[0], p4[1], p2[0], p2[1]);
-  const d3 = d(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]);
-  const d4 = d(p1[0], p1[1], p2[0], p2[1], p4[0], p4[1]);
-  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
-  return false;
-}
+const OVERSIZED_SEG_MEDIAN_MULT = DEFAULT_OVERSIZED_SEG_MEDIAN_MULT;
+const OVERSIZED_SEG_ABS_METERS = DEFAULT_OVERSIZED_SEG_ABS;
+const SELF_INTERSECTION_MAX_POINTS = DEFAULT_SELF_INTERSECTION_MAX_POINTS;
 
 /**
- * 1リング（[[x,y],...] の点列。座標系は呼び出し側で統一済み）を評価する。
- * @returns {{points:number, uniquePoints:number, closed:boolean, maxSegment:number,
- *   bboxDiag:number, oversizedSegments:number, selfIntersections:number, selfIntersectionScanned:boolean,
- *   nonFinite:number}}
+ * 1リングの幾何評価。実体は tools/lib/geometry-anomaly.js の analyzeRing に集約している
+ * （河川・水域validatorと共通。AUTODEV_RULES.md 9条: 重複実装を避ける）。
  */
-export function evaluateRing(rawPoints) {
-  const points = Array.isArray(rawPoints) ? rawPoints : [];
-  let nonFinite = 0;
-  for (const pt of points) if (!isFinitePair(pt)) nonFinite++;
-  const finitePoints = points.filter(isFinitePair);
-
-  const n = finitePoints.length;
-  const closed = n >= 2 &&
-    finitePoints[0][0] === finitePoints[n - 1][0] &&
-    finitePoints[0][1] === finitePoints[n - 1][1];
-
-  const uniqueKeys = new Set(finitePoints.map((p) => `${p[0]}_${p[1]}`));
-
-  const bb = n ? ringBbox(finitePoints) : { diag: 0 };
-  const segLengths = [];
-  for (let i = 0; i < n - 1; i++) {
-    segLengths.push(Math.hypot(finitePoints[i + 1][0] - finitePoints[i][0], finitePoints[i + 1][1] - finitePoints[i][1]));
-  }
-  const maxSegment = segLengths.length ? Math.max(...segLengths) : 0;
-  const sorted = [...segLengths].sort((a, b) => a - b);
-  const medianSegment = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
-  let oversizedSegments = 0;
-  if (n >= OVERSIZED_SEG_MIN_POINTS && medianSegment > 0) {
-    for (const seg of segLengths) {
-      if (seg > OVERSIZED_SEG_ABS_METERS && seg > medianSegment * OVERSIZED_SEG_MEDIAN_MULT) oversizedSegments++;
-    }
-  }
-
-  let selfIntersections = 0;
-  let selfIntersectionScanned = false;
-  if (n >= 4 && n <= SELF_INTERSECTION_MAX_POINTS) {
-    selfIntersectionScanned = true;
-    for (let i = 0; i < n - 1; i++) {
-      for (let j = i + 2; j < n - 1; j++) {
-        // 隣接セグメントと、閉じたリングの最初と最後のセグメント同士は共有頂点があるためスキップ
-        if (i === 0 && j === n - 2) continue;
-        if (segmentsIntersect(finitePoints[i], finitePoints[i + 1], finitePoints[j], finitePoints[j + 1])) {
-          selfIntersections++;
-        }
-      }
-    }
-  }
-
-  return {
-    points: points.length,
-    uniquePoints: uniqueKeys.size,
-    closed,
-    maxSegment,
-    medianSegment,
-    bboxDiag: bb.diag,
-    oversizedSegments,
-    selfIntersections,
-    selfIntersectionScanned,
-    nonFinite,
-  };
-}
+export const evaluateRing = analyzeRing;
 
 // geometry を「検証用の共通座標系リング配列」へ正規化する。
 // - 変換済み(rings) はそのまま [x,z] メートル。
@@ -342,7 +253,7 @@ export function validateBoundaryIngestion(payload, registry, options = {}) {
   checks.push(check('no-oversized-segments',
     wardsWithOversizedSeg.length === 0,
     wardsWithOversizedSeg.length
-      ? `地物を横断しうる巨大な辺(リングbbox対角比>${OVERSIZED_SEG_RATIO}かつ>${OVERSIZED_SEG_ABS_METERS}m): ${wardsWithOversizedSeg.join(', ')}`
+      ? `地物を横断しうる巨大な辺(同一リング中央値セグメント長の${OVERSIZED_SEG_MEDIAN_MULT}倍かつ>${OVERSIZED_SEG_ABS_METERS}m): ${wardsWithOversizedSeg.join(', ')}`
       : 'OK',
     projection || convertedCount > 0 ? 'error' : 'warning'));
   checks.push(check('no-self-intersections',

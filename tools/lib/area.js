@@ -19,7 +19,8 @@ export async function loadAreaConfig(areaId) {
     );
   }
   const raw = await readFile(configPath, 'utf-8');
-  return JSON.parse(raw);
+  // 一部のエディタ(Windows)がUTF-8 BOM付きで保存すると JSON.parse が失敗するため先頭のBOMを除去する。
+  return JSON.parse(raw.replace(/^﻿/, ''));
 }
 
 export function rawDir(areaId) {

@@ -2572,25 +2572,65 @@ const WaterLayer = (function () {
     return 0.95 + (h % 100) / 100 * 0.08; // 0.95〜1.03の穏やかな明度差
   }
 
-  // 面ポリゴンをearcutで分割（凹形状の水域でも正しく塗る）
-  function appendArea(positions, colors, poly, tint) {
+  function trimClosingRing(poly) {
     const n0 = poly.length;
-    if (n0 < 3) return 0;
-    let ring = poly;
-    if (n0 > 3 && Math.abs(ring[0][0] - ring[n0 - 1][0]) < 1e-9 && Math.abs(ring[0][1] - ring[n0 - 1][1]) < 1e-9) {
-      ring = ring.slice(0, -1);
+    if (n0 > 3 && Math.abs(poly[0][0] - poly[n0 - 1][0]) < 1e-9 && Math.abs(poly[0][1] - poly[n0 - 1][1]) < 1e-9) {
+      return poly.slice(0, -1);
     }
+    return poly;
+  }
+
+  // 「川面を横断する巨大三角形」ガード: 取得パイプライン側でmultipolygonのmember wayが連結
+  // されず、閉じていないリング片を閉ポリゴンとして扱うと、暗黙の閉合辺（終点→始点）が地物全体を
+  // 横断する巨大な辺になる。三角形分割前にこれを検出し、そのリングは描画しない（データ再生成で解消）。
+  // tools/lib/geometry-anomaly.js / tools/validate/water-geometry.js と同じ考え方。
+  function ringHasSpanningEdge(ring) {
+    const n = ring.length;
+    if (n < 4) return false;
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    const segs = [];
+    for (let i = 0; i < n; i++) {
+      const a = ring[i], b = ring[(i + 1) % n];
+      segs.push(Math.hypot(b[0] - a[0], b[1] - a[1]));
+      if (a[0] < minX) minX = a[0]; if (a[0] > maxX) maxX = a[0];
+      if (a[1] < minZ) minZ = a[1]; if (a[1] > maxZ) maxZ = a[1];
+    }
+    const diag = Math.hypot(maxX - minX, maxZ - minZ);
+    const sorted = segs.slice().sort((x, y) => x - y);
+    const median = sorted[Math.floor(sorted.length / 2)] || 0;
+    for (const s of segs) {
+      if (s > 350 && diag > 0 && (s > diag * 0.33 || (median > 0 && s > median * 15))) return true;
+    }
+    return false;
+  }
+
+  // 面ポリゴンをearcutで分割（凹形状の水域でも正しく塗る）。holes=中州・島(inner ring)の配列。
+  function appendArea(positions, colors, poly, tint, holes) {
+    if (poly.length < 3) return 0;
+    let ring = trimClosingRing(poly);
     if (ring.length < 3) return 0;
+    if (ringHasSpanningEdge(ring)) {
+      console.warn('[WaterLayer] 地物を横断する巨大な辺を検出したためスキップ（未連結multipolygonの疑い。頂点数 ' + ring.length + '）');
+      return 0;
+    }
+    const holeRings = Array.isArray(holes)
+      ? holes.map(trimClosingRing).filter(h => h.length >= 3 && !ringHasSpanningEdge(h))
+      : [];
+    const allPts = ring.concat(...holeRings);
     let faces = null;
     try {
-      faces = THREE.ShapeUtils.triangulateShape(ring.map(p => new THREE.Vector2(p[0], p[1])), []);
+      faces = THREE.ShapeUtils.triangulateShape(
+        ring.map(p => new THREE.Vector2(p[0], p[1])),
+        holeRings.map(h => h.map(p => new THREE.Vector2(p[0], p[1])))
+      );
     } catch (e) { faces = null; }
     if (!faces || !faces.length) {
       console.warn('[WaterLayer] 三角形分割に失敗した水域をスキップ（頂点数 ' + ring.length + '）');
       return 0;
     }
     for (const f of faces) {
-      const a = ring[f[0]], b = ring[f[1]], c = ring[f[2]];
+      const a = allPts[f[0]], b = allPts[f[1]], c = allPts[f[2]];
+      if (!a || !b || !c) continue;
       const p0 = [a[0], Y, a[1]], p1 = [b[0], Y, b[1]], p2 = [c[0], Y, c[1]];
       const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
       const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]];
@@ -2657,8 +2697,14 @@ const WaterLayer = (function () {
         if (t) stats.lines++;
       } else {
         if (pts.length < 3) { stats.skipped++; return; }
-        t = appendArea(positions, colors, pts, tint);
-        if (t) { stats.areas++; appendEdgeRing(edgePositions, pts); }
+        t = appendArea(positions, colors, pts, tint, w.holes);
+        if (t) {
+          stats.areas++;
+          appendEdgeRing(edgePositions, pts);
+          for (const h of (Array.isArray(w.holes) ? w.holes : [])) {
+            if (Array.isArray(h) && h.length >= 3) appendEdgeRing(edgePositions, h);
+          }
+        }
       }
       if (!t) { stats.skipped++; return; }
       stats.triangles += t;
