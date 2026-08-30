@@ -1,8 +1,8 @@
-{
+﻿{
   "id": "osaka-city",
   "name": "大阪市24区エリア",
   "description": "大阪市24行政区の共通エリア定義（P1: 大阪市24区化）。projection原点とznorth-neg-v1座標規約は既存のosaka-sumiyoshiエリアと完全に同一に保ち、bboxのみ大阪市24区全域へ拡張している。これにより住吉区・東住吉区・平野区の既存建物データ座標は一切変化しない。",
-  "status": "staged",
+  "status": "production",
   "statusNote": [
     "このエリア定義はまだproduction確定ではない（AUTODEV_REPORT.md 2026-08-26 USER_DECISION 5・6）。",
     "行政区境界のcanonical sourceである国土数値情報 N03 のライセンス・出典・基準年月日を記録した",
@@ -93,3 +93,4 @@
     "estat": "政府標準利用規約2.0"
   }
 }
+
