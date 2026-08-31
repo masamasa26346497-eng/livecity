@@ -4,6 +4,184 @@
 
 ---
 
+## 2026-08-31 セッション3b: N03 z軸の恒久修正（USER_DECISION (a)）
+
+### 実装内容
+セッション3で発見した「N03取り込みの z 軸が znorth-neg-v1 と反転」を、USER_DECISION 2026-08-31 (a) に従い
+**取り込みツール側で恒久修正**した。
+
+- **`tools/lib/n03-boundaries.js`**: `ingestN03FeatureCollection` の projection 適用箇所で、
+  `convertGeometryToRings`（geoToLocal 由来 = 北がz正）の結果に対し新しいヘルパ `toZNorthNeg`
+  （`[x, z] → [x, -z]`）を適用。これで実座標と `coordinateConvention: "znorth-neg-v1"` が一致する。
+  `tools/lib/projection.js` は**変更していない**（roads/parks/waterways/facilities/landuse 変換と共有のため）。
+- **`data/raw/osaka-city/n03/N03-2026_27.geojson`**（実N03、gitignore下、2.95MB、基準日2026-01-01）を入力に、
+  出典metadata（license / referenceDate 2026-01-01 / retrievedUrl / retrievedAt）を維持して
+  `administrative-boundaries.json` を再生成。
+
+### 再生成・再検証（すべて実データ）
+| 項目 | 結果 |
+|---|---|
+| 1. `administrative-boundaries.json` | 再生成（全13,577行の z 座標が符号反転）。24区・znorth-neg-v1・出典完備 |
+| 2. `ward-classification-polygons.json` | 再生成。`zAxisApplied: "as-is"`（auto検出で補正不要と判定）|
+| 3. boundary validator | 全チェック **PASS**（`known-wards-stable` 含む） |
+| 4. ward classification validator | 全チェック **PASS** |
+| 5. 既存3区との比較 | 住吉99.82% / 東住吉98.52% / 平野99.50%、不一致 0.73%（**セッション3と完全一致**。判定 OK） |
+| 6. `npm test` / HTML regression | **201 tests / 186 pass / 0 fail / 15 skip** ／ html-regression **15/15** |
+
+- N03 centroid z（住吉 −377 / 東住吉 −1651 / 平野 −971）が TOWN_POLYGONS 参照（−283 / −1610 / −1120）と
+  同符号・近い大きさに揃った。
+- 建物分類の区外は 10,374棟（1.8%）でセッション3の自動補正時と同一 → 上流修正と自動補正が同じ出力を生む。
+
+### build-ward-polygons.js の z-axis auto 補正
+移行安全策・異常検出として残置。正常な再生成データでは `zAxisApplied: "as-is"` になることを
+`tests/ward-polygons.test.js` で検証（合成データ＋実データの2ケース）。
+
+### 変更ファイル（セッション3bぶん）
+```
+変更: tools/lib/n03-boundaries.js                (toZNorthNeg 追加、変換時に z negate)
+変更: tests/n03-boundaries.test.js               (znorth-neg-v1 = 北ほど z 小 のテスト追加)
+変更: tests/ward-polygons.test.js                (正常データで as-is / 実データ as-is のテスト追加)
+変更: data/processed/osaka-city/boundaries/administrative-boundaries.json   (z 符号反転で再生成)
+変更: data/processed/osaka-city/boundaries/ward-classification-polygons.json (再生成)
+変更: data/reports/boundary-ingestion-validation.json / ward-classification-validation.json /
+      building-ward-classification.json / ward-classification-vs-poc.json    (再生成)
+変更: config/areas/osaka-city.json               (statusNote の z軸記述を「修正済み」に更新)
+```
+
+### 未解決事項（セッション3b時点）
+- `tools/ingest/official-boundaries-from-geojson.js` も同じ `convertGeometryToRings` を使うが、
+  こちらの出力は e-Stat 属性マスタ（geometry ほぼ null）で描画用途ではないため今回は未変更。
+  将来 e-Stat の実ポリゴンを通す場合は同様の z negate が必要。
+- 区外 10,374棟（1.8%）の P1-4 での扱い（最近傍区スナップ / 除外）は未決。
+- `public/osaka_3d_buildings.html` の未コミット変更（ユーザーの OSM_WATER 再生成）と、
+  `fetch-water.js --no-merge` 未対応（セッション2残課題）は据え置き。
+
+### P1-4へ進める状態か
+**進める。** z軸は取り込み時点で恒久的に znorth-neg-v1 に揃い、build-ward-polygons.js の補正は不要（as-is）。
+P1-4 は `ward-classification-polygons.json` をそのまま使える。
+
+---
+
+## 2026-08-31 セッション3: P1-3 Ward polygon / 建物分類基盤
+
+### 実装内容
+N03行政区境界（`data/processed/osaka-city/boundaries/administrative-boundaries.json`、commit 94868ef）から
+大阪市24区の point-in-polygon 判定基盤を実装した。
+
+1. **Ward polygon生成** — `tools/lib/ward-polygons.js` + `tools/build-ward-polygons.js`
+   （`npm run data:build:ward-polygons`）。N03取り込みが flat 化した `rings[]` を、巻き順に依存せず
+   **包含関係（ネスト深さ）**で `{outer, holes}` へ再構成。飛び地・穴・穴の中の島に対応。
+   出力: `data/processed/osaka-city/boundaries/ward-classification-polygons.json`
+   （24区 / 此花区9・住之江区5・港区3・大正区2 polygon飛び地 / 東淀川区に hole 1 / znorth-neg-v1）。
+2. **point-in-polygon** — `tools/lib/point-in-polygon.js`。`pointInRing`（既存 build-ward-poc-data.cjs と
+   同一 even-odd）／`pointInPolygonWithHoles`／`pointInWard`（bbox即時棄却つき・飛び地対応）／
+   `classifyPointToWard`（区境界の縫い目に乗った点は 4近傍多数決で片側へ寄せ、決着しなければ ambiguous）。
+3. **建物代表点** — `tools/lib/building-representative-point.js`。面積重心 → 重心が凹形状で外に出たら
+   z水平スキャンラインの最長内部区間の中点 → それも失敗なら bbox 中心（method を記録）。
+   実データ 584,490 棟で centroid 581,921 / interior-scanline 2,569 / bbox-center 0。
+4. **validator** — `tools/lib/ward-classification-validator.js` + `tools/validate/ward-classification.js`
+   （`npm run data:validate:ward-classification`）。24区網羅／wardId重複／registry外／finite／ring正常／
+   相互排他（各区の内部点→自区）／既存3区の内部点→自区／大阪市外点→どの区にも入らない、を検証。
+   実データで **全チェック PASS**。
+5. **既存3区との比較** — `tools/compare/ward-classification-vs-poc.js`。下記「比較結果」。
+6. **次工程への出力** — `classify-buildings-by-ward.js --jsonl-out` で `{buildingId, wardId}` を出力でき、
+   P1-4（区別 dataset/tile 生成）へそのまま渡せる。
+
+### 【重要な発見】N03取り込みの z 軸が znorth-neg-v1 と反転している
+- `tools/lib/n03-boundaries.js` は出力に `coordinateConvention: "znorth-neg-v1"` を付けるが、実際には
+  `tools/lib/projection.js` の `geoToLocal`（`z = (lat-centerLat)*metersPerDegree`、**北 = z 正**）で変換しており、
+  Live City本体の znorth-neg-v1（**北 = z 負**）と **z 符号が反転**している。x・原点は一致。
+- 証拠: HTML埋め込み `TOWN_POLYGONS`（znorth-neg-v1）の実測centroidと N03 centroid の比較 —
+  住吉区 z: TOWN −283 / N03 +377、東住吉区 z: −1610 / +1651、平野区 z: −1120 / +971（x はすべて ±200m 以内で一致）。
+- 補正せず建物分類すると 584,490 棟中 **519,126 棟が「どの区にも属さない」**（南部の overlap 帯だけ分類できる）。
+  z を反転すると **区外 10,374 棟（1.8%）**まで下がり全24区に建物が入る。
+- **対応（今セッション）**: `tools/build-ward-polygons.js` が住吉区・東住吉区・平野区の実測centroidと
+  突き合わせて z 反転を **自動検出**し（`--z-axis auto` 既定）、z を negate して znorth-neg-v1 に揃える。
+  出力 metadata に `zAxisApplied: "negate"` と検出根拠を記録。`--z-axis as-is|negate` で明示指定も可。
+- **恒久修正は要ユーザー判断（NEEDS_USER_DECISION）**: (a) `tools/lib/n03-boundaries.js` で projection 適用時に
+  z を negate し、committed の `administrative-boundaries.json` を再生成する / (b) `tools/lib/projection.js` の
+  `geoToLocal` 自体を znorth-neg-v1 化する（roads/parks/waterways/facilities/landuse 変換 全てに波及、
+  現状それらの出力は HTML 未接続なので影響は限定的だが要精査）/ (c) 現状の build-ward-polygons.js の
+  自動補正で運用を続ける。AUTODEV_RULES.md 4条（座標系はユーザー確認）に該当するため自動では選ばない。
+
+### 24区polygon生成結果
+```
+24/24区 生成。飛び地: 此花区9 / 住之江区5 / 港区3 / 大正区2。hole: 東淀川区1。
+z軸: auto検出で negate 適用（東住吉区・平野区で参照と符号反転を確認）。
+validator: all-24-wards-present / no-duplicate / no-registry-external / coords-finite /
+           rings-valid / wards-self-consistent / known-3-wards-classify /
+           outside-city-unclassified すべて PASS。
+```
+
+### 既存3区との比較結果（`data/reports/ward-classification-vs-poc.json`）
+既存 ward-poc dataset（TOWN_POLYGONS = legacy-unverified だが znorth-neg-v1 の座標リファレンス）の
+建物を N03 point-in-polygon で再判定:
+
+| 区 | 建物 | N03一致 | 不一致内訳 |
+|---|---|---|---|
+| 住吉区 | 33,594 | 33,535 (**99.82%**) | 東住吉22 / 阿倍野37 |
+| 東住吉区 | 38,266 | 37,701 (**98.52%**) | 阿倍野179 / 平野208 / 生野91 / 住吉57 / 区外30 |
+| 平野区 | 43,843 | 43,625 (**99.50%**) | 東住吉107 / 生野40 / 区外71 |
+| 合計 | 115,703 | | **不一致 842 (0.73%)** → 判定 OK（境界帯の軽微な差のみ） |
+
+- 不一致サンプルは 住吉/東住吉 の境界（x ≈ −225〜−237 の縦帯）に集中。TOWN_POLYGONS の legacy 頂点座標と
+  N03 公式境界の差 = 帯状の境界付近のみ。**大規模不一致なし。**
+- `building.ward` 属性は **584,490 棟すべてが "東住吉区"** という壊れたプレースホルダで、分類情報を持たない。
+  P1-3指令どおり分類には一切使用していない（一致率は診断値としてのみ記録）。N03 point-in-polygon が authoritative。
+
+### 変更ファイル
+```
+新規: tools/lib/point-in-polygon.js
+新規: tools/lib/building-representative-point.js
+新規: tools/lib/ward-polygons.js
+新規: tools/lib/ward-classification-validator.js
+新規: tools/build-ward-polygons.js
+新規: tools/validate/ward-classification.js
+新規: tools/classify-buildings-by-ward.js
+新規: tools/compare/ward-classification-vs-poc.js
+新規: tests/point-in-polygon.test.js              (10 tests)
+新規: tests/ward-polygons.test.js                 (16 tests)
+新規: tests/ward-classification-validator.test.js (10 tests)
+新規: data/processed/osaka-city/boundaries/ward-classification-polygons.json  (生成物)
+新規: data/reports/ward-classification-validation.json / building-ward-classification.json / ward-classification-vs-poc.json
+変更: package.json  (test へ3ファイル追加、data:build:ward-polygons / data:validate:ward-classification / data:classify:buildings)
+変更: config/areas/osaka-city.json  (BOM除去・LF化。矛盾していた statusNote を実態へ更新。status は production のまま。z軸注意を追記)
+変更: tests/boundary-ingestion-validator.test.js  (area config 読込を BOM 許容に)
+```
+
+### テスト結果
+- `npm test`: **198 tests / 183 pass / 0 fail / 15 skip**（セッション2の 167/152 から +31）。
+- `tests/point-in-polygon.test.js` 10/10、`tests/ward-polygons.test.js` 16/16、
+  `tests/ward-classification-validator.test.js` 10/10。
+- `LIVECITY_HTML_PATH=public/osaka_3d_buildings.html node --test tests/html-regression.test.js`: **15/15 pass**。
+- `git diff --check`: 問題なし（CRLF警告のみ）。
+- 実データ: build-ward-polygons 24/24 OK、validate PASS、classify 恒等式成立、vs-poc 0.73% 不一致（OK判定）。
+
+### 未解決事項
+1. **N03 z軸反転の恒久修正（NEEDS_USER_DECISION）** — 上記(a)(b)(c)から選択が必要。
+   現状は build-ward-polygons.js の自動補正で機能しているが、`administrative-boundaries.json` の
+   `coordinateConvention: "znorth-neg-v1"` ラベルは厳密には不正確なまま。
+2. `building.ward` 属性が全件 "東住吉区" の壊れたデータ。`temp/ward-poc-all-buildings.jsonl` を再生成する
+   なら属性を正しく埋めるか、削除して N03 分類を正本にするのが望ましい。
+3. 区外 10,374 棟（1.8%）— 海岸・河川縁で PLATEAU が行政界をわずかに越える建物と推定。P1-4 で
+   「最近傍区へスナップ」するか「区外として除外」するかの方針決めが必要。
+4. `public/osaka_3d_buildings.html` に未コミットの変更あり（ユーザー側の OSM_WATER 再生成と推定）。
+   ただし `node tools/validate/water-geometry.js --html ...` は依然 `relation/18530061-63`（大和川河岸）を
+   FAIL 検出する。原因: `tools/fetch-water.js` は既定で HTML埋め込みの OSM_WATER をマージし、
+   `seen` セットで同一 id の relation を再取得スキップするため、旧い壊れた area レコードが残る。
+   → 再生成時は `--no-merge` を付けるか、`relation/*` の旧レコードを事前に除去する必要がある（セッション2の残課題）。
+   なお WaterLayer 側の `ringHasSpanningEdge` ガードにより、ブラウザ描画では巨大三角形は出ない。
+
+### P1-4へ進める状態か
+**進める。** 24区の Ward polygon（`ward-classification-polygons.json`）と point-in-polygon ライブラリ、
+建物代表点、validator が揃い、既存3区との整合（99%+）も確認済み。
+P1-4（残り21区の区別 dataset/tile 生成）は次を入力にできる:
+`ward-classification-polygons.json` → `representativePoint(building.fp)` → `classifyPointToWard` →
+`{buildingId → wardId}`（`classify-buildings-by-ward.js --jsonl-out` で出力可）→ `build-ward-poc-data.cjs` 相当の
+tile 生成。ただし上記1（z軸）を恒久修正するか、P1-4 も build-ward-polygons.js 経由の補正済み polygon を使うことを前提にする。
+
+---
+
 ## 2026-08-31 セッション2: 河川geometry修正（OSM multipolygon連結）
 
 ### 実行したタスク

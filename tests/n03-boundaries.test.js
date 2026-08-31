@@ -102,6 +102,31 @@ test('N03取り込み: projectionを渡した場合、既存projection.jsの式�
   }
 });
 
+test('N03取り込み: znorth-neg-v1 = 北ほど z が小さい（geoToLocal の +z 北から z を反転している）', () => {
+  // fixture の住吉区リング: 緯度 34.60（南）と 34.62（北）の頂点を含む。
+  // USER_DECISION 2026-08-31 (a): 変換後の z は「北 = 負」でなければならない。
+  const north = 34.62, south = 34.60, lon = 135.50;
+  const proj = SUMIYOSHI_AREA_PROJECTION;
+  const zOf = (lat) => -(lat - proj.centerLat) * proj.metersPerDegree; // 期待式（negate 済み）
+  assert.ok(zOf(north) < zOf(south), '北の頂点の方が z が小さい');
+
+  const fc = {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      properties: { N03_001: '大阪府', N03_004: '大阪市', N03_005: '住吉区', N03_007: '27120' },
+      geometry: { type: 'Polygon', coordinates: [[[lon, south], [lon + 0.01, south], [lon + 0.01, north], [lon, north], [lon, south]]] },
+    }],
+  };
+  const result = ingestN03FeatureCollection(fc, REGISTRY, { projection: proj });
+  const ring = result.records[0].geometry.rings[0];
+  const zs = ring.map((p) => p[1]);
+  const zNorth = Math.min(...zs);
+  const zSouth = Math.max(...zs);
+  assert.ok(Math.abs(zNorth - zOf(north)) < 1, `北頂点 z=${zNorth} が期待 ${zOf(north).toFixed(1)} と一致`);
+  assert.ok(Math.abs(zSouth - zOf(south)) < 1, `南頂点 z=${zSouth} が期待 ${zOf(south).toFixed(1)} と一致`);
+});
+
 test('N03取り込み: 出典データ(sourceProperties)にN03_001/004/005/007が原文のまま保持される', () => {
   const result = ingestN03FeatureCollection(FIXTURE, REGISTRY);
   const sumiyoshi = result.records.find((r) => r.wardId === 'sumiyoshi');

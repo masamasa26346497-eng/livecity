@@ -21,6 +21,16 @@
 // (fail-fast。1件だけスキップして処理を続行する既存のe-Stat取り込みツールとは意図的に方針を変えている)。
 import { validateGeometryStructure, convertGeometryToRings, mergeGeometriesToMultiPolygon } from './geojson-geometry.js';
 
+// tools/lib/projection.js の geoToLocal は「北 = z 正」で緯度経度をローカル座標へ変換する。
+// Live City本体の座標規約 znorth-neg-v1 は「北 = z 負」であり、既存の建物データ(BLDGS)・
+// TOWN_POLYGONS と座標系を一致させるには z を反転する必要がある。
+// projection.js 自体は roads/parks/waterways/facilities/landuse 等の変換でも共有されるため変更せず、
+// N03取り込みのこの位置で明示的に z へ負号を付け、実座標と coordinateConvention:"znorth-neg-v1" を一致させる。
+// （USER_DECISION 2026-08-31: option (a)。projection.js の変換規約は変更禁止。）
+function toZNorthNeg(ring) {
+  return ring.map(([x, z]) => [x, -z]);
+}
+
 export const REQUIRED_N03_PROPS = ['N03_001', 'N03_004', 'N03_005', 'N03_007'];
 // 大阪市24区以外の通常市町村では、行政区が存在しないためN03_005(区名)がnullになるのが正常データ
 // (REAL_N03_OUT_OF_SCOPE_NULL_VALIDATION 2026-08-30で実N03データにて確認済み)。scope判定に
@@ -115,8 +125,8 @@ export function resolveWardScope(props, registry, feature, index) {
  * @param {object} geojson FeatureCollection
  * @param {object} registry config/wards/registry.json相当のオブジェクト({ city, wards: [...] })
  * @param {{projection?: object}} [options] projectionを渡した場合のみThree.js座標(znorth-neg-v1)へ
- *   変換する。渡さない場合はWGS84のまま構造検証のみ行い、生のgeometryを保持する
- *   (config/areas/osaka-city.jsonがまだ確定していないため、production座標変換は本関数の責務外とする)。
+ *   変換する（geoToLocalで変換後、z を反転して znorth-neg-v1 = 北がz負 に一致させる。toZNorthNeg参照）。
+ *   渡さない場合はWGS84のまま構造検証のみ行い、生のgeometryを保持する。
  */
 export function ingestN03FeatureCollection(geojson, registry, options = {}) {
   if (!geojson || geojson.type !== 'FeatureCollection' || !Array.isArray(geojson.features)) {
@@ -181,7 +191,7 @@ export function ingestN03FeatureCollection(geojson, registry, options = {}) {
       ? {
           coordinatesConverted: true,
           coordinateConvention: 'znorth-neg-v1',
-          rings: group.geometries.flatMap((g) => convertGeometryToRings(g, projection)),
+          rings: group.geometries.flatMap((g) => convertGeometryToRings(g, projection).map(toZNorthNeg)),
         }
       : { coordinatesConverted: false, coordinateConvention: null, raw: rawGeometry };
 

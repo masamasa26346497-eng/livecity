@@ -1,14 +1,19 @@
-﻿{
+{
   "id": "osaka-city",
   "name": "大阪市24区エリア",
   "description": "大阪市24行政区の共通エリア定義（P1: 大阪市24区化）。projection原点とznorth-neg-v1座標規約は既存のosaka-sumiyoshiエリアと完全に同一に保ち、bboxのみ大阪市24区全域へ拡張している。これにより住吉区・東住吉区・平野区の既存建物データ座標は一切変化しない。",
   "status": "production",
   "statusNote": [
-    "このエリア定義はまだproduction確定ではない（AUTODEV_REPORT.md 2026-08-26 USER_DECISION 5・6）。",
-    "行政区境界のcanonical sourceである国土数値情報 N03 のライセンス・出典・基準年月日を記録した",
-    "再取り込み（tools/ingest/n03-administrative-boundaries.js を --license/--reference-date/--retrieved-url",
-    "付きでローカルPCから実行）と、tools/validate/boundary-ingestion.js による検証を通過した時点で",
-    "status を production へ引き上げる。それまでは既存の orchestrate/registry からは参照されない。"
+    "行政区境界（administrativeBoundaries）は canonical source の国土数値情報 N03 を出典metadata付きで",
+    "取り込み済み（data/processed/osaka-city/boundaries/administrative-boundaries.json、24区・出典完備）。",
+    "tools/validate/boundary-ingestion.js の全チェック PASS を確認して production へ昇格した（commit 94868ef）。",
+    "【座標軸】tools/lib/projection.js の geoToLocal は北=z正で変換するが、Live City本体は znorth-neg-v1（北=z負）。",
+    "USER_DECISION 2026-08-31 (a) により tools/lib/n03-boundaries.js の変換時に z を明示的に negate し、",
+    "administrative-boundaries.json は znorth-neg-v1 で保存済み。projection.js は変更していない。",
+    "tools/build-ward-polygons.js の z-axis auto 補正は移行安全策・異常検出として残しているが、正常データでは as-is。",
+    "都市レイヤー（roads/parks/railways/waterways/landuse）の24区展開は未着手。tiling 設計後に enabled。",
+    "【ファイル形式】UTF-8（BOMなし）・LF で保存すること。BOM付きだと一部ツールの JSON.parse が失敗する",
+    "（config/areas/osaka-sumiyoshi.json と同じ形式に揃える。loadAreaConfig はBOMを許容するが他は非対応）。"
   ],
   "bbox": {
     "south": 34.585,
@@ -53,7 +58,7 @@
       "source": "osm-overpass",
       "osmFilter": "way[\"natural\"=\"water\"];way[\"waterway\"=\"river\"];way[\"waterway\"=\"canal\"];relation[\"natural\"=\"water\"];relation[\"waterway\"=\"riverbank\"]",
       "outputFile": "waterways.json",
-      "note": "河川・河岸はOSMのmultipolygon relationとして提供されることが多く、outerメンバーwayの連結・inner ring（中州）の保持が必須。tools/convert/waterways.js / tools/fetch-water.js のリング組み立てが未対応だと、川を横断する巨大な三角形が生成される既知の不具合がある（P1後続タスクで対応予定）。"
+      "note": "河川・河岸はOSMのmultipolygon relationとして提供されることが多く、outerメンバーwayの連結・inner ring（中州）の保持が必須。tools/lib/osm-multipolygon.js の assembleMultipolygon がリング組み立てを担当し、未連結フラグメントは黙って三角形分割せず tools/validate/water-geometry.js で検出・報告する。"
     },
     "landuse": {
       "enabled": true,
@@ -67,7 +72,8 @@
       "outputFile": "boundaries/administrative-boundaries.json",
       "canonicalSource": "国土数値情報 N03 行政区域データ 2026年版（国土交通省）",
       "ingestTool": "tools/ingest/n03-administrative-boundaries.js",
-      "note": "24区の行政区外周ポリゴンおよびWard classificationの基準。町丁目ポリゴンは別系統（e-Stat 令和2年国勢調査 町丁・字等境界データ）。AUTODEV_REPORT.md 2026-08-26 USER_DECISION 1・2 を参照。"
+      "classificationPolygons": "boundaries/ward-classification-polygons.json",
+      "note": "24区の行政区外周ポリゴンおよびWard classificationの基準。point-in-polygon 判定用の {outer,holes} 構造は tools/build-ward-polygons.js が ward-classification-polygons.json として生成する。町丁目ポリゴンは別系統（e-Stat 令和2年国勢調査 町丁・字等境界データ）。"
     }
   },
   "demographics": {
@@ -82,7 +88,7 @@
   },
   "tiling": {
     "enabled": false,
-    "note": "大阪市24区全域（約23km x 20km）ではOSM都市レイヤーのタイル分割が必須。zoomLevels/tileSizeMeters を確定し次第 enabled:true にする（P1-3）。現時点では administrativeBoundaries の取り込み・検証のみを対象とし、都市レイヤーの24区展開は着手していない。",
+    "note": "大阪市24区全域（約23km x 20km）ではOSM都市レイヤーのタイル分割が必須。zoomLevels/tileSizeMeters を確定し次第 enabled:true にする（P1-3）。現時点では administrativeBoundaries の取り込み・検証・分類のみを対象とし、都市レイヤーの24区展開は着手していない。",
     "zoomLevels": [],
     "tileSizeMeters": 2000
   },
@@ -93,4 +99,3 @@
     "estat": "政府標準利用規約2.0"
   }
 }
-

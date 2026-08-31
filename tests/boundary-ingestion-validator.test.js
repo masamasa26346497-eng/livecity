@@ -16,9 +16,10 @@ import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { ingestN03FeatureCollection } from '../tools/lib/n03-boundaries.js';
 import { validateBoundaryIngestion, evaluateRing } from '../tools/lib/boundary-ingestion-validator.js';
 
-const REGISTRY = JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'config', 'wards', 'registry.json'), 'utf-8'));
-const OSAKA_CITY_AREA = JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'config', 'areas', 'osaka-city.json'), 'utf-8'));
-const OSAKA_SUMIYOSHI_AREA = JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'config', 'areas', 'osaka-sumiyoshi.json'), 'utf-8'));
+const readJson = (p) => JSON.parse(readFileSync(p, 'utf-8').replace(/^﻿/, '')); // 一部エディタのUTF-8 BOMを許容
+const REGISTRY = readJson(path.join(PROJECT_ROOT, 'config', 'wards', 'registry.json'));
+const OSAKA_CITY_AREA = readJson(path.join(PROJECT_ROOT, 'config', 'areas', 'osaka-city.json'));
+const OSAKA_SUMIYOSHI_AREA = readJson(path.join(PROJECT_ROOT, 'config', 'areas', 'osaka-sumiyoshi.json'));
 
 // 24区 + 一部を複数Feature分割した synthetic N03 FeatureCollection。
 // 各区の矩形は registry の実bboxに緩く合わせ、既存3区は legacy osaka-sumiyoshi エリアと重なる位置に置く。

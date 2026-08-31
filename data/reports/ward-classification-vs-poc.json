@@ -1,0 +1,371 @@
+{
+  "generatedAt": "2026-08-31T11:25:32.675Z",
+  "pocDir": "public/__test__/ward-poc/buildings",
+  "wardPolygons": "data/processed/osaka-city/boundaries/ward-classification-polygons.json",
+  "total": 115703,
+  "disagreeTotal": 842,
+  "disagreeRate": 0.7277252966647364,
+  "verdict": "OK（境界帯の軽微な差のみ）",
+  "perWard": {
+    "sumiyoshi": {
+      "pocWardId": "sumiyoshi",
+      "count": 33594,
+      "agree": 33535,
+      "toOtherWard": {
+        "higashisumiyoshi": 22,
+        "abeno": 37
+      },
+      "toOutside": 0,
+      "toAmbiguous": 0,
+      "boundaryResolved": 0
+    },
+    "higashisumiyoshi": {
+      "pocWardId": "higashisumiyoshi",
+      "count": 38266,
+      "agree": 37701,
+      "toOtherWard": {
+        "sumiyoshi": 57,
+        "abeno": 179,
+        "ikuno": 91,
+        "hirano": 208
+      },
+      "toOutside": 30,
+      "toAmbiguous": 0,
+      "boundaryResolved": 0
+    },
+    "hirano": {
+      "pocWardId": "hirano",
+      "count": 43843,
+      "agree": 43625,
+      "toOtherWard": {
+        "higashisumiyoshi": 107,
+        "ikuno": 40
+      },
+      "toOutside": 71,
+      "toAmbiguous": 0,
+      "boundaryResolved": 0
+    }
+  },
+  "samples": [
+    {
+      "id": "bldg_d4b654b6-8b0d-452b-9898-133e6001dd7d",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -225.25,
+      "z": -169.17,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_746f77b9-b759-4d0c-b169-2a42a2fed35b",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -235.07,
+      "z": -10.43,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_97824ca1-8d8e-4527-b50f-60d200397b12",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -218.57,
+      "z": -62.74,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_b797215d-85e2-4abf-ad78-a48d310f61bc",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -235.22,
+      "z": -116.17,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_7bdd6ab2-b425-4e09-8ca5-e208b2ab8e19",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -234.87,
+      "z": -30.16,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_fe01140b-7df4-4e01-9bee-61669f0d8938",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -231.4,
+      "z": -15.89,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_22391fd7-665b-4311-a599-f8b5927fdf52",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -221.62,
+      "z": -33.72,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_d4d86e97-0c94-4bbc-b268-235bf960c7ee",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -234.71,
+      "z": -35.27,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_8117f86b-3961-4c12-bb7c-b1b42b57720b",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -219.04,
+      "z": -114.37,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_dc83c5dc-d062-4c41-8771-7daa09253fd5",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -225.83,
+      "z": -13.91,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_7e290b88-2a08-484f-adc0-17f241933900",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -235.96,
+      "z": -40.08,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_ccfc92f5-40e9-4d18-96dc-04bc525114d2",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -224.11,
+      "z": -136.31,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_66c54723-7d3b-438f-82d1-3ef1bbbb55fb",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -234.67,
+      "z": -152.35,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_df67cc1a-a84d-4be9-833b-662b143bbc7d",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -235.99,
+      "z": -44.7,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_b221e905-efb3-4fa8-b10c-dcf9b74b40d2",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -223.2,
+      "z": -114.4,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_ee40df8b-e220-49d1-bdc9-4febf6bec11f",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -224.25,
+      "z": -5.05,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_b05ad8bc-d842-48a5-8838-aede85c1936c",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -227.96,
+      "z": -151.64,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_55d2f549-996a-4a78-a2b4-b88ca8dd6f6d",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -227.94,
+      "z": -136.92,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_a6368adf-8d19-4589-a413-b14b86150549",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -226.23,
+      "z": -33.83,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_660d7df4-f243-4af4-adfa-dc8cb3e29574",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -237.16,
+      "z": -66.07,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_7eeb8ac5-197c-4e59-aff4-61fcce931529",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -186.35,
+      "z": -473.23,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_9a335f8a-29e2-4e7b-8b0b-23ea0fb1228d",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "higashisumiyoshi",
+      "x": -225.54,
+      "z": 813.41,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_94803eb8-5390-4b4f-b5c0-151d0c1f812e",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1077.85,
+      "z": -1353.14,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_f2af65bf-72a3-4482-a5b6-ccb32a183052",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1031.58,
+      "z": -1347.52,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_7570b8db-bef7-4bef-961f-47110ad7c582",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1093.97,
+      "z": -1356.58,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_feabfb18-5867-40e8-81f4-6dc48d0540d0",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1020.14,
+      "z": -1345.47,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_6b6076d8-1d51-43cd-9af1-c5681606f7d1",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1443.86,
+      "z": -1398,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_f5d89a61-eb58-4d33-bf99-fe231eca6df9",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1411.59,
+      "z": -1397.36,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_cae4b2b1-c457-41f4-8219-d56675f1d90a",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1494.71,
+      "z": -1399.74,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_12fe2f1a-5ed4-4e14-900d-08ce08d746aa",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1414.73,
+      "z": -1392.5,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_96ab039b-7b65-43cd-99b2-899be9de68f7",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1429.9,
+      "z": -1407.11,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_b7f5f37c-6167-426b-975c-69e215c64158",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1443.74,
+      "z": -1404.99,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_7191f19d-4d61-4aca-88ea-21307d41649d",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1477.63,
+      "z": -1399.73,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_2454acf3-4f04-414c-af61-f272255a5c4a",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1452.09,
+      "z": -1390.88,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_bc633e56-9b41-4f8a-9f6c-e3be62137ca3",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1398.31,
+      "z": -1390.76,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_c9bc699e-bd2c-4ebb-a9b8-ad34d90c68bc",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1417.06,
+      "z": -1398.52,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_989de287-7c03-496a-b777-60dda9235c87",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1379.73,
+      "z": -1390,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_4b450912-6a48-4f7b-b7a5-310f5d64fa0b",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1446.51,
+      "z": -1391.31,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_1abb46ca-7582-428f-a2b1-1bccb374b559",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1416.06,
+      "z": -1386.32,
+      "method": "centroid"
+    },
+    {
+      "id": "bldg_b6ee1040-2a1a-4a66-a35a-344660da4cf0",
+      "pocWard": "sumiyoshi",
+      "n03Ward": "abeno",
+      "x": -1372.6,
+      "z": -1379.35,
+      "method": "centroid"
+    }
+  ]
+}

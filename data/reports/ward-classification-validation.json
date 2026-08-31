@@ -1,0 +1,315 @@
+{
+  "generatedAt": "2026-08-31T11:25:21.549Z",
+  "input": "data/processed/osaka-city/boundaries/ward-classification-polygons.json",
+  "ok": true,
+  "checks": [
+    {
+      "name": "all-24-wards-present",
+      "pass": true,
+      "detail": "24区すべて存在",
+      "severity": "error"
+    },
+    {
+      "name": "no-duplicate-wardId",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "no-registry-external-ward",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "ward-identity-matches-registry",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "coords-finite",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "rings-valid",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "no-empty-wards",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "wards-self-consistent",
+      "pass": true,
+      "detail": "全24区で内部点→自区",
+      "severity": "error"
+    },
+    {
+      "name": "known-3-wards-classify",
+      "pass": true,
+      "detail": "住吉区・東住吉区・平野区の内部点が正しく自区へ",
+      "severity": "error"
+    },
+    {
+      "name": "outside-city-unclassified",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    }
+  ],
+  "wardReports": [
+    {
+      "wardId": "miyakojima",
+      "wardName": "都島区",
+      "wardCode": "27102",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "fukushima",
+      "wardName": "福島区",
+      "wardCode": "27103",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "konohana",
+      "wardName": "此花区",
+      "wardCode": "27104",
+      "polygonCount": 9,
+      "holeCount": 0,
+      "ringCount": 9,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "nishi",
+      "wardName": "西区",
+      "wardCode": "27106",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "minato",
+      "wardName": "港区",
+      "wardCode": "27107",
+      "polygonCount": 3,
+      "holeCount": 0,
+      "ringCount": 3,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "taisho",
+      "wardName": "大正区",
+      "wardCode": "27108",
+      "polygonCount": 2,
+      "holeCount": 0,
+      "ringCount": 2,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "tennoji",
+      "wardName": "天王寺区",
+      "wardCode": "27109",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "naniwa",
+      "wardName": "浪速区",
+      "wardCode": "27111",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "nishiyodogawa",
+      "wardName": "西淀川区",
+      "wardCode": "27113",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "higashiyodogawa",
+      "wardName": "東淀川区",
+      "wardCode": "27114",
+      "polygonCount": 1,
+      "holeCount": 1,
+      "ringCount": 2,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "higashinari",
+      "wardName": "東成区",
+      "wardCode": "27115",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "ikuno",
+      "wardName": "生野区",
+      "wardCode": "27116",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "asahi",
+      "wardName": "旭区",
+      "wardCode": "27117",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "joto",
+      "wardName": "城東区",
+      "wardCode": "27118",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "abeno",
+      "wardName": "阿倍野区",
+      "wardCode": "27119",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "sumiyoshi",
+      "wardName": "住吉区",
+      "wardCode": "27120",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "higashisumiyoshi",
+      "wardName": "東住吉区",
+      "wardCode": "27121",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "nishinari",
+      "wardName": "西成区",
+      "wardCode": "27122",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "yodogawa",
+      "wardName": "淀川区",
+      "wardCode": "27123",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "tsurumi",
+      "wardName": "鶴見区",
+      "wardCode": "27124",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "suminoe",
+      "wardName": "住之江区",
+      "wardCode": "27125",
+      "polygonCount": 5,
+      "holeCount": 0,
+      "ringCount": 5,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "hirano",
+      "wardName": "平野区",
+      "wardCode": "27126",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "kita",
+      "wardName": "北区",
+      "wardCode": "27127",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    },
+    {
+      "wardId": "chuo",
+      "wardName": "中央区",
+      "wardCode": "27128",
+      "polygonCount": 1,
+      "holeCount": 0,
+      "ringCount": 1,
+      "nonFiniteCoords": 0,
+      "badRings": 0
+    }
+  ],
+  "summary": {
+    "wardCount": 24,
+    "registryWardCount": 24,
+    "coordinateConvention": "znorth-neg-v1",
+    "errorFailCount": 0
+  }
+}
