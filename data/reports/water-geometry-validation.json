@@ -1,91 +1,18 @@
 {
-  "generatedAt": "2026-08-30T16:02:08.588Z",
+  "generatedAt": "2026-09-01T12:17:47.597Z",
   "source": "public/osaka_3d_buildings.html",
-  "ok": false,
+  "ok": true,
   "summary": {
-    "total": 130,
-    "areas": 40,
+    "total": 124,
+    "areas": 34,
     "lines": 90,
-    "offenders": 6,
-    "oversizedSegments": 8,
+    "offenders": 0,
+    "oversizedSegments": 0,
     "selfIntersections": 0,
     "nonFiniteCoords": 0,
     "degenerate": 0
   },
-  "offenders": [
-    {
-      "id": "relation/18530061",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 45,
-      "oversizedSegments": 1,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530061"
-    },
-    {
-      "id": "relation/18530061",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 39,
-      "oversizedSegments": 1,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530061"
-    },
-    {
-      "id": "relation/18530062",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 26,
-      "oversizedSegments": 1,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530062"
-    },
-    {
-      "id": "relation/18530062",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 52,
-      "oversizedSegments": 3,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530062"
-    },
-    {
-      "id": "relation/18530063",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 30,
-      "oversizedSegments": 1,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530063"
-    },
-    {
-      "id": "relation/18530063",
-      "name": "",
-      "kind": "area",
-      "subtype": "river",
-      "points": 30,
-      "oversizedSegments": 1,
-      "selfIntersections": 0,
-      "nonFiniteCoords": 0,
-      "degenerate": false,
-      "label": "relation/18530063"
-    }
-  ],
+  "offenders": [],
   "checks": [
     {
       "name": "coords-finite",
@@ -99,8 +26,8 @@
     },
     {
       "name": "no-oversized-segments",
-      "pass": false,
-      "detail": "巨大セグメントを含む面 6件 / 計8辺"
+      "pass": true,
+      "detail": "OK"
     },
     {
       "name": "no-area-self-intersections",

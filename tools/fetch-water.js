@@ -24,6 +24,22 @@
 // ── ES Module形式（package.jsonの "type": "module" に対応）──
 import fs from 'node:fs';
 import { assembleMultipolygon } from './lib/osm-multipolygon.js';
+import { analyzeRing } from './lib/geometry-anomaly.js';
+
+// 埋め込み済み OSM_WATER レコードが「川面を横断する巨大三角形」の原因になる幾何を持つか判定する。
+// merge 時に旧い壊れた relation（旧 fetch-water の個別way面化で生じた暗黙閉合辺つき area 等）を
+// 温存しないためのフィルタ。--no-merge（完全 replace）でも、fixture 等で混入した壊れ record を弾く。
+function isBrokenWaterRecord(w) {
+  if (!w || !Array.isArray(w.p) || w.p.length < 2) return true;
+  if (w.p.some((q) => !Array.isArray(q) || !Number.isFinite(q[0]) || !Number.isFinite(q[1]))) return true;
+  if (w.kind === 'line') return false; // 線（中心線）は長い直線区間があっても正常
+  const rings = [w.p, ...((w.holes || []))];
+  for (const ring of rings) {
+    const ev = analyzeRing(ring, { oversizedAbs: 350, oversizedMedianMult: 15, oversizedBboxRatio: 0.33 });
+    if (ev.oversizedSegments > 0 || ev.selfIntersections > 0 || ev.uniquePoints < 3) return true;
+  }
+  return false;
+}
 
 const ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 const RETRY = 3, RETRY_WAIT_MS = 3000;
@@ -99,26 +115,36 @@ async function main() {
   const htmlPath = args.html || 'public/osaka_3d_buildings.html';
   const out = [];
   const stats = { fromLanduse: 0, fromOverpass: 0, fromHtml: 0, areas: 0, lines: 0,
-    skippedSmall: 0, skippedInvalid: 0, skippedUnclosed: 0, holesKept: 0, holesOrphan: 0,
-    byKind: {}, unclosedReport: [] };
+    skippedSmall: 0, skippedInvalid: 0, skippedUnclosed: 0, skippedBrokenOnMerge: 0,
+    holesKept: 0, holesOrphan: 0, byKind: {}, unclosedReport: [], droppedBrokenIds: [] };
 
   // ── 既存のHTML埋め込みデータを引き継ぐ（再実行しても既存分が消えない）──
-  if (fs.existsSync(htmlPath) && !args['no-merge']) {
+  // --no-merge（または --replace）で完全 replace。壊れた relation を温存したくない場合に使う。
+  if (fs.existsSync(htmlPath) && !args['no-merge'] && !args.replace) {
     const line = fs.readFileSync(htmlPath, 'utf8').split('\n').find(l => l.startsWith('const OSM_WATER = '));
     if (line) {
       try {
         const prev = JSON.parse(line.slice(line.indexOf('['), line.lastIndexOf(']') + 1));
         for (const w of (prev || [])) {
           if (!w || !w.id || !Array.isArray(w.p)) continue;
+          // 旧 fetch-water の個別way面化で生じた壊れ area（巨大暗黙閉合辺・自己交差）は引き継がない。
+          if (isBrokenWaterRecord(w)) {
+            stats.skippedBrokenOnMerge++;
+            if (stats.droppedBrokenIds.length < 50) stats.droppedBrokenIds.push(w.id);
+            continue;
+          }
           out.push(w);
           stats.fromHtml++;
           if (w.kind === 'line') stats.lines++; else stats.areas++;
           const k = w.subtype || w.kind || 'water';
           stats.byKind[k] = (stats.byKind[k] || 0) + 1;
         }
-        console.log('既存HTMLの水域を引き継ぎ:', stats.fromHtml, '件');
+        console.log('既存HTMLの水域を引き継ぎ:', stats.fromHtml, '件' +
+          (stats.skippedBrokenOnMerge ? ` / 壊れ record を除外: ${stats.skippedBrokenOnMerge}件 (${stats.droppedBrokenIds.join(', ')})` : ''));
       } catch (e) { /* 解析できない場合は引き継がない */ }
     }
+  } else if (args['no-merge'] || args.replace) {
+    console.log('replace モード: 既存 OSM_WATER は引き継がず、取得分で完全に置き換えます。');
   }
 
   // ── A) ローカル取込（landuse.json の水域面）──

@@ -1,0 +1,301 @@
+{
+  "generatedAt": "2026-08-31T23:26:30.418Z",
+  "source": {
+    "buildings": "temp/ward-poc-all-buildings.jsonl",
+    "wardPolygons": "data/processed/osaka-city/boundaries/ward-classification-polygons.json",
+    "wardPolygonsCoordinateConvention": "znorth-neg-v1",
+    "classification": "N03 point-in-polygon (tools/lib/point-in-polygon.js). building.ward attribute NOT used.",
+    "tileSize": 500
+  },
+  "totals": {
+    "input": 584490,
+    "classified": 574112,
+    "unclassified": 10378,
+    "duplicateIdsSkipped": 0,
+    "invariant": true
+  },
+  "methodCounts": {
+    "centroid": 581921,
+    "interior-scanline": 2569
+  },
+  "wardBuildingCount": {
+    "miyakojima": 13199,
+    "fukushima": 11159,
+    "konohana": 13437,
+    "nishi": 12098,
+    "minato": 15489,
+    "taisho": 17363,
+    "tennoji": 14244,
+    "naniwa": 10133,
+    "nishiyodogawa": 23242,
+    "higashiyodogawa": 34685,
+    "higashinari": 21976,
+    "ikuno": 46212,
+    "asahi": 22424,
+    "joto": 32447,
+    "abeno": 26924,
+    "sumiyoshi": 34930,
+    "higashisumiyoshi": 38489,
+    "nishinari": 29204,
+    "yodogawa": 34289,
+    "tsurumi": 22068,
+    "suminoe": 21608,
+    "hirano": 44434,
+    "kita": 15779,
+    "chuo": 18279
+  },
+  "wardTileCount": {
+    "miyakojima": 33,
+    "fukushima": 25,
+    "konohana": 58,
+    "nishi": 29,
+    "minato": 34,
+    "taisho": 40,
+    "tennoji": 30,
+    "naniwa": 30,
+    "nishiyodogawa": 47,
+    "higashiyodogawa": 66,
+    "higashinari": 29,
+    "ikuno": 50,
+    "asahi": 35,
+    "joto": 48,
+    "abeno": 38,
+    "sumiyoshi": 51,
+    "higashisumiyoshi": 59,
+    "nishinari": 40,
+    "yodogawa": 62,
+    "tsurumi": 46,
+    "suminoe": 67,
+    "hirano": 83,
+    "kita": 44,
+    "chuo": 52
+  },
+  "wardBounds": {
+    "miyakojima": {
+      "minX": -670.62,
+      "maxX": 1453.65,
+      "minZ": -14252.16,
+      "maxZ": -9729.81
+    },
+    "fukushima": {
+      "minX": -5717.2,
+      "maxX": -3129.73,
+      "minZ": -11035.85,
+      "maxZ": -8560.07
+    },
+    "konohana": {
+      "minX": -12402.84,
+      "maxX": -4931.72,
+      "minZ": -10158.51,
+      "maxZ": -4553.86
+    },
+    "nishi": {
+      "minX": -5774.72,
+      "maxX": -2510.64,
+      "minZ": -9818.17,
+      "maxZ": -7006.05
+    },
+    "minato": {
+      "minX": -8319.07,
+      "maxX": -4684.98,
+      "minZ": -8110.02,
+      "maxZ": -5123.33
+    },
+    "taisho": {
+      "minX": -6826.97,
+      "maxX": -3924.27,
+      "minZ": -7049.88,
+      "maxZ": -3236.97
+    },
+    "tennoji": {
+      "minX": -1685.41,
+      "maxX": 776.32,
+      "minZ": -7986.55,
+      "maxZ": -4591.56
+    },
+    "naniwa": {
+      "minX": -4046.54,
+      "maxX": -1306.61,
+      "minZ": -7310.46,
+      "maxZ": -4873.34
+    },
+    "nishiyodogawa": {
+      "minX": -9013.26,
+      "maxX": -4864.41,
+      "minZ": -13719.38,
+      "maxZ": -9519.58
+    },
+    "higashiyodogawa": {
+      "minX": -2117.53,
+      "maxX": 3230.8,
+      "minZ": -17993.53,
+      "maxZ": -13401.36
+    },
+    "higashinari": {
+      "minX": 518.63,
+      "maxX": 3506.1,
+      "minZ": -8800.27,
+      "maxZ": -6686.14
+    },
+    "ikuno": {
+      "minX": -28.18,
+      "maxX": 3531.4,
+      "minZ": -6914.06,
+      "maxZ": -3216.46
+    },
+    "asahi": {
+      "minX": 310.07,
+      "maxX": 3898.43,
+      "minZ": -15453.78,
+      "maxZ": -11946.48
+    },
+    "joto": {
+      "minX": 860.07,
+      "maxX": 3724.92,
+      "minZ": -12382.25,
+      "maxZ": -8223.07
+    },
+    "abeno": {
+      "minX": -2661.39,
+      "maxX": 390.54,
+      "minZ": -4921.34,
+      "maxZ": -1316.64
+    },
+    "sumiyoshi": {
+      "minX": -3431.4,
+      "maxX": -128.54,
+      "minZ": -2286.99,
+      "maxZ": 1842.6
+    },
+    "higashisumiyoshi": {
+      "minX": -1003.89,
+      "maxX": 2084.65,
+      "minZ": -4472.81,
+      "maxZ": 1427.8
+    },
+    "nishinari": {
+      "minX": -4548.4,
+      "maxX": -1527.24,
+      "minZ": -5881.92,
+      "maxZ": -1949.9
+    },
+    "yodogawa": {
+      "minX": -6659.9,
+      "maxX": -1674.24,
+      "minZ": -16222,
+      "maxZ": -11652.77
+    },
+    "tsurumi": {
+      "minX": 3099.06,
+      "maxX": 6743.14,
+      "minZ": -12646.83,
+      "maxZ": -9239.05
+    },
+    "suminoe": {
+      "minX": -10312.73,
+      "maxX": -2955.57,
+      "minZ": -3400.23,
+      "maxZ": 720.74
+    },
+    "hirano": {
+      "minX": 1437.19,
+      "maxX": 5702.18,
+      "minZ": -4440.08,
+      "maxZ": 1482.2
+    },
+    "kita": {
+      "minX": -4342.87,
+      "maxX": -131.7,
+      "minZ": -12493.33,
+      "maxZ": -9393.2
+    },
+    "chuo": {
+      "minX": -2588.68,
+      "maxX": 1034.28,
+      "minZ": -10142.6,
+      "maxZ": -6490.91
+    }
+  },
+  "boundaryResolved": 1,
+  "unclassified": {
+    "total": 10378,
+    "pct": 1.78,
+    "byReason": {
+      "outside-all-wards": 10374,
+      "ambiguous": 4,
+      "invalid-footprint": 0
+    },
+    "outsideByDistanceToNearestWard": {
+      "<=25m": 2286,
+      "<=100m": 4831,
+      "<=500m": 3257,
+      ">500m": 0
+    },
+    "outsideNearestWard": {
+      "yodogawa": 176,
+      "konohana": 86,
+      "higashiyodogawa": 1103,
+      "suminoe": 15,
+      "higashisumiyoshi": 173,
+      "tsurumi": 3026,
+      "hirano": 890,
+      "higashinari": 945,
+      "ikuno": 755,
+      "asahi": 2397,
+      "joto": 808
+    }
+  },
+  "buildingWardAttributeVsN03": {
+    "match": 38489,
+    "mismatch": 535623,
+    "n03OutsideButAttr": 10378,
+    "noAttr": 0
+  },
+  "knownWardDelta": {
+    "sumiyoshi": {
+      "existing": 33594,
+      "n03": 34930,
+      "delta": 1336,
+      "pct": 4
+    },
+    "higashisumiyoshi": {
+      "existing": 38266,
+      "n03": 38489,
+      "delta": 223,
+      "pct": 0.6
+    },
+    "hirano": {
+      "existing": 43843,
+      "n03": 44434,
+      "delta": 591,
+      "pct": 1.3
+    }
+  },
+  "dataReadyCandidates": [
+    "miyakojima",
+    "fukushima",
+    "konohana",
+    "nishi",
+    "minato",
+    "taisho",
+    "tennoji",
+    "naniwa",
+    "nishiyodogawa",
+    "higashiyodogawa",
+    "higashinari",
+    "ikuno",
+    "asahi",
+    "joto",
+    "abeno",
+    "sumiyoshi",
+    "higashisumiyoshi",
+    "nishinari",
+    "yodogawa",
+    "tsurumi",
+    "suminoe",
+    "hirano",
+    "kita",
+    "chuo"
+  ],
+  "registryProductionSwitch": "NOT PERFORMED (P1-4指令#10)。dataReady 切替はユーザー判断。"
+}

@@ -21,6 +21,28 @@ Thumbs.db
 # Large raw datasets
 data/raw/
 
+# Large generated 24-ward building datasets (P1-4). Regenerate with:
+#   node tools/build-ward-building-datasets.js                              (nested, data/processed)
+#   node tools/build-ward-building-datasets.js --layout flat --out public/map-data/osaka-city/buildings --force   (P1-5 servable)
+# The per-ward counts / tileCount / bbox / unclassified breakdown are kept in
+# data/reports/building-dataset-generation.json (committed).
+data/processed/osaka-city/buildings/
+public/map-data/osaka-city/buildings/
+
+# P1-6 都市レイヤー tile（道路・河川・公園・鉄道）と Overpass raw キャッシュ。再生成:
+#   node tools/download/city-tiles.js --layer all --area osaka-city        (ローカルPC / ネットワーク必要)
+#   node tools/build-city-layer-tiles.js --layer all --public --force
+# 生成数・validator 結果は data/reports/city-layer-tiles-*.json（コミット）に保持。
+# （data/raw/ は既に上で除外済み。Overpass raw キャッシュは data/raw/osaka-city/_cache/ に置く）
+data/processed/osaka-city/roads/
+data/processed/osaka-city/parks/
+data/processed/osaka-city/railways/
+data/processed/osaka-city/waterways/
+public/map-data/osaka-city/roads/
+public/map-data/osaka-city/parks/
+public/map-data/osaka-city/railways/
+public/map-data/osaka-city/waterways/
+
 # Temporary/generated working data
 temp/
 

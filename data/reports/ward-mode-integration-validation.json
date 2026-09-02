@@ -1,0 +1,296 @@
+{
+  "generatedAt": "2026-08-31T23:33:25.578Z",
+  "datasetRoot": "public/map-data/osaka-city/buildings",
+  "htmlPath": "public/osaka_3d_buildings.ward-ux-v1.html",
+  "ok": true,
+  "checks": [
+    {
+      "name": "dataset:all-datasets-present",
+      "pass": true,
+      "detail": "24区 dataset 存在",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:no-registry-external-dataset",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:building-id-unique",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:no-building-in-two-wards",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:coords-finite",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:tile-bbox-consistent",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:classified-plus-unclassified-equals-input",
+      "pass": true,
+      "detail": "input 584490 = classified 574112 + unclassified 10378 + dup 0（root manifest 恒等式: true）",
+      "severity": "error"
+    },
+    {
+      "name": "dataset:known-3-wards-count-stable",
+      "pass": true,
+      "detail": "sumiyoshi: 33594→34930 (+4.0%) / higashisumiyoshi: 38266→38489 (+0.6%) / hirano: 43843→44434 (+1.3%)",
+      "severity": "error"
+    },
+    {
+      "name": "servable-path",
+      "pass": true,
+      "detail": "C:\\Users\\user\\OneDrive\\ドキュメント\\LiveCity\\livecity-data-pipeline\\public\\map-data\\osaka-city\\buildings",
+      "severity": "error"
+    },
+    {
+      "name": "flat-layout-servable",
+      "pass": true,
+      "detail": "<datasetId>/tile_x_z.json 形式・znorth-neg-v1",
+      "severity": "error"
+    },
+    {
+      "name": "html-ward-defs-24",
+      "pass": true,
+      "detail": "24区",
+      "severity": "error"
+    },
+    {
+      "name": "html-ward-defs-match-registry",
+      "pass": true,
+      "detail": "name/code/datasetId 一致",
+      "severity": "error"
+    },
+    {
+      "name": "html-ward-defs-all-dataReady",
+      "pass": true,
+      "detail": "24区とも dataReady:true",
+      "severity": "error"
+    },
+    {
+      "name": "html-ward-defs-have-datasets",
+      "pass": true,
+      "detail": "WARD_DEFS 全区に servable dataset あり",
+      "severity": "error"
+    },
+    {
+      "name": "html-basePath",
+      "pass": true,
+      "detail": "basePath=map-data/osaka-city/buildings rootManifest=map-data/osaka-city/buildings/manifest.json",
+      "severity": "error"
+    },
+    {
+      "name": "n03-ward-polygons-servable",
+      "pass": true,
+      "detail": "24区 / znorth-neg-v1",
+      "severity": "error"
+    }
+  ],
+  "wardDefs": [
+    {
+      "id": "sumiyoshi",
+      "name": "住吉区",
+      "datasetId": "osaka-sumiyoshi",
+      "code": "27120",
+      "dataReady": true
+    },
+    {
+      "id": "higashisumiyoshi",
+      "name": "東住吉区",
+      "datasetId": "osaka-higashisumiyoshi",
+      "code": "27121",
+      "dataReady": true
+    },
+    {
+      "id": "hirano",
+      "name": "平野区",
+      "datasetId": "osaka-hirano",
+      "code": "27126",
+      "dataReady": true
+    },
+    {
+      "id": "kita",
+      "name": "北区",
+      "datasetId": "osaka-kita",
+      "code": "27127",
+      "dataReady": true
+    },
+    {
+      "id": "miyakojima",
+      "name": "都島区",
+      "datasetId": "osaka-miyakojima",
+      "code": "27102",
+      "dataReady": true
+    },
+    {
+      "id": "fukushima",
+      "name": "福島区",
+      "datasetId": "osaka-fukushima",
+      "code": "27103",
+      "dataReady": true
+    },
+    {
+      "id": "konohana",
+      "name": "此花区",
+      "datasetId": "osaka-konohana",
+      "code": "27104",
+      "dataReady": true
+    },
+    {
+      "id": "chuo",
+      "name": "中央区",
+      "datasetId": "osaka-chuo",
+      "code": "27128",
+      "dataReady": true
+    },
+    {
+      "id": "nishi",
+      "name": "西区",
+      "datasetId": "osaka-nishi",
+      "code": "27106",
+      "dataReady": true
+    },
+    {
+      "id": "minato",
+      "name": "港区",
+      "datasetId": "osaka-minato",
+      "code": "27107",
+      "dataReady": true
+    },
+    {
+      "id": "taisho",
+      "name": "大正区",
+      "datasetId": "osaka-taisho",
+      "code": "27108",
+      "dataReady": true
+    },
+    {
+      "id": "tennoji",
+      "name": "天王寺区",
+      "datasetId": "osaka-tennoji",
+      "code": "27109",
+      "dataReady": true
+    },
+    {
+      "id": "naniwa",
+      "name": "浪速区",
+      "datasetId": "osaka-naniwa",
+      "code": "27111",
+      "dataReady": true
+    },
+    {
+      "id": "nishiyodogawa",
+      "name": "西淀川区",
+      "datasetId": "osaka-nishiyodogawa",
+      "code": "27113",
+      "dataReady": true
+    },
+    {
+      "id": "yodogawa",
+      "name": "淀川区",
+      "datasetId": "osaka-yodogawa",
+      "code": "27123",
+      "dataReady": true
+    },
+    {
+      "id": "higashiyodogawa",
+      "name": "東淀川区",
+      "datasetId": "osaka-higashiyodogawa",
+      "code": "27114",
+      "dataReady": true
+    },
+    {
+      "id": "higashinari",
+      "name": "東成区",
+      "datasetId": "osaka-higashinari",
+      "code": "27115",
+      "dataReady": true
+    },
+    {
+      "id": "ikuno",
+      "name": "生野区",
+      "datasetId": "osaka-ikuno",
+      "code": "27116",
+      "dataReady": true
+    },
+    {
+      "id": "asahi",
+      "name": "旭区",
+      "datasetId": "osaka-asahi",
+      "code": "27117",
+      "dataReady": true
+    },
+    {
+      "id": "joto",
+      "name": "城東区",
+      "datasetId": "osaka-joto",
+      "code": "27118",
+      "dataReady": true
+    },
+    {
+      "id": "tsurumi",
+      "name": "鶴見区",
+      "datasetId": "osaka-tsurumi",
+      "code": "27124",
+      "dataReady": true
+    },
+    {
+      "id": "abeno",
+      "name": "阿倍野区",
+      "datasetId": "osaka-abeno",
+      "code": "27119",
+      "dataReady": true
+    },
+    {
+      "id": "suminoe",
+      "name": "住之江区",
+      "datasetId": "osaka-suminoe",
+      "code": "27125",
+      "dataReady": true
+    },
+    {
+      "id": "nishinari",
+      "name": "西成区",
+      "datasetId": "osaka-nishinari",
+      "code": "27122",
+      "dataReady": true
+    }
+  ],
+  "btConfig": {
+    "basePath": "map-data/osaka-city/buildings",
+    "rootManifest": "map-data/osaka-city/buildings/manifest.json"
+  },
+  "datasetSummary": {
+    "datasetCount": 24,
+    "classifiedScanned": 574112,
+    "unclassifiedScanned": 10378,
+    "rootTotals": {
+      "input": 584490,
+      "classified": 574112,
+      "unclassified": 10378,
+      "duplicateIdsSkipped": 0,
+      "invariant": true
+    },
+    "errorFailCount": 0,
+    "warningCount": 0
+  },
+  "summary": {
+    "errorFailCount": 0,
+    "warningCount": 0
+  }
+}

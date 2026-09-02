@@ -1612,6 +1612,12 @@ const GROUND_VISUAL_STYLE = {
   margin: 100,        // 座標範囲に加える安全余白（メートル相当）
   tileSize: 500       // 1タイルの一辺（この間隔で明度差を付ける。範囲に応じてタイル数は自動決定）
 };
+// [P1-5B] 補助地表の最小extent。config/areas/osaka-city.json の bbox
+//   (W135.342 / E135.601 / S34.585 / N34.770) を既存 znorth-neg-v1 変換
+//   （x=(lon-135.52502)*cos(34.604208°)*111320 / z=-(lat-34.604208)*111320）へ通した値。
+// 埋め込みBLDGS(旧3区)だけだと地面が3区分しか無く、24区表示で背景が途切れて見えるため、
+// データ由来のbboxとこれのunionを地面範囲とする（projection原点・znorth-neg-v1は不変）。
+const OSAKA_CITY_GROUND_EXTENT = { minX: -16900, maxX: 7100, minZ: -18600, maxZ: 2300 };
 const GroundVisualLayer = (function(){
   let group = null;
   let groundMesh = null; // [フェーズ4修正] 全タイルを統合した単一メッシュ（1 Draw Call）
@@ -1639,7 +1645,13 @@ const GroundVisualLayer = (function(){
     if (typeof OSM_PARKING !== 'undefined') for (const lot of OSM_PARKING) for (const pg of lot.polygons) for (const p of pg.outer) acc(p[0], p[1]);
     if (!isFinite(minX)) { minX = -2500; maxX = 2500; minZ = -750; maxZ = 750; } // 保険
     const m = GROUND_VISUAL_STYLE.margin;
-    return { minX: minX - m, maxX: maxX + m, minZ: minZ - m, maxZ: maxZ + m };
+    // [P1-5B] 大阪市24区の bbox（config/areas/osaka-city.json 由来）を最小extentとしてunionし、
+    // 24区表示で地面が途中で切れないようにする。
+    const E = OSAKA_CITY_GROUND_EXTENT;
+    return {
+      minX: Math.min(minX - m, E.minX), maxX: Math.max(maxX + m, E.maxX),
+      minZ: Math.min(minZ - m, E.minZ), maxZ: Math.max(maxZ + m, E.maxZ),
+    };
   }
   function build() {
     group = new THREE.Group();
@@ -3809,12 +3821,18 @@ const nightGM = new THREE.MeshPhongMaterial({color:0xffffff,vertexColors:true,em
 //   再試行はMAX_TILE_RETRIESまで。失敗しても住吉区（embedded）の表示は継続する。
 const BUILDING_TILE_CONFIG = {
   tileSize: 500,                 // 全データセット共通のタイル一辺（既存の描画マージ粒度と同一）
-  // [WARD-MODE-V2] このwardtest-v2.html限定で、本番release(data/buildings/releases/znorth-neg-v1)
-  // ではなく、STEP2で生成したWard PoC専用データ(public/__test__/ward-poc/buildings/)を参照する。
-  // production HTML(public/osaka_3d_buildings.html)のBUILDING_TILE_CONFIGはこの変更の影響を受けない
-  // （このファイルはstaging限定のコピーであり、本番ファイルとは別物）。
-  basePath: '__test__/ward-poc/buildings',
-  rootManifest: '__test__/ward-poc/buildings/manifest.json',
+  // [WARD-MODE P1-5] 大阪市24区の建物datasetを参照する。
+  //   root:  public/map-data/osaka-city/buildings/manifest.json
+  //   区:    public/map-data/osaka-city/buildings/{datasetId}/manifest.json
+  //   tile:  public/map-data/osaka-city/buildings/{datasetId}/tile_{tx}_{tz}.json  （flat layout）
+  // 生成: node tools/build-ward-building-datasets.js --layout flat --out public/map-data/osaka-city/buildings --force
+  //   （N03 point-in-polygon 分類。24区/1,096 tile/574,112棟。coordinateConvention=znorth-neg-v1。
+  //    building.ward 属性は不使用。data/reports/building-dataset-generation.json 参照）
+  // 旧 __test__/ward-poc/buildings（3区PoC、TOWN_POLYGONS分類）は削除せず残置（未使用）。
+  // production HTML(public/osaka_3d_buildings.html) はこの変更の影響を受けない（別ファイル）。
+  // protected baseline public/osaka_3d_buildings.fullward-v3.html も変更していない。
+  basePath: 'map-data/osaka-city/buildings',
+  rootManifest: 'map-data/osaka-city/buildings/manifest.json',
   embeddedDatasetId: 'osaka-embedded-mixedward-legacy', // HTML埋め込みBLDGSが属するデータセット
   nearDist: 900,                 // カメラ距離がこの値以下=近距離 → 3×3タイル
   midDist: 100000,                 // この値以下=中距離 → 5×5タイル
@@ -4610,45 +4628,78 @@ const BuildingTileLayer = (function () {
 // production(このフラグが存在しない)では従来のembedded込み重複除外仕様のまま。
 if (typeof window !== 'undefined') window.__WARD_POC_MODE__ = true;
 
+// [WARD-MODE P1-5B] 大阪市24区の行政区外周polygon(N03、znorth-neg-v1)を非同期ロードする。
+// 用途は「Ward切替時のカメラ移動先(centroid/bbox)」と detectWardAt のみ。
+// WardAreaFillLayer / WardBoundaryLayer / WardLabelLayer（町丁目タイル前提の塗り・外周抽出）へは
+// 流し込まない（1区=1巨大concaveポリゴンを入れると塗りが破綻し河川崩れに見えるため。P1-5実機で確認）。
+// - 出典: map-data/osaka-city/boundaries/ward-classification-polygons.json（build-ward-polygons.js 出力）
+// - 失敗しても建物表示・区切替・カメラ以外に影響しない（camera fly-to が既存3区のみに戻るだけ）。
+let __n03WardPolyCache = null; // wardId -> { rings:[[x,z]...], centroid:{x,z}, bbox:{minX,maxX,minZ,maxZ} }
+const __n03WardRingsReady = (typeof fetch === 'function')
+  ? fetch('map-data/osaka-city/boundaries/ward-classification-polygons.json')
+      .then((r) => (r && r.ok ? r.json() : null))
+      .then((j) => {
+        if (!j || !Array.isArray(j.wards)) { console.warn('[N03-WARD-POLY] 未配置または形式不一致'); return; }
+        const map = {};
+        for (const w of j.wards) {
+          const rings = [];
+          for (const poly of (w.polygons || [])) {
+            if (Array.isArray(poly.outer) && poly.outer.length >= 3) rings.push(poly.outer);
+          }
+          if (!w.wardId || !rings.length) continue;
+          let sx = 0, sz = 0, n = 0, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+          for (const ring of rings) for (const p of ring) {
+            sx += p[0]; sz += p[1]; n++;
+            if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
+            if (p[1] < minZ) minZ = p[1]; if (p[1] > maxZ) maxZ = p[1];
+          }
+          map[w.wardId] = { rings, centroid: { x: sx / n, z: sz / n }, bbox: { minX, maxX, minZ, maxZ } };
+        }
+        __n03WardPolyCache = map;
+        console.log('[N03-WARD-POLY] loaded 区数=' + Object.keys(map).length + '（用途: カメラ移動先・detectWardAt）');
+      })
+      .catch((e) => console.warn('[N03-WARD-POLY] 読込失敗（camera fly-to は既存3区のみ）:', e && e.message))
+  : Promise.resolve();
+
 const WardModeManager = (function () {
   // [WARD-NAVIGATOR] 大阪市24区分のWard Registry。config/wards/registry.json(Node側の生成/検証
   // ツールが読む正本)と同じ id/name/kana/code/townPrefix/datasetId を持つ。ブラウザ側はビルドツールを
   // 持たない単一静的HTMLのため、registry.jsonを起動時にfetchするのではなく、この配列へ手動で反映する
   // 運用としている(区を1つ追加するたびに、この配列へ1エントリ追記するだけで済み、他のロジックは
   // 一切変更不要)。
-  // dataReady: この区の建物datasetが実際にpublic/__test__/ward-poc/buildings/{datasetId}/へ
-  //   生成済みで、switchWard()で安全に読み込めるか(静的な既知の事実。推測では立てない)。
-  //   trueなのは現時点でtools/build-ward-poc-data.cjs実行済みの3区(住吉区・東住吉区・平野区)のみ。
-  //   残り21区はTOWN_POLYGONSに町丁目境界データが無くbuilding datasetも未生成のため、
-  //   Ward Registryには載せつつdataReady:falseとし、Ward Selector側で「準備中」disabled表示にする。
+  // dataReady: この区の建物datasetが public/map-data/osaka-city/buildings/{datasetId}/ へ生成済みで、
+  //   switchWard()で安全に読み込めるか(静的な既知の事実。推測では立てない)。
+  //   [P1-5 2026-09-01] 24区すべて建物dataset生成済み・tools/validate/ward-mode-integration.js PASS のため
+  //   24区とも dataReady:true。生成: node tools/build-ward-building-datasets.js --layout flat
+  //     --out public/map-data/osaka-city/buildings --force
+  //   区境界polygonは N03(map-data/osaka-city/boundaries/ward-classification-polygons.json)を
+  //   ensureWardRings()が非同期ロードして24区分を埋める(TOWN_POLYGONSにある3区も含め全てN03へ寄せる)。
   // kana: Ward Selectorの検索欄でかな入力から部分一致させるための読み仮名。
   const WARD_DEFS = [
     { id: 'sumiyoshi', name: '住吉区', kind: 'remote', datasetId: 'osaka-sumiyoshi', townPrefix: '住吉区', color: 0xffa64a, dataReady: true, kana: 'すみよし', code: '27120' },
     { id: 'higashisumiyoshi', name: '東住吉区', kind: 'remote', datasetId: 'osaka-higashisumiyoshi', townPrefix: '東住吉区', color: 0x4aa3ff, dataReady: true, kana: 'ひがしすみよし', code: '27121' },
     { id: 'hirano', name: '平野区', kind: 'remote', datasetId: 'osaka-hirano', townPrefix: '平野区', color: 0x5fd3a8, dataReady: true, kana: 'ひらの', code: '27126' },
-    // ここから先は建物dataset未生成(dataReady:false)。TOWN_POLYGONSに町丁目境界データが無いため
-    // 境界/ラベル/面発光レイヤーも自動的に何も描画しない(空のring配列→各レイヤーが自前でスキップ)。
-    { id: 'kita', name: '北区', kind: 'remote', datasetId: 'osaka-kita', townPrefix: '北区', color: 0xd45454, dataReady: false, kana: 'きた', code: '27127' },
-    { id: 'miyakojima', name: '都島区', kind: 'remote', datasetId: 'osaka-miyakojima', townPrefix: '都島区', color: 0xd47854, dataReady: false, kana: 'みやこじま', code: '27102' },
-    { id: 'fukushima', name: '福島区', kind: 'remote', datasetId: 'osaka-fukushima', townPrefix: '福島区', color: 0xd49c54, dataReady: false, kana: 'ふくしま', code: '27103' },
-    { id: 'konohana', name: '此花区', kind: 'remote', datasetId: 'osaka-konohana', townPrefix: '此花区', color: 0xd4c154, dataReady: false, kana: 'このはな', code: '27104' },
-    { id: 'chuo', name: '中央区', kind: 'remote', datasetId: 'osaka-chuo', townPrefix: '中央区', color: 0xc1d454, dataReady: false, kana: 'ちゅうおう', code: '27128' },
-    { id: 'nishi', name: '西区', kind: 'remote', datasetId: 'osaka-nishi', townPrefix: '西区', color: 0x9cd454, dataReady: false, kana: 'にし', code: '27106' },
-    { id: 'minato', name: '港区', kind: 'remote', datasetId: 'osaka-minato', townPrefix: '港区', color: 0x78d454, dataReady: false, kana: 'みなと', code: '27107' },
-    { id: 'taisho', name: '大正区', kind: 'remote', datasetId: 'osaka-taisho', townPrefix: '大正区', color: 0x54d454, dataReady: false, kana: 'たいしょう', code: '27108' },
-    { id: 'tennoji', name: '天王寺区', kind: 'remote', datasetId: 'osaka-tennoji', townPrefix: '天王寺区', color: 0x54d478, dataReady: false, kana: 'てんのうじ', code: '27109' },
-    { id: 'naniwa', name: '浪速区', kind: 'remote', datasetId: 'osaka-naniwa', townPrefix: '浪速区', color: 0x54d49c, dataReady: false, kana: 'なにわ', code: '27111' },
-    { id: 'nishiyodogawa', name: '西淀川区', kind: 'remote', datasetId: 'osaka-nishiyodogawa', townPrefix: '西淀川区', color: 0x54d4c1, dataReady: false, kana: 'にしよどがわ', code: '27113' },
-    { id: 'yodogawa', name: '淀川区', kind: 'remote', datasetId: 'osaka-yodogawa', townPrefix: '淀川区', color: 0x54c1d4, dataReady: false, kana: 'よどがわ', code: '27123' },
-    { id: 'higashiyodogawa', name: '東淀川区', kind: 'remote', datasetId: 'osaka-higashiyodogawa', townPrefix: '東淀川区', color: 0x549cd4, dataReady: false, kana: 'ひがしよどがわ', code: '27114' },
-    { id: 'higashinari', name: '東成区', kind: 'remote', datasetId: 'osaka-higashinari', townPrefix: '東成区', color: 0x5478d4, dataReady: false, kana: 'ひがしなり', code: '27115' },
-    { id: 'ikuno', name: '生野区', kind: 'remote', datasetId: 'osaka-ikuno', townPrefix: '生野区', color: 0x5454d4, dataReady: false, kana: 'いくの', code: '27116' },
-    { id: 'asahi', name: '旭区', kind: 'remote', datasetId: 'osaka-asahi', townPrefix: '旭区', color: 0x7854d4, dataReady: false, kana: 'あさひ', code: '27117' },
-    { id: 'joto', name: '城東区', kind: 'remote', datasetId: 'osaka-joto', townPrefix: '城東区', color: 0x9c54d4, dataReady: false, kana: 'じょうとう', code: '27118' },
-    { id: 'tsurumi', name: '鶴見区', kind: 'remote', datasetId: 'osaka-tsurumi', townPrefix: '鶴見区', color: 0xc154d4, dataReady: false, kana: 'つるみ', code: '27124' },
-    { id: 'abeno', name: '阿倍野区', kind: 'remote', datasetId: 'osaka-abeno', townPrefix: '阿倍野区', color: 0xd454c1, dataReady: false, kana: 'あべの', code: '27119' },
-    { id: 'suminoe', name: '住之江区', kind: 'remote', datasetId: 'osaka-suminoe', townPrefix: '住之江区', color: 0xd4549c, dataReady: false, kana: 'すみのえ', code: '27125' },
-    { id: 'nishinari', name: '西成区', kind: 'remote', datasetId: 'osaka-nishinari', townPrefix: '西成区', color: 0xd45478, dataReady: false, kana: 'にしなり', code: '27122' },
+    { id: 'kita', name: '北区', kind: 'remote', datasetId: 'osaka-kita', townPrefix: '北区', color: 0xd45454, dataReady: true, kana: 'きた', code: '27127' },
+    { id: 'miyakojima', name: '都島区', kind: 'remote', datasetId: 'osaka-miyakojima', townPrefix: '都島区', color: 0xd47854, dataReady: true, kana: 'みやこじま', code: '27102' },
+    { id: 'fukushima', name: '福島区', kind: 'remote', datasetId: 'osaka-fukushima', townPrefix: '福島区', color: 0xd49c54, dataReady: true, kana: 'ふくしま', code: '27103' },
+    { id: 'konohana', name: '此花区', kind: 'remote', datasetId: 'osaka-konohana', townPrefix: '此花区', color: 0xd4c154, dataReady: true, kana: 'このはな', code: '27104' },
+    { id: 'chuo', name: '中央区', kind: 'remote', datasetId: 'osaka-chuo', townPrefix: '中央区', color: 0xc1d454, dataReady: true, kana: 'ちゅうおう', code: '27128' },
+    { id: 'nishi', name: '西区', kind: 'remote', datasetId: 'osaka-nishi', townPrefix: '西区', color: 0x9cd454, dataReady: true, kana: 'にし', code: '27106' },
+    { id: 'minato', name: '港区', kind: 'remote', datasetId: 'osaka-minato', townPrefix: '港区', color: 0x78d454, dataReady: true, kana: 'みなと', code: '27107' },
+    { id: 'taisho', name: '大正区', kind: 'remote', datasetId: 'osaka-taisho', townPrefix: '大正区', color: 0x54d454, dataReady: true, kana: 'たいしょう', code: '27108' },
+    { id: 'tennoji', name: '天王寺区', kind: 'remote', datasetId: 'osaka-tennoji', townPrefix: '天王寺区', color: 0x54d478, dataReady: true, kana: 'てんのうじ', code: '27109' },
+    { id: 'naniwa', name: '浪速区', kind: 'remote', datasetId: 'osaka-naniwa', townPrefix: '浪速区', color: 0x54d49c, dataReady: true, kana: 'なにわ', code: '27111' },
+    { id: 'nishiyodogawa', name: '西淀川区', kind: 'remote', datasetId: 'osaka-nishiyodogawa', townPrefix: '西淀川区', color: 0x54d4c1, dataReady: true, kana: 'にしよどがわ', code: '27113' },
+    { id: 'yodogawa', name: '淀川区', kind: 'remote', datasetId: 'osaka-yodogawa', townPrefix: '淀川区', color: 0x54c1d4, dataReady: true, kana: 'よどがわ', code: '27123' },
+    { id: 'higashiyodogawa', name: '東淀川区', kind: 'remote', datasetId: 'osaka-higashiyodogawa', townPrefix: '東淀川区', color: 0x549cd4, dataReady: true, kana: 'ひがしよどがわ', code: '27114' },
+    { id: 'higashinari', name: '東成区', kind: 'remote', datasetId: 'osaka-higashinari', townPrefix: '東成区', color: 0x5478d4, dataReady: true, kana: 'ひがしなり', code: '27115' },
+    { id: 'ikuno', name: '生野区', kind: 'remote', datasetId: 'osaka-ikuno', townPrefix: '生野区', color: 0x5454d4, dataReady: true, kana: 'いくの', code: '27116' },
+    { id: 'asahi', name: '旭区', kind: 'remote', datasetId: 'osaka-asahi', townPrefix: '旭区', color: 0x7854d4, dataReady: true, kana: 'あさひ', code: '27117' },
+    { id: 'joto', name: '城東区', kind: 'remote', datasetId: 'osaka-joto', townPrefix: '城東区', color: 0x9c54d4, dataReady: true, kana: 'じょうとう', code: '27118' },
+    { id: 'tsurumi', name: '鶴見区', kind: 'remote', datasetId: 'osaka-tsurumi', townPrefix: '鶴見区', color: 0xc154d4, dataReady: true, kana: 'つるみ', code: '27124' },
+    { id: 'abeno', name: '阿倍野区', kind: 'remote', datasetId: 'osaka-abeno', townPrefix: '阿倍野区', color: 0xd454c1, dataReady: true, kana: 'あべの', code: '27119' },
+    { id: 'suminoe', name: '住之江区', kind: 'remote', datasetId: 'osaka-suminoe', townPrefix: '住之江区', color: 0xd4549c, dataReady: true, kana: 'すみのえ', code: '27125' },
+    { id: 'nishinari', name: '西成区', kind: 'remote', datasetId: 'osaka-nishinari', townPrefix: '西成区', color: 0xd45478, dataReady: true, kana: 'にしなり', code: '27122' },
   ];
   // STEP5: hysteresis/transition buffer。実データ(TOWN_POLYGONSの町丁目境界の典型的な辺長・
   // 頂点間隔)を確認したところ、隣接頂点間は概ね数十m〜200m程度、タイルサイズは500m。
@@ -4678,6 +4729,9 @@ const WardModeManager = (function () {
         }
       }
     }
+    // [P1-5B] N03 の行政区外周は WardAreaFillLayer / WardBoundaryLayer（町丁目タイル前提の
+    // 塗り/外周抽出）へは流し込まない（1区=1巨大concaveポリゴンを入れると塗りが破綻し河川崩れに
+    // 見える）。N03 は getWardPolygonN03()（カメラ移動・detectWardAt 専用）としてのみ公開する。
     wardRings = next;
     return wardRings;
   }
@@ -4698,13 +4752,31 @@ const WardModeManager = (function () {
   }
 
   function pointInWard(x, z, wardId) {
+    // TOWN_POLYGONS 由来（3区）を優先。無ければ [P1-5B] N03 の行政区外周で判定する（21区）。
     const rings = ensureWardRings()[wardId];
-    if (!rings) return false;
-    for (const ring of rings) { if (wardPointInRing(x, z, ring)) return true; }
+    if (rings && rings.length) {
+      for (const ring of rings) { if (wardPointInRing(x, z, ring)) return true; }
+      return false;
+    }
+    const n03 = __n03WardPolyCache && __n03WardPolyCache[wardId];
+    if (n03) {
+      if (x < n03.bbox.minX || x > n03.bbox.maxX || z < n03.bbox.minZ || z > n03.bbox.maxZ) return false;
+      for (const ring of n03.rings) { if (wardPointInRing(x, z, ring)) return true; }
+    }
     return false;
   }
   function detectWardAt(x, z) {
     for (const w of WARD_DEFS) if (pointInWard(x, z, w.id)) return w.id;
+    return null;
+  }
+  // [P1-5B] Ward切替時のカメラ移動先。N03 centroid/bbox を返す（HTMLへ24区座標をハードコードしない）。
+  function getWardCameraTarget(wardId) {
+    const n03 = __n03WardPolyCache && __n03WardPolyCache[wardId];
+    if (n03) {
+      const diag = Math.hypot(n03.bbox.maxX - n03.bbox.minX, n03.bbox.maxZ - n03.bbox.minZ);
+      return { x: n03.centroid.x, z: n03.centroid.z, radius: diag * 0.62 };
+    }
+    // フォールバック: TOWN_POLYGONS の3区は WardLabelLayer.getCentroid + estimateWardViewRadius へ委譲
     return null;
   }
   // 現在地から各ringの各辺までの最短距離（境界近接判定用。新規幾何は作らず既存頂点列から算出）
@@ -4883,43 +4955,63 @@ const WardModeManager = (function () {
       return true;
     }
 
-    // ── 'stream'モード: 従来通りのring Bベース挙動(後方互換、変更なし) ──
-    // 1. 現在区を非ACTIVE化（両区ともremote。embeddedは常にhide済みのまま維持）
-    if (prev) {
-      const prevDef = WARD_DEFS.find((w) => w.id === prev);
+    // ── 'stream'モード: ring Bベース。[P1-5B] 新区の最初のtileが届くまで旧区を消さない（画面を空にしない）──
+    const prevDef = prev ? WARD_DEFS.find((w) => w.id === prev) : null;
+    let oldWardReleased = false;
+    const releaseOldWard = (reason) => {
+      if (oldWardReleased) return;
+      oldWardReleased = true;
       if (prevDef) {
         if (disposeOnSwitch) BuildingTileLayer.disposeDataset(prevDef.datasetId);
         else BuildingTileLayer.disableDataset(prevDef.datasetId);
       }
-    }
-    timing.oldWardHiddenAt = now();
+      timing.oldWardHiddenAt = now();
+      if (reason) console.log(`[WardModeManager] 旧区 ${prevDef ? prevDef.name : 'なし'} を解放 (${reason})`);
+    };
 
-    // 2〜4. 新しい区だけをACTIVE化。enableDatasetが内部でmanifest取得→
-    //       次のupdateByCameraでcontrols.target近傍のtileを自動fetchする。
+    // 新しい区をACTIVE化。enableDatasetが内部でmanifest取得→次のupdateByCameraで
+    // controls.target(=カメラ移動先)近傍のtileを自動fetchする（段階的表示）。
     BuildingTileLayer.enableDataset(def.datasetId);
-    console.log('[WardModeManager] switchWard(stream) →', def.name, `(dataset=${def.datasetId})`);
+    console.log('[WardModeManager] switchWard(stream) →', def.name, `(dataset=${def.datasetId})　旧区は最初のtileまで表示継続`);
+    if (typeof showWardLoadingIndicator === 'function') showWardLoadingIndicator(def.name);
 
-    // STEP9計測: manifest ready → first tile ready → usable view ready をポーリングで検出
     const pollStart = now();
+    const OLD_WARD_HOLD_TIMEOUT_MS = 4000; // 新区のtileが4秒来なくても旧区は解放（無限に古い区を残さない）
     const timer = setInterval(() => {
       const stats = BuildingTileLayer.getDatasetStats(def.datasetId);
       if (!timing.manifestReadyAt && stats && stats.manifestState === 'ready') {
         timing.manifestReadyAt = now();
+        timing.manifestMs = timing.manifestReadyAt - timing.switchStart;
       }
       if (!timing.firstTileAt && stats && stats.tiles > 0) {
         timing.firstTileAt = now();
         timing.wardSwitchMs = timing.firstTileAt - timing.switchStart;
         timing.firstTileMs = timing.firstTileAt - (timing.manifestReadyAt || timing.switchStart);
+        timing.firstRenderMs = timing.firstTileAt - timing.switchStart;
+        releaseOldWard('新区の最初のtile到着'); // ← ここで初めて旧区を消す（重複表示を1フレームも作らない範囲で最短）
+        if (typeof hideWardLoadingIndicator === 'function') hideWardLoadingIndicator();
       }
       if (!timing.usableViewAt && stats && stats.tiles >= USABLE_VIEW_TILE_THRESHOLD) {
         timing.usableViewAt = now();
         timing.usableViewMs = timing.usableViewAt - timing.switchStart;
       }
+      if (!timing.firstTileAt && (now() - pollStart) > OLD_WARD_HOLD_TIMEOUT_MS) {
+        releaseOldWard('新区tileが4秒来ないためタイムアウト解放');
+      }
       if (timing.usableViewAt || (now() - pollStart) > SWITCH_TIMEOUT_MS) {
         clearInterval(timer);
+        releaseOldWard('切替完了');
+        if (typeof hideWardLoadingIndicator === 'function') hideWardLoadingIndicator();
+        const s = BuildingTileLayer.getDatasetStats(def.datasetId) || {};
         if (!timing.usableViewAt) console.warn('[WardModeManager] switchWard計測タイムアウト(15秒)。タイルが少ない/未配置の可能性。');
-        console.log('[WardModeManager] switch timing:', JSON.stringify({
-          ward: def.name, wardSwitchMs: timing.wardSwitchMs, firstTileMs: timing.firstTileMs, usableViewMs: timing.usableViewMs,
+        console.log('[WARD-PERF] ' + JSON.stringify({
+          wardId: def.id, ward: def.name, datasetId: def.datasetId,
+          manifestMs: Math.round(timing.manifestMs || 0),
+          firstTileFetchMs: Math.round(timing.firstTileMs || 0),
+          firstRenderMs: Math.round(timing.firstRenderMs || 0),
+          usableViewMs: Math.round(timing.usableViewMs || 0),
+          visibleTileCount: s.tiles || 0,
+          buildingCount: s.buildings || (s.manifest && s.manifest.totalBuildings) || 0,
         }));
       }
     }, 50);
@@ -4982,6 +5074,7 @@ const WardModeManager = (function () {
     detectWardAt,
     WARD_DEFS,
     getWardRings: ensureWardRings, // [FULLWARD-V2-FIX1] 遅延初期化を経由させる。呼び出し側の参照タイミングに依らず安全。
+    getWardCameraTarget, // [P1-5B] N03 centroid/bbox（カメラ移動先。無い区は null）
     HYSTERESIS_M,
     setAutoSwitch(v) { autoSwitchEnabled = !!v; },
     isAutoSwitch() { return autoSwitchEnabled; },
@@ -5001,10 +5094,15 @@ const WardModeManager = (function () {
 //   実際にレンダーフレームを跨いで可視化されることはない）ことで実現する。
 // 全タイル処理完了後、そのward所属の全タイルへ一括でshow()を呼ぶことで「1回のcommit」を実現する。
 //
-// window.__WARD_RENDER_MODE__: 'full'（既定、PoC）| 'stream'（従来のring Bベース）
+// window.__WARD_RENDER_MODE__: 'stream'（[P1-5B] 既定。最初の可視tileから段階的に表示。区切替が速い）
+//                            | 'full'（atomic commit。全タイルREADY後に一括表示。切替は遅いが空白なし）
+// [P1-5B] 24区の大きめdataset(最大 生野区 46k棟/50 tile)で full の atomic commit 待ちが体感の
+//   「区を切り替えても新しい区がすぐ表示されない」の主因だったため、既定を stream へ変更。
+//   stream 側は「新区の最初のtile到着まで旧区を消さない」よう修正済み（switchWard stream分岐）。
+//   full mode のロジック（atomic commit の順序）は一切変更していない（診断トグルで使用可）。
 // window.__WARD_FULL_CONCURRENCY__: 同時fetch数上限（既定6）
 const FullWardManager = (function () {
-  if (typeof window !== 'undefined' && window.__WARD_RENDER_MODE__ === undefined) window.__WARD_RENDER_MODE__ = 'full';
+  if (typeof window !== 'undefined' && window.__WARD_RENDER_MODE__ === undefined) window.__WARD_RENDER_MODE__ = 'stream';
   if (typeof window !== 'undefined' && window.__WARD_FULL_CONCURRENCY__ === undefined) window.__WARD_FULL_CONCURRENCY__ = 6;
 
   let loadingState = null; // { datasetId, total, done, failed, startedAt, loadDoneAt, geometryReadyAt, swapAt, cancelled, generation }
@@ -5514,6 +5612,7 @@ const WardBoundaryLayer = (function () {
 // WardBoundaryLayer定義よりも後方(script下部)でconst宣言されているため、ここで同期実行すると
 // TDZ違反(Cannot access 'TOWN_POLYGONS' before initialization)が再発する。
 // script全体の同期評価が完了しTOWN_POLYGONSの初期化が終わった後(setTimeout 0)に実行する。
+// [P1-5B] N03 は WardBoundaryLayer へ流さない方針に戻したため、待ち合わせは不要（従来どおり setTimeout 0）。
 setTimeout(() => {
   try {
     WardBoundaryLayer.show();
@@ -5631,7 +5730,7 @@ const WardAreaFillLayer = (function () {
     update: applyStatus, // 描画ループから毎フレーム呼ばれる想定。geometry生成は一切行わない軽量更新のみ。
   };
 })();
-// TOWN_POLYGONSのTDZを避けるため、WardBoundaryLayerと同じくsetTimeout(0)で初期化する。
+// TOWN_POLYGONSのTDZを避けるため setTimeout(0)で初期化する（P1-5B: N03は流さないため待ち合わせ不要）。
 setTimeout(() => {
   try {
     WardAreaFillLayer.show();
@@ -5907,7 +6006,7 @@ const cs = {
   ph: Math.PI/4,      // 45°仰角（地図モードでもこの45°を維持して固定する）
   r:  5300,
   drag:false, btn:-1, lx:0, ly:0,
-  minPh:0.05, maxPh:1.45, minR:60, maxR:9000
+  minPh:0.05, maxPh:1.45, minR:60, maxR:24000 // [P1-5B] 大阪市24区(約24km四方)を1画面へ収めるため maxR を拡大
 };
 // 距離に応じた操作モード切替の閾値（Google Maps/Earth風の操作感）
 // 近距離(<NEAR_DIST): 都市探索モード = 左ドラッグ回転・右ドラッグパン、回転速度100%
@@ -6491,7 +6590,7 @@ const WardLabelLayer = (function () {
   };
 })();
 setTimeout(() => {
-  // TOWN_POLYGONS(script下部でconst宣言)のTDZを避けるため、WardBoundaryLayerと同じくsetTimeout(0)で初期化する。
+  // TOWN_POLYGONS(script下部でconst宣言)のTDZを避けるため setTimeout(0)で初期化する。
   try {
     WardLabelLayer.show();
     console.log('[WARD-LABEL-READY]');
@@ -6499,6 +6598,182 @@ setTimeout(() => {
     console.error('[WARD-LABEL-ERROR]', e);
   }
 }, 0);
+
+// ══════════════════════════════════════════════════════════════
+// [P1-6] CityTileLayer: 大阪市24区の道路・河川・公園・鉄道を Ward 周辺タイルだけ progressive load。
+// ── 既存 RoadLayer / ParkLayer / WaterLayer / 埋め込み OSM_* には一切触れない独立レイヤー ──
+//   出典: map-data/osaka-city/{roads,waterways,parks,railways}/tile_<tx>_<tz>.json
+//         （node tools/build-city-layer-tiles.js --public。coordinateConvention=znorth-neg-v1）
+//   描画: 道路/鉄道 = LineSegments（幅なし・正確な中心線）、公園/水域(面) = 平面フィル（holes対応）、
+//         水域(線) = LineSegments、駅 = 小マーカー。ribbon 化は P1-7 以降。
+//   tile 割当: feature bbox の tile を load 時に id で dedup。LRU で不要 tile を dispose。
+//   データ未配置(404)時は静かに no-op（既存の埋め込み3区レイヤーがそのまま動作）。
+// ══════════════════════════════════════════════════════════════
+const CityTileLayer = (function () {
+  const BASE = 'map-data/osaka-city';
+  const LAYERS = ['waterways', 'parks', 'railways', 'roads'];
+  const STYLE = {
+    roads:     { y: 0.13, color: 0x8892a0, kind: 'line' },
+    railways:  { y: 0.14, color: 0xb0b6c0, kind: 'line' },
+    waterways: { y: 0.05, color: 0x3f6b8a, areaColor: 0x39627f, kind: 'mixed' },
+    parks:     { y: 0.07, color: 0x4a8f45, kind: 'area' },
+  };
+  const TILE_SIZE = 2000;
+  const RING = 1;                 // Ward 中心タイル ± RING を保持
+  const MAX_TILES_PER_LAYER = 40; // LRU 上限
+  const grp = new THREE.Group(); grp.name = 'CityTileLayer';
+  let attached = false;
+  const manifests = {};          // layer -> { tileSet:Set, loading:boolean, ok:boolean }
+  const tiles = {};              // layer -> Map("tx_tz" -> { mesh[], lastUsed, loading })
+  for (const L of LAYERS) tiles[L] = new Map();
+  const seenFeatureIds = new Set();
+  let lastKey = null, lastAt = 0;
+  const perf = {};
+
+  function ensureAttached() { if (!attached && typeof scene !== 'undefined') { scene.add(grp); attached = true; } }
+
+  async function loadManifest(layer) {
+    if (manifests[layer]) return manifests[layer];
+    manifests[layer] = { tileSet: new Set(), loading: true, ok: false };
+    try {
+      const t0 = performance.now();
+      const res = await fetch(`${BASE}/${layer}/manifest.json`);
+      if (!res.ok) { manifests[layer].loading = false; return manifests[layer]; }
+      const m = await res.json();
+      if (m.coordinateConvention !== 'znorth-neg-v1') { console.warn(`[CityTileLayer] ${layer}: coordinateConvention=${m.coordinateConvention} 不一致のためスキップ`); manifests[layer].loading = false; return manifests[layer]; }
+      manifests[layer].tileSet = new Set((m.tiles || []).map((t) => `${t.tx}_${t.tz}`));
+      manifests[layer].ok = true;
+      manifests[layer].loading = false;
+      perf[layer] = { manifestMs: Math.round(performance.now() - t0), firstTileMs: null, firstRenderMs: null };
+      console.log(`[LAYER-PERF] {"layer":"${layer}","manifestMs":${perf[layer].manifestMs},"tiles":${manifests[layer].tileSet.size}}`);
+    } catch (e) { manifests[layer].loading = false; console.warn(`[CityTileLayer] ${layer} manifest 読込不可（表示は継続）:`, e && e.message); }
+    return manifests[layer];
+  }
+
+  function disposeTile(layer, key) {
+    const rec = tiles[layer].get(key);
+    if (!rec) return;
+    for (const mesh of rec.mesh) { grp.remove(mesh); if (mesh.geometry) mesh.geometry.dispose(); if (mesh.material) mesh.material.dispose(); }
+    tiles[layer].delete(key);
+  }
+
+  function lru(layer) {
+    if (tiles[layer].size <= MAX_TILES_PER_LAYER) return;
+    const sorted = [...tiles[layer].entries()].sort((a, b) => a[1].lastUsed - b[1].lastUsed);
+    while (tiles[layer].size > MAX_TILES_PER_LAYER) disposeTile(layer, sorted.shift()[0]);
+  }
+
+  function lineMesh(features, y, color) {
+    const pos = [];
+    for (const f of features) {
+      const p = f.p;
+      for (let i = 0; i < p.length - 1; i++) { pos.push(p[i][0], y, p[i][1], p[i + 1][0], y, p[i + 1][1]); }
+    }
+    if (!pos.length) return null;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeBoundingSphere();
+    return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color }));
+  }
+
+  function areaMesh(features, y, color) {
+    const pos = [];
+    for (const f of features) {
+      let ring = f.p;
+      if (!ring || ring.length < 3) continue;
+      if (ring.length > 3 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) ring = ring.slice(0, -1);
+      const holes = (f.holes || []).map((h) => (h.length > 3 && h[0][0] === h[h.length - 1][0] && h[0][1] === h[h.length - 1][1] ? h.slice(0, -1) : h)).filter((h) => h.length >= 3);
+      let faces = null;
+      try {
+        faces = THREE.ShapeUtils.triangulateShape(ring.map((p) => new THREE.Vector2(p[0], p[1])), holes.map((h) => h.map((p) => new THREE.Vector2(p[0], p[1]))));
+      } catch (e) { faces = null; }
+      if (!faces || !faces.length) continue;
+      const all = ring.concat(...holes);
+      for (const fc of faces) { for (const idx of fc) { const v = all[idx]; if (v) pos.push(v[0], y, v[1]); } }
+    }
+    if (!pos.length) return null;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeVertexNormals(); g.computeBoundingSphere();
+    return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
+  }
+
+  function stationMesh(features, y) {
+    const pos = [];
+    for (const f of features) {
+      const p = f.p[0]; if (!p) continue;
+      const s = 12;
+      pos.push(p[0] - s, y, p[1], p[0] + s, y, p[1], p[0], y, p[1] - s, p[0], y, p[1] + s);
+    }
+    if (!pos.length) return null;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xe0e4ea }));
+  }
+
+  async function loadTile(layer, tx, tz) {
+    const key = `${tx}_${tz}`;
+    const m = manifests[layer];
+    if (!m || !m.ok || !m.tileSet.has(key)) return;
+    const rec = tiles[layer].get(key);
+    if (rec) { rec.lastUsed = Date.now(); return; }
+    tiles[layer].set(key, { mesh: [], lastUsed: Date.now(), loading: true });
+    try {
+      const t0 = performance.now();
+      const res = await fetch(`${BASE}/${layer}/tile_${tx}_${tz}.json`);
+      if (!res.ok) { tiles[layer].delete(key); return; }
+      const tile = await res.json();
+      const cur = tiles[layer].get(key); if (!cur) return; // superseded by dispose
+      const feats = (tile.features || []).filter((f) => { const gid = layer + ':' + f.id; if (seenFeatureIds.has(gid)) return false; seenFeatureIds.add(gid); return true; });
+      const st = STYLE[layer];
+      const meshes = [];
+      if (layer === 'roads' || layer === 'railways') { const mm = lineMesh(feats.filter((f) => f.kind === 'line'), st.y, st.color); if (mm) meshes.push(mm); }
+      else if (layer === 'parks') { const mm = areaMesh(feats.filter((f) => f.kind === 'area'), st.y, st.color); if (mm) meshes.push(mm); }
+      else if (layer === 'waterways') {
+        const am = areaMesh(feats.filter((f) => f.kind === 'area'), st.y, st.areaColor); if (am) meshes.push(am);
+        const lm = lineMesh(feats.filter((f) => f.kind === 'line'), st.y + 0.005, st.color); if (lm) meshes.push(lm);
+      }
+      if (layer === 'railways') { const sm = stationMesh(feats.filter((f) => f.kind === 'station'), st.y + 0.01); if (sm) meshes.push(sm); }
+      ensureAttached();
+      for (const mesh of meshes) { mesh.renderOrder = 930; mesh.frustumCulled = true; grp.add(mesh); }
+      cur.mesh = meshes; cur.loading = false; cur.lastUsed = Date.now();
+      lru(layer);
+      if (perf[layer] && perf[layer].firstTileMs == null) {
+        perf[layer].firstTileMs = Math.round(performance.now() - t0);
+        perf[layer].firstRenderMs = perf[layer].firstTileMs;
+        console.log(`[LAYER-PERF] {"layer":"${layer}","firstTileMs":${perf[layer].firstTileMs},"firstRenderMs":${perf[layer].firstRenderMs}}`);
+      }
+    } catch (e) { tiles[layer].delete(key); console.warn(`[CityTileLayer] ${layer} tile ${key} 読込エラー（継続）:`, e && e.message); }
+  }
+
+  function updateForTarget(x, z) {
+    if (typeof fetch === 'undefined') return;
+    const ctx = Math.floor(x / TILE_SIZE), ctz = Math.floor(z / TILE_SIZE);
+    const key = ctx + '_' + ctz;
+    const nowT = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    if (key === lastKey && nowT - lastAt < 400) return;
+    lastKey = key; lastAt = nowT;
+    for (const layer of LAYERS) {
+      loadManifest(layer).then((m) => {
+        if (!m.ok) return;
+        for (let dz = -RING; dz <= RING; dz++) for (let dx = -RING; dx <= RING; dx++) loadTile(layer, ctx + dx, ctz + dz);
+      });
+    }
+  }
+
+  return {
+    updateForTarget,
+    // Ward 切替時: その Ward の周辺を即ロード開始（camera 到着を待たない）
+    onWardSwitch(x, z) { lastKey = null; updateForTarget(x, z); },
+    getStats() {
+      const s = {};
+      for (const L of LAYERS) s[L] = { loadedTiles: tiles[L].size, manifest: manifests[L] ? (manifests[L].ok ? 'ok' : 'none') : 'pending' };
+      return s;
+    },
+    getPerf() { return perf; },
+    dispose() { for (const L of LAYERS) for (const k of [...tiles[L].keys()]) disposeTile(L, k); seenFeatureIds.clear(); },
+  };
+})();
 
 // 建物クリック/ホバーの有効範囲も同じ距離閾値で判定する（広域表示時の誤クリック防止）
 // near: クリック・ホバーともに有効 / mid: ホバー有効・クリックは確認表示を挟む / far: クリック・ホバーともに無効
@@ -6522,8 +6797,29 @@ function overheadFactor(r){
   const t = (r - OVERHEAD_START) / (OVERHEAD_END - OVERHEAD_START);
   return t * t; // ease-in: 地図モードに入った直後は緩やかに、さらに引くと真上へ加速して寄っていく
 }
+// [P1-5B] カメラ距離に応じて Fog を後退させる。区全体〜市全体を見たときに背景面が
+// Fog で途切れて見える問題への対処。近距離では従来どおりのタイトな Fog を維持する。
+function updateFogForCameraDistance(){
+  try {
+    if (!scene || !scene.fog || typeof VISUAL_CONFIG === 'undefined') return;
+    const L = VISUAL_CONFIG.lighting[currentTimeOfDay] || VISUAL_CONFIG.lighting.day;
+    const fogScale = (VISUAL_CONFIG.mode && VISUAL_CONFIG.mode.current === 'data') ? VISUAL_CONFIG.fog.dataModeDistanceScale : 1;
+    const baseFar = (L.fogFar || 6000) * fogScale;
+    const baseNear = (L.fogNear || 2000) * fogScale;
+    const far = Math.max(baseFar, cs.r * 3.6);        // 遠景ほど Fog を遠ざける
+    scene.fog.far = far;
+    scene.fog.near = Math.min(baseNear, far * 0.35);
+  } catch (e) { /* Fog更新失敗は描画継続 */ }
+}
 function camUpd(){
   cs.ph=Math.max(cs.minPh,Math.min(cs.maxPh,cs.ph));
+  updateFogForCameraDistance();
+  // [P1-5B] 遠景（区全体〜市全体）で far clip により地面・建物が切れないよう、
+  // カメラ far plane を距離に応じて広げる（近景では従来の 14000 を維持）。
+  const wantFar = Math.max(14000, cs.r * 1.6 + 16000);
+  if (Math.abs(camera.far - wantFar) > 500) { camera.far = wantFar; camera.updateProjectionMatrix(); }
+  // [P1-6] Ward周辺の都市レイヤー tile を progressive load（内部で throttle。近景のみ）。
+  try { if (typeof CityTileLayer !== 'undefined' && cs.r < 6000) CityTileLayer.updateForTarget(cs.tgt.x, cs.tgt.z); } catch (e) { /* noop */ }
   // 視線角度: 通常のcs.phと、真上視点(ph≈0)をoverheadFactorでブレンド
   const ov = overheadFactor(cs.r);
   const effPh = cs.ph * (1 - ov) + 0.08 * ov; // 完全な0だと真上特有のジンバルロック感が出るため僅かに傾けて残す
@@ -7707,11 +8003,22 @@ function estimateWardViewRadius(wardId) {
 }
 function flyToWardCentroid(wardId) {
   try {
-    if (typeof WardLabelLayer === 'undefined' || typeof flyTo !== 'function') return;
-    const c = WardLabelLayer.getCentroid(wardId);
-    if (!c) return; // centroidがまだ計算されていない(WardLabelLayer未初期化等)場合は何もしない
-    const r = estimateWardViewRadius(wardId);
-    flyTo(c.x, c.z, r != null ? { r } : {});
+    if (typeof flyTo !== 'function') return;
+    // [P1-5B] まず N03 の centroid/bbox（24区共通、ハードコードなし）。無ければ TOWN_POLYGONS 3区の centroid。
+    let tgt = null, r = null;
+    if (typeof WardModeManager !== 'undefined' && WardModeManager.getWardCameraTarget) {
+      const t = WardModeManager.getWardCameraTarget(wardId);
+      if (t) { tgt = { x: t.x, z: t.z }; r = t.radius; }
+    }
+    if (!tgt && typeof WardLabelLayer !== 'undefined') {
+      tgt = WardLabelLayer.getCentroid(wardId);
+      r = estimateWardViewRadius(wardId);
+    }
+    if (!tgt) { console.warn('[WARD-NAVIGATOR] camera target 未取得（N03 polygon 未ロード & TOWN_POLYGONS外）', wardId); return; }
+    if (typeof cs !== 'undefined' && cs) r = Math.max(cs.minR || 0, Math.min(cs.maxR || Infinity, r || cs.r));
+    flyTo(tgt.x, tgt.z, r != null ? { r } : {});
+    // [P1-6] 建物 tile と独立して、選択 Ward 周辺の道路・河川・公園・鉄道 tile も即ロード開始。
+    try { if (typeof CityTileLayer !== 'undefined') CityTileLayer.onWardSwitch(tgt.x, tgt.z); } catch (e) { /* noop */ }
   } catch (e) {
     console.warn('[WARD-NAVIGATOR] flyToWardCentroid failed (camera move skipped, ward switch itself is unaffected)', wardId, e);
   }
@@ -8149,6 +8456,7 @@ function applySkyAndFog(){
   scene.fog.color.setHex(L.fogColor);
   scene.fog.near = L.fogNear * fogScale;
   scene.fog.far  = L.fogFar  * fogScale;
+  if (typeof updateFogForCameraDistance === 'function') updateFogForCameraDistance(); // [P1-5B] 遠景時は再度後退
 }
 
 // ── 時間帯切替(昼・夕方・夜) ──
@@ -8631,7 +8939,7 @@ let fc=0,lt=performance.now();
     ' &nbsp; <button id="perf-hud-metaevict-toggle" style="cursor:pointer;">metadata evict: ON</button>' +
     ' &nbsp; <button id="perf-hud-ward-auto-toggle" style="cursor:pointer;">Auto Ward Switch: OFF</button>' +
     ' &nbsp; <button id="perf-hud-ward-dispose-toggle" style="cursor:pointer;">switch dispose: IMMEDIATE</button>' +
-    ' &nbsp; <button id="perf-hud-render-mode-toggle" style="cursor:pointer;">render mode: FULL</button>' +
+    ' &nbsp; <button id="perf-hud-render-mode-toggle" style="cursor:pointer;">render mode: STREAM</button>' +
     ' &nbsp; ward: ' +
     WardModeManager.WARD_DEFS.map(w => `<button data-ward="${w.id}" style="margin:0 2px;cursor:pointer;">${w.name}</button>`).join('');
   document.body.appendChild(ctrl);
@@ -8899,6 +9207,68 @@ ${revisitLine}
   render();
   setInterval(render, 500); // [重要] 毎フレームではなく500ms間隔。renderループへは無干渉。
   console.log('[MEMORY-HUD] 有効化済み（500ms間隔更新・render loop無変更・production既定値は無変更）');
+})();
+
+// ══════════════════════════════════════════════════════════════
+// [P1-5B] Ward loading indicator + 実機確認用 diagnostic overlay
+// ── 区切替の待ち状態を可視化し、10〜20回切替でのメッシュ/タイル単調増加をチェックする ──
+// 描画ループ・BuildingTileLayer・WardModeManager のロジックには一切触れない（読み取りと DOM のみ）。
+// ══════════════════════════════════════════════════════════════
+function showWardLoadingIndicator(wardName) {
+  try {
+    let el = document.getElementById('ward-loading-indicator');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'ward-loading-indicator';
+      el.style.cssText = 'position:fixed;top:92px;left:50%;transform:translateX(-50%);z-index:99998;' +
+        'background:rgba(8,20,40,0.92);color:#8fd0ff;font:600 12.5px sans-serif;padding:7px 16px;' +
+        'border-radius:16px;border:1px solid rgba(80,160,255,0.35);pointer-events:none;';
+      document.body.appendChild(el);
+    }
+    el.textContent = `${wardName || ''} を読み込み中…`;
+    el.style.display = 'block';
+  } catch (e) { /* noop */ }
+}
+function hideWardLoadingIndicator() {
+  try {
+    const el = document.getElementById('ward-loading-indicator');
+    if (el) el.style.display = 'none';
+  } catch (e) { /* noop */ }
+}
+(function wardDiagnosticOverlay() {
+  if (typeof document === 'undefined') return;
+  const box = document.createElement('div');
+  box.id = 'ward-diag';
+  box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99990;background:rgba(3,8,18,0.82);' +
+    'color:#a8c8e8;font:11px/1.5 monospace;padding:6px 10px;border-radius:6px;border:1px solid rgba(80,160,255,0.2);' +
+    'white-space:pre;pointer-events:none;max-width:44vw;';
+  box.textContent = '[WARD-DIAG] init…';
+  document.body.appendChild(box);
+
+  let peakLoadedTiles = 0, peakTileObjects = 0;
+  setInterval(() => {
+    try {
+      if (typeof WardModeManager === 'undefined' || typeof BuildingTileLayer === 'undefined') return;
+      const wid = WardModeManager.currentWardId;
+      const def = (WardModeManager.WARD_DEFS || []).find((w) => w.id === wid);
+      const s = def ? (BuildingTileLayer.getDatasetStats(def.datasetId) || {}) : {};
+      const t = WardModeManager.getLastSwitchTiming ? (WardModeManager.getLastSwitchTiming() || {}) : {};
+      const loadedTiles = s.loadedTiles || 0;
+      const tileObjects = s.tiles || 0;
+      if (loadedTiles > peakLoadedTiles) peakLoadedTiles = loadedTiles;
+      if (tileObjects > peakTileObjects) peakTileObjects = tileObjects;
+      const fr = t.firstRenderMs != null ? Math.round(t.firstRenderMs) + 'ms'
+        : (t.wardSwitchMs != null ? Math.round(t.wardSwitchMs) + 'ms' : '—');
+      box.textContent =
+        `[WARD-DIAG] currentWard: ${def ? def.name : '(未初期化)'}  (${wid || '-'})\n` +
+        `visibleBuildings: ${(s.visibleBuildings || 0).toLocaleString()}   buildingCount(all): ${(s.buildings || 0).toLocaleString()}\n` +
+        `loadedTiles: ${loadedTiles}  (visible ${s.visibleTiles || 0} / hidden ${s.hiddenTiles || 0})   loadingTiles: ${s.io ? (s.io.pendingRequests ?? '—') : '—'}\n` +
+        `disposedTiles: ${s.disposedTiles || 0}   cachedTiles(hidden): ${s.hiddenTiles || 0}\n` +
+        `firstRenderMs: ${fr}   renderMode: ${(typeof window !== 'undefined' && window.__WARD_RENDER_MODE__) || 'stream'}\n` +
+        `peak loadedTiles: ${peakLoadedTiles}   peak tileObjects: ${peakTileObjects}  ← 連続切替で単調増加しないこと\n` +
+        `city layers: ${(typeof CityTileLayer !== 'undefined') ? JSON.stringify(CityTileLayer.getStats()) : '—'}`;
+    } catch (e) { /* noop */ }
+  }, 500);
 })();
 </script>
 </body>

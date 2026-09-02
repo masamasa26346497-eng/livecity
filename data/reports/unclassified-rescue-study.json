@@ -1,0 +1,269 @@
+{
+  "generatedAt": "2026-08-31T23:37:57.293Z",
+  "datasetRoot": "public/map-data/osaka-city/buildings",
+  "wardPolygons": "public/map-data/osaka-city/boundaries/ward-classification-polygons.json",
+  "params": {
+    "minCoverage": 0.5,
+    "grid": 12
+  },
+  "method": "footprint bbox grid-sampling で footprint と Ward polygon の面積重複率を近似。重なり率 >= 0.5 の区へ救済分類できるとみなす（実データセットは書き換えていない）。",
+  "unclassifiedOutside": 10374,
+  "rescuable": 12,
+  "rescuablePct": 0.12,
+  "stillUnclassifiedAfterRescue": 10362,
+  "rescuedByWard": {
+    "higashisumiyoshi": 1,
+    "tsurumi": 2,
+    "higashiyodogawa": 3,
+    "ikuno": 3,
+    "higashinari": 1,
+    "hirano": 2
+  },
+  "coverageBuckets": {
+    "0.5-0.7": 11,
+    "0.7-0.9": 1,
+    "0.9-1.0": 0
+  },
+  "rescuedVsReason": {
+    "outside-all-wards": 12
+  },
+  "rescueSamples": [
+    {
+      "id": "bldg_ee0eb955-03ee-4939-a186-9f268acf06b4",
+      "rescueWard": "higashisumiyoshi",
+      "coverage": 0.545,
+      "nearestWardId": "higashisumiyoshi",
+      "nearestWardDistance": 0.5
+    },
+    {
+      "id": "bldg_4b60a51f-5fb5-4a81-844a-1f5da0eccb02",
+      "rescueWard": "tsurumi",
+      "coverage": 0.506,
+      "nearestWardId": "tsurumi",
+      "nearestWardDistance": 0.1
+    },
+    {
+      "id": "bldg_5e153d16-1f42-4eea-9bcf-164bff8ab2c1",
+      "rescueWard": "tsurumi",
+      "coverage": 0.556,
+      "nearestWardId": "tsurumi",
+      "nearestWardDistance": 1.2
+    },
+    {
+      "id": "bldg_877c2114-495c-4c16-bbb8-3c2d63428284",
+      "rescueWard": "higashiyodogawa",
+      "coverage": 0.673,
+      "nearestWardId": "higashiyodogawa",
+      "nearestWardDistance": 0.2
+    },
+    {
+      "id": "bldg_e0b082f9-21df-4eb4-bdde-c474e9df63cd",
+      "rescueWard": "higashiyodogawa",
+      "coverage": 0.5,
+      "nearestWardId": "higashiyodogawa",
+      "nearestWardDistance": 3.3
+    },
+    {
+      "id": "bldg_a0ce583b-65d2-4fdd-99c0-99dd15e918c1",
+      "rescueWard": "higashiyodogawa",
+      "coverage": 0.583,
+      "nearestWardId": "higashiyodogawa",
+      "nearestWardDistance": 2.1
+    },
+    {
+      "id": "bldg_67d95c1f-a0c2-4d5c-8724-24b900d31895",
+      "rescueWard": "ikuno",
+      "coverage": 0.5,
+      "nearestWardId": "ikuno",
+      "nearestWardDistance": 0.5
+    },
+    {
+      "id": "bldg_8a5bd98f-3211-438f-bd3a-7882259dc8fb",
+      "rescueWard": "ikuno",
+      "coverage": 0.541,
+      "nearestWardId": "ikuno",
+      "nearestWardDistance": 1.6
+    },
+    {
+      "id": "bldg_2b10c721-efa4-4f02-a8b1-1291ea9a00bb",
+      "rescueWard": "ikuno",
+      "coverage": 0.511,
+      "nearestWardId": "ikuno",
+      "nearestWardDistance": 0.2
+    },
+    {
+      "id": "bldg_77b26cbb-070e-471d-8b44-c92a69f9fd3a",
+      "rescueWard": "higashinari",
+      "coverage": 0.541,
+      "nearestWardId": "higashinari",
+      "nearestWardDistance": 5
+    },
+    {
+      "id": "bldg_d33e45d1-4b57-446b-a9d9-dc169fd264ae",
+      "rescueWard": "hirano",
+      "coverage": 0.574,
+      "nearestWardId": "hirano",
+      "nearestWardDistance": 1
+    },
+    {
+      "id": "bldg_5d968813-8251-41af-b08f-8db66ec52c22",
+      "rescueWard": "hirano",
+      "coverage": 0.816,
+      "nearestWardId": "hirano",
+      "nearestWardDistance": 0.3
+    }
+  ],
+  "noOverlapSamples": [
+    {
+      "id": "bldg_9e93970a-8672-43bd-9bd4-516c916ae722",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 6.5
+    },
+    {
+      "id": "bldg_b2bca052-9330-499c-bd52-5826150ff469",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 10.2
+    },
+    {
+      "id": "bldg_a0a7f630-a0b8-4d0c-a4b0-05d6416ade88",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 9.1
+    },
+    {
+      "id": "bldg_7626a4a7-2ec7-4cf8-b910-272dc5fc4cc4",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 18.5
+    },
+    {
+      "id": "bldg_5a13fcdb-2a4b-4609-bdbf-6d98babdf5e6",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 14.8
+    },
+    {
+      "id": "bldg_ecc2ca11-e736-4731-87d0-97dd805a97a4",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 20.3
+    },
+    {
+      "id": "bldg_4b089539-3ba7-458e-a023-34c1c73a23bb",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 14.7
+    },
+    {
+      "id": "bldg_e2c2f85c-3fc9-4458-af61-3a1467966b7b",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 4.4
+    },
+    {
+      "id": "bldg_56b028c7-c813-4944-939d-6714c17a19be",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 10
+    },
+    {
+      "id": "bldg_6d959a11-aec5-470f-a5d8-1e862463639e",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 8.4
+    },
+    {
+      "id": "bldg_5a27a912-0116-4827-9852-1d57096428b3",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 11.9
+    },
+    {
+      "id": "bldg_79e40768-7da1-4789-8650-3fee6b1b0a33",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 11.9
+    },
+    {
+      "id": "bldg_2670f6fc-016f-497c-a35f-f766ef2e0c37",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 13.3
+    },
+    {
+      "id": "bldg_a76b39cb-99c9-4d19-96c8-6878566a002a",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 6
+    },
+    {
+      "id": "bldg_10e33130-a15c-4202-9816-76487eb226d5",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 8.1
+    },
+    {
+      "id": "bldg_ead1dcbe-9b7d-4da4-8a25-16d2069d9890",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 9.4
+    },
+    {
+      "id": "bldg_250018c5-c583-461c-8819-447bdbd40d87",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 7.4
+    },
+    {
+      "id": "bldg_b99929ab-56d3-4001-b069-bd1a4dc1f753",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 2.6
+    },
+    {
+      "id": "bldg_a826ac55-b7da-4af7-aadf-479de701061f",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 6.5
+    },
+    {
+      "id": "bldg_c3e26151-190b-42f2-993a-a4c54ab97f7b",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 6
+    },
+    {
+      "id": "bldg_74332251-e24f-47db-9543-0a57dfca1073",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 8.8
+    },
+    {
+      "id": "bldg_18484c63-ce16-490e-a3d4-bca363ee251c",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 10
+    },
+    {
+      "id": "bldg_2a5f0983-3d6a-463d-8631-d3dbbf98b0bb",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 26.3
+    },
+    {
+      "id": "bldg_1c488df1-2d0a-4660-afe8-0b82908a3632",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 14.6
+    },
+    {
+      "id": "bldg_5af0de0c-30e6-48f7-8f3f-bef2eb5c85ea",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 3.3
+    },
+    {
+      "id": "bldg_a74a9369-55b2-4943-95ff-5b2521faf3a0",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 11.6
+    },
+    {
+      "id": "bldg_7efca94b-867c-4ab9-8ebb-30d1534f9bcf",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 13.4
+    },
+    {
+      "id": "bldg_98acbaaf-2bec-480a-9255-a5c3f3d25956",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 14
+    },
+    {
+      "id": "bldg_cfcad089-477a-4e3f-b1d9-93a3bad7edec",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 24.6
+    },
+    {
+      "id": "bldg_6656a000-44cc-4cf5-b349-da477919b0b7",
+      "nearestWardId": "yodogawa",
+      "nearestWardDistance": 15.5
+    }
+  ],
+  "recommendation": "救済率が低い。unclassified は別レイヤー表示 or 非表示のままとし、P1-6 で PLATEAU 側の境界超過の実態を確認する。"
+}

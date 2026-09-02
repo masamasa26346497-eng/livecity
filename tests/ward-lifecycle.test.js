@@ -157,11 +157,14 @@ function createMockBuildingTileLayer(tilesByDataset, shouldFail) {
   };
 }
 
-function buildSandbox(mockBTL) {
+function buildSandbox(mockBTL, windowStub) {
   const factory = loadWardModules(loadHtml());
+  // [P1-5B] ward-ux-v1.html の既定 render mode は 'stream' に変更されたため、
+  // FULL WARD の atomic commit / superseded / abort を検証するこれらのテストは
+  // 明示的に full モードを指定する（full モードのロジック自体は未変更）。
   return factory(
     mockBTL, undefined, undefined, undefined, undefined,
-    performance, createConsoleStub(), {}, createDocumentStub(),
+    performance, createConsoleStub(), windowStub || { __WARD_RENDER_MODE__: 'full' }, createDocumentStub(),
     setInterval, clearInterval, setTimeout,
   );
 }

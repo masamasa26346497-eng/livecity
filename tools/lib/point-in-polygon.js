@@ -132,4 +132,49 @@ export function classifyPointToWard(x, z, wards, options = {}) {
   return { wardId: null, status: 'ambiguous', hitCount: direct.hitCount };
 }
 
+// ── 距離ユーティリティ（unclassified 建物の原因分類用） ──
+
+function pointToSegmentDistance(px, pz, ax, az, bx, bz) {
+  const dx = bx - ax, dz = bz - az;
+  const len2 = dx * dx + dz * dz;
+  if (len2 === 0) return Math.hypot(px - ax, pz - az);
+  let t = ((px - ax) * dx + (pz - az) * dz) / len2;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  return Math.hypot(px - (ax + t * dx), pz - (az + t * dz));
+}
+
+function distanceToRing(px, pz, ring) {
+  let min = Infinity;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const d = pointToSegmentDistance(px, pz, ring[i][0], ring[i][1], ring[i + 1][0], ring[i + 1][1]);
+    if (d < min) min = d;
+  }
+  return min;
+}
+
+/**
+ * 点(x,z)から、いずれかの区ポリゴン境界までの最短距離（メートル）。
+ * どの区にも属さない建物が「境界のすぐ外」なのか「明らかに市外」なのかを分けるのに使う。
+ * @returns {{distance:number, nearestWardId:string|null}}
+ */
+export function nearestWardDistance(x, z, wards) {
+  let min = Infinity;
+  let nearestWardId = null;
+  for (const w of wards) {
+    // bbox から明らかに遠い区はスキップ（bbox の外周までの距離が現在の min を超えるなら見ない）
+    if (w.bbox) {
+      const bx = Math.max(w.bbox.minX - x, 0, x - w.bbox.maxX);
+      const bz = Math.max(w.bbox.minZ - z, 0, z - w.bbox.maxZ);
+      if (Math.hypot(bx, bz) >= min) continue;
+    }
+    for (const poly of w.polygons) {
+      for (const ring of [poly.outer, ...(poly.holes || [])]) {
+        const d = distanceToRing(x, z, ring);
+        if (d < min) { min = d; nearestWardId = w.wardId; }
+      }
+    }
+  }
+  return { distance: min === Infinity ? null : min, nearestWardId };
+}
+
 export { BOUNDARY_EPS };
