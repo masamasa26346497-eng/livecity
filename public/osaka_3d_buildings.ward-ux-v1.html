@@ -5,7 +5,7 @@
 <title>大阪市 都市デジタルツイン</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#0d1117}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#f3f4f1}
 canvas{display:block}
 .panel{position:absolute;background:rgba(5,10,24,0.88);border:1px solid rgba(80,160,255,0.16);
   border-radius:12px;backdrop-filter:blur(14px);color:#b8cef0;font-size:11.5px;
@@ -645,10 +645,16 @@ const OSM_LABELS = [{"name":"市立苅田北小学校","category":"school","prio
    建物全体: x:-619~619, z:-345~345, 中心=(0,0,0)
    ============================================================ */
 
+// [Mission17] 都市模型の背景/地表/fog を統一する明るい neutral tone。
+//   建物白(MS_BUILDING_WHITE 0xeef0ec)よりわずかに明るい・中立で、純白ではない
+//   （純白だと白建物が背景へ溶ける）。scene.background / renderer.clearColor / scene.fog.color /
+//   CSS body / GroundVisualLayer(model) の 5 箇所をこの色へ揃え、有限な四角い地表境界を消す。
+const MS_BG_NEUTRAL = 0xf3f4f1;
+
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setClearColor(0x4a6178);   // ← 透明でなく不透明。背景確実に表示（明るい昼間トーン）
+renderer.setClearColor(MS_BG_NEUTRAL);   // [Mission17] 初期値も統一（initVisualSystem の applySkyAndFog で再適用）
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -664,12 +670,60 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.95;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x4a6178);  // ← scene側でも背景設定（明るい昼間トーン）
-scene.fog = new THREE.Fog(0x4a6178, 2200, 6000);
+scene.background = new THREE.Color(MS_BG_NEUTRAL);  // [Mission17] applySkyAndFog で時間帯別に再適用
+scene.fog = new THREE.Fog(MS_BG_NEUTRAL, 2200, 6000); // [Mission17] fog色は背景と同一。距離は applySkyAndFog / Mission18 で調整
+
+// ══════════════════════════════════════════════════════════════
+// [P1-6H] 都市模型スタイル: 白い建物 / 淡い水色の川 / 整然とした道路 / 落ち着いた台座
+// ══════════════════════════════════════════════════════════════
+//   canonical のヘルパは tools/lib/model-style.js（Node テスト済み）。ここに同じ計算を inline する。
+//   【正式な既定表示】ページを開くだけで模型表示になる。initVisualSystem() が applyModelStyle() を自動実行する。
+//   legacy 表示（従来のクリスタル建物・濃い川）は debug 用として残す:
+//     window.__MODEL_STYLE__ = false; applyModelStyle();
+if (typeof window !== 'undefined' && window.__MODEL_STYLE__ === undefined) window.__MODEL_STYLE__ = true;
+const MODEL_STYLE = { on: (typeof window === 'undefined' || window.__MODEL_STYLE__ !== false) };
+function msBlend(hex, target, t) {
+  const ar = (hex >> 16) & 255, ag = (hex >> 8) & 255, ab = hex & 255;
+  const br = (target >> 16) & 255, bg = (target >> 8) & 255, bb = target & 255;
+  const k = Math.max(0, Math.min(1, t));
+  const c = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  return (c(ar + (br - ar) * k) << 16) | (c(ag + (bg - ag) * k) << 8) | c(ab + (bb - ab) * k);
+}
+const MS_BUILDING_WHITE = 0xeef0ec;
+// [Mission09] 屋根(上面)は壁面よりごく僅かに明るい白にして、白模型でも roof/wall の立体差を出す。
+//   差は小さく（roof ≈ 1.00 / wall ≈ 0.95 相当）。用途色は寄せたまま強くしない。
+const MS_ROOF_WHITE = 0xf6f7f3;
+// [Mission07] 通常表示（MODEL_STYLE=true）の建物用途色をさらに白へ寄せ、「ほぼ白〜薄灰の都市模型」に統一する。
+//   壁 0.92 / 屋根 0.93（=用途色は 7〜8% だけ残る）。住宅/事務所/工場等の差は通常表示ではほぼ分からず、
+//   ごく僅かな色温度差のみ残る。用途色そのもの（PRESET_WALL_COLOR / UST / UST_REAL）は削除せず、
+//   MODEL_STYLE=false（分析/legacy）でそのまま復活する。立体感は色差ではなく陰影(Mission09)で出す。
+const MS_BUILDING_BLEND = 0.92, MS_ROOF_BLEND = 0.93;
+const msBuildingColor = (usageHex) => MODEL_STYLE.on ? msBlend(usageHex, MS_BUILDING_WHITE, MS_BUILDING_BLEND) : usageHex;
+const msRoofColor = (usageHex) => MODEL_STYLE.on ? msBlend(usageHex, MS_ROOF_WHITE, MS_ROOF_BLEND) : usageHex;
+// [Mission12] 都市模型の公園・緑地の淡い soft green（河川 #9ed6e6 とは緑優勢で明確に区別・彩度控えめ）。
+const MS_PARK_GREEN = 0xcfe3c7;
+function msLerpClamp(x, x0, x1, y0, y1) { const t = x1 === x0 ? 0 : Math.max(0, Math.min(1, (x - x0) / (x1 - x0))); return y0 + (y1 - y0) * t; }
 
 // カメラ: Step2と同じ方式
 // 全建物中心(0,8,0)から見る。pos=(600,600,600)→distance≈1039m, 45度
-const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 1, 14000);
+const WARD_FOV = 60; // Ward Mode / 近景の既定 FOV（従来値。ラベル・スプライトの距離スケール等がこれ前提で調整済み）
+// [Mission16] City Mode（大阪市全域）の初期カメラ preset。値を1箇所へ集約（magic number を散らさない）。
+//   canonical: tools/lib/city-mode.js の CITY_CAMERA_PRESET / cityCameraTarget()。
+const CITY_CAMERA_PRESET = {
+  elevationDeg: 42,     // 地平線からの仰角。真上(90)禁止・水平(0)禁止。屋根と側面の両方が読める斜め上視点。
+  azimuthDeg: 0,        // 北を画面上へ（既存の「北向き」方針を維持）。NW/SW 等は __CITY_CAMERA_PREVIEW__ で比較。
+  fov: 50,             // 都市模型写真的な落ち着いた perspective（Ward の 60 より控えめ。City Mode 中のみ適用）。
+  marginFactor: 1.10,  // bbox fit 後の余白（大阪市が画面の ~80〜88% を占める）。
+  targetYOffset: 50,   // controls.target を地表より少し上へ（立体感。地表が下へずれない程度）。
+  headroomM: 800,      // 縦 fit 時に建物高さ・空の余白として加える量。
+  minRadius: 6000,
+  maxRadius: 24000     // cs.maxR と一致（大阪市24区 ≈ 24km 四方）。
+};
+let cityFitSnapshot = null; // [Mission16] City Mode entry 時の {r,tx,tz,th,ph}。resize 再fit の安全判定に使う（未操作時のみ再fit）。
+// [Mission16] City Mode が有効か。camUpd / onR から参照する（CityModeManager 本体は宣言が後方にあり
+//   typeof でも TDZ になるため、前方で使えるフラグを別に持つ。CityModeManager.enter/exit が同期する）。
+let cityModeActive = false;
+const camera = new THREE.PerspectiveCamera(WARD_FOV, innerWidth/innerHeight, 1, 14000);
 camera.position.set(600, 600, 600);
 camera.lookAt(0, 8, 0);
 
@@ -1610,7 +1664,13 @@ const GROUND_VISUAL_STYLE = {
   // OSM_ROADSは範囲算出から除外する（区外へ伸びる道路端点がZ+4190mまであり、含めると
   // 地表がカメラ遠方まで不自然に延びる巨大面になるため。指示: 対象範囲に限定する）。
   margin: 100,        // 座標範囲に加える安全余白（メートル相当）
-  tileSize: 500       // 1タイルの一辺（この間隔で明度差を付ける。範囲に応じてタイル数は自動決定）
+  tileSize: 500,      // 1タイルの一辺（この間隔で明度差を付ける。範囲に応じてタイル数は自動決定）
+  // [P1-7B] City Mode（大阪市全域）では camera 距離が OSAKA_CITY_GROUND_EXTENT の半径を大きく
+  // 超えるため（例: radiusFactor=0.5でも約16km、手動ズームでmaxR=24km）、地表の四角い外周が
+  // 斜めの巨大面として視認されてしまう。GroundVisualLayer.computeBounds() の表示範囲だけを
+  // 追加パディングして遠ざける（OSAKA_CITY_GROUND_EXTENT 定数自体はcamera/tile grid計算で
+  // 共有されているため変更しない。ここでのみ範囲を広げる）。
+  groundPad: 9000
 };
 // [P1-5B] 補助地表の最小extent。config/areas/osaka-city.json の bbox
 //   (W135.342 / E135.601 / S34.585 / N34.770) を既存 znorth-neg-v1 変換
@@ -1648,9 +1708,12 @@ const GroundVisualLayer = (function(){
     // [P1-5B] 大阪市24区の bbox（config/areas/osaka-city.json 由来）を最小extentとしてunionし、
     // 24区表示で地面が途中で切れないようにする。
     const E = OSAKA_CITY_GROUND_EXTENT;
+    // [P1-7B] groundPad分だけ E よりさらに外側まで地表を伸ばし、City Mode遠景でも
+    // 四角い外周の辺が画面内の目立つ位置に来にくくする（OSAKA_CITY_GROUND_EXTENT自体は不変）。
+    const pad = GROUND_VISUAL_STYLE.groundPad || 0;
     return {
-      minX: Math.min(minX - m, E.minX), maxX: Math.max(maxX + m, E.maxX),
-      minZ: Math.min(minZ - m, E.minZ), maxZ: Math.max(maxZ + m, E.maxZ),
+      minX: Math.min(minX - m, E.minX - pad), maxX: Math.max(maxX + m, E.maxX + pad),
+      minZ: Math.min(minZ - m, E.minZ - pad), maxZ: Math.max(maxZ + m, E.maxZ + pad),
     };
   }
   function build() {
@@ -1875,20 +1938,33 @@ const ParkLayer = (function(){
     }
   }
 
-  let parkMesh = null; // [フェーズ4] モード切替でマテリアル色を差し替えるために参照を保持
-
+  // [フェーズ4/Mission12] tier 別（large/medium/small）の統合 fill mesh。CityTileLayer の公園 LOD と揃える。
+  const parkMeshes = {}; // 'large'|'medium'|'small' -> THREE.Mesh
   let parkEdge = null; // [フェーズ4視覚調整] 全公園の境界線を統合した単一LineSegments（1 Draw Call）
+
+  // [Mission12] レイヤー独立性のため park-lod のロジックをローカルに持つ（canonical: tools/lib/park-lod.js）。
+  const P_LARGE_M2 = 100000, P_MEDIUM_M2 = 10000, P_FAR_M = 9000, P_MID_M = 3500;
+  function pRingArea(r) { let a = 0; for (let i = 0; i < r.length; i++) { const p = r[i], q = r[(i + 1) % r.length]; a += p[0] * q[1] - q[0] * p[1]; } return Math.abs(a / 2); }
+  function pClassify(a) { if (!(a > 0)) return 'small'; if (a >= P_LARGE_M2) return 'large'; if (a >= P_MEDIUM_M2) return 'medium'; return 'small'; }
+  function pBand(d) { if (d > P_FAR_M) return 'far'; if (d > P_MID_M) return 'mid'; return 'near'; }
+  function pClassVisible(cls, d) { const b = pBand(d); if (cls === 'large') return true; if (cls === 'medium') return b !== 'far'; return b === 'near'; }
+  const P_OPACITY = { large: { near: 0.85, mid: 0.66, far: 0.5 }, medium: { near: 0.82, mid: 0.6, far: 0.6 }, small: { near: 0.8, mid: 0.8, far: 0.8 } };
+  function pOpacity(cls, d) { return (P_OPACITY[cls] || P_OPACITY.small)[pBand(d)]; }
+  // [Mission12] 模型スタイル時は淡い soft green（河川シアンと区別）、legacy は従来のオリーブ。
+  function parkFillColor(isReal) {
+    if (typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on) return MS_PARK_GREEN;
+    return isReal ? PARK_STYLE.colorReal : PARK_STYLE.color;
+  }
 
   function build() {
     group = new THREE.Group();
-    const positions = [];
-    const colors = []; // [フェーズ4] 公園ごとの決定的明度差
-    const edgePositions = []; // [フェーズ4視覚調整] 全公園の境界線（統合）
+    const buckets = { large: { pos: [], col: [] }, medium: { pos: [], col: [] }, small: { pos: [], col: [] } };
+    const edgePositions = [];
     let parkIndex = 0;
     for (const tileKey in OSM_PARK_TILES) {
       for (const park of OSM_PARK_TILES[tileKey]) {
-        appendParkPolygon(positions, park.p, colors, parkTintFactor(parkIndex));
-        // 境界線（各辺を2点ペアでLineSegmentsへ。縁取りは本体よりごくわずかに上へ）
+        const tier = pClassify(pRingArea(park.p));
+        appendParkPolygon(buckets[tier].pos, park.p, buckets[tier].col, parkTintFactor(parkIndex));
         const poly = park.p, n = poly.length;
         for (let i = 0; i < n; i++) {
           const a = poly[i], b = poly[(i + 1) % n];
@@ -1897,34 +1973,36 @@ const ParkLayer = (function(){
         parkIndex++;
       }
     }
-    if (positions.length) {
+    const isReal = isRealModeSafe();
+    for (const tier of ['large', 'medium', 'small']) {
+      const b = buckets[tier];
+      if (!b.pos.length) continue;
       const geom = new THREE.BufferGeometry();
-      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-      geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(b.pos), 3));
+      geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(b.col), 3));
       geom.computeVertexNormals();
       geom.computeBoundingSphere();
-      const isReal = isRealModeSafe();
       const mat = new THREE.MeshPhongMaterial({
-        color: isReal ? PARK_STYLE.colorReal : PARK_STYLE.color, vertexColors: true, // 頂点カラー(明度差)×material.color
-        shininess: 2, transparent: true, opacity: PARK_STYLE.opacity,
-        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, // Z-fighting防止（地面メッシュと近接するため）
-        side: THREE.DoubleSide // 巻き順補正済みだが、保険として両面描画にしておく
+        color: parkFillColor(isReal), vertexColors: true,
+        shininess: 2, transparent: true, opacity: P_OPACITY[tier].near,
+        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+        side: THREE.DoubleSide
       });
       const mesh = new THREE.Mesh(geom, mat);
       mesh.receiveShadow = true;
       mesh.frustumCulled = true;
-      parkMesh = mesh;
+      mesh.userData.parkTier = tier;
+      parkMeshes[tier] = mesh;
       group.add(mesh);
     }
-    // [フェーズ4視覚調整] 全公園の境界線を1つのLineSegmentsに統合（公園ごとの個別Mesh化はしない = 1 Draw Call）
+    // [フェーズ4視覚調整] 全公園の境界線を1つのLineSegmentsに統合（1 Draw Call）
     if (edgePositions.length) {
       const eg = new THREE.BufferGeometry();
       eg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(edgePositions), 3));
       eg.computeBoundingSphere();
-      const isReal = isRealModeSafe();
       const eMat = new THREE.LineBasicMaterial({
-        color: isReal ? PARK_STYLE.edgeColorReal : PARK_STYLE.color,
-        transparent: true, opacity: 0.5 // ごく控えめな縁取り
+        color: (typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on) ? MS_PARK_GREEN : (isReal ? PARK_STYLE.edgeColorReal : PARK_STYLE.color),
+        transparent: true, opacity: 0.4
       });
       parkEdge = new THREE.LineSegments(eg, eMat);
       parkEdge.frustumCulled = true;
@@ -1944,12 +2022,37 @@ const ParkLayer = (function(){
     dispose() {
       if (!group) return;
       group.children.forEach(m => { m.geometry.dispose(); m.material.dispose(); });
-      group = null; parkMesh = null; parkEdge = null;
+      group = null; parkEdge = null;
+      for (const k of Object.keys(parkMeshes)) delete parkMeshes[k];
     },
     // [フェーズ4] 表示モードに応じて公園のベース色・縁取り色を差し替える（Geometry再生成なし）
     applyMode(isReal) {
-      if (parkMesh) parkMesh.material.color.setHex(isReal ? PARK_STYLE.colorReal : PARK_STYLE.color);
-      if (parkEdge) parkEdge.material.color.setHex(isReal ? PARK_STYLE.edgeColorReal : PARK_STYLE.color);
+      for (const tier of Object.keys(parkMeshes)) parkMeshes[tier].material.color.setHex(parkFillColor(isReal));
+      if (parkEdge) parkEdge.material.color.setHex((typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on) ? MS_PARK_GREEN : (isReal ? PARK_STYLE.edgeColorReal : PARK_STYLE.color));
+    },
+    // [Mission12] カメラ距離で tier 別に可視/opacity を切替（CityTileLayer 公園 LOD と同方針）。
+    updateByCamera(distance) {
+      const d = Number.isFinite(distance) ? distance : 0;
+      for (const tier of Object.keys(parkMeshes)) {
+        const m = parkMeshes[tier];
+        const vis = pClassVisible(tier, d);
+        m.visible = vis;
+        if (vis) m.material.opacity = pOpacity(tier, d);
+      }
+      if (parkEdge) {
+        // 縁取りは近景のみ（遠景では点線ノイズになる）
+        const b = pBand(d);
+        parkEdge.visible = (b === 'near');
+        parkEdge.material.opacity = (b === 'near') ? 0.4 : 0;
+      }
+    },
+    getLodDebug() {
+      const d = (typeof cs !== 'undefined' && cs) ? cs.r : 0;
+      const tiers = {};
+      for (const tier of ['large', 'medium', 'small']) {
+        tiers[tier] = { present: !!parkMeshes[tier], visible: parkMeshes[tier] ? parkMeshes[tier].visible : false, opacity: pOpacity(tier, d) };
+      }
+      return { source: 'embedded ParkLayer (3区)', cameraDistance: Math.round(d), band: pBand(d), tiers, edgeVisible: parkEdge ? parkEdge.visible : false };
     },
     // 将来の樹木レイヤーが再利用するためのユーティリティ公開
     polygonCentroid, pointInPolygon, randomPointInPolygon
@@ -2570,6 +2673,17 @@ try {
 // - 全水面を1つのBufferGeometryへ統合し 1 Draw Call（＋境界線1）。
 // - データ定数 OSM_WATER が未定義/空なら静かにスキップし、既存表示に影響を与えない。
 // - ラベルは今回対象外（nameは保持するが描画しない）。
+// ══════════════════════════════════════════════════════════════
+// [河川再構築] 旧河川描画（WaterLayer の面area直接塗り・CityTileLayer waterways の
+//   area-polygon直接fill）を canonical 表示から完全に外す。
+//   実機で「巨大な帯・三角形」が繰り返し確認されたため、centerline+width ribbon方式の
+//   新レイヤー RiverLayerV2（本ファイル後方で定義）へ全面的に置き換える。
+//   旧実装のコード・データは比較/デバッグ用に削除せず残すが、既定では絶対に描画しない。
+//   デバッグで旧表示に戻す場合のみ: window.WATER_LAYER_ENABLED = true; を console から設定
+//   （WaterLayer.show() / CityTileLayer の waterways tile 再取得が必要な場合がある）。
+// ══════════════════════════════════════════════════════════════
+let WATER_LAYER_ENABLED = false;
+
 const WATER_STYLE = {
   // 落ち着いた青系。地表(real 0x1a2438=輝度35 / data 0x161e30=30)より明るく水面として視認でき、
   // 道路のブルーグレー(real 0x848a92=137 / data 0x96a4b4=162)とは彩度と輝度の双方で分離する。
@@ -2727,6 +2841,9 @@ const WaterLayer = (function () {
 
   return {
     show() {
+      // [河川再構築] 旧WaterLayer（area直接塗り）はcanonical表示から除外。
+      //   デバッグ時のみ window.WATER_LAYER_ENABLED=true; WaterLayer.show(); で復活できる。
+      if (!(typeof WATER_LAYER_ENABLED !== 'undefined' && WATER_LAYER_ENABLED)) return;
       if (!group) build();
       if (group && !scene.children.includes(group)) scene.add(group);
     },
@@ -2746,9 +2863,308 @@ const WaterLayer = (function () {
   };
 })();
 try {
-  WaterLayer.show(); // 初期表示（データ未投入時は内部で安全にスキップ）
+  WaterLayer.show(); // [河川再構築] WATER_LAYER_ENABLED=false の間はshow()内部で何もしない
 } catch (e) {
   console.error('[WaterLayer] 初期化に失敗しました（他レイヤーの処理は継続します）:', e);
+}
+
+// ══════════════════════════════════════════════════════════════
+// [河川再導入] RiverLayerV2: centerline + width の ribbon 方式による河川レイヤー。
+// ══════════════════════════════════════════════════════════════
+// 旧WaterLayer / CityTileLayer waterways（area polygon 直接fill）とは完全に独立したモジュール
+//   （WATER_LAYER_ENABLED=false のまま、旧描画は復活させない）。
+// データ: public/map-data/osaka-city/rivers-v2/rivers.json（node tools/build-river-layer.js 生成）。
+//   waterway=river/canal/riverbank, water=river のみが対象（pond/lake/reservoir/harbour/streamは
+//   このレイヤーでは扱わない。旧レイヤーの対象のまま据え置き＝現時点では非表示）。
+//   centerline+width から left/right offset を Node側(tools/lib/river-ribbon.js)で計算済みの
+//   ribbon polyline をそのまま受け取り、three.js 側では三角形ストリップ＋岸線(LineSegments)へ
+//   組み立てるだけ（幅推定・offset計算をブラウザ側で再実装しない）。
+// [河川再導入] 第一段階（主要7河川のみ）は実機確認・承認済み（2026-09-05）。
+//   既定を全河川（canal・小河川を含む全172河川）表示へ拡張した。淀川/大和川/神崎川/安治川/
+//   木津川/寝屋川/道頓堀川はMAJOR_RIVER_NAMESとして常時表示tier・太め岸線のまま、
+//   それ以外はminor tierとしてCity Mode遠景では距離LODで非表示/減衰する
+//   （nameFilter既定=null＝全件。主要7河川だけに戻すには
+//   setNameFilter(['淀川','大和川','神崎川','安治川','木津川','寝屋川','道頓堀川'])）。
+//   河川名・source idはOSMデータ由来で選択し、形状や座標をHTMLへハードコードしていない。
+// 公開API: init / load / show / hide / dispose / updateByCamera のみ。
+const RiverLayerV2 = (function () {
+  const Y = MAP_LAYER_Y.WATER;  // [河川カラー調整] ground(-0.02) < water(0.04) < park/road(0.06〜) の順序を維持。geometry(Y含む)は変更しない
+  const DATA_URL = 'map-data/osaka-city/rivers-v2/rivers.json';
+  // [Mission05] 白模型に合う淡い水色（light cyan-blue）。opacityは NEAR/MID/FAR の3バンドで
+  //   major/minor 別に整理する（指示書2節）。geometry/width/topology は Mission04 で確定・不変。
+  //   material は MeshBasicMaterial / FrontSide / depthWrite=false / transparent=true を維持（重shader無し）。
+  //   opacityバンドの距離アンカー: NEAR<=OPACITY_NEAR_M / MID=OPACITY_MID_M / FAR>=OPACITY_FAR_M（間は線形補間）。
+  const OPACITY_NEAR_M = 2500, OPACITY_MID_M = 6000, OPACITY_FAR_M = 14000;
+  const DEFAULT_STYLE = Object.freeze({
+    fillColor: 0x9ed6e6,   // 淡い水色（候補: 0x9ed6e6 / 0xaddce8 / 0xb8e0ea）
+    shoreColor: 0x6fafc4,  // 岸線: 本体より少し濃い水色（強い線に見せない）
+    // major river fill opacity（NEAR/MID/FAR）— City Mode遠景でも水系が読み取れるよう far を残す
+    majorOpacity: 0.72, majorOpacityMid: 0.55, majorOpacityFar: 0.40,
+    // minor river/canal fill opacity — 遠景で弱く、近景で明確
+    minorOpacity: 0.62, minorOpacityMid: 0.44, minorOpacityFar: 0.20,
+    // 岸線 opacity（輪郭を軽く締める程度）
+    shoreOpacity: 0.50, shoreOpacityMid: 0.40, shoreOpacityFar: 0.28,
+  });
+  // 実機で色・透明度を調整できるよう可変にする（既定値はDEFAULT_STYLE。setStyle()で上書き可能）。
+  const STYLE = { ...DEFAULT_STYLE };
+  const MAJOR_WIDTH_M = 80;
+  // 7つの主要河川（実測幅に関わらず常時表示tier）。名称・source id はOSMデータ由来で、
+  // 形状や座標をHTMLへハードコードしているわけではない（centerline自体はrivers.jsonから取得）。
+  const MAJOR_RIVER_NAMES = new Set(['淀川', '大和川', '神崎川', '安治川', '木津川', '寝屋川', '道頓堀川']);
+  // [Mission04-B] 小河川は遠景でノイズ化しやすいので抑制を強める。
+  //   NEAR(<3500m): 全minor表示 / 中景(3500〜MINOR_HIDE): minorは残すがfadeで薄く /
+  //   City Mode遠景(>MINOR_HIDE): minor完全非表示（主要河川のみ）。
+  const MINOR_HIDE_DISTANCE_M = 4500;
+  const MINOR_FADE_START_M = 3500; // ここから minor が薄くなり始める
+
+  let group = null;
+  let majorMesh = null, minorMesh = null, shoreMesh = null;
+  let visible = true;
+  let loaded = false;
+  let loadingPromise = null;
+  let lastDistance = null;
+  let stats = null;
+  let cachedData = null;   // STEP段階確認用に再フェッチ無しでrebuildできるよう保持
+  let nameFilter = null;   // 既定=全河川（主要7河川は承認済み。canal含む全172河川を表示する）
+
+  function ensureGroup() {
+    if (!group) { group = new THREE.Group(); group.name = 'RiverLayerV2'; }
+    return group;
+  }
+  function makeMaterial(opacity) {
+    return new THREE.MeshBasicMaterial({ color: STYLE.fillColor, transparent: true, opacity, side: THREE.FrontSide, depthWrite: false });
+  }
+  // [Mission05] 距離 d を NEAR/MID/FAR の3アンカーで線形補間する（バンド別 opacity 用）。
+  function band3(d, near, mid, far) {
+    if (d <= OPACITY_NEAR_M) return near;
+    if (d <= OPACITY_MID_M) return near + (mid - near) * (d - OPACITY_NEAR_M) / (OPACITY_MID_M - OPACITY_NEAR_M);
+    if (d <= OPACITY_FAR_M) return mid + (far - mid) * (d - OPACITY_MID_M) / (OPACITY_FAR_M - OPACITY_MID_M);
+    return far;
+  }
+  // river.left/right（既にribbon offset済みのXZ配列）から三角形positionsを組み立てる。
+  // 面法線が+Y（上向き）になるよう、WaterLayer.appendArea と同じ per-triangle winding判定を使う
+  // （XZ平面での「CCW/CW」は隣接コードの慣習依存のため、既存の実証済みロジックを流用する）。
+  function pushTriangleUpFacing(positions, p0, p1, p2) {
+    const v1x = p1[0] - p0[0], v1z = p1[2] - p0[2];
+    const v2x = p2[0] - p0[0], v2z = p2[2] - p0[2];
+    const ny = v1z * v2x - v1x * v2z;
+    if (ny >= 0) positions.push(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+    else positions.push(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2]);
+  }
+  function appendRibbonTriangles(positions, left, right) {
+    const n = Math.min(left.length, right.length);
+    let triCount = 0;
+    for (let i = 0; i < n - 1; i++) {
+      const a = [left[i][0], Y, left[i][1]], b = [right[i][0], Y, right[i][1]];
+      const c = [left[i + 1][0], Y, left[i + 1][1]], d = [right[i + 1][0], Y, right[i + 1][1]];
+      pushTriangleUpFacing(positions, a, c, b);
+      pushTriangleUpFacing(positions, b, c, d);
+      triCount += 2;
+    }
+    return triCount;
+  }
+  // [河川再導入・指示書6節] ribbonの左右端を細い岸線として描画する（LineSegments。主張しすぎない
+  //   色・opacityで、本体fillより少し上のYへ乗せてZ-fighting回避）。
+  const SHORE_Y = Y + 0.005;
+  function appendShorelineSegments(positions, edge) {
+    for (let i = 0; i < edge.length - 1; i++) {
+      positions.push(edge[i][0], SHORE_Y, edge[i][1], edge[i + 1][0], SHORE_Y, edge[i + 1][1]);
+    }
+  }
+
+  // 既存のmajor/minor/shore meshを破棄する（geometry再構築の前に呼ぶ。groupは維持しシーンから外さない）。
+  function disposeMeshes() {
+    if (majorMesh) { majorMesh.geometry.dispose(); majorMesh.material.dispose(); if (group) group.remove(majorMesh); majorMesh = null; }
+    if (minorMesh) { minorMesh.geometry.dispose(); minorMesh.material.dispose(); if (group) group.remove(minorMesh); minorMesh = null; }
+    if (shoreMesh) { shoreMesh.geometry.dispose(); shoreMesh.material.dispose(); if (group) group.remove(shoreMesh); shoreMesh = null; }
+  }
+
+  function build(data) {
+    disposeMeshes();
+    const majorPos = [], minorPos = [], shorePos = [];
+    let majorCount = 0, minorCount = 0, majorTriangles = 0, minorTriangles = 0, skippedError = 0, skippedSuppressed = 0;
+    for (const r of (data.rivers || [])) {
+      if (!r.ok || !Array.isArray(r.left) || !Array.isArray(r.right) || r.left.length < 2) continue;
+      if (r.validationErrors && r.validationErrors.length) { skippedError++; continue; } // validator ERROR は描画しない
+      if (r.suppressed) { skippedSuppressed++; continue; } // [Mission04-B] 建物干渉が解消できない小河川は非表示
+      if (nameFilter && !nameFilter.has(r.name)) continue; // 既定nameFilter=null（全河川）。実機切り分け時のみ絞り込む
+      // [Mission04-B] riverClass（build時に確定）を優先。無い旧データは幅/名前でfallback。
+      const isMajor = r.riverClass ? (r.riverClass === 'major')
+        : ((Number.isFinite(r.width) && r.width >= MAJOR_WIDTH_M) || MAJOR_RIVER_NAMES.has(r.name));
+      const positions = isMajor ? majorPos : minorPos;
+      const added = appendRibbonTriangles(positions, r.left, r.right);
+      appendShorelineSegments(shorePos, r.left);
+      appendShorelineSegments(shorePos, r.right);
+      if (isMajor) { majorCount++; majorTriangles += added; } else { minorCount++; minorTriangles += added; }
+    }
+    const g = ensureGroup();
+    if (majorPos.length) {
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(majorPos), 3));
+      geom.computeBoundingSphere();
+      majorMesh = new THREE.Mesh(geom, makeMaterial(STYLE.majorOpacity));
+      majorMesh.renderOrder = 922; majorMesh.frustumCulled = true;
+      majorMesh.userData.riverLayer = { tier: 'major' };
+      g.add(majorMesh);
+    }
+    if (minorPos.length) {
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(minorPos), 3));
+      geom.computeBoundingSphere();
+      minorMesh = new THREE.Mesh(geom, makeMaterial(STYLE.minorOpacity));
+      minorMesh.renderOrder = 922; minorMesh.frustumCulled = true;
+      minorMesh.userData.riverLayer = { tier: 'minor' };
+      g.add(minorMesh);
+    }
+    if (shorePos.length) {
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(shorePos), 3));
+      geom.computeBoundingSphere();
+      const mat = new THREE.LineBasicMaterial({ color: STYLE.shoreColor, transparent: true, opacity: STYLE.shoreOpacity });
+      shoreMesh = new THREE.LineSegments(geom, mat);
+      shoreMesh.renderOrder = 923; shoreMesh.frustumCulled = true;
+      shoreMesh.userData.riverLayer = { tier: 'shore' };
+      g.add(shoreMesh);
+    }
+    stats = {
+      riverCount: (data.rivers || []).length, shownCount: majorCount + minorCount, skippedError, skippedSuppressed,
+      majorCount, minorCount, majorTriangles, minorTriangles, totalTriangles: majorTriangles + minorTriangles,
+    };
+    console.log('[RiverLayerV2] build完了: ' + JSON.stringify(stats));
+    // [Mission04-B] 建物干渉回避の内訳（rivers.json 由来）
+    try {
+      const rs = (data.rivers || []);
+      const shrink = rs.filter((r) => r.conflictAction === 'shrink').length;
+      const suppress = rs.filter((r) => r.suppressed).length;
+      const conflictBefore = rs.filter((r) => (r.conflictEdgeInFrac || 0) > 0.28 || (r.conflictCenterInFrac || 0) > 0.30).length;
+      console.log(`[RIVER-CONFLICT] minor=${minorCount + suppress} conflictBefore=${conflictBefore} → shrink=${shrink} suppress=${suppress}`);
+    } catch (e) { /* noop */ }
+  }
+
+  function load() {
+    if (loaded) return Promise.resolve(true);
+    if (loadingPromise) return loadingPromise;
+    loadingPromise = (async () => {
+      try {
+        const res = await fetch(DATA_URL);
+        if (!res.ok) { console.log(`[RiverLayerV2] rivers.json 未配置 (HTTP ${res.status})。河川は表示されません（他レイヤーの表示は継続します）。`); return false; }
+        const data = await res.json();
+        if (data.coordinateConvention !== 'znorth-neg-v1') {
+          console.error('[RiverLayerV2] coordinateConvention不一致のため読み込みを拒否:', data.coordinateConvention);
+          return false;
+        }
+        cachedData = data;
+        build(data);
+        loaded = true;
+        if (visible) show();
+        if (lastDistance != null) updateByCamera(lastDistance);
+        return true;
+      } catch (e) {
+        console.warn('[RiverLayerV2] 読み込み失敗（他レイヤーの表示は継続します）:', e && e.message);
+        return false;
+      } finally { loadingPromise = null; }
+    })();
+    return loadingPromise;
+  }
+
+  function init() { ensureGroup(); load(); }
+
+  function show() {
+    visible = true;
+    ensureGroup();
+    if (!scene.children.includes(group)) scene.add(group);
+    if (!loaded) load();
+  }
+  function hide() {
+    visible = false;
+    if (group && scene.children.includes(group)) scene.remove(group);
+  }
+  function dispose() {
+    if (!group) return;
+    group.children.forEach((m) => { if (m.geometry) m.geometry.dispose(); if (m.material) m.material.dispose(); });
+    if (scene.children.includes(group)) scene.remove(group);
+    group = null; majorMesh = null; minorMesh = null; shoreMesh = null; loaded = false; stats = null;
+    lastDistance = null; cachedData = null; nameFilter = null; // 再initで既定（全河川）の状態に戻す
+  }
+  // [河川再導入] 実機切り分け用: 表示する河川名を絞り込む（null=全河川、既定値）。
+  //   再フェッチせず cachedData から rebuild するだけなので素早く切り替えられる。
+  //   例: RiverLayerV2.setNameFilter(['淀川']);                                          // 淀川だけ
+  //       RiverLayerV2.setNameFilter([...MAJOR_RIVER_NAMES]);  // 主要7河川のみ（承認済みの第一段階相当）へ絞る
+  //       RiverLayerV2.setNameFilter(null);                     // 全河川へ戻す（既定）
+  function setNameFilter(names) {
+    nameFilter = names ? new Set(names) : null;
+    if (cachedData) build(cachedData);
+    if (lastDistance != null) updateByCamera(lastDistance);
+  }
+  // [Mission05] camera距離に応じて opacity を NEAR/MID/FAR バンドで更新する。
+  //   major は City Mode遠景でも far 値（0.40）を残す＝水系が都市構造として読み取れる。
+  //   [Mission04-B] minor は MINOR_HIDE_DISTANCE_M で完全非表示（それまでは band 値 × 追加fade）。
+  function updateByCamera(distance) {
+    if (!Number.isFinite(distance)) return;
+    lastDistance = distance;
+    if (minorMesh) minorMesh.visible = visible && distance <= MINOR_HIDE_DISTANCE_M;
+    if (majorMesh) majorMesh.material.opacity = band3(distance, STYLE.majorOpacity, STYLE.majorOpacityMid, STYLE.majorOpacityFar);
+    if (minorMesh) {
+      const base = band3(distance, STYLE.minorOpacity, STYLE.minorOpacityMid, STYLE.minorOpacityFar);
+      // MINOR_FADE_START_M → MINOR_HIDE_DISTANCE_M で band 値をさらに 0 近くまで落とす（急速に消す）
+      const mt = Math.max(0, Math.min(1, (distance - MINOR_FADE_START_M) / (MINOR_HIDE_DISTANCE_M - MINOR_FADE_START_M)));
+      minorMesh.material.opacity = base * (1 - 0.85 * mt);
+    }
+    if (shoreMesh) shoreMesh.material.opacity = band3(distance, STYLE.shoreOpacity, STYLE.shoreOpacityMid, STYLE.shoreOpacityFar);
+  }
+
+  // [Mission05・指示書11節] 実機で色・透明度を調整するデバッグAPI。geometry/width は一切触れず、
+  //   material の color/opacity のみを更新する（rebuild不要・即時反映）。渡さなかったキーは維持。
+  //   `fillColor`（推奨）でも旧 `color` でも受ける。opacity は NEAR/MID/FAR キーで個別調整可。
+  //   例: RiverLayerV2.setStyle({ fillColor: 0x9ed6e6, majorOpacity: 0.72, majorOpacityFar: 0.42 });
+  //       RiverLayerV2.setStyle(RiverLayerV2.getDefaultStyle()); // 既定へ戻す
+  function setStyle(overrides) {
+    const o = { ...(overrides || {}) };
+    if (o.color != null && o.fillColor == null) o.fillColor = o.color; // 旧キー互換
+    Object.assign(STYLE, o);
+    if (majorMesh) majorMesh.material.color.setHex(STYLE.fillColor);
+    if (minorMesh) minorMesh.material.color.setHex(STYLE.fillColor);
+    if (shoreMesh) shoreMesh.material.color.setHex(STYLE.shoreColor);
+    // opacity は距離バンドから再計算（updateByCamera が band3 で確定させる）
+    updateByCamera(lastDistance != null ? lastDistance : OPACITY_NEAR_M);
+    console.log('[RiverLayerV2] setStyle適用: ' + JSON.stringify(STYLE));
+  }
+  function getStyle() { return { ...STYLE, color: STYLE.fillColor }; } // color は fillColor の別名として返す
+  function getDefaultStyle() { return { ...DEFAULT_STYLE }; }
+
+  // [Mission04-B・指示書7節] 建物干渉回避の内訳を確認するデバッグAPI。
+  //   river 名/sourceId/class/元width/回避後width/suppress有無/干渉指標 を返す。
+  function getConflictDebug(opts) {
+    const rs = (cachedData && cachedData.rivers) || [];
+    const rows = rs
+      .filter((r) => r.riverClass === 'minor' && (r.suppressed || r.conflictAction === 'shrink' || (opts && opts.all)))
+      .map((r) => ({
+        name: r.name || r.id, sourceId: r.source && `${r.source.type}/${r.source.id}`, class: r.riverClass,
+        rawWidth: r.widthRaw, finalWidth: r.suppressed ? 0 : (Number.isFinite(r.conflictWidthScale) ? +(r.widthRaw * r.conflictWidthScale).toFixed(1) : r.widthRaw),
+        action: r.conflictAction, suppressed: !!r.suppressed,
+        edgeInFrac: r.conflictEdgeInFrac, centerInFrac: r.conflictCenterInFrac,
+      }));
+    const summary = {
+      major: rs.filter((r) => r.riverClass === 'major').length,
+      minor: rs.filter((r) => r.riverClass === 'minor').length,
+      shrink: rs.filter((r) => r.conflictAction === 'shrink').length,
+      suppress: rs.filter((r) => r.suppressed).length,
+      minorShown: rs.filter((r) => r.riverClass === 'minor' && r.ok && !r.suppressed).length,
+    };
+    return { summary, rows };
+  }
+
+  // コアAPIは init/load/show/hide/dispose/updateByCamera の6つ。
+  //   その他は実機確認・デバッグ用の補助であり、河川描画ロジック本体には関与しない。
+  return {
+    init, load, show, hide, dispose, updateByCamera,
+    getStats: () => stats, isVisible: () => visible, setNameFilter, setStyle, getStyle, getDefaultStyle, getConflictDebug,
+  };
+})();
+try {
+  RiverLayerV2.init(); // [河川再構築] 新河川レイヤー。旧WaterLayer/CityTileLayer waterwaysとは独立
+} catch (e) {
+  console.error('[RiverLayerV2] 初期化に失敗しました（他レイヤーの処理は継続します）:', e);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3680,9 +4096,11 @@ function realTintFactor(buildingId) {
   return 0.94 + ((hash >>> 5) % 100) / 100 * 0.12;
 }
 // 接地部分のわずかな暗化係数（疑似AO用、高さ方向の正規化位置に応じて0(接地)〜1(屋上)で使う）
+// [Mission09] 白模型の「地面に置かれている感」を出すため接地暗化をやや強化（黒くはしない）。
+//   下端 0.76 → 高さ下から24%でなだらかに 1.0 へ。
 function groundContactDarken(heightRatio) {
-  const minDarken = 0.82; // 接地部分の明度（最も暗い箇所でもこの程度に留め、真っ黒を避ける）
-  return minDarken + (1 - minDarken) * Math.min(1, heightRatio / 0.3); // 高さの下から30%の範囲でグラデーション
+  const minDarken = 0.76; // 接地部分の明度（最も暗い箇所でもこの程度に留め、真っ黒を避ける）
+  return minDarken + (1 - minDarken) * Math.min(1, heightRatio / 0.24);
 }
 // [フェーズ3] 夜景の窓発光を「建物単位」で決定的に決める。
 // 天井は用途×タイルでマージされるため、点灯/消灯は頂点カラーとして各建物の天井頂点へ焼き込む
@@ -3726,6 +4144,15 @@ function wm(u){return wmc[u]||(wmc[u]=new THREE.MeshPhongMaterial({color:0xfffff
 function tm(u){return tmc[u]||(tmc[u]=new THREE.MeshPhongMaterial({color:gs(u).top,shininess:70,specular:0x33404a}));}
 function em(u){
   if (emc[u]) return emc[u];
+  if (MODEL_STYLE.on) {
+    // [Mission08] 模型: 「線で建物を読ませる」のをやめ、陰影(Mission09)で形状を認識させる方向へ寄せる。
+    //   用途色の輪郭はやめ、白模型に合う light neutral gray の非常に弱い輪郭のみ。
+    //   opacity は距離バンドで BUILDING_EDGE_LOD が更に弱める（遠景では非表示＝白いエッジノイズと
+    //   Draw Call を消す）。初期値は近景バンド相当。
+    return (emc[u] = new THREE.LineBasicMaterial({
+      color: BUILDING_EDGE_LOD.EDGE_COLOR, transparent: true, opacity: BUILDING_EDGE_LOD.OP.near
+    }));
+  }
   // WebGLのLineBasicMaterial.linewidthは大半の環境で無視され常に1pxになるため、
   // 「線を細く見せる」は太さではなく彩度・明度を壁色側に近づけて目立たなくする方式で対応。
   // 元のedge色（鮮やかなアクセントカラー）と壁色をブレンドして彩度を落とし、不透明度も下げる。
@@ -3819,8 +4246,24 @@ const nightGM = new THREE.MeshPhongMaterial({color:0xffffff,vertexColors:true,em
 //   表示範囲外は即disposeせずhide（loaded-hidden）とし、キャッシュ上限超過時のみLRUでdispose。
 // - エラー処理: 404・壊れたJSONを捕捉し、同一タイルのエラーは1回だけ簡潔に出力、
 //   再試行はMAX_TILE_RETRIESまで。失敗しても住吉区（embedded）の表示は継続する。
+// [P1-6E] bbox（znorth-neg-v1 world XZ）を覆う tile 座標を「中心 → 外」の順で返す共通ヘルパ。
+//   Ward 切替時に建物レイヤーと都市レイヤー（CityTileLayer）が同じ footprint を段階ロードするために使う。
+//   canonical: tools/lib/ward-tile-coverage.js（Node 側テストと同一ロジック）。
+function wardTilesForBboxXZ(bbox, tileSize, cap, bufferM) {
+  if (!bbox || !isFinite(bbox.minX)) return [];
+  const b = bufferM || 0;
+  const tx0 = Math.floor((bbox.minX - b) / tileSize), tx1 = Math.floor((bbox.maxX + b) / tileSize);
+  const tz0 = Math.floor((bbox.minZ - b) / tileSize), tz1 = Math.floor((bbox.maxZ + b) / tileSize);
+  const cx = (tx0 + tx1) / 2, cz = (tz0 + tz1) / 2;
+  const list = [];
+  for (let tz = tz0; tz <= tz1; tz++) for (let tx = tx0; tx <= tx1; tx++) list.push({ tx, tz });
+  list.sort((a, c) => (Math.hypot(a.tx - cx, a.tz - cz) - Math.hypot(c.tx - cx, c.tz - cz)));
+  return (cap && cap > 0) ? list.slice(0, cap) : list;
+}
+
 const BUILDING_TILE_CONFIG = {
   tileSize: 500,                 // 全データセット共通のタイル一辺（既存の描画マージ粒度と同一）
+  wardCoverCap: 120,             // [P1-6E] Ward切替時に bbox 一括カバーする建物 tile 上限（8km四方≈256tile → 中心優先で120）
   // [WARD-MODE P1-5] 大阪市24区の建物datasetを参照する。
   //   root:  public/map-data/osaka-city/buildings/manifest.json
   //   区:    public/map-data/osaka-city/buildings/{datasetId}/manifest.json
@@ -4511,6 +4954,49 @@ const BuildingTileLayer = (function () {
     getTileOf(datasetId, tx, tz) { return tiles.get(tileKey(datasetId, tx, tz)) || null; },
     loadRemoteTile,
     updateByCamera,
+    // [P1-6E] Ward の bbox 全域の建物 tile を「中心 → 外」の順で段階ロードする
+    //   （camera 位置に依らず区全体を埋める。都市レイヤーは CityTileLayer.coverBbox が同じ footprint を担当）。
+    loadDatasetBbox(datasetId, bbox, cap) {
+      const d = datasets.get(datasetId);
+      if (!d || !bbox) return 0;
+      const want = wardTilesForBboxXZ(bbox, BUILDING_TILE_CONFIG.tileSize, cap || BUILDING_TILE_CONFIG.wardCoverCap, 250);
+      let issued = 0, attempts = 0;
+      const run = () => {
+        attempts++;
+        if (!d.tileSet) { if (attempts < 40) setTimeout(run, 120); return; } // manifest 到着待ち
+        for (const { tx, tz } of want) {
+          if (!d.tileSet.has(tx + '_' + tz)) continue; // manifest 外は 404 を撃たない
+          const t = tiles.get(tileKey(datasetId, tx, tz));
+          if (!t || (!t.loaded && t.state !== 'loading' &&
+              !(t.state === 'error' && t.retries >= BUILDING_TILE_CONFIG.maxTileRetries))) {
+            loadRemoteTile(datasetId, tx, tz); issued++;
+          }
+        }
+        if (typeof window !== 'undefined' && window.__BUILDING_DRAW_DEBUG__) {
+          console.log('[BUILDING-DRAW-DEBUG] ' + JSON.stringify({
+            phase: 'wardBboxLoad', datasetId, wardBBox: bbox,
+            requestedTiles: want.length, issued, manifestTiles: d.tileSet ? d.tileSet.size : 0,
+          }));
+        }
+      };
+      run();
+      return want.length;
+    },
+    // [P1-6E] 実機診断: 現在の建物描画スコープ（currentWard / camera / visible tile / 建物数）。
+    getDrawDebug() {
+      const tgt = (typeof cs !== 'undefined' && cs.tgt) ? cs.tgt : { x: 0, z: 0 };
+      const list = [...tiles.values()];
+      const enabledDs = [...datasets.values()].filter((d) => d.enabled).map((d) => d.id);
+      const loaded = list.filter((t) => t.state === 'loaded-visible' || t.state === 'loaded-hidden');
+      const visible = list.filter((t) => t.state === 'loaded-visible');
+      return {
+        cameraX: Math.round(tgt.x), cameraZ: Math.round(tgt.z),
+        enabledDatasets: enabledDs,
+        loadedTiles: loaded.length, visibleTiles: visible.length,
+        visibleBuildings: visible.reduce((s, t) => s + t.buildingCount, 0),
+        tileSize: BUILDING_TILE_CONFIG.tileSize,
+      };
+    },
     setLOD(level) {
       if (level === 0) { this.hide(); lod = 0; return true; }
       if (level === 1) { lod = 1; this.show(); return true; }
@@ -4770,13 +5256,24 @@ const WardModeManager = (function () {
     return null;
   }
   // [P1-5B] Ward切替時のカメラ移動先。N03 centroid/bbox を返す（HTMLへ24区座標をハードコードしない）。
+  // [P1-6E] bbox も返す（建物/都市レイヤーの区全域カバー用）。
   function getWardCameraTarget(wardId) {
     const n03 = __n03WardPolyCache && __n03WardPolyCache[wardId];
     if (n03) {
       const diag = Math.hypot(n03.bbox.maxX - n03.bbox.minX, n03.bbox.maxZ - n03.bbox.minZ);
-      return { x: n03.centroid.x, z: n03.centroid.z, radius: diag * 0.62 };
+      return { x: n03.centroid.x, z: n03.centroid.z, radius: diag * 0.62, bbox: n03.bbox };
     }
-    // フォールバック: TOWN_POLYGONS の3区は WardLabelLayer.getCentroid + estimateWardViewRadius へ委譲
+    // フォールバック: TOWN_POLYGONS の3区は既存 ring から bbox/centroid を算出（camera radius は既存経路に委譲）
+    try {
+      const rings = ensureWardRings()[wardId];
+      if (rings && rings.length) {
+        let mnx = Infinity, mxx = -Infinity, mnz = Infinity, mxz = -Infinity;
+        for (const ring of rings) for (const p of ring) {
+          if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0]; if (p[1] < mnz) mnz = p[1]; if (p[1] > mxz) mxz = p[1];
+        }
+        if (isFinite(mnx)) return { x: (mnx + mxx) / 2, z: (mnz + mxz) / 2, radius: null, bbox: { minX: mnx, maxX: mxx, minZ: mnz, maxZ: mxz } };
+      }
+    } catch (e) { /* noop */ }
     return null;
   }
   // 現在地から各ringの各辺までの最短距離（境界近接判定用。新規幾何は作らず既存頂点列から算出）
@@ -4972,6 +5469,12 @@ const WardModeManager = (function () {
     // 新しい区をACTIVE化。enableDatasetが内部でmanifest取得→次のupdateByCameraで
     // controls.target(=カメラ移動先)近傍のtileを自動fetchする（段階的表示）。
     BuildingTileLayer.enableDataset(def.datasetId);
+    // [P1-6E] camera 位置に依らず「区の bbox 全域」の建物 tile を段階ロード（都市レイヤーは
+    //   flyToWardCentroid → CityTileLayer.onWardSwitch(x,z,bbox) が同じ footprint を担当）。
+    try {
+      const wt = getWardCameraTarget(def.id);
+      if (wt && wt.bbox && BuildingTileLayer.loadDatasetBbox) BuildingTileLayer.loadDatasetBbox(def.datasetId, wt.bbox);
+    } catch (e) { /* noop */ }
     console.log('[WardModeManager] switchWard(stream) →', def.name, `(dataset=${def.datasetId})　旧区は最初のtileまで表示継続`);
     if (typeof showWardLoadingIndicator === 'function') showWardLoadingIndicator(def.name);
 
@@ -5080,6 +5583,10 @@ const WardModeManager = (function () {
     isAutoSwitch() { return autoSwitchEnabled; },
     setDisposeOnSwitch(v) { disposeOnSwitch = !!v; },
     isDisposeOnSwitch() { return disposeOnSwitch; },
+    // [P1-7] City Mode 突入時: 「単一区がACTIVE」という前提を解除する。update()（境界近接での
+    //   自動区切替）は currentWardId===null で早期returnするため、City Mode 中は自動切替が働かない。
+    //   BuildingTileLayer の enable/disable には一切触れない（CityModeManager 側の責務）。
+    clearActiveWard() { currentWardId = null; },
   };
 })();
 
@@ -5258,6 +5765,65 @@ const bldgTM = [];    // 夜景モード用：統合天井Meshと用途のペア
 const bldgEdges = []; // [建物視覚確認] 建物エッジ(輪郭線)LineSegments。外観強調時に非表示化する
 const buildingMeshes = bMesh; // デバッグ用エイリアス（既存名維持）
 
+// ══════════════════════════════════════════════════════════════
+// [Mission08] 建物エッジ(輪郭線)の距離LOD ─ 「陰影で形状が読める」都市模型へ寄せる
+// ------------------------------------------------------------
+// ・対象は MODEL_STYLE=true（正式既定表示）のときの bldgEdges（用途×タイル単位の統合 LineSegments）のみ。
+//   MODEL_STYLE=false（用途色/分析モード）は em() の従来ブランチ（壁色寄せブレンド）に一切触れない。
+// ・材質は em() が用途ごとにキャッシュした共有 LineBasicMaterial。色は模型グレー固定。
+//   距離バンドで opacity を弱め、FAR では visible=false にして白いエッジノイズ・Draw Call を消す。
+// ・band 変化時のみ全 bldgEdges を走査（毎フレームの再代入はしない = 軽量）。
+// ・CityBuildingLOD（遠景の軽量建物メッシュ）へは一切エッジを足さない（Mission01の方針維持）。
+// ・hover/select/ward/town の各ハイライトは makeHighlightSet 等の別実装（renderOrder 997-999）で、
+//   ここでは触らない＝通常エッジを弱めても強調表示は明確なまま。
+// ・高さによる opacity 増加はしない（高層ビルの立体感は Mission09 の側面陰影に任せる）。
+// ══════════════════════════════════════════════════════════════
+const BUILDING_EDGE_LOD = (function () {
+  const NEAR_M = 2400, MID_M = 5600;          // これを超えると FAR
+  const EDGE_COLOR = 0xa0a6ac;                 // 白模型に合う light neutral gray（黒/濃灰にしない）
+  const OP = { near: 0.16, mid: 0.08, far: 0.0 }; // NEAR:最低限の輪郭 / MID:かなり弱く / FAR:非表示
+  let band = null, lastVis = null, lastOp = null;
+  function bandOf(d) { return d <= NEAR_M ? 'near' : (d <= MID_M ? 'mid' : 'far'); }
+  function emphasisHiding() { return typeof emphasisMode !== 'undefined' && emphasisMode; }
+  function apply(d) {
+    if (typeof bldgEdges === 'undefined') return;
+    if (!MODEL_STYLE.on) {
+      // legacy（用途色/分析）へ切替: 以前 LOD で隠したエッジがあれば元に戻して手を引く
+      if (band !== null) { for (const e of bldgEdges) e.visible = true; reset(); }
+      return;
+    }
+    if (emphasisHiding()) return;                // 外観強調モード中は toggleEmphasis が全非表示を管理
+    const b = bandOf(d);
+    const op = OP[b], vis = op > 0.001;
+    if (b === band && vis === lastVis && op === lastOp) return; // band変化時のみ
+    band = b; lastVis = vis; lastOp = op;
+    for (const e of bldgEdges) {
+      e.visible = vis;
+      if (e.material && e.material.opacity !== op) e.material.opacity = op;
+    }
+  }
+  // 遅延ロードされたリモートタイルの新規エッジを現在のバンドへ即時同期
+  function syncNew(e) {
+    if (!MODEL_STYLE.on || band === null) return;
+    const op = OP[band];
+    e.visible = op > 0.001 && !emphasisHiding();
+    if (e.material && e.material.opacity !== op) e.material.opacity = op;
+  }
+  function reset() { band = null; lastVis = null; lastOp = null; } // 次の apply を強制フル適用
+  function getEdgeDebug() {
+    return {
+      distance: Math.round(typeof cs !== 'undefined' ? cs.r : 0),
+      edgeBand: band, opacity: lastOp, visible: lastVis,
+      edgeObjectCount: (typeof bldgEdges !== 'undefined' ? bldgEdges.length : 0),
+      modelStyle: (typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on),
+      color: '#' + EDGE_COLOR.toString(16).padStart(6, '0'),
+      bands: { nearM: NEAR_M, midM: MID_M }, op: OP
+    };
+  }
+  return { apply, syncNew, reset, bandOf, getEdgeDebug, NEAR_M, MID_M, EDGE_COLOR, OP };
+})();
+if (typeof window !== 'undefined') window.__BUILDING_EDGE_DEBUG__ = () => BUILDING_EDGE_LOD.getEdgeDebug();
+
 // 「用途×タイル」キーごとにBLDGSのインデックスをグルーピング
 const groupsByUsage = {};
 const groupUsageOf = {}; // グループキー→用途コード（マテリアル取得用）
@@ -5407,9 +5973,11 @@ function buildUsageTileMeshes(groupKey, indices, usage, source, datasetId) {
   const eg = new THREE.BufferGeometry();
   eg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ev), 3));
   const eLine = new THREE.LineSegments(eg, em(usage));
+  eLine.userData.usage = usage; // [P1-6H] applyModelStyle でエッジ材質を差し替えるため
   eLine.frustumCulled = BUILDING_TILE_CONFIG.enableFrustumCulling; // [開発モード] 上記wMと同方針
   eg.computeBoundingSphere();
   bldgEdges.push(eLine); // [建物視覚確認] 外観強調時に非表示化するため参照を保持
+  if (typeof BUILDING_EDGE_LOD !== 'undefined') BUILDING_EDGE_LOD.syncNew(eLine); // [Mission08] 遅延タイルを現バンドへ
   scene.add(eLine);
   // [building-tile-engine-v1] 生成Mesh群を空間タイルへ登録（タイル単位のshow/hide/dispose/統計用）
   BuildingTileLayer._registerGroupMeshes(groupKey, [wM, tM, eLine], indices, source || 'embedded', datasetId);
@@ -6002,7 +6570,11 @@ function updateHighlight(hl, building) {
 // ── OrbitControls ──
 const cs = {
   tgt: new THREE.Vector3(0, 8, 0),
-  th: Math.PI*0.25,   // 45°方位
+  // [北向き] th=0: camera.position = tgt + (r*sin(ph)*sin(th), r*cos(ph), r*sin(ph)*cos(th)) より
+  //   th=0では camera は tgt の +Z（南。znorth-neg-v1で北は-Z）側に位置し、-Z（北）を向く。
+  //   camera.up=既定+Yのため、この向きだと北が画面上方向になる（#compassの「N」も rotate(0deg)で正立）。
+  //   projection(geoToThree/znorth-neg-v1)自体は変更していない。camera初期方位のみの変更。
+  th: 0,              // 北を画面上向きに（既定の向き）
   ph: Math.PI/4,      // 45°仰角（地図モードでもこの45°を維持して固定する）
   r:  5300,
   drag:false, btn:-1, lx:0, ly:0,
@@ -6613,14 +7185,105 @@ const CityTileLayer = (function () {
   const BASE = 'map-data/osaka-city';
   const LAYERS = ['waterways', 'parks', 'railways', 'roads'];
   const STYLE = {
-    roads:     { y: 0.13, color: 0x8892a0, kind: 'line' },
-    railways:  { y: 0.14, color: 0xb0b6c0, kind: 'line' },
-    waterways: { y: 0.05, color: 0x3f6b8a, areaColor: 0x39627f, kind: 'mixed' },
-    parks:     { y: 0.07, color: 0x4a8f45, kind: 'area' },
+    roads:     { y: 0.13, color: 0x9aa1a8, kind: 'line' }, // [P1-6H] 整然としたグレー線（明るい台座の上で読める濃さ）
+    railways:  { y: 0.17, color: 0x8f969d, kind: 'line' }, // [Mission13] 道路(0.13)より上・tier別色は build 時に設定
+    waterways: { y: 0.05, color: 0x8fb6c8, kind: 'mixed' }, // line(中心線)用: 淡いシアン
+    parks:     { y: 0.07, color: ((typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on) ? MS_PARK_GREEN : 0x7bb36a), kind: 'area' }, // [Mission12] 模型は淡い soft green
   };
+  // [P1-6G] 水域描画: 河川はベタ塗りをやめ「岸線 + 距離LODの薄いフィル」。池/湖はフィル中心。港湾は背景寄り。
+  //   canonical: tools/lib/water-classify.js / tools/lib/water-render-lod.js
+  const WATER_FILL_Y = 0.04;      // 地表(0) の直上。道路(0.13)・公園(0.07) より下 → 都市を覆わない
+  const WATER_SHORE_Y = 0.055;
+  const WATER_GIANT_DIAG = 2500;  // outer bbox 対角がこれ超で「巨大河川」= より早く薄く消す
+  // [P1-6H] 淡いシアン（都市模型の川）。canonical: tools/lib/model-style.js MODEL_WATER_COLOR
+  const WATER_FILL_COLOR = { linear: 0xbcdce6, basin: 0xb2d6e2, harbour: 0x9fc4d2 };
+  const WATER_SHORE_COLOR = 0x9fb8c6;
+  function waterBand(d) { d = Number.isFinite(d) ? d : 0; return d > 6000 ? 'far' : d > 3000 ? 'mid' : 'near'; }
+  function waterFamily(cls, diag) {
+    if (cls === 'harbour') return 'harbour';
+    if (cls === 'lake' || cls === 'pond' || cls === 'reservoir') return 'basin';
+    if (cls === 'river' || cls === 'canal' || cls === 'stream') return 'linear';
+    if (cls === 'water') return (diag > 600) ? 'linear' : 'basin';
+    return 'linear';
+  }
+  const wLerp = (x, x0, x1, y0, y1) => { const t = x1 === x0 ? 0 : Math.max(0, Math.min(1, (x - x0) / (x1 - x0))); return y0 + (y1 - y0) * t; };
+  // [P1-6H] 距離で滑らかに減衰する低 opacity（帯・板を作らない）。canonical: model-style.js modelWaterFillOpacity
+  function waterLod(distance, mode, family, giant) {
+    const band = waterBand(distance);
+    const d = Number.isFinite(distance) ? distance : 4000;
+    if (mode === 'legacy') return { band, fillVisible: family !== 'harbour', fillOpacity: 0.5, shoreVisible: false, shoreOpacity: 0 };
+    if (mode === 'shoreline') return { band, fillVisible: family !== 'harbour', fillOpacity: 0, shoreVisible: family !== 'harbour', shoreOpacity: wLerp(d, 1000, 8000, 0.5, 0.75) };
+    let fo, sv = family !== 'harbour', so;
+    if (family === 'harbour') { fo = d > 9000 ? 0 : wLerp(d, 2000, 9000, 0.10, 0.04); so = 0; }
+    else if (family === 'basin') { fo = wLerp(d, 1500, 9000, 0.34, 0.14); so = wLerp(d, 2500, 7000, 0.20, 0.45); }
+    else if (giant) { fo = wLerp(d, 1800, 5200, 0.20, 0.0); so = wLerp(d, 2500, 7000, 0.24, 0.5); }
+    else { fo = wLerp(d, 2200, 6200, 0.30, 0.0); so = wLerp(d, 2500, 7000, 0.22, 0.48); }
+    // [P1-7B] City Mode（大阪市全域）は camera 距離が 9000m を大きく超える。河川の岸線が
+    // そこでも強いままだと「大河川がまだやや強すぎる」ため、9000m 以遠はさらに弱める（basin/harbourは対象外）。
+    if (family !== 'harbour' && family !== 'basin' && d > 9000) so = wLerp(d, 9000, 20000, so, 0.12);
+    return { band, fillVisible: fo > 0.005, fillOpacity: fo, shoreVisible: sv, shoreOpacity: so };
+  }
+  let curCamDist = 4000, lastWaterBand = null, lastWaterMode = null;
+  const waterStyleMode = () => (typeof window !== 'undefined' && window.__WATER_STYLE_MODE__) || 'lod';
+
+  // [P1-7] City Mode 用レイヤー LOD（道路・公園・鉄道）。canonical: tools/lib/city-mode.js
+  // [見た目改善 Mission02] 道路LODを3段階（MAJOR/MID/LOCAL）+ 距離band（FAR/MID/NEAR）へ再設計。
+  //   MAJOR(幹線: motorway/trunk/primary系)=常時 / MID(secondary/tertiary系)=FARでのみ非表示 /
+  //   LOCAL(residential/unclassified/service等・不明)=NEARのみ。canonical: tools/lib/road-lod.js
+  const ROAD_LOD_MAJOR = new Set(['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link']);
+  const ROAD_LOD_MID = new Set(['secondary', 'secondary_link', 'tertiary', 'tertiary_link']);
+  function classifyRoadLod(hw) { if (ROAD_LOD_MAJOR.has(hw)) return 'major'; if (ROAD_LOD_MID.has(hw)) return 'mid'; return 'local'; }
+  const ROAD_LOD_FAR_M = 9000, ROAD_LOD_MID_M = 3500;
+  function roadLodBand(d) { if (d > ROAD_LOD_FAR_M) return 'far'; if (d > ROAD_LOD_MID_M) return 'mid'; return 'near'; }
+  function roadClassVisible(cls, d) {
+    const band = roadLodBand(d);
+    if (cls === 'major') return true;
+    if (cls === 'mid') return band !== 'far';
+    return band === 'near';
+  }
+  // [Mission12] 公園を面積で large(≥10ha)/medium(1–10ha)/small に分け、道路LODと同じ FAR/MID/NEAR band で絞る。
+  //   FAR = large のみ / MID = large+medium / NEAR = all。canonical: tools/lib/park-lod.js。
+  const PARK_AREA_LARGE_M2 = 100000, PARK_AREA_MEDIUM_M2 = 10000;
+  function classifyParkArea(a) { if (!(a > 0)) return 'small'; if (a >= PARK_AREA_LARGE_M2) return 'large'; if (a >= PARK_AREA_MEDIUM_M2) return 'medium'; return 'small'; }
+  const PARK_LOD_FAR_M = 9000, PARK_LOD_MID_M = 3500;
+  let parkLodForce = null; // [Mission12] __PARK_LOD_FORCE__ で 'near'|'mid'|'far' を上書き（デバッグ）。null=距離依存。
+  function parkLodBand(d) { if (parkLodForce) return parkLodForce; if (d > PARK_LOD_FAR_M) return 'far'; if (d > PARK_LOD_MID_M) return 'mid'; return 'near'; }
+  function parkClassVisible(cls, d) { const b = parkLodBand(d); if (cls === 'large') return true; if (cls === 'medium') return b !== 'far'; return b === 'near'; }
+  const PARK_TIER_OPACITY = { large: { near: 0.80, mid: 0.62, far: 0.46 }, medium: { near: 0.78, mid: 0.58, far: 0.58 }, small: { near: 0.75, mid: 0.75, far: 0.75 } };
+  function parkTierOpacity(cls, d) { return (PARK_TIER_OPACITY[cls] || PARK_TIER_OPACITY.small)[parkLodBand(d)]; }
+  // [Mission13] 鉄道を MAJOR/URBAN/LOCAL の3クラス + 道路と同じ FAR/MID/NEAR band で整理。
+  //   OSM tag（railway= のみ）+ way 長で汎用分類。canonical: tools/lib/rail-lod.js。
+  const RAIL_MAJOR_MIN_LEN_M = 60;
+  const RAIL_EXCLUDED = new Set(['construction', 'proposed', 'disused', 'abandoned', 'razed', 'dismantled']);
+  function railIncluded(r) { return !RAIL_EXCLUDED.has(String(r || '').toLowerCase()); }
+  function railLineLength(p) { let L = 0; if (Array.isArray(p)) for (let i = 0; i < p.length - 1; i++) L += Math.hypot(p[i][0] - p[i + 1][0], p[i][1] - p[i + 1][1]); return L; }
+  function classifyRail(railway, lengthM) {
+    const r = String(railway || '').toLowerCase();
+    if (r === 'subway' || r === 'metro') return 'urban';
+    if (r === 'light_rail' || r === 'tram' || r === 'monorail') return 'local';
+    if (r === 'rail' || r === 'narrow_gauge') return (lengthM >= RAIL_MAJOR_MIN_LEN_M) ? 'major' : 'local';
+    return 'local';
+  }
+  const RAIL_LOD_FAR_M = 9000, RAIL_LOD_MID_M = 3500;
+  let railLodForce = null; // [Mission13] __RAIL_LOD_FORCE__ で 'near'|'mid'|'far' を上書き（デバッグ）。
+  function railLodBand(d) { if (railLodForce) return railLodForce; if (d > RAIL_LOD_FAR_M) return 'far'; if (d > RAIL_LOD_MID_M) return 'mid'; return 'near'; }
+  function railClassVisible(cls, d) { const b = railLodBand(d); if (cls === 'major') return true; if (cls === 'urban') return b !== 'far'; return b === 'near'; }
+  const RAIL_TIER_OPACITY = { major: { near: 0.82, mid: 0.72, far: 0.6 }, urban: { near: 0.5, mid: 0.4, far: 0.4 }, local: { near: 0.6, mid: 0.6, far: 0.6 } };
+  function railTierOpacity(cls, d) { return (RAIL_TIER_OPACITY[cls] || RAIL_TIER_OPACITY.local)[railLodBand(d)]; }
+  // MODEL_STYLE の鉄道色: 道路より少し濃い medium neutral gray（黒すぎない）。地下鉄は少し明るく主張を抑える。
+  const RAIL_COLORS = { major: 0x8f969d, urban: 0xa0a6ac, local: 0xadb2b7 };
+  const STATION_MAX_M = 5000;
+  function stationVisible(d) { return d <= STATION_MAX_M; }
+  // レイヤー個別 ON/OFF（layer UI から）。station は rail 内の別トグル。
+  const layerEnabled = { roads: true, parks: true, waterways: true, railways: true, railStations: true };
+
   const TILE_SIZE = 2000;
-  const RING = 1;                 // Ward 中心タイル ± RING を保持
-  const MAX_TILES_PER_LAYER = 40; // LRU 上限
+  const RING = 1;                 // camera 中心タイル ± RING を随時ロード
+  // [P1-7] City Mode で大阪市24区全域（レイヤーごと最大156 tile）を同時に保持できる上限へ。
+  //   tile JSON は小さい（roads 1レイヤーで数十KB/tile）ため全156保持してもメモリ上問題ない。
+  const MAX_TILES_PER_LAYER = 170;
+  const MAX_AREA_FEATURE_DIAG = 12000; // [P1-6E/H] これを超える面フィーチャは assemble 異常とみなし描画しない
+  const WARD_COVER_CAP = 20;      // Ward 切替時に bbox 一括カバーする最大 tile 数（層ごと。2000m tile）
   const grp = new THREE.Group(); grp.name = 'CityTileLayer';
   let attached = false;
   const manifests = {};          // layer -> { tileSet:Set, loading:boolean, ok:boolean }
@@ -6644,23 +7307,42 @@ const CityTileLayer = (function () {
       manifests[layer].tileSet = new Set((m.tiles || []).map((t) => `${t.tx}_${t.tz}`));
       manifests[layer].ok = true;
       manifests[layer].loading = false;
-      perf[layer] = { manifestMs: Math.round(performance.now() - t0), firstTileMs: null, firstRenderMs: null };
+      perf[layer] = Object.assign({}, perf[layer], { manifestMs: Math.round(performance.now() - t0), firstTileMs: null, firstRenderMs: null });
       console.log(`[LAYER-PERF] {"layer":"${layer}","manifestMs":${perf[layer].manifestMs},"tiles":${manifests[layer].tileSet.size}}`);
     } catch (e) { manifests[layer].loading = false; console.warn(`[CityTileLayer] ${layer} manifest 読込不可（表示は継続）:`, e && e.message); }
     return manifests[layer];
   }
 
-  function disposeTile(layer, key) {
+  function clearRecMeshes(rec) {
+    for (const mesh of (rec.mesh || [])) { grp.remove(mesh); if (mesh.geometry) mesh.geometry.dispose(); if (mesh.material) mesh.material.dispose(); }
+    rec.mesh = [];
+  }
+
+  function disposeTile(layer, key, opts) {
     const rec = tiles[layer].get(key);
     if (!rec) return;
-    for (const mesh of rec.mesh) { grp.remove(mesh); if (mesh.geometry) mesh.geometry.dispose(); if (mesh.material) mesh.material.dispose(); }
+    clearRecMeshes(rec);
+    // [P1-6F] この tile が「所有」して描画した feature id を dedup Set から外す。
+    //   大きな feature（複数 tile にまたがる河川等）が、所有 tile の LRU 破棄で永久に消える不具合の対処。
+    for (const gid of (rec.ownedIds || [])) seenFeatureIds.delete(gid);
     tiles[layer].delete(key);
+    if (!opts || !opts.skipReconcile) reconcileLayer(layer);
+  }
+
+  // 所有者を失った feature を、まだ生きている tile で描き直す。
+  function reconcileLayer(layer) {
+    for (const [k, rec] of tiles[layer]) {
+      if (!rec.allFeats || rec.loading) continue;
+      const hasOrphan = rec.allFeats.some((f) => !seenFeatureIds.has(layer + ':' + f.id));
+      if (hasOrphan) renderTileMeshes(layer, k, rec);
+    }
   }
 
   function lru(layer) {
     if (tiles[layer].size <= MAX_TILES_PER_LAYER) return;
     const sorted = [...tiles[layer].entries()].sort((a, b) => a[1].lastUsed - b[1].lastUsed);
-    while (tiles[layer].size > MAX_TILES_PER_LAYER) disposeTile(layer, sorted.shift()[0]);
+    while (tiles[layer].size > MAX_TILES_PER_LAYER) disposeTile(layer, sorted.shift()[0], { skipReconcile: true });
+    reconcileLayer(layer);
   }
 
   function lineMesh(features, y, color) {
@@ -6676,26 +7358,244 @@ const CityTileLayer = (function () {
     return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color }));
   }
 
-  function areaMesh(features, y, color) {
-    const pos = [];
+  // [Mission13] 鉄道を MAJOR/URBAN/LOCAL の tier 別 LineSegments へ統合（1 tile 最大 3 mesh。1 way = 1 mesh 禁止）。
+  //   道路 ribbon 化はせず軽量な線表現。tier ごとに色・renderOrder・距離LOD 用の userData を持つ。
+  function buildRailMeshes(features, y) {
+    const buckets = { major: [], urban: [], local: [] };
     for (const f of features) {
-      let ring = f.p;
-      if (!ring || ring.length < 3) continue;
-      if (ring.length > 3 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) ring = ring.slice(0, -1);
-      const holes = (f.holes || []).map((h) => (h.length > 3 && h[0][0] === h[h.length - 1][0] && h[0][1] === h[h.length - 1][1] ? h.slice(0, -1) : h)).filter((h) => h.length >= 3);
-      let faces = null;
-      try {
-        faces = THREE.ShapeUtils.triangulateShape(ring.map((p) => new THREE.Vector2(p[0], p[1])), holes.map((h) => h.map((p) => new THREE.Vector2(p[0], p[1]))));
-      } catch (e) { faces = null; }
-      if (!faces || !faces.length) continue;
-      const all = ring.concat(...holes);
-      for (const fc of faces) { for (const idx of fc) { const v = all[idx]; if (v) pos.push(v[0], y, v[1]); } }
+      if (!f.p || f.p.length < 2) continue;
+      if (!railIncluded(f.railway)) continue; // 工事中・廃線は canonical 表示しない
+      buckets[classifyRail(f.railway, railLineLength(f.p))].push(f);
     }
+    const meshes = [];
+    // tier ごとに僅かな y 差（major を一番上に）＝ Z-fighting 回避
+    const dy = { major: 0.006, urban: 0.003, local: 0 };
+    for (const tier of ['major', 'urban', 'local']) {
+      const m = lineMesh(buckets[tier], y + dy[tier], RAIL_COLORS[tier]);
+      if (!m) continue;
+      m.material.transparent = true;
+      m.material.opacity = RAIL_TIER_OPACITY[tier].near;
+      m.material.depthWrite = false;
+      m.userData.rail = 'line';
+      m.userData.railTier = tier;
+      m.renderOrder = 936; // park(930)・道路より上、建物より下
+      meshes.push(m);
+    }
+    return meshes;
+  }
+
+  // [見た目改善 Mission03] 道路を centerline + 幅から ribbon（面）で描く。
+  //   miter clamp / densify は RiverLayerV2 と共通設計。canonical: tools/lib/road-ribbon.js。
+  //   tier(major/mid/local)ごとに1つの merged BufferGeometry（1 tile につき最大3 mesh。1道路=1meshは禁止）。
+  const ROAD_RIBBON_WIDTH = { motorway: 17, motorway_link: 9, trunk: 14, trunk_link: 8, primary: 12, primary_link: 7,
+    secondary: 9.5, secondary_link: 6, tertiary: 7.5, tertiary_link: 5.5, residential: 5.5, living_street: 4.5, unclassified: 4.5, service: 3.5 };
+  const ROAD_W_MIN = 2.5, ROAD_W_MAX = 28, ROAD_LANE_W = 3.25;
+  function roadRibbonWidth(f) {
+    const wt = parseFloat(f.width);
+    let w = (Number.isFinite(wt) && wt > 0) ? wt : null;
+    if (w == null) { const ln = parseFloat(f.lanes); if (Number.isFinite(ln) && ln >= 1) w = ln * ROAD_LANE_W; }
+    if (w == null) w = ROAD_RIBBON_WIDTH[f.highway || ''] || ROAD_RIBBON_WIDTH.residential;
+    return Math.max(ROAD_W_MIN, Math.min(ROAD_W_MAX, w));
+  }
+  function rrDensify(pts, maxSeg) {
+    if (!Array.isArray(pts) || pts.length < 2) return pts || [];
+    const out = [pts[0]];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1], d = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (d > maxSeg) { const n = Math.min(64, Math.ceil(d / maxSeg)); for (let k = 1; k < n; k++) out.push([a[0] + (b[0] - a[0]) * (k / n), a[1] + (b[1] - a[1]) * (k / n)]); }
+      out.push(b);
+    }
+    return out;
+  }
+  function rrNorm(x, z) { const l = Math.hypot(x, z); return l > 1e-9 ? [x / l, z / l] : [0, 0]; }
+  function roadRibbonOffsets(cl, width, maxMiterRatio) {
+    const n = cl.length, half = width / 2, left = new Array(n), right = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const prev = cl[Math.max(0, i - 1)], cur = cl[i], next = cl[Math.min(n - 1, i + 1)];
+      const [d1x, d1z] = rrNorm(cur[0] - prev[0], cur[1] - prev[1]);
+      const [d2x, d2z] = rrNorm(next[0] - cur[0], next[1] - cur[1]);
+      let nx, nz, scale;
+      if (i === 0) { nx = -d2z; nz = d2x; scale = 1; }
+      else if (i === n - 1) { nx = -d1z; nz = d1x; scale = 1; }
+      else {
+        const n1x = -d1z, n1z = d1x; let bx = n1x + (-d2z), bz = n1z + d2x;
+        const bl = Math.hypot(bx, bz);
+        if (bl < 1e-6) { nx = n1x; nz = n1z; scale = 1; }
+        else { bx /= bl; bz /= bl; const cosH = bx * n1x + bz * n1z; scale = Math.min(1 / Math.max(cosH, 1e-3), maxMiterRatio); nx = bx; nz = bz; }
+      }
+      left[i] = [cur[0] + nx * half * scale, cur[1] + nz * half * scale];
+      right[i] = [cur[0] - nx * half * scale, cur[1] - nz * half * scale];
+    }
+    return { left, right };
+  }
+  function rrPushTri(pos, p0, p1, p2) {
+    const v1z = p1[2] - p0[2], v1x = p1[0] - p0[0], v2z = p2[2] - p0[2], v2x = p2[0] - p0[0];
+    const ny = v1z * v2x - v1x * v2z;
+    if (ny >= 0) pos.push(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2]);
+    else pos.push(p0[0], p0[1], p0[2], p2[0], p2[1], p2[2], p1[0], p1[1], p1[2]);
+  }
+  function appendRoadRibbon(pos, cl0, width, y) {
+    const cl = rrDensify(cl0, 40);
+    if (cl.length < 2) return;
+    const { left, right } = roadRibbonOffsets(cl, width, 2.75);
+    for (let i = 0; i < left.length - 1; i++) {
+      const a = [left[i][0], y, left[i][1]], b = [right[i][0], y, right[i][1]];
+      const c = [left[i + 1][0], y, left[i + 1][1]], d = [right[i + 1][0], y, right[i + 1][1]];
+      rrPushTri(pos, a, c, b); rrPushTri(pos, b, c, d);
+    }
+  }
+  // [指示書6節] 白模型のグレー階調。major #b8bdc3 / mid #c4c8cc / local #d0d3d6（黒・濃灰にしない）。
+  //   [指示書11節] major(motorway/trunk系)は僅かに濃い＝上の色差のみ（派手な色分けはしない）。
+  const ROAD_RIBBON_COLOR = { major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 };
+  //   tier間の coplanar z-fighting を避けるため tier ごとに僅かな y 差を付ける（水域0.05/公園0.07より上、建物より下）。
+  const ROAD_TIER_DY = { major: 0, mid: 0.004, local: 0.008 };
+  function buildRoadMeshes(features, y, baseColor) {
+    const lineDebug = (typeof window !== 'undefined' && window.__ROAD_LINE_DEBUG__ === true);
+    const buckets = { major: [], mid: [], local: [] };
+    for (const f of features) {
+      const tier = classifyRoadLod(f.highway || '');
+      const ty = y + ROAD_TIER_DY[tier];
+      if (lineDebug) { const p = f.p; for (let i = 0; i < p.length - 1; i++) buckets[tier].push(p[i][0], ty, p[i][1], p[i + 1][0], ty, p[i + 1][1]); }
+      else if (Array.isArray(f.p) && f.p.length >= 2) appendRoadRibbon(buckets[tier], f.p, roadRibbonWidth(f), ty);
+    }
+    const meshes = [];
+    for (const tier of ['major', 'mid', 'local']) {
+      const pos = buckets[tier];
+      if (!pos.length) continue;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+      g.computeBoundingSphere();
+      const m = lineDebug
+        ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: ROAD_RIBBON_COLOR[tier] }))
+        : new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: ROAD_RIBBON_COLOR[tier], side: THREE.FrontSide }));
+      m.userData.roadTier = tier;
+      m.renderOrder = 930;
+      m.frustumCulled = true;
+      meshes.push(m);
+    }
+    return meshes;
+  }
+
+  // [P1-6E] 面フィルの入力正規化 + 分割結果検証。canonical: tools/lib/polygon-fill.js
+  //   実機で「巨大な水色polygon/帯が画面を横断する」問題が出た。earcut 自体は正しい（triArea/polyArea≈1）が、
+  //   重複頂点・巻き方向・outer 外 hole を正規化せず、分割結果も一切検証せず描画していたため、
+  //   壊れた assemble 結果（自己交差・退化）がそのまま巨大メッシュになっていた。
+  function pfSignedArea(r) { let a = 0; for (let i = 0; i < r.length; i++) { const p = r[i], q = r[(i + 1) % r.length]; a += p[0] * q[1] - q[0] * p[1]; } return a / 2; }
+  function pfArea(r) { return Math.abs(pfSignedArea(r)); }
+  function pfClean(r, eps) {
+    eps = eps || 0.01;
+    let s = (r || []).filter((p) => Array.isArray(p) && isFinite(p[0]) && isFinite(p[1]));
+    if (s.length > 1) { const a = s[0], b = s[s.length - 1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) <= eps) s = s.slice(0, -1); }
+    const o = [];
+    for (const p of s) { const q = o[o.length - 1]; if (!q || Math.hypot(p[0] - q[0], p[1] - q[1]) > eps) o.push([p[0], p[1]]); }
+    if (o.length > 2 && Math.hypot(o[0][0] - o[o.length - 1][0], o[0][1] - o[o.length - 1][1]) <= eps) o.pop();
+    return o;
+  }
+  function pfWind(r, ccw) { const a = pfSignedArea(r); if ((a > 0) === ccw || a === 0) return r.slice(); return r.slice().reverse(); }
+  function pfPIR(pt, r) {
+    let ins = false; const x = pt[0], z = pt[1];
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      const xi = r[i][0], zi = r[i][1], xj = r[j][0], zj = r[j][1];
+      if (((zi > z) !== (zj > z)) && (x < ((xj - xi) * (z - zi)) / (zj - zi) + xi)) ins = !ins;
+    }
+    return ins;
+  }
+  function pfPrepare(outerRaw, holesRaw) {
+    const outer = pfWind(pfClean(outerRaw), true);
+    const holes = []; let dropped = 0;
+    for (const hr of (holesRaw || [])) {
+      const h = pfClean(hr);
+      if (h.length < 3) { dropped++; continue; }
+      const cen = [h.reduce((s, p) => s + p[0], 0) / h.length, h.reduce((s, p) => s + p[1], 0) / h.length];
+      if (!pfPIR(cen, outer) && !h.some((v) => pfPIR(v, outer))) { dropped++; continue; }
+      holes.push(pfWind(h, false));
+    }
+    return { outer, holes, dropped };
+  }
+  function pfValidate(outer, holes, faces, pts) {
+    let polyA = pfArea(outer); for (const h of holes) polyA -= pfArea(h); polyA = Math.max(polyA, 1e-6);
+    let triA = 0, maxTriA = 0, maxEdge = 0, outCen = 0; const check = faces.length <= 8000;
+    for (const fc of faces) {
+      const a = pts[fc[0]], b = pts[fc[1]], c = pts[fc[2]];
+      if (!a || !b || !c) return { ok: false, reason: 'face-oob', triangleCount: faces.length, areaRatio: 0, maxEdge: 0, dominantRatio: 0 };
+      const ar = Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])) / 2;
+      triA += ar; if (ar > maxTriA) maxTriA = ar;
+      const e = Math.max(Math.hypot(a[0] - b[0], a[1] - b[1]), Math.hypot(b[0] - c[0], b[1] - c[1]), Math.hypot(c[0] - a[0], c[1] - a[1]));
+      if (e > maxEdge) maxEdge = e;
+      if (check) { const cn = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3]; if (!pfPIR(cn, outer) || holes.some((h) => pfPIR(cn, h))) outCen++; }
+    }
+    const ratio = triA / polyA, dom = maxTriA / polyA;
+    const outFrac = faces.length ? outCen / faces.length : 0;
+    let ok = true, reason = '';
+    if (!faces.length) { ok = false; reason = 'no-faces'; }
+    else if (Math.abs(ratio - 1) > 0.15) { ok = false; reason = 'area-ratio ' + ratio.toFixed(3); }
+    else if (outer.length > 6 && dom > 0.85) { ok = false; reason = 'dominant ' + dom.toFixed(3); }
+    // 細く蛇行する実河川は細片三角形の重心が境界際に落ちる。少数なら正常、割合が高いときだけ拒否。
+    else if (check && outCen > 3 && outFrac > 0.06) { ok = false; reason = 'centroid-outside ' + outCen + '/' + faces.length; }
+    return { ok, reason, triangleCount: faces.length, areaRatio: ratio, maxEdge: Math.round(maxEdge), dominantRatio: dom };
+  }
+
+  function areaMesh(features, y, color, meta) {
+    meta = meta || {};
+    const pos = []; let rejected = 0;
+    for (const f of features) {
+      if (f.kind && f.kind !== 'area') continue; // [P1-6E/E] 中心線(line)は絶対にフィルへ流さない
+      if (!f.p || f.p.length < 3) continue;
+      const { outer, holes, dropped } = pfPrepare(f.p, f.holes);
+      if (outer.length < 3) { rejected++; continue; }
+      let mnx = Infinity, mxx = -Infinity, mnz = Infinity, mxz = -Infinity;
+      for (const p of outer) { if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0]; if (p[1] < mnz) mnz = p[1]; if (p[1] > mxz) mxz = p[1]; }
+      const diag = Math.hypot(mxx - mnx, mxz - mnz);
+      let faces = null;
+      if (diag <= MAX_AREA_FEATURE_DIAG) {
+        try {
+          faces = THREE.ShapeUtils.triangulateShape(outer.map((p) => new THREE.Vector2(p[0], p[1])), holes.map((h) => h.map((p) => new THREE.Vector2(p[0], p[1]))));
+        } catch (e) { faces = null; }
+      }
+      const all = outer.concat(...holes);
+      const v = (faces && faces.length) ? pfValidate(outer, holes, faces, all) : { ok: false, reason: diag > MAX_AREA_FEATURE_DIAG ? 'bbox-too-large ' + Math.round(diag) : 'no-faces', triangleCount: 0, areaRatio: 0, maxEdge: 0 };
+      if ((typeof window !== 'undefined' && window.__AREA_DRAW_DEBUG__)) {
+        console.log('[AREA-DRAW-DEBUG] ' + JSON.stringify({ tag: meta.debug || '', featureId: f.id, points: outer.length, holes: holes.length, tri: v.triangleCount, ok: v.ok, reason: v.reason, tileId: meta.tileId || '' }));
+      }
+      if (!v.ok) { rejected++; continue; }
+      for (const fc of faces) for (const idx of fc) { const vv = all[idx]; if (vv) pos.push(vv[0], y, vv[1]); }
+    }
+    void rejected;
     if (!pos.length) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-    g.computeVertexNormals(); g.computeBoundingSphere();
-    return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
+    g.computeBoundingSphere();
+    return new THREE.Mesh(g, new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.5, side: THREE.FrontSide,
+      depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+    }));
+  }
+
+  // [Mission12] 公園を面積で large/medium/small に分け、tier ごとに 1 mesh へ統合（1 tile 最大 3 mesh）。
+  //   遠景では small/medium を隠し、大規模公園だけを都市骨格として残す。三角形分割は既存 areaMesh() を再利用。
+  function pfRingArea(r) { let a = 0; for (let i = 0; i < r.length; i++) { const p = r[i], q = r[(i + 1) % r.length]; a += p[0] * q[1] - q[0] * p[1]; } return Math.abs(a / 2); }
+  function parkFeatureArea(f) {
+    let a = pfRingArea(f.p);
+    if (Array.isArray(f.holes)) for (const h of f.holes) if (h && h.length >= 3) a -= pfRingArea(h);
+    return Math.max(0, a);
+  }
+  function buildParkMeshes(features, y, color, meta) {
+    const buckets = { large: [], medium: [], small: [] };
+    for (const f of features) {
+      if (!f.p || f.p.length < 3) continue;
+      buckets[classifyParkArea(parkFeatureArea(f))].push(f);
+    }
+    const meshes = [];
+    for (const tier of ['large', 'medium', 'small']) {
+      const m = areaMesh(buckets[tier], y, color, meta);
+      if (m) {
+        m.userData.parkTier = tier;
+        m.renderOrder = 930;
+        m.material.opacity = PARK_TIER_OPACITY[tier].near; // 初期は near。applyCityLOD が距離で調整。
+        meshes.push(m);
+      }
+    }
+    return meshes;
   }
 
   function stationMesh(features, y) {
@@ -6711,37 +7611,200 @@ const CityTileLayer = (function () {
     return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xe0e4ea }));
   }
 
+  // [P1-6G] 水域 area を「岸線 LineSegments + ファミリ別フィル mesh」に分解する。
+  //   各 mesh は userData.water.{role,family,giant} を持ち、applyWaterLOD が距離で可視/opacity を制御する。
+  function buildWaterMeshes(areaFeats, tileId) {
+    const mode = waterStyleMode();
+    const buckets = { linear: [], linearGiant: [], basin: [], harbour: [] };
+    const shoreRings = [];
+    let rejected = 0;
+    for (const f of areaFeats) {
+      if (!f.p || f.p.length < 3) continue;
+      const { outer, holes, dropped } = pfPrepare(f.p, f.holes);
+      if (outer.length < 3) { rejected++; continue; }
+      let mnx = Infinity, mxx = -Infinity, mnz = Infinity, mxz = -Infinity;
+      for (const p of outer) { if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0]; if (p[1] < mnz) mnz = p[1]; if (p[1] > mxz) mxz = p[1]; }
+      const diag = Math.hypot(mxx - mnx, mxz - mnz);
+      const cls = f.waterClass || f.subtype || 'water';
+      const fam = waterFamily(cls, diag);
+      const areaKm2 = pfArea(outer) / 1e6;
+      const giant = diag > WATER_GIANT_DIAG || areaKm2 > 0.35;
+
+      let faces = null;
+      if (diag <= MAX_AREA_FEATURE_DIAG) {
+        try { faces = THREE.ShapeUtils.triangulateShape(outer.map((p) => new THREE.Vector2(p[0], p[1])), holes.map((h) => h.map((p) => new THREE.Vector2(p[0], p[1])))); }
+        catch (e) { faces = null; }
+      }
+      const all = outer.concat(...holes);
+      const v = (faces && faces.length) ? pfValidate(outer, holes, faces, all)
+        : { ok: false, reason: diag > MAX_AREA_FEATURE_DIAG ? 'bbox-too-large ' + Math.round(diag) : 'no-faces', triangleCount: 0, areaRatio: 0, maxEdge: 0 };
+      if (typeof window === 'undefined' || window.__WATER_DRAW_DEBUG__) {
+        console.log('[WATER-DRAW-DEBUG] ' + JSON.stringify({
+          featureId: f.id, sourceType: f.source ? f.source.type : null, sourceId: f.source ? f.source.id : null,
+          sourceName: (f.source && f.source.name) || f.name || '', waterClass: cls, family: fam, giant, styleMode: mode,
+          outerPointCount: outer.length, holeCount: holes.length, droppedHoles: dropped,
+          bboxDiag: Math.round(diag), triangleCount: v.triangleCount, areaRatio: +Number(v.areaRatio).toFixed(3),
+          maxTriEdge: v.maxEdge, tileId: tileId || '', ok: v.ok, reason: v.reason,
+        }));
+      }
+      if (!v.ok) { rejected++; continue; }
+      const bucket = fam === 'harbour' ? 'harbour' : fam === 'basin' ? 'basin' : (giant ? 'linearGiant' : 'linear');
+      const arr = buckets[bucket];
+      for (const fc of faces) for (const idx of fc) { const p = all[idx]; if (p) arr.push(p[0], WATER_FILL_Y, p[1]); }
+      if (fam !== 'harbour') { shoreRings.push(outer); for (const h of holes) shoreRings.push(h); }
+    }
+    if (rejected && (typeof window === 'undefined' || window.__WATER_DRAW_DEBUG__)) {
+      console.warn('[WATER-DRAW-DEBUG] tile ' + (tileId || '') + ' で ' + rejected + ' 件の area を描画拒否');
+    }
+
+    const meshes = [];
+    for (const name of ['linear', 'linearGiant', 'basin', 'harbour']) {
+      const pos = buckets[name];
+      if (!pos.length) continue;
+      const fam = name === 'harbour' ? 'harbour' : name === 'basin' ? 'basin' : 'linear';
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+      g.computeBoundingSphere();
+      const mat = new THREE.MeshBasicMaterial({ color: WATER_FILL_COLOR[fam], transparent: true, opacity: 0.16, side: THREE.FrontSide, depthWrite: false });
+      const m = new THREE.Mesh(g, mat);
+      m.renderOrder = 906; m.frustumCulled = true;
+      m.userData.water = { role: 'fill', family: fam, giant: name === 'linearGiant' };
+      meshes.push(m);
+    }
+    // 岸線（河川形状の認識に最重要。遠景ではこれが主役）
+    if (mode !== 'legacy') {
+      const spos = [];
+      for (const ring of shoreRings) {
+        if (!ring || ring.length < 2) continue;
+        for (let i = 0; i < ring.length; i++) { const a = ring[i], b = ring[(i + 1) % ring.length]; spos.push(a[0], WATER_SHORE_Y, a[1], b[0], WATER_SHORE_Y, b[1]); }
+      }
+      if (spos.length) {
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(spos), 3));
+        g.computeBoundingSphere();
+        const m = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: WATER_SHORE_COLOR, transparent: true, opacity: 0.8, depthWrite: false }));
+        m.renderOrder = 923; m.frustumCulled = true;
+        m.userData.water = { role: 'shore', family: 'linear', giant: false };
+        meshes.push(m);
+      }
+    }
+    return meshes;
+  }
+
+  // [P1-7] 1つの mesh へ距離LODを適用する（水域 + 道路tier + 公園tier + 駅）。layer別 ON/OFF も併せて反映。
+  function applyLodToOneMesh(m, distance, mode) {
+    const ud = m.userData || {};
+    if (ud.water) {
+      const lod = waterLod(distance, mode, ud.water.family, ud.water.giant);
+      const on = layerEnabled.waterways;
+      if (ud.water.role === 'fill') { m.visible = on && lod.fillVisible; m.material.opacity = lod.fillOpacity; }
+      else if (ud.water.role === 'shore') { m.visible = on && lod.shoreVisible; m.material.opacity = lod.shoreOpacity; }
+      return;
+    }
+    if (ud.roadTier) { m.visible = layerEnabled.roads && roadClassVisible(ud.roadTier, distance); return; }
+    if (ud.parkTier) {
+      const vis = layerEnabled.parks && parkClassVisible(ud.parkTier, distance);
+      m.visible = vis;
+      if (vis) m.material.opacity = parkTierOpacity(ud.parkTier, distance); // [Mission12] 距離バンド別 opacity
+      return;
+    }
+    if (ud.rail === 'line') {
+      const vis = layerEnabled.railways && railClassVisible(ud.railTier || 'major', distance);
+      m.visible = vis;
+      if (vis) m.material.opacity = railTierOpacity(ud.railTier || 'major', distance); // [Mission13] 距離バンド別 opacity
+      return;
+    }
+    if (ud.rail === 'station') { m.visible = layerEnabled.railways && layerEnabled.railStations && stationVisible(distance); return; }
+  }
+  function applyLodToMeshList(list, distance, mode) { for (const m of (list || [])) applyLodToOneMesh(m, distance, mode); }
+
+  // カメラ距離・layer ON/OFF に応じて全 city レイヤーの mesh を更新する（変化時のみ全走査）。
+  //   [見た目改善 Mission02] (distance<=9000)/(distance<=3500) は道路LODのFAR/MID band境界
+  //   （ROAD_LOD_FAR_M/ROAD_LOD_MID_M）と一致しており、road band変化もこのkeyで検出できる。
+  let lastCityLodKey = null;
+  function applyCityLOD(distance, force) {
+    const mode = waterStyleMode();
+    const key = waterBand(distance) + '|' + (distance <= 9000) + '|' + (distance <= 3500) + '|' + (distance <= 4000) + '|' + (distance <= 5000) + '|' + mode
+      + '|' + layerEnabled.roads + layerEnabled.parks + layerEnabled.waterways + layerEnabled.railways + layerEnabled.railStations;
+    if (!force && key === lastCityLodKey) return;
+    lastCityLodKey = key;
+    for (const layer of LAYERS) for (const rec of tiles[layer].values()) applyLodToMeshList(rec.mesh, distance, mode);
+  }
+
+  // rec.allFeats（tile 内の全 feature）から、まだ他 tile に所有されていない分を dedup 登録して描画する。
+  function renderTileMeshes(layer, key, rec) {
+    clearRecMeshes(rec);
+    const owned = new Set();
+    const feats = (rec.allFeats || []).filter((f) => {
+      const gid = layer + ':' + f.id;
+      if (seenFeatureIds.has(gid)) return false;
+      seenFeatureIds.add(gid); owned.add(gid); return true;
+    });
+    rec.ownedIds = owned;
+    const st = STYLE[layer];
+    const meshes = [];
+    if (layer === 'roads') {
+      // [P1-7] highway 種別で major/mid/local に分け、大阪市全域表示の遠景では細街路を隠す。
+      for (const rm of buildRoadMeshes(feats.filter((f) => f.kind === 'line'), st.y, st.color)) meshes.push(rm);
+    } else if (layer === 'railways') {
+      // [Mission13] MAJOR/URBAN/LOCAL の tier 別 mesh。距離LODは applyLodToOneMesh が制御。
+      for (const rm of buildRailMeshes(feats.filter((f) => f.kind === 'line'), st.y)) meshes.push(rm);
+    } else if (layer === 'parks') {
+      // [P1-7] 面積で big/small に分け、遠景では小規模公園を隠す。
+      for (const pm of buildParkMeshes(feats.filter((f) => f.kind === 'area'), st.y, st.color, { tileId: key, debug: 'park' })) meshes.push(pm);
+    } else if (layer === 'waterways') {
+      // [河川再構築] 旧area-polygon直接fillのcanonical描画を停止。WATER_LAYER_ENABLED=false の
+      //   間は mesh を1つも生成しない（新RiverLayerV2が河川描画を担う。データ取得自体は
+      //   従来どおり行うため rec.allFeats は保持され、デバッグ時に旧表示へ戻す余地を残す）。
+      if (typeof WATER_LAYER_ENABLED !== 'undefined' && WATER_LAYER_ENABLED) {
+        // [P1-6G] area は岸線+ファミリ別フィル（距離LOD）。line(中心線) は従来どおり細線。
+        for (const wm of buildWaterMeshes(feats.filter((f) => f.kind === 'area'), key)) meshes.push(wm);
+        const lm = lineMesh(feats.filter((f) => f.kind === 'line'), st.y + 0.01, st.color); if (lm) meshes.push(lm);
+      }
+    }
+    if (layer === 'railways' && (typeof window !== 'undefined' && window.__RAIL_STATION_MARKERS__ === true)) {
+      // [Mission14] 駅の視覚表現は StationLabelLayer（dot + ラベル）が担当。旧 '+' マーカーは debug flag 時のみ。
+      //   station feature 自体は rec.allFeats に保持され CityTileLayer.getAllStations() から読める。
+      const sm = stationMesh(feats.filter((f) => f.kind === 'station'), st.y + 0.01);
+      if (sm) { sm.userData.rail = 'station'; sm.renderOrder = 938; meshes.push(sm); }
+    }
+    ensureAttached();
+    for (const mesh of meshes) {
+      if (mesh.userData && (mesh.userData.water || mesh.userData.roadTier || mesh.userData.parkTier || mesh.userData.rail)) {
+        mesh.frustumCulled = true; grp.add(mesh); continue; // renderOrder は各 build*Meshes 側で設定済み（未設定は既定のまま）
+      }
+      mesh.renderOrder = 930; mesh.frustumCulled = true; grp.add(mesh);
+    }
+    rec.mesh = meshes;
+    applyLodToMeshList(meshes, curCamDist, waterStyleMode()); // 新tileに即座にLOD適用（この tile ぶんだけ・全走査しない）
+  }
+
   async function loadTile(layer, tx, tz) {
     const key = `${tx}_${tz}`;
     const m = manifests[layer];
     if (!m || !m.ok || !m.tileSet.has(key)) return;
     const rec = tiles[layer].get(key);
     if (rec) { rec.lastUsed = Date.now(); return; }
-    tiles[layer].set(key, { mesh: [], lastUsed: Date.now(), loading: true });
+    tiles[layer].set(key, { mesh: [], lastUsed: Date.now(), loading: true, ownedIds: new Set(), allFeats: null });
     try {
       const t0 = performance.now();
       const res = await fetch(`${BASE}/${layer}/tile_${tx}_${tz}.json`);
       if (!res.ok) { tiles[layer].delete(key); return; }
       const tile = await res.json();
       const cur = tiles[layer].get(key); if (!cur) return; // superseded by dispose
-      const feats = (tile.features || []).filter((f) => { const gid = layer + ':' + f.id; if (seenFeatureIds.has(gid)) return false; seenFeatureIds.add(gid); return true; });
-      const st = STYLE[layer];
-      const meshes = [];
-      if (layer === 'roads' || layer === 'railways') { const mm = lineMesh(feats.filter((f) => f.kind === 'line'), st.y, st.color); if (mm) meshes.push(mm); }
-      else if (layer === 'parks') { const mm = areaMesh(feats.filter((f) => f.kind === 'area'), st.y, st.color); if (mm) meshes.push(mm); }
-      else if (layer === 'waterways') {
-        const am = areaMesh(feats.filter((f) => f.kind === 'area'), st.y, st.areaColor); if (am) meshes.push(am);
-        const lm = lineMesh(feats.filter((f) => f.kind === 'line'), st.y + 0.005, st.color); if (lm) meshes.push(lm);
-      }
-      if (layer === 'railways') { const sm = stationMesh(feats.filter((f) => f.kind === 'station'), st.y + 0.01); if (sm) meshes.push(sm); }
-      ensureAttached();
-      for (const mesh of meshes) { mesh.renderOrder = 930; mesh.frustumCulled = true; grp.add(mesh); }
-      cur.mesh = meshes; cur.loading = false; cur.lastUsed = Date.now();
+      cur.allFeats = tile.features || [];
+      renderTileMeshes(layer, key, cur);
+      cur.loading = false; cur.lastUsed = Date.now();
       lru(layer);
       if (perf[layer] && perf[layer].firstTileMs == null) {
         perf[layer].firstTileMs = Math.round(performance.now() - t0);
         perf[layer].firstRenderMs = perf[layer].firstTileMs;
         console.log(`[LAYER-PERF] {"layer":"${layer}","firstTileMs":${perf[layer].firstTileMs},"firstRenderMs":${perf[layer].firstRenderMs}}`);
+      }
+      // [P1-7][CITY-PERF] City Mode 開始（markCityStart）からこのレイヤーの最初の tile までの時間。
+      if (perf[layer] && perf[layer].cityStartMs != null && perf[layer].cityFirstTileMs == null) {
+        const nowT = (typeof performance !== 'undefined') ? performance.now() : Date.now();
+        perf[layer].cityFirstTileMs = Math.round(nowT - perf[layer].cityStartMs);
       }
     } catch (e) { tiles[layer].delete(key); console.warn(`[CityTileLayer] ${layer} tile ${key} 読込エラー（継続）:`, e && e.message); }
   }
@@ -6761,19 +7824,641 @@ const CityTileLayer = (function () {
     }
   }
 
+  // [P1-6E] Ward の bbox 全域を各レイヤーで一括カバー（camera 位置に依らず区全体を埋める）。
+  function coverBbox(bbox) {
+    if (typeof fetch === 'undefined' || !bbox) return;
+    const want = wardTilesForBboxXZ(bbox, TILE_SIZE, WARD_COVER_CAP, 200);
+    for (const layer of LAYERS) {
+      loadManifest(layer).then((m) => { if (!m.ok) return; for (const { tx, tz } of want) loadTile(layer, tx, tz); });
+    }
+  }
+
+  // [P1-7] City Mode: tile 一覧を N 件ずつバッチ化し setTimeout で間隔を空けてロードする
+  //   （156 tile を同期一括ロードしない。中心→外の順は呼び出し側が事前ソートしている前提）。
+  const CITY_BATCH_SIZE = 10;
+  const CITY_BATCH_DELAY_MS = 70;
+  function loadTilesProgressively(layer, tileList) {
+    let i = 0;
+    function step() {
+      const batch = tileList.slice(i, i + CITY_BATCH_SIZE);
+      i += CITY_BATCH_SIZE;
+      for (const { tx, tz } of batch) loadTile(layer, tx, tz);
+      if (i < tileList.length) setTimeout(step, CITY_BATCH_DELAY_MS);
+    }
+    step();
+  }
+
+  // [P1-7] 大阪市24区全域を各レイヤーでカバーする。156 tile を手書きせず、各レイヤーの
+  //   manifest（実際に生成された tile 一覧。data/reports/city-layer-tiles-generation.json が
+  //   config/areas/osaka-city.json の bbox から生成した正の tile 集合）をそのまま使う。
+  //   中心→外の順で progressive load（loadTilesProgressively）する。
+  function coverCityBbox() {
+    if (typeof fetch === 'undefined') return;
+    markCityStart();
+    const ext = (typeof OSAKA_CITY_GROUND_EXTENT !== 'undefined') ? OSAKA_CITY_GROUND_EXTENT : { minX: -16900, maxX: 7100, minZ: -18600, maxZ: 2300 };
+    const centerTx = Math.floor(((ext.minX + ext.maxX) / 2) / TILE_SIZE);
+    const centerTz = Math.floor(((ext.minZ + ext.maxZ) / 2) / TILE_SIZE);
+    for (const layer of LAYERS) {
+      loadManifest(layer).then((m) => {
+        if (!m.ok) return;
+        const all = [...m.tileSet].map((k) => { const [tx, tz] = k.split('_').map(Number); return { tx, tz }; });
+        all.sort((a, b) => (Math.hypot(a.tx - centerTx, a.tz - centerTz) - Math.hypot(b.tx - centerTx, b.tz - centerTz)));
+        loadTilesProgressively(layer, all);
+      });
+    }
+  }
+
+  // [P1-7][CITY-PERF] City Mode 開始時刻を記録。各レイヤーの最初の tile 到着で firstXxxMs を確定する。
+  function markCityStart() {
+    const t0 = (typeof performance !== 'undefined') ? performance.now() : Date.now();
+    for (const layer of LAYERS) { perf[layer] = perf[layer] || {}; perf[layer].cityStartMs = t0; perf[layer].cityFirstTileMs = null; }
+  }
+
+  // [見た目改善 Mission02・指示書8節] 実機確認用デバッグAPI。現在の道路LOD状態を返す。
+  //   featureCountは読み込み済み道路tileのfeatureをid重複排除して集計する（表示中のmeshだけでなく
+  //   データ全体の内訳を見たいため）。
+  function getRoadLodDebug() {
+    const distance = curCamDist;
+    const band = roadLodBand(distance);
+    const counts = { major: 0, mid: 0, local: 0 };
+    const seen = new Set();
+    for (const rec of tiles.roads.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'line' || seen.has(f.id)) continue;
+        seen.add(f.id);
+        counts[classifyRoadLod(f.highway || '')]++;
+      }
+    }
+    return {
+      distance, band,
+      majorVisible: roadClassVisible('major', distance),
+      midVisible: roadClassVisible('mid', distance),
+      localVisible: roadClassVisible('local', distance),
+      majorFeatureCount: counts.major, midFeatureCount: counts.mid, localFeatureCount: counts.local,
+    };
+  }
+
+  // [Mission12・指示書16節] 公園 LOD の実機確認用デバッグ。distance/band/tier別の可視・feature数・
+  //   ロード済み tile 数・現在表示中の公園 mesh 数を返す。
+  function getParkLodDebug() {
+    const distance = curCamDist;
+    const band = parkLodBand(distance);
+    const counts = { large: 0, medium: 0, small: 0 };
+    const seen = new Set();
+    for (const rec of tiles.parks.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'area' || seen.has(f.id)) continue;
+        seen.add(f.id);
+        counts[classifyParkArea(parkFeatureArea(f))]++;
+      }
+    }
+    let visibleFeatures = 0, drawCallsEstimate = 0;
+    for (const rec of tiles.parks.values()) {
+      for (const m of (rec.mesh || [])) {
+        const tier = m.userData && m.userData.parkTier; if (!tier) continue;
+        if (m.visible) { drawCallsEstimate++; }
+      }
+    }
+    if (parkClassVisible('large', distance)) visibleFeatures += counts.large;
+    if (parkClassVisible('medium', distance)) visibleFeatures += counts.medium;
+    if (parkClassVisible('small', distance)) visibleFeatures += counts.small;
+    return {
+      cameraDistance: Math.round(distance), band, forced: parkLodForce,
+      visibleLarge: parkClassVisible('large', distance),
+      visibleMedium: parkClassVisible('medium', distance),
+      visibleSmall: parkClassVisible('small', distance),
+      largeFeatureCount: counts.large, mediumFeatureCount: counts.medium, smallFeatureCount: counts.small,
+      loadedTiles: tiles.parks.size, visibleFeatures, drawCallsEstimate,
+      opacity: { large: parkTierOpacity('large', distance), medium: parkTierOpacity('medium', distance), small: parkTierOpacity('small', distance) },
+      thresholds: { largeM2: PARK_AREA_LARGE_M2, mediumM2: PARK_AREA_MEDIUM_M2, farM: PARK_LOD_FAR_M, midM: PARK_LOD_MID_M },
+    };
+  }
+  function setParkLodForce(band) {
+    parkLodForce = band ? String(band).toLowerCase() : null;
+    if (parkLodForce && !['near', 'mid', 'far'].includes(parkLodForce)) parkLodForce = null;
+    applyCityLOD(curCamDist, true);
+    return getParkLodDebug();
+  }
+
+  // [Mission13・指示書18節] 鉄道 LOD の実機確認用デバッグ。
+  function getRailLodDebug() {
+    const distance = curCamDist;
+    const band = railLodBand(distance);
+    const counts = { major: 0, urban: 0, local: 0, excluded: 0 };
+    const seen = new Set();
+    for (const rec of tiles.railways.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'line' || seen.has(f.id)) continue;
+        seen.add(f.id);
+        if (!railIncluded(f.railway)) { counts.excluded++; continue; }
+        counts[classifyRail(f.railway, railLineLength(f.p))]++;
+      }
+    }
+    let drawCallsEstimate = 0;
+    for (const rec of tiles.railways.values()) for (const m of (rec.mesh || [])) { if (m.userData && m.userData.railTier && m.visible) drawCallsEstimate++; }
+    const vMajor = railClassVisible('major', distance), vUrban = railClassVisible('urban', distance), vLocal = railClassVisible('local', distance);
+    return {
+      cameraDistance: Math.round(distance), band, forced: railLodForce,
+      visibleMajor: vMajor, visibleUrban: vUrban, visibleLocal: vLocal, visibleSubway: vUrban,
+      majorFeatureCount: counts.major, urbanFeatureCount: counts.urban, localFeatureCount: counts.local, excludedFeatureCount: counts.excluded,
+      loadedTiles: tiles.railways.size,
+      visibleFeatures: (vMajor ? counts.major : 0) + (vUrban ? counts.urban : 0) + (vLocal ? counts.local : 0),
+      drawCallsEstimate,
+      opacity: { major: railTierOpacity('major', distance), urban: railTierOpacity('urban', distance), local: railTierOpacity('local', distance) },
+      colors: { major: '#' + RAIL_COLORS.major.toString(16), urban: '#' + RAIL_COLORS.urban.toString(16), local: '#' + RAIL_COLORS.local.toString(16) },
+      thresholds: { majorMinLenM: RAIL_MAJOR_MIN_LEN_M, farM: RAIL_LOD_FAR_M, midM: RAIL_LOD_MID_M },
+    };
+  }
+  function setRailLodForce(band) {
+    railLodForce = band ? String(band).toLowerCase() : null;
+    if (railLodForce && !['near', 'mid', 'far'].includes(railLodForce)) railLodForce = null;
+    applyCityLOD(curCamDist, true);
+    return getRailLodDebug();
+  }
+
+  // [Mission13・指示書19節] Mission 14 準備: station node の集計（今回ラベルは表示しない）。
+  function getStationDebug() {
+    const seen = new Set();
+    const stations = [];
+    let mnx = Infinity, mxx = -Infinity, mnz = Infinity, mxz = -Infinity;
+    const operatorCounts = {};
+    for (const rec of tiles.railways.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'station' || seen.has(f.id)) continue;
+        seen.add(f.id);
+        const p = (f.p && f.p[0]) || null;
+        if (p) { if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0]; if (p[1] < mnz) mnz = p[1]; if (p[1] > mxz) mxz = p[1]; }
+        const op = f.operator || '(none)';
+        operatorCounts[op] = (operatorCounts[op] || 0) + 1;
+        stations.push(f);
+      }
+    }
+    const named = stations.filter((s) => s.name);
+    return {
+      stationCount: stations.length,
+      namedStationCount: named.length,
+      sampleNames: named.slice(0, 20).map((s) => s.name),
+      bbox: isFinite(mnx) ? { minX: Math.round(mnx), maxX: Math.round(mxx), minZ: Math.round(mnz), maxZ: Math.round(mxz) } : null,
+      operatorCounts,
+      loadedTiles: tiles.railways.size,
+    };
+  }
+
+  // [Mission14] StationLabelLayer 用: 全 station node（id 重複排除、{id,name,x,z}）。
+  function getAllStations() {
+    const seen = new Set(); const out = [];
+    for (const rec of tiles.railways.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'station' || seen.has(f.id) || !f.p || !f.p[0]) continue;
+        seen.add(f.id);
+        out.push({ id: f.id, name: f.name || '', x: f.p[0][0], z: f.p[0][1] });
+      }
+    }
+    return out;
+  }
+  // [Mission15] LabelEngine 用: name 付き公園（{id,name,x,z,area,tier}）。small tier は除外（ラベル対象外）。
+  function getAllParks() {
+    const seen = new Set(); const out = [];
+    for (const rec of tiles.parks.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'area' || !f.name || seen.has(f.id) || !f.p || f.p.length < 3) continue;
+        seen.add(f.id);
+        const a = parkFeatureArea(f);
+        const tier = classifyParkArea(a);
+        if (tier === 'small') continue;
+        let mnx = Infinity, mxx = -Infinity, mnz = Infinity, mxz = -Infinity;
+        for (const p of f.p) { if (p[0] < mnx) mnx = p[0]; if (p[0] > mxx) mxx = p[0]; if (p[1] < mnz) mnz = p[1]; if (p[1] > mxz) mxz = p[1]; }
+        out.push({ id: f.id, name: f.name, x: (mnx + mxx) / 2, z: (mnz + mxz) / 2, area: a, tier });
+      }
+    }
+    return out;
+  }
+  // [Mission14] StationLabelLayer 用: 鉄道 line feature（{id,railway,p}）。cluster 周辺の路線数カウントに使う。
+  function getAllRailLines() {
+    const seen = new Set(); const out = [];
+    for (const rec of tiles.railways.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'line' || seen.has(f.id) || !f.p) continue;
+        seen.add(f.id);
+        out.push({ id: f.id, railway: f.railway, p: f.p });
+      }
+    }
+    return out;
+  }
+
+  // [見た目改善 Mission03・指示書14節] 道路 ribbon の実機確認用デバッグ。
+  //   現在の ribbon mesh 状態（tier別の visible / mesh数 / triangle数 / maxTriangleEdge）と、
+  //   代表的な named 道路のサンプル（highway/sourceId/width/segmentCount）を返す。
+  function getRoadRibbonDebug() {
+    const distance = curCamDist;
+    const band = roadLodBand(distance);
+    const out = { distance, band, mode: (typeof window !== 'undefined' && window.__ROAD_LINE_DEBUG__ === true) ? 'line' : 'ribbon' };
+    for (const tier of ['major', 'mid', 'local']) {
+      out[tier] = { visible: roadClassVisible(tier, distance), meshCount: 0, triangleCount: 0, maxTriangleEdge: 0 };
+    }
+    for (const rec of tiles.roads.values()) {
+      for (const m of (rec.mesh || [])) {
+        const tier = m.userData && m.userData.roadTier; if (!tier || !out[tier]) continue;
+        const arr = m.geometry && m.geometry.getAttribute && m.geometry.getAttribute('position');
+        if (!arr) continue;
+        out[tier].meshCount++;
+        const triN = m.geometry.isBufferGeometry && m instanceof THREE.Mesh ? arr.count / 3 : 0;
+        out[tier].triangleCount += Math.round(triN);
+        for (let i = 0; i + 8 < arr.array.length; i += 9) {
+          const e1 = Math.hypot(arr.array[i] - arr.array[i + 3], arr.array[i + 2] - arr.array[i + 5]);
+          const e2 = Math.hypot(arr.array[i + 3] - arr.array[i + 6], arr.array[i + 5] - arr.array[i + 8]);
+          const e3 = Math.hypot(arr.array[i + 6] - arr.array[i], arr.array[i + 8] - arr.array[i + 2]);
+          const mx = Math.max(e1, e2, e3);
+          if (mx > out[tier].maxTriangleEdge) out[tier].maxTriangleEdge = Math.round(mx);
+        }
+      }
+    }
+    const sample = [];
+    const seenName = new Set();
+    for (const rec of tiles.roads.values()) {
+      for (const f of (rec.allFeats || [])) {
+        if (f.kind !== 'line' || !f.name || seenName.has(f.name) || sample.length >= 12) continue;
+        seenName.add(f.name);
+        sample.push({ name: f.name, highway: f.highway, sourceId: f.source && `${f.source.type}/${f.source.id}`,
+          width: roadRibbonWidth(f), tier: classifyRoadLod(f.highway || ''), segmentCount: (f.p || []).length - 1 });
+      }
+    }
+    out.totalTriangles = out.major.triangleCount + out.mid.triangleCount + out.local.triangleCount;
+    out.sampleNamedRoads = sample;
+    return out;
+  }
+
   return {
     updateForTarget,
+    coverBbox,
+    coverCityBbox, // [P1-7] City Mode: 24区全域を各レイヤーで progressive load
+    // [P1-6G] camera 距離を通知。band（far/mid/near）が変わったときだけ水域 LOD を再適用する。
+    setCameraDistance(r) { if (Number.isFinite(r)) { curCamDist = r; applyCityLOD(r, false); } },
+    setWaterStyleMode(mode) { if (typeof window !== 'undefined') window.__WATER_STYLE_MODE__ = mode; applyCityLOD(curCamDist, true); },
+    // [P1-7] layer UI から個別 ON/OFF（roads/parks/waterways/railways/railStations）
+    setLayerEnabled(layer, on) { if (layer in layerEnabled) { layerEnabled[layer] = !!on; applyCityLOD(curCamDist, true); } },
+    isLayerEnabled(layer) { return !!layerEnabled[layer]; },
+    getRoadLodDebug, // [見た目改善 Mission02] 実機確認用: distance/band/各クラスの可視・feature数
+    getRoadRibbonDebug, // [見た目改善 Mission03] 実機確認用: ribbon mesh の tier別 triangle数/maxEdge・named道路サンプル
+    getParkLodDebug, setParkLodForce, // [Mission12] 実機確認用: 公園 LOD の band/可視/opacity・force 上書き
+    getRailLodDebug, setRailLodForce, getStationDebug, // [Mission13] 鉄道 LOD・station 集計
+    getAllStations, getAllRailLines, getAllParks, // [Mission14/15] Station/LabelEngine のデータソース
     // Ward 切替時: その Ward の周辺を即ロード開始（camera 到着を待たない）
-    onWardSwitch(x, z) { lastKey = null; updateForTarget(x, z); },
+    onWardSwitch(x, z, bbox) { lastKey = null; updateForTarget(x, z); if (bbox) coverBbox(bbox); },
     getStats() {
       const s = {};
       for (const L of LAYERS) s[L] = { loadedTiles: tiles[L].size, manifest: manifests[L] ? (manifests[L].ok ? 'ok' : 'none') : 'pending' };
       return s;
     },
     getPerf() { return perf; },
-    dispose() { for (const L of LAYERS) for (const k of [...tiles[L].keys()]) disposeTile(L, k); seenFeatureIds.clear(); },
+    dispose() { for (const L of LAYERS) for (const k of [...tiles[L].keys()]) disposeTile(L, k, { skipReconcile: true }); seenFeatureIds.clear(); },
   };
 })();
+
+// [Mission12] 公園 LOD の実機確認・デバッグ。
+if (typeof window !== 'undefined') {
+  window.__PARK_LOD_DEBUG__ = () => (typeof CityTileLayer !== 'undefined' ? CityTileLayer.getParkLodDebug() : null);
+  // __PARK_LOD_FORCE__('NEAR'|'MID'|'FAR')。null で距離依存へ戻す。
+  window.__PARK_LOD_FORCE__ = (band) => (typeof CityTileLayer !== 'undefined' ? CityTileLayer.setParkLodForce(band) : null);
+  // [Mission13] 鉄道 LOD / station の実機確認・デバッグ。
+  window.__RAIL_LOD_DEBUG__ = () => (typeof CityTileLayer !== 'undefined' ? CityTileLayer.getRailLodDebug() : null);
+  window.__RAIL_LOD_FORCE__ = (band) => (typeof CityTileLayer !== 'undefined' ? CityTileLayer.setRailLodForce(band) : null);
+  window.__STATION_DEBUG__ = () => (typeof CityTileLayer !== 'undefined' ? CityTileLayer.getStationDebug() : null);
+}
+
+// ══════════════════════════════════════════════════════════════
+// [Mission14] StationLabelLayer: 主要駅ラベルを LOD + screen-space collision 付きで表示する。
+// ------------------------------------------------------------
+//   データ: CityTileLayer.getAllStations() / getAllRailLines()（tile 到着で増える）。
+//   clustering + importance: tools/lib/station-cluster.js と同じロジックを inline。
+//   描画: 既存 LabelLayer と同じ「THREE.Sprite + CanvasTexture、初回生成し以後は visible/scale のみ更新」。
+//   collision: camera 移動 / zoom / band 変化時のみ再計算（throttle 180ms）。毎フレーム全件計算しない。
+// ══════════════════════════════════════════════════════════════
+const StationLabelLayer = (function () {
+  // ── station-cluster.js inline ──
+  const MAJOR_GROUPS = [
+    { canonical: '大阪・梅田', names: ['大阪', '梅田', '大阪梅田', '東梅田', '西梅田', '北新地'] },
+    { canonical: 'なんば', names: ['なんば', '難波', 'JR難波', '大阪難波'] },
+    { canonical: '天王寺', names: ['天王寺', '大阪阿部野橋', '阿倍野'] },
+    { canonical: '新今宮', names: ['新今宮', '新今宮駅前', '動物園前'] },
+    { canonical: '新大阪', names: ['新大阪'] },
+    { canonical: '京橋', names: ['京橋'] },
+    { canonical: '鶴橋', names: ['鶴橋'] },
+    { canonical: '大阪上本町', names: ['大阪上本町', '上本町'] },
+    { canonical: '淀屋橋', names: ['淀屋橋'] },
+    { canonical: '本町', names: ['本町'] },
+    { canonical: '心斎橋', names: ['心斎橋'] },
+    { canonical: '西九条', names: ['西九条'] },
+  ];
+  const NAME2GROUP = new Map();
+  for (const g of MAJOR_GROUPS) for (const n of g.names) NAME2GROUP.set(n, g);
+  const normName = (s) => String(s == null ? '' : s).normalize('NFKC').replace(/[\s　]+/g, '').trim();
+  const cdist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+
+  function clusterStations(stations, radiusM, groupMergeM, sameNameMergeM) {
+    const pts = stations.filter((s) => s && Number.isFinite(s.x) && Number.isFinite(s.z));
+    const used = new Array(pts.length).fill(false);
+    const raw = [];
+    for (let i = 0; i < pts.length; i++) {
+      if (used[i]) continue;
+      const members = [pts[i]]; used[i] = true;
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (let j = 0; j < pts.length; j++) {
+          if (used[j]) continue;
+          if (members.some((m) => cdist(m, pts[j]) < radiusM)) { members.push(pts[j]); used[j] = true; changed = true; }
+        }
+      }
+      raw.push(members);
+    }
+    let clusters = raw.map((members, idx) => {
+      const x = members.reduce((s, m) => s + m.x, 0) / members.length;
+      const z = members.reduce((s, m) => s + m.z, 0) / members.length;
+      const names = [...new Set(members.map((m) => normName(m.name)).filter(Boolean))];
+      let gref = null;
+      for (const n of names) { const g = NAME2GROUP.get(n); if (g) { gref = g; break; } }
+      const cnt = new Map();
+      for (const m of members) { const n = normName(m.name); if (n) cnt.set(n, (cnt.get(n) || 0) + 1); }
+      let mc = null, mcN = 0;
+      for (const [n, k] of cnt) if (k > mcN || (k === mcN && mc && n.length < mc.length)) { mc = n; mcN = k; }
+      const label = gref ? gref.canonical : (mc || names[0] || '駅');
+      return { clusterId: 'sc_' + idx, label, x, z, members, memberIds: members.map((m) => m.id), memberNames: names, group: gref ? gref.canonical : null, _g: gref };
+    });
+    // group merge
+    const byG = new Map();
+    for (const c of clusters) if (c._g) { const k = c._g.canonical; if (!byG.has(k)) byG.set(k, []); byG.get(k).push(c); }
+    const rm = new Set();
+    for (const [, list] of byG) {
+      if (list.length < 2) continue;
+      const base = list[0];
+      for (let i = 1; i < list.length; i++) {
+        if (cdist(base, list[i]) <= groupMergeM) {
+          base.members.push(...list[i].members); base.memberIds.push(...list[i].memberIds);
+          base.memberNames = [...new Set([...base.memberNames, ...list[i].memberNames])];
+          rm.add(list[i].clusterId);
+        }
+      }
+      base.x = base.members.reduce((s, m) => s + m.x, 0) / base.members.length;
+      base.z = base.members.reduce((s, m) => s + m.z, 0) / base.members.length;
+    }
+    clusters = clusters.filter((c) => !rm.has(c.clusterId));
+    // same-name merge
+    const rm2 = new Set();
+    for (let i = 0; i < clusters.length; i++) {
+      if (rm2.has(clusters[i].clusterId)) continue;
+      for (let j = i + 1; j < clusters.length; j++) {
+        if (rm2.has(clusters[j].clusterId)) continue;
+        if (clusters[i].label === clusters[j].label && cdist(clusters[i], clusters[j]) <= sameNameMergeM) {
+          clusters[i].members.push(...clusters[j].members); clusters[i].memberIds.push(...clusters[j].memberIds);
+          clusters[i].memberNames = [...new Set([...clusters[i].memberNames, ...clusters[j].memberNames])];
+          clusters[i].x = clusters[i].members.reduce((s, m) => s + m.x, 0) / clusters[i].members.length;
+          clusters[i].z = clusters[i].members.reduce((s, m) => s + m.z, 0) / clusters[i].members.length;
+          rm2.add(clusters[j].clusterId);
+        }
+      }
+    }
+    return clusters.filter((c) => !rm2.has(c.clusterId));
+  }
+
+  function classifyImportance(cluster, nearby) {
+    if (cluster.group) return 'major';
+    const rail = nearby.railWays || 0, sub = nearby.subwayWays || 0;
+    const members = cluster.memberIds.length;
+    if ((rail > 0 && sub > 0) || rail >= 8 || sub >= 10 || members >= 3) return 'medium';
+    return 'local';
+  }
+
+  const BANDS = { farM: 9000, midM: 3500 };
+  let forceBand = null;
+  function band(d) { if (forceBand) return forceBand; if (d > BANDS.farM) return 'far'; if (d > BANDS.midM) return 'mid'; return 'near'; }
+  function lodVisible(imp, d) { const b = band(d); if (imp === 'major') return true; if (imp === 'medium') return b !== 'far'; return b === 'near'; }
+  const FAR_MAX = 26;
+
+  // ── 描画スタイル（白模型に合う。黒ベタ・派手色は禁止） ──
+  const STYLE = {
+    major:  { font: 15, weight: '600', text: '#3f4852', bg: 'rgba(255,255,255,0.90)', border: 'rgba(120,130,140,0.30)', dot: 5.0, dotColor: '#6d7680', priority: 0 },
+    medium: { font: 12, weight: '500', text: '#4f5963', bg: 'rgba(255,255,255,0.84)', border: 'rgba(120,130,140,0.24)', dot: 3.6, dotColor: '#8a929b', priority: 1 },
+    local:  { font: 10.5, weight: '500', text: '#5a636d', bg: 'rgba(255,255,255,0.80)', border: 'rgba(120,130,140,0.20)', dot: 3.0, dotColor: '#9aa1a9', priority: 2 },
+  };
+  const STATION_Y = 0.5; // rail(0.17) より少し上。3D 空間の y は高くしすぎない。
+  const LABEL_ANCHOR_DY = 22; // ラベルは駅点より少し上（world 単位、建物に埋もれない範囲）
+
+  let group = null;
+  let labels = []; // { cluster, imp, labelSprite, dotSprite, aspect, w, h }
+  let dotTex = {};
+  let lastStationCount = -1;
+  let lastRecomputeKey = null;
+  let lastUpdateAt = 0;
+  const THROTTLE_MS = 180;
+  // [hotfix] progressive tile load 中に station 数が変わるたび rebuild すると 174 個の CanvasTexture を
+  //   毎回作り直し、GPU テクスチャの大量チャーンで WebGL コンテキストロス（画面が真っ白）を招きうる。
+  //   → station 数が「安定」してからだけ rebuild する（変化が止まって 1.6s 経過 & 前回から 3s 以上）。
+  let pendingCount = -1, pendingSince = 0, lastRebuildAt = 0;
+
+  function makeDotTexture(style) {
+    const c = document.createElement('canvas'); c.width = 24; c.height = 24;
+    const ctx = c.getContext('2d');
+    ctx.beginPath(); ctx.arc(12, 12, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = style.dotColor; ctx.stroke();
+    const t = new THREE.CanvasTexture(c); t.minFilter = THREE.LinearFilter;
+    return t;
+  }
+  function makeLabelTexture(name, style) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const fs = style.font * 2; // 高DPI
+    ctx.font = `${style.weight} ${fs}px "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif`;
+    const tw = ctx.measureText(name).width;
+    const padX = 16, padY = 9;
+    canvas.width = Math.ceil(tw + padX * 2);
+    canvas.height = Math.ceil(fs + padY * 2);
+    ctx.font = `${style.weight} ${fs}px "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif`;
+    const r = 10;
+    ctx.fillStyle = style.bg;
+    ctx.strokeStyle = style.border; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(r, 1); ctx.lineTo(canvas.width - r, 1);
+    ctx.arcTo(canvas.width - 1, 1, canvas.width - 1, r, r);
+    ctx.lineTo(canvas.width - 1, canvas.height - r);
+    ctx.arcTo(canvas.width - 1, canvas.height - 1, canvas.width - r, canvas.height - 1, r);
+    ctx.lineTo(r, canvas.height - 1);
+    ctx.arcTo(1, canvas.height - 1, 1, canvas.height - r, r);
+    ctx.lineTo(1, r); ctx.arcTo(1, 1, r, 1, r);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = style.text; ctx.textBaseline = 'middle';
+    ctx.fillText(name, padX, canvas.height / 2 + 1);
+    const tex = new THREE.CanvasTexture(canvas); tex.minFilter = THREE.LinearFilter;
+    return { tex, aspect: canvas.width / canvas.height };
+  }
+
+  function computeNearby(cluster, lines) {
+    const R = 250, rail = new Set(), sub = new Set(), lr = new Set();
+    for (const l of lines) {
+      let hit = false;
+      for (const p of l.p) { if (Math.hypot(p[0] - cluster.x, p[1] - cluster.z) < R) { hit = true; break; } }
+      if (hit) { if (l.railway === 'subway') sub.add(l.id); else if (l.railway === 'light_rail') lr.add(l.id); else rail.add(l.id); }
+    }
+    return { railWays: rail.size, subwayWays: sub.size, lightRailWays: lr.size };
+  }
+
+  function disposeSprites() {
+    if (group) {
+      for (const s of group.children) { if (s.material.map) s.material.map.dispose(); s.material.dispose(); }
+      if (scene.children.includes(group)) scene.remove(group);
+    }
+    labels = [];
+  }
+
+  function rebuild() {
+    if (typeof CityTileLayer === 'undefined') return;
+    const stations = CityTileLayer.getAllStations();
+    if (!stations.length) return;
+    disposeSprites();
+    group = new THREE.Group(); group.renderOrder = 1001;
+    if (!dotTex.major) for (const k of ['major', 'medium', 'local']) dotTex[k] = makeDotTexture(STYLE[k]);
+    const lines = CityTileLayer.getAllRailLines();
+    const clusters = clusterStations(stations, 130, 900, 420);
+    for (const c of clusters) {
+      const imp = classifyImportance(c, computeNearby(c, lines));
+      c.importance = imp;
+      const st = STYLE[imp];
+      // dot
+      const dm = new THREE.SpriteMaterial({ map: dotTex[imp], depthTest: false, depthWrite: false, transparent: true, fog: false });
+      const dot = new THREE.Sprite(dm);
+      dot.scale.set(st.dot, st.dot, 1);
+      dot.position.set(c.x, STATION_Y, c.z);
+      dot.renderOrder = 1001;
+      group.add(dot);
+      // label
+      const { tex, aspect } = makeLabelTexture(c.label, st);
+      const lm = new THREE.SpriteMaterial({ map: tex, depthTest: false, depthWrite: false, transparent: true, fog: false });
+      const spr = new THREE.Sprite(lm);
+      spr.position.set(c.x, STATION_Y + LABEL_ANCHOR_DY, c.z);
+      spr.renderOrder = 1002;
+      group.add(spr);
+      labels.push({ cluster: c, imp, labelSprite: spr, dotSprite: dot, aspect });
+    }
+    scene.add(group);
+    lastStationCount = stations.length;
+    lastRecomputeKey = null; // 次の update で強制再配置
+  }
+
+  // priority + 中心距離で並べ、screen-space bbox collision で低優先を hide する。
+  let lastResult = { visible: 0, hiddenByCollision: 0, hiddenByLod: 0, sampleNames: [] };
+  function place() {
+    if (!group || !labels.length) return;
+    const d = cs.r;
+    const b = band(d);
+    // pixel サイズ一定（screen-space label）。遠景でも極端に小さくならない。
+    const pxScale = Math.max(0.55, Math.min(1.35, 620 / d));
+    // 1. LOD で候補を絞る
+    let cand = [];
+    let hiddenByLod = 0;
+    for (const it of labels) {
+      if (!lodVisible(it.imp, d)) { it.labelSprite.visible = false; it.dotSprite.visible = false; hiddenByLod++; continue; }
+      const wp = new THREE.Vector3(it.cluster.x, STATION_Y + LABEL_ANCHOR_DY, it.cluster.z);
+      const sp = wp.clone().project(camera);
+      if (sp.z > 1 || sp.x < -1.15 || sp.x > 1.15 || sp.y < -1.15 || sp.y > 1.15) { it.labelSprite.visible = false; it.dotSprite.visible = false; continue; }
+      const distToCenter = Math.hypot(it.cluster.x - cs.tgt.x, it.cluster.z - cs.tgt.z);
+      cand.push({ it, sx: sp.x, sy: sp.y, distToCenter });
+    }
+    // 2. priority（major>medium>local）→ 中心に近い順
+    cand.sort((a, b2) => (STYLE[a.it.imp].priority - STYLE[b2.it.imp].priority) || (a.distToCenter - b2.distToCenter));
+    // 3. FAR では major ラベルの上限を適用（駅名だらけ防止。collision と併用）
+    if (b === 'far') {
+      let majorSeen = 0;
+      cand = cand.filter((c) => { if (c.it.imp !== 'major') return true; majorSeen++; return majorSeen <= FAR_MAX; });
+    }
+    // 4. screen-space bbox collision（NDC）。既に確定した bbox と重なる低優先を hide。
+    const placed = [];
+    const collisionDebug = (typeof window !== 'undefined' && window.__STATION_COLLISION_DEBUG__ === true);
+    let visN = 0, hiddenByCollision = 0;
+    const sampleNames = [];
+    for (const c of cand) {
+      // NDC 上のラベル半幅・半高（pxScale と aspect から概算）
+      const hw = (0.052 * (STYLE[c.it.imp].font / 12) * pxScale) * c.it.aspect * 0.5 + 0.004;
+      const hh = 0.030 * (STYLE[c.it.imp].font / 12) * pxScale * 0.5 + 0.004;
+      let overlap = false;
+      for (const q of placed) {
+        if (Math.abs(c.sx - q.sx) < (hw + q.hw) && Math.abs(c.sy - q.sy) < (hh + q.hh)) { overlap = true; break; }
+      }
+      if (overlap) {
+        c.it.labelSprite.visible = false;
+        c.it.dotSprite.visible = (c.it.imp === 'major'); // major は点だけは残す
+        hiddenByCollision++;
+        continue;
+      }
+      placed.push({ sx: c.sx, sy: c.sy, hw, hh });
+      c.it.labelSprite.visible = true;
+      c.it.dotSprite.visible = true;
+      const lh = 13 * pxScale;
+      c.it.labelSprite.scale.set(lh * c.it.aspect, lh, 1);
+      const ds = STYLE[c.it.imp].dot * (0.7 + 0.5 * pxScale);
+      c.it.dotSprite.scale.set(ds, ds, 1);
+      visN++;
+      if (sampleNames.length < 14) sampleNames.push(c.it.cluster.label);
+    }
+    void collisionDebug;
+    lastResult = { visible: visN, hiddenByCollision, hiddenByLod, sampleNames };
+  }
+
+  function update() {
+    const now = (typeof performance !== 'undefined') ? performance.now() : Date.now();
+    if (typeof CityTileLayer !== 'undefined') {
+      const n = CityTileLayer.getAllStations().length;
+      if (n !== lastStationCount) {
+        // station 数が変化中: 安定するまで rebuild しない（debounce）
+        if (n !== pendingCount) { pendingCount = n; pendingSince = now; }
+        else if (n > 0 && now - pendingSince > 1600 && now - lastRebuildAt > 3000) {
+          try { rebuild(); } catch (e) { if (!window.__STLBL_REBUILD_ERR__) { console.warn('[StationLabel.rebuild]', e); window.__STLBL_REBUILD_ERR__ = 1; } }
+          lastRebuildAt = now;
+        }
+      }
+    }
+    if (!group) return;
+    if (now - lastUpdateAt < THROTTLE_MS) return;
+    const key = Math.round(cs.tgt.x / 40) + ',' + Math.round(cs.tgt.z / 40) + ',' + Math.round(cs.r / 60) + ',' + Math.round(cs.th * 20) + ',' + Math.round(cs.ph * 20) + ',' + band(cs.r) + ',' + forceBand;
+    if (key === lastRecomputeKey) return;
+    lastRecomputeKey = key; lastUpdateAt = now;
+    place();
+  }
+
+  return {
+    show() { if (!group) rebuild(); if (group && !scene.children.includes(group)) scene.add(group); },
+    hide() { if (group && scene.children.includes(group)) scene.remove(group); },
+    setVisible(on) { if (on) this.show(); else this.hide(); },
+    dispose() { disposeSprites(); for (const k of Object.keys(dotTex)) { dotTex[k].dispose(); delete dotTex[k]; } group = null; lastStationCount = -1; },
+    update,
+    rebuild,
+    setForceBand(b) { forceBand = b ? String(b).toLowerCase() : null; if (forceBand && !['near', 'mid', 'far'].includes(forceBand)) forceBand = null; lastRecomputeKey = null; place(); return this.getDebug(); },
+    getDebug() {
+      const clusters = labels.map((l) => l.cluster);
+      const cnt = { major: 0, medium: 0, local: 0 };
+      for (const l of labels) cnt[l.imp]++;
+      return {
+        stationCount: (typeof CityTileLayer !== 'undefined') ? CityTileLayer.getAllStations().length : 0,
+        clusterCount: clusters.length,
+        majorCount: cnt.major, mediumCount: cnt.medium, localCount: cnt.local,
+        cameraBand: band(cs.r), forced: forceBand,
+        visibleLabels: lastResult.visible,
+        hiddenByCollision: lastResult.hiddenByCollision,
+        hiddenByLOD: lastResult.hiddenByLod,
+        sampleVisibleNames: lastResult.sampleNames,
+        farMax: FAR_MAX,
+      };
+    },
+  };
+})();
+if (typeof window !== 'undefined') {
+  window.__STATION_LABEL_DEBUG__ = () => StationLabelLayer.getDebug();
+  window.__STATION_LABEL_FORCE__ = (b) => StationLabelLayer.setForceBand(b);
+}
+StationLabelLayer.show(); // 初期表示（station tile 到着まで no-op、到着後に update() が rebuild）
+
+// [Mission15 revert] 共通 LabelEngine（区名/河川名/公園名/公共施設名の追加表示）は実機で表示不具合が
+//   出たため一旦取り下げ。純粋ロジックは tools/lib/label-engine.js に温存。駅ラベル(Mission14)は有効。
 
 // 建物クリック/ホバーの有効範囲も同じ距離閾値で判定する（広域表示時の誤クリック防止）
 // near: クリック・ホバーともに有効 / mid: ホバー有効・クリックは確認表示を挟む / far: クリック・ホバーともに無効
@@ -6797,11 +8482,48 @@ function overheadFactor(r){
   const t = (r - OVERHEAD_START) / (OVERHEAD_END - OVERHEAD_START);
   return t * t; // ease-in: 地図モードに入った直後は緩やかに、さらに引くと真上へ加速して寄っていく
 }
-// [P1-5B] カメラ距離に応じて Fog を後退させる。区全体〜市全体を見たときに背景面が
-// Fog で途切れて見える問題への対処。近距離では従来どおりのタイトな Fog を維持する。
+// [Mission18] MODEL_STYLE + day 専用の fog レンジ（都市模型の「空気遠近」）。
+//   fog を天候ではなく空気遠近として使う: 遠景ほど少し背景色へ寄り、データ境界・建物密集ノイズを
+//   和らげつつ、河川・主要道路・都市骨格は残す。強い白霧にはしない。
+//   - camera 距離を [DIST_NEAR, DIST_FAR] へ clamp し、near/far を smoothstep で連続補間（バンド切替なし）。
+//   - fog.far は MAX_FAR で頭打ち（P1-5B の cs.r*3.6 無制限後退を廃止 → 遠景が濃霧で消えすぎない）。
+//   - fog.near は MIN_NEAR 下限で Ward 近景がすぐ霞まない。
+//   evening/night・legacy(MODEL_STYLE=false)・data モードは従来ロジックのまま（下の else 節）。
+const MODEL_FOG = {
+  DIST_NEAR: 3000,   // camera 距離がこれ以下 → near/far は最小値（Ward 近景）
+  DIST_FAR: 16000,   // これ以上 → 最大値（City Mode 全景 ≈ radius 15900）
+  MIN_NEAR: 6000,    // Ward 近景でこの手前は必ずクリア
+  MAX_NEAR: 12000,   // City 全景の near
+  MIN_FAR: 18000,    // Ward 近景の far
+  MAX_FAR: 40000     // City 最大ズームアウトでもこれ以上 fog.far を後退させない
+};
+function modelFogSmooth(t){ t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); } // smoothstep
+function modelDayFogRange(cameraDist){
+  const span = MODEL_FOG.DIST_FAR - MODEL_FOG.DIST_NEAR;
+  const d = Math.max(MODEL_FOG.DIST_NEAR, Math.min(MODEL_FOG.DIST_FAR, cameraDist || 0));
+  const t = modelFogSmooth((d - MODEL_FOG.DIST_NEAR) / span);
+  return {
+    near: MODEL_FOG.MIN_NEAR + (MODEL_FOG.MAX_NEAR - MODEL_FOG.MIN_NEAR) * t,
+    far:  MODEL_FOG.MIN_FAR  + (MODEL_FOG.MAX_FAR  - MODEL_FOG.MIN_FAR)  * t
+  };
+}
+function isModelDayFog(){
+  return (typeof MODEL_STYLE !== 'undefined' && MODEL_STYLE.on)
+    && currentTimeOfDay === 'day'
+    && !(typeof VISUAL_CONFIG !== 'undefined' && VISUAL_CONFIG.mode && VISUAL_CONFIG.mode.current === 'data');
+}
+// [P1-5B/Mission18] カメラ距離に応じて Fog を調整する。camUpd から毎フレーム呼ばれる（安価）。
 function updateFogForCameraDistance(){
   try {
     if (!scene || !scene.fog || typeof VISUAL_CONFIG === 'undefined') return;
+    if (isModelDayFog()) {
+      // [Mission18] 空気遠近: clamp + smoothstep 補間、far は MAX_FAR 頭打ち
+      const r = (typeof cs !== 'undefined' && cs) ? cs.r : MODEL_FOG.DIST_NEAR;
+      const range = modelDayFogRange(r);
+      scene.fog.near = range.near;
+      scene.fog.far  = range.far;
+      return;
+    }
     const L = VISUAL_CONFIG.lighting[currentTimeOfDay] || VISUAL_CONFIG.lighting.day;
     const fogScale = (VISUAL_CONFIG.mode && VISUAL_CONFIG.mode.current === 'data') ? VISUAL_CONFIG.fog.dataModeDistanceScale : 1;
     const baseFar = (L.fogFar || 6000) * fogScale;
@@ -6814,14 +8536,39 @@ function updateFogForCameraDistance(){
 function camUpd(){
   cs.ph=Math.max(cs.minPh,Math.min(cs.maxPh,cs.ph));
   updateFogForCameraDistance();
+  const cityActive = cityModeActive; // [Mission16] TDZ 回避のため前方フラグを参照（CityModeManager は宣言が後方）
+  // [Mission16] City Mode 中は「3D都市模型」の斜め上視点用に FOV を preset へ（Ward 復帰で自動で戻る・change-only）。
+  const wantFov = cityActive ? CITY_CAMERA_PRESET.fov : WARD_FOV;
+  if (Math.abs(camera.fov - wantFov) > 0.01) { camera.fov = wantFov; camera.updateProjectionMatrix(); }
   // [P1-5B] 遠景（区全体〜市全体）で far clip により地面・建物が切れないよう、
   // カメラ far plane を距離に応じて広げる（近景では従来の 14000 を維持）。
   const wantFar = Math.max(14000, cs.r * 1.6 + 16000);
   if (Math.abs(camera.far - wantFar) > 500) { camera.far = wantFar; camera.updateProjectionMatrix(); }
   // [P1-6] Ward周辺の都市レイヤー tile を progressive load（内部で throttle。近景のみ）。
-  try { if (typeof CityTileLayer !== 'undefined' && cs.r < 6000) CityTileLayer.updateForTarget(cs.tgt.x, cs.tgt.z); } catch (e) { /* noop */ }
+  try {
+    if (typeof CityTileLayer !== 'undefined') {
+      CityTileLayer.setCameraDistance(cs.r);                       // [P1-6G] 距離LOD（band変化時のみ再適用・軽量）
+      if (cs.r < 6000) CityTileLayer.updateForTarget(cs.tgt.x, cs.tgt.z);
+    }
+    // [P1-7B] CityBuildingLOD⇔BuildingTileLayer実体のhandoff距離判定（毎フレーム軽量: Set走査のみ）。
+    if (typeof CityBuildingLOD !== 'undefined') CityBuildingLOD.setCameraDistance(cs.r);
+    // [河川再構築] RiverLayerV2の遠景LOD（minor非表示・opacity減衰）。
+    if (typeof RiverLayerV2 !== 'undefined') RiverLayerV2.updateByCamera(cs.r);
+    // [Mission08] 建物エッジの距離LOD（band変化時のみ再適用・軽量）。MODEL_STYLE時のみ作用。
+    if (typeof BUILDING_EDGE_LOD !== 'undefined') BUILDING_EDGE_LOD.apply(cs.r);
+    // [Mission12] 埋め込み ParkLayer（3区）の tier LOD（遠景で小公園を隠す・opacity減衰）。
+    if (typeof ParkLayer !== 'undefined' && ParkLayer.updateByCamera) ParkLayer.updateByCamera(cs.r);
+    // [Mission09] City Mode遠景（cs.r 大）ではリアルタイム影を止めて shadow map の描画負荷を削る。
+    //   立体感は fake AO（頂点接地暗化）+ 方向光の Lambert 陰影で維持。近景へ戻れば影は復帰。
+    //   sun 自体（方向光）は消さない。shadowEnabled=false のときはこのゲートは何もしない。
+    if (typeof sun !== 'undefined' && typeof shadowEnabled !== 'undefined' && shadowEnabled && !nightMode) {
+      const wantCastShadow = cs.r <= 8000;
+      if (sun.castShadow !== wantCastShadow) sun.castShadow = wantCastShadow;
+    }
+  } catch (e) { /* noop */ }
   // 視線角度: 通常のcs.phと、真上視点(ph≈0)をoverheadFactorでブレンド
-  const ov = overheadFactor(cs.r);
+  //   [Mission16] City Mode 中は真上寄せをかけず preset elevation（斜め上）を維持する。
+  const ov = cityActive ? 0 : overheadFactor(cs.r);
   const effPh = cs.ph * (1 - ov) + 0.08 * ov; // 完全な0だと真上特有のジンバルロック感が出るため僅かに傾けて残す
   camera.position.set(
     cs.tgt.x+cs.r*Math.sin(effPh)*Math.sin(cs.th),
@@ -6831,7 +8578,7 @@ function camUpd(){
   document.getElementById('compass').style.transform=`rotate(${-cs.th*180/Math.PI}deg)`;
 }
 // 「ホーム」ボタン押下時のみ原点に戻る例外仕様（他の操作では原点に縛られない）
-function resetCamera(){cs.tgt.set(0,8,0);cs.th=Math.PI*0.25;cs.ph=Math.PI/4;cs.r=5300;camUpd();}
+function resetCamera(){cs.tgt.set(0,8,0);cs.th=0;cs.ph=Math.PI/4;cs.r=5300;camUpd();} // [北向き] 北が画面上向きになる既定方位(th=0)へ戻す
 camUpd();
 
 // controls エイリアス（デバッグ用）
@@ -6909,7 +8656,30 @@ canvas.addEventListener('touchmove',e=>{
     cs.r=Math.max(cs.minR,Math.min(cs.maxR,cs.r*td0/d));td0=d;camUpd();}
 },{passive:true});
 
-function onR(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+function onR(){
+  renderer.setSize(innerWidth,innerHeight);
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  // [Mission16] City Mode でユーザーが未操作のまま resize したときだけ aspect-aware fit を再計算する
+  //   （初期状態のときだけ再fit。操作済みなら初期視点へ強制復帰させない）。
+  try {
+    if (cityModeActive && cityFitSnapshot
+        && typeof getCityCameraTarget === 'function' && typeof camUpd === 'function') {
+      const s = cityFitSnapshot;
+      const moved = Math.abs(cs.r - s.r) > 1 || Math.abs(cs.tgt.x - s.tx) > 1 || Math.abs(cs.tgt.z - s.tz) > 1
+        || Math.abs(cs.th - s.th) > 1e-4 || Math.abs(cs.ph - s.ph) > 1e-4;
+      if (!moved) {
+        const cam = getCityCameraTarget();
+        cs.tgt.x = cam.x; cs.tgt.z = cam.z; cs.r = cam.radius;
+        cs.th = CITY_CAMERA_PRESET.azimuthDeg * Math.PI / 180;
+        cs.ph = (90 - CITY_CAMERA_PRESET.elevationDeg) * Math.PI / 180;
+        cs.tgt.y = CITY_CAMERA_PRESET.targetYOffset;
+        cityFitSnapshot = { r: cam.radius, tx: cam.x, tz: cam.z, th: cs.th, ph: cs.ph };
+        camUpd();
+      }
+    }
+  } catch (e) { /* noop */ }
+}
 onR(); window.addEventListener('resize',onR);
 
 // 夜景・シャドウ
@@ -7967,7 +9737,10 @@ function flyTo(x, z, opts={}){
     cs.tgt.x = fromX + (x-fromX)*e;
     cs.tgt.z = fromZ + (z-fromZ)*e;
     cs.r     = fromR + (toR-fromR)*e;
-    camUpd();
+    // [緊急回帰修正] camUpd() が万一 throw しても rAF チェーンを止めない。以前は throw すると
+    //   次行の再スケジュールに到達せず、アニメが 1 フレームで凍結し目標へ収束しなかった
+    //   （City Mode の初期 fit が Ward 値のまま残る不具合の一因）。
+    try { camUpd(); } catch (e2) { if (!window.__FLYTO_CAMUPD_ERR__) { console.warn('[flyTo] camUpd', e2); window.__FLYTO_CAMUPD_ERR__ = 1; } }
     if(t<1) searchAnim = requestAnimationFrame(step);
   }
   step();
@@ -8005,10 +9778,10 @@ function flyToWardCentroid(wardId) {
   try {
     if (typeof flyTo !== 'function') return;
     // [P1-5B] まず N03 の centroid/bbox（24区共通、ハードコードなし）。無ければ TOWN_POLYGONS 3区の centroid。
-    let tgt = null, r = null;
+    let tgt = null, r = null, wardBbox = null;
     if (typeof WardModeManager !== 'undefined' && WardModeManager.getWardCameraTarget) {
       const t = WardModeManager.getWardCameraTarget(wardId);
-      if (t) { tgt = { x: t.x, z: t.z }; r = t.radius; }
+      if (t) { tgt = { x: t.x, z: t.z }; r = t.radius; wardBbox = t.bbox || null; }
     }
     if (!tgt && typeof WardLabelLayer !== 'undefined') {
       tgt = WardLabelLayer.getCentroid(wardId);
@@ -8017,8 +9790,9 @@ function flyToWardCentroid(wardId) {
     if (!tgt) { console.warn('[WARD-NAVIGATOR] camera target 未取得（N03 polygon 未ロード & TOWN_POLYGONS外）', wardId); return; }
     if (typeof cs !== 'undefined' && cs) r = Math.max(cs.minR || 0, Math.min(cs.maxR || Infinity, r || cs.r));
     flyTo(tgt.x, tgt.z, r != null ? { r } : {});
-    // [P1-6] 建物 tile と独立して、選択 Ward 周辺の道路・河川・公園・鉄道 tile も即ロード開始。
-    try { if (typeof CityTileLayer !== 'undefined') CityTileLayer.onWardSwitch(tgt.x, tgt.z); } catch (e) { /* noop */ }
+    // [P1-6/P1-6E] 建物 tile と独立して、選択 Ward の bbox 全域の道路・河川・公園・鉄道 tile をロード開始
+    //   （camera 位置に依らず区全体をカバー。建物側は WardModeManager.switchWard が loadDatasetBbox で揃える）。
+    try { if (typeof CityTileLayer !== 'undefined') CityTileLayer.onWardSwitch(tgt.x, tgt.z, wardBbox); } catch (e) { /* noop */ }
   } catch (e) {
     console.warn('[WARD-NAVIGATOR] flyToWardCentroid failed (camera move skipped, ward switch itself is unaffected)', wardId, e);
   }
@@ -8248,8 +10022,31 @@ const PRESET_ROOF_COLOR = {
   other:           0xcfd8dc
 };
 function presetKeyOf(usage){ return BLDG_PRESET_OF_USAGE[usage] || 'other'; }
-function presetWallColor(usage){ return PRESET_WALL_COLOR[presetKeyOf(usage)] || PRESET_WALL_COLOR.other; }
-function presetRoofColor(usage){ return PRESET_ROOF_COLOR[presetKeyOf(usage)] || PRESET_ROOF_COLOR.other; }
+// [P1-6H] 模型スタイル ON 時は用途色（クリスタル系の鮮やかなパレット）を暖色オフホワイトへ強く寄せる。
+function presetWallColor(usage){ return msBuildingColor(PRESET_WALL_COLOR[presetKeyOf(usage)] || PRESET_WALL_COLOR.other); }
+// [Mission09] 屋根は壁よりごく僅かに明るい白（msRoofColor）。用途色の寄せ方は壁と同じ方向。
+function presetRoofColor(usage){ return msRoofColor(PRESET_ROOF_COLOR[presetKeyOf(usage)] || PRESET_ROOF_COLOR.other); }
+
+// [Mission07] 現在の建物色を数値で確認するデバッグ。window.__MODEL_STYLE__ を切り替えて applyModelStyle() 後に呼ぶと
+//   MODEL_STYLE ON（白模型）と OFF（用途色）で同一視点比較できる。
+if (typeof window !== 'undefined') window.__BUILDING_COLOR_DEBUG__ = function () {
+  const hx = (v) => '#' + (v >>> 0).toString(16).padStart(6, '0');
+  const sat = (v) => { const r = (v >> 16) & 255, g = (v >> 8) & 255, b = v & 255; return Math.max(r, g, b) - Math.min(r, g, b); };
+  const keys = ['residential_low', 'office', 'industrial', 'commercial'];
+  const rows = keys.map((k) => {
+    const uHex = PRESET_WALL_COLOR[k];
+    const w = presetWallColor(k === 'residential_low' ? '411' : k === 'office' ? '401' : k === 'industrial' ? '441' : '402');
+    const r = presetRoofColor(k === 'residential_low' ? '411' : k === 'office' ? '401' : k === 'industrial' ? '441' : '402');
+    return { preset: k, usageColor: hx(uHex), wall: hx(w), roof: hx(r), wallSat: sat(w), roofSat: sat(r) };
+  });
+  return {
+    modelStyle: MODEL_STYLE.on,
+    wallWhite: hx(MS_BUILDING_WHITE), roofWhite: hx(MS_ROOF_WHITE),
+    wallBlend: MS_BUILDING_BLEND, roofBlend: MS_ROOF_BLEND,
+    cityLodColor: hx(typeof MS_BUILDING_WHITE === 'number' ? MS_BUILDING_WHITE : 0),
+    samples: rows
+  };
+};
 
 // [クリスタル表現] リアル表示の用途別色。明度は高いまま彩度を上げ、
 // 色付きクリスタル（宝石）のような鮮やかな発色にする（PRESET_WALL_COLORと同水準）。
@@ -8272,7 +10069,7 @@ const UST_REAL = {
   '_':   0xcfd8dc  // その他: クリアクォーツ
 };
 const wmRealC = {}, tmRealC = {}, wmRealNearC = {};
-function gsReal(u){ return (u in UST_REAL) ? UST_REAL[u] : UST_REAL['_']; }
+function gsReal(u){ return msBuildingColor((u in UST_REAL) ? UST_REAL[u] : UST_REAL['_']); }
 function wmReal(u){
   // [クリスタル表現] 高い光沢(shininess)と明るい鏡面反射(specular)でガラス／クリスタルのような
   // シャープなハイライトを出し、わずかな自己発光(emissive)で澄んだ輝きを加える。
@@ -8281,7 +10078,15 @@ function wmReal(u){
   // 不透明のまま、明るい色 × 強いハイライト × 発光でクリスタル感を表現する。
   // vertexColors:true のまま、壁頂点カラー(建物ごとの微差×接地暗化)を color へ乗算するので、
   // 建物ごとの個体差と接地の陰影は維持される。
-  return wmRealC[u] || (wmRealC[u] = new THREE.MeshPhongMaterial({
+  if (wmRealC[u]) return wmRealC[u];
+  if (MODEL_STYLE.on) {
+    // [P1-6H] マット模型: 発光・強ハイライトなし。拡散反射のみで白い模型らしく。
+    return (wmRealC[u] = new THREE.MeshPhongMaterial({
+      color: presetWallColor(u), vertexColors: true,
+      shininess: 6, specular: 0x161616, side: THREE.FrontSide
+    }));
+  }
+  return (wmRealC[u] = new THREE.MeshPhongMaterial({
     color: presetWallColor(u), vertexColors: true,
     shininess: 100,          // 高光沢（クリスタルのシャープなハイライト）
     specular: 0xc4d8e4,      // 明るい鏡面反射（青みを帯びた白）
@@ -8304,7 +10109,12 @@ function tmReal(u){
   // どの建物でも同一になり、拡散反射だけで完全に均一な色になる。
   // そのため MeshLambertMaterial（拡散反射のみ・鏡面ハイライトなし）を使う。
   // クリスタルらしい光沢は壁面（面の向きが多方向でムラになりにくい）側で表現する。
-  const c = new THREE.Color(presetRoofColor(u)); // = presetWallColor(u) と同色
+  // [Mission09] 屋根はLambert（+Y法線で高さによらず均一）。模型スタイルでは presetRoofColor が
+  //   壁(presetWallColor)よりごく僅かに明るい白＝roof/wallの立体差。Lambertなので色ムラは出ない。
+  const c = new THREE.Color(presetRoofColor(u));
+  if (MODEL_STYLE.on) {
+    return (tmRealC[u] = new THREE.MeshLambertMaterial({ color: c })); // マット・発光なし
+  }
   return (tmRealC[u] = new THREE.MeshLambertMaterial({
     color: c,
     emissive: 0x2a3540,      // 壁と同じわずかな発光で、屋上が暗く沈まないようにする
@@ -8381,7 +10191,8 @@ function wmRealNear(u){
   // map × color で二重乗算になり近距離へ切り替えた瞬間に壁全体が暗くなる。colorは0xffffffにして
   // 二重乗算を避ける。建物微差と接地暗化はvertexColors(real用頂点カラー)側で維持される。
   return (wmRealNearC[u] = new THREE.MeshPhongMaterial({
-    color: 0xffffff, vertexColors: true, shininess: 12, specular: 0x1c2024,
+    color: 0xffffff, vertexColors: true,
+    shininess: MODEL_STYLE.on ? 5 : 12, specular: MODEL_STYLE.on ? 0x141414 : 0x1c2024,
     side: THREE.FrontSide, map: makeRealWindowTexture(u)
   }));
 }
@@ -8393,7 +10204,8 @@ function wmRealMid(u){
   if (wmRealMidC[u]) return wmRealMidC[u];
   const near = wmRealNear(u); // 窓テクスチャを共有（同一CanvasTextureを参照）
   return (wmRealMidC[u] = new THREE.MeshPhongMaterial({
-    color: 0xffffff, vertexColors: true, shininess: 10, specular: 0x1c2024,
+    color: 0xffffff, vertexColors: true,
+    shininess: MODEL_STYLE.on ? 4 : 10, specular: MODEL_STYLE.on ? 0x141414 : 0x1c2024,
     side: THREE.FrontSide, map: near.map
   }));
 }
@@ -8450,14 +10262,73 @@ function refreshBuildingMaterials(){
 function applySkyAndFog(){
   const L = VISUAL_CONFIG.lighting[currentTimeOfDay];
   const fogScale = (VISUAL_CONFIG.mode.current === 'data') ? VISUAL_CONFIG.fog.dataModeDistanceScale : 1;
-  if (scene.background && scene.background.isColor) scene.background.setHex(L.skyColor);
-  else scene.background = new THREE.Color(L.skyColor);
-  renderer.setClearColor(L.skyColor);
-  scene.fog.color.setHex(L.fogColor);
-  scene.fog.near = L.fogNear * fogScale;
-  scene.fog.far  = L.fogFar  * fogScale;
-  if (typeof updateFogForCameraDistance === 'function') updateFogForCameraDistance(); // [P1-5B] 遠景時は再度後退
+  // [P1-6H] 模型スタイル・昼: 背景を落ち着いた明るいブルーグレーへ（「台座の上の都市模型」）。
+  const modelDay = MODEL_STYLE.on && currentTimeOfDay === 'day';
+  // [Mission17] 模型スタイル・昼: 背景と fog を明るい neutral tone（MS_BG_NEUTRAL）へ統一し、
+  //   GroundVisualLayer の有限な外周が「四角い板」として視認されないようにする。fog色 = 背景色。
+  const skyHex = modelDay ? MS_BG_NEUTRAL : L.skyColor;
+  const fogHex = modelDay ? MS_BG_NEUTRAL : L.fogColor;
+  if (scene.background && scene.background.isColor) scene.background.setHex(skyHex);
+  else scene.background = new THREE.Color(skyHex);
+  renderer.setClearColor(skyHex);
+  scene.fog.color.setHex(fogHex);
+  if (modelDay) {
+    // [Mission18] near/far は updateFogForCameraDistance が camera 距離から smoothstep 補間する。
+    //   ここは cs 未定義時の安全既定のみ（直後に updateFogForCameraDistance が上書き）。
+    const seed = modelDayFogRange((typeof cs !== 'undefined' && cs) ? cs.r : 0);
+    scene.fog.near = seed.near;
+    scene.fog.far  = seed.far;
+  } else {
+    scene.fog.near = L.fogNear * fogScale;
+    scene.fog.far  = L.fogFar * fogScale;
+  }
+  if (typeof updateFogForCameraDistance === 'function') updateFogForCameraDistance(); // [P1-5B] camera 距離で再調整
 }
+
+// [Mission17] 背景・地表まわりの色を一括確認するデバッグ。「四角い境界」調査用。
+//   scene.background / renderer.clearColor / fog.color / CSS body / ground の可視状態を返す。
+if (typeof window !== 'undefined') window.__BACKGROUND_DEBUG__ = function () {
+  const hx = (n) => '#' + (n >>> 0).toString(16).padStart(6, '0');
+  let clear = null;
+  try { const c = new THREE.Color(); renderer.getClearColor(c); clear = '#' + c.getHexString(); } catch (e) { /* older three */ }
+  const bodyBg = (typeof getComputedStyle === 'function') ? getComputedStyle(document.body).backgroundColor : null;
+  const gvStats = (typeof GroundVisualLayer !== 'undefined' && GroundVisualLayer.getStats) ? GroundVisualLayer.getStats() : null;
+  return {
+    canonicalNeutral: hx(MS_BG_NEUTRAL),
+    sceneBackground: (scene.background && scene.background.getHexString) ? '#' + scene.background.getHexString() : null,
+    rendererClearColor: clear,
+    fogColor: (scene.fog && scene.fog.color) ? '#' + scene.fog.color.getHexString() : null,
+    fogNear: scene.fog ? Math.round(scene.fog.near) : null,
+    fogFar: scene.fog ? Math.round(scene.fog.far) : null,
+    bodyBackground: bodyBg,
+    legacyGround: { name: 'gnd', visible: (typeof gnd !== 'undefined' ? gnd.visible : null), showFlag: MAP_RENDER_CONFIG.SHOW_LEGACY_GROUND },
+    groundVisualLayer: {
+      shown: (typeof GroundVisualLayer !== 'undefined' && GroundVisualLayer.isShown) ? GroundVisualLayer.isShown() : null,
+      colorReal: hx(GROUND_VISUAL_STYLE.colorReal),
+      bounds: gvStats ? gvStats.bounds : null
+    }
+  };
+};
+
+// [Mission18] Fog / Lighting を一括確認するデバッグ。City / Ward の空気遠近・立体感の比較用。
+if (typeof window !== 'undefined') window.__FOG_LIGHT_DEBUG__ = function () {
+  const round1 = (v) => Math.round(v * 1000) / 1000;
+  return {
+    cameraDistance: (typeof cs !== 'undefined' && cs) ? Math.round(cs.r) : null,
+    fogNear: scene.fog ? Math.round(scene.fog.near) : null,
+    fogFar: scene.fog ? Math.round(scene.fog.far) : null,
+    fogColor: (scene.fog && scene.fog.color) ? '#' + scene.fog.color.getHexString() : null,
+    fogMode: isModelDayFog() ? 'model-day (smoothstep, far-capped)' : 'legacy (L.fogFar / cs.r*3.6)',
+    modelFog: MODEL_FOG,
+    sunIntensity: (typeof sun !== 'undefined') ? round1(sun.intensity) : null,
+    hemiIntensity: (typeof hemiLight !== 'undefined') ? round1(hemiLight.intensity) : null,
+    fillIntensity: (typeof fillLight !== 'undefined') ? round1(fillLight.intensity) : null,
+    sunGteHemi: (typeof sun !== 'undefined' && typeof hemiLight !== 'undefined') ? (sun.intensity >= hemiLight.intensity) : null,
+    sunCastShadow: (typeof sun !== 'undefined') ? sun.castShadow : null,
+    modelStyle: (typeof MODEL_STYLE !== 'undefined') && MODEL_STYLE.on,
+    timeMode: currentTimeOfDay
+  };
+};
 
 // ── 時間帯切替(昼・夕方・夜) ──
 function applyTimeOfDay(t){
@@ -8465,14 +10336,17 @@ function applyTimeOfDay(t){
   currentTimeOfDay = t;
   nightMode = (t === 'night'); // 既存コード(updateWindowMaterials/不動産カード等)との互換のため同期を維持
   const L = VISUAL_CONFIG.lighting[t];
+  // [Mission09] 模型スタイル・昼: hemi を弱め・sun を強め、方向性のある柔らかい陰影で立体感を出す
+  //   （hemi が強すぎると全建物が均一に明るくなり平坦に見える）。影は黒すぎず、fill で暗部を持ち上げる。
+  const modelDay = MODEL_STYLE.on && t === 'day';
   hemiLight.color.setHex(L.hemiSky);
-  hemiLight.groundColor.setHex(L.hemiGround);
-  hemiLight.intensity = L.hemiIntensity;
-  sun.color.setHex(L.sunColor);
-  sun.intensity = L.sunIntensity;
+  hemiLight.groundColor.setHex(modelDay ? 0xece9e2 : L.hemiGround);
+  hemiLight.intensity = modelDay ? 1.02 : L.hemiIntensity; // 1.35 → 1.02（均一化を抑え立体感を戻す）
+  sun.color.setHex(modelDay ? 0xfff4e6 : L.sunColor);
+  sun.intensity = modelDay ? 1.08 : L.sunIntensity;         // 0.85 → 1.08（側面の明暗差を強める）
   sun.position.set(L.sunPosition[0], L.sunPosition[1], L.sunPosition[2]);
-  fillLight.color.setHex(L.fillColor);
-  fillLight.intensity = L.fillIntensity;
+  fillLight.color.setHex(modelDay ? 0xa6bad0 : L.fillColor);
+  fillLight.intensity = modelDay ? 0.30 : L.fillIntensity;  // 影側を持ち上げる（黒くしない）補助光
   nightAmb.visible = nightMode;
   nightPt.visible = nightMode;
   if (nightMode) {
@@ -8480,7 +10354,7 @@ function applyTimeOfDay(t){
     nightAmb.intensity = L.nightAmbIntensity;
   }
   sun.visible = !nightMode && shadowEnabled; // 既存toggleShadowとの連動仕様を維持
-  renderer.toneMappingExposure = L.exposure;
+  renderer.toneMappingExposure = modelDay ? 1.05 : L.exposure;
   applySkyAndFog();
   windowsOn = false; wallLOD = 'none'; // 次フレームのupdateWindowMaterials()で距離に応じて壁LODを再評価させる
   refreshBuildingMaterials();
@@ -8597,6 +10471,8 @@ function toggleEmphasis(){
     for (const e of bldgEdges) e.visible = false; // エッジを弱める（非表示）
   } else {
     for (const e of bldgEdges) e.visible = true;
+    // [Mission08] 外観強調解除後は距離バンドに応じたエッジLODへ戻す（FARなら再度非表示になる）
+    if (typeof BUILDING_EDGE_LOD !== 'undefined') { BUILDING_EDGE_LOD.reset(); BUILDING_EDGE_LOD.apply(cs.r); }
     if (typeof FacilityLayer !== 'undefined' && FacilityLayer.show && document.getElementById('chk-facility') && document.getElementById('chk-facility').checked) FacilityLayer.show();
   }
   wallLOD = 'none'; // 次フレームで壁LODを強制再評価
@@ -8621,6 +10497,36 @@ function toggleEmphasis(){
   });
 }
 
+// [P1-6H] 都市模型スタイルの適用/切替。window.__MODEL_STYLE__（既定 true）を反映し、
+//   建物マテリアルキャッシュ破棄 → 道路/地表色の寄せ → 環境・時間帯の再同期を行う。
+//   console から: window.__MODEL_STYLE__ = false; applyModelStyle();  で従来表現へ戻せる。
+function applyModelStyle(){
+  MODEL_STYLE.on = (typeof window === 'undefined' || window.__MODEL_STYLE__ !== false);
+  // 道路 colorReal をライトグレーへ寄せる（整然としたグレー線に）
+  for (const k in ROAD_STYLE) {
+    const s = ROAD_STYLE[k];
+    if (s._crOrig === undefined) s._crOrig = s.colorReal;
+    s.colorReal = MODEL_STYLE.on ? msBlend(s._crOrig, 0x9aa0a6, 0.55) : s._crOrig;
+  }
+  // 補助地表を明るい中立グレー（模型台座）へ
+  // [Mission17] GroundVisualLayer の有限な外周が「四角い板」として視認されないよう、
+  //   模型スタイルでは地表色を背景/fog と同一の MS_BG_NEUTRAL に揃える（groundPad 拡張とあわせた二段構え）。
+  //   タイルごとの微小明度差(tileTint 0.97〜1.02)と受け影は残るため近景で完全な無地平面にはならない。
+  //   ground mesh(gnd, 旧単色Plane)は SHOW_LEGACY_GROUND=false のまま（再表示しない）。
+  if (GROUND_VISUAL_STYLE._crOrig === undefined) GROUND_VISUAL_STYLE._crOrig = GROUND_VISUAL_STYLE.colorReal;
+  GROUND_VISUAL_STYLE.colorReal = MODEL_STYLE.on ? MS_BG_NEUTRAL : GROUND_VISUAL_STYLE._crOrig;
+  // 建物マテリアルキャッシュを破棄 → 距離LODを再評価させて作り直し
+  for (const c of [wmRealC, tmRealC, wmRealNearC, wmRealMidC, wmc, tmc, emc]) for (const kk in c) delete c[kk];
+  wallLOD = 'none'; windowsOn = false;
+  if (typeof bldgEdges !== 'undefined') for (const e of bldgEdges) if (e.userData && e.userData.usage != null) e.material = em(e.userData.usage);
+  // [Mission08] エッジ材質を差し替えたので距離バンドを再適用（em()はnear相当のopacityで作られる）
+  if (typeof BUILDING_EDGE_LOD !== 'undefined') { BUILDING_EDGE_LOD.reset(); BUILDING_EDGE_LOD.apply(typeof cs !== 'undefined' ? cs.r : BUILDING_EDGE_LOD.NEAR_M); }
+  if (typeof refreshBuildingMaterials === 'function') refreshBuildingMaterials();
+  if (typeof applySkyAndFog === 'function') applyTimeOfDay(currentTimeOfDay); // sky/fog/lights を再同期
+  if (typeof refreshEnvironmentMaterials === 'function') refreshEnvironmentMaterials(); // 道路/地表色を反映
+  console.log('[MODEL-STYLE] applied: ' + (MODEL_STYLE.on ? 'model（正式既定）' : 'legacy（debug）'));
+}
+
 // ── 初期化(全宣言の後・描画ループ開始の前に一度だけ実行) ──
 (function initVisualSystem(){
   const prefs = loadVisualPrefs();
@@ -8630,6 +10536,7 @@ function toggleEmphasis(){
     if (prefs.shadowQuality && VISUAL_CONFIG.shadows[prefs.shadowQuality]) currentShadowQuality = prefs.shadowQuality;
   }
   applyShadowQuality(currentShadowQuality);
+  applyModelStyle();               // [P1-6H] 模型スタイルを反映（道路/地表色の寄せを含む）
   applyTimeOfDay(currentTimeOfDay); // 内部でapplySkyAndFog/refreshBuildingMaterials/updateVisualUI/saveVisualPrefsまで実施
   refreshEnvironmentMaterials();     // [フェーズ4] 道路・公園・樹木・補助地表を初期モードへ同期（GroundVisualの初期表示制御を含む）
 })();
@@ -8640,6 +10547,8 @@ let fc=0,lt=performance.now();
   updateWindowMaterials();
   LabelLayer.update();
   FacilityLayer.update();
+  // [Mission14] 駅ラベル（内部 throttle 180ms + camera dirty 判定）。念のため例外を隔離する。
+  try { if (typeof StationLabelLayer !== 'undefined') StationLabelLayer.update(); } catch (e) { if (!window.__LABEL_ERR_LOGGED__) { console.warn('[StationLabelLayer.update]', e); window.__LABEL_ERR_LOGGED__ = 1; } }
   BuildingTileLayer.updateByCamera(camera); // [building-tile-engine-v1] タイル表示のカメラ連動（500ms間隔で内部判定）
   if (typeof WardModeManager !== 'undefined') WardModeManager.update(); // [WARD-MODE] 内部200ms throttle済み
   // [WARD-UX-V1] ラベル/境界はvisible・opacity・map参照の更新のみ(ジオメトリ再生成なし)なので
@@ -8702,6 +10611,460 @@ let fc=0,lt=performance.now();
 //   ACTIVE行のハイライト・ロード中表示だけを差し替える。区一覧・centroid・manifestの
 //   毎フレーム/毎tick再計算は行わない。
 // ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// [P1-7] City Mode: 大阪市24区全域表示
+// ══════════════════════════════════════════════════════════════
+// getCityCameraTarget(): 大阪市全域の camera 位置を、ハードコードではなく地表範囲
+//   OSAKA_CITY_GROUND_EXTENT（config/areas/osaka-city.json の bbox を znorth-neg-v1 へ変換した値。
+//   P1-5B で算出・GroundVisualLayer の表示範囲と共通）から算出する。canonical: tools/lib/city-mode.js
+function getCityCameraTarget() {
+  const ext = (typeof OSAKA_CITY_GROUND_EXTENT !== 'undefined') ? OSAKA_CITY_GROUND_EXTENT : { minX: -16900, maxX: 7100, minZ: -18600, maxZ: 2300 };
+  const width = ext.maxX - ext.minX, height = ext.maxZ - ext.minZ;
+  const diag = Math.hypot(width, height);
+  const x = (ext.minX + ext.maxX) / 2, z = (ext.minZ + ext.maxZ) / 2;
+  // [Mission16] aspect-aware fit: 1920×1080 固定ではなく、city bbox / FOV / aspect / elevation から
+  //   必要 camera 距離を算出する。横幅 fit と縦幅 fit のうち大きい方 + margin。
+  //   canonical: tools/lib/city-mode.js の cityCameraTarget()（aspect 指定時と同一計算）。
+  //   参考として旧方式（diag * 0.5）も残す:
+  let radius = diag * 0.5; // [P1-7B] 旧: ward の 0.62 より詰めた係数（aspect 非考慮）。
+  const P = CITY_CAMERA_PRESET;
+  const aspect = (typeof camera !== 'undefined' && camera.aspect) ? camera.aspect : (innerWidth / innerHeight);
+  const halfV = (P.fov * Math.PI / 180) / 2;
+  const halfH = Math.atan(Math.tan(halfV) * aspect);
+  const elevRad = P.elevationDeg * Math.PI / 180;
+  const fitDistanceX = (width / 2) / Math.tan(halfH);                              // 東西（azimuth=0 で foreshorten なし）
+  const projZ = (height / 2) * Math.sin(elevRad) + P.headroomM;                    // 南北 depth を仰角で foreshorten + 建物高さ
+  const fitDistanceY = projZ / Math.tan(halfV);
+  const fitDistance = Math.max(fitDistanceX, fitDistanceY) * P.marginFactor;
+  radius = fitDistance;
+  const minR = (typeof cs !== 'undefined' && cs) ? (cs.minR || P.minRadius) : P.minRadius;
+  const maxR = (typeof cs !== 'undefined' && cs) ? (cs.maxR || P.maxRadius) : P.maxRadius;
+  radius = Math.max(minR, Math.min(maxR, radius));
+  return {
+    x, z, width, height, diag, radius,
+    aspect, fov: P.fov, elevationDeg: P.elevationDeg, azimuthDeg: P.azimuthDeg,
+    targetY: P.targetYOffset, margin: P.marginFactor,
+    fitDistanceX, fitDistanceY, fitDistance
+  };
+}
+
+// [Mission16] City Mode カメラのデバッグ出力（実機で構図を数値比較する用）。
+if (typeof window !== 'undefined') window.__CITY_CAMERA_DEBUG__ = function () {
+  const ct = getCityCameraTarget();
+  const toDeg = (r) => Math.round(r * 180 / Math.PI * 10) / 10;
+  const s = cityFitSnapshot;
+  const moved = s ? (Math.abs(cs.r - s.r) > 1 || Math.abs(cs.tgt.x - s.tx) > 1 || Math.abs(cs.tgt.z - s.tz) > 1
+    || Math.abs(cs.th - s.th) > 1e-4 || Math.abs(cs.ph - s.ph) > 1e-4) : null;
+  return {
+    position: (typeof camera !== 'undefined') ? { x: Math.round(camera.position.x), y: Math.round(camera.position.y), z: Math.round(camera.position.z) } : null,
+    target: { x: Math.round(cs.tgt.x), y: Math.round(cs.tgt.y), z: Math.round(cs.tgt.z) },
+    radius: Math.round(cs.r),
+    elevationDeg: Math.round((90 - toDeg(cs.ph)) * 10) / 10,
+    azimuthDeg: toDeg(cs.th),
+    fov: (typeof camera !== 'undefined') ? camera.fov : null,
+    aspect: (typeof camera !== 'undefined') ? Math.round(camera.aspect * 1000) / 1000 : null,
+    cityBBox: (typeof OSAKA_CITY_GROUND_EXTENT !== 'undefined') ? OSAKA_CITY_GROUND_EXTENT : null,
+    cityWidth: ct.width, cityDepth: ct.height,
+    fitDistanceX: Math.round(ct.fitDistanceX), fitDistanceY: Math.round(ct.fitDistanceY),
+    fitDistance: Math.round(ct.fitDistance), presetRadius: Math.round(ct.radius),
+    margin: CITY_CAMERA_PRESET.marginFactor,
+    preset: CITY_CAMERA_PRESET,
+    fogNear: (scene.fog) ? Math.round(scene.fog.near) : null,
+    fogFar: (scene.fog) ? Math.round(scene.fog.far) : null,
+    cityActive: cityModeActive,
+    userMovedSinceEntry: moved
+  };
+};
+
+// [Mission16] azimuth / elevation 比較用（開発時）。canonical 決定後も debug として残す。
+//   例: __CITY_CAMERA_PREVIEW__('NW')  __CITY_CAMERA_PREVIEW__('N', 45)  __CITY_CAMERA_PREVIEW__(-30, 40)
+if (typeof window !== 'undefined') window.__CITY_CAMERA_PREVIEW__ = function (dir, elevationDeg) {
+  const AZ = { N: 0, NW: -35, NE: 35, W: -90, E: 90, SW: -145, SE: 145, S: 180 };
+  const azDeg = (typeof dir === 'number') ? dir : (AZ[String(dir == null ? 'N' : dir).toUpperCase()] != null ? AZ[String(dir).toUpperCase()] : 0);
+  const elDeg = (typeof elevationDeg === 'number') ? elevationDeg : CITY_CAMERA_PRESET.elevationDeg;
+  if (!cityModeActive) {
+    console.warn('[__CITY_CAMERA_PREVIEW__] City Mode ではないため overheadFactor により角度が上書きされる場合があります');
+  }
+  cs.th = azDeg * Math.PI / 180;
+  cs.ph = (90 - elDeg) * Math.PI / 180;
+  if (cityFitSnapshot) { cityFitSnapshot.th = cs.th; cityFitSnapshot.ph = cs.ph; }
+  if (typeof camUpd === 'function') camUpd();
+  return (typeof window.__CITY_CAMERA_DEBUG__ === 'function') ? window.__CITY_CAMERA_DEBUG__() : { azimuthDeg: azDeg, elevationDeg: elDeg };
+};
+
+// [緊急回帰調査] City Mode / 24区表示の状態を数値で確認する。
+if (typeof window !== 'undefined') window.__CITY_MODE_DEBUG__ = function () {
+  const cmActive = (typeof CityModeManager !== 'undefined') && CityModeManager.isActive();
+  const wardCount = (typeof __n03WardPolyCache !== 'undefined' && __n03WardPolyCache) ? Object.keys(__n03WardPolyCache).length : null;
+  const wardDefs = (typeof WardModeManager !== 'undefined' && WardModeManager.WARD_DEFS) ? WardModeManager.WARD_DEFS.length : null;
+  const lod = (typeof CityBuildingLOD !== 'undefined' && CityBuildingLOD.getStats) ? CityBuildingLOD.getStats() : null;
+  const cityTiles = (typeof CityTileLayer !== 'undefined' && CityTileLayer.getStats) ? CityTileLayer.getStats() : null;
+  let btlStats = null;
+  try { btlStats = (typeof BuildingTileLayer !== 'undefined' && BuildingTileLayer.getStats) ? BuildingTileLayer.getStats() : null; } catch (e) { /* noop */ }
+  let enabledDatasets = (btlStats && btlStats.enabledDatasets) || null;
+  if (!enabledDatasets && btlStats && Array.isArray(btlStats.datasets)) {
+    enabledDatasets = btlStats.datasets.filter((d) => d && d.enabled).map((d) => d.id);
+  }
+  return {
+    cityModeActive: cmActive,
+    currentWardId: (typeof WardModeManager !== 'undefined') ? WardModeManager.currentWardId : null,
+    wardDefsCount: wardDefs,
+    wardPolyCacheCount: wardCount,                 // N03 24区 boundary が読めているか（期待 24）
+    cameraRadius: (typeof cs !== 'undefined') ? Math.round(cs.r) : null,
+    embeddedBuildingCount: (typeof BLDGS !== 'undefined') ? BLDGS.length : null, // FPS HUD の「建物」はこれ（常に一定）
+    cityBuildingLOD: lod,                          // { wardsStarted, wardsReady, triangles }（期待 wardsReady=24）
+    enabledBuildingDatasets: enabledDatasets,      // City Mode で 24区 dataset が enable されているか（BuildingTileLayer.getStats 由来）
+    buildingTileLayer: btlStats,
+    cityTileLayer: cityTiles,                      // roads/waterways/parks/railways の loadedTiles
+    rendererDrawCalls: (typeof renderer !== 'undefined' && renderer.info) ? renderer.info.render.calls : null,
+    hint: cmActive ? 'City Mode active. cityBuildingLOD.wardsReady が 24 に近づけば正常。'
+      : '「大阪市全域」を選択 → CityModeManager.enter() で City Mode へ。',
+  };
+};
+
+// ══════════════════════════════════════════════════════════════
+// [P1-7B] CityBuildingLOD: City Mode遠景の建物密度レイヤー。
+// ══════════════════════════════════════════════════════════════
+// 問題: BuildingTileLayer(Option A)はcamera近傍のtileしかfetchしないため、City Mode遠景では
+//   「道路・河川・公園・鉄道は24区全域に広がるのに、建物はcamera中心の一部にしか見えない」
+//   という密度の食い違いが起きる（574,112棟を一括ロードするのはNG・別の解決策が必要）。
+// 方針: 24区分の建物 manifest+tile を軽量な形（footprint押し出し+屋根のみ。壁頂点カラー無し・
+//   UV無し・底面無し・エッジ無し・ピッキング用metadata無し・影無し）で取得し、区ごとに1つの
+//   BufferGeometryへマージ、共有の白 MeshLambertMaterial 1個で描画する（区あたり1 Draw Call）。
+//   camera距離が HIDE_NEAR_M を下回ったら非表示にし、BuildingTileLayerの実体表示（既存のring
+//   判定・詳細マテリアル・ピッキング・影つき）に引き継ぐ（handoff。同時に両方表示はしない）。
+// データ形状は BuildingTileLayer.loadRemoteTile / loadDatasetManifest と同一のものを読む
+//   （manifest.tiles: [{tx,tz,file,count}], tile.buildings: [{id,fp,z0,dz,usage,...}]）。
+const CityBuildingLOD = (function () {
+  // [Mission01] BuildingTileLayerのring判定（BUILDING_TILE_CONFIG.midRing=5, tileSize=500m）は
+  //   Chebyshev距離（正方形のring）で判定するため、対角方向には 5*500*sqrt(2)≈3536m まで実体タイルが
+  //   表示され続ける。HIDE_NEAR_M=3000だとその対角範囲でCityBuildingLOD（軽量mesh）と実体建物が
+  //   同時に見える一瞬（duplicate）が理論上起き得たため、ring最大到達距離に安全マージンを乗せた
+  //   4000mへ引き上げた（BUILDING_TILE_CONFIG.midRing/tileSize自体は変更しない）。
+  const HIDE_NEAR_M = 4000;      // これ未満はBuildingTileLayerの実体表示に譲り、LOD側は隠す
+  const BATCH_SIZE = 6;          // tile一括fetchの同時件数（区ごとのmanifest取得後にバッチ分割）
+  const BATCH_DELAY_MS = 90;     // バッチ間の間隔（同期一括ロードを避ける。CityTileLayerと同じ考え方）
+  const LOD_COLOR = MS_BUILDING_WHITE; // 既存の模型建物白(0xeef0ec)と同色
+
+  let group = null;
+  let sharedMaterial = null;
+  let visible = true;            // layer-toggle「建物」との連動（BuildingTileLayer側と同じON/OFF）
+  let lastCameraDistance = Infinity;
+  let started = false;           // build()の二重起動防止
+  let cancelled = false;         // exit→再enter等での途中打ち切り
+  const wardState = new Map();   // wardId → { mesh: THREE.Mesh|null, status: 'loading'|'ready'|'empty'|'error' }
+
+  function ensureGroup() {
+    if (!group) { group = new THREE.Group(); group.name = 'CityBuildingLOD'; scene.add(group); }
+    return group;
+  }
+  function getMaterial() {
+    // [Mission09] 遠景LODも「平坦な白い箱」に見えないよう、頂点カラーで軽い接地暗化のみ付与
+    //   （影・ピッキング・エッジは無し＝軽量方針は維持。vertexColors だけなら追加Draw Callは0）。
+    if (!sharedMaterial) sharedMaterial = new THREE.MeshLambertMaterial({ color: LOD_COLOR, vertexColors: true });
+    return sharedMaterial;
+  }
+  async function fetchJson(url) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) { return null; }
+  }
+  function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+  // footprint押し出し（壁+屋根のみ。底面・エッジ・UV・buildingIndexは省略）。
+  //   [Mission09] wc に頂点別の明度係数を追加（壁下端=0.80 / 壁上端=1.0 / 屋根=1.03）。
+  const LOD_BOTTOM_SHADE = 0.80, LOD_TOP_SHADE = 1.0, LOD_ROOF_SHADE = 1.03;
+  function appendBuilding(wv, wc, b) {
+    const P = b.fp, n = P.length;
+    if (!P || n < 3) return;
+    const y0 = b.z0, y1 = b.z0 + b.dz;
+    const push3 = (s) => { wc.push(s, s, s, s, s, s, s, s, s); };
+    for (let i = 0; i < n; i++) {
+      const a = P[i], c = P[(i + 1) % n];
+      wv.push(a[0], y0, a[1], c[0], y1, c[1], c[0], y0, c[1]);
+      wv.push(a[0], y0, a[1], a[0], y1, a[1], c[0], y1, c[1]);
+      // 三角形1: a底/c頂/c底 → 三角形2: a底/a頂/c頂
+      wc.push(LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE,  LOD_TOP_SHADE, LOD_TOP_SHADE, LOD_TOP_SHADE,  LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE);
+      wc.push(LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE, LOD_BOTTOM_SHADE,  LOD_TOP_SHADE, LOD_TOP_SHADE, LOD_TOP_SHADE,  LOD_TOP_SHADE, LOD_TOP_SHADE, LOD_TOP_SHADE);
+    }
+    for (let i = 1; i < n - 1; i++) {
+      wv.push(P[0][0], y1, P[0][1], P[i + 1][0], y1, P[i + 1][1], P[i][0], y1, P[i][1]);
+      push3(LOD_ROOF_SHADE);
+    }
+  }
+
+  function buildWardMesh(wardId, buildingsArr) {
+    const wv = [], wc = [];
+    for (const b of buildingsArr) appendBuilding(wv, wc, b);
+    if (wv.length === 0) return null;
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(wv), 3));
+    geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(wc), 3));
+    geom.computeVertexNormals();
+    geom.computeBoundingSphere();
+    const mesh = new THREE.Mesh(geom, getMaterial());
+    mesh.castShadow = false; mesh.receiveShadow = false;   // [directive] 影は付けない（軽量優先）
+    mesh.frustumCulled = true;
+    mesh.renderOrder = 500;
+    mesh.userData.cityBuildingLOD = true;
+    mesh.userData.wardId = wardId;
+    mesh.visible = visible && lastCameraDistance >= HIDE_NEAR_M;
+    return mesh;
+  }
+
+  async function loadWard(wardId, datasetId) {
+    wardState.set(wardId, { mesh: null, status: 'loading' });
+    const manifest = await fetchJson(`${BUILDING_TILE_CONFIG.basePath}/${datasetId}/manifest.json`);
+    if (cancelled) return;
+    if (!manifest || manifest.coordinateConvention !== 'znorth-neg-v1' || !Array.isArray(manifest.tiles)) {
+      wardState.set(wardId, { mesh: null, status: 'error' }); return;
+    }
+    const tileRefs = manifest.tiles;
+    const all = [];
+    const seen = new Set();
+    for (let i = 0; i < tileRefs.length; i += BATCH_SIZE) {
+      if (cancelled) return;
+      const batch = tileRefs.slice(i, i + BATCH_SIZE);
+      await Promise.all(batch.map(async (t) => {
+        const data = await fetchJson(`${BUILDING_TILE_CONFIG.basePath}/${datasetId}/tile_${t.tx}_${t.tz}.json`);
+        if (!data || !Array.isArray(data.buildings)) return;
+        for (const b of data.buildings) {
+          if (!b || !b.id || !Array.isArray(b.fp) || b.fp.length < 3) continue;
+          if (seen.has(b.id)) continue;
+          seen.add(b.id);
+          all.push(b);
+        }
+      }));
+      if (i + BATCH_SIZE < tileRefs.length) await sleep(BATCH_DELAY_MS);
+    }
+    if (cancelled) return;
+    const mesh = buildWardMesh(wardId, all);
+    if (mesh) { ensureGroup().add(mesh); wardState.set(wardId, { mesh, status: 'ready' }); }
+    else wardState.set(wardId, { mesh: null, status: 'empty' });
+  }
+
+  // 24区を1区ずつ順番にロードする（同時多発fetchを避け、既存のCityTileLayer progressive load
+  // と同様に「重い処理をまとめて走らせない」方針を踏襲）。呼び出し側からの再入は無視する。
+  async function build() {
+    if (started) return;
+    started = true; cancelled = false;
+    if (typeof WardModeManager === 'undefined') return;
+    for (const w of WardModeManager.WARD_DEFS) {
+      if (cancelled) return;
+      await loadWard(w.id, w.datasetId);
+    }
+  }
+
+  // BuildingTileLayer実体への引き継ぎ判定と同じ距離をLOD側の表示可否にも使う。
+  function setCameraDistance(r) {
+    lastCameraDistance = r;
+    const show = visible && r >= HIDE_NEAR_M;
+    for (const s of wardState.values()) if (s.mesh) s.mesh.visible = show;
+  }
+  function setVisible(on) {
+    visible = on;
+    for (const s of wardState.values()) if (s.mesh) s.mesh.visible = on && lastCameraDistance >= HIDE_NEAR_M;
+  }
+  function getStats() {
+    let wards = 0, ready = 0, triangles = 0;
+    for (const s of wardState.values()) {
+      wards++;
+      if (s.status === 'ready') { ready++; triangles += s.mesh.geometry.attributes.position.count / 3; }
+    }
+    return { wardsStarted: wards, wardsReady: ready, triangles };
+  }
+
+  return { build, setCameraDistance, setVisible, getStats, HIDE_NEAR_M };
+})();
+
+// CityModeManager: Ward Mode と直交する「大阪市全域表示」。
+//   - 建物: 24区全datasetをenable（Option A = camera近傍のtileだけ実際にfetchされる。
+//     BuildingTileLayerのring判定は既存のまま無改変。24区分を同時enableしても、実際に
+//     読み込まれるのは camera 周辺 tile だけなので 574,112棟の一括ロードにはならない）。
+//     加えて CityBuildingLOD が24区軽量メッシュを progressive load し、遠景での建物密度の
+//     食い違い（道路は全域・建物は中心だけ）を補う。camera接近時はBuildingTileLayer実体へ
+//     handoffする（両者は排他的に表示。setCameraDistanceで切替）。
+//   - 都市レイヤー: CityTileLayer.coverCityBbox()（156 tile 全域を中心→外へ progressive load）。
+//   - camera: getCityCameraTarget() で24区全体が入る位置へ。
+const CityModeManager = (function () {
+  let active = false;
+  let perfTimer = null;
+  function now() { return (typeof performance !== 'undefined' ? performance.now() : Date.now()); }
+
+  function startCityPerfWatch(switchStart) {
+    if (perfTimer) clearInterval(perfTimer);
+    const LAYERS4 = ['roads', 'waterways', 'parks', 'railways'];
+    perfTimer = setInterval(() => {
+      if (typeof CityTileLayer === 'undefined') { clearInterval(perfTimer); return; }
+      const perf = CityTileLayer.getPerf();
+      const stats = CityTileLayer.getStats();
+      const allArrived = LAYERS4.every((L) => perf[L] && perf[L].cityFirstTileMs != null);
+      const elapsed = now() - switchStart;
+      if (allArrived || elapsed > 15000) {
+        clearInterval(perfTimer); perfTimer = null;
+        const info = (typeof renderer !== 'undefined' && renderer.info) ? renderer.info : null;
+        console.log('[CITY-PERF] ' + JSON.stringify({
+          firstRoadMs: perf.roads ? perf.roads.cityFirstTileMs : null,
+          firstWaterMs: perf.waterways ? perf.waterways.cityFirstTileMs : null,
+          firstParkMs: perf.parks ? perf.parks.cityFirstTileMs : null,
+          firstRailMs: perf.railways ? perf.railways.cityFirstTileMs : null,
+          loadedRoadTiles: stats.roads ? stats.roads.loadedTiles : 0,
+          loadedWaterTiles: stats.waterways ? stats.waterways.loadedTiles : 0,
+          loadedParkTiles: stats.parks ? stats.parks.loadedTiles : 0,
+          loadedRailTiles: stats.railways ? stats.railways.loadedTiles : 0,
+          drawCalls: info ? info.render.calls : null,
+          geometries: info ? info.memory.geometries : null,
+          triangles: info ? info.render.triangles : null,
+          elapsedMs: Math.round(elapsed),
+          timedOut: !allArrived,
+        }));
+      }
+    }, 300);
+  }
+
+  function enter() {
+    active = true;
+    cityModeActive = true; // [Mission16] camUpd / onR が参照する前方フラグ
+    const t0 = now();
+    if (typeof WardModeManager !== 'undefined' && WardModeManager.clearActiveWard) WardModeManager.clearActiveWard();
+    // [Option A] 24区すべての建物datasetをenable。実際に読み込まれる tile は camera 近傍のみ
+    //   （BuildingTileLayer.updateByCamera の ring 判定は不変。ここでは enable するだけ）。
+    if (typeof BuildingTileLayer !== 'undefined' && typeof WardModeManager !== 'undefined') {
+      for (const w of WardModeManager.WARD_DEFS) BuildingTileLayer.enableDataset(w.datasetId);
+    }
+    // [P1-7B] 24区の軽量建物LODを progressive load 開始（既にbuild済みなら二重起動しない）。
+    if (typeof CityBuildingLOD !== 'undefined') CityBuildingLOD.build();
+    const cam = getCityCameraTarget();
+    // [Mission16] City Mode の斜め上視点: elevation / azimuth / target.y を preset へ（cs.th/ph は
+    //   flyTo が動かさないためここで設定。overheadFactor は camUpd 側で City 中は無効化される）。
+    cs.th = CITY_CAMERA_PRESET.azimuthDeg * Math.PI / 180;
+    cs.ph = (90 - CITY_CAMERA_PRESET.elevationDeg) * Math.PI / 180; // polar角 = 90 - 仰角
+    cs.tgt.y = CITY_CAMERA_PRESET.targetYOffset;
+    // [Mission16] resize 時の再fit判定用スナップショット（＝City fit の最終目標値）。
+    cityFitSnapshot = { r: cam.radius, tx: cam.x, tz: cam.z, th: cs.th, ph: cs.ph };
+    // [緊急回帰修正] Ward→City は flyTo（900ms アニメ）で寄せる。ただし tab が非アクティブ/occluded で
+    //   requestAnimationFrame が停止していたり、直後に別の flyTo が割り込むと City fit が適用されない
+    //   ことがある。→ アニメ終了想定時刻に「まだ目標へ収束していなければ直接 cs へ適用」する保険を置く
+    //   （entry 時 1 回だけ。onR の再fit判定と同じ cityFitSnapshot を基準にする）。
+    if (typeof flyTo === 'function') flyTo(cam.x, cam.z, { r: cam.radius });
+    setTimeout(function () {
+      if (!active || !cityFitSnapshot) return;
+      var s = cityFitSnapshot;
+      var notConverged = Math.abs(cs.r - s.r) > 300 || Math.abs(cs.tgt.x - s.tx) > 120 || Math.abs(cs.tgt.z - s.tz) > 120;
+      if (notConverged) {
+        cs.tgt.x = s.tx; cs.tgt.z = s.tz; cs.r = s.r; cs.th = s.th; cs.ph = s.ph;
+        cs.tgt.y = CITY_CAMERA_PRESET.targetYOffset;
+        if (typeof camUpd === 'function') camUpd();
+        console.log('[CityModeManager] City fit フォールバック適用（flyTo 未収束）: target=(' + Math.round(s.tx) + ',' + Math.round(s.tz) + ') r=' + Math.round(s.r));
+      }
+    }, 1000);
+    if (typeof CityTileLayer !== 'undefined') CityTileLayer.coverCityBbox();
+    if (typeof showWardLoadingIndicator === 'function') showWardLoadingIndicator('大阪市全域');
+    if (typeof hideWardLoadingIndicator === 'function') setTimeout(hideWardLoadingIndicator, 1200);
+    startCityPerfWatch(t0);
+    console.log('[CityModeManager] enter: camera=(' + Math.round(cam.x) + ',' + Math.round(cam.z) + ') r=' + Math.round(cam.radius) +
+      ' elev=' + CITY_CAMERA_PRESET.elevationDeg + ' az=' + CITY_CAMERA_PRESET.azimuthDeg +
+      ' fit=' + Math.round(cam.fitDistance) + ' (X=' + Math.round(cam.fitDistanceX) + ' Y=' + Math.round(cam.fitDistanceY) + ')');
+  }
+
+  // City Mode → 特定区 X へ。X 以外の23区datasetをdisable（hide。disposeはしない=LRUに委ねる）
+  //   してから、呼び出し側が通常どおり WardModeManager.switchWard(X) を呼ぶ。
+  function exit(nextWardId) {
+    if (!active) return;
+    active = false;
+    cityModeActive = false; // [Mission16] camUpd が FOV / overhead を Ward 既定へ戻す
+    cityFitSnapshot = null;
+    // [Mission16] City preset を Ward Mode の camera 状態へ漏らさない。elevation / azimuth / target.y を
+    //   Ward 既定（45°見下ろし・北向き・y=8）へ戻す。FOV は camUpd の cityActive 判定で自動的に WARD_FOV へ。
+    cs.ph = Math.PI / 4;
+    cs.th = 0;
+    cs.tgt.y = 8;
+    if (perfTimer) { clearInterval(perfTimer); perfTimer = null; }
+    if (typeof BuildingTileLayer !== 'undefined' && typeof WardModeManager !== 'undefined') {
+      for (const w of WardModeManager.WARD_DEFS) if (w.id !== nextWardId) BuildingTileLayer.disableDataset(w.datasetId);
+    }
+  }
+
+  return { enter, exit, isActive: () => active, getFitSnapshot: () => cityFitSnapshot };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// [P1-7] layer UI: 建物/道路/河川/公園/鉄道/駅名 の個別 ON/OFF。
+//   City Mode・Ward Mode どちらでも有効（CityTileLayer.setLayerEnabled + 埋め込み3区レイヤーの show/hide）。
+// ══════════════════════════════════════════════════════════════
+(function initLayerToggles(){
+  const panel = document.createElement('div');
+  panel.id = 'layer-toggle-panel';
+  panel.style.cssText = [
+    'position:fixed', 'bottom:14px', 'left:14px', 'z-index:99996',
+    'background:rgba(8,14,26,0.88)', 'border:1px solid rgba(80,160,255,0.25)', 'border-radius:10px',
+    'padding:10px 12px', 'font:12px sans-serif', 'color:#dceaff', 'backdrop-filter:blur(10px)',
+    'display:flex', 'flex-direction:column', 'gap:5px', 'user-select:none',
+  ].join(';');
+
+  const items = [
+    { key: 'buildings', label: '建物', checked: true },
+    { key: 'roads', label: '道路', checked: true },
+    { key: 'waterways', label: '河川', checked: true },
+    { key: 'parks', label: '公園', checked: true },
+    { key: 'railways', label: '鉄道', checked: true },
+    { key: 'railStations', label: '駅名', checked: true },
+  ];
+
+  function apply(key, on) {
+    try {
+      if (key === 'buildings') {
+        if (typeof BuildingTileLayer !== 'undefined') (on ? BuildingTileLayer.show() : BuildingTileLayer.hide());
+        if (typeof CityBuildingLOD !== 'undefined') CityBuildingLOD.setVisible(on);
+        return;
+      }
+      if (key === 'roads') {
+        if (typeof RoadLayer !== 'undefined') (on ? RoadLayer.show() : RoadLayer.hide());
+        if (typeof CityTileLayer !== 'undefined') CityTileLayer.setLayerEnabled('roads', on);
+        return;
+      }
+      if (key === 'waterways') {
+        // [河川再構築] 「河川」トグルは新RiverLayerV2を主として操作する。
+        //   旧WaterLayer/CityTileLayer waterwaysもあわせて呼ぶが、WATER_LAYER_ENABLED=false の間は
+        //   内部で何もしない（デバッグで旧表示へ戻した場合に備え配線だけ残す）。
+        if (typeof RiverLayerV2 !== 'undefined') (on ? RiverLayerV2.show() : RiverLayerV2.hide());
+        if (typeof WaterLayer !== 'undefined') (on ? WaterLayer.show() : WaterLayer.hide());
+        if (typeof CityTileLayer !== 'undefined') CityTileLayer.setLayerEnabled('waterways', on);
+        return;
+      }
+      if (key === 'parks') {
+        if (typeof ParkLayer !== 'undefined') (on ? ParkLayer.show() : ParkLayer.hide());
+        if (typeof CityTileLayer !== 'undefined') CityTileLayer.setLayerEnabled('parks', on);
+        return;
+      }
+      if (key === 'railways') { if (typeof CityTileLayer !== 'undefined') CityTileLayer.setLayerEnabled('railways', on); return; }
+      if (key === 'railStations') {
+        if (typeof CityTileLayer !== 'undefined') CityTileLayer.setLayerEnabled('railStations', on);
+        if (typeof StationLabelLayer !== 'undefined') StationLabelLayer.setVisible(on); // [Mission14] 駅名トグル → 駅ラベル
+        return;
+      }
+    } catch (e) { console.warn('[layer-toggle] ' + key + ' 切替失敗:', e && e.message); }
+  }
+
+  for (const it of items) {
+    const row = document.createElement('label');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = it.checked;
+    cb.addEventListener('change', () => apply(it.key, cb.checked));
+    row.appendChild(cb);
+    const span = document.createElement('span');
+    span.textContent = it.label;
+    row.appendChild(span);
+    panel.appendChild(row);
+  }
+  document.body.appendChild(panel);
+})();
+
+// ══════════════════════════════════════════════════════════════
 (function initWardSelector(){
   if (typeof WardModeManager === 'undefined') return;
 
@@ -8742,6 +11105,29 @@ let fc=0,lt=performance.now();
     'padding:8px 10px', 'outline:none', 'margin-bottom:10px', 'box-sizing:border-box',
   ].join(';');
   panel.appendChild(searchInputEl);
+
+  // [P1-7] City Mode 行（大阪市24区全域表示）。区一覧より上・独立した行として常時表示する
+  //   （検索フィルタの対象外。closePanel/ラベル更新は下の共通ロジックへ合流させる）。
+  if (typeof CityModeManager !== 'undefined') {
+    const cityRow = document.createElement('div');
+    cityRow.id = 'ward-selector-city-row';
+    cityRow.style.cssText = [
+      'display:flex', 'align-items:center', 'gap:10px', 'padding:10px 8px', 'margin-bottom:8px',
+      'border-radius:8px', 'cursor:pointer', 'font-size:13.5px', 'font-weight:700', 'color:#dceaff',
+      'background:rgba(80,160,255,0.10)', 'border:1px solid rgba(80,160,255,0.3)', 'transition:background 0.12s',
+    ].join(';');
+    const cityDot = document.createElement('span');
+    cityDot.style.cssText = 'width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#ffd257;';
+    cityRow.appendChild(cityDot);
+    const cityNameEl = document.createElement('span');
+    cityNameEl.textContent = '大阪市全域';
+    cityNameEl.style.cssText = 'flex:1;';
+    cityRow.appendChild(cityNameEl);
+    cityRow.addEventListener('mouseenter', () => { cityRow.style.background = 'rgba(80,160,255,0.2)'; });
+    cityRow.addEventListener('mouseleave', () => { cityRow.style.background = 'rgba(80,160,255,0.10)'; });
+    cityRow.addEventListener('click', () => { CityModeManager.enter(); closePanel(); });
+    panel.appendChild(cityRow);
+  }
 
   const groupLabel = document.createElement('div');
   groupLabel.textContent = '大阪市';
@@ -8799,6 +11185,8 @@ let fc=0,lt=performance.now();
       row.addEventListener('mouseenter', () => { if (row.dataset.active !== '1') row.style.background = 'rgba(80,160,255,0.14)'; });
       row.addEventListener('mouseleave', () => { if (row.dataset.active !== '1') row.style.background = 'transparent'; });
       row.addEventListener('click', () => {
+        // [P1-7] City Mode 中に区を選んだ場合、他23区datasetをdisableしてから通常のswitchWardへ。
+        if (typeof CityModeManager !== 'undefined' && CityModeManager.isActive()) CityModeManager.exit(def.id);
         // [WARD-NAVIGATOR] 切替そのものは既存のswitchWard()のみを呼ぶ。連打・二重クリックへの安全性は
         // WardModeManager/FullWardManager側のgeneration guardが既に担保しているため、ここでは
         // 追加のロック処理を行わない(呼ぶだけ)。
@@ -8843,10 +11231,13 @@ let fc=0,lt=performance.now();
   function refreshRowStates() {
     let curId = null;
     try { curId = WardModeManager.currentWardId; } catch (e) {}
+    const cityActive = (typeof CityModeManager !== 'undefined') && CityModeManager.isActive();
     for (const r of rows) {
-      const isActive = r.ready && r.def.id === curId;
+      const isActive = !cityActive && r.ready && r.def.id === curId;
       row_setActive(r, isActive);
     }
+    const cityRowEl = document.getElementById('ward-selector-city-row');
+    if (cityRowEl) cityRowEl.style.background = cityActive ? 'rgba(80,160,255,0.32)' : 'rgba(80,160,255,0.10)';
   }
   function row_setActive(r, isActive) {
     if (r.rowEl.dataset.active === (isActive ? '1' : '0')) return; // 変化なしなら何もしない
@@ -8866,9 +11257,10 @@ let fc=0,lt=performance.now();
 
   function update() {
     try {
-      const w = WardModeManager.getCurrentWard();
-      label.textContent = '現在のエリア: ' + (w ? w.name : '(未初期化)') + ' ▼';
-      label.style.borderColor = w ? `#${w.color.toString(16).padStart(6, '0')}` : 'rgba(255,255,255,0.25)';
+      const cityActive = (typeof CityModeManager !== 'undefined') && CityModeManager.isActive();
+      const w = cityActive ? null : WardModeManager.getCurrentWard();
+      label.textContent = '現在のエリア: ' + (cityActive ? '大阪市全域' : (w ? w.name : '(未初期化)')) + ' ▼';
+      label.style.borderColor = cityActive ? '#ffd257' : (w ? `#${w.color.toString(16).padStart(6, '0')}` : 'rgba(255,255,255,0.25)');
       if (panel.style.display !== 'none') refreshRowStates();
 
       // [WARD-NAVIGATOR] ロード中表示。既存のFullWardManager.getLoadingState()をそのまま参照するだけで、
