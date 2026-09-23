@@ -50,6 +50,8 @@ export const PERF_SITES = [
   { id: 'shin-osaka', lat: 34.73340, lon: 135.50020, r: 900 },
 ];
 export const PERF_SECONDS = 12;
+/** §27 ON/OFF A/B の 1 回あたりの計測秒数（4 回測るので短め）。 */
+export const PERF_AB_SECONDS = 8;
 /** §27 35I baseline 比の FPS 低下許容。 */
 export const FPS_DROP_BUDGET_PCT = 5;
 
@@ -309,6 +311,34 @@ export async function run() {
       console.log('[k-qa] perf', s.id.padEnd(12), 'fps', r.fpsAverage, 'p95', r.frameMsP95 + 'ms',
         'ラベル', r.labelsVisible, 'texture', r.textures, 'sprite', r.sprites);
     }
+    // §27 35K そのものの費用は **同一セッション・同一カメラ** の ON/OFF で測る。
+    //   35I の baseline（梅田・draw call 285）は読み込まれていたタイルが違うので、
+    //   その数字と直接引き算すると 35K と無関係な差まで混ざる（35H の City Mode と同じ罠）。
+    try {
+      const w = worldOf(PERF_SITES[0]);
+      await page.evaluate(JS.ward(w.x, w.z)); await sleep(2000);
+      await page.evaluate(JS.camera(w.x, w.z, PERF_SITES[0].r));
+      await settle(page);
+      const on = [], off = [];
+      for (let i = 0; i < 2; i++) {                      // ON/OFF を交互に。ドリフトを打ち消す
+        await page.evaluate("(() => { CityLabelLayer.setTypeVisible('station', true); return 1; })()");
+        await sleep(600);
+        on.push(await page.evaluate(JS.bench(PERF_AB_SECONDS), { timeoutMs: 120000 }));
+        await page.evaluate("(() => { CityLabelLayer.setTypeVisible('station', false); return 1; })()");
+        await sleep(600);
+        off.push(await page.evaluate(JS.bench(PERF_AB_SECONDS), { timeoutMs: 120000 }));
+      }
+      await page.evaluate("(() => { CityLabelLayer.setTypeVisible('station', true); return 1; })()");
+      const avg = (a, k) => +(a.reduce((x, y) => x + y[k], 0) / a.length).toFixed(1);
+      const fOn = avg(on, 'fpsAverage'), fOff = avg(off, 'fpsAverage');
+      out.perfAb = { id: PERF_SITES[0].id, seconds: PERF_AB_SECONDS, rounds: on.length,
+        stationsOn: { fps: fOn, calls: Math.round(avg(on, 'drawCallsAvg')), labels: Math.round(avg(on, 'labelsVisible')) },
+        stationsOff: { fps: fOff, calls: Math.round(avg(off, 'drawCallsAvg')), labels: Math.round(avg(off, 'labelsVisible')) },
+        fpsDropPct: +(((fOff - fOn) / fOff) * 100).toFixed(1),
+        samples: { on: on.map((r) => r.fpsAverage), off: off.map((r) => r.fpsAverage) } };
+      console.log('[k-qa] A/B 梅田 駅ラベル ON', fOn, 'fps / OFF', fOff, 'fps → 低下', out.perfAb.fpsDropPct + '%');
+    } catch (e) { out.perfAbError = String(e && e.message || e).slice(0, 200); }
+
     try {
       await page.evaluate('(() => { CityModeManager.enter(); return 1; })()');
       await settle(page, 4000, 150000);
@@ -351,8 +381,14 @@ export async function run() {
     // §24 町クリック
     townSitesClicked: out.townSites.filter((s) => s.clicked && s.clicked.clicked).length,
     townSitesTotal: out.townSites.length,
-    townGranularityOk: out.townSites.every((s) => !s.selected || s.selected.granularity
-      === (s.expectGranularity === 'chochome' ? 'chochome' : s.selected.granularity)),
+    // §11 粒度は **既存 source の粒度** をそのまま名乗る。町丁目のデータがある区は
+    //   chochome（1 丁目だけ）か chochome-union（「東粉浜」= 東粉浜 1〜3 丁目の束ね）のどちらか。
+    //   無い区は ward（N03 正式区界）へ落ちる。推測した町界は作らない（§12）。
+    townGranularityOk: out.townSites.every((s) => !s.selected || (s.expectGranularity === 'chochome'
+      ? (s.selected.granularity === 'chochome' || s.selected.granularity === 'chochome-union')
+      : s.selected.granularity === s.expectGranularity)),
+    townGranularities: Object.fromEntries(out.townSites.map((s) => [s.id,
+      s.selected ? s.selected.granularity : null])),
     townSelectionShown: out.townSites.every((s) => !s.clicked || !s.clicked.clicked || s.outlineMeshes > 0),
     townZoomApplied: out.townSites.every((s) => !s.clicked || !s.clicked.clicked || (s.lastFitR > 0)),
     townClearOk: out.townSites.every((s) => s.clearedSelected === null && s.clearedOutline === 0),
@@ -364,6 +400,7 @@ export async function run() {
     // §27 性能
     perf: Object.fromEntries(out.performance.map((p) => [p.id, { fps: p.fpsAverage, p95: p.frameMsP95,
       calls: p.drawCallsAvg, labels: p.labelsVisible, textures: p.textures, sprites: p.sprites }])),
+    perfAb: out.perfAb || null,
     // §28 回帰
     regressionOk: !!(r.roadMode === 'ROAD_V3' && r.buildingsVersion === 'V4' && r.selfCheck === 0
       && r.highLod && r.labels === 'ok' && r.search && r.hover && r.pick && r.card && r.cardHasWard

@@ -132,7 +132,14 @@ test('[Mission14] render loop / 駅名トグル / 初期表示 の配線', () =>
   // [Mission 33A] 駅ラベルの描画は CityLabelLayer（canonical 233 駅）へ移した。Mission14 のクラスタリング・
   //   スタイル・debug API はそのまま残っており、「駅名」トグルは CityLabelLayer の station 型に配線されている。
   assert.ok(/if \(typeof CityLabelLayer !== 'undefined'\) CityLabelLayer\.setTypeVisible\('station', on\);/.test(html), '「駅名」トグルがラベル層に配線されていない');
-  assert.ok(/StationLabelLayer\.clusterStations\(raw, 130, 900, 420\)/.test(html), 'Mission14 のクラスタリングが使われていない');
+  // [Mission 35K §4] 駅の統合は **ビルド時**（derived/station-index.json・dedupeM 450）へ移した。
+  //   表示側で再クラスタリングすると、名前の違う別の駅（大阪 / 梅田 / 東梅田 / 西梅田）が
+  //   畳まれて消えてしまうため、CityLabelLayer では意図的にクラスタリングしない。
+  //   Mission14 のクラスタリング実装そのものは StationLabelLayer に残っている。
+  assert.ok(/clusterStations\(stations, 130, 900, 420\)/.test(html), 'Mission14 のクラスタリングが StationLabelLayer から消えている');
+  assert.ok(/clusterStations,/.test(html), 'clusterStations が StationLabelLayer の API から外れている');
+  assert.ok(/\*\*ここではクラスタリングしない\*\*/.test(html), 'CityLabelLayer 側で再クラスタリングしない旨の根拠が無い');
+  assert.ok(/STATION_URL = 'map-data\/osaka-city\/derived\/station-index\.json'/.test(html), '統合済みの駅データを読んでいない');
   // [Mission 33A] 初期表示は CityLabelLayer が担当（旧レイヤーは比較用に手動 show() できる形で残す）
   assert.ok(/CityLabelLayer\.show\(\);   \/\/ 通常表示に統合/.test(html), 'ラベル層の初期表示が無い');
   // CityTileLayer の旧 '+' マーカーは debug flag 時のみ（データは保持）

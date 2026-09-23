@@ -152,7 +152,9 @@ test('[33C §11/§13/§14] HTML: 河川ラベルの向き・zoom band・優先�
   assert.match(html, /const RIVER_URL = 'map-data\/osaka-city\/labels\/river-labels\.json';/);
   assert.match(html, /const PLACE_URL = 'map-data\/osaka-city\/labels\/place-labels\.json';/);
   assert.match(html, /const LANDMARK_URL = 'map-data\/osaka-city\/labels\/landmark-labels\.json';/);
-  assert.match(html, /const STATION_URL = 'map-data\/osaka-city\/labels\/station-labels\.json';/);
+  // [Mission 35K §2/§4] 駅は事業者つき・統合済みの derived/station-index.json へ移した
+  //   （station-labels.json 自体は 33C のまま残っており、上のテストで検証している）。
+  assert.match(html, /const STATION_URL = 'map-data\/osaka-city\/derived\/station-index\.json';/);
   // tier による band（S=遠景 / A=中景 / B=近景）
   assert.match(html, /if \(item\.kind === 'landmark'\) return item\.tier === 'S' \? true : \(item\.tier === 'A' \? b !== 'far' : b === 'near'\);/);
   // 河川の band と、引き画面での優先度アップ

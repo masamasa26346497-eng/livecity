@@ -143,16 +143,28 @@ test('35F 地名ラベルは広域 PBF を使う', () => {
 });
 
 test('35F 駅ラベルが読むファイルは canonical の駅数と一致する', () => {
-  // CityLabelLayer が読むのは labels/station-labels.json。
+  // 35F の意図: **画面が実際に読むファイル** が canonical と同じ駅数に追随していること。
   //   derived/rail-stations.json だけ更新して満足すると、画面のラベルは古いまま残る。
+  //   35K で CityLabelLayer の読み先は labels/station-labels.json から
+  //   derived/station-index.json（事業者付き・§4 で同一駅を統合したもの）へ移った。
+  //   統合後の件数は canonical と一致しないので、canonicalCount を経由して追随を見る。
   const html = fs.readFileSync(path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
-  assert.match(html, /STATION_URL = 'map-data\/osaka-city\/labels\/station-labels\.json'/);
+  const m = html.match(/STATION_URL = '([^']+)'/);
+  assert.ok(m, 'CityLabelLayer の駅データの読み先が見つからない');
+  const readPath = path.join(ROOT, 'public', m[1]);
+  assert.ok(fs.existsSync(readPath), '画面が読む駅ファイルが無い: ' + m[1]);
+  const read = rj(readPath);
   const lab = rj(path.join(ROOT, 'public', 'map-data', 'osaka-city', 'labels', 'station-labels.json'));
   const der = rj(path.join(ROOT, 'public', 'map-data', 'osaka-city', 'derived', 'rail-stations.json'));
   const canon = rj(path.join(ROOT, 'data', 'processed', 'osaka-city', 'canonical', 'rail', 'stations.json'));
   if (lab && der) assert.equal(lab.stations.length, der.count, 'ラベルと配信データの駅数が食い違う');
   if (lab && canon) assert.equal(lab.stations.length, canon.count, 'ラベルと canonical の駅数が食い違う');
   if (lab) assert.ok(lab.stations.length > BEFORE_35F.stations, '駅が増えていない');
+  // 画面が読むファイルの出どころが canonical と同じ世代か
+  if (canon) assert.equal(read.canonicalCount ?? read.stations.length, canon.count,
+    '画面が読む駅ファイルが canonical に追随していない');
+  // 統合後の表示件数（230）は 35F 以前の 233 より小さくなりうる。増えたことを見るのは統合前の件数。
+  assert.ok((read.canonicalCount ?? read.stations.length) > BEFORE_35F.stations, '画面側の駅が増えていない');
 });
 
 // ── §5 影響のあったものだけ直したか ────────────────────────────────────

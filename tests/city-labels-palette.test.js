@@ -75,10 +75,12 @@ test('[33A] CityLabelLayer: 3 種のラベルを 1 つの優先度キューで�
   // [33C] ラベル用データは labels/ へ整理した（地名は OSM + PLATEAU 町丁目名称の統合）
   assert.match(html, /const PLACE_URL = 'map-data\/osaka-city\/labels\/place-labels\.json';/);
   assert.match(html, /const LANDMARK_URL = 'map-data\/osaka-city\/labels\/landmark-labels\.json';/);
-  assert.match(html, /const STATION_URL = 'map-data\/osaka-city\/labels\/station-labels\.json';/);
+  // [Mission 35K §2/§4] 駅は事業者つき・統合済みの derived/station-index.json へ移した。
+  assert.match(html, /const STATION_URL = 'map-data\/osaka-city\/derived\/station-index\.json';/);
   // 優先順位: ランドマーク > 駅 > 地名
   assert.match(html, /const rank = item\.kind === 'landmark' \? \(item\.tier === 'S' \? 0 : item\.tier === 'A' \? 2\.5 : 3\)/);
-  assert.match(html, /: item\.kind === 'station' \? \(item\.importance === 'major' \? 1 : item\.importance === 'medium' \? 4 : 6\)/);
+  // [Mission 35K §7] 駅は町名ラベルより強い。ランドマーク S（rank 0）だけは駅より上に残す。
+  assert.match(html, /: item\.kind === 'station' \? \(item\.importance === 'major' \? 0\.8\s*\n\s*: \(item\.importance === 'transfer' \|\| item\.importance === 'medium'\) \? 2\.2 : 4\.2\)/);
   // [33D] 同順位の並びに「前回出ていたか」を挟んだ（大分類の優先順位は変えない）
   assert.match(html, /pool\.sort\(\(a, z\) => \(a\.rank - z\.rank\) \|\| \(a\.stable - z\.stable\) \|\| \(a\.dc - z\.dc\)\);/);
   // 密度制御（band 別上限 + 画面グリッド）と衝突回避
@@ -87,7 +89,8 @@ test('[33A] CityLabelLayer: 3 種のラベルを 1 つの優先度キューで�
   assert.match(html, /const hits = \(c, q\) => Math\.abs\(c\.sx - q\.sx\) < \(c\.hw \+ q\.hw\) && Math\.abs\(c\.sy - q\.sy\) < \(c\.hh \+ q\.hh\);/);
   // ズームで表示数を変える
   assert.match(html, /const BANDS = \{ farM: 9000, midM: 3500 \};\s+\/\/ 道路・鉄道・公園 LOD と同じ距離帯/);
-  assert.match(html, /if \(item\.kind === 'station'\) return item\.importance === 'major' \? true : \(item\.importance === 'medium' \? b !== 'far' : b === 'near'\);/);
+  // [Mission 35K §8] 遠景=主要駅 / 中距離=乗換駅も / 近距離=全駅
+  assert.match(html, /if \(item\.kind === 'station'\) \{\s*\n\s*if \(item\.importance === 'major'\) return true;\s*\n\s*if \(item\.importance === 'transfer' \|\| item\.importance === 'medium'\) return b !== 'far';\s*\n\s*return b === 'near';\s*\n\s*\}/);
   // 画面に出るものだけ sprite 化 + texture キャッシュ
   assert.match(html, /function getSprite\(item\) \{/);
   assert.match(html, /if \(texCache\.has\(key\)\) \{ stats\.cachedTextures\+\+; return texCache\.get\(key\); \}/);
@@ -108,7 +111,8 @@ test('[33A] ラベルの見た目: 明るい地図では濃いインク + 白ハ
   assert.match(html, /ctx\.strokeText\(text, padX, canvas\.height \/ 2 \+ R\);/);
   // 文字サイズの階層（地名 major > 地名 medium > 駅 major）
   const place = html.match(/const f = importance === 'major' \? 17 : \(importance === 'medium' \? 14 : 12\);/);
-  const station = html.match(/const f = importance === 'major' \? 13\.5 : \(importance === 'medium' \? 12 : 10\.5\);/);
+  // [Mission 35K §5] 駅は町名ラベルより強く出す（以前は地名より一段小さかった）。
+  const station = html.match(/const f = importance === 'major' \? 15 : \(importance === 'transfer' \|\| importance === 'medium' \? 13\.5 : 12\);/);
   assert.ok(place && station, 'font 階層が指定どおりでない');
   assert.doesNotMatch(html, /text: '#000000'/);
   // 画面ピクセル基準のサイズ（引いても読める。world 固定サイズにしない）

@@ -134,8 +134,9 @@ test('35J 開発用の切替は production で隠れる', () => {
 
 // ── §11 ビルドの作り方 ─────────────────────────────────────────────────
 test('35J production は dev からプロファイル 1 行だけの変換', () => {
-  // cutover した直後なので、この条件が成り立つ。
-  assert.deepEqual(productionIsDevWithProfileOnly(), { ok: true });
+  // production は「cutover したときの dev」から 1 行だけ変えたもの、という関係を記録で見る。
+  //   productionIsDevWithProfileOnly() は **cutover 直後だけ** 成り立つ条件で、
+  //   以後 dev を進めると（35K は §30 のとおり dev のみ変更）必ず崩れる。恒常条件は build 記録との一致。
   const build = rpt('production-cutover-build.json');
   assert.ok(build && build.productionSha256);
   assert.equal(build.source, 'public/osaka_3d_buildings.ward-ux-v1.html');

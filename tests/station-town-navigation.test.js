@@ -339,6 +339,10 @@ test('35K 実測: 町名クリックで境界・ズーム・解除が動く', { 
   assert.equal(s.townZoomApplied, true, 'ズームしていない');
   assert.equal(s.townClearOk, true, '解除で消えていない');
   assert.equal(s.stationClickOk, true, '駅クリックが効いていない');
+  assert.equal(s.townSitesClicked, s.townSitesTotal, '§24 の町が全部クリックできていない');
+  // §11 粒度は source のまま名乗る。町丁目のある 3 区は chochome / chochome-union、
+  //   無い区は ward（N03 正式区界）。推測した町界へは落とさない（§12）。
+  assert.equal(s.townGranularityOk, true, JSON.stringify(s.townGranularities));
 });
 
 test('35K 実測: クリックの衝突とドラッグ保護', { skip: skip('station-town-navigation-qa.json') }, () => {
@@ -356,12 +360,20 @@ test('35K 実測: 性能と回帰', { skip: skip('station-town-navigation-qa.jso
   for (const [id, p] of Object.entries(s.perf)) {
     assert.ok(p.sprites < 3000, id + ' の sprite が ' + p.sprites);
   }
-  // §27 35I baseline 比
+  // §27 35K が増やした分の費用は **同一セッション・同一カメラの ON/OFF** で測る。
+  //   35I の baseline をそのまま引き算すると、読み込まれていたタイルの違い（梅田の
+  //   draw call 285 → 483）まで 35K の費用に化けてしまう（35H の City Mode と同じ罠）。
+  const ab = s.perfAb;
+  assert.ok(ab, '駅ラベル ON/OFF の A/B が無い');
+  assert.equal(ab.id, 'umeda');
+  assert.ok(ab.rounds >= 2, 'A/B が 1 往復しかしていない');
+  assert.ok(ab.fpsDropPct <= FPS_DROP_BUDGET_PCT,
+    `駅ラベルの FPS 低下が ${ab.fpsDropPct}%（ON ${ab.stationsOn.fps} / OFF ${ab.stationsOff.fps}）`);
+  assert.ok(ab.stationsOn.labels > ab.stationsOff.labels, 'ON/OFF でラベル数が変わっていない（A/B が効いていない）');
+  // 35I baseline は「参考値」として残す。同じ場面ではないので合否には使わない。
   const base = rpt('directional-balance-qa.json');
   if (base && base.summary.perf && s.perf.umeda) {
-    const b = base.summary.perf.new.fpsAverage;
-    const drop = ((b - s.perf.umeda.fps) / b) * 100;
-    assert.ok(drop <= FPS_DROP_BUDGET_PCT + 10, `梅田の FPS が ${b} → ${s.perf.umeda.fps}`);
+    assert.ok(Number.isFinite(base.summary.perf.new.fpsAverage));
   }
 });
 
