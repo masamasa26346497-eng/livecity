@@ -175,7 +175,11 @@ test('normalizePrimitive: id が string / refs・latitude の揺れを吸収', (
 
 test('純粋ヘルパ: matchWayLayer / expandBbox / resolveGeometry / geometryIntersectsBbox', () => {
   assert.equal(matchWayLayer({ highway: 'secondary' }, ALL_LAYERS), 'roads');
-  assert.equal(matchWayLayer({ highway: 'service' }, ALL_LAYERS), null);
+  // [Mission23] service / unclassified / *_link / living_street / pedestrian も roads へ取り込む
+  assert.equal(matchWayLayer({ highway: 'service' }, ALL_LAYERS), 'roads');
+  assert.equal(matchWayLayer({ highway: 'unclassified' }, ALL_LAYERS), 'roads');
+  assert.equal(matchWayLayer({ highway: 'motorway_link' }, ALL_LAYERS), 'roads');
+  assert.equal(matchWayLayer({ highway: 'footway' }, ALL_LAYERS), null, 'footway は道路対象外');
   assert.equal(matchWayLayer({ waterway: 'river' }, ALL_LAYERS), 'waterways');
 
   const b = expandBbox({ south: 34.6, north: 34.7, west: 135.4, east: 135.6 }, 1000, 34.65);

@@ -1,155 +1,177 @@
 // tools/lib/zip-reader.js
-// 依存ゼロのZIP部分読み取りライブラリ。
-//
-// 目的（ご指示: Windows互換 & 1.5GB級を全展開しない）:
-//   - unzip コマンドに依存しない。Node.js標準の fs（ランダムアクセス read）と zlib で完結する。
-//   - ZIPの「中央ディレクトリ(End of Central Directory → Central Directory)」だけを読み、
-//     エントリ一覧を得る。これはファイル末尾の数十KB〜数MBを読むだけで済む（全展開しない）。
-//   - 個別エントリは、ローカルヘッダの位置へ seek して「そのエントリの圧縮バイトだけ」を読み、
-//     zlib.inflateRawSync で1件ずつ解凍する。1.5GBのZIPでも、抽出対象GML(数MB)のI/Oしか発生しない。
-//
-// 対応範囲:
-//   - 圧縮方式: stored(0) と deflate(8)。PLATEAUのCityGML ZIPはdeflate。
-//   - ZIP64: End of Central Directoryが0xFFFFFFFF飽和している場合はZIP64 EOCDを辿る（大容量対応）。
-//   - 非対応方式(bzip2等)や暗号化エントリに当たった場合は、呼び出し側がOSツールへフォールバックできるよう
-//     明確なエラーを投げる（extractOr フォールバックは別関数で提供）。
-//
-// フォールバック（ご指示の優先順位2,3）:
-//   - このNode実装で読めない場合に限り、PowerShell(Expand-Archive) / 7-Zip / unzip を使う
-//     フォールバックを extractEntriesWithFallback() が試みる。ただし Expand-Archive は
-//     「部分抽出」ができないため、フォールバックは最終手段（全展開→対象コピー）となる旨を明示する。
-
-import { openSync, readSync, closeSync, statSync } from 'fs';
-import zlib from 'zlib';
-
-const EOCD_SIG = 0x06054b50;       // End of Central Directory
-const EOCD64_SIG = 0x06064b50;     // ZIP64 End of Central Directory
-const EOCD64_LOC_SIG = 0x07064b50; // ZIP64 EOCD locator
-const CEN_SIG = 0x02014b50;        // Central Directory file header
-const LOC_SIG = 0x04034b50;        // Local file header
-
-function readChunk(fd, position, length) {
-  const buf = Buffer.alloc(length);
-  const bytes = readSync(fd, buf, 0, length, position);
-  return bytes === length ? buf : buf.subarray(0, bytes);
-}
+// ローカル ZIP の中央ディレクトリを読み、エントリ単位で展開する最小リーダ。
+//   ZIP64 対応 / store(0) と deflate(8) をサポート。依存なし（Node 組み込み fs + zlib のみ）。
+//   PLATEAU の市配布 CityGML（数 GB・数千エントリ）を全展開せず必要な GML だけ取り出すために使う。
+import fs from 'node:fs';
+import zlib from 'node:zlib';
 
 /**
- * ZIPの中央ディレクトリを解析し、エントリ配列を返す。
- * 各エントリ: { fileName, compressionMethod, compressedSize, uncompressedSize, localHeaderOffset }
- * @param {string} zipPath
- * @returns {Array}
+ * @param {string} file ZIP パス
+ * @returns {Array<{name:string, method:number, compSize:number, uncompSize:number, localOff:number}>}
  */
-export function readCentralDirectory(zipPath) {
-  const fd = openSync(zipPath, 'r');
+export function readZipEntries(file) {
+  const fd = fs.openSync(file, 'r');
   try {
-    const size = statSync(zipPath).size;
-    // --- EOCD を末尾から探索（コメント最大65535 + EOCD22バイト） ---
-    const maxBack = Math.min(size, 65535 + 22);
-    const tail = readChunk(fd, size - maxBack, maxBack);
-    let eocdRel = -1;
-    for (let i = tail.length - 22; i >= 0; i--) {
-      if (tail.readUInt32LE(i) === EOCD_SIG) { eocdRel = i; break; }
-    }
-    if (eocdRel < 0) throw new Error('EOCDが見つかりません（ZIPではない/破損）。');
-
-    let cdOffset = tail.readUInt32LE(eocdRel + 16);
-    let cdSize = tail.readUInt32LE(eocdRel + 12);
-    let totalEntries = tail.readUInt16LE(eocdRel + 10);
-
-    // --- ZIP64 対応: いずれかが飽和(0xFFFFFFFF/0xFFFF)ならZIP64 EOCDを辿る ---
-    const eocdAbs = size - maxBack + eocdRel;
-    if (cdOffset === 0xffffffff || cdSize === 0xffffffff || totalEntries === 0xffff) {
-      // EOCD の直前に ZIP64 EOCD Locator(20バイト)がある
-      const locBuf = readChunk(fd, eocdAbs - 20, 20);
-      if (locBuf.readUInt32LE(0) === EOCD64_LOC_SIG) {
-        const zip64EocdOffset = Number(locBuf.readBigUInt64LE(8));
-        const z64 = readChunk(fd, zip64EocdOffset, 56);
-        if (z64.readUInt32LE(0) === EOCD64_SIG) {
-          totalEntries = Number(z64.readBigUInt64LE(32));
-          cdSize = Number(z64.readBigUInt64LE(40));
-          cdOffset = Number(z64.readBigUInt64LE(48));
+    const size = fs.statSync(file).size;
+    const tailLen = Math.min(size, 66560); // EOCD(22) + comment(最大65535) を確実に含む
+    const tail = Buffer.alloc(tailLen);
+    fs.readSync(fd, tail, 0, tailLen, size - tailLen);
+    let eocd = -1;
+    for (let i = tail.length - 22; i >= 0; i--) if (tail.readUInt32LE(i) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error('EOCD が見つからない（ZIP ではない可能性）: ' + file);
+    let count = tail.readUInt16LE(eocd + 10);
+    let cdSize = tail.readUInt32LE(eocd + 12);
+    let cdOff = tail.readUInt32LE(eocd + 16);
+    if (cdOff === 0xFFFFFFFF || count === 0xFFFF || cdSize === 0xFFFFFFFF) {
+      let loc = -1;
+      for (let i = eocd - 20; i >= 0; i--) if (tail.readUInt32LE(i) === 0x07064b50) { loc = i; break; }
+      if (loc >= 0) {
+        const z64Off = Number(tail.readBigUInt64LE(loc + 8));
+        const z = Buffer.alloc(56);
+        fs.readSync(fd, z, 0, 56, z64Off);
+        if (z.readUInt32LE(0) === 0x06064b50) {
+          count = Number(z.readBigUInt64LE(32));
+          cdSize = Number(z.readBigUInt64LE(40));
+          cdOff = Number(z.readBigUInt64LE(48));
         }
       }
     }
-
-    // --- 中央ディレクトリ本体を読む（ここだけで全エントリのメタが得られる） ---
-    const cd = readChunk(fd, cdOffset, cdSize);
+    const cd = Buffer.alloc(cdSize);
+    fs.readSync(fd, cd, 0, cdSize, cdOff);
     const entries = [];
     let p = 0;
-    while (p + 46 <= cd.length && cd.readUInt32LE(p) === CEN_SIG) {
-      const compressionMethod = cd.readUInt16LE(p + 10);
-      let compressedSize = cd.readUInt32LE(p + 20);
-      let uncompressedSize = cd.readUInt32LE(p + 24);
-      const fileNameLen = cd.readUInt16LE(p + 28);
+    for (let n = 0; n < count && p + 46 <= cd.length; n++) {
+      if (cd.readUInt32LE(p) !== 0x02014b50) break;
+      const method = cd.readUInt16LE(p + 10);
+      let compSize = cd.readUInt32LE(p + 20);
+      let uncompSize = cd.readUInt32LE(p + 24);
+      const nameLen = cd.readUInt16LE(p + 28);
       const extraLen = cd.readUInt16LE(p + 30);
       const commentLen = cd.readUInt16LE(p + 32);
-      let localHeaderOffset = cd.readUInt32LE(p + 42);
-      const fileName = cd.toString('utf8', p + 46, p + 46 + fileNameLen);
-
-      // ZIP64拡張フィールド解析（サイズ/オフセットが飽和している場合）
-      if (compressedSize === 0xffffffff || uncompressedSize === 0xffffffff || localHeaderOffset === 0xffffffff) {
-        const extraStart = p + 46 + fileNameLen;
-        let ep = extraStart;
-        const extraEnd = extraStart + extraLen;
-        while (ep + 4 <= extraEnd) {
-          const tag = cd.readUInt16LE(ep);
-          const sz = cd.readUInt16LE(ep + 2);
-          let dp = ep + 4;
-          if (tag === 0x0001) { // ZIP64
-            if (uncompressedSize === 0xffffffff) { uncompressedSize = Number(cd.readBigUInt64LE(dp)); dp += 8; }
-            if (compressedSize === 0xffffffff) { compressedSize = Number(cd.readBigUInt64LE(dp)); dp += 8; }
-            if (localHeaderOffset === 0xffffffff) { localHeaderOffset = Number(cd.readBigUInt64LE(dp)); dp += 8; }
+      let localOff = cd.readUInt32LE(p + 42);
+      const name = cd.slice(p + 46, p + 46 + nameLen).toString('utf8');
+      if (uncompSize === 0xFFFFFFFF || compSize === 0xFFFFFFFF || localOff === 0xFFFFFFFF) {
+        let e = p + 46 + nameLen; const end = e + extraLen;
+        while (e + 4 <= end) {
+          const id = cd.readUInt16LE(e), sz = cd.readUInt16LE(e + 2);
+          if (id === 0x0001) {
+            let q = e + 4;
+            if (uncompSize === 0xFFFFFFFF) { uncompSize = Number(cd.readBigUInt64LE(q)); q += 8; }
+            if (compSize === 0xFFFFFFFF) { compSize = Number(cd.readBigUInt64LE(q)); q += 8; }
+            if (localOff === 0xFFFFFFFF) { localOff = Number(cd.readBigUInt64LE(q)); q += 8; }
+            break;
           }
-          ep += 4 + sz;
+          e += 4 + sz;
         }
       }
-
-      entries.push({ fileName, compressionMethod, compressedSize, uncompressedSize, localHeaderOffset });
-      p += 46 + fileNameLen + extraLen + commentLen;
+      entries.push({ name, method, compSize, uncompSize, localOff });
+      p += 46 + nameLen + extraLen + commentLen;
     }
     return entries;
-  } finally {
-    closeSync(fd);
-  }
+  } finally { fs.closeSync(fd); }
 }
 
-/**
- * 単一エントリの中身をBufferで取り出す（全展開せず、そのエントリの圧縮バイトのみを読む）。
- * @param {string} zipPath
- * @param {object} entry readCentralDirectory の1要素
- * @returns {Buffer}
- */
-export function extractEntryBuffer(zipPath, entry) {
-  const fd = openSync(zipPath, 'r');
+/** エントリ 1 件を展開して Buffer で返す。 */
+export function extractEntry(file, entry) {
+  const fd = fs.openSync(file, 'r');
   try {
-    // ローカルヘッダ(30バイト固定 + fileNameLen + extraLen)を読み、実データ開始位置を得る。
-    // 中央ディレクトリのfileNameLen/extraLenとローカルのそれは異なり得るため、ローカル側を必ず読む。
-    const localFixed = readChunk(fd, entry.localHeaderOffset, 30);
-    if (localFixed.readUInt32LE(0) !== LOC_SIG) {
-      throw new Error(`ローカルヘッダ署名不一致: ${entry.fileName}`);
-    }
-    const nameLen = localFixed.readUInt16LE(26);
-    const extraLen = localFixed.readUInt16LE(28);
-    const dataStart = entry.localHeaderOffset + 30 + nameLen + extraLen;
-    const comp = readChunk(fd, dataStart, entry.compressedSize);
-
-    if (entry.compressionMethod === 0) {
-      return comp; // stored（無圧縮）
-    }
-    if (entry.compressionMethod === 8) {
-      return zlib.inflateRawSync(comp); // deflate
-    }
-    throw new Error(`未対応の圧縮方式 method=${entry.compressionMethod}（${entry.fileName}）。OSツールへのフォールバックが必要です。`);
-  } finally {
-    closeSync(fd);
-  }
+    const hdr = Buffer.alloc(30);
+    fs.readSync(fd, hdr, 0, 30, entry.localOff);
+    if (hdr.readUInt32LE(0) !== 0x04034b50) throw new Error('local header 不正: ' + entry.name);
+    const nl = hdr.readUInt16LE(26), el = hdr.readUInt16LE(28);
+    const comp = Buffer.alloc(entry.compSize);
+    fs.readSync(fd, comp, 0, entry.compSize, entry.localOff + 30 + nl + el);
+    if (entry.method === 0) return comp;
+    if (entry.method === 8) return zlib.inflateRawSync(comp, { maxOutputLength: 1 << 30 });
+    throw new Error('未対応の圧縮方式 ' + entry.method + ': ' + entry.name);
+  } finally { fs.closeSync(fd); }
 }
 
+// [Mission 31G-FIX22] ネスト ZIP（ZIP の中に ZIP が入っている GSI 基盤地図情報の一括ダウンロード形式）
+//   対応のため、file path ではなく in-memory Buffer から直接読む版を追加する。
+//   既存の readZipEntries/extractEntry（file path 版）はロジック・シグネチャとも一切変更しない
+//   （他の利用箇所への影響ゼロ・純粋な追加のみ）。中央ディレクトリ解析ロジックは同一。
 /**
- * 中身の一部だけをテキストで欲しい場合（監査の座標サンプル用に、大きなGMLでも先頭～必要分を得る）。
- * ここでは簡潔さのため全体を解凍して返す（対象GMLは数MB規模のため許容）。
+ * @param {Buffer} buf ZIP 全体を読み込んだ Buffer
+ * @returns {Array<{name:string, method:number, compSize:number, uncompSize:number, localOff:number}>}
  */
-export function extractEntryText(zipPath, entry, encoding = 'utf8') {
-  return extractEntryBuffer(zipPath, entry).toString(encoding);
+export function readZipEntriesFromBuffer(buf) {
+  const size = buf.length;
+  const tailLen = Math.min(size, 66560);
+  const tail = buf.slice(size - tailLen, size);
+  let eocd = -1;
+  for (let i = tail.length - 22; i >= 0; i--) if (tail.readUInt32LE(i) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('EOCD が見つからない（ZIP ではない可能性、または buffer が不完全）');
+  let count = tail.readUInt16LE(eocd + 10);
+  let cdSize = tail.readUInt32LE(eocd + 12);
+  let cdOff = tail.readUInt32LE(eocd + 16);
+  if (cdOff === 0xFFFFFFFF || count === 0xFFFF || cdSize === 0xFFFFFFFF) {
+    let loc = -1;
+    for (let i = eocd - 20; i >= 0; i--) if (tail.readUInt32LE(i) === 0x07064b50) { loc = i; break; }
+    if (loc >= 0) {
+      const z64Off = Number(tail.readBigUInt64LE(loc + 8));
+      const z = buf.slice(z64Off, z64Off + 56);
+      if (z.readUInt32LE(0) === 0x06064b50) {
+        count = Number(z.readBigUInt64LE(32));
+        cdSize = Number(z.readBigUInt64LE(40));
+        cdOff = Number(z.readBigUInt64LE(48));
+      }
+    }
+  }
+  const cd = buf.slice(cdOff, cdOff + cdSize);
+  const entries = [];
+  let p = 0;
+  for (let n = 0; n < count && p + 46 <= cd.length; n++) {
+    if (cd.readUInt32LE(p) !== 0x02014b50) break;
+    const method = cd.readUInt16LE(p + 10);
+    let compSize = cd.readUInt32LE(p + 20);
+    let uncompSize = cd.readUInt32LE(p + 24);
+    const nameLen = cd.readUInt16LE(p + 28);
+    const extraLen = cd.readUInt16LE(p + 30);
+    const commentLen = cd.readUInt16LE(p + 32);
+    let localOff = cd.readUInt32LE(p + 42);
+    const name = cd.slice(p + 46, p + 46 + nameLen).toString('utf8');
+    if (uncompSize === 0xFFFFFFFF || compSize === 0xFFFFFFFF || localOff === 0xFFFFFFFF) {
+      let e = p + 46 + nameLen; const end = e + extraLen;
+      while (e + 4 <= end) {
+        const id = cd.readUInt16LE(e), sz = cd.readUInt16LE(e + 2);
+        if (id === 0x0001) {
+          let q = e + 4;
+          if (uncompSize === 0xFFFFFFFF) { uncompSize = Number(cd.readBigUInt64LE(q)); q += 8; }
+          if (compSize === 0xFFFFFFFF) { compSize = Number(cd.readBigUInt64LE(q)); q += 8; }
+          if (localOff === 0xFFFFFFFF) { localOff = Number(cd.readBigUInt64LE(q)); q += 8; }
+          break;
+        }
+        e += 4 + sz;
+      }
+    }
+    entries.push({ name, method, compSize, uncompSize, localOff });
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  return entries;
+}
+/** エントリ 1 件を Buffer から展開する（file path 不要）。 */
+export function extractEntryFromBuffer(buf, entry) {
+  const hdr = buf.slice(entry.localOff, entry.localOff + 30);
+  if (hdr.readUInt32LE(0) !== 0x04034b50) throw new Error('local header 不正: ' + entry.name);
+  const nl = hdr.readUInt16LE(26), el = hdr.readUInt16LE(28);
+  const start = entry.localOff + 30 + nl + el;
+  const comp = buf.slice(start, start + entry.compSize);
+  if (entry.method === 0) return Buffer.from(comp);
+  if (entry.method === 8) return zlib.inflateRawSync(comp, { maxOutputLength: 1 << 30 });
+  throw new Error('未対応の圧縮方式 ' + entry.method + ': ' + entry.name);
+}
+
+/** codelist XML（gml:Definition の name/description）→ { code: 説明 }。 */
+export function parseCodelist(xml) {
+  const out = {};
+  for (const m of String(xml).matchAll(/<gml:Definition>[\s\S]*?<\/gml:Definition>/g)) {
+    const nm = (m[0].match(/<gml:name>([^<]*)<\/gml:name>/) || [])[1];
+    const de = (m[0].match(/<gml:description>([^<]*)<\/gml:description>/) || [])[1];
+    if (nm != null) out[nm.trim()] = (de || '').trim();
+  }
+  if (!Object.keys(out).length) {
+    for (const m of String(xml).matchAll(/<gml:description>([^<]*)<\/gml:description>\s*<gml:name>([^<]*)<\/gml:name>/g)) out[m[2].trim()] = m[1].trim();
+  }
+  return out;
 }

@@ -14,7 +14,8 @@ const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildin
 
 function cityBuildingLODBody() {
   const startIdx = html.indexOf('const CityBuildingLOD = (function () {');
-  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats, HIDE_NEAR_M };', startIdx);
+  // [Mission27] return 文に getMajorLodDebug / MID_MAX_M が追加された。build, で始まる return を探す。
+  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats,', startIdx);
   assert.ok(startIdx >= 0 && endIdx > startIdx, 'CityBuildingLOD の本体範囲を特定できない');
   return html.slice(startIdx, endIdx);
 }
@@ -24,7 +25,9 @@ test('[Mission01] picking不要: buildingIndex等のピッキング用属性を�
   // BuildingTileLayer側のbuildUsageTileMeshes()が実際に使う形: setAttribute('buildingIndex', ...)。
   // CityBuildingLODのコメントは「buildingIndexは省略」と書くだけで、実際の属性生成コードは持たない。
   assert.ok(!/setAttribute\('buildingIndex'/.test(body), 'CityBuildingLOD が buildingIndex 属性を実際に生成している');
-  assert.ok(!/raycast|Raycaster/.test(body), 'CityBuildingLOD がpicking/raycast関連ロジックを持っている');
+  assert.ok(!/new THREE\.Raycaster|\.intersectObject/.test(body), 'CityBuildingLOD がpicking/raycast関連ロジックを持っている');
+  // [Mission27] 明示的な raycast 無効化（no-op）は許容＝むしろ picking 対象外を保証する
+  assert.ok(/mesh\.raycast = \(\) => \{\};/.test(body), 'Mission27: 遠中景ブロックの raycast 無効化が無い');
 });
 
 test('[Mission01] 区ごとに1つの共有BufferGeometry・共有material（InstancedMeshではなくmerged geometry方式）', () => {
@@ -62,7 +65,13 @@ test('[Mission01] duplicateなし: handoff距離(HIDE_NEAR_M)がBuildingTileLaye
 test('[Mission01] Ward Mode近景では既存BuildingTileLayerへ切替可能（handoffはcamera距離のみで判定、ward固有ロジックを追加していない）', () => {
   const body = cityBuildingLODBody();
   assert.ok(/function setCameraDistance\(r\) \{/.test(body), 'setCameraDistance が無い');
-  assert.ok(/const show = visible && r >= HIDE_NEAR_M;/.test(body), 'distance条件のみでhandoffしていない（ward別の特別扱いをしている疑い）');
+  // [Mission27] handoff は bandVisibility(距離) のみ。ward id 等の分岐は無い。
+  assert.ok(/function setCameraDistance\(r\) \{\s*lastCameraDistance = r;\s*applyBand\(\);\s*\}/.test(body),
+    'setCameraDistance が距離→applyBand 以外のことをしている');
+  assert.ok(/const far = r > MID_MAX_M;\s*\n\s*const mid = r > HIDE_NEAR_M && r <= MID_MAX_M;/.test(body),
+    'band 判定が距離のみでない（ward別の特別扱いの疑い）');
+  assert.ok(!/wardId ===|w\.id ===/.test(body.slice(body.indexOf('function bandVisibility'), body.indexOf('function bandVisibility') + 400)),
+    'band 判定に ward 固有分岐がある');
 });
 
 test('protected baseline fullward-v3.html は Mission01 の変更を含まない', () => {

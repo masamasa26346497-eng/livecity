@@ -49,7 +49,11 @@ test('[Mission09] model-day ライト: hemi弱め(<1.2)・sun強め(>1.0)・fill
 
 test('[Mission09] CityBuildingLOD: 頂点接地暗化のみ追加（影・UV・pickingは無しのまま＝軽量維持）', () => {
   const startIdx = html.indexOf('const CityBuildingLOD = (function () {');
-  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats, HIDE_NEAR_M };', startIdx);
+  assert.ok(startIdx >= 0, 'CityBuildingLOD 定義が見つからない');
+  // 完全一致の return 文字列は後続ミッションで戻り値フィールドが増えるたびに追随が必要で壊れやすいため、
+  // 安定した prefix のみで終端を特定する（endIdx が -1 のままファイル末尾まで暴走するのを防ぐ）。
+  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats,', startIdx);
+  assert.ok(endIdx > startIdx, 'CityBuildingLOD の return 文が見つからない');
   const body = html.slice(startIdx, endIdx);
   assert.ok(/new THREE\.MeshLambertMaterial\(\{ color: LOD_COLOR, vertexColors: true \}\)/.test(body), 'vertexColors が有効になっていない');
   assert.ok(/const LOD_BOTTOM_SHADE = 0\.80, LOD_TOP_SHADE = 1\.0, LOD_ROOF_SHADE = 1\.03;/.test(body), '接地暗化係数が無い');

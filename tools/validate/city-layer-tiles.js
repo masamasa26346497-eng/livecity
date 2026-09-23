@@ -14,6 +14,7 @@ import { resolveProjectPath, toProjectRelativePath } from '../lib/paths.js';
 import { createCityTileGrid } from '../lib/city-tile-grid.js';
 import { validateCityLayer } from '../lib/city-layer-validator.js';
 import { validateWaterGeometry } from '../lib/water-geometry-validator.js';
+import { validateWaterSemantics } from '../lib/water-semantic-validator.js';
 
 const LAYERS = ['roads', 'parks', 'railways', 'waterways'];
 
@@ -39,7 +40,7 @@ function waterItemsFromTiles(layerRoot, man) {
     for (const f of (JSON.parse(fs.readFileSync(tf, 'utf-8')).features || [])) {
       if (f.id && seen.has(f.id)) continue;
       if (f.id) seen.add(f.id);
-      items.push({ id: f.id, name: f.name, kind: f.kind, subtype: f.subtype, p: f.p, holes: f.holes });
+      items.push({ id: f.id, name: f.name, kind: f.kind, subtype: f.subtype, p: f.p, holes: f.holes, source: f.source });
     }
   }
   return items;
@@ -78,11 +79,21 @@ async function main() {
     }
     if (layer === 'waterways') {
       const man = JSON.parse(fs.readFileSync(path.join(layerRoot, 'manifest.json'), 'utf-8'));
-      const wr = validateWaterGeometry(waterItemsFromTiles(layerRoot, man));
+      const items = waterItemsFromTiles(layerRoot, man);
+      const wr = validateWaterGeometry(items);
       console.log('  -- water geometry validator --');
       for (const c of wr.checks) console.log(`  [${c.pass ? 'PASS' : (c.severity === 'warning' ? 'WARN' : 'FAIL')}] water:${c.name}: ${c.detail}`);
       r.water = wr;
       if (!wr.ok) anyFail = true;
+      // [P1-6F] 意味的検証（独立 outer 誤連結 / 暗黙 closure / 疎ノード巨大三角形）
+      const sr = validateWaterSemantics(items.map((it) => ({ id: it.id, name: it.name, kind: it.kind, p: it.p, holes: it.holes, source: it.source })));
+      console.log('  -- water semantic validator --');
+      console.log(`  [${sr.ok ? 'PASS' : 'FAIL'}] water-semantic: area=${sr.summary.areaFeatures} error=${sr.summary.errorCount} warn=${sr.summary.warnCount}`);
+      for (const e of sr.errors) console.log(`  [FAIL] water-semantic: ${e.id} ${e.reason}`);
+      for (const w of sr.warnings.slice(0, 15)) console.log(`  [WARN] water-semantic: ${w.id} [${w.name || ''}] src=${w.source ? w.source.type + '/' + w.source.id : '?'} — ${w.reason}`);
+      if (sr.warnings.length > 15) console.log(`  [WARN] water-semantic: … 他 ${sr.warnings.length - 15} 件`);
+      r.waterSemantic = sr;
+      if (!sr.ok) anyFail = true;
     }
     if (!r.ok) anyFail = true;
     console.log('');

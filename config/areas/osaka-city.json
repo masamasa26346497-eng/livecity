@@ -37,7 +37,7 @@
     "roads": {
       "enabled": true,
       "source": "osm-overpass",
-      "osmFilter": "way[\"highway\"~\"^(motorway|trunk|primary|secondary|tertiary|residential)$\"]",
+      "osmFilter": "way[\"highway\"~\"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|residential|living_street|unclassified|service|pedestrian|road)$\"]",
       "outputFile": "roads.json",
       "note": "24区全域ではbbox一括クエリはOverpassのタイムアウト・データ量の両面で非現実的。tiling を有効化し、タイル単位でダウンロード・変換・結合する運用を前提とする（P1-3）。"
     },
@@ -56,9 +56,9 @@
     "waterways": {
       "enabled": true,
       "source": "osm-overpass",
-      "osmFilter": "way[\"natural\"=\"water\"];way[\"waterway\"=\"river\"];way[\"waterway\"=\"canal\"];relation[\"natural\"=\"water\"];relation[\"waterway\"=\"riverbank\"]",
+      "osmFilter": "way[\"natural\"=\"water\"];way[\"waterway\"~\"^(river|canal|stream|drain|ditch)$\"];relation[\"natural\"=\"water\"];relation[\"waterway\"=\"riverbank\"]",
       "outputFile": "waterways.json",
-      "note": "河川・河岸はOSMのmultipolygon relationとして提供されることが多く、outerメンバーwayの連結・inner ring（中州）の保持が必須。tools/lib/osm-multipolygon.js の assembleMultipolygon がリング組み立てを担当し、未連結フラグメントは黙って三角形分割せず tools/validate/water-geometry.js で検出・報告する。"
+      "note": "河川・河岸はOSMのmultipolygon relationとして提供されることが多く、outerメンバーwayの連結・inner ring（中州）の保持が必須。tools/lib/osm-multipolygon.js の assembleMultipolygon がリング組み立てを担当し、未連結フラグメントは黙って三角形分割せず tools/validate/water-geometry.js で検出・報告する。Mission22 で stream/drain/ditch（surface な水路網）も取り込む（地下水路は convert 側で surface:false に分類し RiverLayerV2 から除外）。"
     },
     "landuse": {
       "enabled": true,

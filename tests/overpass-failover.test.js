@@ -198,8 +198,9 @@ test('roads の query snapshot: 最小フィルタ・out geom・recursive expans
   const info = tileQueryInfo('roads', AREA, GRID, -1, -5, 90);
   assert.equal(info.recursiveExpansion, false, '(._;>;) 等の無条件 recursive expansion が入っている');
   assert.equal(info.outMode.trim(), 'geom');
-  assert.deepEqual(info.filters, ['way["highway"~"^(motorway|trunk|primary|secondary|tertiary|residential)$"]']);
-  assert.ok(info.queryBytes < 400, `query が想定より大きい: ${info.queryBytes} bytes`);
+  // [Mission23] 生活道路・細街路まで対象に拡張
+  assert.deepEqual(info.filters, ['way["highway"~"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|residential|living_street|unclassified|service|pedestrian|road)$"]']);
+  assert.ok(info.queryBytes < 500, `query が想定より大きい: ${info.queryBytes} bytes`);
   assert.match(info.query, /^\[out:json\]\[timeout:90\];\n\(\n {2}way\["highway"/);
 });
 

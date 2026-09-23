@@ -89,7 +89,11 @@ test('[Mission07] lib model-style.js: modelBuildingColor 既定 0.92 / modelRoof
 
 test('[Mission07] CityBuildingLOD の色は白模型の壁色に統一（軽量: shared material / edge無 / shadow無）', () => {
   const startIdx = html.indexOf('const CityBuildingLOD = (function () {');
-  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats, HIDE_NEAR_M };', startIdx);
+  assert.ok(startIdx >= 0, 'CityBuildingLOD 定義が見つからない');
+  // 完全一致の return 文字列は後続ミッションで戻り値フィールドが増えるたびに追随が必要で壊れやすいため、
+  // 安定した prefix のみで終端を特定する（endIdx が -1 のままファイル末尾まで暴走するのを防ぐ）。
+  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats,', startIdx);
+  assert.ok(endIdx > startIdx, 'CityBuildingLOD の return 文が見つからない');
   const body = html.slice(startIdx, endIdx);
   assert.ok(/const LOD_COLOR = MS_BUILDING_WHITE;/.test(body), 'LOD_COLOR が MS_BUILDING_WHITE ではない');
   assert.ok(/if \(!sharedMaterial\) sharedMaterial = new THREE\.MeshLambertMaterial\(\{ color: LOD_COLOR, vertexColors: true \}\);/.test(body),
@@ -151,7 +155,7 @@ test('protected baseline fullward-v3.html は Mission07 の変更を含まない
   assert.ok(!/MS_BUILDING_BLEND|MS_ROOF_BLEND|__BUILDING_COLOR_DEBUG__/.test(fw), 'fullward-v3.html に Mission07 の変更が混入');
 });
 
-test('production osaka_3d_buildings.html は Mission07 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission07 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/MS_BUILDING_BLEND|__BUILDING_COLOR_DEBUG__/.test(prod), 'production HTML に Mission07 の変更が混入');
+  assert.ok(/MS_BUILDING_BLEND|__BUILDING_COLOR_DEBUG__/.test(prod), 'production HTML に Mission07 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

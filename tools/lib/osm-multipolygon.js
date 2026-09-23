@@ -40,64 +40,61 @@ function isClosed(chain, eps) {
 
 /**
  * way（点列）の配列を端点一致で連結し、閉じたリング群と未連結フラグメントに分ける。
- * @param {number[][][]} ways [[[lon,lat],...], ...]
+ * [P1-6F] way に id を付けて渡すと、各リング/未連結フラグメントを構成した member way id を返す
+ *   （ringWayIds / unclosedWayIds）。id 省略時は入力インデックス。
+ * @param {number[][][] | {points:number[][], id:(string|number)}[]} ways
  * @param {number} eps 端点一致の許容誤差
- * @returns {{rings:number[][][], unclosed:number[][][]}}
+ * @returns {{rings:number[][][], unclosed:number[][][], ringWayIds:(string|number)[][], unclosedWayIds:(string|number)[][]}}
  */
 export function stitchWays(ways, eps = DEFAULT_EPS) {
+  const norm = (ways || []).map((w, i) => (
+    Array.isArray(w) ? { points: w, id: i } : { points: w.points || [], id: w.id != null ? w.id : i }
+  ));
+
   const rings = [];
-  /** @type {number[][][]} */
+  const ringWayIds = [];
+  /** @type {{points:number[][], ids:Set}[]} */
   const open = [];
 
-  for (const way of ways) {
-    let chain = way.slice();
-    if (chain.length < 2) {
-      // 単独の点や空 way。連結不能なフラグメントとして後で報告する。
-      open.push(chain);
-      continue;
-    }
+  for (const way of norm) {
+    let chain = { points: way.points.slice(), ids: new Set([way.id]) };
+    if (chain.points.length < 2) { open.push(chain); continue; }
 
     let merged = true;
-    while (merged && !isClosed(chain, eps)) {
+    while (merged && !isClosed(chain.points, eps)) {
       merged = false;
       for (let i = 0; i < open.length; i++) {
         const oc = open[i];
-        if (oc.length < 2) continue;
-        const cs = chain[0], ce = chain[chain.length - 1];
-        const os = oc[0], oe = oc[oc.length - 1];
+        if (oc.points.length < 2) continue;
+        const cp = chain.points, op = oc.points;
+        const cs = cp[0], ce = cp[cp.length - 1];
+        const os = op[0], oe = op[op.length - 1];
 
-        if (samePoint(ce, os, eps)) {
-          chain = chain.concat(oc.slice(1));
-        } else if (samePoint(ce, oe, eps)) {
-          chain = chain.concat(oc.slice(0, -1).reverse());
-        } else if (samePoint(cs, oe, eps)) {
-          chain = oc.slice(0, -1).concat(chain);
-        } else if (samePoint(cs, os, eps)) {
-          chain = oc.slice().reverse().slice(0, -1).concat(chain);
-        } else {
-          continue;
-        }
+        if (samePoint(ce, os, eps)) chain.points = cp.concat(op.slice(1));
+        else if (samePoint(ce, oe, eps)) chain.points = cp.concat(op.slice(0, -1).reverse());
+        else if (samePoint(cs, oe, eps)) chain.points = op.slice(0, -1).concat(cp);
+        else if (samePoint(cs, os, eps)) chain.points = op.slice().reverse().slice(0, -1).concat(cp);
+        else continue;
+
+        for (const id of oc.ids) chain.ids.add(id);
         open.splice(i, 1);
         merged = true;
         break;
       }
     }
 
-    if (isClosed(chain, eps)) {
-      rings.push(chain);
-    } else {
-      open.push(chain);
-    }
+    if (isClosed(chain.points, eps)) { rings.push(chain.points); ringWayIds.push([...chain.ids]); }
+    else open.push(chain);
   }
 
-  // 残った open のうち、それ自体が閉じているものはリングへ（単独 way で完結する島など）。
   const unclosed = [];
+  const unclosedWayIds = [];
   for (const chain of open) {
-    if (isClosed(chain, eps)) rings.push(chain);
-    else unclosed.push(chain);
+    if (isClosed(chain.points, eps)) { rings.push(chain.points); ringWayIds.push([...chain.ids]); }
+    else { unclosed.push(chain.points); unclosedWayIds.push([...chain.ids]); }
   }
 
-  return { rings, unclosed };
+  return { rings, unclosed, ringWayIds, unclosedWayIds };
 }
 
 function ringArea2(ring) {
@@ -137,50 +134,60 @@ export function assembleMultipolygon(members, options = {}) {
 
   const outerWays = [];
   const innerWays = [];
+  let idx = 0;
   for (const m of members || []) {
     if (!m || m.type === 'node') continue;
     const pts = toCoordPairs(m.geometry);
     if (!pts.length) continue;
+    const id = m.ref != null ? m.ref : (m.id != null ? m.id : `idx${idx++}`);
+    const rec = { points: pts, id };
     const role = (m.role || '').trim();
-    if (role === 'inner') innerWays.push(pts);
-    else if (role === 'outer' || (treatEmptyRoleAsOuter && role === '')) outerWays.push(pts);
-    else outerWays.push(pts); // 未知roleはouter扱い（黙って捨てない）
+    if (role === 'inner') innerWays.push(rec);
+    else outerWays.push(rec); // outer / 空role / 未知role はすべて outer 扱い（黙って捨てない）
   }
 
   const outer = stitchWays(outerWays, eps);
   const inner = stitchWays(innerWays, eps);
 
   const unclosed = [
-    ...outer.unclosed.map((c) => frag('outer', c)),
-    ...inner.unclosed.map((c) => frag('inner', c)),
+    ...outer.unclosed.map((c, i) => frag('outer', c, outer.unclosedWayIds[i])),
+    ...inner.unclosed.map((c, i) => frag('inner', c, inner.unclosedWayIds[i])),
   ];
 
-  // outer ring を面積降順に並べ、各 inner ring を内包する最小の outer へ割り当てる。
+  // outer ring を面積降順に並べ（way id 対応も保つ）、各 inner ring を内包する最小の outer へ割り当てる。
   const outerSorted = outer.rings
-    .map((ring) => ({ ring, area: Math.abs(ringArea2(ring)) }))
+    .map((ring, i) => ({ ring, area: Math.abs(ringArea2(ring)), wayIds: outer.ringWayIds[i] || [] }))
     .sort((a, b) => b.area - a.area);
 
-  const polygons = outerSorted.map((o) => ({ outer: o.ring, holes: [] }));
+  const polygons = outerSorted.map((o) => ({ outer: o.ring, holes: [], memberWayIds: o.wayIds.slice() }));
   let holesAssigned = 0;
   let holesOrphan = 0;
-  for (const hole of inner.rings) {
-    const probe = hole[0];
+  const orphanInnerWayIds = [];
+  inner.rings.forEach((hole, hi) => {
+    // inner representative point（重心が hole 内に無い凹リングもあるため頂点も併用）
+    const probe = ringRepPoint(hole);
     let target = null;
     let targetArea = Infinity;
     for (const poly of polygons) {
-      if (pointInRing(probe, poly.outer)) {
+      if (pointInRing(probe, poly.outer) || pointInRing(hole[0], poly.outer)) {
         const a = Math.abs(ringArea2(poly.outer));
         if (a < targetArea) { target = poly; targetArea = a; }
       }
     }
-    if (target) { target.holes.push(hole); holesAssigned++; }
-    else holesOrphan++; // どのouterにも入らないinner（データ不整合）。捨てずにカウントのみ。
-  }
+    if (target) {
+      target.holes.push(hole);
+      target.memberWayIds.push(...(inner.ringWayIds[hi] || []));
+      holesAssigned++;
+    } else { holesOrphan++; orphanInnerWayIds.push(...(inner.ringWayIds[hi] || [])); }
+  });
 
   return {
     polygons,
     outerRings: outer.rings,
     innerRings: inner.rings,
+    ringWayIds: outer.ringWayIds,
+    innerRingWayIds: inner.ringWayIds,
+    orphanInnerWayIds,
     unclosed,
     stats: {
       outerWays: outerWays.length,
@@ -194,11 +201,33 @@ export function assembleMultipolygon(members, options = {}) {
   };
 }
 
-function frag(role, chain) {
+/** リングの内部にある確率が高い代表点（重心。凹で外れる場合は最初の辺の中点を少し内側へ）。 */
+function ringRepPoint(ring) {
+  let x = 0, y = 0;
+  for (const p of ring) { x += p[0]; y += p[1]; }
+  const c = [x / ring.length, y / ring.length];
+  if (pointInRing(c, ring)) return c;
+  // fallback: スキャンラインで内点を1つ探す
+  const ys = ring.map((p) => p[1]).sort((a, b) => a - b);
+  const midY = ys[Math.floor(ys.length / 2)] + (ys[Math.floor(ys.length / 2) + 1] || ys[Math.floor(ys.length / 2)]) * 0 + 1e-6;
+  const xs = [];
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const yi = ring[i][1], yj = ring[j][1];
+    if ((yi > midY) !== (yj > midY)) {
+      xs.push(ring[j][0] + ((midY - yj) / (yi - yj)) * (ring[i][0] - ring[j][0]));
+    }
+  }
+  xs.sort((a, b) => a - b);
+  if (xs.length >= 2) return [(xs[0] + xs[1]) / 2, midY];
+  return c;
+}
+
+function frag(role, chain, wayIds) {
   return {
     role,
     points: chain.length,
     first: chain[0] || null,
     last: chain[chain.length - 1] || null,
+    wayIds: wayIds || [],
   };
 }

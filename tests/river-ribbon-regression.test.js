@@ -49,8 +49,12 @@ test('実データ regression: 河川ribbonは全172本が build成功・ERROR 0
   assert.deepEqual(withErrors.map((r) => r.id), [], 'validator ERRORが残っているriverがある');
 });
 
-test('実データ regression: waterway=river/canal/riverbank 以外（pond/lake/reservoir/harbour/stream）は含まれない', { skip: !hasData && 'rivers.json 未生成' }, () => {
+test('実データ regression: 面水域（pond/lake/reservoir/harbour/water）は含まれない / 線水路のみ', { skip: !hasData && 'rivers.json 未生成' }, () => {
   const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  // [Mission22] 対象を surface な線水路網へ拡張: river/canal に加え stream/drain/ditch（waterClass 上は canal）。
+  //   面水域（basin/harbour 系）は依然として対象外。
   const classes = new Set((data.rivers || []).map((r) => r.waterClass));
-  for (const c of classes) assert.ok(c === 'river' || c === 'canal', `対象外のwaterClassが混入: ${c}`);
+  for (const c of classes) assert.ok(c === 'river' || c === 'canal' || c === 'stream', `対象外のwaterClassが混入: ${c}`);
+  // 地下水路（暗渠）は地表描画に含まれない
+  for (const r of data.rivers) assert.notEqual(r.surface, false, `${r.name || r.id}: 地下水路が rivers.json に混入`);
 });

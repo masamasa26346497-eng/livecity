@@ -80,3 +80,50 @@ public/osaka_3d_buildings_streetscape-debug.html
 public/osaka_3d_buildings_znorth_test.html
 # Nested duplicate repository
 /livecity/
+
+# [Mission 31C] canonical roads の derived tile（42,547 feature・約 70MB）。再生成:
+#   node tools/build-canonical-roads.js
+# manifest / validator 結果 / preview は data/reports/canonical-road-*.json（コミット）に保持。
+data/processed/osaka-city/canonical/roads/
+
+# [Mission 31D] canonical buildings の derived tile（615,000+ feature・約 250MB）。再生成:
+#   node --max-old-space-size=4096 tools/build-canonical-buildings.js
+# manifest / validator 結果 / preview は data/reports/canonical-building-*.json（コミット）に保持。
+data/processed/osaka-city/canonical/buildings/
+
+# [Mission 31C2] PLATEAU tran 変換の中間 polygon（取得後にローカル生成）。
+data/processed/osaka-city/canonical/roads-tran/
+data/raw/plateau/
+data/processed/osaka-city/canonical/parks/
+data/processed/osaka-city/canonical/rail/
+data/processed/osaka-city/canonical/resolved/
+data/processed/osaka-city/derived/
+data/reports/derived-preview/
+public/map-data/osaka-city/derived/
+# [Mission 31G-FIX16] GSI 道路縁 normalized line（実データ・~150MB級）。raw ZIP は元々 data/raw/ 配下で除外済み。
+data/processed/osaka-city/gsi-road-edge/
+public/map-data/osaka-city/gsi-road-edge/
+# [Mission 31G-FIX17] GSI road edge reconstruction v2（segments/pairs/prototype-surfaces・~160MB級）。
+data/processed/osaka-city/gsi-road-surface-v2/
+public/map-data/osaka-city/gsi-road-surface-v2/
+# [Mission 31G-FIX18] GSI corridor-level reconstruction v3（edge-tracks/corridor-pairs/prototype-surfaces）。
+data/processed/osaka-city/gsi-road-surface-v3/
+public/map-data/osaka-city/gsi-road-surface-v3/
+# [Mission 31G-FIX19] Hybrid GSI road surface prototype（provenance.json が全大阪 45MB級のため除外）。
+data/processed/osaka-city/gsi-road-hybrid-v1/
+public/map-data/osaka-city/gsi-road-hybrid-v1/
+data/reports/.gsi-road-hybrid-v1.progress.log
+# [Mission 31G-FIX20] GSI building outline import + alignment 出力（実データ投入時に大容量化しうるため除外）。
+data/processed/osaka-city/gsi-building-outline/
+public/map-data/osaka-city/gsi-building-outline/
+# Live City generated datasets
+
+# Live City generated datasets
+/public/map-data/osaka-city/
+/public/map-data/osaka-city/
+
+# Browser QA screenshots / generated QA directories
+/data/reports/*-qa/
+/data/processed/osaka-city/**
+/public/map-data/osaka-city/**
+/data/reports/*-qa/**

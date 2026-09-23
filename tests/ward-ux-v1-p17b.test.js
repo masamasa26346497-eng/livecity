@@ -46,7 +46,8 @@ test('[P1-7B] CityBuildingLOD: 24区の軽量建物メッシュを progressive l
   assert.ok(/mesh\.castShadow = false; mesh\.receiveShadow = false;/.test(html), 'CityBuildingLOD が影を落とす設定になっている（軽量方針違反）');
   // CityModeManager.enter() から起動され、camUpdからカメラ距離で表示/非表示が切り替わる
   assert.ok(/if \(typeof CityBuildingLOD !== 'undefined'\) CityBuildingLOD\.build\(\);/.test(html), 'CityModeManager.enter() が CityBuildingLOD.build() を呼んでいない');
-  assert.ok(/if \(typeof CityBuildingLOD !== 'undefined'\) CityBuildingLOD\.setCameraDistance\(cs\.r\);/.test(html), 'camUpd が CityBuildingLOD.setCameraDistance を呼んでいない');
+  // [Mission 31G-FIX3] Canonical Runtime 所有中は canonicalOwns ガードで停止する（配線自体は維持）
+  assert.ok(/if \((?:!canonicalOwns && )?typeof CityBuildingLOD !== 'undefined'\) CityBuildingLOD\.setCameraDistance\(cs\.r\);/.test(html), 'camUpd が CityBuildingLOD.setCameraDistance を呼んでいない');
   // layer-toggle「建物」と連動
   assert.ok(/if \(typeof CityBuildingLOD !== 'undefined'\) CityBuildingLOD\.setVisible\(on\);/.test(html), '建物レイヤートグルが CityBuildingLOD に配線されていない');
 });

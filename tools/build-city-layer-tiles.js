@@ -21,24 +21,41 @@ import { loadAreaConfig, writeJson } from './lib/area.js';
 import { resolveProjectPath, toProjectRelativePath, PROJECT_ROOT, isMainModule } from './lib/paths.js';
 import { createCityTileGrid, boundsOfPoints } from './lib/city-tile-grid.js';
 import { analyzeRing } from './lib/geometry-anomaly.js';
-import { convertRoads } from './convert/roads.js';
+import { buildWardIndex, featureWardOverlap } from './lib/feature-ward-overlap.js';
+import { clipPolylineToWards, isUnclipped } from './lib/polyline-ward-clip.js';
+import { convertRoadsWithReport } from './convert/roads.js';
 import { convertParks } from './convert/parks.js';
 import { convertRailways } from './convert/railways.js';
+import { reclassifyRailNetwork } from './lib/rail-lod.js';
 import { convertWaterwaysWithReport } from './convert/waterways.js';
 
 const LAYERS = ['roads', 'parks', 'railways', 'waterways'];
 
 function parseArgs(argv) {
-  const a = { layer: null, raw: null, area: 'osaka-city', out: null, public: false, tileSize: null, report: true };
+  const a = { layer: null, raw: null, area: 'osaka-city', out: null, public: false, tileSize: null, report: true, force: false, wardFilter: true };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--layer') a.layer = argv[++i];
     else if (argv[i] === '--raw') a.raw = argv[++i];
     else if (argv[i] === '--area') a.area = argv[++i];
     else if (argv[i] === '--out') a.out = argv[++i];
     else if (argv[i] === '--public') a.public = true;
+    else if (argv[i] === '--force') a.force = true;   // 出力先レイヤーの旧 tile を消してから書き直す
+    else if (argv[i] === '--no-ward-filter') a.wardFilter = false;
     else if (argv[i] === '--tile-size') a.tileSize = parseInt(argv[++i], 10) || null;
   }
   return a;
+}
+
+/** [P1-6F] --force 時: レイヤーの旧 tile_*.json / manifest.json を消してから書く（stale tile を残さない）。 */
+function clearLayerDir(root, layer) {
+  for (const dir of [path.join(root, layer), path.join(root, layer, 'tiles')]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (/^tile_-?\d+_-?\d+\.json$/.test(f) || f === 'manifest.json') {
+        try { fs.rmSync(path.join(dir, f)); } catch { /* noop */ }
+      }
+    }
+  }
 }
 
 function readRawElements(rawPath) {
@@ -57,12 +74,31 @@ const featureId = (layer, obj) => `${layer}_${crypto.createHash('sha1').update(J
  */
 function convertLayer(layer, rawElements, projection) {
   if (layer === 'roads') {
-    const roads = convertRoads(rawElements, projection); // [{highway, p}]（+z）
+    // [Mission23] 生活道路・細街路まで。私有 driveway/parking_aisle/access=private は convert 側で除外。
+    const { roads, skippedIneligible, skipReasons, sourceWays } = convertRoadsWithReport(rawElements, projection);
     const features = roads.map((r) => {
       const p = negZ(r.p);
-      return { id: featureId('road', p), kind: 'line', highway: r.highway, p };
+      const f = { id: featureId('road', p), kind: 'line', highway: r.highway, p };
+      if (r.name) f.name = r.name;
+      if (r.width != null) f.width = r.width;
+      if (r.lanes != null) f.lanes = r.lanes;
+      // [Mission23] tier/detail/access/service/bridge/tunnel/oneway を保持（LOD/coverage/高架分類用）
+      if (r.tier) f.tier = r.tier;
+      if (r.detail) f.detail = r.detail;
+      if (r.oneway) f.oneway = r.oneway;
+      if (r.service) f.service = r.service;          // [Mission26] §4/§7 serviceType
+      if (r.surface) f.surface = r.surface;          // [Mission26] §7
+      if (r.tracktype) f.tracktype = r.tracktype;    // [Mission26] §6
+      if (r.access) f.access = r.access;
+      if (r.layer != null) f.layer = r.layer;        // [Mission26] §7
+      if (r.ultraLocal) f.ultraLocal = true;         // [Mission26] §5/§11 alley / track
+      if (r.bridge) f.bridge = true;
+      if (r.tunnel) f.tunnel = true;
+      if (r.underground) f.underground = true;
+      if (r.source) f.source = { type: r.source.type, id: r.source.id, name: r.source.name || '' };
+      return f;
     });
-    return { features, meta: { sourceWays: rawElements.filter((e) => e.type === 'way' && e.tags && e.tags.highway).length } };
+    return { features, meta: { sourceWays, skippedIneligible, skipReasons } };
   }
   if (layer === 'parks') {
     const parks = convertParks(rawElements, projection); // [{tag, name, p}]（+z, area）
@@ -75,10 +111,16 @@ function convertLayer(layer, rawElements, projection) {
   if (layer === 'railways') {
     const { lines, stations } = convertRailways(rawElements, projection);
     const features = [];
-    for (const l of lines) {
-      const p = negZ(l.p);
-      features.push({ id: featureId('rail', p), kind: 'line', railway: l.railway, p });
-    }
+    const railFeats = lines.map((l) => ({ railway: l.railway, name: l.name || '', p: negZ(l.p) }));
+    // [Mission24] ネットワーク連結で major を救済（本線の橋・分岐断片が local→FAR で消える問題）
+    const railClasses = reclassifyRailNetwork(railFeats);
+    railFeats.forEach((rf, i) => {
+      const f = { id: featureId('rail', rf.p), kind: 'line', railway: rf.railway, p: rf.p };
+      if (rf.name) f.name = rf.name; // [Mission24] 路線名
+      const rc = railClasses.get(i);
+      if (rc && rc !== 'excluded') f.railClass = rc; // major / urban / local
+      features.push(f);
+    });
     for (const s of stations) {
       const p = [Math.round(s.p[0] * 100) / 100, Math.round(-s.p[1] * 100) / 100];
       features.push({ id: featureId('station', { n: s.name, p }), kind: 'station', name: s.name || '', p: [p] }); // p は [[x,z]] に統一（tile割当共通化）
@@ -102,8 +144,17 @@ function convertLayer(layer, rawElements, projection) {
         }
       }
       if (broken) continue;
-      const f = { id: featureId('water', { p, holes, k: w.kind }), kind: w.kind, subtype: w.type, name: w.name || '', p };
+      const f = { id: featureId('water', { p, holes, k: w.kind }), kind: w.kind, subtype: w.type, name: w.name || '', waterClass: w.waterClass || w.type, p };
       if (holes.length) f.holes = holes;
+      // [Mission22] 河川ネットワーク用: 幅タグ / 地表判定 / waterway タグ種別を保持
+      if (w.waterwayTag) f.waterwayTag = w.waterwayTag;
+      if (w.surface === false) f.surface = false;
+      if (w.width != null) f.width = w.width;
+      if (w.intermittent) f.intermittent = true;
+      if (w.source) {
+        f.source = { type: w.source.type, id: w.source.id, name: w.source.name || '' };
+        if (w.source.memberWayIds && w.source.memberWayIds.length) f.source.memberWayIds = w.source.memberWayIds;
+      }
       features.push(f);
     }
     return { features, meta: { items: items.length, kept: features.length, unclosedRelations: unclosed.length, oversizedDropped: oversized, selfIntersectionDropped: selfInt, unclosed } };
@@ -117,9 +168,57 @@ function featureBounds(f) {
   return boundsOfPoints(pts);
 }
 
-async function buildOne(layer, rawPath, areaConfig, grid, outRoot, publicRoot) {
+function bboundsOf(f) {
+  const b = featureBounds(f);
+  return { ...b, diag: Number.isFinite(b.minX) ? Math.hypot(b.maxX - b.minX, b.maxZ - b.minZ) : 0 };
+}
+
+async function buildOne(layer, rawPath, areaConfig, grid, outRoot, publicRoot, wardIndex, opts = {}) {
   const rawElements = readRawElements(rawPath);
-  const { features, meta } = convertLayer(layer, rawElements, areaConfig.projection);
+  const { features: allFeatures, meta } = convertLayer(layer, rawElements, areaConfig.projection);
+
+  if (opts.force) {
+    clearLayerDir(outRoot, layer);
+    if (publicRoot) clearLayerDir(publicRoot, layer);
+  }
+
+  // [P1-6F] 24区の陸域ポリゴンと重ならない feature を除外する（24区 bbox 矩形の隅をかすめる
+  //   尼崎側の巨大河川ポリゴン等が「左上へ数km伸びる楔形」として描画されていた）。
+  let droppedOutsideWards = 0;
+  const droppedSample = [];
+  let features = allFeatures;
+  let clippedLineCount = 0;
+  if (wardIndex && wardIndex.length) {
+    features = [];
+    for (const f of allFeatures) {
+      if (f.kind === 'line') {
+        // [P1-7B] 折れ線（道路・鉄道・河川中心線）は bbox の keep/drop ではなく実クリップする。
+        //   市境を跨ぐ長い道路・鉄道を「大阪市側部分だけ」残す（丸ごと残す/丸ごと消すのどちらもしない）。
+        const runs = clipPolylineToWards(f.p, wardIndex, 150);
+        if (!runs.length) {
+          droppedOutsideWards++;
+          if (droppedSample.length < 12) droppedSample.push({ id: f.id, name: f.name || '', source: f.source || null, points: f.p.length, wardFraction: 0 });
+          continue;
+        }
+        if (isUnclipped(f.p, runs)) { features.push(f); continue; }
+        clippedLineCount++;
+        runs.forEach((run, i) => { features.push({ ...f, id: `${f.id}_c${i}`, p: run }); });
+        continue;
+      }
+      const pts = f.kind === 'station' ? f.p : [...(f.p || []), ...((f.holes || []).flat())];
+      const ov = featureWardOverlap(pts, wardIndex, { bufferM: 500, sample: 80 });
+      let keep = ov.inCount >= 1;
+      // 巨大な面フィーチャが24区にほんの少ししか掛かっていない場合は除外
+      //   （尼崎側の猪名川河口デルタ rel/8445877 = 12% しか大阪市に無い 5.2km ポリゴン等）。
+      if (keep && f.kind === 'area' && ov.fraction < 0.25 && bboundsOf(f).diag > 3500) keep = false;
+      if (keep) { features.push(f); continue; }
+      droppedOutsideWards++;
+      if (droppedSample.length < 12) droppedSample.push({ id: f.id, name: f.name || '', source: f.source || null, points: pts.length, wardFraction: +ov.fraction.toFixed(2) });
+    }
+  }
+  meta.droppedOutsideWards = droppedOutsideWards;
+  meta.clippedLineFeatures = clippedLineCount; // [P1-7B] 市境で実クリップした line feature 数（分割元の件数）
+  if (droppedSample.length) meta.droppedOutsideWardsSample = droppedSample;
 
   // タイル割当（bbox 重なる全タイルへ）
   const tileMap = new Map(); // "tx_tz" -> feature[]
@@ -194,10 +293,23 @@ async function main() {
   const outRoot = resolveProjectPath(args.out || path.join('data', 'processed', 'osaka-city'));
   const publicRoot = args.public ? path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city') : null;
 
+  // [P1-6F] 24区の陸域ポリゴン（feature の 24区外除外に使う）
+  let wardIndex = null;
+  if (args.wardFilter) {
+    const wpPath = resolveProjectPath(path.join('data', 'processed', 'osaka-city', 'boundaries', 'ward-classification-polygons.json'));
+    if (fs.existsSync(wpPath)) {
+      try { wardIndex = buildWardIndex(JSON.parse(fs.readFileSync(wpPath, 'utf-8').replace(/^﻿/, ''))); }
+      catch (e) { console.warn('  [warn] ward-classification-polygons.json 読込失敗、24区外フィルタ無効:', e.message); }
+    } else {
+      console.warn('  [warn] ward-classification-polygons.json が無いため 24区外フィルタ無効');
+    }
+  }
+
   const layers = args.layer === 'all' || !args.layer ? LAYERS : [args.layer];
   const results = {};
   console.log('=== 都市レイヤー tile 生成（大阪市24区）===');
   console.log(`tile grid: ${grid.tileSize}m / ${grid.cols}×${grid.rows} = ${grid.tileCount} tiles / buffer ${grid.buffer}m / znorth-neg-v1`);
+  console.log(`24区外フィルタ: ${wardIndex ? `有効（区ポリゴン ${wardIndex.length}）` : '無効'}` + (args.force ? ' / --force（旧 tile を削除して再生成）' : ''));
   for (const layer of layers) {
     const rawPath = args.raw || path.join('data', 'raw', 'osaka-city', `${layer}-osm.json`);
     if (!fs.existsSync(resolveProjectPath(rawPath))) {
@@ -205,10 +317,11 @@ async function main() {
       results[layer] = { skipped: true, rawPath };
       continue;
     }
-    const m = await buildOne(layer, rawPath, areaConfig, grid, outRoot, publicRoot);
+    const m = await buildOne(layer, rawPath, areaConfig, grid, outRoot, publicRoot, wardIndex, { force: args.force });
     results[layer] = m;
     const lm = m.layerMeta || {};
     console.log(`  [OK] ${layer}: feature ${m.featureCount} / tile ${m.tileCount} / entries ${m.featureTileEntries}` +
+      ` / 24区外除外 ${lm.droppedOutsideWards || 0}` +
       (layer === 'waterways' ? ` / unclosed ${lm.unclosedRelations} / 巨大seg除外 ${lm.oversizedDropped} / 自己交差除外 ${lm.selfIntersectionDropped}` : '') +
       (layer === 'railways' ? ` / line ${lm.lines} station ${lm.stations}` : ''));
   }

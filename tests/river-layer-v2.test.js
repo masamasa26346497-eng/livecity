@@ -44,7 +44,7 @@ test('[河川再導入] 主要7河川の実機承認後: 既定nameFilterは nul
 
 test('[河川再導入] validator ERROR が付いたriverは描画から除外する', () => {
   const startIdx = html.indexOf('const RiverLayerV2 = (function () {');
-  const body = html.slice(startIdx, startIdx + 6000);
+  const body = html.slice(startIdx, startIdx + 9000); // [Mission28] micro tier 追加で IIFE が伸びたため窓を拡大
   assert.ok(/if \(r\.validationErrors && r\.validationErrors\.length\) \{ skippedError\+\+; continue; \}/.test(body),
     'validationErrors を持つriverをスキップしていない');
 });

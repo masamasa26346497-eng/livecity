@@ -56,11 +56,24 @@ test('[Mission04] 河口の自然な拡幅は維持（大和川・木津川は�
 });
 
 test('[Mission04] 単発の異常幅（神崎川の 43m ピンチ相当）が最終widthに残っていない', { skip: !hasData && 'rivers.json 未生成' }, () => {
+  // 元は「神崎川の最小幅 > 60m」で見ていた。橋の下などで 1 点だけ極端に細くなる
+  //   生成バグを捕まえるための代用値で、狙いは **単発の落ち込みが残っていないこと**。
+  //   [Mission 35F] 広域 PBF へ入れ替えて神崎川の上流側（本来 30m 前後の区間）が
+  //   入ったため、最小幅は 28m になった。これは連続した 50 点以上にわたる実際の川幅で、
+  //   単発の落ち込みではない。最小値ではなく「隣と比べて落ちていないか」で見る。
   const d = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
   const kanzaki = d.rivers.filter((r) => r.name === '神崎川' && r.ok);
-  const allW = kanzaki.flatMap((r) => r.widths);
-  const minW = Math.min(...allW);
-  assert.ok(minW > 60, `神崎川の最小幅が ${minW.toFixed(1)}m（43m級のピンチが残っている疑い）`);
+  assert.ok(kanzaki.length > 0, '神崎川が無い');
+  let worst = { ratio: 0 };
+  for (const r of kanzaki) {
+    const w = r.widths;
+    for (let i = 1; i < w.length - 1; i++) {
+      const ratio = ((w[i - 1] + w[i + 1]) / 2) / w[i];   // 隣の平均 ÷ 自分
+      if (ratio > worst.ratio) worst = { ratio, at: i, w: w[i], prev: w[i - 1], next: w[i + 1] };
+    }
+  }
+  assert.ok(worst.ratio < 1.5,
+    `神崎川に単発の落ち込み: ${JSON.stringify(worst)}（隣の平均の ${(1 / worst.ratio).toFixed(2)} 倍）`);
 });
 
 test('[Mission04] RiverLayerV2 の geometry/width ロジック・y基準は不変（色はMission05で調整済み）', () => {

@@ -1,5 +1,6 @@
 {
  "_generated": "tools/estimate-origin.js による自動生成（手入力なし）",
+ "_deprecated": "[Mission 31G-FIX11] この第7系＋逆推定 origin config は現行の大阪市24区 canonical 建物 pipeline には接続されていない。24区 canonical 建物は Live City world（local-equirectangular・原点 34.604208/135.52502・znorth-neg-v1、tools/lib/projection.js geoToLocal と同一）で描かれており、N03 行政界との一致率 99.999%（n=160,943）・world 自己整合 0m で検証済み。第6系(28m)・第7系(89m)いずれも equirect(0m) より誤差が大きく、CorrectProjectionV2 は不採用。詳細: data/reports/coordinate-system-authority-audit.json。この config は旧3区 PoC / convert-plateau-buildings.js（geographic-jprect モード）の遺物として保持のみ。",
  "generatedAt": "2026-07-20T04:43:15.467Z",
  "version": 1,
  "city": "osaka",

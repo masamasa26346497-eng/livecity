@@ -1,22 +1,69 @@
 // tools/convert/roads.js
 // 道路レイヤー変換: Overpassの生データ -> RoadLayerが読み込む {highway, p} 形式。
+// [Mission23] 生活道路・細街路（*_link / living_street / unclassified / service / pedestrian / road）
+//   まで対象を拡張。私有 driveway / parking_aisle / access=private は classifyRoad で eligible:false と
+//   なるので除外する。access/service/bridge/tunnel/layer/oneway をフィーチャへ保持する。
 import { convertCoordsArray } from '../lib/projection.js';
+import { classifyRoad } from '../lib/road-network.js';
+
+/** 後方互換: roads 配列だけ返す。 */
+export function convertRoads(rawElements, projection, opts = {}) {
+  return convertRoadsWithReport(rawElements, projection, opts).roads;
+}
 
 /**
- * 生のOverpass要素配列から、RoadLayer互換のroads配列を生成する。
+ * 生のOverpass要素配列から、RoadLayer互換のroads配列 + 除外統計を返す。
+ * @param {object} [opts] { keepIneligible:false — true なら除外理由つきで全件返す（audit用） }
+ * @returns {{roads:object[], skippedIneligible:number, skipReasons:Record<string,number>, sourceWays:number}}
  */
-export function convertRoads(rawElements, projection) {
+export function convertRoadsWithReport(rawElements, projection, opts = {}) {
   const roads = [];
+  let sourceWays = 0;
+  let skippedIneligible = 0;
+  const skipReasons = {};
   for (const el of rawElements) {
     if (el.type !== 'way' || !el.geometry) continue;
     const highway = el.tags && el.tags.highway;
     if (!highway) continue;
+    sourceWays++;
     const coords = el.geometry.map((pt) => [pt.lon, pt.lat]);
     const p = convertCoordsArray(coords, projection);
     if (p.length < 2) continue;
-    roads.push({ highway, p });
+    const t = el.tags || {};
+    const cls = classifyRoad(t);
+    if (!cls.eligible && !opts.keepIneligible) {
+      skippedIneligible++;
+      const key = (cls.skipReason || 'other').split(':')[0];
+      skipReasons[key] = (skipReasons[key] || 0) + 1;
+      continue;
+    }
+    // [Mission03] 幅推定の優先順位: width → lanes×laneWidth → highway class default。
+    // [Mission23] access/service/bridge/tunnel/layer/oneway を保持（audit / 高架分類 / 私有除外）。
+    roads.push({
+      highway,
+      p,
+      name: t.name || '',
+      width: t.width != null ? t.width : null,
+      lanes: t.lanes != null ? t.lanes : null,
+      oneway: (t.oneway && t.oneway !== 'no') ? t.oneway : null,
+      access: t.access || null,
+      service: t.service || null,        // [Mission26] §4/§7 serviceType（alley / parking_aisle 等）
+      surface: t.surface || null,        // [Mission26] §7 路面（品質向上・幅推定用）
+      tracktype: t.tracktype || null,    // [Mission26] §6 track の等級
+      bridge: cls.bridge || undefined,
+      tunnel: cls.tunnel || undefined,
+      underground: cls.underground || undefined,
+      ultraLocal: cls.ultraLocal || undefined, // [Mission26] alley / track（超近景のみ表示候補）
+      layer: t.layer != null ? t.layer : null,
+      tier: cls.tier,
+      detail: cls.detail,
+      eligible: cls.eligible,
+      skipReason: cls.skipReason || null,
+      source: { type: 'way', id: el.id, name: t.name || '' },
+    });
   }
-  return mergeParallelDuplicates(roads);
+  const merged = mergeParallelDuplicates(roads);
+  return { roads: merged, skippedIneligible, skipReasons, sourceWays };
 }
 
 /**
@@ -59,13 +106,23 @@ function mergeParallelDuplicates(roads, distThreshold = 15) {
   }
 
   const majorTypes = new Set(['motorway', 'trunk', 'primary', 'secondary']);
-  for (let i = 0; i < n; i++) {
-    if (!majorTypes.has(roads[i].highway)) continue;
-    for (let j = i + 1; j < n; j++) {
+  // [Mission23] 細街路まで含めると n が数万に増える。並走統合の対象は major 種別のみなので、
+  //   まず bbox を前計算し、外側ループも major に限定、内側は bbox 非重なりを即棄却する。
+  const bb = roads.map((r) => {
+    let a = Infinity, b = -Infinity, c = Infinity, d = -Infinity;
+    for (const [x, z] of r.p) { if (x < a) a = x; if (x > b) b = x; if (z < c) c = z; if (z > d) d = z; }
+    return { a, b, c, d };
+  });
+  const majorIdx = [];
+  for (let i = 0; i < n; i++) if (majorTypes.has(roads[i].highway)) majorIdx.push(i);
+  for (let ii = 0; ii < majorIdx.length; ii++) {
+    const i = majorIdx[ii];
+    for (let jj = ii + 1; jj < majorIdx.length; jj++) {
+      const j = majorIdx[jj];
       if (roads[j].highway !== roads[i].highway) continue;
-      if (avgMinDist(roads[i], roads[j]) < distThreshold) {
-        union(i, j);
-      }
+      const bi = bb[i], bj = bb[j];
+      if (bi.b + distThreshold < bj.a || bj.b + distThreshold < bi.a || bi.d + distThreshold < bj.c || bj.d + distThreshold < bi.c) continue;
+      if (avgMinDist(roads[i], roads[j]) < distThreshold) union(i, j);
     }
   }
 

@@ -51,8 +51,10 @@ test('[Mission13] 実データ: railway tag 内訳と3クラス分類', () => {
 
 test('[Mission13] 実データ: 主要路線相当の geometry が存在（name 欠落でも表示できる）', () => {
   const { lines } = loadRail();
-  // name/operator は実データに無い → geometry と tag だけで扱えること
-  assert.equal(lines.filter((f) => f.name).length, 0, '実データに rail name は無い前提');
+  // [Mission24] rail way に路線名を保持するようになった（生データの 2/3 が name あり）。
+  //   ただし name が無くても geometry + tag + railClass だけで扱えること（下記の geometry チェック）。
+  assert.ok(lines.filter((f) => f.name).length > 1500, '路線名が保持されていない（Mission24）');
+  assert.ok(lines.some((f) => !f.name), 'name 無し way も存在（geometry のみで扱える前提の検証）');
   // 御堂筋線相当: 南北に長い subway 骨格 → 長い subway way が複数ある
   const longSubway = lines.filter((f) => f.railway === 'subway' && polylineLengthXZ(f.p) > 1000);
   assert.ok(longSubway.length >= 3, `長い subway way が少ない: ${longSubway.length}`);
@@ -137,7 +139,8 @@ test('[Mission13] 他ミッションの成果を壊していない', () => {
   assert.ok(/const MS_PARK_GREEN = 0xcfe3c7;/.test(html), '公園色');
   assert.ok(/const PARK_AREA_LARGE_M2 = 100000, PARK_AREA_MEDIUM_M2 = 10000;/.test(html), 'Mission12 公園 LOD');
   assert.ok(/const ROAD_RIBBON_COLOR = \{ major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 \};/.test(html), '道路 ribbon 色');
-  assert.ok(/const MS_BG_NEUTRAL = 0xf3f4f1;/.test(html), 'Mission17 背景');
+  // [Mission 33A] 背景は 0xf6f7f3 へ（明るい neutral のまま）
+  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景');
 });
 
 test('[Mission13] protected baseline fullward-v3.html は Mission13 の変更を含まない', () => {
@@ -145,7 +148,7 @@ test('[Mission13] protected baseline fullward-v3.html は Mission13 の変更を
   assert.ok(!/RAIL_COLORS|buildRailMeshes|railClassVisible|__RAIL_LOD_DEBUG__/.test(fw), 'fullward-v3.html に Mission13 の変更が混入');
 });
 
-test('[Mission13] production osaka_3d_buildings.html は Mission13 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission13 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/RAIL_COLORS|buildRailMeshes|__RAIL_LOD_DEBUG__/.test(prod), 'production HTML に Mission13 の変更が混入');
+  assert.ok(/RAIL_COLORS|buildRailMeshes|__RAIL_LOD_DEBUG__/.test(prod), 'production HTML に Mission13 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

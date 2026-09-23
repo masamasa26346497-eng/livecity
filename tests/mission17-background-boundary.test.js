@@ -116,7 +116,7 @@ test('protected baseline fullward-v3.html は Mission17 の変更を含まない
   assert.ok(!/background:#f3f4f1/.test(fw), 'fullward-v3.html の CSS 背景が変わった');
 });
 
-test('production osaka_3d_buildings.html は Mission17 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission17 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/MS_BG_NEUTRAL|__BACKGROUND_DEBUG__/.test(prod), 'production HTML に Mission17 の変更が混入');
+  assert.ok(/MS_BG_NEUTRAL|__BACKGROUND_DEBUG__/.test(prod), 'production HTML に Mission17 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

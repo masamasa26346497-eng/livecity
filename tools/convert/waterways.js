@@ -11,6 +11,7 @@
 // tools/lib/osm-multipolygon.js に集約している。
 import { convertCoordsArray } from '../lib/projection.js';
 import { assembleMultipolygon } from '../lib/osm-multipolygon.js';
+import { classifyWater } from '../lib/water-classify.js';
 
 function trimClosing(p) {
   return (p.length > 1 && p[0][0] === p[p.length - 1][0] && p[0][1] === p[p.length - 1][1])
@@ -40,18 +41,29 @@ export function convertWaterwaysWithReport(rawElements, projection) {
       if (tags.waterway === 'river') type = 'river';
       else if (tags.waterway === 'canal') type = 'canal';
       else if (tags.waterway === 'stream') type = 'stream';
+      else if (tags.waterway === 'drain') type = 'drain';   // [Mission22] surface な水路網
+      else if (tags.waterway === 'ditch') type = 'ditch';   // [Mission22]
       else if (tags.natural === 'water' || tags.water || tags.waterway === 'riverbank') type = 'water';
       else continue;
 
-      const isLine = type === 'river' || type === 'canal' || type === 'stream';
+      const isLine = type === 'river' || type === 'canal' || type === 'stream' || type === 'drain' || type === 'ditch';
       let p = convertCoordsArray(coords, projection);
+      const src = { type: 'way', id: el.id != null ? el.id : null, name: tags.name || '', tags: { ...tags } };
+      const waterClass = classifyWater(tags);
+      // [Mission22] 地表/地下判定と幅タグ。地下水路（暗渠・トンネル・layer<0・covered）は
+      //   surface:false として河川描画から外す（§14）。
+      const layerNum = Number(tags.layer);
+      const underground = tags.tunnel === 'culvert' || tags.tunnel === 'yes' || tags.tunnel === 'building_passage'
+        || tags.covered === 'yes' || (Number.isFinite(layerNum) && layerNum < 0);
+      const widthM = (() => { const w = parseFloat(tags.width); return Number.isFinite(w) && w > 0 && w < 400 ? w : null; })();
+      const extra = { waterwayTag: tags.waterway || null, surface: !underground, width: widthM, intermittent: tags.intermittent === 'yes' };
       if (isLine) {
         if (p.length < 2) continue;
-        items.push({ type, name: tags.name || '', kind: 'line', p });
+        items.push({ type, name: tags.name || '', kind: 'line', p, source: src, waterClass, ...extra });
       } else {
         p = trimClosing(p);
         if (p.length < 3) continue;
-        items.push({ type, name: tags.name || '', kind: 'area', p });
+        items.push({ type, name: tags.name || '', kind: 'area', p, source: src, waterClass, ...extra });
       }
       continue;
     }
@@ -60,6 +72,7 @@ export function convertWaterwaysWithReport(rawElements, projection) {
       const isWater = tags.natural === 'water' || tags.waterway === 'riverbank' || tags.water;
       if (!isWater) continue;
       const type = tags.waterway === 'riverbank' ? 'river' : 'water';
+      const waterClass = classifyWater(tags);
       const asm = assembleMultipolygon(el.members);
       for (const poly of asm.polygons) {
         const outer = trimClosing(convertCoordsArray(poly.outer, projection));
@@ -67,7 +80,15 @@ export function convertWaterwaysWithReport(rawElements, projection) {
         const holes = poly.holes
           .map((h) => trimClosing(convertCoordsArray(h, projection)))
           .filter((h) => h.length >= 3);
-        const rec = { type, name: tags.name || '', kind: 'area', p: outer };
+        const rec = {
+          type, name: tags.name || '', kind: 'area', p: outer, waterClass,
+          source: {
+            type: 'relation', id: el.id != null ? el.id : null, name: tags.name || '',
+            memberWayIds: poly.memberWayIds || [],
+            relationOuterWayCount: asm.stats.outerWays, relationOuterRingCount: asm.stats.outerRings,
+            tags: { ...tags },
+          },
+        };
         if (holes.length) rec.holes = holes;
         items.push(rec);
       }
@@ -75,7 +96,7 @@ export function convertWaterwaysWithReport(rawElements, projection) {
         unclosed.push({
           id: `relation/${el.id}`,
           name: tags.name || '',
-          fragments: asm.unclosed.map((f) => ({ role: f.role, points: f.points })),
+          fragments: asm.unclosed.map((f) => ({ role: f.role, points: f.points, wayIds: f.wayIds || [] })),
         });
       }
     }

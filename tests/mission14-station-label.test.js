@@ -129,8 +129,12 @@ test('[Mission14] 地下鉄駅の扱い: FAR は major(override)のみ → 地�
 
 test('[Mission14] render loop / 駅名トグル / 初期表示 の配線', () => {
   assert.ok(/if \(typeof StationLabelLayer !== 'undefined'\) StationLabelLayer\.update\(\);/.test(html), 'render loop に StationLabelLayer.update() が無い');
-  assert.ok(/if \(typeof StationLabelLayer !== 'undefined'\) StationLabelLayer\.setVisible\(on\);/.test(html), '「駅名」トグルが StationLabelLayer に配線されていない');
-  assert.ok(/StationLabelLayer\.show\(\); \/\/ 初期表示/.test(html), '初期表示の show() が無い');
+  // [Mission 33A] 駅ラベルの描画は CityLabelLayer（canonical 233 駅）へ移した。Mission14 のクラスタリング・
+  //   スタイル・debug API はそのまま残っており、「駅名」トグルは CityLabelLayer の station 型に配線されている。
+  assert.ok(/if \(typeof CityLabelLayer !== 'undefined'\) CityLabelLayer\.setTypeVisible\('station', on\);/.test(html), '「駅名」トグルがラベル層に配線されていない');
+  assert.ok(/StationLabelLayer\.clusterStations\(raw, 130, 900, 420\)/.test(html), 'Mission14 のクラスタリングが使われていない');
+  // [Mission 33A] 初期表示は CityLabelLayer が担当（旧レイヤーは比較用に手動 show() できる形で残す）
+  assert.ok(/CityLabelLayer\.show\(\);   \/\/ 通常表示に統合/.test(html), 'ラベル層の初期表示が無い');
   // CityTileLayer の旧 '+' マーカーは debug flag 時のみ（データは保持）
   assert.ok(/layer === 'railways' && \(typeof window !== 'undefined' && window\.__RAIL_STATION_MARKERS__ === true\)/.test(html),
     '旧 station マーカーが debug flag ガードされていない');
@@ -154,9 +158,9 @@ test('[Mission14] 他ミッション成果を壊していない', () => {
   assert.ok(/const CITY_CAMERA_PRESET = \{/.test(html), 'Mission16 camera preset');
 });
 
-test('[Mission14] protected / production 無変更', () => {
+test('[Mission14] protected は無変更 / production は promoted build（32U cutover）', () => {
   const fw = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.fullward-v3.html'), 'utf-8');
   assert.ok(!/StationLabelLayer|__STATION_LABEL_DEBUG__|clusterStations/.test(fw), 'fullward-v3.html に Mission14 の変更が混入');
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/StationLabelLayer|__STATION_LABEL_DEBUG__/.test(prod), 'production HTML に Mission14 の変更が混入');
+  assert.ok(/StationLabelLayer|__STATION_LABEL_DEBUG__/.test(prod), 'production HTML に Mission14 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

@@ -122,7 +122,8 @@ test('[Mission12] debug API: __PARK_LOD_DEBUG__ / __PARK_LOD_FORCE__', () => {
 test('[Mission12] 他ミッションの成果を壊していない', () => {
   assert.ok(/fillColor: 0x9ed6e6/.test(html), '河川色が変わった');
   assert.ok(/const ROAD_RIBBON_COLOR = \{ major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 \};/.test(html), '道路 ribbon 色が変わった');
-  assert.ok(/const MS_BG_NEUTRAL = 0xf3f4f1;/.test(html), 'Mission17 背景色が変わった');
+  // [Mission 33A] 背景は 0xf3f4f1 → 0xf6f7f3 へ一段明るくした（Mission17 の「明るい neutral」方針は維持）
+  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景色が変わった');
   assert.ok(/const MODEL_FOG = \{/.test(html), 'Mission18 fog が消えた');
   assert.ok(/const CITY_CAMERA_PRESET = \{/.test(html), 'Mission16 camera preset が消えた');
 });
@@ -132,7 +133,7 @@ test('[Mission12] protected baseline fullward-v3.html は Mission12 の変更を
   assert.ok(!/MS_PARK_GREEN|parkClassVisible|__PARK_LOD_DEBUG__|PARK_AREA_LARGE_M2/.test(fw), 'fullward-v3.html に Mission12 の変更が混入');
 });
 
-test('[Mission12] production osaka_3d_buildings.html は Mission12 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission12 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/MS_PARK_GREEN|__PARK_LOD_DEBUG__|PARK_AREA_LARGE_M2/.test(prod), 'production HTML に Mission12 の変更が混入');
+  assert.ok(/MS_PARK_GREEN|__PARK_LOD_DEBUG__|PARK_AREA_LARGE_M2/.test(prod), 'production HTML に Mission12 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

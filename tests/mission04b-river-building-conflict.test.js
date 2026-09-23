@@ -13,9 +13,10 @@ const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildin
 const hasData = fs.existsSync(DATA);
 const MAJORS = new Set(['淀川', '大和川', '神崎川', '安治川', '木津川', '寝屋川', '道頓堀川']);
 
-test('[Mission04-B] rivers.json: 各riverに riverClass(major/minor) が付く', { skip: !hasData && 'no data' }, () => {
+test('[Mission04-B] rivers.json: 各riverに riverClass(major/medium/minor/micro) が付く', { skip: !hasData && 'no data' }, () => {
   const d = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
-  for (const r of d.rivers) assert.ok(r.riverClass === 'major' || r.riverClass === 'minor', `${r.name || r.id}: riverClass=${r.riverClass}`);
+  // [Mission22] 3 階級 → [Mission28] micro 追加で 4 階級
+  for (const r of d.rivers) assert.ok(['major', 'medium', 'minor', 'micro'].includes(r.riverClass), `${r.name || r.id}: riverClass=${r.riverClass}`);
   // 7河川はすべて major
   for (const r of d.rivers) if (MAJORS.has(r.name)) assert.equal(r.riverClass, 'major', `${r.name} が major でない`);
 });
@@ -56,8 +57,10 @@ test('[Mission04-B] HTML: build() が suppressed river をスキップする', (
   assert.ok(/if \(r\.suppressed\) \{ skippedSuppressed\+\+; continue; \}/.test(html), 'build() が suppressed をスキップしていない');
 });
 
-test('[Mission04-B] HTML: riverClass で major/minor を分ける（無い旧データは幅/名前でfallback）', () => {
-  assert.ok(/const isMajor = r\.riverClass \? \(r\.riverClass === 'major'\)/.test(html), 'riverClass 優先の分類になっていない');
+test('[Mission04-B] HTML: riverClass で major/medium/minor/micro を分ける（無い旧データは幅/名前でfallback）', () => {
+  // [Mission22] 3 階級 → [Mission28] micro tier 分岐
+  assert.ok(/const tier = r\.riverClass \|\| \(\(Number\.isFinite\(r\.width\) && r\.width >= MAJOR_WIDTH_M\)/.test(html), 'tier 優先の分類になっていない');
+  assert.ok(/tier === 'major' \? majorPos : tier === 'medium' \? mediumPos : tier === 'micro' \? microPos : minorPos/.test(html), 'micro バケットが無い');
 });
 
 test('[Mission04-B] HTML: minor LOD 抑制強化（MINOR_HIDE_DISTANCE_M=4500・中景fade）', () => {

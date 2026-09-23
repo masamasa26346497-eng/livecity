@@ -52,7 +52,10 @@ test('[Mission16] azimuth は北向き（既存「北向き」方針を維持）
 
 test('[Mission16] FOV は City Mode 中のみ preset へ（Ward は WARD_FOV=60、change-only、自動復帰）', () => {
   assert.ok(CITY_CAMERA_PRESET.fov >= 40 && CITY_CAMERA_PRESET.fov <= 55, `city fov=${CITY_CAMERA_PRESET.fov}`);
-  assert.ok(/const wantFov = cityActive \? CITY_CAMERA_PRESET\.fov : WARD_FOV;/.test(html), 'camUpd の fov 切替が無い');
+  // [Mission 31G-FIX25] Ward側は WARD_FOV 固定から CAMERA_MODE_FOV[cameraMode] 経由へ拡張されたが、
+  //   既定 cameraMode='current' では CAMERA_MODE_FOV.current === WARD_FOV のため実質的な挙動は不変。
+  assert.ok(/const wantFov = cityActive \? CITY_CAMERA_PRESET\.fov : \(CAMERA_MODE_FOV\[cameraMode\] \|\| WARD_FOV\);/.test(html), 'camUpd の fov 切替が無い');
+  assert.ok(/current: WARD_FOV,/.test(html), 'CAMERA_MODE_FOV.current が WARD_FOV でない');
   assert.ok(/if \(Math\.abs\(camera\.fov - wantFov\) > 0\.01\) \{ camera\.fov = wantFov; camera\.updateProjectionMatrix\(\); \}/.test(html),
     'fov 切替が change-only になっていない');
 });
@@ -195,7 +198,7 @@ test('protected baseline fullward-v3.html は Mission16 の変更を含まない
   assert.ok(!/CITY_CAMERA_PRESET|__CITY_CAMERA_DEBUG__|cityFitSnapshot|WARD_FOV/.test(fw), 'fullward-v3.html に Mission16 の変更が混入');
 });
 
-test('production osaka_3d_buildings.html は Mission16 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission16 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/CITY_CAMERA_PRESET|__CITY_CAMERA_DEBUG__/.test(prod), 'production HTML に Mission16 の変更が混入');
+  assert.ok(/CITY_CAMERA_PRESET|__CITY_CAMERA_DEBUG__/.test(prod), 'production HTML に Mission16 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

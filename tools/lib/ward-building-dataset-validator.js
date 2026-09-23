@@ -55,8 +55,12 @@ export function validateWardBuildingDatasets(datasetRoot, ctx = {}) {
   const layout = root.layout === 'flat' ? 'flat' : 'nested';
   const dirNameOf = (d) => (layout === 'flat' ? d.id : d.wardId);
 
+  // [Mission21B] 区に紐づかない補助 dataset（osaka-osm-fallback 等）は区検証の対象外。
+  //   専用の検証は tools/validate/building-coverage.js が担当する。
+  const wardDatasets = (root.datasets || []).filter((d) => d && d.wardId && d.kind !== 'osm-fallback');
+
   // ── 全区 dataset 存在（registry の全区。実 registry では 24） ──
-  const dsWardIds = new Set((root.datasets || []).map((d) => d.wardId));
+  const dsWardIds = new Set(wardDatasets.map((d) => d.wardId));
   const expectedCount = (registry.wards || []).length;
   const missing = (registry.wards || []).filter((w) => !dsWardIds.has(w.id)).map((w) => w.name);
   checks.push(check('all-datasets-present', missing.length === 0 && dsWardIds.size === expectedCount,
@@ -108,7 +112,7 @@ export function validateWardBuildingDatasets(datasetRoot, ctx = {}) {
     return { count, tiles };
   };
 
-  for (const d of (root.datasets || [])) {
+  for (const d of wardDatasets) {
     const dir = path.join(datasetRoot, dirNameOf(d));
     if (!fs.existsSync(path.join(dir, 'manifest.json'))) {
       checks.push(check('ward-manifest', false, `${dirNameOf(d)}/manifest.json が無い`));

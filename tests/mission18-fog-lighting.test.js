@@ -149,7 +149,8 @@ test('[Mission18] window.__FOG_LIGHT_DEBUG__ が必要フィールドを返す',
 });
 
 test('[Mission18] Mission17 / drawCalls に影響なし', () => {
-  assert.ok(/const MS_BG_NEUTRAL = 0xf3f4f1;/.test(html), 'Mission17 背景色が変わった');
+  // [Mission 33A] 背景は 0xf6f7f3 へ（明るい neutral のまま）
+  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景色が変わった');
   assert.ok(/GROUND_VISUAL_STYLE\.colorReal = MODEL_STYLE\.on \? MS_BG_NEUTRAL/.test(html), 'Mission17 地表色が変わった');
   assert.ok(/drawCalls: 1,/.test(html), 'GroundVisualLayer の Draw Call が変わった');
 });
@@ -159,7 +160,7 @@ test('protected baseline fullward-v3.html は Mission18 の変更を含まない
   assert.ok(!/MODEL_FOG|modelDayFogRange|__FOG_LIGHT_DEBUG__|isModelDayFog/.test(fw), 'fullward-v3.html に Mission18 の変更が混入');
 });
 
-test('production osaka_3d_buildings.html は Mission18 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission18 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/MODEL_FOG|modelDayFogRange|__FOG_LIGHT_DEBUG__/.test(prod), 'production HTML に Mission18 の変更が混入');
+  assert.ok(/MODEL_FOG|modelDayFogRange|__FOG_LIGHT_DEBUG__/.test(prod), 'production HTML に Mission18 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

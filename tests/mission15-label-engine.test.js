@@ -147,9 +147,9 @@ test('[Mission15] 他ミッション成果を壊していない', () => {
   assert.ok(/window\.__STATION_LABEL_DEBUG__/.test(html), 'Mission14 駅 debug API');
 });
 
-test('[Mission15] protected / production 無変更', () => {
+test('[Mission15] protected は無変更 / production は promoted build（32U cutover）', () => {
   const fw = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.fullward-v3.html'), 'utf-8');
   assert.ok(!/LabelEngine|__LABEL_DEBUG__|collectCandidates/.test(fw), 'fullward-v3.html に Mission15 の変更が混入');
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/LabelEngine|__LABEL_DEBUG__/.test(prod), 'production HTML に Mission15 の変更が混入');
+  assert.ok(/LabelEngine|__LABEL_DEBUG__/.test(prod), 'production HTML に Mission15 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

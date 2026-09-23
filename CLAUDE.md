@@ -28,7 +28,9 @@ Live City本体は単一の静的HTML（`public/osaka_3d_buildings.html`、3800�
 ## コマンド一覧（package.json実測）
 
 ```bash
-npm install   # 外部パッケージ依存ゼロ（dependencies/devDependenciesとも空。Node.js 18+組み込み機能のみ）
+npm install   # 依存は osm-pbf-parser の1件のみ（P1-6B。OSM PBF ローカルimport専用。
+              # tools/import/osm-pbf-city.js だけが tools/lib/osm-pbf-stream.js 経由で遅延読み込みする。
+              # 他の全ツール・npm test は Node.js 18+ 組み込み機能のみで動作し、この依存を必要としない）
 npm test      # 9本のtestファイルをnode --testで実行（後述「テストスイートの注意点」を参照）
 
 # データセット一覧・取得元の到達確認

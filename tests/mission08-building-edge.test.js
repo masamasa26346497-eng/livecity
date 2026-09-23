@@ -99,7 +99,11 @@ test('[Mission08] 遅延ロードタイルの新規エッジを現バンドへ�
 
 test('[Mission08] CityBuildingLOD にはエッジを足さない（Mission01の軽量方針維持）', () => {
   const startIdx = html.indexOf('const CityBuildingLOD = (function () {');
-  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats, HIDE_NEAR_M };', startIdx);
+  assert.ok(startIdx >= 0, 'CityBuildingLOD 定義が見つからない');
+  // 完全一致の return 文字列は後続ミッション（Mission24/25/27 等）で戻り値フィールドが増えるたびに
+  // 追随が必要で壊れやすいため、安定した prefix のみで終端を特定する（末尾フィールド増減に強くする）。
+  const endIdx = html.indexOf('return { build, setCameraDistance, setVisible, getStats,', startIdx);
+  assert.ok(endIdx > startIdx, 'CityBuildingLOD の return 文が見つからない（endIdx が -1 のまま検索範囲がファイル末尾まで暴走するのを防ぐ）');
   const body = html.slice(startIdx, endIdx);
   assert.ok(!/LineSegments|EdgesGeometry|bldgEdges|BUILDING_EDGE_LOD/.test(body),
     'CityBuildingLOD にエッジ関連コードが混入');
@@ -140,7 +144,7 @@ test('protected baseline fullward-v3.html は Mission08 の変更を含まない
   assert.ok(!/BUILDING_EDGE_LOD|__BUILDING_EDGE_DEBUG__/.test(fw), 'fullward-v3.html に Mission08 の変更が混入');
 });
 
-test('production osaka_3d_buildings.html は Mission08 の変更を含まない', () => {
+test('[Mission 32U] production osaka_3d_buildings.html は promoted build（Mission08 を含む）', () => {
   const prod = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.html'), 'utf-8');
-  assert.ok(!/BUILDING_EDGE_LOD/.test(prod), 'production HTML に Mission08 の変更が混入');
+  assert.ok(/BUILDING_EDGE_LOD/.test(prod), 'production HTML に Mission08 の内容が無い（32U cutover 後の production は ward-ux-v1 から生成した promoted build）');
 });

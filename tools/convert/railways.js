@@ -9,7 +9,9 @@ export function convertRailways(rawElements, projection) {
     if (el.type === 'way' && el.geometry && el.tags && el.tags.railway) {
       const coords = el.geometry.map((pt) => [pt.lon, pt.lat]);
       const p = convertCoordsArray(coords, projection);
-      if (p.length >= 2) lines.push({ railway: el.tags.railway, p });
+      // [Mission24] 路線名を保持する（生データの 2/3 の way が name を持つ。従来は落としていた）。
+      //   main line の断片（ヤード渡り線等）を LOD 分類で救済する材料にもなる。
+      if (p.length >= 2) lines.push({ railway: el.tags.railway, name: el.tags['name:ja'] || el.tags.name || '', p });
     } else if (el.tags && el.tags.railway === 'station') {
       const name = el.tags['name:ja'] || el.tags.name || '';
       let lat, lon;
