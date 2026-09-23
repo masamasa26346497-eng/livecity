@@ -1,0 +1,27 @@
+name: Mission 35L CI
+
+on:
+  push:
+    branches:
+      - feature/mission-35l-town-boundaries
+  pull_request:
+    branches:
+      - feature/ward-expansion-20260817
+
+jobs:
+  mission35l:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Mission 35L unit tests
+        run: node --test tests/mission35l-town-boundaries.test.js
+      - name: Existing boundary regression tests
+        run: node --test tests/boundary-master.test.js tests/boundary-ingestion-validator.test.js tests/station-town-navigation.test.js
+      - name: Full test suite
+        run: npm test
