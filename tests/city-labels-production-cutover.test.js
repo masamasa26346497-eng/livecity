@@ -9,6 +9,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { PALETTE_33A, LABEL_RULES_33A } from '../tools/validate/city-labels-production-cutover.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] cutover の記録 / baseline hash はコミットされないので、無いときだけ skip
+const CUTOVER_SKIP = skipIfMissingRel('data/reports/production-cutover-build.json', 'data/reports/baselines');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROD = path.join(ROOT, 'public', 'osaka_3d_buildings.html');
@@ -20,7 +23,7 @@ const rpt = (n) => rj(path.join(ROOT, 'data', 'reports', n));
 const skip = (n) => (!rpt(n) && 'no report');
 const sha = (p) => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 
-test('[33B §1/§2] production は dev から生成したビルド成果物（profile だけが違う）', () => {
+test('[33B §1/§2] production は dev から生成したビルド成果物（profile だけが違う）', { skip: CUTOVER_SKIP }, () => {
   const build = rpt('production-cutover-build.json');
   assert.ok(build && build.productionSha256, 'ビルド記録が無い');
   assert.equal(sha(PROD), build.productionSha256);
@@ -70,7 +73,7 @@ test('[33B §12] production では開発用 UI が隠れ、通常 UI は残る',
   assert.match(prod, /\{ key: 'landmarkLabels', label: '施設名', checked: true \}/);
 });
 
-test('[33B §24] protected は不変', () => {
+test('[33B §24] protected は不変', { skip: CUTOVER_SKIP }, () => {
   const baseline = rpt('baselines/prod-protected-hashes.json');
   assert.ok(baseline && baseline.prot);
   assert.equal(sha(PROT), baseline.prot);

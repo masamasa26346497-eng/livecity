@@ -11,6 +11,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { classifyParkArea, polygonAreaWithHoles } from '../tools/lib/park-lod.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
+const TILE_SKIP = skipIfMissingRel('public/map-data/osaka-city/parks');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const PARKS_DIR = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'parks');
@@ -34,7 +37,7 @@ test('[Mission12] ward-ux-v1.html: インライン <script> の JS 構文が壊�
   try { execFileSync('node', ['--check', f], { stdio: 'pipe' }); } finally { try { fs.unlinkSync(f); } catch { /* noop */ } }
 });
 
-test('[Mission12] 実データ: 公園 area feature 数と面積3分類', () => {
+test('[Mission12] 実データ: 公園 area feature 数と面積3分類', { skip: TILE_SKIP }, () => {
   const feats = loadParkFeatures();
   assert.ok(feats.length > 2000, `公園 feature が少なすぎる: ${feats.length}`);
   const c = { large: 0, medium: 0, small: 0 };
@@ -45,7 +48,7 @@ test('[Mission12] 実データ: 公園 area feature 数と面積3分類', () => 
   assert.ok(c.small / feats.length > 0.85, `SMALL 比率=${(c.small / feats.length).toFixed(2)}（街区公園がノイズ源）`);
 });
 
-test('[Mission12] 実データ: 主要大公園が面積classificationで large になる（名前一致に依存しない）', () => {
+test('[Mission12] 実データ: 主要大公園が面積classificationで large になる（名前一致に依存しない）', { skip: TILE_SKIP }, () => {
   const feats = loadParkFeatures();
   const byName = (kw) => feats.filter((f) => f.name && f.name.includes(kw))
     .map((f) => ({ name: f.name, area: polygonAreaWithHoles(f.p, f.holes), cls: classifyParkArea(polygonAreaWithHoles(f.p, f.holes)) }))

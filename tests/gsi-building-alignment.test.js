@@ -7,6 +7,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInlineScript } from './_ward-ux-v1-smoke-harness.cjs';
 import { CANONICAL_ROAD_FEATURE_COUNT, REFINED_ROAD_SURFACE_INDEXED_COUNT } from "../tools/lib/canonical-baseline.js";
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
+const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json', 'data/processed/osaka-city/canonical/roads/manifest.json', 'data/processed/osaka-city/derived/refined-road-surface.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -45,7 +48,7 @@ test('[FIX20 §1] raw data が無い現状では正直に GSI_BUILDING_OUTLINE_R
   assert.equal(j.outlineCount, 0);
 });
 
-test('[FIX20 §29] canonical building / road は完全不変（今回615,617棟を書き換えていない）', () => {
+test('[FIX20 §29] canonical building / road は完全不変（今回615,617棟を書き換えていない）', { skip: CANONICAL_SKIP }, () => {
   const bm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'));
   assert.equal(bm.featureCount, 615617);
   const rm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'roads', 'manifest.json'));
@@ -165,7 +168,7 @@ test('[FIX21 §27] 実データで [Building Alignment] runtime overlay が実�
   assert.ok(d.stats && d.stats.matching, 'stats（HIGH/MED/LOW/Unmatched）が読み込まれていない');
 });
 
-test('[FIX21 §36] source protection: canonical building/road/FIX13 refined が完全不変', () => {
+test('[FIX21 §36] source protection: canonical building/road/FIX13 refined が完全不変', { skip: CANONICAL_SKIP }, () => {
   const bm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'));
   assert.equal(bm.featureCount, 615617);
   const rm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'roads', 'manifest.json'));

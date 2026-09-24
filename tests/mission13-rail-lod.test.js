@@ -11,6 +11,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { classifyRail, polylineLengthXZ, countByRailClass } from '../tools/lib/rail-lod.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
+const TILE_SKIP = skipIfMissingRel('public/map-data/osaka-city/railways');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const RAIL_DIR = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'railways');
@@ -34,7 +37,7 @@ test('[Mission13] ward-ux-v1.html: インライン <script> の JS 構文が壊�
   try { execFileSync('node', ['--check', f], { stdio: 'pipe' }); } finally { try { fs.unlinkSync(f); } catch { /* noop */ } }
 });
 
-test('[Mission13] 実データ: railway tag 内訳と3クラス分類', () => {
+test('[Mission13] 実データ: railway tag 内訳と3クラス分類', { skip: TILE_SKIP }, () => {
   const { lines } = loadRail();
   assert.ok(lines.length > 2000, `line feature が少なすぎる: ${lines.length}`);
   const byTag = {};
@@ -49,7 +52,7 @@ test('[Mission13] 実データ: railway tag 内訳と3クラス分類', () => {
   assert.ok(c.major > 800 && c.major < byTag.rail, `MAJOR=${c.major}（rail の一部＝本線骨格）`);
 });
 
-test('[Mission13] 実データ: 主要路線相当の geometry が存在（name 欠落でも表示できる）', () => {
+test('[Mission13] 実データ: 主要路線相当の geometry が存在（name 欠落でも表示できる）', { skip: TILE_SKIP }, () => {
   const { lines } = loadRail();
   // [Mission24] rail way に路線名を保持するようになった（生データの 2/3 が name あり）。
   //   ただし name が無くても geometry + tag + railClass だけで扱えること（下記の geometry チェック）。
@@ -63,7 +66,7 @@ test('[Mission13] 実データ: 主要路線相当の geometry が存在（name 
   assert.ok(centralRail.length > 50, `中心部の rail feature が少ない: ${centralRail.length}`);
 });
 
-test('[Mission13] 実データ: station node 233件前後・全件 name 付き（Mission 14 用に保持）', () => {
+test('[Mission13] 実データ: station node 233件前後・全件 name 付き（Mission 14 用に保持）', { skip: TILE_SKIP }, () => {
   const { stations } = loadRail();
   assert.ok(stations.length >= 200 && stations.length <= 300, `station 数=${stations.length}`);
   assert.equal(stations.filter((s) => s.name).length, stations.length, '全 station に name');

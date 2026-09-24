@@ -6,6 +6,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CANONICAL_ROAD_FEATURE_COUNT, REFINED_ROAD_SURFACE_INDEXED_COUNT } from "../tools/lib/canonical-baseline.js";
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
+const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json', 'data/processed/osaka-city/canonical/roads/manifest.json', 'data/processed/osaka-city/derived/refined-road-surface.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -86,7 +89,7 @@ test('[FIX19 §24] residential 4地区（住吉/阿倍野/平野/十三）で re
   }
 });
 
-test('[FIX19 §37] canonical / building / FIX13 は完全不変', () => {
+test('[FIX19 §37] canonical / building / FIX13 は完全不変', { skip: CANONICAL_SKIP }, () => {
   const bm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'));
   assert.equal(bm.featureCount, 615617);
   const rm = rj(R('data', 'processed', 'osaka-city', 'canonical', 'roads', 'manifest.json'));

@@ -7,6 +7,9 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] cutover の記録 / baseline hash はコミットされないので、無いときだけ skip
+const BASELINE_SKIP = skipIfMissingRel('data/reports/baselines');
 
 const require_ = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -91,7 +94,7 @@ test('[32Q §6-§8] property card: 固定の「南港南エリア」を出さず
   assert.equal(f(null), null);
 });
 
-test('[32Q §10-§13] SUPPRESS 2 棟: 個別確認の根拠を残し、placement 全体は再生成しない', () => {
+test('[32Q §10-§13] SUPPRESS 2 棟: 個別確認の根拠を残し、placement 全体は再生成しない', { skip: BASELINE_SKIP }, () => {
   const ov = rj(path.join(ROOT, 'data', 'processed', 'osaka-city', 'v2-final', 'placement-overrides.json'));
   assert.ok(ov);
   assert.equal(ov.overrides.length, 2);

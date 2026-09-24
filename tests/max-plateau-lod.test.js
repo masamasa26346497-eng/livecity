@@ -18,6 +18,11 @@ import {
 import { POSITION_TOLERANCE_M, LOD_BANDS } from '../tools/validate/max-plateau-lod.js';
 import { latLonToLiveCityWorld } from '../tools/lib/livecity-coordinate-system.js';
 import { productionMatchesBuildRecord, devUiIsGated } from '../tools/lib/production-invariants.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] cutover の記録 / baseline hash はコミットされないので、無いときだけ skip
+const BASELINE_SKIP = skipIfMissingRel('data/reports/baselines');
+// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
+const HD_SKIP = skipIfMissingRel('public/map-data/osaka-city/derived-v2-osmv2/building-lod-high');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEV = path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html');
@@ -160,7 +165,7 @@ test('[34A §5] 壊れた高 LOD は採用しない（building 単位の fallbac
   assert.ok(VALID.maxCentroidShiftM <= 30);
 });
 
-test('[34A §12] 出力の namespace と宣言', () => {
+test('[34A §12] 出力の namespace と宣言', { skip: HD_SKIP }, () => {
   assert.ok(manifest, 'building-lod-high の manifest が無い');
   assert.equal(manifest.kind, 'building-lod-high');
   assert.equal(manifest.namespace, 'derived-v2-osmv2');
@@ -171,7 +176,7 @@ test('[34A §12] 出力の namespace と宣言', () => {
   assert.ok(manifest.tiles.length > 0);
 });
 
-test('[34A §11] 高 LOD は canonicalId に紐づく別表現（ID を作り替えない）', () => {
+test('[34A §11] 高 LOD は canonicalId に紐づく別表現（ID を作り替えない）', { skip: HD_SKIP }, () => {
   const dir = path.join(ROOT, 'public', 'map-data', 'osaka-city', 'derived-v2-osmv2', 'building-lod-high');
   const files = fs.readdirSync(dir).filter((f) => /^tile_/.test(f)).slice(0, 4);
   let n = 0;
@@ -330,7 +335,7 @@ test('[34A §24] validator が PASS', { skip: skip('max-plateau-lod-validation.j
   assert.equal(v.protectedModified, false);
 });
 
-test('[34A] production / protected は変更していない', () => {
+test('[34A] production / protected は変更していない', { skip: BASELINE_SKIP }, () => {
   const build = rpt('production-cutover-build.json');
   assert.ok(build && build.productionSha256);
   assert.equal(sha(PROD), build.productionSha256);

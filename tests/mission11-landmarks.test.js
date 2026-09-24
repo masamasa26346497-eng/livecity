@@ -11,6 +11,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { LANDMARK_SEED, LANDMARK_CATEGORIES } from '../tools/lib/landmark-registry.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
+const DATA_SKIP = skipIfMissingRel('public/map-data/osaka-city/landmarks/landmarks.json');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const DATA = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'landmarks', 'landmarks.json');
@@ -115,7 +118,7 @@ test('[Mission11] protected HTML に変更が混入していない（production 
   }
 });
 
-test('[Mission11] 配信データ landmarks.json: 健全性', () => {
+test('[Mission11] 配信データ landmarks.json: 健全性', { skip: DATA_SKIP }, () => {
   assert.ok(fs.existsSync(DATA), 'landmarks.json が無い（node tools/build-landmark-registry.js）');
   const doc = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
   assert.equal(doc.coordinateConvention, 'znorth-neg-v1');

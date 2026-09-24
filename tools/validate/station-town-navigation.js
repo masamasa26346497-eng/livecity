@@ -33,8 +33,19 @@ export const BUILDING_COUNT = 618749;
 export const FPS_DROP_BUDGET_PCT = 5;
 /** §31 dev だけに出す操作。 */
 export const DEV_ONLY_IDS = ['stations-toggle', 'town-click-toggle', 'town-boundary-toggle'];
-/** §12 町丁目の境界データがある区（これ以外は区界へ落とす）。 */
+/**
+ * §12 35K 時点で町丁目の境界データがあった区。
+ * HTML に埋まっている legacy の TOWN_POLYGONS は今もこの 3 区ぶんだけ（35L でも触っていない）。
+ */
 export const TOWN_BOUNDARY_WARDS = ['住吉区', '東住吉区', '平野区'];
+/**
+ * [Mission 35L] 配信する境界の出所として認めるもの。
+ *   estat-census-2020-official … e-Stat 令和2年国勢調査 小地域（町丁・字等）境界（24 区・公式）
+ *   legacy-unverified          … 35K までの出所未確認の町丁目（残してよいが増やさない）
+ *   n03-official               … 国土数値情報の行政区域（町丁目が取れないときの区界 fallback）
+ * ここに無い出所が 1 件でもあれば「推測で作った境界」とみなす（§12 の本来の意図）。
+ */
+export const ALLOWED_BOUNDARY_SOURCES = ['estat-census-2020-official', 'legacy-unverified', 'n03-official'];
 
 const rj = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; } };
 const count = (p, k) => { const j = rj(p); return j ? (j[k] ?? j.featureCount ?? j.count ?? null) : null; };
@@ -121,11 +132,14 @@ export async function validateStationTownNavigation() {
   // ── §12 町丁目の境界は既存データのある区だけ ───────────────────────
   let townWardsOk = null, inventedBoundary = 0;
   if (ab) {
-    townWardsOk = JSON.stringify([...ab.townWards].sort()) === JSON.stringify([...TOWN_BOUNDARY_WARDS].sort());
-    if (!townWardsOk) errors.push('§12: 町丁目の境界を持つ区が変わっている ' + JSON.stringify(ab.townWards));
-    // 「推測で作った」境界が混ざっていないこと（出所は 2 種類だけ）
+    // [Mission 35L] 35K では町丁目があるのは 3 区だけだった。35L で e-Stat の公式境界を
+    //   入れたので 24 区へ増える。**減っていないこと**を見る（35K の区が落ちたら退行）。
+    const missingLegacy = TOWN_BOUNDARY_WARDS.filter((w) => !ab.townWards.includes(w));
+    townWardsOk = missingLegacy.length === 0;
+    if (!townWardsOk) errors.push('§12: 35K まであった区の町丁目が消えている ' + missingLegacy.join(','));
+    // 「推測で作った」境界が混ざっていないこと（出所は決めたものだけ）
     for (const a of ab.areas) {
-      if (a.boundarySource !== 'legacy-unverified' && a.boundarySource !== 'n03-official') inventedBoundary++;
+      if (!ALLOWED_BOUNDARY_SOURCES.includes(a.boundarySource)) inventedBoundary++;
     }
     if (inventedBoundary) errors.push('§12: 出所不明の境界が ' + inventedBoundary + ' 件');
   } else errors.push('§12: area-boundaries.json が無い');

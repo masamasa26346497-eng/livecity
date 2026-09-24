@@ -11,6 +11,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { clusterStations, classifyStationImportance } from '../tools/lib/station-cluster.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
+const TILE_SKIP = skipIfMissingRel('public/map-data/osaka-city/railways');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const RAIL_DIR = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'railways');
@@ -39,7 +42,7 @@ test('[Mission14] ward-ux-v1.html: インライン <script> の JS 構文が壊�
   try { execFileSync('node', ['--check', f], { stdio: 'pipe' }); } finally { try { fs.unlinkSync(f); } catch { /* noop */ } }
 });
 
-test('[Mission14] 実データ: 233 station → cluster 後は大幅減、MAJOR は 10〜25', () => {
+test('[Mission14] 実データ: 233 station → cluster 後は大幅減、MAJOR は 10〜25', { skip: TILE_SKIP }, () => {
   const { stations, lines } = loadRail();
   assert.ok(stations.length >= 200 && stations.length <= 260, `raw station=${stations.length}`);
   const clusters = clusterStations(stations, {});
@@ -51,7 +54,7 @@ test('[Mission14] 実データ: 233 station → cluster 後は大幅減、MAJOR 
   assert.ok(cnt.major + cnt.medium >= 30, `MID pool (major+medium)=${cnt.major + cnt.medium}`);
 });
 
-test('[Mission14] 実データ: 大阪・梅田 / なんば / 天王寺 が MAJOR で1ラベルに統合', () => {
+test('[Mission14] 実データ: 大阪・梅田 / なんば / 天王寺 が MAJOR で1ラベルに統合', { skip: TILE_SKIP }, () => {
   const { stations, lines } = loadRail();
   const clusters = clusterStations(stations, {});
   const near = nearbyOf(lines);
@@ -62,7 +65,7 @@ test('[Mission14] 実データ: 大阪・梅田 / なんば / 天王寺 が MAJO
   }
 });
 
-test('[Mission14] 実データ: 重複 canonical label は既知の別駅（中津/野江/平野/今里 等）のみ', () => {
+test('[Mission14] 実データ: 重複 canonical label は既知の別駅（中津/野江/平野/今里 等）のみ', { skip: TILE_SKIP }, () => {
   const { stations } = loadRail();
   const clusters = clusterStations(stations, {});
   const lc = {};
@@ -116,7 +119,7 @@ test('[Mission14] station y(0.5) > rail y(0.17)、駅点とラベルが対応（
   assert.ok(/for \(const k of \['major', 'medium', 'local'\]\) dotTex\[k\] = makeDotTexture/.test(html), 'dot テクスチャが tier 共有でない');
 });
 
-test('[Mission14] 地下鉄駅の扱い: FAR は major(override)のみ → 地下鉄単独駅は FAR で出ない', () => {
+test('[Mission14] 地下鉄駅の扱い: FAR は major(override)のみ → 地下鉄単独駅は FAR で出ない', { skip: TILE_SKIP }, () => {
   // subway 単独駅は group 無し → major にならない → FAR で lodVisible=false
   assert.ok(/if \(imp === 'medium'\) return b !== 'far';/.test(html), 'medium(地下鉄乗換含む) が FAR で表示される');
   // 実データ: 心斎橋/本町 等の主要地下鉄駅は override で major、昭和町等の単独駅は local/medium

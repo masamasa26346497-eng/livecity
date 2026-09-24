@@ -18,7 +18,7 @@ import {
   baseTownName, splitTownKey, bboxOfRings, bboxInfo, readTownPolygons,
 } from '../tools/build-area-boundaries.js';
 import {
-  BUILDING_COUNT, DEV_ONLY_IDS, TOWN_BOUNDARY_WARDS, FPS_DROP_BUDGET_PCT,
+  BUILDING_COUNT, DEV_ONLY_IDS, TOWN_BOUNDARY_WARDS, ALLOWED_BOUNDARY_SOURCES, FPS_DROP_BUDGET_PCT,
 } from '../tools/validate/station-town-navigation.js';
 import { STATION_SITES, TOWN_SITES, worldOf } from '../tools/audit/station-town-navigation-qa.js';
 import { devUiIsGated } from '../tools/lib/production-invariants.js';
@@ -174,15 +174,25 @@ test('35K TOWN_POLYGONS を HTML から読める（新しい座標は作らな�
 test('35K 実データ: 町丁目が無い区は区界へ落ちる（推測の町界は作らない）', () => {
   const ab = rj(M('derived', 'area-boundaries.json'));
   if (!ab) return;
-  assert.deepEqual([...ab.townWards].sort(), [...TOWN_BOUNDARY_WARDS].sort());
+  // [Mission 35L] 35K では町丁目が 3 区ぶんしか無く、残り 21 区は区界へ落としていた。
+  //   35L で e-Stat 令和2年国勢調査の公式境界を入れて 24 区へ広げた。
+  //   このテストの意図は「町丁目が 3 区しか無いこと」ではなく
+  //   **推測で作った境界を混ぜないこと**（§12）なので、そこを見る。
+  for (const w of TOWN_BOUNDARY_WARDS) {
+    assert.ok(ab.townWards.includes(w), w + ' の町丁目が消えている（35K からの退行）');
+  }
   assert.equal(ab.counts.wards, 24, '区界が 24 件でない');
-  // 出所は 2 種類だけ
-  const sources = new Set(ab.areas.map((a) => a.boundarySource));
-  assert.deepEqual([...sources].sort(), ['legacy-unverified', 'n03-official']);
-  // 町丁目は 3 区の区名しか持たない
+  // 出所は決めたものだけ（ここに無い出所＝推測で作った境界）
+  const sources = [...new Set(ab.areas.map((a) => a.boundarySource))].sort();
+  for (const src of sources) {
+    assert.ok(ALLOWED_BOUNDARY_SOURCES.includes(src), '出所不明の境界: ' + src);
+  }
+  // 町丁目を名乗るものは、必ず実在する区のもの
+  const wardNames = new Set(ab.areas.filter((a) => a.kind === 'ward').map((a) => a.wardName));
   for (const a of ab.areas) {
     if (a.boundaryGranularity !== 'chochome' && a.boundaryGranularity !== 'chochome-union') continue;
-    assert.ok(TOWN_BOUNDARY_WARDS.includes(a.wardName), a.wardName + ' の町丁目が作られている');
+    assert.ok(wardNames.has(a.wardName), a.wardName + ' は大阪市の区ではない');
+    assert.ok(a.boundarySource !== 'n03-official', a.wardName + a.name + ' が区界を町丁目と名乗っている');
   }
 });
 

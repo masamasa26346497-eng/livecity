@@ -83,6 +83,32 @@ export function featureToTown(feature, context) {
   };
 }
 
+/**
+ * [Mission 35L §8] e-Stat は 1 つの町丁目が飛び地に分かれている場合、
+ * **同じ KEY_CODE を持つ別レコード**として収録する（住之江区 南港南 = 4 レコード）。
+ * そのまま並べると id（town:KEY_CODE）が重複し、ラベルから範囲を引けなくなるうえ、
+ * クリックしても飛び地の 1 つしか選べない。KEY_CODE 単位でリングをまとめて 1 件にする。
+ * 形は足すだけで、新しい境界は作らない。
+ */
+export function mergeTownsByKeyCode(towns) {
+  const byKey = new Map();
+  for (const t of towns) {
+    const cur = byKey.get(t.keyCode);
+    if (!cur) { byKey.set(t.keyCode, { ...t, rings: [...t.rings], partCount: 1 }); continue; }
+    cur.rings.push(...t.rings);
+    cur.partCount++;
+  }
+  const merged = [];
+  for (const t of byKey.values()) {
+    if (t.partCount > 1) {
+      const bbox = bboxOfRings(t.rings);
+      Object.assign(t, { bbox, ...bboxInfo(bbox) });
+    }
+    merged.push(t);
+  }
+  return merged;
+}
+
 export function buildTownGroups(towns) {
   const byBase = new Map();
   for (const t of towns) {
@@ -128,16 +154,26 @@ function wardAreas(wardDoc) {
   }).filter((x) => x.rings.length && x.bbox);
 }
 
+/**
+ * [Mission 35L] 地名ラベル（OSM）と公式町丁目名の表記ゆれを吸収する。
+ *   - 「ヶ」と「ケ」: OSM は 照ヶ丘矢田 / e-Stat は 照ケ丘矢田。7 件がこれで引けなかった。
+ * ここでやるのは **突き合わせ用のキーを揃えること** だけで、表示名は元のまま変えない。
+ */
+export function normalizeTownKey(name) {
+  return String(name ?? '').trim().replace(/ヶ/g, 'ケ');
+}
+
 export function buildLabelMap({ places, towns, groups, wards }) {
   const wardById = new Map(wards.map((w) => [w.wardId, w]));
   const byExact = new Map();
   const byBase = new Map();
+  const K = (ward, name) => `${ward}|${normalizeTownKey(name)}`;
   for (const t of towns) {
-    byExact.set(`${t.wardName}|${t.name}`, t.id);
-    const k = `${t.wardName}|${t.baseName}`;
+    byExact.set(K(t.wardName, t.name), t.id);
+    const k = K(t.wardName, t.baseName);
     if (!byBase.has(k)) byBase.set(k, t.id);
   }
-  for (const g of groups) byBase.set(`${g.wardName}|${g.name}`, g.id);
+  for (const g of groups) byBase.set(K(g.wardName, g.name), g.id);
 
   const labelMap = {};
   let town = 0, ward = 0, unresolved = 0;
@@ -146,7 +182,14 @@ export function buildLabelMap({ places, towns, groups, wards }) {
     let wardId = p.wardId || null;
     if (!wardName && wardId && wardById.has(wardId)) wardName = wardById.get(wardId).wardName;
     if (!wardName) { unresolved++; continue; }
-    const areaId = byExact.get(`${wardName}|${p.name}`) || byBase.get(`${wardName}|${baseTownName(p.name)}`) || null;
+    // 1) そのままの名前 2) 「丁目」を落とした基準地名 3) ラベル名そのものを基準地名として
+    //   3) が要るのは、baseTownName が「十八条」「九条」の **末尾の「条」を丁目の数え方**と
+    //   みなして削ってしまうため（十八条→"" / 西九条→"西"）。地名側は既に基準地名なので、
+    //   そのまま基準地名の表として引く。baseTownName 自体は 35K の束ね方を変えないよう触らない。
+    const areaId = byExact.get(K(wardName, p.name))
+      || byBase.get(K(wardName, baseTownName(p.name)))
+      || byBase.get(K(wardName, p.name))
+      || null;
     if (areaId) {
       labelMap[p.id] = { areaId, name: p.name, wardName, fitBbox: null };
       town++;
@@ -174,11 +217,12 @@ export function run() {
   if (!shpEntry || !dbfEntry) throw new Error('ZIP内に .shp / .dbf が見つかりません');
   const fc = shapefileToFeatureCollection(extractEntry(SRC_ZIP, shpEntry), extractEntry(SRC_ZIP, dbfEntry), { encoding: 'shift_jis' });
 
-  const towns = [];
+  const rawTowns = [];
   for (const f of fc.features) {
     const t = featureToTown(f, { wardByCode, projection: area.projection });
-    if (t) towns.push(t);
+    if (t) rawTowns.push(t);
   }
+  const towns = mergeTownsByKeyCode(rawTowns);
   const wardSet = new Set(towns.map((t) => t.wardId));
   const missingWards = registry.wards.filter((w) => !wardSet.has(w.id)).map((w) => w.name);
   if (missingWards.length) throw new Error(`町丁目境界がない区: ${missingWards.join('、')}`);
@@ -199,7 +243,9 @@ export function run() {
     referenceDate: '2020-10-01',
     note: '24区の町丁・字等境界はe-Stat 2020国勢調査統計境界。法的な住居表示境界と常に一致する保証はない。町丁目が一致しないラベルのみN03区界へfallback。',
     counts: { towns: towns.length, townGroups: groups.length, wards: wards.length, ...mapped.counts },
-    townWards: [...wardSet].sort(),
+    // [Mission 35L] 35K と同じ **区名** で書く（wardSet は区 id なので、そのまま出すと
+    //   既存の読み手（validator / HTML の debug）が「町丁目のある区」を引けなくなる）。
+    townWards: [...new Set(towns.map((t) => t.wardName))].sort(),
     areas: [...towns, ...groups, ...wards],
     labelMap: mapped.labelMap,
   };

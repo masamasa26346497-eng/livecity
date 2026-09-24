@@ -21,6 +21,9 @@ import { SPATIAL_VALID, VALID, roofQuality, TIER } from '../tools/build-plateau-
 import { FIXED, PREVIOUS } from '../tools/validate/max-lod-reaudit.js';
 import { AREAS, DENSITY_CELL_M, TOP_N } from '../tools/audit/max-lod-coverage-matrix.js';
 import { devUiIsGated } from '../tools/lib/production-invariants.js';
+import { skipIfMissingRel } from './_generated-data.mjs';
+// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
+const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEV = path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html');
@@ -271,7 +274,7 @@ test('[34D §41] 前回との比較', { skip: skip('max-lod-coverage-matrix.json
   assert.equal(m.totals.wardsWithHighLod + m.totals.wardsWithoutHighLod.length, 24);
 });
 
-test('[34D §2] 建物総数を変えていない', () => {
+test('[34D §2] 建物総数を変えていない', { skip: CANONICAL_SKIP }, () => {
   const man = rj(path.join(ROOT, 'data', 'processed', 'osaka-city', 'canonical', 'buildings-v2-osmv2', 'manifest.json'));
   assert.ok(man, 'canonical manifest が無い');
   assert.equal(man.featureCount, FIXED.total);
