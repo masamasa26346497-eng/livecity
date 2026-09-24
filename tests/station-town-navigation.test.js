@@ -280,8 +280,39 @@ test('35K 境界の見た目（§13/§14）', () => {
   assert.match(html, /const COLOR = 0x40fff0;/);                 // §13 turquoise
   const m = html.match(/const FILL_OPACITY = ([\d.]+);/);
   assert.ok(m, '塗りの不透明度が読めない');
-  assert.ok(+m[1] >= 0.04 && +m[1] <= 0.10, '§14 の 0.04〜0.10 の外: ' + m[1]);
-  assert.match(html, /line\.renderOrder = 990;/);                // 道路・鉄道より上
+  // [Mission 35M] 実機で「境界線だけ」では選択範囲が分かりにくかったため、面を塗る方式へ変更。
+  //   §14 の趣旨（建物・地図を完全には隠さない）は保ったまま、0.20〜0.35 の範囲で濃くする。
+  assert.ok(+m[1] >= 0.20 && +m[1] <= 0.35, '面ハイライトは 0.20〜0.35: ' + m[1]);
+  assert.match(html, /m\.renderOrder = 990;/);                   // 外周の帯が道路・鉄道より上
+});
+
+test('35M 面ハイライト: 半透明の面・太い外周・z-fighting 対策・解除', () => {
+  // 面を半透明で塗る（一目で範囲が分かる）。建物は透けて見える濃さ。
+  assert.match(html, /const fill = new THREE\.Mesh\(fg, flatMaterial\(FILL_OPACITY, \{ depthTest: false \}\)\);/);
+  assert.match(html, /fill\.position\.y = FILL_Y;/);
+  // 外周は world 幅の帯（linewidth が効かない環境でも太くなる）
+  assert.match(html, /function ringRibbon\(ring, widthM, y\)/);
+  assert.match(html, /const band = ringRibbon\(ring, edgeW, EDGE_Y\);/);
+  // 縁の強調
+  assert.match(html, /const rim = ringRibbon\(ring, RIM_WIDTH_M, FILL_Y \+ 0\.2\);/);
+  // 斜め視点でも範囲が読めるよう、境界に沿った低い壁を立てる（建物は覆わない高さ）
+  assert.match(html, /function ringWall\(ring, height, y0\)/);
+  assert.match(html, /const wall = ringWall\(ring, WALL_H, 0\.4\);/);
+  const wh = html.match(/const WALL_H = (\d+);/);
+  assert.ok(wh && +wh[1] > 0 && +wh[1] <= 40, '壁が高すぎる/無い: ' + (wh && wh[1]));
+  // z-fighting 対策: 地面から浮かせる + polygonOffset
+  const fy = html.match(/const FILL_Y = ([\d.]+);/);
+  assert.ok(fy && +fy[1] > 0.5, '面が地面と同じ高さでチラつく: ' + (fy && fy[1]));
+  assert.match(html, /polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,/);
+  // 高さは 面 < 帯 < 芯線 の順（前後関係が崩れない）
+  const ey = html.match(/const EDGE_Y = ([\d.]+);/);
+  const ly = html.match(/const LINE_Y = ([\d.]+);/);
+  assert.ok(+fy[1] < +ey[1] && +ey[1] < +ly[1], `高さの順が違う: ${fy[1]} / ${ey[1]} / ${ly[1]}`);
+  // 壁だけは depthTest を効かせる（手前の建物に隠れて奥行きの手掛かりになる）
+  assert.match(html, /flatMaterial\(WALL_OPACITY, \{ polygonOffsetFactor: 0, polygonOffsetUnits: 0 \}\)/);
+  // 解除で面も外周も消える
+  assert.match(html, /for \(const g of \[outlineGroup, fillGroup\]\)/);
+  assert.match(html, /function clearSelection\(\)/);
 });
 
 test('35K ズームは bbox から決め、真上視点に強制しない（§15/§16）', () => {

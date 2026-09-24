@@ -10664,10 +10664,21 @@ CityLabelLayer.show();   // 通常表示に統合（地名・主要施設は既�
 // ══════════════════════════════════════════════════════════════════════════════
 const AreaSelectionLayer = (function () {
   const URL_ = 'map-data/osaka-city/derived/area-boundaries.json';
-  const Y = 1.2;                       // road(0.30) / rail(0.5) より上。建物には埋もれる高さにしない
   const COLOR = 0x40fff0;              // §13 以前の町丁目境界と同じ turquoise
-  const FILL_OPACITY = 0.07;           // §14 建物を隠さない薄さ
-  const LINE_WIDTH_HINT = 2;           // WebGL の linewidth は多くの環境で 1 固定。二重に描いて太く見せる
+  // [Mission 35M] 実機で「境界線だけ」では選択範囲が分かりにくかったので、面を塗って一目で分かるようにする。
+  //   建物・地図を完全に隠さない範囲（0.20〜0.35）で、実機で認識できる濃さにする。
+  const FILL_OPACITY = 0.30;
+  const RIM_OPACITY = 0.30;            // 縁の内側を少しだけ強める（面と外周の間をつなぐ）
+  const RIM_WIDTH_M = 26;              // 縁の強調を内側へ何 m 入れるか
+  const LINE_WIDTH_HINT = 2;           // WebGL の linewidth は多くの環境で 1 固定。帯を作って太さを出す
+  // 外周は world 幅の帯（リボン）で描く。linewidth が効かない環境でも確実に太く見える。
+  const EDGE_MIN_M = 5, EDGE_MAX_M = 14, EDGE_DIAG_DIV = 260;
+  // 面と地面が同じ高さだとチラつく（z-fighting）ので、少しだけ浮かせる。
+  const WALL_H = 26;                   // 境界の立ち上がり壁の高さ。建物を覆わない程度に留める
+  const WALL_OPACITY = 0.22;
+  const FILL_Y = 1.0;                  // road(0.30) / rail(0.5) より上
+  const EDGE_Y = 1.7;                  // 帯は面より上
+  const LINE_Y = 2.2;                  // 芯線はさらに上
   const FIT_MARGIN = 1.35;             // §15 bbox に対する余裕
   const FIT_MIN_R = 260, FIT_MAX_R = 6200;
   const ANIM_MS = 600;                 // §16 400〜800ms
@@ -10735,45 +10746,159 @@ const AreaSelectionLayer = (function () {
     }
   }
 
-  /** §13/§14 選択した範囲の輪郭と薄い塗り。 */
+  /**
+   * [Mission 35M] 閉じたリングに沿って **world 幅の帯（リボン）** を作る。
+   * WebGL の `linewidth` はほとんどの環境で 1 固定なので、線を重ねても太くならない。
+   * 各頂点でマイター（前後のセグメントの二等分方向）を出し、交差部で二重に重ならない帯にする。
+   * リングの座標そのものは読むだけで、geometry データは変更しない。
+   */
+  function ringRibbon(ring, widthM, y) {
+    const n = ring.length;
+    if (n < 3) return null;
+    const half = widthM / 2;
+    const dir = [];                       // 各セグメント i→i+1 の単位ベクトル
+    for (let i = 0; i < n; i++) {
+      const a = ring[i], b = ring[(i + 1) % n];
+      let dx = b[0] - a[0], dz = b[1] - a[1];
+      const len = Math.hypot(dx, dz) || 1;
+      dir.push([dx / len, dz / len]);
+    }
+    const inner = [], outer = [];
+    for (let i = 0; i < n; i++) {
+      const d0 = dir[(i - 1 + n) % n];     // 入ってくる向き
+      const d1 = dir[i];                   // 出ていく向き
+      // 法線は向きを 90° 回したもの。2 つの法線の平均がマイター方向。
+      let mx = -d0[1] - d1[1], mz = d0[0] + d1[0];
+      const ml = Math.hypot(mx, mz);
+      let nx, nz, scale;
+      if (ml < 1e-6) {                     // 折り返し（180°）は入ってくる側の法線で代用
+        nx = -d0[1]; nz = d0[0]; scale = 1;
+      } else {
+        nx = mx / ml; nz = mz / ml;
+        // マイター長 = half / cos(θ/2)。鋭角でトゲにならないよう上限を付ける。
+        const cos = nx * -d0[1] + nz * d0[0];
+        scale = Math.min(4, 1 / Math.max(0.25, Math.abs(cos)));
+      }
+      const ox = nx * half * scale, oz = nz * half * scale;
+      inner.push([ring[i][0] - ox, ring[i][1] - oz]);
+      outer.push([ring[i][0] + ox, ring[i][1] + oz]);
+    }
+    const pos = [];
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      const i0 = inner[i], i1 = inner[j], o0 = outer[i], o1 = outer[j];
+      pos.push(i0[0], y, i0[1], o0[0], y, o0[1], o1[0], y, o1[1]);
+      pos.push(i0[0], y, i0[1], o1[0], y, o1[1], i1[0], y, i1[1]);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeBoundingSphere();
+    return g;
+  }
+
+  /**
+   * [Mission 35M] リングに沿った **低い立ち上がり壁**。
+   * 地表の塗りだけだと建物に隠れて範囲が読めない（住吉・梅田の実機で確認）。
+   * 境界に沿って低い壁を立てると、斜め視点でも範囲が一目で分かる。
+   * 壁は建物を覆わない高さに留め、深度も効かせるので手前の建物に自然に隠れる。
+   */
+  function ringWall(ring, height, y0) {
+    const n = ring.length;
+    if (n < 3) return null;
+    const pos = [];
+    for (let i = 0; i < n; i++) {
+      const a = ring[i], b = ring[(i + 1) % n];
+      const x0 = a[0], z0 = a[1], x1 = b[0], z1 = b[1];
+      const yt = y0 + height;
+      pos.push(x0, y0, z0, x1, y0, z1, x1, yt, z1);
+      pos.push(x0, y0, z0, x1, yt, z1, x0, yt, z0);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeBoundingSphere();
+    return g;
+  }
+
+  /** z-fighting を避けるための共通設定（面を少し手前へ押し出す）。 */
+  function flatMaterial(opacity, extra = {}) {
+    return new THREE.MeshBasicMaterial({
+      color: COLOR, transparent: true, opacity,
+      depthWrite: false, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+      ...extra,
+    });
+  }
+
+  /**
+   * §13/§14 選択した範囲を出す。
+   *   - 面を半透明で塗る（一目で範囲が分かる）
+   *   - 外周は world 幅の帯で太く
+   *   - 縁の内側をもう一段だけ強める
+   *   - 境界に沿った低い壁で、斜め視点でも範囲が読める
+   *
+   * [Mission 35M] 面・帯・芯線は **depthTest を切った重ね塗り**にしている。
+   *   地表に貼るだけだと、密集した低層市街（住吉）でも高層（梅田）でも建物に隠れて
+   *   ほとんど見えず、「選択範囲が一目で分かる」という目的を果たせなかった（実機で確認）。
+   *   不透明度は 0.30 なので建物の色・形はそのまま透けて見え、完全には隠さない。
+   *   壁だけは depthTest を効かせてあり、手前の建物に隠れて奥行きの手掛かりになる。
+   */
   function drawArea(area) {
     clearMeshes();
     if (!area || !boundaryVisible) return;
     ensureGroup();
+    // 帯の幅は範囲の大きさに合わせる（小さい町で帯が太すぎないように）
+    const diag = (area.diag != null) ? area.diag : 600;
+    const edgeW = Math.max(EDGE_MIN_M, Math.min(EDGE_MAX_M, diag / EDGE_DIAG_DIV));
     for (const ring of (area.rings || [])) {
       if (!Array.isArray(ring) || ring.length < 3) continue;
-      // 輪郭（閉じたループ）
-      const pos = [];
-      for (const p of ring) pos.push(p[0], Y, p[1]);
-      pos.push(ring[0][0], Y, ring[0][1]);
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-      g.computeBoundingSphere();
-      const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: COLOR, transparent: true, opacity: 0.95, depthTest: false }));
-      line.renderOrder = 990;      // 道路・鉄道より上（§13）
-      line.frustumCulled = true;
-      outlineGroup.add(line);
-      // 太く見せるためにわずかに高い位置へもう 1 本（linewidth が効かない環境向け）
-      if (LINE_WIDTH_HINT > 1) {
-        const g2 = g.clone();
-        const arr = g2.getAttribute('position').array;
-        for (let i = 1; i < arr.length; i += 3) arr[i] = Y + 0.6;
-        const line2 = new THREE.Line(g2, new THREE.LineBasicMaterial({ color: COLOR, transparent: true, opacity: 0.55, depthTest: false }));
-        line2.renderOrder = 989; line2.frustumCulled = true;
-        outlineGroup.add(line2);
-      }
-      // 薄い塗り（§14 建物を隠さない）
+
+      // ── 面（§14 建物・地図を完全には隠さない濃さ）──────────────────
       try {
         const shape = new THREE.Shape(ring.map((p) => new THREE.Vector2(p[0], p[1])));
         const fg = new THREE.ShapeGeometry(shape);
         fg.rotateX(Math.PI / 2);
-        const fill = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({
-          color: COLOR, transparent: true, opacity: FILL_OPACITY, depthWrite: false, side: THREE.DoubleSide,
-        }));
-        fill.position.y = Y - 0.6;
-        fill.renderOrder = 988; fill.frustumCulled = true;
+        const fill = new THREE.Mesh(fg, flatMaterial(FILL_OPACITY, { depthTest: false }));
+        fill.position.y = FILL_Y;
+        fill.renderOrder = 986; fill.frustumCulled = true;
         fillGroup.add(fill);
       } catch (e) { /* 自己交差などで三角形化できない環境は輪郭だけ */ }
+
+      // ── 縁の内側をもう一段強める（面と外周のつながりを出す）──────────
+      const rim = ringRibbon(ring, RIM_WIDTH_M, FILL_Y + 0.2);
+      if (rim) {
+        const m = new THREE.Mesh(rim, flatMaterial(RIM_OPACITY, { depthTest: false }));
+        m.renderOrder = 988; m.frustumCulled = true;
+        fillGroup.add(m);
+      }
+
+      // ── 境界の立ち上がり壁（斜め視点で範囲が読めるように）──────────────
+      const wall = ringWall(ring, WALL_H, 0.4);
+      if (wall) {
+        const m = new THREE.Mesh(wall, flatMaterial(WALL_OPACITY, { polygonOffsetFactor: 0, polygonOffsetUnits: 0 }));
+        m.renderOrder = 987; m.frustumCulled = true;
+        fillGroup.add(m);
+      }
+
+      // ── 外周の帯（太さは world 単位なので linewidth に依存しない）──────
+      const band = ringRibbon(ring, edgeW, EDGE_Y);
+      if (band) {
+        const m = new THREE.Mesh(band, flatMaterial(0.92, { depthTest: false }));
+        m.renderOrder = 990;      // 道路・鉄道より上（§13）
+        m.frustumCulled = true;
+        outlineGroup.add(m);
+      }
+
+      // ── 芯線（建物に隠れても輪郭を追えるように depthTest なし）──────────
+      const pos = [];
+      for (const p of ring) pos.push(p[0], LINE_Y, p[1]);
+      pos.push(ring[0][0], LINE_Y, ring[0][1]);
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+      g.computeBoundingSphere();
+      const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xd8fffb, transparent: true, opacity: 0.55, depthTest: false }));
+      line.renderOrder = 991;
+      line.frustumCulled = true;
+      outlineGroup.add(line);
     }
   }
 
