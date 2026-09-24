@@ -10664,21 +10664,20 @@ CityLabelLayer.show();   // 通常表示に統合（地名・主要施設は既�
 // ══════════════════════════════════════════════════════════════════════════════
 const AreaSelectionLayer = (function () {
   const URL_ = 'map-data/osaka-city/derived/area-boundaries.json';
-  const COLOR = 0x40fff0;              // §13 以前の町丁目境界と同じ turquoise
-  // [Mission 35M] 実機で「境界線だけ」では選択範囲が分かりにくかったので、面を塗って一目で分かるようにする。
-  //   建物・地図を完全に隠さない範囲（0.20〜0.35）で、実機で認識できる濃さにする。
-  const FILL_OPACITY = 0.30;
-  const RIM_OPACITY = 0.30;            // 縁の内側を少しだけ強める（面と外周の間をつなぐ）
-  const RIM_WIDTH_M = 26;              // 縁の強調を内側へ何 m 入れるか
-  const LINE_WIDTH_HINT = 2;           // WebGL の linewidth は多くの環境で 1 固定。帯を作って太さを出す
-  // 外周は world 幅の帯（リボン）で描く。linewidth が効かない環境でも確実に太く見える。
-  const EDGE_MIN_M = 5, EDGE_MAX_M = 14, EDGE_DIAG_DIV = 260;
-  // 面と地面が同じ高さだとチラつく（z-fighting）ので、少しだけ浮かせる。
-  const WALL_H = 26;                   // 境界の立ち上がり壁の高さ。建物を覆わない程度に留める
-  const WALL_OPACITY = 0.22;
-  const FILL_Y = 1.0;                  // road(0.30) / rail(0.5) より上
-  const EDGE_Y = 1.7;                  // 帯は面より上
-  const LINE_Y = 2.2;                  // 芯線はさらに上
+  const COLOR = 0x40fff0;              // §13 以前の町丁目境界と同じ turquoise（既存 UI との対応用）
+  // [Mission 35N] 選択の見せ方を「上から透明シートを被せる」方式から
+  //   **地面だけを着色する**方式へ変える。35M では depthTest を切って重ね塗りしていたため、
+  //   建物・道路・鉄道まで水色に染まり「土地が選ばれている」ように見えなかった（実機で確認）。
+  //   地表付近（road 0.30 / rail 0.5 / park 0.22 / water 0.14 より下）に置き、
+  //   depthTest を効かせる。これで道路・鉄道・建物は元の色のまま上に乗る。
+  const GROUND_COLOR = 0x4fd8c8;       // aqua。地表(0xebede6)へ 0.48 で載せると明確に色が変わる
+  const GROUND_OPACITY = 0.48;         // 0.35〜0.50
+  const GROUND_Y = 0.08;               // 他の地表レイヤーより下（= 地面そのものの色が変わる）
+  // 境界は「補助」。太い帯や壁は使わない（道路を横切る線の存在感を出さない）。
+  const OUTLINE_COLOR = 0x2fa89e;      // 面より少し濃い
+  const OUTLINE_OPACITY = 0.5;
+  const OUTLINE_W = 3.0;               // world 幅 1〜3m
+  const OUTLINE_Y = 0.10;              // 面のすぐ上
   const FIT_MARGIN = 1.35;             // §15 bbox に対する余裕
   const FIT_MIN_R = 260, FIT_MAX_R = 6200;
   const ANIM_MS = 600;                 // §16 400〜800ms
@@ -10796,33 +10795,10 @@ const AreaSelectionLayer = (function () {
     return g;
   }
 
-  /**
-   * [Mission 35M] リングに沿った **低い立ち上がり壁**。
-   * 地表の塗りだけだと建物に隠れて範囲が読めない（住吉・梅田の実機で確認）。
-   * 境界に沿って低い壁を立てると、斜め視点でも範囲が一目で分かる。
-   * 壁は建物を覆わない高さに留め、深度も効かせるので手前の建物に自然に隠れる。
-   */
-  function ringWall(ring, height, y0) {
-    const n = ring.length;
-    if (n < 3) return null;
-    const pos = [];
-    for (let i = 0; i < n; i++) {
-      const a = ring[i], b = ring[(i + 1) % n];
-      const x0 = a[0], z0 = a[1], x1 = b[0], z1 = b[1];
-      const yt = y0 + height;
-      pos.push(x0, y0, z0, x1, y0, z1, x1, yt, z1);
-      pos.push(x0, y0, z0, x1, yt, z1, x0, yt, z0);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-    g.computeBoundingSphere();
-    return g;
-  }
-
   /** z-fighting を避けるための共通設定（面を少し手前へ押し出す）。 */
   function flatMaterial(opacity, extra = {}) {
     return new THREE.MeshBasicMaterial({
-      color: COLOR, transparent: true, opacity,
+      color: GROUND_COLOR, transparent: true, opacity,
       depthWrite: false, side: THREE.DoubleSide,
       polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
       ...extra,
@@ -10831,74 +10807,40 @@ const AreaSelectionLayer = (function () {
 
   /**
    * §13/§14 選択した範囲を出す。
-   *   - 面を半透明で塗る（一目で範囲が分かる）
-   *   - 外周は world 幅の帯で太く
-   *   - 縁の内側をもう一段だけ強める
-   *   - 境界に沿った低い壁で、斜め視点でも範囲が読める
    *
-   * [Mission 35M] 面・帯・芯線は **depthTest を切った重ね塗り**にしている。
-   *   地表に貼るだけだと、密集した低層市街（住吉）でも高層（梅田）でも建物に隠れて
-   *   ほとんど見えず、「選択範囲が一目で分かる」という目的を果たせなかった（実機で確認）。
-   *   不透明度は 0.30 なので建物の色・形はそのまま透けて見え、完全には隠さない。
-   *   壁だけは depthTest を効かせてあり、手前の建物に隠れて奥行きの手掛かりになる。
+   * [Mission 35N] **地面だけを着色する**。
+   *   - 地表ハイライト: 公式町丁目 polygon をそのまま、road/rail/park/water より下に置く。
+   *     depthTest を効かせるので、道路・鉄道・建物は元の色のまま上に乗る。
+   *   - 補助の輪郭: world 幅 2.2m の細い線。道路を横切る帯にはしない。
+   *   35M にあった depthTest を切った重ね塗り・太い帯・26m の壁・強い rim は削除した。
    */
   function drawArea(area) {
     clearMeshes();
     if (!area || !boundaryVisible) return;
     ensureGroup();
-    // 帯の幅は範囲の大きさに合わせる（小さい町で帯が太すぎないように）
-    const diag = (area.diag != null) ? area.diag : 600;
-    const edgeW = Math.max(EDGE_MIN_M, Math.min(EDGE_MAX_M, diag / EDGE_DIAG_DIV));
     for (const ring of (area.rings || [])) {
       if (!Array.isArray(ring) || ring.length < 3) continue;
 
-      // ── 面（§14 建物・地図を完全には隠さない濃さ）──────────────────
+      // ── 地面のハイライト ────────────────────────────────────────────
       try {
         const shape = new THREE.Shape(ring.map((p) => new THREE.Vector2(p[0], p[1])));
         const fg = new THREE.ShapeGeometry(shape);
         fg.rotateX(Math.PI / 2);
-        const fill = new THREE.Mesh(fg, flatMaterial(FILL_OPACITY, { depthTest: false }));
-        fill.position.y = FILL_Y;
-        fill.renderOrder = 986; fill.frustumCulled = true;
+        const fill = new THREE.Mesh(fg, flatMaterial(GROUND_OPACITY, { color: GROUND_COLOR }));
+        fill.position.y = GROUND_Y;
+        fill.renderOrder = 6;        // 地表レイヤー（water/park/road/rail）より先に描く
+        fill.frustumCulled = true;
         fillGroup.add(fill);
       } catch (e) { /* 自己交差などで三角形化できない環境は輪郭だけ */ }
 
-      // ── 縁の内側をもう一段強める（面と外周のつながりを出す）──────────
-      const rim = ringRibbon(ring, RIM_WIDTH_M, FILL_Y + 0.2);
-      if (rim) {
-        const m = new THREE.Mesh(rim, flatMaterial(RIM_OPACITY, { depthTest: false }));
-        m.renderOrder = 988; m.frustumCulled = true;
-        fillGroup.add(m);
-      }
-
-      // ── 境界の立ち上がり壁（斜め視点で範囲が読めるように）──────────────
-      const wall = ringWall(ring, WALL_H, 0.4);
-      if (wall) {
-        const m = new THREE.Mesh(wall, flatMaterial(WALL_OPACITY, { polygonOffsetFactor: 0, polygonOffsetUnits: 0 }));
-        m.renderOrder = 987; m.frustumCulled = true;
-        fillGroup.add(m);
-      }
-
-      // ── 外周の帯（太さは world 単位なので linewidth に依存しない）──────
-      const band = ringRibbon(ring, edgeW, EDGE_Y);
+      // ── 補助の輪郭（細い） ──────────────────────────────────────────
+      const band = ringRibbon(ring, OUTLINE_W, OUTLINE_Y);
       if (band) {
-        const m = new THREE.Mesh(band, flatMaterial(0.92, { depthTest: false }));
-        m.renderOrder = 990;      // 道路・鉄道より上（§13）
+        const m = new THREE.Mesh(band, flatMaterial(OUTLINE_OPACITY, { color: OUTLINE_COLOR }));
+        m.renderOrder = 7;
         m.frustumCulled = true;
         outlineGroup.add(m);
       }
-
-      // ── 芯線（建物に隠れても輪郭を追えるように depthTest なし）──────────
-      const pos = [];
-      for (const p of ring) pos.push(p[0], LINE_Y, p[1]);
-      pos.push(ring[0][0], LINE_Y, ring[0][1]);
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-      g.computeBoundingSphere();
-      const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xd8fffb, transparent: true, opacity: 0.55, depthTest: false }));
-      line.renderOrder = 991;
-      line.frustumCulled = true;
-      outlineGroup.add(line);
     }
   }
 
@@ -15296,6 +15238,47 @@ const CanonicalRuntime = (function () {
     hotel:           0xc78f9b, // ダスティローズ（宿泊）
     other:           0xb2bac0, // ニュートラルグレー（その他）
   };
+  // ── [Mission 35N] 用途不明（'other'）の建物を高さで色分けする ──────────────
+  //   灰色の正体は usageCategory が付かない建物。PLATEAU は用途コードを持つが、
+  //   35D/35E で足した OSM fallback（47,259 棟 = 全体の 7.3%）はその 74% が用途不明で、
+  //   すべて CR_USAGE_COLOR.other（0xb2bac0 のニュートラルグレー）1 色になっていた。
+  //   **用途色が付いている建物には触らない**（§8）。色を変えるのは 'other' だけ。
+  //
+  //   単にカラフルにするのではなく、**高さを読めるようにする**（§9）。
+  //   閾値は実測の高さ分布から決めた（647,746 棟）:
+  //     p10 3.3m / p25 6.0m / p50 7.1m / p75 9.6m / p90 12.6m / p97 29m / p99 40.3m
+  const CR_OTHER_HEIGHT_CLASSES = [
+    { id: 'low',      maxH: 6,        color: 0xd9c9a8 },  // 低層: warm sand
+    { id: 'midLow',   maxH: 9,        color: 0xbcc9a8 },  // 中低層: pale sage
+    { id: 'mid',      maxH: 13,       color: 0xa8bcd0 },  // 中層: pale blue
+    { id: 'midHigh',  maxH: 30,       color: 0xd3b784 },  // 中高層: muted gold
+    { id: 'high',     maxH: 60,       color: 0xcfa08c },  // 高層: soft terracotta
+    { id: 'veryHigh', maxH: Infinity, color: 0xb9a3c6 },  // 超高層: light lavender
+  ];
+  /**
+   * 高さから色分けクラスを決める。**高さだけで決まる決定論**なので、
+   * 再読み込みしても同じ建物は必ず同じ色になる（§10。乱数は使わない）。
+   * PLATEAU には measuredHeight の外れ値（9999 など）があるので上限で丸める。
+   */
+  function crOtherHeightClass(h) {
+    const v = (typeof h === 'number' && isFinite(h) && h > 0) ? Math.min(h, 400) : 0;
+    for (const c of CR_OTHER_HEIGHT_CLASSES) if (v < c.maxH) return c.id;
+    return CR_OTHER_HEIGHT_CLASSES[CR_OTHER_HEIGHT_CLASSES.length - 1].id;
+  }
+  const CR_OTHER_CLASS_COLOR = Object.fromEntries(CR_OTHER_HEIGHT_CLASSES.map((c) => [c.id, c.color]));
+  /**
+   * [Mission 35N §12] 高さクラスごとに mesh を分けると draw call が増える（梅田で実測 483 → 608）。
+   * DEPTH プロファイルは既に **頂点カラー**（面ごとの明暗）を焼いているので、そこへ
+   * クラスの色みを掛ければ **mesh も material も増やさずに** 色分けできる。
+   * 頂点カラーは乗算なので、base は各クラス色より明るい必要がある。
+   */
+  const CR_OTHER_BASE = 0xe9e6e0;
+  const CR_OTHER_TINT = Object.fromEntries(CR_OTHER_HEIGHT_CLASSES.map((c) => {
+    const br = (CR_OTHER_BASE >> 16) & 255, bg = (CR_OTHER_BASE >> 8) & 255, bb = CR_OTHER_BASE & 255;
+    const cr = (c.color >> 16) & 255, cg = (c.color >> 8) & 255, cb = c.color & 255;
+    return [c.id, [Math.min(1, cr / br), Math.min(1, cg / bg), Math.min(1, cb / bb)]];
+  }));
+
   const CR_USAGE_CATEGORIES = Object.keys(CR_USAGE_COLOR);
   // §6: 正式カテゴリへ寄せる（null / undefined / 未知コード → 'other'）。
   function crUsageCategory(a) {
@@ -15348,13 +15331,20 @@ const CanonicalRuntime = (function () {
     return (to(hue(h + 1 / 3)) << 16) | (to(hue(h)) << 8) | to(hue(h - 1 / 3));
   }
   const crBuildingMats = new Map();
-  function crBuildingMaterial(cat, band) {
+  function crBuildingMaterial(cat, band, heightClass) {
     // [Mission 35H] profile ごとに別 material（DEPTH は頂点カラーを掛ける）。
     //   同じ key を使い回すと profile を切り替えたとき古い設定の material が残る。
-    const key = cat + '|' + band + '|' + visualProfile;
+    // [Mission 35N] 'other' だけ高さクラスごとに分ける。material は **クラス単位で共有**し、
+    //   建物 1 棟ごとに new しない（§12）。
+    const hc = (cat === 'other' && heightClass) ? heightClass : '';
+    const key = cat + '|' + band + '|' + visualProfile + (hc ? '|' + hc : '');
     let m = crBuildingMats.get(key);
     if (!m) {
-      const base = CR_USAGE_COLOR[cat] || CR_USAGE_COLOR.other;
+      const base = (cat === 'other' && depthEnabled())
+        ? CR_OTHER_BASE                                   // 色みは頂点カラーで付ける（§12 mesh を増やさない）
+        : (cat === 'other' && hc && CR_OTHER_CLASS_COLOR[hc] != null)
+          ? CR_OTHER_CLASS_COLOR[hc]                      // CURRENT プロファイル用の退避経路
+          : (CR_USAGE_COLOR[cat] || CR_USAGE_COLOR.other);
       const WH = depthEnabled() ? CR_USAGE_WHITEN_DEPTH : CR_USAGE_WHITEN;
       const wh = (WH[band] != null) ? WH[band] : 0.24;
       const col0 = (typeof msBlend === 'function') ? msBlend(base, COL.white, wh) : base;
@@ -15383,7 +15373,9 @@ const CanonicalRuntime = (function () {
     const grp = layerGroup.buildings;
     if (grp) grp.traverse((o) => {
       if (!o.isMesh || o.userData.usageCategory == null) return;
-      o.material = want ? crBuildingGrayMaterial() : crBuildingMaterial(o.userData.usageCategory, o.userData.crBuildingBand || 'mid');
+      // [Mission 35N] 戻すときに高さクラスも一緒に渡す（渡さないと other が灰色 1 色へ戻ってしまう）
+      o.material = want ? crBuildingGrayMaterial()
+        : crBuildingMaterial(o.userData.usageCategory, o.userData.crBuildingBand || 'mid', o.userData.crOtherHeightClass);
     });
     return crBuildingDiffGray;
   }
@@ -18626,14 +18618,18 @@ const CanonicalRuntime = (function () {
    * `colors`（任意）を渡すと [Mission 35H] の面ごと・高さごとの明暗を頂点カラーとして同時に焼く。
    * **positions の中身は colors の有無で 1 mm も変わらない**（geometry 不変・§3/§27）。
    */
-  function pushExtrude(positions, geometryType, coordinates, h, colors) {
+  function pushExtrude(positions, geometryType, coordinates, h, colors, tint) {
     const polys = geometryType === 'Polygon' ? [coordinates] : coordinates;
+    // [Mission 35N] tint は [r,g,b]（各 0〜1）。用途不明の建物に高さクラスの色みを掛けるために使う。
+    //   渡されないときは従来どおり無彩色の明暗（= 用途色をそのまま出す）。
+    const tr = tint ? tint[0] : 1, tg = tint ? tint[1] : 1, tb = tint ? tint[2] : 1;
+    const push3 = (c) => colors.push(shadeByte(c * tr / 255), shadeByte(c * tg / 255), shadeByte(c * tb / 255));
     // 6 頂点（壁 1 面 = 三角形 2 枚）ぶんの明暗を一度に積む
     const pushWallShades = (s, yTop) => {
       const c0 = shadeByte(s * heightShade(0, h)), c1 = shadeByte(s * heightShade(yTop, h));
       // 順番は下の positions.push と同じ: (a,0) (b,0) (b,h) / (a,0) (b,h) (a,h)
-      colors.push(c0, c0, c0, c0, c0, c0, c1, c1, c1);
-      colors.push(c0, c0, c0, c1, c1, c1, c1, c1, c1);
+      push3(c0); push3(c0); push3(c1);
+      push3(c0); push3(c1); push3(c1);
     };
     for (const poly of polys) {
       const outer = poly[0];
@@ -18661,7 +18657,7 @@ const CanonicalRuntime = (function () {
         for (const t of tris) for (const idx of t) {
           const v = all[idx];
           positions.push(v.x, h, v.y);
-          if (colors) colors.push(rc, rc, rc);
+          if (colors) push3(rc);
         }
       }
     }
@@ -19114,20 +19110,34 @@ const CanonicalRuntime = (function () {
             }
             const cat = crUsageCategory(a);            // §6: null / 未知 → 'other'
             buildingPalette[cat] = (buildingPalette[cat] || 0) + 1;
-            if (!byCat.has(cat)) byCat.set(cat, { pos: [], col: depthEnabled() ? [] : null });
-            const bucket = byCat.get(cat);
-            pushExtrude(bucket.pos, f.geometryType, f.coordinates, h, bucket.col);
+            // [Mission 35N] 用途不明だけ高さクラスで束ねを分ける。
+            //   用途色が付いている建物の束ね方・色は一切変えない（§8）。
+            // QA 用: 色みを切ると 35N 以前と同じ「灰色 1 色」に戻る（draw call の A/B に使う）
+            const hc = (cat === 'other' && !(typeof window !== 'undefined' && window.__CR_DISABLE_OTHER_TINT__))
+              ? crOtherHeightClass(h) : null;
+            // DEPTH では頂点カラーで色分けするので束ねは 1 つのまま（mesh も draw call も増えない）。
+            //   頂点カラーを使わない CURRENT プロファイルのときだけ、高さクラスで束ねを分ける。
+            const splitByHeight = hc && !depthEnabled();
+            const bkey = splitByHeight ? (cat + '|' + hc) : cat;
+            if (!byCat.has(bkey)) byCat.set(bkey, { cat, heightClass: splitByHeight ? hc : null, pos: [], col: depthEnabled() ? [] : null });
+            const bucket = byCat.get(bkey);
+            pushExtrude(bucket.pos, f.geometryType, f.coordinates, h, bucket.col, hc ? CR_OTHER_TINT[hc] : null);
             if (outer && f.centroid) footprints.push({ canonicalId: f.canonicalId, ring: outer, cx: f.centroid[0], cz: f.centroid[1], h, attributes: a, placement: pp ? pp.policy : 'DISPLAY' });
           }
-          for (const [cat, bucket] of byCat) {
+          for (const bucket of byCat.values()) {
             const pos = bucket.pos;
-            // §7: usageCategory × band 共有 material（feature ごとに new しない）
+            const cat = bucket.cat;
+            // §7: usageCategory × band（+ 35N: other は高さクラス）共有 material。feature ごとに new しない
             const m = meshFromPositions(pos, 0, REN.building, {
-              material: crBuildingDiffGray ? crBuildingGrayMaterial() : crBuildingMaterial(cat, band),
+              material: crBuildingDiffGray ? crBuildingGrayMaterial() : crBuildingMaterial(cat, band, bucket.heightClass),
               colors: bucket.col,   // [Mission 35H] DEPTH のときだけ面ごとの明暗が入る
             });
             // [Mission 34B §22] LOD DIFF で灰色へ差し替え／元へ戻すために cat・band を控えておく
-            if (m) { m.userData.usageCategory = cat; m.userData.crBuildingBand = band; g.add(m); vtx += pos.length / 3; }
+            if (m) {
+              m.userData.usageCategory = cat; m.userData.crBuildingBand = band;
+              if (bucket.heightClass) m.userData.crOtherHeightClass = bucket.heightClass;
+              g.add(m); vtx += pos.length / 3;
+            }
           }
         } else if (layer === 'rail') {
           const seg = { major: [], urban: [], local: [] };
@@ -19709,7 +19719,9 @@ const CanonicalRuntime = (function () {
       return out;
     },
     // [Mission 34A §16] 高 LOD でも LOD1 と同じ用途色を使うため、共有 material を貸し出す
-    buildingMaterial: (cat, band) => crBuildingMaterial(cat, band),
+    buildingMaterial: (cat, band, heightClass) => crBuildingMaterial(cat, band, heightClass),
+    otherHeightClasses: () => CR_OTHER_HEIGHT_CLASSES.map((c) => ({ ...c })),
+    otherHeightClassOf: (h) => crOtherHeightClass(h),
     // [Mission 34D §34] 表示中の建物 footprint を source 付きで返す（QA の色分け用。読むだけ）
     visibleBuildingFootprints(limit = 40000) {
       const out = [];

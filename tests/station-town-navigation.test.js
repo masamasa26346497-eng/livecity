@@ -277,42 +277,54 @@ test('35K 選択状態は将来の selectedArea の形で持つ', () => {
 });
 
 test('35K 境界の見た目（§13/§14）', () => {
-  assert.match(html, /const COLOR = 0x40fff0;/);                 // §13 turquoise
-  const m = html.match(/const FILL_OPACITY = ([\d.]+);/);
-  assert.ok(m, '塗りの不透明度が読めない');
-  // [Mission 35M] 実機で「境界線だけ」では選択範囲が分かりにくかったため、面を塗る方式へ変更。
-  //   §14 の趣旨（建物・地図を完全には隠さない）は保ったまま、0.20〜0.35 の範囲で濃くする。
-  assert.ok(+m[1] >= 0.20 && +m[1] <= 0.35, '面ハイライトは 0.20〜0.35: ' + m[1]);
-  assert.match(html, /m\.renderOrder = 990;/);                   // 外周の帯が道路・鉄道より上
+  // [Mission 35N] 選択の見せ方を「地面だけを着色する」方式へ変えた。
+  //   §13 の turquoise 系・§14 の「建物を隠さない」という趣旨はそのまま。
+  //   色は GROUND_COLOR / 濃さは GROUND_OPACITY が正本（FILL_OPACITY は廃止）。
+  assert.match(html, /const GROUND_COLOR = 0x[0-9a-f]{6};/);
+  const m = html.match(/const GROUND_OPACITY = ([\d.]+);/);
+  assert.ok(m, '地面ハイライトの不透明度が読めない');
+  assert.ok(+m[1] >= 0.35 && +m[1] <= 0.50, '地面ハイライトは 0.35〜0.50: ' + m[1]);
+  // 面・輪郭とも地表レイヤーの中に収める（道路・鉄道より上へ出さない）
+  assert.match(html, /fill\.renderOrder = 6;/);
+  assert.match(html, /m\.renderOrder = 7;/);
 });
 
-test('35M 面ハイライト: 半透明の面・太い外周・z-fighting 対策・解除', () => {
-  // 面を半透明で塗る（一目で範囲が分かる）。建物は透けて見える濃さ。
-  assert.match(html, /const fill = new THREE\.Mesh\(fg, flatMaterial\(FILL_OPACITY, \{ depthTest: false \}\)\);/);
-  assert.match(html, /fill\.position\.y = FILL_Y;/);
-  // 外周は world 幅の帯（linewidth が効かない環境でも太くなる）
-  assert.match(html, /function ringRibbon\(ring, widthM, y\)/);
-  assert.match(html, /const band = ringRibbon\(ring, edgeW, EDGE_Y\);/);
-  // 縁の強調
-  assert.match(html, /const rim = ringRibbon\(ring, RIM_WIDTH_M, FILL_Y \+ 0\.2\);/);
-  // 斜め視点でも範囲が読めるよう、境界に沿った低い壁を立てる（建物は覆わない高さ）
-  assert.match(html, /function ringWall\(ring, height, y0\)/);
-  assert.match(html, /const wall = ringWall\(ring, WALL_H, 0\.4\);/);
-  const wh = html.match(/const WALL_H = (\d+);/);
-  assert.ok(wh && +wh[1] > 0 && +wh[1] <= 40, '壁が高すぎる/無い: ' + (wh && wh[1]));
-  // z-fighting 対策: 地面から浮かせる + polygonOffset
-  const fy = html.match(/const FILL_Y = ([\d.]+);/);
-  assert.ok(fy && +fy[1] > 0.5, '面が地面と同じ高さでチラつく: ' + (fy && fy[1]));
+test('35N 地面ハイライト: 面は地表・道路より下・depthTest あり', () => {
+  // 地面だけを着色する（上から透明シートを被せない）
+  assert.match(html, /const fill = new THREE\.Mesh\(fg, flatMaterial\(GROUND_OPACITY, \{ color: GROUND_COLOR \}\)\);/);
+  assert.match(html, /fill\.position\.y = GROUND_Y;/);
+  // depthTest を切っていない = 建物・道路が上に乗る
+  const fm = html.match(/function flatMaterial\(opacity, extra = \{\}\) \{[\s\S]{0,400}?\n  \}/);
+  assert.ok(fm, 'flatMaterial が読めない');
+  assert.ok(!/depthTest:\s*false/.test(fm[0]), 'flatMaterial が depthTest を切っている');
+  const sel = html.slice(html.indexOf('function drawArea(area)'), html.indexOf('function notify()'));
+  assert.ok(!/depthTest:\s*false/.test(sel), '選択表示に depthTest:false が残っている');
+  // 面は road(0.30) / rail(0.5) より下（= 道路・鉄道が選択色にならない）
+  const gy = html.match(/const GROUND_Y = ([\d.]+);/);
+  const oy = html.match(/const OUTLINE_Y = ([\d.]+);/);
+  const layer = html.match(/const Y = \{ water: ([\d.]+), park: ([\d.]+), road: ([\d.]+),/);
+  assert.ok(gy && layer, '高さ定数が読めない');
+  assert.ok(+gy[1] < +layer[3], `面 ${gy[1]} が道路 ${layer[3]} より上にある`);
+  assert.ok(+gy[1] < +layer[1], `面 ${gy[1]} が水面 ${layer[1]} より上にある`);
+  assert.ok(+oy[1] < +layer[3], `補助輪郭 ${oy[1]} が道路より上にある`);
+  assert.ok(+gy[1] > 0, '面が地面と同じ高さでチラつく');
   assert.match(html, /polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,/);
-  // 高さは 面 < 帯 < 芯線 の順（前後関係が崩れない）
-  const ey = html.match(/const EDGE_Y = ([\d.]+);/);
-  const ly = html.match(/const LINE_Y = ([\d.]+);/);
-  assert.ok(+fy[1] < +ey[1] && +ey[1] < +ly[1], `高さの順が違う: ${fy[1]} / ${ey[1]} / ${ly[1]}`);
-  // 壁だけは depthTest を効かせる（手前の建物に隠れて奥行きの手掛かりになる）
-  assert.match(html, /flatMaterial\(WALL_OPACITY, \{ polygonOffsetFactor: 0, polygonOffsetUnits: 0 \}\)/);
-  // 解除で面も外周も消える
+  // 色と濃さ
+  const op = html.match(/const GROUND_OPACITY = ([\d.]+);/);
+  assert.ok(+op[1] >= 0.35 && +op[1] <= 0.50, '地面ハイライトは 0.35〜0.50: ' + op[1]);
+  // 境界は補助（細い）。太い帯にしない
+  const ow = html.match(/const OUTLINE_W = ([\d.]+);/);
+  assert.ok(+ow[1] >= 1 && +ow[1] <= 3, '補助輪郭は world 幅 1〜3m: ' + ow[1]);
+  // 解除で面も輪郭も消える
   assert.match(html, /for \(const g of \[outlineGroup, fillGroup\]\)/);
   assert.match(html, /function clearSelection\(\)/);
+});
+
+test('35N 旧 35M の表現（壁・太い帯・重ね塗り）が残っていない', () => {
+  assert.ok(!/function ringWall\(/.test(html), 'ringWall が残っている');
+  assert.ok(!/WALL_H|WALL_OPACITY/.test(html), '壁の定数が残っている');
+  assert.ok(!/RIM_OPACITY|RIM_WIDTH_M/.test(html), 'rim の定数が残っている');
+  assert.ok(!/EDGE_MIN_M|EDGE_MAX_M|EDGE_DIAG_DIV/.test(html), '太い帯の定数が残っている');
 });
 
 test('35K ズームは bbox から決め、真上視点に強制しない（§15/§16）', () => {

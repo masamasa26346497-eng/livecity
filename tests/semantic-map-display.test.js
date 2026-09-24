@@ -56,7 +56,7 @@ test('[32K §15] OLD / SEMANTIC 比較モードがある', () => {
 
 test('[32K §0/§9] 建物を動かす処理を入れていない（source 座標をそのまま押し出す）', () => {
   // [Mission 35H] 頂点カラー用の bucket へ渡す形に変わったが、座標は f.coordinates のまま。
-  assert.match(html, /pushExtrude\(bucket\.pos, f\.geometryType, f\.coordinates, h, bucket\.col\)/);
+  assert.match(html, /pushExtrude\(bucket\.pos, f\.geometryType, f\.coordinates, h, bucket\.col, /);
   // 32K で building 側に offset/scale/clip を足していないこと
   const bStart = html.indexOf("} else if (layer === 'buildings') {");
   const bEnd = html.indexOf("} else if (layer === 'rail') {");

@@ -163,7 +163,8 @@ test('[33A] 配色 v2: 明るく・少し鮮やかに（建物 geometry は不�
   // 建物の形状・高さの組み立ては触っていない
   assert.match(html, /const h = Math\.max\(2, \+a\.heightM \|\| 6\);/);
   // [Mission 35H] bucket（positions + colors）へ渡す形に変わったが、高さ h の作り方は不変。
-  assert.match(html, /pushExtrude\(bucket\.pos, f\.geometryType, f\.coordinates, h, bucket\.col\);/);
+  // [Mission 35N] 第 6 引数に高さクラスの色みが増えただけ（座標は不変）
+  assert.match(html, /pushExtrude\(bucket\.pos, f\.geometryType, f\.coordinates, h, bucket\.col, hc \? CR_OTHER_TINT\[hc\] : null\);/);
   // 用途色の定義そのもの（色相の意味）は変えていない
   assert.match(html, /residential_low: 0xcaa870,/);
   assert.match(html, /office:\s+0x6d93c4,/);
