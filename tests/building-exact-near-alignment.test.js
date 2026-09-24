@@ -6,9 +6,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInlineScript } from './_ward-ux-v1-smoke-harness.cjs';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const NEAR_SKIP = skipIfMissingRel('data/processed/osaka-city/derived/near/buildings/manifest.json', 'public/map-data/osaka-city/derived/near/buildings/manifest.json', 'data/processed/osaka-city/derived/near/roads/manifest.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -34,7 +31,7 @@ test('[FIX24 §30] building-exact-near-alignment validator が PASS', { skip: !r
   assert.equal(v.checks.protectedModified, false);
 });
 
-test('[FIX24 §1] derived/near/buildings の simplificationToleranceM が 0（canonical exact footprint）', { skip: NEAR_SKIP }, () => {
+test('[FIX24 §1] derived/near/buildings の simplificationToleranceM が 0（canonical exact footprint）', () => {
   const m = rj(R('data', 'processed', 'osaka-city', 'derived', 'near', 'buildings', 'manifest.json'));
   assert.ok(m, 'near buildings manifest が無い');
   assert.equal(m.simplificationToleranceM, 0);
@@ -44,7 +41,7 @@ test('[FIX24 §1] derived/near/buildings の simplificationToleranceM が 0（ca
   assert.equal(pubM.simplificationToleranceM, 0);
 });
 
-test('[FIX24 §20] road/water/park/rail の near tier tolerance は変更していない（tolM=2のまま）', { skip: NEAR_SKIP }, () => {
+test('[FIX24 §20] road/water/park/rail の near tier tolerance は変更していない（tolM=2のまま）', () => {
   for (const layer of ['roads', 'water', 'parks', 'rail']) {
     const m = rj(R('data', 'processed', 'osaka-city', 'derived', 'near', layer, 'manifest.json'));
     assert.ok(m, layer + ' near manifest が無い');

@@ -6,11 +6,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CANONICAL_ROAD_FEATURE_COUNT, REFINED_ROAD_SURFACE_INDEXED_COUNT } from "../tools/lib/canonical-baseline.js";
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
-const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json', 'data/processed/osaka-city/canonical/roads/manifest.json', 'data/processed/osaka-city/derived/refined-road-surface.json');
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const RAW_SKIP = skipIfMissingRel('data/raw/gsi/road-edge');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -20,7 +15,7 @@ const rpt = (n) => rj(R('data', 'reports', n));
 const HTML = R('public', 'osaka_3d_buildings.ward-ux-v1.html');
 const html = fs.existsSync(HTML) ? fs.readFileSync(HTML, 'utf-8') : '';
 
-test('[FIX15 §1] data/raw/gsi/road-edge/ input directory + README が存在する', { skip: RAW_SKIP }, () => {
+test('[FIX15 §1] data/raw/gsi/road-edge/ input directory + README が存在する', () => {
   const dir = R('data', 'raw', 'gsi', 'road-edge');
   assert.ok(fs.existsSync(dir), 'input directory が無い');
   assert.ok(fs.existsSync(path.join(dir, 'README.md')), 'README.md が無い');
@@ -183,7 +178,7 @@ test('[FIX15 §10/§26/§27] runtime: GSI Road Edge toggle は既定 OFF・per-f
   if (animIdx >= 0) assert.doesNotMatch(html.slice(animIdx, animIdx + 4000), /gsiRoadEdge/);
 });
 
-test('[FIX15 §0] canonical / building / FIX13 refined-road-surface は不変', { skip: CANONICAL_SKIP }, () => {
+test('[FIX15 §0] canonical / building / FIX13 refined-road-surface は不変', () => {
   const bm = JSON.parse(fs.readFileSync(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'), 'utf-8'));
   assert.equal(bm.featureCount, 615617);
   const rm = JSON.parse(fs.readFileSync(R('data', 'processed', 'osaka-city', 'canonical', 'roads', 'manifest.json'), 'utf-8'));

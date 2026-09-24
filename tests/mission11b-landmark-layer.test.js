@@ -10,9 +10,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { getModelSpec, buildGeometry } from '../tools/lib/landmark-model-provider.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const DATA_SKIP = skipIfMissingRel('public/map-data/osaka-city/landmarks/landmarks.json');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const DATA = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'landmarks', 'landmarks.json');
@@ -94,7 +91,7 @@ test('[Mission11B QA] __LANDMARK_FOCUS__: registry の x/z を読み cs を書�
   assert.ok(!/function camUpd|function flyTo|function getCityCameraTarget/.test(fn), '__LANDMARK_FOCUS__ 内で既存 camera 関数を再定義している');
 });
 
-test('[Mission11B] 配信データ landmarks.json: PoC 3 件が procedural geometry を焼き込み済み', { skip: DATA_SKIP }, () => {
+test('[Mission11B] 配信データ landmarks.json: PoC 3 件が procedural geometry を焼き込み済み', () => {
   assert.ok(fs.existsSync(DATA), 'landmarks.json が無い');
   const doc = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
   const withModel = doc.landmarks.filter((l) => l.model && l.model.kind === 'procedural');
@@ -145,7 +142,7 @@ test('[Mission11B] protected HTML に変更が混入していない（production
   }
 });
 
-test('[Mission11B] Data QA: 異常 height（>500m）はランドマーク候補に採用されていない', { skip: DATA_SKIP }, () => {
+test('[Mission11B] Data QA: 異常 height（>500m）はランドマーク候補に採用されていない', () => {
   const doc = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
   for (const l of doc.landmarks) {
     if (typeof l.osmHeight === 'number') assert.ok(l.osmHeight <= 500, `${l.id}: osmHeight ${l.osmHeight} > 500`);

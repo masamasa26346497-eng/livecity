@@ -18,9 +18,6 @@ import { isEnvelopeOfExisting, MULTI_MATCH, dedupeRecovered, recoveredFeature, G
 import { FIXTURES, anchorWorld, matchFixture, loadCanonicalIds } from '../tools/audit/missing-recovery-fixtures.js';
 import { ringsEqual, FIXED, OTHER_LAYERS, loadSet } from '../tools/validate/citywide-missing-recovery.js';
 import { latLonToLiveCityWorld } from '../tools/lib/livecity-coordinate-system.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const V2N_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings-v2-osmv2/manifest.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rj = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; } };
@@ -222,7 +219,7 @@ test('35D 変えてはならない件数が記録されている', () => {
   assert.equal(OTHER_LAYERS.rail, 2828);
 });
 
-test('35D V2N の PLATEAU 数が変わっていない', { skip: V2N_SKIP }, () => {
+test('35D V2N の PLATEAU 数が変わっていない', () => {
   const m = rj(path.join(ROOT, 'data', 'processed', 'osaka-city', 'canonical', 'buildings-v2-osmv2', 'manifest.json'));
   assert.ok(m, 'V2N manifest が無い');
   assert.equal(m.featureCount, FIXED.v2nTotal);

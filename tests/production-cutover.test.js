@@ -11,9 +11,6 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { renderProductionHtml, buildProductionHtml } from '../tools/build-production-html.js';
 import { stripComments } from '../tools/validate/production-data-integrity.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] cutover の記録 / baseline hash はコミットされないので、無いときだけ skip
-const CUTOVER_SKIP = skipIfMissingRel('data/reports/production-cutover-build.json', 'data/reports/baselines');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROD = path.join(ROOT, 'public', 'osaka_3d_buildings.html');
@@ -26,7 +23,7 @@ const rpt = (n) => rj(path.join(ROOT, 'data', 'reports', n));
 const skip = (n) => (!rpt(n) && 'no report');
 const sha = (p) => crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 
-test('[32U] production は cutover 時のビルド成果物そのもの（手編集されていない）', { skip: CUTOVER_SKIP }, () => {
+test('[32U] production は cutover 時のビルド成果物そのもの（手編集されていない）', () => {
   // production は tools/build-production-html.js が dev から生成する。以後のミッションで dev だけが
   // 進んでいる間も、production は「最後に昇格したビルド」と完全一致していなければならない。
   const build = rpt('production-cutover-build.json');
@@ -35,7 +32,7 @@ test('[32U] production は cutover 時のビルド成果物そのもの（手編
   assert.match(prod, /const LIVECITY_BUILD_PROFILE = 'production';/);
 });
 
-test('[32U] dev が昇格時点から進んでいなければ production は dev の生成結果と一致する', { skip: CUTOVER_SKIP }, () => {
+test('[32U] dev が昇格時点から進んでいなければ production は dev の生成結果と一致する', () => {
   const dev = fs.readFileSync(DEV, 'utf-8');
   const build = rpt('production-cutover-build.json');
   if (build && build.devSha256 && build.devSha256 !== sha(DEV)) {
@@ -87,7 +84,7 @@ test('[32U §18] production 起動時 self-check がある', () => {
   assert.match(prod, /console\.warn\('\[LiveCity\] production self-check MISMATCH', r\);/);
 });
 
-test('[32U §1/§23] protected は不変', { skip: CUTOVER_SKIP }, () => {
+test('[32U §1/§23] protected は不変', () => {
   const baseline = rpt('baselines/prod-protected-hashes.json');
   assert.ok(baseline && baseline.prot, 'baseline hash が無い');
   assert.equal(sha(PROT), baseline.prot);

@@ -10,9 +10,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { GROUND_EXTENT, INLAND_TEST_POINTS, validateWaterSurface, pointInTriangle } from '../tools/lib/water-surface.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const DATA_SKIP = skipIfMissingRel('public/map-data/osaka-city/water-surface/water-surface.json');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const DATA_PATH = path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'water-surface', 'water-surface.json');
@@ -70,7 +67,7 @@ test('[Mission06] __WATER_SURFACE_DEBUG__ が enabled/polygons/triangles/bbox/so
   }
 });
 
-test('[Mission06] 配信データ: znorth-neg-v1 / emitted / 多重ゲート検証を全通過', { skip: DATA_SKIP }, () => {
+test('[Mission06] 配信データ: znorth-neg-v1 / emitted / 多重ゲート検証を全通過', () => {
   assert.ok(fs.existsSync(DATA_PATH), 'water-surface.json が無い（node tools/build-water-surface.js）');
   const doc = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
   assert.equal(doc.coordinateConvention, 'znorth-neg-v1');
@@ -89,7 +86,7 @@ test('[Mission06] 配信データ: znorth-neg-v1 / emitted / 多重ゲート検�
   assert.equal(v.stats.inlandHits, 0, '内陸テスト点が海面に内包されている');
 });
 
-test('[Mission06] 配信データ: 既知の内陸/沿岸市街地点が海面に含まれない', { skip: DATA_SKIP }, () => {
+test('[Mission06] 配信データ: 既知の内陸/沿岸市街地点が海面に含まれない', () => {
   const doc = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
   const pos = doc.positions;
   const LAND_POINTS = [
@@ -106,7 +103,7 @@ test('[Mission06] 配信データ: 既知の内陸/沿岸市街地点が海面�
   }
 });
 
-test('[Mission06] 配信データ: 総面積が妥当（陸を塗っていない）/ bbox は西・南のみ', { skip: DATA_SKIP }, () => {
+test('[Mission06] 配信データ: 総面積が妥当（陸を塗っていない）/ bbox は西・南のみ', () => {
   const doc = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
   const km2 = doc.areaM2 / 1e6;
   assert.ok(km2 >= 20 && km2 <= 120, `海面総面積 ${km2.toFixed(1)}km² が想定外`);

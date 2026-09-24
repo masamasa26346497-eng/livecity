@@ -20,9 +20,6 @@ import {
 } from '../tools/validate/north-road-recovery.js';
 import { SITES, PERF_SITES, worldOf } from '../tools/audit/north-road-runtime-qa.js';
 import { latLonToLiveCityWorld } from '../tools/lib/livecity-coordinate-system.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const RAW_SKIP = skipIfMissingRel('data/raw/osaka-city/roads-osm.osaka-latest-backup.json', 'data/raw/osm/osaka-latest.osm.pbf');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEV = path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html');
@@ -167,7 +164,7 @@ test('35E §14 production は V2N（600,764）のまま', { skip: fs.existsSync(
   if (m) assert.equal(m.canonicalBuildingCount, PRODUCTION_BUILDING_COUNT, 'V2N の建物数が変わっている');
 });
 
-test('35E 旧 road source を消していない', { skip: RAW_SKIP }, () => {
+test('35E 旧 road source を消していない', () => {
   const backup = path.join(ROOT, 'data', 'raw', 'osaka-city', 'roads-osm.osaka-latest-backup.json');
   assert.ok(fs.existsSync(backup), '旧 road source のバックアップが無い');
   const oldPbf = path.join(ROOT, 'data', 'raw', 'osm', 'osaka-latest.osm.pbf');

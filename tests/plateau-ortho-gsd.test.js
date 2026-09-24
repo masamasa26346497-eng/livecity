@@ -20,9 +20,6 @@ import { classifyGsd, UMEDA_LL, UMEDA_BBOX } from '../tools/audit/umeda-aerial-s
 import { meshCode3, UMEDA_MESH3 } from '../tools/audit/umeda-ortho-source-catalog.js';
 import { ARCHIVES, WORK_DIR } from '../tools/download/plateau-ortho-archive.js';
 import { isInsideRepo, EXPECTED_GENERATED_ROOFS, QUALITY_GATE_35A } from '../tools/validate/plateau-ortho-gsd.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const RAW_SKIP = skipIfMissingRel('data/raw/osaka-city/aerial-probe');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rj = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; } };
@@ -175,7 +172,7 @@ test('35C repo 内に 7z を置いていない', () => {
   assert.deepEqual(found, []);
 });
 
-test('35C 35B で置いた raw の probe 成果が残っている', { skip: RAW_SKIP }, () => {
+test('35C 35B で置いた raw の probe 成果が残っている', () => {
   const d = path.join(ROOT, 'data', 'raw', 'osaka-city', 'aerial-probe');
   assert.ok(fs.existsSync(d), 'aerial-probe が消えている');
   assert.ok(fs.readdirSync(d).length > 0);

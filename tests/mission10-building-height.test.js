@@ -11,9 +11,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { PROJECT_ROOT } from '../tools/lib/paths.js';
 import { classifyBuildingHeight, HEIGHT_THRESHOLDS } from '../tools/lib/building-height-style.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const TILE_SKIP = skipIfMissingRel('public/map-data/osaka-city/buildings/manifest.json');
 
 const html = fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html'), 'utf-8');
 const iife = html.slice(html.indexOf('const BUILDING_HEIGHT_STYLE = (function'), html.indexOf('function msLerpClamp'));
@@ -119,7 +116,7 @@ test('[Mission10] protected HTML に変更が混入していない（production 
   }
 });
 
-test('[Mission10] 実データ分布のサニティ（>=100m 建物が存在＝スカイライン表現に足る）', { skip: TILE_SKIP }, () => {
+test('[Mission10] 実データ分布のサニティ（>=100m 建物が存在＝スカイライン表現に足る）', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, 'public', 'map-data', 'osaka-city', 'buildings', 'manifest.json'), 'utf-8'));
   let n = 0, ge100 = 0, kita100 = 0;
   for (const ds of manifest.datasets || []) {

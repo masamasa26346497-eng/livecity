@@ -5,9 +5,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
-const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -62,7 +59,7 @@ test('[FIX11 §1] coordinate-config.json（第7系）は現行 pipeline 未接�
   assert.equal(cfg.jprectZone, 7);
 });
 
-test('[FIX11 §22/§23/§24] geometry / placement policy / conflict は不変（再build なし）', { skip: CANONICAL_SKIP }, () => {
+test('[FIX11 §22/§23/§24] geometry / placement policy / conflict は不変（再build なし）', () => {
   const m = JSON.parse(fs.readFileSync(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'), 'utf-8'));
   assert.equal(m.featureCount, 615617);
   const a = rpt('coordinate-system-authority-audit.json');

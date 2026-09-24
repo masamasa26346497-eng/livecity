@@ -5,9 +5,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] canonical の生成物が無い素のチェックアウトでは検証対象が無いので skip（assertion 失敗では skip しない）
-const CANONICAL_SKIP = skipIfMissingRel('data/processed/osaka-city/canonical/buildings/manifest.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -80,7 +77,7 @@ test('[FIX10 §1/§3] 座標 pipeline: roads/water/N03/geoToThree が同一原�
   assert.match(p.byLayer['CanonicalRuntime'].transform, /座標変換ゼロ|なし/);
 });
 
-test('[FIX10 §18/§19] source geometry 不変・placement policy 再計算不要（geometry 未変更）', { skip: CANONICAL_SKIP }, () => {
+test('[FIX10 §18/§19] source geometry 不変・placement policy 再計算不要（geometry 未変更）', () => {
   // この mission は canonical geometry を書き換えていない → placement/conflict を再生成する必要がない
   assert.ok(fs.existsSync(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json')));
   const m = JSON.parse(fs.readFileSync(R('data', 'processed', 'osaka-city', 'canonical', 'buildings', 'manifest.json'), 'utf-8'));

@@ -23,11 +23,6 @@ import {
 import { railVisibleAt, waterVisibleAt, parkVisibleAt, ALLOWED } from '../tools/build-derived-shared-layers.js';
 import { PRODUCTION_BUILDING_COUNT, ROAD_35E, CANONICAL_BUILDING_V1 } from '../tools/validate/osm-shared-source-audit.js';
 import { CANONICAL_ROAD_FEATURE_COUNT } from '../tools/lib/canonical-baseline.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const LABEL_SKIP = skipIfMissingRel('public/map-data/osaka-city/derived/station-index.json');
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const RAW_SKIP = skipIfMissingRel('data/raw/osaka-city/railways-osm.osaka-latest-backup.json', 'data/raw/osm/osaka-latest.osm.pbf');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rj = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; } };
@@ -147,7 +142,7 @@ test('35F 地名ラベルは広域 PBF を使う', () => {
   if (j) assert.match(j.source, /osaka-full-coverage/, '地名ラベルが旧 PBF のまま');
 });
 
-test('35F 駅ラベルが読むファイルは canonical の駅数と一致する', { skip: LABEL_SKIP }, () => {
+test('35F 駅ラベルが読むファイルは canonical の駅数と一致する', () => {
   // 35F の意図: **画面が実際に読むファイル** が canonical と同じ駅数に追随していること。
   //   derived/rail-stations.json だけ更新して満足すると、画面のラベルは古いまま残る。
   //   35K で CityLabelLayer の読み先は labels/station-labels.json から
@@ -307,7 +302,7 @@ test('35F 建物 V4 が dev の既定、production は V2N', () => {
   if (v4) assert.equal(v4.featureCount, 618749, '建物 V4 が変わっている');
 });
 
-test('35F 旧 source を消していない', { skip: RAW_SKIP }, () => {
+test('35F 旧 source を消していない', () => {
   for (const f of ['railways-osm.osaka-latest-backup.json', 'waterways-osm.osaka-latest-backup.json',
     'parks-osm.osaka-latest-backup.json', 'roads-osm.osaka-latest-backup.json']) {
     assert.ok(fs.existsSync(path.join(ROOT, 'data', 'raw', 'osaka-city', f)), f + ' が無い');

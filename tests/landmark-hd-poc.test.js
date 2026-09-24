@@ -18,11 +18,6 @@ import {
 import { REQUIRED_CONFIG_FIELDS, LOD1_TRIANGLE_BASELINE, MIN_DETAIL_RATIO } from '../tools/validate/landmark-hd-poc.js';
 import { SCAN_RADIUS_M, KEEP_MATCH, ringArea, ringCentroid, toLocal } from '../tools/audit/osaka-castle-source-scan.js';
 import { productionMatchesBuildRecord, devUiIsGated } from '../tools/lib/production-invariants.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] cutover の記録 / baseline hash はコミットされないので、無いときだけ skip
-const BASELINE_SKIP = skipIfMissingRel('data/reports/baselines');
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const MODEL_SKIP = skipIfMissingRel('public/map-data/osaka-city/landmarks/landmark-models.json');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEV = path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html');
@@ -61,7 +56,7 @@ test('[33E §2] 対象は設定ファイルが決める（HTML に名前や寸�
   assert.match(block, /const URL_ = 'map-data\/osaka-city\/landmarks\/landmark-models\.json';/);
 });
 
-test('[33E §2] 設定ファイルに必須項目がそろっている', { skip: MODEL_SKIP }, () => {
+test('[33E §2] 設定ファイルに必須項目がそろっている', () => {
   assert.ok(models, 'landmark-models.json が無い');
   assert.ok((models.landmarks || []).length >= 1);
   for (const l of models.landmarks) {
@@ -80,7 +75,7 @@ test('[33E §2] 設定ファイルに必須項目がそろっている', { skip:
   }
 });
 
-test('[33E §4/§7] 大阪城: 実データと様式化の切り分けが設定に書かれている', { skip: MODEL_SKIP }, () => {
+test('[33E §4/§7] 大阪城: 実データと様式化の切り分けが設定に書かれている', () => {
   const c = models.landmarks.find((l) => l.landmarkId === 'osaka-castle');
   assert.ok(c, '大阪城の設定が無い');
   // 平面形は OSM の実 footprint
@@ -101,7 +96,7 @@ test('[33E §4/§7] 大阪城: 実データと様式化の切り分けが設定�
   for (const g of c.sources.gates) assert.match(g.source, /city_gate/);
 });
 
-test('[33E §検証] HD は LOD1 の箱より明確に高精細', { skip: MODEL_SKIP }, () => {
+test('[33E §検証] HD は LOD1 の箱より明確に高精細', () => {
   const c = models.landmarks.find((l) => l.landmarkId === 'osaka-castle');
   const tri = c.parts.reduce((s, p) => s + p.triangleCount, 0);
   assert.ok(tri / LOD1_TRIANGLE_BASELINE >= MIN_DETAIL_RATIO, '比 ' + (tri / LOD1_TRIANGLE_BASELINE));
@@ -112,7 +107,7 @@ test('[33E §検証] HD は LOD1 の箱より明確に高精細', { skip: MODEL_
   for (const m of ['stone', 'wall', 'roof', 'trim']) assert.ok(mats.includes(m), m + ' が無い');
 });
 
-test('[33E §3] 切替と抑制の設定が整合している', { skip: MODEL_SKIP }, () => {
+test('[33E §3] 切替と抑制の設定が整合している', () => {
   const c = models.landmarks.find((l) => l.landmarkId === 'osaka-castle');
   assert.ok(Array.isArray(c.suppressBuildingIds) && c.suppressBuildingIds.length === 1);
   assert.equal(c.suppressBuildingIds[0], c.pickCanonicalId, '抑制する棟と card に出す棟が違う');
@@ -275,7 +270,7 @@ test('[33E] validator が PASS', { skip: skip('landmark-hd-poc-validation.json')
   assert.equal(v.protectedModified, false);
 });
 
-test('[33E] production / protected は変更していない', { skip: BASELINE_SKIP }, () => {
+test('[33E] production / protected は変更していない', () => {
   const build = rpt('production-cutover-build.json');
   assert.ok(build && build.productionSha256);
   assert.equal(sha(PROD), build.productionSha256);

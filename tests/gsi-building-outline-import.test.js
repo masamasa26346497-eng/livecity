@@ -6,9 +6,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseBuildingOutlineGml, posListToPairs } from '../tools/lib/gsi-building-outline-gml.js';
-import { skipIfMissingRel } from './_generated-data.mjs';
-// [Mission 35L] 検証対象の生成物が無いときだけ skip（生成済みなら従来どおり全部検証する）
-const RAW_SKIP = skipIfMissingRel('data/raw/gsi/building-outline/README.md');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (...s) => path.join(ROOT, ...s);
@@ -81,7 +78,7 @@ test('[FIX22実測で発見・修正] building-outline-lines.json は JSON.strin
   assert.match(src, /writeLargeLinesJson\(OUT_LINES,/);
 });
 
-test('[README] data/raw/gsi/building-outline/README.md が存在し取得手順を明示している', { skip: RAW_SKIP }, () => {
+test('[README] data/raw/gsi/building-outline/README.md が存在し取得手順を明示している', () => {
   const p = R('data', 'raw', 'gsi', 'building-outline', 'README.md');
   assert.ok(fs.existsSync(p));
   const t = fs.readFileSync(p, 'utf-8');

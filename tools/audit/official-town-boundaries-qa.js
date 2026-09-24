@@ -24,6 +24,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * 35K では梅田・本町・淡路は区界へ落ちていた（町丁目データが無かった）。
  * 35L の公式境界が入れば、すべて chochome 粒度で選べるはず。
  */
+/** --smoke で指定 6 地点だけに絞る（CI 構成の変更が QA を壊していないかの確認用）。 */
+export const SMOKE_IDS = ['umeda', 'honmachi', 'namba', 'awaji', 'higashimikuni', 'sumiyoshi'];
+
 export const SITES = [
   { id: 'umeda', label: '梅田', ward: '北区', lat: 34.70250, lon: 135.49586, r: 1200 },
   { id: 'honmachi', label: '本町', ward: '中央区', lat: 34.68200, lon: 135.49900, r: 1200 },
@@ -128,7 +131,9 @@ export async function run() {
   try {
     await page.send('Page.navigate', { url: URL_ });
     await settle(page, 6000, 240000);
-    for (const s of SITES) {
+    const smoke = process.argv.includes('--smoke');
+    const sites = smoke ? SITES.filter((x) => SMOKE_IDS.includes(x.id)) : SITES;
+    for (const s of sites) {
       const w = worldOf(s);
       await page.evaluate(JS.ward(w.x, w.z)); await sleep(2200);
       await page.evaluate(JS.camera(w.x, w.z, s.r));
