@@ -52,7 +52,7 @@ jobs:
             --out public/map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json
 
       - name: Patch dev runtime only
-        run: python tools/experiments/mission35s_patch_dev.py
+        run: python tools/experiments/mission35s_patch_dev_v2.py
 
       - name: Mission 35S regression tests
         run: node --test tests/mission35s-custom-lod2.test.js
