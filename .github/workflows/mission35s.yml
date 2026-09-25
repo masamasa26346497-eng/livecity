@@ -1,0 +1,17 @@
+name: Mission 35S Live City custom LOD2 integration
+
+on:
+  push:
+    branches: [feature/mission-35s-livecity-custom-lod2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe dev runtime anchors
+        run: python tools/experiments/mission35s_runtime_probe.py
