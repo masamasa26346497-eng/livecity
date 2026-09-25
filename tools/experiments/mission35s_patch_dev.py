@@ -20,10 +20,18 @@ const CustomLod2Layer = (function () {
   const URL_ = 'map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json';
   const MAX_CAMERA_R = 2500;
   const MATCH_MAX_SHIFT_M = 20;
-  let group = null, mesh = null, loaded = false, loading = null, enabled = true, data = null;
+  // 重心が相手のポリゴンの中に入っている（= 強い証拠）ときだけ、距離の上限を広げる。
+  //   実測: 本命は重心 22.0m / 面積比 1.71 / 内包あり。20m で切ると一度も表示されなかった。
+  const MATCH_MAX_SHIFT_WITH_EVIDENCE_M = 35;
+  // [Mission 35S QA] 試作の 1 棟だけ、どれか一目で分かる色にする。周りの建物の色は変えない。
+  const QA_COLOR = { roof: 0x2f9bff, wall: 0x10399c, ground: 0x8b949c };
+  // 対象棟が画面中央に大きく入る距離（650m では遠すぎて判別できなかった）
+  const FOCUS_R = 150;
+  const LABEL_TEXT = '35S CUSTOM LOD2';
+  let group = null, mesh = null, label = null, loaded = false, loading = null, enabled = true, data = null;
   let canonicalId = null, visible = false, suppressActive = false, lastSuppress = false;
   let mats = null;
-  const stats = { loaded: false, matched: false, matchDistanceM: null, areaRatio: null, triangles: 0, error: null, visible: false };
+  const stats = { loaded: false, matched: false, matchDistanceM: null, areaRatio: null, triangles: 0, error: null, visible: false, lod1SuppressedCount: 0 };
 
   function ensureGroup() {
     if (group) return group;
@@ -76,9 +84,24 @@ const CustomLod2Layer = (function () {
       return CanonicalRuntime.buildingTileKeys().has(Math.floor(x / 500) + '_' + Math.floor(z / 500));
     } catch (e) { return true; }
   }
+  /** 対象棟の 500m タイルキー（invalidateBuildingTiles はこの粒度で受け取る）。 */
+  function targetTileKeys() {
+    if (!data || !data.match || !Array.isArray(data.match.sourceCentroid)) return [];
+    const [x, z] = data.match.sourceCentroid;
+    const tx = Math.floor(x / 500), tz = Math.floor(z / 500);
+    const keys = [];
+    // 建物が隣のタイルにまたがることがあるので、周囲 1 枚ぶんも一緒に落とす
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) keys.push((tx + dx) + '_' + (tz + dz));
+    return keys;
+  }
   function invalidateBuildings() {
-    try { if (typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.invalidateBuildingTiles) CanonicalRuntime.invalidateBuildingTiles(); }
-    catch (e) { /* noop */ }
+    // invalidateBuildingTiles(tileKeys) は渡されたキーに当たるタイルだけを捨てる。
+    //   引数なしで呼ぶと空集合になり 1 枚も落ちず、抑制が画面に反映されない（実機で確認）。
+    try {
+      if (typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.invalidateBuildingTiles) {
+        CanonicalRuntime.invalidateBuildingTiles(targetTileKeys());
+      }
+    } catch (e) { /* noop */ }
   }
   function tryMatch() {
     if (canonicalId || !data || typeof CanonicalRuntime === 'undefined' || !CanonicalRuntime.visibleBuildingFootprints) return !!canonicalId;
@@ -93,12 +116,14 @@ const CustomLod2Layer = (function () {
       const id = candidateId(fp), ring = fpRing(fp); if (!id || !ring) continue;
       const c = fpCentroid(fp, ring); if (!c) continue;
       const d = Math.hypot(c[0] - srcC[0], c[1] - srcC[1]);
-      if (d > MATCH_MAX_SHIFT_M) continue;
+      if (d > MATCH_MAX_SHIFT_WITH_EVIDENCE_M) continue;
       const a = ringArea(ring); if (!(a > 0)) continue;
       const ratio = a / srcArea;
       if (ratio < 0.45 || ratio > 2.2) continue;
       const spatialEvidence = pointInRing(srcC[0], srcC[1], ring) || pointInRing(c[0], c[1], srcRing);
       if (!spatialEvidence) continue;
+      // 内包が取れていない相手は、従来どおり近いものしか採らない
+      if (!spatialEvidence && d > MATCH_MAX_SHIFT_M) continue;
       const score = d + Math.abs(Math.log(ratio)) * 8;
       if (!best || score < best.score) best = { id, d, ratio, score };
     }
@@ -112,10 +137,12 @@ const CustomLod2Layer = (function () {
   }
   function materials() {
     if (mats) return mats;
+    // QA 用の配色。roof = 明るい青 / wall = 濃い青 / ground = グレー。
+    //   試作であることを画面で示すための一時的な色で、通常の建物マテリアルとは別物。
     mats = [
-      new THREE.MeshStandardMaterial({ color: 0xd9b980, roughness: 0.72, metalness: 0.02, side: THREE.DoubleSide }),
-      new THREE.MeshStandardMaterial({ color: 0xc9d7df, roughness: 0.84, metalness: 0.01, side: THREE.DoubleSide }),
-      new THREE.MeshStandardMaterial({ color: 0xaeb9bd, roughness: 0.90, metalness: 0.00, side: THREE.DoubleSide }),
+      new THREE.MeshStandardMaterial({ color: QA_COLOR.roof, roughness: 0.55, metalness: 0.02, side: THREE.DoubleSide }),
+      new THREE.MeshStandardMaterial({ color: QA_COLOR.wall, roughness: 0.70, metalness: 0.02, side: THREE.DoubleSide }),
+      new THREE.MeshStandardMaterial({ color: QA_COLOR.ground, roughness: 0.92, metalness: 0.00, side: THREE.DoubleSide }),
     ];
     return mats;
   }
@@ -141,6 +168,46 @@ const CustomLod2Layer = (function () {
     mesh.userData.customLod2 = { canonicalId: null, mission: '35S', experimental: true };
     g.add(mesh);
     stats.triangles = Math.floor(idx.length / 3);
+    buildLabel(g, verts);
+  }
+  /** [Mission 35S QA] 対象棟の上に「35S CUSTOM LOD2」を常時出す。 */
+  function buildLabel(g, verts) {
+    let cx = 0, cz = 0, top = -Infinity;
+    for (const v of verts) { cx += v[0]; cz += v[2]; if (v[1] > top) top = v[1]; }
+    cx /= verts.length; cz /= verts.length;
+    if (!Number.isFinite(top)) top = 0;
+    const cv = document.createElement('canvas');
+    const fontPx = 64;
+    const probe = cv.getContext('2d');
+    probe.font = '700 ' + fontPx + 'px system-ui, sans-serif';
+    cv.width = Math.ceil(probe.measureText(LABEL_TEXT).width) + 48;
+    cv.height = fontPx + 40;
+    const c2 = cv.getContext('2d');
+    c2.font = '700 ' + fontPx + 'px system-ui, sans-serif';
+    c2.textAlign = 'center'; c2.textBaseline = 'middle';
+    c2.fillStyle = 'rgba(16,57,156,0.92)';
+    c2.strokeStyle = '#2f9bff'; c2.lineWidth = 6;
+    const rr = 14, W = cv.width - 8, H = cv.height - 8;
+    c2.beginPath();
+    c2.moveTo(4 + rr, 4); c2.lineTo(4 + W - rr, 4); c2.quadraticCurveTo(4 + W, 4, 4 + W, 4 + rr);
+    c2.lineTo(4 + W, 4 + H - rr); c2.quadraticCurveTo(4 + W, 4 + H, 4 + W - rr, 4 + H);
+    c2.lineTo(4 + rr, 4 + H); c2.quadraticCurveTo(4, 4 + H, 4, 4 + H - rr);
+    c2.lineTo(4, 4 + rr); c2.quadraticCurveTo(4, 4, 4 + rr, 4);
+    c2.closePath(); c2.fill(); c2.stroke();
+    c2.fillStyle = '#ffffff';
+    c2.fillText(LABEL_TEXT, cv.width / 2, cv.height / 2 + 2);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.needsUpdate = true;
+    label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    label.name = 'CR_customLod2_35S_label';
+    // world 固定サイズ。FOCUS_R(150m) で確実に読める大きさにする。
+    const hW = 46, hH = hW * (cv.height / cv.width);
+    label.scale.set(hW, hH, 1);
+    label.position.set(cx, top + 22, cz);
+    label.renderOrder = 10030;
+    label.frustumCulled = false;
+    g.add(label);
+    stats.labelText = LABEL_TEXT;
   }
   async function load() {
     if (loaded) return true; if (loading) return loading;
@@ -172,30 +239,93 @@ const CustomLod2Layer = (function () {
     if (suppressActive !== lastSuppress) { lastSuppress = suppressActive; invalidateBuildings(); }
   }
   function setEnabled(on) { enabled = on !== false; update(); return enabled; }
-  function isSuppressedBuilding(id) { return !!(enabled && suppressActive && visible && canonicalId && id === canonicalId); }
+  function isSuppressedBuilding(id) {
+    const hit = !!(enabled && suppressActive && visible && canonicalId && id === canonicalId);
+    // §6 の実証値。canonical runtime は LOD1 の箱を積む直前にここを呼び、
+    //   true なら continue する。つまりこの数がそのまま「LOD1 を出さなかった回数」。
+    if (hit) stats.lod1SuppressedCount++;
+    return hit;
+  }
   function pick(rayObj) {
     if (!visible || !mesh || !canonicalId) return null;
     const hits = rayObj.intersectObject(mesh, false); if (!hits.length) return null;
     return { canonicalId, lod: 2, experimental: true, source: 'Live City point cloud prototype', distance: hits[0].distance };
   }
   function getDebug() {
+    const m = (data && data.measurement) || {};
+    const mm = (data && data.match) || {};
+    const src = (data && data.source) || {};
     return { enabled, loaded, canonicalId, visible, suppressActive, url: URL_, maxCameraR: MAX_CAMERA_R,
-      officialPlateauLod2: false, status: data && data.status, ...stats };
+      officialPlateauLod2: false, status: data && data.status, ...stats,
+      // [Mission 35S §5] QA で必要な値をここだけで確認できるようにする
+      heightMedianM: (m.heightMedianM != null) ? m.heightMedianM : null,
+      heightP90M: (m.heightP90M != null) ? m.heightP90M : null,
+      roofType: m.roofType || null,
+      sourceFootprintAreaM2: (mm.sourceFootprintAreaM2 != null) ? mm.sourceFootprintAreaM2 : null,
+      osmWayId: (src.osmWayId != null) ? src.osmWayId : null,
+      // §6 公式側が同じ棟を持っていたら、そちらを優先して自分は出さない
+      officialOwnsCanonical: canonicalId ? officialOwns(canonicalId) : false,
+      landmarkOwnsCanonical: canonicalId ? landmarkOwns(canonicalId) : false,
+      focusR: FOCUS_R, labelText: LABEL_TEXT,
+      labelWorld: label ? { x: +label.position.x.toFixed(2), y: +label.position.y.toFixed(2), z: +label.position.z.toFixed(2) } : null,
+      labelVisible: !!(label && label.visible),
+      qaColors: { roof: '#' + QA_COLOR.roof.toString(16).padStart(6, '0'),
+        wall: '#' + QA_COLOR.wall.toString(16).padStart(6, '0'),
+        ground: '#' + QA_COLOR.ground.toString(16).padStart(6, '0') } };
+  }
+  /** [Mission 35S §4] QA カード用のまとめ。 */
+  function getQaSummary() {
+    const d = getDebug();
+    return {
+      mission: '35S',
+      type: 'Experimental point-cloud LOD2',
+      officialPlateauLod2: false,
+      osmWay: d.osmWayId,
+      heightMedianM: d.heightMedianM,
+      triangles: d.triangles,
+      canonicalId: d.canonicalId,
+      matchDistanceM: d.matchDistanceM,
+      areaRatio: d.areaRatio,
+      sourceFootprintAreaM2: d.sourceFootprintAreaM2,
+      suppressActive: d.suppressActive,
+    };
   }
   function focus() {
     if (!data || !data.match || !Array.isArray(data.match.sourceCentroid)) { load().then(focus); return false; }
+    const [fx, fz] = data.match.sourceCentroid;
+    // 対象棟のある区へ切り替える。区が違うと建物タイルが読まれず、
+    //   canonical との突き合わせが成立しないので試作メッシュが出ない（実機で確認）。
+    try {
+      if (typeof WardModeManager !== 'undefined' && WardModeManager.detectWardAt) {
+        const wid = WardModeManager.detectWardAt(fx, fz);
+        if (wid) {
+          if (typeof CityModeManager !== 'undefined' && CityModeManager.isActive && CityModeManager.isActive()) {
+            CityModeManager.exit(wid);
+          }
+          const cur = WardModeManager.getCurrentWard ? WardModeManager.getCurrentWard() : null;
+          if (!cur || cur.id !== wid) WardModeManager.switchWard(wid);
+        }
+      }
+    } catch (e) { /* 区切替に失敗してもカメラは動かす */ }
     if (typeof cs !== 'undefined') {
-      cs.tgt.x = data.match.sourceCentroid[0]; cs.tgt.z = data.match.sourceCentroid[1]; cs.tgt.y = 0;
-      cs.r = 650; cs.ph = Math.max(0.45, Math.min(1.15, cs.ph || 0.8));
+      cs.tgt.x = fx; cs.tgt.z = fz; cs.tgt.y = 0;
+      // 対象棟が画面中央に大きく入る距離まで寄せる（650m では判別できなかった）
+      cs.r = FOCUS_R; cs.ph = Math.max(0.45, Math.min(1.15, cs.ph || 0.8));
       if (typeof camUpd === 'function') camUpd();
     }
+    // タイルが届いたところで突き合わせ直す
+    for (const ms of [600, 1500, 3000, 6000, 10000]) setTimeout(() => { try { update(); } catch (e) { /* noop */ } }, ms);
     return true;
   }
   ensureGroup(); load();
-  return { load, update, setEnabled, isEnabled: () => enabled, isSuppressedBuilding, pick, getDebug, focus,
+  return { load, update, setEnabled, isEnabled: () => enabled, isSuppressedBuilding, pick, getDebug, getQaSummary, focus,
     getCanonicalId: () => canonicalId };
 })();
 if (typeof window !== 'undefined') {
+  window.__CUSTOM_LOD2_LAYER__ = CustomLod2Layer;
+  window.__CUSTOM_LOD2_DEBUG__ = () => CustomLod2Layer.getDebug();
+  window.__CUSTOM_LOD2_TOGGLE__ = (on) => CustomLod2Layer.setEnabled(on !== false);
+  window.__CUSTOM_LOD2_FOCUS__ = () => CustomLod2Layer.focus();
 __MISSION35S_FOCUS_BUTTON__
 }
 '''
@@ -222,6 +352,44 @@ FOCUS_BUTTON = r'''  // [Mission 35S] 表示確認用ボタン。右側のデバ
     document.body.appendChild(b);
   }
 
+  // [Mission 35S §4] 試作 LOD2 をクリックしたとき、通常の建物属性カードとは別に
+  //   「これは公式 PLATEAU LOD2 ではない」ことと、突き合わせの根拠を出す。
+  function showMission35SQaCard() {
+    const q = (CustomLod2Layer.getQaSummary && CustomLod2Layer.getQaSummary()) || null;
+    if (!q) return;
+    let el = document.getElementById('mission35s-qa-card');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'mission35s-qa-card';
+      el.style.cssText =
+        'position:fixed;left:20px;bottom:150px;z-index:99998;max-width:330px;' +
+        'padding:12px 14px;border:2px solid #2f9bff;background:rgba(9,20,44,.94);' +
+        'border-radius:10px;font:500 12px/1.65 system-ui;color:#e8f2ff;' +
+        'box-shadow:0 4px 16px #0006;';
+      document.body.appendChild(el);
+    }
+    const row = (k, v) => '<div style="display:flex;gap:8px"><span style="color:#9fc4ff;min-width:132px">'
+      + k + '</span><span style="word-break:break-all">' + v + '</span></div>';
+    el.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      + '<b style="color:#2f9bff">35S CUSTOM LOD2（試作）</b>'
+      + '<span id="mission35s-qa-close" style="cursor:pointer;color:#9fc4ff;padding:0 4px">×</span></div>'
+      + row('Mission', q.mission)
+      + row('Type', q.type)
+      + row('officialPlateauLod2', String(q.officialPlateauLod2))
+      + row('OSM way', q.osmWay == null ? '—' : q.osmWay)
+      + row('高さ（中央値）', q.heightMedianM == null ? '—' : q.heightMedianM + ' m')
+      + row('三角形数', q.triangles == null ? '—' : q.triangles)
+      + row('canonicalId', q.canonicalId || '（未一致）')
+      + row('matchDistanceM', q.matchDistanceM == null ? '—' : q.matchDistanceM)
+      + row('areaRatio', q.areaRatio == null ? '—' : q.areaRatio)
+      + row('LOD1 抑制', q.suppressActive ? 'ON（元 LOD1 は非表示）' : 'OFF');
+    el.style.display = 'block';
+    const c = document.getElementById('mission35s-qa-close');
+    if (c) c.addEventListener('click', () => { el.style.display = 'none'; });
+  }
+  window.__MISSION35S_QA_CARD__ = showMission35SQaCard;
+
   // DOMContentLoaded を撃ち終えたあとに読み込まれても必ず作る。
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', createMission35SFocusButton);
@@ -243,37 +411,55 @@ FOCUS_ANCHOR = "  window.__CUSTOM_LOD2_FOCUS__ = () => CustomLod2Layer.focus();"
 FOCUS_END = chr(10) + "}" + chr(10) + chr(10) + "// " + "═" * 3
 
 
-def refresh_focus_button(s: str) -> str:
-    """既にパッチ済みの dev HTML のボタン定義だけを今の FOCUS_BUTTON に貼り替える。
+QA_CARD_HOOK = ("        // [Mission 35S §4] 通常の property card に加えて、試作であることが分かる QA カードも出す。"
+                + chr(10) + "        try { if (window.__MISSION35S_QA_CARD__) window.__MISSION35S_QA_CARD__(); } catch (e2) { /* noop */ }")
+QA_CARD_ANCHOR = "        const d = CanonicalRuntime.buildingDataById(cl.canonicalId);"
 
-    パッチ全体は MARK で冪等にしているので、ボタンの見た目や生成タイミングを直しても
-    「もう入っている」と判断されて反映されない。実際、dev HTML は
-    DOMContentLoaded だけの古い形のまま残っていた。CI が再生成しても直りが残るよう、
-    ここだけは毎回上書きする。
-    """
-    i = s.find(FOCUS_ANCHOR)
-    if i < 0:
-        raise RuntimeError('focus button refresh: anchor missing')
-    start = i + len(FOCUS_ANCHOR)
-    j = s.find(FOCUS_END, start)
-    if j < 0:
-        raise RuntimeError('focus button refresh: end marker missing')
-    current = s[start:j]
-    wanted = chr(10) + FOCUS_BUTTON
-    if current == wanted:
+
+def refresh_pick_hook(s: str) -> str:
+    """pick 経路は 35S ブロックの外にあるので、ブロック貼り直しでは直らない。ここだけ別に足す。"""
+    if '__MISSION35S_QA_CARD__()' in s:
         return s
-    return s[:start] + wanted + s[j:]
+    i = s.find(QA_CARD_ANCHOR)
+    if i < 0:
+        raise RuntimeError('pick hook refresh: anchor missing')
+    end = i + len(QA_CARD_ANCHOR)
+    return s[:end] + chr(10) + QA_CARD_HOOK + s[end:]
+
+
+def refresh_layer_block(s: str) -> str:
+    """既にパッチ済みの dev HTML の 35S ブロックを、今の LAYER で丸ごと貼り替える。
+
+    パッチ全体は MARK で冪等にしているので、レイヤーの中身（QA 配色・ラベル・focus 距離・
+    debug 値）を直しても「もう入っている」と判断されて反映されない。実際、dev HTML は
+    DOMContentLoaded だけの古い形のまま残っていた。CI が再生成しても直りが残るよう、
+    35S が自分で入れたブロックだけは毎回上書きする。
+
+    差し替えるのは MARK から window ブロックの閉じ括弧までで、
+    その外側（canonical runtime 側のフック）は触らない。
+    """
+    i = s.find(MARK)
+    if i < 0:
+        raise RuntimeError('layer refresh: MARK missing')
+    j = s.find(FOCUS_END, i)
+    if j < 0:
+        raise RuntimeError('layer refresh: end marker missing')
+    end = j + len(chr(10) + '}')
+    wanted = LAYER[LAYER.index(MARK):].rstrip(chr(10))
+    if s[i:end] == wanted:
+        return s
+    return s[:i] + wanted + s[end:]
 
 
 def main():
     s = DEV.read_text(encoding='utf-8')
     if MARK in s:
-        updated = refresh_focus_button(s)
+        updated = refresh_pick_hook(refresh_layer_block(s))
         if updated == s:
-            print('[35S patch] already patched; focus button current; no-op')
+            print('[35S patch] already patched; layer block current; no-op')
             return
         DEV.write_text(updated, encoding='utf-8', newline=chr(10))
-        print('[35S patch] already patched; focus button refreshed (left-bottom + readyState)')
+        print('[35S patch] already patched; layer block refreshed (QA colors + label + focus + debug)')
         return
 
     maxlod_anchor = '// [Mission 34D §34/§35/§36] MAX LOD QA'
@@ -311,6 +497,8 @@ def main():
       const cl = window.__CUSTOM_LOD2_LAYER__.pick(ray);
       if (cl && cl.canonicalId && typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.buildingDataById) {
         const d = CanonicalRuntime.buildingDataById(cl.canonicalId);
+        // [Mission 35S §4] 通常の property card に加えて、試作であることが分かる QA カードも出す。
+        try { if (window.__MISSION35S_QA_CARD__) window.__MISSION35S_QA_CARD__(); } catch (e2) { /* noop */ }
         if (d) return { d: { ...d, displayLod: 2, displayLodSource: 'Live City experimental point cloud' }, distance: cl.distance };
       }
     } catch (err) { /* 独自高LODが拾えなければ通常建物pickへ */ }
