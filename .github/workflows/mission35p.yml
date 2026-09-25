@@ -8,7 +8,7 @@ on:
       - 'tools/audit/mission35p-remote-lod-audit.js'
       - 'tools/audit/plateau-source-inventory.js'
       - 'tools/audit/max-lod-reaudit.js'
-      - 'tests/max-lod-reaudit.test.js'
+      - 'tests/mission35p-lod-audit.test.js'
       - '.github/workflows/mission35p.yml'
   workflow_dispatch:
 
@@ -29,8 +29,11 @@ jobs:
 
       - run: npm ci
 
-      - name: Mission 34D LOD parser regression
-        run: node --test tests/max-lod-reaudit.test.js
+      # The full Mission 34D test file also checks gitignored canonical/report artifacts.
+      # Those do not exist in a clean Actions checkout, so 35P runs a dedicated parser
+      # regression here without weakening or changing the historical 34D assertions.
+      - name: Mission 35P LOD parser regression
+        run: node --test tests/mission35p-lod-audit.test.js
 
       - name: Audit latest official Osaka PLATEAU building CityGML
         env:
