@@ -595,6 +595,7 @@ if (typeof window !== 'undefined') {
   window.__CUSTOM_LOD2_OVERLAY__ = (on) => CustomLod2Layer.setOverlay(on !== false);
 __MISSION35S_FOCUS_BUTTON__
 }
+__MISSION35U_LAYER__
 '''
 
 # 確認用ボタン。右側のデバッグパネルの裏に隠れないよう **左下** に出す。
@@ -664,7 +665,188 @@ FOCUS_BUTTON = r'''  // [Mission 35S] 表示確認用ボタン。右側のデバ
     createMission35SFocusButton();
   }'''
 
+MARK_35U = '// [Mission 35U] PlanarRoofLayer'
+
+# [Mission 35U] building part の平面屋根レイヤー。35S の RAW と見比べるために足す。
+LAYER_35U = r'''
+// ══════════════════════════════════════════════════════════════════════════════
+// [Mission 35U] PlanarRoofLayer — building part の範囲だけを平面分割で作り直した実験的な屋根。
+//   35S の RAW（点群をそのまま三角形化したギザギザ）と見比べるための層。
+//   これは公式 PLATEAU LOD2 ではない。canonical 建物全体を置き換えるものでもないので、
+//   canonical 全体の LOD1 は **絶対に消さない**（§7）。
+// ══════════════════════════════════════════════════════════════════════════════
+const PlanarRoofLayer = (function () {
+  const URL_ = 'map-data/osaka-city/experimental/mission35u/part-roof-planes-267613423.json';
+  const MAX_CAMERA_R = 2500;
+  const LABEL_TEXT = '35U PLANAR ROOF';
+  // 35S の青（roof 0x2f9bff / wall 0x10399c）と見分けられる色にする。
+  const QA_COLOR = { roof: 0x35d17a, wall: 0x1b7a4b };
+  // RAW = 35S だけ / PLANAR = 35U だけ / BOTH = 両方
+  const MODES = ['RAW', 'PLANAR', 'BOTH'];
+  let mode = 'PLANAR';
+  let group = null, mesh = null, label = null, data = null;
+  let loaded = false, loading = null, enabled = true, visible = false;
+  const stats = { loaded: false, error: null, visible: false, triangles: 0, roofTriangles: 0,
+    wallTriangles: 0, planeCount: 0, roofType: null, partVerdict: null, mode: mode };
+
+  function ensureGroup() {
+    if (group) return group;
+    group = new THREE.Group();
+    group.name = 'CR_planarRoof_35U';
+    group.visible = false;
+    (typeof canonicalRoot !== 'undefined' ? canonicalRoot : scene).add(group);
+    if (typeof tagRuntimeOwnerRecursive === 'function' && typeof RUNTIME_OWNER !== 'undefined') {
+      try { tagRuntimeOwnerRecursive(group, RUNTIME_OWNER.CANONICAL); } catch (e) { /* noop */ }
+    }
+    return group;
+  }
+  function materials() {
+    return [
+      new THREE.MeshStandardMaterial({ color: QA_COLOR.roof, roughness: 0.55, metalness: 0.02, side: THREE.DoubleSide }),
+      new THREE.MeshStandardMaterial({ color: QA_COLOR.wall, roughness: 0.72, metalness: 0.02, side: THREE.DoubleSide }),
+    ];
+  }
+  function buildLabel(g, verts) {
+    let cx = 0, cz = 0, top = -Infinity;
+    for (const v of verts) { cx += v[0]; cz += v[2]; if (v[1] > top) top = v[1]; }
+    cx /= verts.length; cz /= verts.length;
+    if (!Number.isFinite(top)) top = 0;
+    const cv = document.createElement('canvas');
+    const probe = cv.getContext('2d');
+    const fontPx = 60;
+    probe.font = '700 ' + fontPx + 'px system-ui, sans-serif';
+    cv.width = Math.ceil(probe.measureText(LABEL_TEXT).width) + 44;
+    cv.height = fontPx + 36;
+    const c2 = cv.getContext('2d');
+    c2.font = '700 ' + fontPx + 'px system-ui, sans-serif';
+    c2.textAlign = 'center'; c2.textBaseline = 'middle';
+    c2.fillStyle = 'rgba(12,64,40,0.92)';
+    c2.strokeStyle = '#35d17a'; c2.lineWidth = 6;
+    c2.fillRect(4, 4, cv.width - 8, cv.height - 8);
+    c2.strokeRect(4, 4, cv.width - 8, cv.height - 8);
+    c2.fillStyle = '#ffffff';
+    c2.fillText(LABEL_TEXT, cv.width / 2, cv.height / 2 + 2);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.needsUpdate = true;
+    label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    label.name = 'CR_planarRoof_35U_label';
+    const hW = 44, hH = hW * (cv.height / cv.width);
+    label.scale.set(hW, hH, 1);
+    // 35S のラベルと重ならないよう、少し低い位置に出す
+    label.position.set(cx, top + 10, cz);
+    label.renderOrder = 10031;
+    label.frustumCulled = false;
+    g.add(label);
+  }
+  function build(doc) {
+    const g = ensureGroup();
+    if (!doc || doc.coordinateConvention !== 'znorth-neg-v1'
+      || doc.officialPlateauLod2 !== false || doc.status !== 'EXPERIMENTAL_POINT_CLOUD_PLANAR_ROOF') {
+      throw new Error('35U planar roof provenance/coordinate contract mismatch');
+    }
+    const gg = doc.geometry || {}, verts = gg.vertices || [], idx = gg.indices || [];
+    if (!verts.length || !idx.length) throw new Error('35U planar roof geometry empty');
+    const flat = new Float32Array(verts.length * 3);
+    for (let i = 0; i < verts.length; i++) { flat[i*3] = verts[i][0]; flat[i*3+1] = verts[i][1]; flat[i*3+2] = verts[i][2]; }
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(flat, 3));
+    geom.setIndex(idx);
+    geom.clearGroups();
+    const mi = { roof: 0, wall: 1 };
+    for (const r of (gg.groups || [])) geom.addGroup(r.start || 0, r.count || 0, mi[r.kind] ?? 1);
+    geom.computeVertexNormals(); geom.computeBoundingSphere();
+    mesh = new THREE.Mesh(geom, materials());
+    mesh.name = 'CR_planarRoof_35U_mesh';
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    mesh.userData.planarRoof = { mission: '35U', experimental: true,
+      canonicalId: (doc.match && doc.match.canonicalId) || null };
+    g.add(mesh);
+    buildLabel(g, verts);
+    stats.triangles = Math.floor(idx.length / 3);
+    stats.roofTriangles = gg.roofTriangles || 0;
+    stats.wallTriangles = gg.wallTriangles || 0;
+    stats.planeCount = (doc.roof && doc.roof.planeCount) || 0;
+    stats.roofType = (doc.roof && doc.roof.type) || null;
+    stats.partVerdict = (doc.buildingPart && doc.buildingPart.verdict) || null;
+  }
+  async function load() {
+    if (loaded) return true; if (loading) return loading;
+    loading = (async () => {
+      try {
+        const r = await fetch(URL_); if (!r.ok) throw new Error('HTTP ' + r.status);
+        data = await r.json(); build(data); loaded = true; stats.loaded = true;
+        setTimeout(() => { try { update(); } catch (e) { /* noop */ } }, 0);
+        return true;
+      } catch (e) {
+        stats.error = String(e && e.message || e);
+        console.warn('[PlanarRoofLayer 35U] load failed:', stats.error); return false;
+      } finally { loading = null; }
+    })();
+    return loading;
+  }
+  function wanted() {
+    if (!enabled || !loaded) return false;
+    if (mode === 'RAW') return false;              // 35S だけを見るモード
+    const near = typeof cs !== 'undefined' ? cs.r <= MAX_CAMERA_R : true;
+    return near;
+  }
+  function update() {
+    visible = wanted();
+    if (group) group.visible = visible;
+    stats.visible = visible;
+    stats.mode = mode;
+    if (!loaded && enabled) load();
+  }
+  /** §6 表示モード。RAW=35S / PLANAR=35U / BOTH=両方。 */
+  function setMode(next) {
+    if (MODES.indexOf(next) < 0) return mode;
+    mode = next;
+    // 35S 側は RAW / BOTH のときだけ出す
+    try {
+      if (window.__CUSTOM_LOD2_LAYER__) window.__CUSTOM_LOD2_LAYER__.setEnabled(mode !== 'PLANAR');
+    } catch (e) { /* noop */ }
+    update();
+    return mode;
+  }
+  function getDebug() {
+    const p = (data && data.buildingPart) || {};
+    const rf = (data && data.roof) || {};
+    const pc = (data && data.pointCloud) || {};
+    const ct = (data && data.containment) || {};
+    return { enabled, loaded, visible, mode, modes: MODES.slice(), url: URL_,
+      officialPlateauLod2: false, status: data && data.status, ...stats,
+      partVerdict: p.verdict || null, partChecks: p.checks || null, partFailed: p.failed || null,
+      canonicalId: (data && data.match && data.match.canonicalId) || null,
+      // §7 building part なので canonical 全体の LOD1 は消さない
+      lod1SuppressionAllowed: false,
+      roofType: rf.type || null, planeCount: rf.planeCount || 0,
+      planes: (rf.planes || []).map((x) => ({ index: x.index, support: x.support, slopeDeg: x.slopeDeg,
+        rmsErrorM: x.rmsErrorM, triangles: x.triangles, polygonAreaM2: x.polygonAreaM2 })),
+      roofCandidatePoints: pc.roofCandidatePoints || null,
+      containment: ct, labelText: LABEL_TEXT,
+      qaColors: { roof: '#' + QA_COLOR.roof.toString(16).padStart(6, '0'),
+        wall: '#' + QA_COLOR.wall.toString(16).padStart(6, '0') } };
+  }
+  /** §7 canonical 建物全体の LOD1 は絶対に消さない。 */
+  function isSuppressedBuilding() { return false; }
+  function focus() {
+    if (!data || !data.match || !Array.isArray(data.match.sourceCentroid)) { load().then(focus); return false; }
+    try { if (window.__CUSTOM_LOD2_LAYER__) window.__CUSTOM_LOD2_LAYER__.focus(); } catch (e) { /* noop */ }
+    return true;
+  }
+  ensureGroup(); load();
+  return { load, update, setMode, getMode: () => mode, setEnabled: (on) => { enabled = on !== false; update(); return enabled; },
+    isEnabled: () => enabled, isSuppressedBuilding, getDebug, focus };
+})();
+if (typeof window !== 'undefined') {
+  window.__PLANAR_ROOF_LAYER__ = PlanarRoofLayer;
+  window.__PLANAR_ROOF_DEBUG__ = () => PlanarRoofLayer.getDebug();
+  window.__PLANAR_ROOF_MODE__ = (m) => PlanarRoofLayer.setMode(m);
+}
+'''
+
 LAYER = LAYER.replace('__MISSION35S_FOCUS_BUTTON__', FOCUS_BUTTON)
+LAYER = LAYER.replace('__MISSION35U_LAYER__', LAYER_35U)
 
 
 def one_replace(s: str, old: str, new: str, label: str) -> str:

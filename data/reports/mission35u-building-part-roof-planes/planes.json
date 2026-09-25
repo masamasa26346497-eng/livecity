@@ -1,0 +1,310 @@
+{
+  "version": 1,
+  "mission": "35U",
+  "status": "EXPERIMENTAL_POINT_CLOUD_PLANAR_ROOF",
+  "officialPlateauLod2": false,
+  "note": "OSM building part の範囲だけを、実測点群から平面分割して作った実験的な屋根。公式 PLATEAU LOD2 ではない。canonical 建物全体を置き換えるものでもない。",
+  "coordinateConvention": "znorth-neg-v1",
+  "source": {
+    "pointCloud": "Osaka City Niitaka A.las",
+    "pointCloudPoints": 8870514,
+    "sampleStep": 1,
+    "osmWayId": 267613423,
+    "osmUrl": "https://api.openstreetmap.org/api/0.6/way/267613423/full",
+    "buildingTag": "residential",
+    "name": null
+  },
+  "buildingPart": {
+    "verdict": "BUILDING_PART_CANDIDATE",
+    "checks": {
+      "sourceCoveredRatio>=0.90": true,
+      "candidateCoveredRatio 0.25-0.75": true,
+      "source centroid inside candidate": true,
+      "second candidate weak": true,
+      "source area < candidate area": true
+    },
+    "failed": [],
+    "rules": {
+      "sourceCoveredRatioMin": 0.9,
+      "candidateCoveredRatio": [
+        0.25,
+        0.75
+      ],
+      "secondIouMax": 0.2
+    },
+    "note": "source は candidate の中にほぼ収まり、candidate 側は部分的にしか覆われていない。つまり OSM way は建物全体ではなく building part を指している。",
+    "bestCanonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "mission35tConfidence": "UNMATCHED"
+  },
+  "match": {
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "relation": "PART_OF_CANONICAL",
+    "lod1SuppressionAllowed": false,
+    "suppressionNote": "building part なので canonical 建物全体の LOD1 は消さない（§7）。",
+    "sourceCentroid": [
+      -3968.473,
+      -14803.99
+    ],
+    "sourceFootprintAreaM2": 1015.96,
+    "sourceRing": [
+      [
+        -3994.1173,
+        -14784.5873
+      ],
+      [
+        -3983.4336,
+        -14774.9915
+      ],
+      [
+        -3941.9083,
+        -14821.1003
+      ],
+      [
+        -3953.9205,
+        -14831.8872
+      ],
+      [
+        -3959.0516,
+        -14826.1876
+      ],
+      [
+        -3961.0033,
+        -14827.9465
+      ],
+      [
+        -3962.0295,
+        -14826.7999
+      ],
+      [
+        -3964.3294,
+        -14828.8704
+      ],
+      [
+        -3966.1894,
+        -14826.7999
+      ],
+      [
+        -3961.9379,
+        -14822.9816
+      ],
+      [
+        -3983.4061,
+        -14799.148
+      ],
+      [
+        -3986.1824,
+        -14801.6415
+      ],
+      [
+        -3987.74,
+        -14799.9049
+      ],
+      [
+        -3984.6889,
+        -14797.1665
+      ],
+      [
+        -3993.0636,
+        -14787.8824
+      ],
+      [
+        -3992.0098,
+        -14786.9362
+      ]
+    ]
+  },
+  "pointCloud": {
+    "inFootprint": 188638,
+    "droppedGround": 579,
+    "droppedHeightOutlier": 5643,
+    "cells": 242,
+    "droppedSpikeCells": 0,
+    "droppedBelowTopSurface": 180492,
+    "topSurfacePoints": 1887,
+    "droppedIsolated": 1,
+    "roofCandidatePoints": 1886,
+    "lasTotalPoints": 8870514,
+    "sampleStep": 1,
+    "nearFootprintPoints": 771363,
+    "sampledNearFootprint": 771363,
+    "groundAltitudeM": 4.423
+  },
+  "roof": {
+    "type": "UNKNOWN_PLANAR_ROOF",
+    "planeCount": 5,
+    "minSupport": 60,
+    "droppedPlanes": 1,
+    "ransac": {
+      "iterations": 600,
+      "toleranceM": 0.35,
+      "seed": 20350
+    },
+    "planes": [
+      {
+        "index": 0,
+        "support": 812,
+        "normal": [
+          -0.12777,
+          0.11865,
+          0.98468
+        ],
+        "slopeDeg": 10.042,
+        "interceptM": -10644.494,
+        "elevationMinM": 61.027,
+        "elevationMaxM": 62.397,
+        "rmsErrorM": 0.1357,
+        "maxAbsErrorM": 0.3498,
+        "bbox": {
+          "minX": -47484.9,
+          "maxX": -47464.53,
+          "minY": -139986.88,
+          "maxY": -139962.35,
+          "minZ": 65.45,
+          "maxZ": 66.82
+        },
+        "polygonRingCount": 3,
+        "polygonAreaM2": 167.79,
+        "triangles": 67
+      },
+      {
+        "index": 1,
+        "support": 250,
+        "normal": [
+          0.10645,
+          -0.03629,
+          0.99366
+        ],
+        "slopeDeg": 6.458,
+        "interceptM": 87.69,
+        "elevationMinM": 60.227,
+        "elevationMaxM": 62.317,
+        "rmsErrorM": 0.1339,
+        "maxAbsErrorM": 0.3406,
+        "bbox": {
+          "minX": -47484.06,
+          "maxX": -47464.5,
+          "minY": -139995.33,
+          "maxY": -139963.31,
+          "minZ": 64.65,
+          "maxZ": 66.74
+        },
+        "polygonRingCount": 5,
+        "polygonAreaM2": 50.68,
+        "triangles": 50
+      },
+      {
+        "index": 2,
+        "support": 104,
+        "normal": [
+          0.49783,
+          0.03633,
+          0.86651
+        ],
+        "slopeDeg": 29.944,
+        "interceptM": -33123.149,
+        "elevationMinM": 11.947,
+        "elevationMaxM": 26.807,
+        "rmsErrorM": 0.2065,
+        "maxAbsErrorM": 0.3478,
+        "bbox": {
+          "minX": -47483.42,
+          "maxX": -47458.5,
+          "minY": -139995.63,
+          "maxY": -139976.49,
+          "minZ": 16.37,
+          "maxZ": 31.23
+        },
+        "polygonRingCount": 2,
+        "polygonAreaM2": 248.72,
+        "triangles": 66
+      },
+      {
+        "index": 3,
+        "support": 87,
+        "normal": [
+          0.60994,
+          -0.05917,
+          0.79023
+        ],
+        "slopeDeg": 37.793,
+        "interceptM": -26107.908,
+        "elevationMinM": 34.687,
+        "elevationMaxM": 61.607,
+        "rmsErrorM": 0.1696,
+        "maxAbsErrorM": 0.3455,
+        "bbox": {
+          "minX": -47484.89,
+          "maxX": -47448.32,
+          "minY": -139991.29,
+          "maxY": -139967.54,
+          "minZ": 39.11,
+          "maxZ": 66.03
+        },
+        "polygonRingCount": 5,
+        "polygonAreaM2": 362.66,
+        "triangles": 51
+      },
+      {
+        "index": 4,
+        "support": 68,
+        "normal": [
+          -0.0121,
+          0.01166,
+          0.99986
+        ],
+        "slopeDeg": 0.963,
+        "interceptM": -998.581,
+        "elevationMinM": 59.317,
+        "elevationMaxM": 60.047,
+        "rmsErrorM": 0.1061,
+        "maxAbsErrorM": 0.3389,
+        "bbox": {
+          "minX": -47483.21,
+          "maxX": -47463.91,
+          "minY": -139997.46,
+          "maxY": -139962.29,
+          "minZ": 63.74,
+          "maxZ": 64.47
+        },
+        "polygonRingCount": 8,
+        "polygonAreaM2": 170.88,
+        "triangles": 85
+      }
+    ]
+  },
+  "measurement": {
+    "localGroundAltitudeM": 4.423,
+    "roofCandidatePoints": 1886,
+    "heightMedianM": 59.494,
+    "heightMaxM": 63.52,
+    "roofType": "UNKNOWN_PLANAR_ROOF"
+  },
+  "containment": {
+    "vertices": 460,
+    "outsideFootprint": 0,
+    "toleranceM": 0.75,
+    "ok": true
+  },
+  "provenance": {
+    "roofElevation": "LAS observed returns inside the OSM building part footprint; RANSAC plane fitting",
+    "footprint": "OpenStreetMap way polygon (treated as building part)",
+    "warning": "Experimental Live City custom roof; not official PLATEAU LOD2 and not survey-certified."
+  },
+  "geometrySummary": {
+    "groups": [
+      {
+        "kind": "roof",
+        "start": 0,
+        "count": 957
+      },
+      {
+        "kind": "wall",
+        "start": 957,
+        "count": 330
+      }
+    ],
+    "triangleCount": 429,
+    "roofTriangles": 319,
+    "wallTriangles": 110
+  }
+}

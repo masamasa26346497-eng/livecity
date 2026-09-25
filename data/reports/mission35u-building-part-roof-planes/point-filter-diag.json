@@ -1,0 +1,38 @@
+{
+  "groundAltitudeM": 4.423,
+  "points": {
+    "inFootprint": 188638,
+    "afterGround": 188059,
+    "afterOutlier": 60000,
+    "kept": 663,
+    "droppedTreeLike": 59336
+  },
+  "localStdM": {
+    "p50": 9.72,
+    "p90": 14.59,
+    "p99": 18.04,
+    "max": 24.85,
+    "threshold": 1.8
+  },
+  "heightAboveGroundM": {
+    "all": {
+      "p10": 11.81,
+      "p50": 26.74,
+      "p90": 50.23,
+      "max": 62.39
+    },
+    "kept": {
+      "p10": 7.02,
+      "p50": 10.06,
+      "p90": 18.01,
+      "max": 60.12
+    },
+    "droppedTreeLike": {
+      "p10": 11.97,
+      "p50": 26.86,
+      "p90": 50.28,
+      "max": 62.39
+    }
+  },
+  "note": "落ちた点の高さ分布が残った点よりはっきり高ければ、footprint の中に立っている高い構造物（壁面や塔）の点を外せていることになる。"
+}
