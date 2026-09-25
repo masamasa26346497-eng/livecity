@@ -62,7 +62,7 @@ test('[35S] dev integration contract when patched', () => {
   assert.match(s, /__CUSTOM_LOD2_LAYER__/);
   assert.match(s, /__CUSTOM_LOD2_DEBUG__/);
   assert.match(s, /__CUSTOM_LOD2_FOCUS__/);
-  assert.match(s, /CustomLod2Layer\.isSuppressedBuilding\(f\.canonicalId\)/);
+  assert.match(s, /window\.__CUSTOM_LOD2_LAYER__\s*&&\s*window\.__CUSTOM_LOD2_LAYER__\.isSuppressedBuilding\(f\.canonicalId\)/);
   assert.match(s, /window\.__CUSTOM_LOD2_LAYER__\.update\(\)/);
   assert.match(s, /window\.__CUSTOM_LOD2_LAYER__\.pick\(ray\)/);
   assert.match(s, /35S 点群LOD2へ/);
