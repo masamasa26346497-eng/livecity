@@ -143,8 +143,9 @@ test('[35S QA] debug exposes the values needed to verify the prototype', () => {
   assert.match(s, /officialOwnsCanonical/);
   assert.match(s, /landmarkOwnsCanonical/);
   assert.match(s, /const conflict = canonicalId && \(officialOwns\(canonicalId\) \|\| landmarkOwns\(canonicalId\)\);/);
-  // LOD1 抑制は visible と連動（同時表示しない）
-  assert.match(s, /suppressActive = visible;/);
+  // [Mission 35T] LOD1 抑制は visible だけでなく **判定が HIGH のとき** に限る。
+  //   MEDIUM / AMBIGUOUS / UNMATCHED では既存 LOD1 を消さない。
+  assert.match(s, /suppressActive = visible && stats\.lod1SuppressionAllowed === true;/);
 });
 
 test('[35S QA] patch script stays the source of the QA presentation', () => {

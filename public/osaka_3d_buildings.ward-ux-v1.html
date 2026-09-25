@@ -14648,10 +14648,16 @@ if (typeof window !== 'undefined') {
 const CustomLod2Layer = (function () {
   const URL_ = 'map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json';
   const MAX_CAMERA_R = 2500;
-  const MATCH_MAX_SHIFT_M = 20;
-  // 重心が相手のポリゴンの中に入っている（= 強い証拠）ときだけ、距離の上限を広げる。
-  //   実測: 本命は重心 22.0m / 面積比 1.71 / 内包あり。20m で切ると一度も表示されなかった。
-  const MATCH_MAX_SHIFT_WITH_EVIDENCE_M = 35;
+  // [Mission 35T] 照合は **IoU（共通部分 / 和集合）** を主判定にする。
+  //   35S は「重心が近い + 面積比が範囲内 + 内包点が 1 つ」で採用していたが、
+  //   これでは隣の棟や、大きな建物の一部を掴んでも通ってしまう。
+  //   しきい値を満たさないときは、現行の canonicalId であっても採用しない（nearest fallback は持たない）。
+  const CANDIDATE_RADIUS_M = 100;
+  const MATCH_RULES = {
+    HIGH: { iou: 0.75, centroidM: 10, areaRatio: [0.80, 1.25] },
+    MEDIUM: { iou: 0.60, centroidM: 15, areaRatio: [0.70, 1.40] },
+    AMBIGUOUS: { iouGap: 0.10, centroidGapM: 3 },
+  };
   // [Mission 35S QA] 試作の 1 棟だけ、どれか一目で分かる色にする。周りの建物の色は変えない。
   const QA_COLOR = { roof: 0x2f9bff, wall: 0x10399c, ground: 0x8b949c };
   // 対象棟が画面中央に大きく入る距離（650m では遠すぎて判別できなかった）
@@ -14660,7 +14666,13 @@ const CustomLod2Layer = (function () {
   let group = null, mesh = null, label = null, loaded = false, loading = null, enabled = true, data = null;
   let canonicalId = null, visible = false, suppressActive = false, lastSuppress = false;
   let mats = null;
-  const stats = { loaded: false, matched: false, matchDistanceM: null, areaRatio: null, triangles: 0, error: null, visible: false, lod1SuppressedCount: 0 };
+  const stats = { loaded: false, matched: false, matchDistanceM: null, areaRatio: null, triangles: 0,
+    error: null, visible: false, lod1SuppressedCount: 0,
+    // [Mission 35T §8]
+    matchConfidence: 'UNMATCHED', bestCandidate: null, secondCandidate: null,
+    iou: null, sourceCoveredRatio: null, candidateCoveredRatio: null,
+    centroidDistanceM: null, heightDeltaM: null, candidateCount: 0,
+    ambiguousReason: null, lod1SuppressionAllowed: false, matchReason: null };
 
   function ensureGroup() {
     if (group) return group;
@@ -14687,6 +14699,41 @@ const CustomLod2Layer = (function () {
       if (((zi > z) !== (zj > z)) && (x < (xj - xi) * (z - zi) / ((zj - zi) || 1e-9) + xi)) inside = !inside;
     }
     return inside;
+  }
+  function ringBboxOf(ring) {
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    for (const p of ring) { if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
+      if (p[1] < minZ) minZ = p[1]; if (p[1] > maxZ) maxZ = p[1]; }
+    return { minX, maxX, minZ, maxZ };
+  }
+  /**
+   * [Mission 35T] 共通部分 / 和集合を格子サンプルで測る。
+   *   厳密なポリゴンクリッピングは自己交差・穴で壊れやすいので、両者の bbox を覆う格子で数える。
+   */
+  function overlapMetrics(ringA, ringB) {
+    const ba = ringBboxOf(ringA), bb = ringBboxOf(ringB);
+    const zero = { iou: 0, aCovered: 0, bCovered: 0 };
+    const minX = Math.min(ba.minX, bb.minX), maxX = Math.max(ba.maxX, bb.maxX);
+    const minZ = Math.min(ba.minZ, bb.minZ), maxZ = Math.max(ba.maxZ, bb.maxZ);
+    const w = maxX - minX, h = maxZ - minZ;
+    if (!(w > 0) || !(h > 0)) return zero;
+    const small = Math.max(1, Math.min(ba.maxX - ba.minX, ba.maxZ - ba.minZ, bb.maxX - bb.minX, bb.maxZ - bb.minZ));
+    let cell = Math.max(0.5, small / 12);
+    let nx = Math.ceil(w / cell), nz = Math.ceil(h / cell);
+    while (nx * nz > 40000) { cell *= 1.5; nx = Math.ceil(w / cell); nz = Math.ceil(h / cell); }
+    let inA = 0, inB = 0, both = 0;
+    for (let i = 0; i < nx; i++) {
+      const x = minX + cell * (i + 0.5);
+      for (let j = 0; j < nz; j++) {
+        const z = minZ + cell * (j + 0.5);
+        const a = pointInRing(x, z, ringA), b = pointInRing(x, z, ringB);
+        if (a) inA++;
+        if (b) inB++;
+        if (a && b) both++;
+      }
+    }
+    const union = inA + inB - both;
+    return { iou: union > 0 ? both / union : 0, aCovered: inA > 0 ? both / inA : 0, bCovered: inB > 0 ? both / inB : 0 };
   }
   function fpRing(fp) { return fp && (fp.ring || fp.fp || (fp.coordinates && fp.coordinates[0])) || null; }
   function fpCentroid(fp, ring) {
@@ -14732,36 +14779,120 @@ const CustomLod2Layer = (function () {
       }
     } catch (e) { /* noop */ }
   }
+  /** 候補 1 件の指標。 */
+  function evaluateCandidate(srcRing, srcArea, srcC, fp) {
+    const id = candidateId(fp), ring = fpRing(fp);
+    if (!id || !ring || ring.length < 3) return null;
+    const c = fpCentroid(fp, ring);
+    if (!c) return null;
+    const centroidDistanceM = Math.hypot(c[0] - srcC[0], c[1] - srcC[1]);
+    if (centroidDistanceM > CANDIDATE_RADIUS_M) return null;
+    const area = ringArea(ring);
+    if (!(area > 0)) return null;
+    const o = overlapMetrics(srcRing, ring);
+    return {
+      canonicalId: id,
+      centroidDistanceM: +centroidDistanceM.toFixed(2),
+      areaRatio: +(area / srcArea).toFixed(3),
+      candidateAreaM2: +area.toFixed(1),
+      iou: +o.iou.toFixed(4),
+      sourceCoveredRatio: +o.aCovered.toFixed(4),
+      candidateCoveredRatio: +o.bCovered.toFixed(4),
+    };
+  }
+  const inRange = (v, r) => v >= r[0] && v <= r[1];
+  /**
+   * [Mission 35T §3/§4] best / second から判定を出す。
+   *   しきい値を満たさないときに現行 canonicalId へ寄せることはしない。
+   */
+  function decideMatch(best, second) {
+    if (!best) return { matchConfidence: 'UNMATCHED', lod1SuppressionAllowed: false,
+      matchReason: '候補が 1 つも無い', ambiguousReason: null };
+    const H = MATCH_RULES.HIGH, M = MATCH_RULES.MEDIUM, A = MATCH_RULES.AMBIGUOUS;
+    const meetsHigh = best.iou >= H.iou && best.centroidDistanceM <= H.centroidM && inRange(best.areaRatio, H.areaRatio);
+    const meetsMedium = best.iou >= M.iou && best.centroidDistanceM <= M.centroidM && inRange(best.areaRatio, M.areaRatio);
+    let ambiguousReason = null;
+    if (second) {
+      const iouGap = best.iou - second.iou;
+      const cGap = second.centroidDistanceM - best.centroidDistanceM;
+      if (iouGap < A.iouGap && cGap < A.centroidGapM) {
+        ambiguousReason = 'best と second が僅差（IoU 差 ' + iouGap.toFixed(3) + ' / 重心差 ' + cGap.toFixed(2) + 'm）';
+      } else if (best.sourceCoveredRatio < 0.75 && second.sourceCoveredRatio >= 0.15) {
+        ambiguousReason = 'source polygon が複数の建物にまたがっている疑い（best '
+          + best.sourceCoveredRatio + ' / second ' + second.sourceCoveredRatio + '）';
+      }
+    }
+    if (ambiguousReason) return { matchConfidence: 'AMBIGUOUS', lod1SuppressionAllowed: false,
+      matchReason: 'best を断定できない', ambiguousReason };
+    if (meetsHigh) return { matchConfidence: 'HIGH', lod1SuppressionAllowed: true,
+      matchReason: 'IoU ' + best.iou + ' / 重心 ' + best.centroidDistanceM + 'm / 面積比 ' + best.areaRatio,
+      ambiguousReason: null };
+    if (meetsMedium) return { matchConfidence: 'MEDIUM', lod1SuppressionAllowed: false,
+      matchReason: 'HIGH に届かない（IoU ' + best.iou + ' / 重心 ' + best.centroidDistanceM + 'm / 面積比 ' + best.areaRatio + '）',
+      ambiguousReason: null };
+    return { matchConfidence: 'UNMATCHED', lod1SuppressionAllowed: false,
+      matchReason: '基準未達（IoU ' + best.iou + ' / 重心 ' + best.centroidDistanceM + 'm / 面積比 ' + best.areaRatio + '）',
+      ambiguousReason: null };
+  }
+  /**
+   * [Mission 35T §2/§3] 候補を **全部** 見て、IoU 主体で判定する。
+   *   最寄り 1 棟だけを選ぶ実装は使わない。
+   */
   function tryMatch() {
-    if (canonicalId || !data || typeof CanonicalRuntime === 'undefined' || !CanonicalRuntime.visibleBuildingFootprints) return !!canonicalId;
+    if (!data || typeof CanonicalRuntime === 'undefined' || !CanonicalRuntime.visibleBuildingFootprints) return false;
+    if (stats.matchConfidence === 'HIGH' && canonicalId) return true;   // 確定済みなら測り直さない
     const srcC = data.match && data.match.sourceCentroid;
     const srcRing = data.match && data.match.sourceRing;
     const srcArea = +(data.match && data.match.sourceFootprintAreaM2) || ringArea(srcRing);
     if (!srcC || !srcRing || !srcArea) return false;
     let fps = [];
     try { fps = CanonicalRuntime.visibleBuildingFootprints() || []; } catch (e) { return false; }
-    let best = null;
+    if (!fps.length) return false;
+    // タイル境界をまたぐ建物は複数回返ってくる。canonicalId で畳まないと
+    //   best と second が同じ建物になり「僅差だから AMBIGUOUS」と誤判定する（実機で確認）。
+    const byId = new Map();
     for (const fp of fps) {
-      const id = candidateId(fp), ring = fpRing(fp); if (!id || !ring) continue;
-      const c = fpCentroid(fp, ring); if (!c) continue;
-      const d = Math.hypot(c[0] - srcC[0], c[1] - srcC[1]);
-      if (d > MATCH_MAX_SHIFT_WITH_EVIDENCE_M) continue;
-      const a = ringArea(ring); if (!(a > 0)) continue;
-      const ratio = a / srcArea;
-      if (ratio < 0.45 || ratio > 2.2) continue;
-      const spatialEvidence = pointInRing(srcC[0], srcC[1], ring) || pointInRing(c[0], c[1], srcRing);
-      if (!spatialEvidence) continue;
-      // 内包が取れていない相手は、従来どおり近いものしか採らない
-      if (!spatialEvidence && d > MATCH_MAX_SHIFT_M) continue;
-      const score = d + Math.abs(Math.log(ratio)) * 8;
-      if (!best || score < best.score) best = { id, d, ratio, score };
+      const e = evaluateCandidate(srcRing, srcArea, srcC, fp);
+      if (!e) continue;
+      const prev = byId.get(e.canonicalId);
+      if (!prev || e.iou > prev.iou) byId.set(e.canonicalId, e);
     }
-    if (!best) return false;
-    canonicalId = best.id;
-    stats.matched = true; stats.matchDistanceM = +best.d.toFixed(2); stats.areaRatio = +best.ratio.toFixed(3);
-    if (mesh) mesh.userData.customLod2 = { canonicalId, mission: '35S', experimental: true };
-    invalidateBuildings();
-    console.log('[CustomLod2Layer 35S] matched', canonicalId, 'shift=' + stats.matchDistanceM + 'm areaRatio=' + stats.areaRatio);
+    const evaluated = [...byId.values()];
+    if (!evaluated.length) return false;
+    // 高さは footprint 一覧に入っていないので、建物データから引く（QA の材料）
+    for (const e of evaluated) {
+      if (e.heightM !== undefined) continue;
+      let h = null;
+      try {
+        const bd = CanonicalRuntime.buildingDataById ? CanonicalRuntime.buildingDataById(e.canonicalId) : null;
+        if (bd && typeof bd.h === 'number' && bd.h > 0) h = +bd.h.toFixed(2);
+      } catch (err) { /* noop */ }
+      e.heightM = h;
+    }
+    evaluated.sort((a, b) => (b.iou - a.iou) || (a.centroidDistanceM - b.centroidDistanceM));
+    const best = evaluated[0], second = evaluated[1] || null;
+    const d = decideMatch(best, second);
+    stats.candidateCount = evaluated.length;
+    stats.bestCandidate = best; stats.secondCandidate = second;
+    stats.iou = best.iou;
+    stats.sourceCoveredRatio = best.sourceCoveredRatio;
+    stats.candidateCoveredRatio = best.candidateCoveredRatio;
+    stats.centroidDistanceM = best.centroidDistanceM;
+    stats.areaRatio = best.areaRatio;
+    stats.matchDistanceM = best.centroidDistanceM;
+    stats.matchConfidence = d.matchConfidence;
+    stats.lod1SuppressionAllowed = d.lod1SuppressionAllowed;
+    stats.matchReason = d.matchReason;
+    stats.ambiguousReason = d.ambiguousReason;
+    stats.matched = d.matchConfidence === 'HIGH';
+    // 表示・QA のために best は覚えるが、LOD1 を消してよいのは HIGH のときだけ（§7）
+    const prevId = canonicalId;
+    canonicalId = best.canonicalId;
+    if (mesh) mesh.userData.customLod2 = { canonicalId, mission: '35S', experimental: true, matchConfidence: d.matchConfidence };
+    if (prevId !== canonicalId) invalidateBuildings();
+    console.log('[CustomLod2Layer 35T] ' + d.matchConfidence + ' best=' + canonicalId
+      + ' IoU=' + best.iou + ' 重心=' + best.centroidDistanceM + 'm 面積比=' + best.areaRatio
+      + ' / suppression=' + (d.lod1SuppressionAllowed ? '許可' : '不許可'));
     return true;
   }
   function materials() {
@@ -14860,16 +14991,135 @@ const CustomLod2Layer = (function () {
       tryMatch();
       const conflict = canonicalId && (officialOwns(canonicalId) || landmarkOwns(canonicalId));
       const near = typeof cs !== 'undefined' ? cs.r <= MAX_CAMERA_R : true;
+      // 試作メッシュ自体は判定によらず出す（QA で形を比べるため）。
+      //   LOD1 を消してよいかは別で、HIGH のときだけ（§7）。
       visible = !!(canonicalId && !conflict && near && sourceTileWanted());
       ensureGroup().visible = visible;
-      suppressActive = visible;
+      suppressActive = visible && stats.lod1SuppressionAllowed === true;
     }
     stats.visible = visible;
     if (suppressActive !== lastSuppress) { lastSuppress = suppressActive; invalidateBuildings(); }
   }
+  // ── [Mission 35T §6] footprint 比較 overlay ───────────────────────
+  //   赤 = OSM source / 青 = best canonical / 黄 = second candidate。
+  //   dev の QA 専用。既定は OFF で、通常表示には出さない。
+  let overlayGroup = null, overlayOn = false;
+  const OVERLAY_Y = 3.0;
+  const OVERLAY_COLOR = { source: 0xff2d2d, best: 0x2f6bff, second: 0xffc400 };
+
+  function ringLine(ring, color, y, width) {
+    // world 幅の帯で描く（WebGL の linewidth はほとんどの環境で 1 固定）
+    const n = ring.length, half = width / 2, pos = [];
+    for (let i = 0; i < n; i++) {
+      const a = ring[i], b = ring[(i + 1) % n];
+      const dx = b[0] - a[0], dz = b[1] - a[1];
+      const len = Math.hypot(dx, dz) || 1;
+      const nx = -dz / len * half, nz = dx / len * half;
+      pos.push(a[0] - nx, y, a[1] - nz, a[0] + nx, y, a[1] + nz, b[0] + nx, y, b[1] + nz);
+      pos.push(a[0] - nx, y, a[1] - nz, b[0] + nx, y, b[1] + nz, b[0] - nx, y, b[1] - nz);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeBoundingSphere();
+    const mm = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, side: THREE.DoubleSide });
+    const mesh2 = new THREE.Mesh(g, mm);
+    mesh2.renderOrder = 10040;
+    mesh2.frustumCulled = false;
+    return mesh2;
+  }
+  function centroidMarker(x, z, color, y) {
+    const g = new THREE.SphereGeometry(2.2, 12, 8);
+    const mk = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, depthTest: false }));
+    mk.position.set(x, y + 1, z);
+    mk.renderOrder = 10041;
+    mk.frustumCulled = false;
+    return mk;
+  }
+  function overlayLabel(text, x, y, z, color) {
+    const cv = document.createElement('canvas');
+    const probe = cv.getContext('2d');
+    probe.font = '700 48px system-ui, sans-serif';
+    cv.width = Math.ceil(probe.measureText(text).width) + 36;
+    cv.height = 78;
+    const c2 = cv.getContext('2d');
+    c2.font = '700 48px system-ui, sans-serif';
+    c2.textAlign = 'center'; c2.textBaseline = 'middle';
+    c2.fillStyle = 'rgba(12,18,30,0.90)';
+    c2.fillRect(0, 0, cv.width, cv.height);
+    c2.strokeStyle = '#' + color.toString(16).padStart(6, '0');
+    c2.lineWidth = 6; c2.strokeRect(3, 3, cv.width - 6, cv.height - 6);
+    c2.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    c2.fillText(text, cv.width / 2, cv.height / 2 + 2);
+    const tex = new THREE.CanvasTexture(cv); tex.needsUpdate = true;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    const hw = 30, hh = hw * (cv.height / cv.width);
+    sp.scale.set(hw, hh, 1);
+    sp.position.set(x, y, z);
+    sp.renderOrder = 10042; sp.frustumCulled = false;
+    return sp;
+  }
+  function clearOverlay() {
+    if (!overlayGroup) return;
+    for (const o of [...overlayGroup.children]) {
+      overlayGroup.remove(o);
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+    }
+  }
+  function buildOverlay() {
+    if (!data || !data.match) return;
+    if (!overlayGroup) {
+      overlayGroup = new THREE.Group();
+      overlayGroup.name = 'CR_customLod2_35T_overlay';
+      (typeof canonicalRoot !== 'undefined' ? canonicalRoot : scene).add(overlayGroup);
+      if (typeof tagRuntimeOwnerRecursive === 'function' && typeof RUNTIME_OWNER !== 'undefined') {
+        try { tagRuntimeOwnerRecursive(overlayGroup, RUNTIME_OWNER.CANONICAL); } catch (e) { /* noop */ }
+      }
+    }
+    clearOverlay();
+    const srcRing = data.match.sourceRing, srcC = data.match.sourceCentroid;
+    if (srcRing) {
+      overlayGroup.add(ringLine(srcRing, OVERLAY_COLOR.source, OVERLAY_Y, 2.4));
+      overlayGroup.add(centroidMarker(srcC[0], srcC[1], OVERLAY_COLOR.source, OVERLAY_Y));
+      overlayGroup.add(overlayLabel('OSM source', srcC[0], OVERLAY_Y + 34, srcC[1], OVERLAY_COLOR.source));
+    }
+    let fps = [];
+    try { fps = CanonicalRuntime.visibleBuildingFootprints() || []; } catch (e) { fps = []; }
+    const byId = new Map();
+    for (const fp of fps) { const id = candidateId(fp); if (id) byId.set(id, fp); }
+    const draw = (cand, color, text, dy) => {
+      if (!cand) return;
+      const fp = byId.get(cand.canonicalId); if (!fp) return;
+      const ring = fpRing(fp); if (!ring) return;
+      const c = fpCentroid(fp, ring);
+      overlayGroup.add(ringLine(ring, color, OVERLAY_Y + 0.4, 2.0));
+      if (c) {
+        overlayGroup.add(centroidMarker(c[0], c[1], color, OVERLAY_Y));
+        overlayGroup.add(overlayLabel(text, c[0], OVERLAY_Y + dy, c[1], color));
+      }
+    };
+    draw(stats.bestCandidate, OVERLAY_COLOR.best, 'BEST canonical', 22);
+    draw(stats.secondCandidate, OVERLAY_COLOR.second, 'SECOND canonical', 10);
+    overlayGroup.visible = overlayOn;
+  }
+  /** §6 QA overlay の ON/OFF。ON の間は試作メッシュを半透明にして形を比べやすくする。 */
+  function setOverlay(on) {
+    overlayOn = on !== false;
+    if (overlayOn) buildOverlay();
+    if (overlayGroup) overlayGroup.visible = overlayOn;
+    if (mesh && mesh.material) {
+      for (const mt of (Array.isArray(mesh.material) ? mesh.material : [mesh.material])) {
+        mt.transparent = overlayOn; mt.opacity = overlayOn ? 0.45 : 1; mt.needsUpdate = true;
+      }
+    }
+    return overlayOn;
+  }
   function setEnabled(on) { enabled = on !== false; update(); return enabled; }
   function isSuppressedBuilding(id) {
-    const hit = !!(enabled && suppressActive && visible && canonicalId && id === canonicalId);
+    // [Mission 35T §7] HIGH のときだけ LOD1 を消す。
+    //   MEDIUM / AMBIGUOUS / UNMATCHED では既存 LOD1 を絶対に消さない。
+    const hit = !!(enabled && suppressActive && visible && canonicalId && id === canonicalId
+      && stats.lod1SuppressionAllowed === true && stats.matchConfidence === 'HIGH');
     // §6 の実証値。canonical runtime は LOD1 の箱を積む直前にここを呼び、
     //   true なら continue する。つまりこの数がそのまま「LOD1 を出さなかった回数」。
     if (hit) stats.lod1SuppressedCount++;
@@ -14895,6 +15145,10 @@ const CustomLod2Layer = (function () {
       // §6 公式側が同じ棟を持っていたら、そちらを優先して自分は出さない
       officialOwnsCanonical: canonicalId ? officialOwns(canonicalId) : false,
       landmarkOwnsCanonical: canonicalId ? landmarkOwns(canonicalId) : false,
+      // [Mission 35T §8] 照合の根拠。IoU が主で、重心距離は従。
+      heightDeltaM: (stats.bestCandidate && stats.bestCandidate.heightM != null && m.heightMedianM != null)
+        ? +(stats.bestCandidate.heightM - m.heightMedianM).toFixed(2) : null,
+      matchRules: MATCH_RULES, candidateRadiusM: CANDIDATE_RADIUS_M,
       focusR: FOCUS_R, labelText: LABEL_TEXT,
       labelWorld: label ? { x: +label.position.x.toFixed(2), y: +label.position.y.toFixed(2), z: +label.position.z.toFixed(2) } : null,
       labelVisible: !!(label && label.visible),
@@ -14917,6 +15171,16 @@ const CustomLod2Layer = (function () {
       areaRatio: d.areaRatio,
       sourceFootprintAreaM2: d.sourceFootprintAreaM2,
       suppressActive: d.suppressActive,
+      // [Mission 35T]
+      matchConfidence: d.matchConfidence,
+      iou: d.iou,
+      sourceCoveredRatio: d.sourceCoveredRatio,
+      candidateCoveredRatio: d.candidateCoveredRatio,
+      candidateCount: d.candidateCount,
+      lod1SuppressionAllowed: d.lod1SuppressionAllowed,
+      ambiguousReason: d.ambiguousReason,
+      matchReason: d.matchReason,
+      secondCandidate: d.secondCandidate,
     };
   }
   function focus() {
@@ -14948,6 +15212,7 @@ const CustomLod2Layer = (function () {
   }
   ensureGroup(); load();
   return { load, update, setEnabled, isEnabled: () => enabled, isSuppressedBuilding, pick, getDebug, getQaSummary, focus,
+    setOverlay, isOverlayOn: () => overlayOn, rebuildOverlay: buildOverlay,
     getCanonicalId: () => canonicalId };
 })();
 if (typeof window !== 'undefined') {
@@ -14955,6 +15220,8 @@ if (typeof window !== 'undefined') {
   window.__CUSTOM_LOD2_DEBUG__ = () => CustomLod2Layer.getDebug();
   window.__CUSTOM_LOD2_TOGGLE__ = (on) => CustomLod2Layer.setEnabled(on !== false);
   window.__CUSTOM_LOD2_FOCUS__ = () => CustomLod2Layer.focus();
+  // [Mission 35T §6] footprint 比較 overlay（赤=OSM source / 青=best / 黄=second）
+  window.__CUSTOM_LOD2_OVERLAY__ = (on) => CustomLod2Layer.setOverlay(on !== false);
   // [Mission 35S] 表示確認用ボタン。右側のデバッグパネルと重ならないよう左下へ置く。
   function createMission35SFocusButton() {
     if (document.getElementById('mission35s-focus')) return;
