@@ -6,12 +6,76 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  probe-runtime:
+  integrate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Probe dev runtime anchors
-        run: python tools/experiments/mission35s_runtime_probe.py
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install point-cloud experiment dependencies
+        run: pip install --disable-pip-version-check laspy numpy pyproj shapely scipy
+
+      - name: Record production/protected hashes
+        run: |
+          sha256sum public/osaka_3d_buildings.html > /tmp/35s-prod.sha
+          sha256sum public/osaka_3d_buildings.fullward-v3.html > /tmp/35s-prot.sha
+
+      - name: Download Osaka City Niitaka point cloud A.las
+        run: |
+          mkdir -p .cache/mission35s
+          curl -L --fail --retry 3 --retry-delay 5 \
+            'https://www.geospatial.jp/ckan/dataset/85ba866a-0bed-415d-9cc8-228e7e6a4550/resource/6bb308a5-940a-4ee9-99e5-cf6b850b88a4/download/a.las' \
+            -o .cache/mission35s/A.las
+          ls -lh .cache/mission35s/A.las
+
+      - name: Generate one experimental point-cloud high-LOD building
+        run: |
+          mkdir -p public/map-data/osaka-city/experimental/mission35s
+          python tools/experiments/mission35s_build_custom_lod2.py \
+            --las .cache/mission35s/A.las \
+            --out public/map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json
+
+      - name: Patch dev runtime only
+        run: python tools/experiments/mission35s_patch_dev.py
+
+      - name: Mission 35S regression tests
+        run: node --test tests/mission35s-custom-lod2.test.js
+
+      - name: Guard production and protected baseline
+        run: |
+          sha256sum -c /tmp/35s-prod.sha
+          sha256sum -c /tmp/35s-prot.sha
+          changed="$(git diff --name-only)"
+          echo "$changed"
+          if echo "$changed" | grep -Eq '^public/osaka_3d_buildings\.html$|^public/osaka_3d_buildings\.fullward-v3\.html$'; then
+            echo 'ERROR: production/protected changed'; exit 1
+          fi
+
+      - name: Commit generated dev prototype
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/osaka_3d_buildings.ward-ux-v1.html \
+            public/map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json
+          if git diff --cached --quiet; then
+            echo '35S generated output already current; no commit needed.'
+          else
+            git commit -m '35S: integrate point-cloud custom LOD2 prototype'
+            git push origin HEAD:feature/mission-35s-livecity-custom-lod2
+          fi
