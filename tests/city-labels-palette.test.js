@@ -205,7 +205,8 @@ test('[33A] runtime: ラベルデータを読み込み、canonical residual を�
   assert.ok(d.stations > 100, `駅 ${d.stations}`);
   assert.equal(d.wards, 24, `区 ${d.wards}`);
   assert.ok(d.parks > 50, `公園 ${d.parks}`);
-  assert.equal(JSON.stringify(d.typeVisible), JSON.stringify({ place: true, landmark: true, station: true, ward: true, park: true, river: true }));   // vm 別 realm のため JSON で比較
+  // [Mission 35O] 建物名（building）が種別に加わった。既存の 6 種別はそのまま。
+  assert.equal(JSON.stringify(d.typeVisible), JSON.stringify({ place: true, landmark: true, station: true, ward: true, park: true, river: true, building: true }));   // vm 別 realm のため JSON で比較
   assert.equal(w.__CANONICAL_SELF_CHECK__().total, 0);
   // トグルが効く
   assert.equal(w.__CITY_LABEL_TOGGLE__('place', false).place, false);

@@ -578,6 +578,9 @@ body.lc-prop-card-open #canonical-runtime-status{right:calc(20px + 280px + 12px)
       <div class="pc-stat" id="pc-floors-stat"><div class="lbl">階数</div><div class="val" id="pc-floors">— <span class="unit">階</span></div></div>
       <div class="pc-stat"><div class="lbl">底面積</div><div class="val" id="pc-area">— <span class="unit">m²</span></div></div>
     </div>
+    <!-- [Mission 35O §19] OSM に実在する建物名・施設名。無い建物では行ごと出さない。 -->
+    <div class="pc-row" id="pc-bldgname-row" style="display:none"><span class="k">建物名</span><span class="v" id="pc-bldgname">—</span></div>
+    <div class="pc-row" id="pc-facility-row" style="display:none"><span class="k">施設</span><span class="v" id="pc-facility">—</span></div>
     <div class="pc-row" id="pc-ward-row"><span class="k">区</span><span class="v" id="pc-ward">—</span></div>
     <div class="pc-row"><span class="k">最寄駅</span><span class="v" id="pc-station">—</span></div>
     <div class="pc-row"><span class="k">用途</span><span class="v" id="pc-usage-full">—</span></div>
@@ -10070,9 +10073,17 @@ const CityLabelLayer = (function () {
   const LANDMARK_URL = 'map-data/osaka-city/labels/landmark-labels.json';   // [Mission 33C] tier S/A/B 付き
   // [Mission 35K §2/§6] 事業者つきの駅索引。canonical の駅に operator / importance を付けたもの。
   const STATION_URL = 'map-data/osaka-city/derived/station-index.json';
+  // [Mission 35O §7] 建物名ラベル。OSM に実在する名称だけを紐づけた sidecar（名前は推測していない）。
+  //   ラベル用は「画面に出す 1 棟ぶん」に絞った軽い方を読む（詳細は建物クリック時に遅延 fetch）。
+  const BUILDING_NAME_URL = 'map-data/osaka-city/derived/building-name-labels.json';
   const RIVER_URL = 'map-data/osaka-city/labels/river-labels.json';       // [Mission 33C] canonical water の名称付き水域
   const ANCHOR_URL = 'map-data/osaka-city/derived/map-label-anchors.json';  // 区名（N03 面積加重セントロイド）+ 公園名
   const BANDS = { farM: 9000, midM: 3500 };        // 道路・鉄道・公園 LOD と同じ距離帯
+  // [Mission 35O §9] 建物名は near よりさらに寄ったところで店舗名まで出す。
+  //   band そのものは 3 段のまま（他レイヤーと共有）。建物ラベルだけ距離で追加判定する。
+  const BUILDING_VERY_NEAR_M = 900;
+  const BUILDING_LABEL_Y_MARGIN = 14;             // §8 屋根の少し上
+  const BUILDING_LABEL_Y_MAX = 220;               // 遠景で高さを強調しすぎない
   const DENSITY_CAP = { far: 18, mid: 36, near: 58 };  // 画面全体の上限（文字だらけにしない）
   const GRID = { cols: 6, rows: 4, perCell: 3 };       // 画面を分割して 1 セルあたりの上限も掛ける
   const THROTTLE_MS = 200;
@@ -10086,9 +10097,9 @@ const CityLabelLayer = (function () {
   const RELAYOUT = { targetFrac: 0.035, targetMinM: 30, distRatio: 1.06, angleRad: 0.035 };
 
   let group = null;
-  let places = [], landmarks = [], stations = [], wards = [], parks = [], rivers = [];
+  let places = [], landmarks = [], stations = [], wards = [], parks = [], rivers = [], buildingNames = [];
   let loaded = false, loadingPromise = null;
-  const typeVisible = { place: true, landmark: true, station: true, ward: true, park: true, river: true };
+  const typeVisible = { place: true, landmark: true, station: true, ward: true, park: true, river: true, building: true };
   const texCache = new Map();          // styleKey|text → { tex, aspect }
   const sprites = new Map();           // label id → { sprite, aspect, styleKey }
   const itemById = new Map();          // [Mission 33D] id → item（再選定せずに大きさだけ更新するために引く）
@@ -10182,6 +10193,18 @@ const CityLabelLayer = (function () {
         // §6 事業者バッジ。色と短い記号だけで区別する（公式ロゴは使わない）。
         badge: op ? { text: op.code, bg: hex, fg: '#ffffff' } : null,
         dot: op ? null : (night ? '#8fc0ff' : '#5b6875'),   // 事業者が分かるならバッジ、分からなければ丸
+      };
+    }
+    if (kind === 'building') {
+      // [Mission 35O §7] 建物名は地名・駅より控えめ。既存ラベルの見た目を変えない。
+      const t = (item && item.tier) || 'veryNear';
+      const f = t === 'mid' ? 13 : (t === 'near' ? 11.5 : 10.5);
+      return {
+        key: 'bl|' + t + '|' + (night ? 'n' : 'd'),
+        font: f, weight: t === 'mid' ? '600' : '500',
+        text: night ? '#d9e4f2' : '#4a5563',
+        halo: night ? 'rgba(6,12,22,0.80)' : 'rgba(255,255,255,0.92)',
+        pill: null, border: null,
       };
     }
     const f = importance === 'major' ? 17 : (importance === 'medium' ? 14 : 12);
@@ -10299,6 +10322,8 @@ const CityLabelLayer = (function () {
   }
 
   // LOD: far は広域地名と MAJOR ランドマークだけ / mid で中位 / near で全部
+  /** いまのカメラ距離（建物ラベルの VERY NEAR 判定に使う）。 */
+  function camDist() { try { return (typeof cs !== 'undefined' && cs && cs.r) ? cs.r : 99999; } catch (e) { return 99999; } }
   function lodVisible(item, b) {
     // [Mission 33D] band は place() で 1 度だけ決める（ヒステリシス付きなので item ごとに評価しない）
     // [Mission 33C] landmark は tier（S/A/B）で band を決める
@@ -10313,6 +10338,13 @@ const CityLabelLayer = (function () {
       if (item.importance === 'transfer' || item.importance === 'medium') return b !== 'far';
       return b === 'near';
     }
+    // [Mission 35O §9] 建物名は遠景では出さない。
+    //   mid(主要ビル・大型施設) → 中景から / near(一般の建物名) → 近景 / veryNear(店舗等) → さらに寄ったときだけ。
+    if (item.kind === 'building') {
+      if (item.tier === 'mid') return b !== 'far';
+      if (item.tier === 'near') return b === 'near';
+      return b === 'near' && camDist() <= BUILDING_VERY_NEAR_M;
+    }
     if (item.importance === 'major') return true;
     if (item.importance === 'medium') return b !== 'far';
     return b === 'near';
@@ -10323,7 +10355,8 @@ const CityLabelLayer = (function () {
     if (loadingPromise) return loadingPromise;
     loadingPromise = (async () => {
       try {
-        const [pr, lr, sr, ar, rr] = await Promise.all([fetch(PLACE_URL), fetch(LANDMARK_URL), fetch(STATION_URL), fetch(ANCHOR_URL), fetch(RIVER_URL)]);
+        const [pr, lr, sr, ar, rr, br] = await Promise.all([fetch(PLACE_URL), fetch(LANDMARK_URL), fetch(STATION_URL),
+          fetch(ANCHOR_URL), fetch(RIVER_URL), fetch(BUILDING_NAME_URL).catch(() => null)]);
         if (pr.ok) {
           const j = await pr.json();
           places = (j.places || []).map((q) => ({ id: 'place:' + q.id, kind: 'place', name: q.name, importance: q.importance, x: q.x, z: q.z }));
@@ -10363,18 +10396,32 @@ const CityLabelLayer = (function () {
           rivers = (j.rivers || []).map((q) => ({ id: 'river:' + q.id, kind: 'river', name: q.name, importance: q.importance,
             x: q.x, z: q.z, angle: q.angle || 0, areaM2: q.areaM2 }));
         }
+        if (br && br.ok) {
+          // [Mission 35O §7/§8] 建物名。位置は footprint の重心、高さは屋根の少し上。
+          //   suppressed（同名の別棟・landmark と同じもの）は sidecar 側で既に外してある。
+          const j = await br.json();
+          buildingNames = (j.labels || [])
+            .filter((q) => q.name && Number.isFinite(q.x) && Number.isFinite(q.z))
+            .map((q) => ({
+              id: 'bldg:' + q.id, kind: 'building', name: q.name,
+              buildingId: q.id, x: q.x, z: q.z,
+              height: Number(q.h) || 0, tier: q.t || 'veryNear', facilityCount: q.n || 0,
+              importance: (q.t === 'mid') ? 'major' : (q.t === 'near' ? 'medium' : 'local'),
+            }));
+        }
         if (ar.ok) {
           const j = await ar.json();
           wards = (j.wards || []).map((q) => ({ id: q.id, kind: 'ward', name: q.name, importance: 'major', x: q.x, z: q.z }));
           parks = (j.parks || []).map((q) => ({ id: q.id, kind: 'park', name: q.name, importance: q.importance, x: q.x, z: q.z, areaM2: q.areaM2 }));
         }
         stats.places = places.length; stats.landmarks = landmarks.length; stats.stations = stations.length;
+        stats.buildingNames = buildingNames.length;
         stats.wards = wards.length; stats.parks = parks.length; stats.rivers = rivers.length;
         // [Mission 33D] 再選定なしで大きさ・向きだけ更新するときに item を引けるようにする
         itemById.clear();
-        for (const arr of [landmarks, wards, stations, rivers, parks, places]) for (const it of arr) itemById.set(it.id, it);
+        for (const arr of [landmarks, wards, stations, rivers, parks, places, buildingNames]) for (const it of arr) itemById.set(it.id, it);
         loaded = true; dirty = true;
-        console.log('[CityLabelLayer] 地名 ' + places.length + ' / ランドマーク ' + landmarks.length + ' / 駅 ' + stations.length + ' / 区 ' + wards.length + ' / 公園 ' + parks.length + ' / 河川 ' + rivers.length);
+        console.log('[CityLabelLayer] 地名 ' + places.length + ' / ランドマーク ' + landmarks.length + ' / 駅 ' + stations.length + ' / 区 ' + wards.length + ' / 公園 ' + parks.length + ' / 河川 ' + rivers.length + ' / 建物名 ' + buildingNames.length);
       } catch (e) {
         stats.dataError = String(e && e.message || e);
         console.warn('[CityLabelLayer] ラベルデータ読み込み失敗（ラベルなしで継続）:', stats.dataError);
@@ -10434,10 +10481,16 @@ const CityLabelLayer = (function () {
     const v = new THREE.Vector3();
     const src = [].concat(typeVisible.landmark ? landmarks : [], typeVisible.ward ? wards : [],
       typeVisible.station ? stations : [], typeVisible.river ? rivers : [],
-      typeVisible.park ? parks : [], typeVisible.place ? places : []);
+      typeVisible.park ? parks : [], typeVisible.place ? places : [],
+      typeVisible.building ? buildingNames : []);
     for (const item of src) {
       if (!lodVisible(item, b)) { stats.hiddenByLOD++; continue; }
-      v.set(item.x, item.kind === 'landmark' ? LANDMARK_Y : PLACE_Y, item.z).project(camera);
+      // [Mission 35O §8] 建物名は footprint 重心 + 建物高さ + 余白（屋根の少し上）。
+      //   遠景で高さを強調しすぎないよう上限を掛ける。
+      const ly = item.kind === 'building'
+        ? Math.min(BUILDING_LABEL_Y_MAX, (item.height || 0) + BUILDING_LABEL_Y_MARGIN)
+        : (item.kind === 'landmark' ? LANDMARK_Y : PLACE_Y);
+      v.set(item.x, ly, item.z).project(camera);
       if (v.z > 1 || v.x < -1.1 || v.x > 1.1 || v.y < -1.1 || v.y > 1.1) { stats.hiddenByViewport++; continue; }
       // 優先順位（33C §13/§14）: ランドマーク(S) > 駅/区 > 地名 > 河川 > 公園。
       //   引き画面では主要河川を少し上げる（都市構造が分かるように）。
@@ -10449,6 +10502,8 @@ const CityLabelLayer = (function () {
           : (item.importance === 'transfer' || item.importance === 'medium') ? 2.2 : 4.2)
         : item.kind === 'river' ? (item.importance === 'major' ? (b === 'far' ? 1.2 : 3.5) : item.importance === 'medium' ? 5.5 : 7.5)
         : item.kind === 'park' ? (item.importance === 'major' ? 4.5 : 6.5)
+        // [Mission 35O §7] 建物名は既存ラベルより後ろ。主要ビルだけ地名と同程度まで上げる。
+        : item.kind === 'building' ? (item.tier === 'mid' ? 5.2 : item.tier === 'near' ? 7.2 : 8.5)
         : (item.importance === 'major' ? 2 : item.importance === 'medium' ? 5 : 7);
       // [Mission 33D §12] 前回出ていたかどうかを「同順位内の並び」にだけ使う。
       //   rank そのものを補正すると ランドマーク/駅/地名 の大分類が逆転しうるので加点はしない。
@@ -11763,6 +11818,74 @@ function propertyAreaLabel(d) {
   }
   return ward;
 }
+// ══════════════════════════════════════════════════════════════
+// [Mission 35O §19] BuildingNameStore — 建物名・施設名を建物クリックで引く
+//
+//   ラベル用（building-name-labels.json）とは別に、施設名つきの索引を持つ。
+//   7MB あるので **起動時には読まない**。最初に建物をクリックしたときだけ取りに行く（§20）。
+//   名前は OSM に実在するものだけ（推測していない）。provenance も一緒に持つ。
+// ══════════════════════════════════════════════════════════════
+const BuildingNameStore = (function () {
+  const URL_ = 'map-data/osaka-city/derived/building-facility-index.json';
+  let byId = null, loading = null, failed = false;
+  const stats = { records: 0, loaded: false, error: null };
+
+  function ensure() {
+    if (byId || loading || failed) return loading;
+    loading = (async () => {
+      try {
+        const r = await fetch(URL_);
+        if (!r.ok) { failed = true; stats.error = 'HTTP ' + r.status; return; }
+        const j = await r.json();
+        byId = new Map();
+        for (const b of (j.buildings || [])) byId.set(b.buildingId, b);
+        stats.records = byId.size; stats.loaded = true;
+        console.log('[BuildingNameStore] 建物名 ' + byId.size + ' 件');
+        // 読み終わったら、いま開いているカードを書き直す
+        try { if (typeof refreshBuildingNameRow === 'function') refreshBuildingNameRow(); } catch (e) { /* noop */ }
+      } catch (e) {
+        failed = true; stats.error = String(e && e.message || e);
+        console.warn('[BuildingNameStore] 読み込み失敗（名称なしで継続）:', stats.error);
+      } finally { loading = null; }
+    })();
+    return loading;
+  }
+  function get(id) { if (!id) return null; if (!byId) { ensure(); return null; } return byId.get(id) || null; }
+  return { ensure, get, isLoaded: () => !!byId, getDebug: () => ({ ...stats }) };
+})();
+if (typeof window !== 'undefined') window.__BUILDING_NAME_DEBUG__ = () => BuildingNameStore.getDebug();
+
+/** [Mission 35O §19] いま開いている property card の建物名・施設欄を書き直す。 */
+function refreshBuildingNameRow() {
+  const card = document.getElementById('prop-card');
+  if (!card || card.style.display === 'none') return;
+  const id = card.dataset ? card.dataset.canonicalId : null;
+  if (id) applyBuildingNameRows(id);
+}
+
+/**
+ * [Mission 35O §19] 建物名と施設を card へ出す。
+ *   施設が多いときは全部出さず「施設 18 件」のように件数で示し、上位だけ名前を出す。
+ */
+function applyBuildingNameRows(canonicalId) {
+  const nameRow = document.getElementById('pc-bldgname-row');
+  const facRow = document.getElementById('pc-facility-row');
+  if (!nameRow || !facRow) return;
+  const rec = canonicalId ? BuildingNameStore.get(canonicalId) : null;
+  if (!rec) { nameRow.style.display = 'none'; facRow.style.display = 'none'; return; }
+  const nm = rec.buildingName || rec.primaryFacilityName;
+  if (nm) {
+    document.getElementById('pc-bldgname').textContent = nm;
+    nameRow.style.display = '';
+  } else nameRow.style.display = 'none';
+  const n = rec.n || 0;
+  if (n > 0) {
+    const top = (rec.f || []).slice(0, 3).join(' / ');
+    document.getElementById('pc-facility').textContent = (n > 3) ? (top + ' ほか（施設 ' + n + ' 件）') : top;
+    facRow.style.display = '';
+  } else facRow.style.display = 'none';
+}
+
 function showPropertyCard(d){
   const p = buildPropertyData(d);
   document.getElementById('pr').style.display='none'; // GML解析パネルは隠してカードに切替
@@ -11777,6 +11900,13 @@ function showPropertyCard(d){
   const areaLabel = propertyAreaLabel(d);
   document.getElementById('pc-title').textContent = (landmarkName || usageDisplayName(d)) + (areaLabel ? ' ／ ' + areaLabel : '');
   document.getElementById('pc-id').textContent = d.id||'—';
+  // [Mission 35O §19] 実在する建物名・施設名（OSM 由来）。まだ索引を読んでいなければ取りに行く。
+  {
+    const cid = (d && (d.canonicalId || d.id)) || null;
+    if (card.dataset) card.dataset.canonicalId = cid || '';
+    BuildingNameStore.ensure();
+    applyBuildingNameRows(cid);
+  }
   // [Mission 32S §2/§3/§10] 高さは実測（measuredHeight / LOD 形状 / OSM タグ）のときだけ出す。
   //   「階数×3.0m」や変換時の既定値 3.0m は根拠が無いので数値を出さない（代わりに実階数を出す）。
   //   階数は PLATEAU bldg:storeysAboveGround の実値のみ。高さから推定はしない。
