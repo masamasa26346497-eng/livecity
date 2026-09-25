@@ -167,6 +167,11 @@ out.summary = {
   buildingLabelSpots: out.spots.map((s) => ({ id: s.id, visible: s.labels.visibleBuildings || 0 })),
   // §9-6 駅名も出ているか
   stationLabelsVisibleSomewhere: out.spots.some((s) => (s.labels.visibleStations || 0) > 0),
+  // [Mission 35V 道路色の差し戻し] 実際に描かれている road mesh の色。
+  //   35V で入れた 0xb7c0cd ではなく、35V 以前の 0x8b929e に戻っていること。
+  roadMeshColors: out.theme && out.theme.roadStyles,
+  roadColorRevertedTo8b929e: !!(out.theme && (out.theme.roadStyles || []).some((r) => r.hex === '#8b929e')),
+  roadGreyB7c0cdGone: !!(out.theme && !(out.theme.roadStyles || []).some((r) => r.hex === '#b7c0cd')),
   labelDataErrors: out.spots.map((s) => s.labels.dataError).filter(Boolean),
   spots: SPOTS.map((s) => s.id),
   jsErrors: out.jsErrors.length,

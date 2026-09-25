@@ -67,37 +67,41 @@ test('[35V §2] 地面からの照り返しを暖色のまま残していない'
 });
 
 // ── §3 道路 ──────────────────────────────────────────────────────
-test('[35V §3] 道路は地面より明るいグレー、建物白より暗い', () => {
-  const road = hexOf(/road: (0x[0-9a-f]{6}),\s+\/\/ 主道路/, 'NAVY 道路色');
-  const land = hexOf(/land: (0x[0-9a-f]{6}),\s+\/\/ 陸/, 'テーマ陸色');
-  assert.ok(bright(road) - bright(land) > 180, '地面と道路の明度差が小さい（道路が見えない）');
-  assert.ok(bright(road) < bright(0xeef0ec), '道路が建物白より明るい');
-  const r = (road >> 16) & 255, g = (road >> 8) & 255, b = road & 255;
-  assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 30, '道路が無彩色寄りでない（色が付きすぎ）');
+// ── §3 道路（35V の灰色化は差し戻し済み） ───────────────────────
+test('[35V 差し戻し] 道路の色は 35V で上書きしない', () => {
+  // ユーザー判断で道路の灰色化（0xb7c0cd）は取り消した。
+  //   COL_NAVY が road を持たないこと自体が「道路は触っていない」の担保になる。
+  const navy = html.match(/const COL_NAVY = \{[\s\S]*?\};/)[0];
+  assert.ok(!/road:/.test(navy), 'COL_NAVY がまだ道路色を上書きしている');
+  // 値として使われていないこと（コメント中の言及は許す）
+  const assigned = html.split(String.fromCharCode(10))
+    .filter((l) => l.includes('0xb7c0cd') && !l.trimStart().startsWith('//'));
+  assert.deepEqual(assigned, [], '35V の道路グレー(0xb7c0cd)がまだ値として使われている');
+  // profile の値がそのまま残る形になっていること
+  assert.match(html, /Object\.assign\(COL, base, dark \? COL_NAVY : \{\}\);/);
+  // 既定 profile は DEPTH なので、実効の道路色は DEPTH の値
+  assert.match(html, /let visualProfile = 'DEPTH';/);
+  assert.match(html, /road: 0x8b929e,/);
 });
 
-test('[35V §3] 暗い地面では 主道路 > 支線 > 歩道 > 余白 の順に暗くなる', () => {
-  const m = html.match(/if \(dark\) \{[\s\S]*?return CR_ROAD_RS;\s*\}/);
-  assert.ok(m, '暗いテーマ用の道路 style が無い');
+test('[35V 差し戻し] 道路 style は 35V 以前と同じ 1 本に戻っている', () => {
+  const m = html.match(/function buildRoadStyles\(\) \{[\s\S]*?return CR_ROAD_RS;\s*\}/);
+  assert.ok(m, 'buildRoadStyles が無い');
   const blk = m[0];
-  // primary は混ぜない（いちばん明るい）。以降は地面色へ寄せる比率が単調に増える。
-  assert.match(blk, /primary:\s+\{ col: COL\.road,/);
-  const mixes = [...blk.matchAll(/col: mix\(COL\.road, gnd, ([0-9.]+)\)/g)].map((x) => Number(x[1]));
-  assert.ok(mixes.length >= 4, '地面へ寄せた段階が足りない: ' + mixes.length);
-  for (let i = 1; i < mixes.length; i++) {
-    assert.ok(mixes[i] > mixes[i - 1], '道路の明度が単調に暗くなっていない: ' + JSON.stringify(mixes));
-  }
-  // 明るい地面のときの元の style は残している（戻せる）
-  assert.match(html, /secondary:\s+\{ col: mix\(COL\.road, COL\.white, 0\.26\)/);
-});
-
-test('[35V §3] geometry は増やしていない（色と不透明度だけ）', () => {
-  const m = html.match(/if \(dark\) \{[\s\S]*?return CR_ROAD_RS;\s*\}/)[0];
-  assert.ok(!/new THREE\.|pushPolygon|BufferGeometry/.test(m), '暗いテーマの道路 style が geometry を作っている');
-  // renderClass の種類は増やしていない（既存の 7 種のまま）
+  // 暗いテーマ用の分岐と、地面色へ寄せる作りが消えていること
+  assert.ok(!/if \(dark\)/.test(blk), '暗いテーマ用の道路 style が残っている');
+  assert.ok(!/gnd/.test(blk), '地面色へ寄せる作りが残っている');
+  assert.equal((blk.match(/CR_ROAD_RS = \{/g) || []).length, 1, 'CR_ROAD_RS の定義が 1 本でない');
+  // 35V 以前の値そのもの
+  assert.match(blk, /secondary:\s+\{ col: mix\(COL\.road, COL\.white, 0\.26\), y: Y\.road - 0\.02, opacity: 0\.82,/);
+  assert.match(blk, /pedestrian: \{ col: 0xb8b0a4,  y: Y\.road - 0\.05,   opacity: 0\.58,/);
+  assert.match(blk, /faint:      \{ col: mix\(COL\.road, 0xf3f4f1, 0\.5\),  y: Y\.road - 0\.08, opacity: 0\.30,/);
+  // renderClass は 7 種のまま
   for (const k of ['primary', 'bridge', 'secondary', 'pedestrian', 'sidewalk', 'median', 'faint']) {
-    assert.ok(m.includes(k + ':'), 'renderClass ' + k + ' が無い');
+    assert.ok(blk.includes(k + ':'), 'renderClass ' + k + ' が無い');
   }
+  // geometry は作っていない
+  assert.ok(!/new THREE\.|pushPolygon|BufferGeometry/.test(blk), '道路 style が geometry を作っている');
 });
 
 test('[35V §3/§6] 鉄道は暗い地面に沈まない明度へ上げてある', () => {

@@ -16244,47 +16244,33 @@ const CanonicalRuntime = (function () {
   };
   const COL_CURRENT = { ...COL };
   // [Mission 35V §3/§6] 暗いネイビー地面の上での配色。
-  //   明るい地面では「道路を地表より濃く」していたが、地面が暗くなったので **逆** にする。
-  //   道路＝明るいグレー（地面より明確に明るい）／鉄道＝道路より青く明るい／水＝明るいシアン。
+  //   鉄道＝暗地で沈まない明度へ／水＝明るいシアン／緑＝原色にしない。
   //   色相の役割（水＝青 / 緑＝緑 / 道路＝無彩色寄り）は 35H から変えていない。
+  // [Mission 35V 道路色の差し戻し] **道路はここで上書きしない**。
+  //   ユーザー判断で道路の灰色化（0xb7c0cd）は取り消し、35V 以前の見え方へ戻した。
+  //   road を持たないので、下の applyPalette が profile の値（DEPTH なら 0x8b929e）を残す。
   const COL_NAVY = {
     water: 0x3fb3e8, waterHarbor: 0x2f9cd2,        // 川・海は明るいシアン（ネイビーの上でよく映える）
-    road: 0xb7c0cd,                                // 主道路。地面(0x18233c)との明度差を最優先
     parkReal: 0x5f9e63, parkGreen: 0x568f59, grass: 0x6fae70,  // 暗い地面では原色の緑は光って見えるので落とす
     railMajor: 0x8e9ac0, railUrban: 0x8d9ee8, railLocal: 0x76809a, // 暗地では元の紺(0x49546a)が沈むので明るく
     white: COL.white,
   };
-  /** profile と theme に合わせて COL の中身を入れ替える（参照は保つ）。 */
+  /** profile と theme に合わせて COL の中身を入れ替える（参照は保つ）。
+   *  暗いテーマは profile の配色を **置き換えず、上に重ねる**。
+   *  これにより COL_NAVY が持たないキー（道路）は profile の値のまま残る。 */
   function applyPalette() {
-    const src = (typeof cityThemeDark === 'function' && cityThemeDark()) ? COL_NAVY
-      : (depthEnabled() ? COL_DEPTH : COL_CURRENT);
-    Object.assign(COL, src);
+    const base = depthEnabled() ? COL_DEPTH : COL_CURRENT;
+    const dark = (typeof cityThemeDark === 'function') && cityThemeDark();
+    Object.assign(COL, base, dark ? COL_NAVY : {});
   }
 
   //   道路の style は COL から作るので、palette を切り替えたら作り直す必要がある。
   let CR_ROAD_RS = null;
+  // [Mission 35V 道路色の差し戻し] 暗いネイビー地面用に組んでいた道路 style
+  //   （主道路を明るくして支線以下を地面色へ寄せる階段）はユーザー判断で取り消した。
+  //   35V 以前（babae19）とまったく同じ定義に戻している。
   function buildRoadStyles() {
     const mix = (a, b, t) => ((typeof msBlend === 'function') ? msBlend(a, b, t) : a);
-    const dark = (typeof cityThemeDark === 'function') && cityThemeDark();
-    if (dark) {
-      // [Mission 35V §3] 暗い地面の上では明度の向きが反転する。
-      //   明るい地面のときは secondary を「白へ寄せて薄く」していたが、暗い地面では
-      //   それだと支線のほうが目立ってしまう。ここでは **地面色へ寄せて暗くする** ことで
-      //   主道路 > 支線 > 歩道 > 余白 の順に暗くなる階段を作る。
-      //   歩道帯(sidewalk)と余白(faint)は車道より一段暗くするだけで curb（縁石）の見え方になる。
-      //   geometry は一切増やしていない（renderClass ごとの色と不透明度だけ）。
-      const gnd = (typeof cityTheme === 'function') ? cityTheme('land') : 0x18233c;
-      CR_ROAD_RS = {
-        primary:    { col: COL.road,                     y: Y.road,        opacity: 1.0,  transparent: false, ren: REN.road },
-        bridge:     { col: mix(COL.road, COL.white, 0.16), y: Y.roadBridge, opacity: 1.0,  transparent: false, ren: REN.road + 2 },
-        secondary:  { col: mix(COL.road, gnd, 0.34),     y: Y.road - 0.02, opacity: 0.94, transparent: true,  ren: REN.road },
-        pedestrian: { col: mix(COL.road, gnd, 0.50),     y: Y.road - 0.05, opacity: 0.80, transparent: true,  ren: REN.road - 1 },
-        sidewalk:   { col: mix(COL.road, gnd, 0.60),     y: Y.road - 0.06, opacity: 0.74, transparent: true,  ren: REN.road - 1 },
-        median:     { col: mix(0x568f59, gnd, 0.35),     y: Y.road - 0.07, opacity: 0.66, transparent: true,  ren: REN.road - 2 },
-        faint:      { col: mix(COL.road, gnd, 0.74),     y: Y.road - 0.08, opacity: 0.52, transparent: true,  ren: REN.road - 2 },
-      };
-      return CR_ROAD_RS;
-    }
     CR_ROAD_RS = {
       primary:    { col: COL.road, y: Y.road,           opacity: 1.0,  transparent: false, ren: REN.road },
       bridge:     { col: COL.road, y: Y.roadBridge,     opacity: 1.0,  transparent: false, ren: REN.road + 2 },

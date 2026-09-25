@@ -112,10 +112,11 @@ test('[Mission17] 色階層を維持: 背景・建物白・道路グレーが明
   const wall = 0xeef0ec;
   const bright = (v) => ((v >> 16) & 255) + ((v >> 8) & 255) + (v & 255);
   if (themeBg().name === 'NAVY') {
-    const road = parseInt(html.match(/road: (0x[0-9a-f]{6}),\s*\/\/ 主道路/)[1], 16);
+    // [Mission 35V 道路色の差し戻し] 道路は 35V で上書きしなくなったので、
+    //   実効値は profile（既定 DEPTH）の値。暗い地面の上でも道路が沈まないことだけ見る。
+    const road = parseInt(html.match(/const COL_DEPTH = \{[\s\S]*?road: (0x[0-9a-f]{6}),/)[1], 16);
     assert.ok(bright(bg) < bright(road), '道路が地面より暗い（暗い地面では道路が見えない）');
     assert.ok(bright(road) < bright(wall), '道路が建物白より明るい（道路が建物より前に出る）');
-    assert.ok(bright(road) - bright(bg) > 180, '地面と道路の明度差が小さすぎる');
   } else {
     assert.ok(bright(bg) >= bright(wall), '背景が建物白より暗い');
   }
