@@ -1,0 +1,59 @@
+name: Mission 35R LOD2 Experiments
+
+on:
+  push:
+    branches:
+      - feature/mission-35r-lod2-experiments
+    paths:
+      - 'tools/experiments/mission35r_lod2_experiments.py'
+      - '.github/workflows/mission35r.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install experiment dependencies
+        run: pip install --disable-pip-version-check laspy numpy pyproj shapely
+
+      - name: Download Osaka City Niitaka point cloud A.las
+        run: |
+          mkdir -p .cache/mission35r
+          curl -L --fail --retry 3 --retry-delay 5 \
+            'https://www.geospatial.jp/ckan/dataset/85ba866a-0bed-415d-9cc8-228e7e6a4550/resource/6bb308a5-940a-4ee9-99e5-cf6b850b88a4/download/a.las' \
+            -o .cache/mission35r/A.las
+          ls -lh .cache/mission35r/A.las
+
+      - name: Run three LOD2 experiments
+        run: |
+          python tools/experiments/mission35r_lod2_experiments.py \
+            --las .cache/mission35r/A.las \
+            --out data/reports/mission35r
+
+      - name: Show result
+        run: |
+          cat data/reports/mission35r/SUMMARY.md
+          python -m json.tool data/reports/mission35r/RESULT.json
+
+      - name: Upload experiment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission35r-lod2-experiments
+          path: |
+            data/reports/mission35r/RESULT.json
+            data/reports/mission35r/SUMMARY.md
+            data/reports/mission35r/*.obj
+            data/reports/mission35r/*.png
+            data/reports/mission35r/C_photogrammetry_adapter_manifest.json
+          if-no-files-found: error
+          retention-days: 14
