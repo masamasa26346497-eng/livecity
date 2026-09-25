@@ -18,7 +18,7 @@ import {
   baseTownName, splitTownKey, bboxOfRings, bboxInfo, readTownPolygons,
 } from '../tools/build-area-boundaries.js';
 import {
-  BUILDING_COUNT, DEV_ONLY_IDS, TOWN_BOUNDARY_WARDS, FPS_DROP_BUDGET_PCT,
+  BUILDING_COUNT, DEV_ONLY_IDS, TOWN_BOUNDARY_WARDS, ALLOWED_BOUNDARY_SOURCES, FPS_DROP_BUDGET_PCT,
 } from '../tools/validate/station-town-navigation.js';
 import { STATION_SITES, TOWN_SITES, worldOf } from '../tools/audit/station-town-navigation-qa.js';
 import { devUiIsGated } from '../tools/lib/production-invariants.js';
@@ -174,15 +174,25 @@ test('35K TOWN_POLYGONS を HTML から読める（新しい座標は作らな�
 test('35K 実データ: 町丁目が無い区は区界へ落ちる（推測の町界は作らない）', () => {
   const ab = rj(M('derived', 'area-boundaries.json'));
   if (!ab) return;
-  assert.deepEqual([...ab.townWards].sort(), [...TOWN_BOUNDARY_WARDS].sort());
+  // [Mission 35L] 35K では町丁目が 3 区ぶんしか無く、残り 21 区は区界へ落としていた。
+  //   35L で e-Stat 令和2年国勢調査の公式境界を入れて 24 区へ広げた。
+  //   このテストの意図は「町丁目が 3 区しか無いこと」ではなく
+  //   **推測で作った境界を混ぜないこと**（§12）なので、そこを見る。
+  for (const w of TOWN_BOUNDARY_WARDS) {
+    assert.ok(ab.townWards.includes(w), w + ' の町丁目が消えている（35K からの退行）');
+  }
   assert.equal(ab.counts.wards, 24, '区界が 24 件でない');
-  // 出所は 2 種類だけ
-  const sources = new Set(ab.areas.map((a) => a.boundarySource));
-  assert.deepEqual([...sources].sort(), ['legacy-unverified', 'n03-official']);
-  // 町丁目は 3 区の区名しか持たない
+  // 出所は決めたものだけ（ここに無い出所＝推測で作った境界）
+  const sources = [...new Set(ab.areas.map((a) => a.boundarySource))].sort();
+  for (const src of sources) {
+    assert.ok(ALLOWED_BOUNDARY_SOURCES.includes(src), '出所不明の境界: ' + src);
+  }
+  // 町丁目を名乗るものは、必ず実在する区のもの
+  const wardNames = new Set(ab.areas.filter((a) => a.kind === 'ward').map((a) => a.wardName));
   for (const a of ab.areas) {
     if (a.boundaryGranularity !== 'chochome' && a.boundaryGranularity !== 'chochome-union') continue;
-    assert.ok(TOWN_BOUNDARY_WARDS.includes(a.wardName), a.wardName + ' の町丁目が作られている');
+    assert.ok(wardNames.has(a.wardName), a.wardName + ' は大阪市の区ではない');
+    assert.ok(a.boundarySource !== 'n03-official', a.wardName + a.name + ' が区界を町丁目と名乗っている');
   }
 });
 
@@ -267,11 +277,54 @@ test('35K 選択状態は将来の selectedArea の形で持つ', () => {
 });
 
 test('35K 境界の見た目（§13/§14）', () => {
-  assert.match(html, /const COLOR = 0x40fff0;/);                 // §13 turquoise
-  const m = html.match(/const FILL_OPACITY = ([\d.]+);/);
-  assert.ok(m, '塗りの不透明度が読めない');
-  assert.ok(+m[1] >= 0.04 && +m[1] <= 0.10, '§14 の 0.04〜0.10 の外: ' + m[1]);
-  assert.match(html, /line\.renderOrder = 990;/);                // 道路・鉄道より上
+  // [Mission 35N] 選択の見せ方を「地面だけを着色する」方式へ変えた。
+  //   §13 の turquoise 系・§14 の「建物を隠さない」という趣旨はそのまま。
+  //   色は GROUND_COLOR / 濃さは GROUND_OPACITY が正本（FILL_OPACITY は廃止）。
+  assert.match(html, /const GROUND_COLOR = 0x[0-9a-f]{6};/);
+  const m = html.match(/const GROUND_OPACITY = ([\d.]+);/);
+  assert.ok(m, '地面ハイライトの不透明度が読めない');
+  assert.ok(+m[1] >= 0.35 && +m[1] <= 0.50, '地面ハイライトは 0.35〜0.50: ' + m[1]);
+  // 面・輪郭とも地表レイヤーの中に収める（道路・鉄道より上へ出さない）
+  assert.match(html, /fill\.renderOrder = 6;/);
+  assert.match(html, /m\.renderOrder = 7;/);
+});
+
+test('35N 地面ハイライト: 面は地表・道路より下・depthTest あり', () => {
+  // 地面だけを着色する（上から透明シートを被せない）
+  assert.match(html, /const fill = new THREE\.Mesh\(fg, flatMaterial\(GROUND_OPACITY, \{ color: GROUND_COLOR \}\)\);/);
+  assert.match(html, /fill\.position\.y = GROUND_Y;/);
+  // depthTest を切っていない = 建物・道路が上に乗る
+  const fm = html.match(/function flatMaterial\(opacity, extra = \{\}\) \{[\s\S]{0,400}?\n  \}/);
+  assert.ok(fm, 'flatMaterial が読めない');
+  assert.ok(!/depthTest:\s*false/.test(fm[0]), 'flatMaterial が depthTest を切っている');
+  const sel = html.slice(html.indexOf('function drawArea(area)'), html.indexOf('function notify()'));
+  assert.ok(!/depthTest:\s*false/.test(sel), '選択表示に depthTest:false が残っている');
+  // 面は road(0.30) / rail(0.5) より下（= 道路・鉄道が選択色にならない）
+  const gy = html.match(/const GROUND_Y = ([\d.]+);/);
+  const oy = html.match(/const OUTLINE_Y = ([\d.]+);/);
+  const layer = html.match(/const Y = \{ water: ([\d.]+), park: ([\d.]+), road: ([\d.]+),/);
+  assert.ok(gy && layer, '高さ定数が読めない');
+  assert.ok(+gy[1] < +layer[3], `面 ${gy[1]} が道路 ${layer[3]} より上にある`);
+  assert.ok(+gy[1] < +layer[1], `面 ${gy[1]} が水面 ${layer[1]} より上にある`);
+  assert.ok(+oy[1] < +layer[3], `補助輪郭 ${oy[1]} が道路より上にある`);
+  assert.ok(+gy[1] > 0, '面が地面と同じ高さでチラつく');
+  assert.match(html, /polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,/);
+  // 色と濃さ
+  const op = html.match(/const GROUND_OPACITY = ([\d.]+);/);
+  assert.ok(+op[1] >= 0.35 && +op[1] <= 0.50, '地面ハイライトは 0.35〜0.50: ' + op[1]);
+  // 境界は補助（細い）。太い帯にしない
+  const ow = html.match(/const OUTLINE_W = ([\d.]+);/);
+  assert.ok(+ow[1] >= 1 && +ow[1] <= 3, '補助輪郭は world 幅 1〜3m: ' + ow[1]);
+  // 解除で面も輪郭も消える
+  assert.match(html, /for \(const g of \[outlineGroup, fillGroup\]\)/);
+  assert.match(html, /function clearSelection\(\)/);
+});
+
+test('35N 旧 35M の表現（壁・太い帯・重ね塗り）が残っていない', () => {
+  assert.ok(!/function ringWall\(/.test(html), 'ringWall が残っている');
+  assert.ok(!/WALL_H|WALL_OPACITY/.test(html), '壁の定数が残っている');
+  assert.ok(!/RIM_OPACITY|RIM_WIDTH_M/.test(html), 'rim の定数が残っている');
+  assert.ok(!/EDGE_MIN_M|EDGE_MAX_M|EDGE_DIAG_DIV/.test(html), '太い帯の定数が残っている');
 });
 
 test('35K ズームは bbox から決め、真上視点に強制しない（§15/§16）', () => {

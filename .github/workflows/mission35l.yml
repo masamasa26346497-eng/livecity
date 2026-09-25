@@ -1,0 +1,49 @@
+name: Mission 35L CI
+
+# このワークフローの役割は
+#   「Mission 35L のコード変更と、既存の境界 / navigation の回帰を検出すること」
+# だけに限定する。リポジトリ全体のデータパイプライン CI をここで新設しない。
+#
+# なぜ `npm test`（フルスイート）を回さないか:
+#   npm test には、パイプラインの **生成物そのもの** を検証する統合テストが多数含まれる
+#   （canonical タイル / derived JSON / QA レポート / baseline hash）。これらは容量の都合で
+#   .gitignore により除外されている（canonical buildings だけで約 250MB）:
+#       data/processed/osaka-city/**  public/map-data/osaka-city/**  data/raw/  data/reports/*-qa/
+#   actions/checkout はソースだけを取得するので、これらの入力は 1 つも存在しない。
+#   そのため素のチェックアウトでは 88 件が「検証対象が無い」状態で落ちる。
+#   これは 35L で持ち込まれたものではなく、35L 直前の 35K コミット(d2b582d)を同条件で
+#   チェックアウトしても **同じ 88 件** が落ちることを実測で確認している。
+#
+#   つまりテストを無効化したのではなく、**テスト環境の責務を分けている**:
+#     GitHub Actions … クリーンチェックアウトで意味のある unit / 回帰テスト（このファイル）
+#     開発機          … 生成物が揃った状態でのフル `npm test`（fail 0 を維持）
+#   リポジトリ全体の CI 設計（生成物のキャッシュ / 再生成）は別 Mission で扱う。
+#
+#   35L の validator / ブラウザ QA もここでは動かさない。どちらも生成済みの
+#   area-boundaries.json や実ブラウザを要求するため、クリーンチェックアウトでは成立しない。
+
+on:
+  push:
+    branches:
+      - feature/mission-35l-town-boundaries
+  pull_request:
+    branches:
+      - feature/ward-expansion-20260817
+
+jobs:
+  mission35l:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      # 35L 本体（Shapefile / DBF 読み取り・町丁目変換・KEY_CODE 統合・表記ゆれ吸収）
+      - name: Mission 35L unit tests
+        run: node --test tests/mission35l-town-boundaries.test.js
+      # 既存の境界 / navigation が 35L で壊れていないこと
+      - name: Existing boundary regression tests
+        run: node --test tests/boundary-master.test.js tests/boundary-ingestion-validator.test.js tests/station-town-navigation.test.js

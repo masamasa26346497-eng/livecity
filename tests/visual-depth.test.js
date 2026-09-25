@@ -118,10 +118,13 @@ test('35H LOD1 の押し出し式が変わっていない', () => {
   assert.ok(html.includes('positions.push(a[0], 0, a[1], b[0], 0, b[1], b[0], h, b[1]);'));
   assert.ok(html.includes('positions.push(a[0], 0, a[1], b[0], h, b[1], a[0], h, a[1]);'));
   assert.ok(html.includes('positions.push(v.x, h, v.y);'));
-  // 頂点カラーは positions と同じ数だけ積む（壁 1 面 = 6 頂点 = 18 要素）
-  assert.match(html, /colors\.push\(c0, c0, c0, c0, c0, c0, c1, c1, c1\);/);
-  assert.match(html, /colors\.push\(c0, c0, c0, c1, c1, c1, c1, c1, c1\);/);
-  assert.match(html, /if \(colors\) colors\.push\(rc, rc, rc\);/);
+  // 頂点カラーは positions と同じ数だけ積む（壁 1 面 = 6 頂点）。
+  //   [Mission 35N] 1 頂点ぶんを push3() にまとめ、用途不明の建物だけ色みを掛けられるようにした。
+  //   積む順番・個数は変えていない（壁 6 頂点 → push3 を 6 回 / 屋根 1 頂点 → 1 回）。
+  assert.match(html, /const push3 = \(c\) => colors\.push\(shadeByte\(c \* tr \/ 255\), shadeByte\(c \* tg \/ 255\), shadeByte\(c \* tb \/ 255\)\);/);
+  assert.match(html, /push3\(c0\); push3\(c0\); push3\(c1\);/);
+  assert.match(html, /push3\(c0\); push3\(c1\); push3\(c1\);/);
+  assert.match(html, /if \(colors\) push3\(rc\);/);
 });
 
 test('35H 頂点カラーは positions と同じ長さのときだけ使う', () => {
@@ -132,12 +135,18 @@ test('35H 頂点カラーは positions と同じ長さのときだけ使う', ()
 
 // ── §6/§7 色相を変えない ────────────────────────────────────────────────
 test('35H 頂点カラーは無彩色（色相を動かさない）', () => {
-  // r=g=b の値しか積んでいない＝material 色の明るさだけを変える。
+  // 35H の意図: **陰影**が色相を動かさないこと（明るさだけを変える）。
+  //   [Mission 35N] 用途不明の建物にだけ高さクラスの色みを掛けられるようにしたが、
+  //   それは tint として明示的に渡したときだけ効き、渡さなければ従来どおり r=g=b になる。
   const s = html.indexOf('const pushWallShades =');
   const e = html.indexOf('for (const poly of polys)', s);
   const block = html.slice(s, e);
-  assert.ok(/colors\.push\(c0, c0, c0/.test(block), '壁の色が無彩色でない');
-  assert.ok(!/c0, c1, c2/.test(block));
+  // 陰影の値そのものは 1 つのスカラー（c0 / c1）で、色相を持たない
+  assert.match(block, /const c0 = shadeByte\(s \* heightShade\(0, h\)\), c1 = shadeByte\(s \* heightShade\(yTop, h\)\);/);
+  assert.ok(!/c0, c1, c2/.test(block), '陰影に 3 チャンネル別の値を使っている');
+  // tint を渡さないときは 3 チャンネルとも同じ値（= 無彩色）
+  const tr = html.match(/const tr = tint \? tint\[0\] : 1, tg = tint \? tint\[1\] : 1, tb = tint \? tint\[2\] : 1;/);
+  assert.ok(tr, 'tint 既定値（無彩色）の定義が無い');
 });
 
 test('35H DEPTH は彩度だけ上げ、明度は上げない（§7/§18）', () => {

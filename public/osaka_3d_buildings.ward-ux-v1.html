@@ -578,6 +578,9 @@ body.lc-prop-card-open #canonical-runtime-status{right:calc(20px + 280px + 12px)
       <div class="pc-stat" id="pc-floors-stat"><div class="lbl">階数</div><div class="val" id="pc-floors">— <span class="unit">階</span></div></div>
       <div class="pc-stat"><div class="lbl">底面積</div><div class="val" id="pc-area">— <span class="unit">m²</span></div></div>
     </div>
+    <!-- [Mission 35O §19] OSM に実在する建物名・施設名。無い建物では行ごと出さない。 -->
+    <div class="pc-row" id="pc-bldgname-row" style="display:none"><span class="k">建物名</span><span class="v" id="pc-bldgname">—</span></div>
+    <div class="pc-row" id="pc-facility-row" style="display:none"><span class="k">施設</span><span class="v" id="pc-facility">—</span></div>
     <div class="pc-row" id="pc-ward-row"><span class="k">区</span><span class="v" id="pc-ward">—</span></div>
     <div class="pc-row"><span class="k">最寄駅</span><span class="v" id="pc-station">—</span></div>
     <div class="pc-row"><span class="k">用途</span><span class="v" id="pc-usage-full">—</span></div>
@@ -10070,9 +10073,17 @@ const CityLabelLayer = (function () {
   const LANDMARK_URL = 'map-data/osaka-city/labels/landmark-labels.json';   // [Mission 33C] tier S/A/B 付き
   // [Mission 35K §2/§6] 事業者つきの駅索引。canonical の駅に operator / importance を付けたもの。
   const STATION_URL = 'map-data/osaka-city/derived/station-index.json';
+  // [Mission 35O §7] 建物名ラベル。OSM に実在する名称だけを紐づけた sidecar（名前は推測していない）。
+  //   ラベル用は「画面に出す 1 棟ぶん」に絞った軽い方を読む（詳細は建物クリック時に遅延 fetch）。
+  const BUILDING_NAME_URL = 'map-data/osaka-city/derived/building-name-labels.json';
   const RIVER_URL = 'map-data/osaka-city/labels/river-labels.json';       // [Mission 33C] canonical water の名称付き水域
   const ANCHOR_URL = 'map-data/osaka-city/derived/map-label-anchors.json';  // 区名（N03 面積加重セントロイド）+ 公園名
   const BANDS = { farM: 9000, midM: 3500 };        // 道路・鉄道・公園 LOD と同じ距離帯
+  // [Mission 35O §9] 建物名は near よりさらに寄ったところで店舗名まで出す。
+  //   band そのものは 3 段のまま（他レイヤーと共有）。建物ラベルだけ距離で追加判定する。
+  const BUILDING_VERY_NEAR_M = 900;
+  const BUILDING_LABEL_Y_MARGIN = 14;             // §8 屋根の少し上
+  const BUILDING_LABEL_Y_MAX = 220;               // 遠景で高さを強調しすぎない
   const DENSITY_CAP = { far: 18, mid: 36, near: 58 };  // 画面全体の上限（文字だらけにしない）
   const GRID = { cols: 6, rows: 4, perCell: 3 };       // 画面を分割して 1 セルあたりの上限も掛ける
   const THROTTLE_MS = 200;
@@ -10086,9 +10097,9 @@ const CityLabelLayer = (function () {
   const RELAYOUT = { targetFrac: 0.035, targetMinM: 30, distRatio: 1.06, angleRad: 0.035 };
 
   let group = null;
-  let places = [], landmarks = [], stations = [], wards = [], parks = [], rivers = [];
+  let places = [], landmarks = [], stations = [], wards = [], parks = [], rivers = [], buildingNames = [];
   let loaded = false, loadingPromise = null;
-  const typeVisible = { place: true, landmark: true, station: true, ward: true, park: true, river: true };
+  const typeVisible = { place: true, landmark: true, station: true, ward: true, park: true, river: true, building: true };
   const texCache = new Map();          // styleKey|text → { tex, aspect }
   const sprites = new Map();           // label id → { sprite, aspect, styleKey }
   const itemById = new Map();          // [Mission 33D] id → item（再選定せずに大きさだけ更新するために引く）
@@ -10182,6 +10193,18 @@ const CityLabelLayer = (function () {
         // §6 事業者バッジ。色と短い記号だけで区別する（公式ロゴは使わない）。
         badge: op ? { text: op.code, bg: hex, fg: '#ffffff' } : null,
         dot: op ? null : (night ? '#8fc0ff' : '#5b6875'),   // 事業者が分かるならバッジ、分からなければ丸
+      };
+    }
+    if (kind === 'building') {
+      // [Mission 35O §7] 建物名は地名・駅より控えめ。既存ラベルの見た目を変えない。
+      const t = (item && item.tier) || 'veryNear';
+      const f = t === 'mid' ? 13 : (t === 'near' ? 11.5 : 10.5);
+      return {
+        key: 'bl|' + t + '|' + (night ? 'n' : 'd'),
+        font: f, weight: t === 'mid' ? '600' : '500',
+        text: night ? '#d9e4f2' : '#4a5563',
+        halo: night ? 'rgba(6,12,22,0.80)' : 'rgba(255,255,255,0.92)',
+        pill: null, border: null,
       };
     }
     const f = importance === 'major' ? 17 : (importance === 'medium' ? 14 : 12);
@@ -10299,6 +10322,8 @@ const CityLabelLayer = (function () {
   }
 
   // LOD: far は広域地名と MAJOR ランドマークだけ / mid で中位 / near で全部
+  /** いまのカメラ距離（建物ラベルの VERY NEAR 判定に使う）。 */
+  function camDist() { try { return (typeof cs !== 'undefined' && cs && cs.r) ? cs.r : 99999; } catch (e) { return 99999; } }
   function lodVisible(item, b) {
     // [Mission 33D] band は place() で 1 度だけ決める（ヒステリシス付きなので item ごとに評価しない）
     // [Mission 33C] landmark は tier（S/A/B）で band を決める
@@ -10313,6 +10338,13 @@ const CityLabelLayer = (function () {
       if (item.importance === 'transfer' || item.importance === 'medium') return b !== 'far';
       return b === 'near';
     }
+    // [Mission 35O §9] 建物名は遠景では出さない。
+    //   mid(主要ビル・大型施設) → 中景から / near(一般の建物名) → 近景 / veryNear(店舗等) → さらに寄ったときだけ。
+    if (item.kind === 'building') {
+      if (item.tier === 'mid') return b !== 'far';
+      if (item.tier === 'near') return b === 'near';
+      return b === 'near' && camDist() <= BUILDING_VERY_NEAR_M;
+    }
     if (item.importance === 'major') return true;
     if (item.importance === 'medium') return b !== 'far';
     return b === 'near';
@@ -10323,7 +10355,8 @@ const CityLabelLayer = (function () {
     if (loadingPromise) return loadingPromise;
     loadingPromise = (async () => {
       try {
-        const [pr, lr, sr, ar, rr] = await Promise.all([fetch(PLACE_URL), fetch(LANDMARK_URL), fetch(STATION_URL), fetch(ANCHOR_URL), fetch(RIVER_URL)]);
+        const [pr, lr, sr, ar, rr, br] = await Promise.all([fetch(PLACE_URL), fetch(LANDMARK_URL), fetch(STATION_URL),
+          fetch(ANCHOR_URL), fetch(RIVER_URL), fetch(BUILDING_NAME_URL).catch(() => null)]);
         if (pr.ok) {
           const j = await pr.json();
           places = (j.places || []).map((q) => ({ id: 'place:' + q.id, kind: 'place', name: q.name, importance: q.importance, x: q.x, z: q.z }));
@@ -10363,18 +10396,32 @@ const CityLabelLayer = (function () {
           rivers = (j.rivers || []).map((q) => ({ id: 'river:' + q.id, kind: 'river', name: q.name, importance: q.importance,
             x: q.x, z: q.z, angle: q.angle || 0, areaM2: q.areaM2 }));
         }
+        if (br && br.ok) {
+          // [Mission 35O §7/§8] 建物名。位置は footprint の重心、高さは屋根の少し上。
+          //   suppressed（同名の別棟・landmark と同じもの）は sidecar 側で既に外してある。
+          const j = await br.json();
+          buildingNames = (j.labels || [])
+            .filter((q) => q.name && Number.isFinite(q.x) && Number.isFinite(q.z))
+            .map((q) => ({
+              id: 'bldg:' + q.id, kind: 'building', name: q.name,
+              buildingId: q.id, x: q.x, z: q.z,
+              height: Number(q.h) || 0, tier: q.t || 'veryNear', facilityCount: q.n || 0,
+              importance: (q.t === 'mid') ? 'major' : (q.t === 'near' ? 'medium' : 'local'),
+            }));
+        }
         if (ar.ok) {
           const j = await ar.json();
           wards = (j.wards || []).map((q) => ({ id: q.id, kind: 'ward', name: q.name, importance: 'major', x: q.x, z: q.z }));
           parks = (j.parks || []).map((q) => ({ id: q.id, kind: 'park', name: q.name, importance: q.importance, x: q.x, z: q.z, areaM2: q.areaM2 }));
         }
         stats.places = places.length; stats.landmarks = landmarks.length; stats.stations = stations.length;
+        stats.buildingNames = buildingNames.length;
         stats.wards = wards.length; stats.parks = parks.length; stats.rivers = rivers.length;
         // [Mission 33D] 再選定なしで大きさ・向きだけ更新するときに item を引けるようにする
         itemById.clear();
-        for (const arr of [landmarks, wards, stations, rivers, parks, places]) for (const it of arr) itemById.set(it.id, it);
+        for (const arr of [landmarks, wards, stations, rivers, parks, places, buildingNames]) for (const it of arr) itemById.set(it.id, it);
         loaded = true; dirty = true;
-        console.log('[CityLabelLayer] 地名 ' + places.length + ' / ランドマーク ' + landmarks.length + ' / 駅 ' + stations.length + ' / 区 ' + wards.length + ' / 公園 ' + parks.length + ' / 河川 ' + rivers.length);
+        console.log('[CityLabelLayer] 地名 ' + places.length + ' / ランドマーク ' + landmarks.length + ' / 駅 ' + stations.length + ' / 区 ' + wards.length + ' / 公園 ' + parks.length + ' / 河川 ' + rivers.length + ' / 建物名 ' + buildingNames.length);
       } catch (e) {
         stats.dataError = String(e && e.message || e);
         console.warn('[CityLabelLayer] ラベルデータ読み込み失敗（ラベルなしで継続）:', stats.dataError);
@@ -10434,10 +10481,16 @@ const CityLabelLayer = (function () {
     const v = new THREE.Vector3();
     const src = [].concat(typeVisible.landmark ? landmarks : [], typeVisible.ward ? wards : [],
       typeVisible.station ? stations : [], typeVisible.river ? rivers : [],
-      typeVisible.park ? parks : [], typeVisible.place ? places : []);
+      typeVisible.park ? parks : [], typeVisible.place ? places : [],
+      typeVisible.building ? buildingNames : []);
     for (const item of src) {
       if (!lodVisible(item, b)) { stats.hiddenByLOD++; continue; }
-      v.set(item.x, item.kind === 'landmark' ? LANDMARK_Y : PLACE_Y, item.z).project(camera);
+      // [Mission 35O §8] 建物名は footprint 重心 + 建物高さ + 余白（屋根の少し上）。
+      //   遠景で高さを強調しすぎないよう上限を掛ける。
+      const ly = item.kind === 'building'
+        ? Math.min(BUILDING_LABEL_Y_MAX, (item.height || 0) + BUILDING_LABEL_Y_MARGIN)
+        : (item.kind === 'landmark' ? LANDMARK_Y : PLACE_Y);
+      v.set(item.x, ly, item.z).project(camera);
       if (v.z > 1 || v.x < -1.1 || v.x > 1.1 || v.y < -1.1 || v.y > 1.1) { stats.hiddenByViewport++; continue; }
       // 優先順位（33C §13/§14）: ランドマーク(S) > 駅/区 > 地名 > 河川 > 公園。
       //   引き画面では主要河川を少し上げる（都市構造が分かるように）。
@@ -10449,6 +10502,8 @@ const CityLabelLayer = (function () {
           : (item.importance === 'transfer' || item.importance === 'medium') ? 2.2 : 4.2)
         : item.kind === 'river' ? (item.importance === 'major' ? (b === 'far' ? 1.2 : 3.5) : item.importance === 'medium' ? 5.5 : 7.5)
         : item.kind === 'park' ? (item.importance === 'major' ? 4.5 : 6.5)
+        // [Mission 35O §7] 建物名は既存ラベルより後ろ。主要ビルだけ地名と同程度まで上げる。
+        : item.kind === 'building' ? (item.tier === 'mid' ? 5.2 : item.tier === 'near' ? 7.2 : 8.5)
         : (item.importance === 'major' ? 2 : item.importance === 'medium' ? 5 : 7);
       // [Mission 33D §12] 前回出ていたかどうかを「同順位内の並び」にだけ使う。
       //   rank そのものを補正すると ランドマーク/駅/地名 の大分類が逆転しうるので加点はしない。
@@ -10664,10 +10719,20 @@ CityLabelLayer.show();   // 通常表示に統合（地名・主要施設は既�
 // ══════════════════════════════════════════════════════════════════════════════
 const AreaSelectionLayer = (function () {
   const URL_ = 'map-data/osaka-city/derived/area-boundaries.json';
-  const Y = 1.2;                       // road(0.30) / rail(0.5) より上。建物には埋もれる高さにしない
-  const COLOR = 0x40fff0;              // §13 以前の町丁目境界と同じ turquoise
-  const FILL_OPACITY = 0.07;           // §14 建物を隠さない薄さ
-  const LINE_WIDTH_HINT = 2;           // WebGL の linewidth は多くの環境で 1 固定。二重に描いて太く見せる
+  const COLOR = 0x40fff0;              // §13 以前の町丁目境界と同じ turquoise（既存 UI との対応用）
+  // [Mission 35N] 選択の見せ方を「上から透明シートを被せる」方式から
+  //   **地面だけを着色する**方式へ変える。35M では depthTest を切って重ね塗りしていたため、
+  //   建物・道路・鉄道まで水色に染まり「土地が選ばれている」ように見えなかった（実機で確認）。
+  //   地表付近（road 0.30 / rail 0.5 / park 0.22 / water 0.14 より下）に置き、
+  //   depthTest を効かせる。これで道路・鉄道・建物は元の色のまま上に乗る。
+  const GROUND_COLOR = 0x4fd8c8;       // aqua。地表(0xebede6)へ 0.48 で載せると明確に色が変わる
+  const GROUND_OPACITY = 0.48;         // 0.35〜0.50
+  const GROUND_Y = 0.08;               // 他の地表レイヤーより下（= 地面そのものの色が変わる）
+  // 境界は「補助」。太い帯や壁は使わない（道路を横切る線の存在感を出さない）。
+  const OUTLINE_COLOR = 0x2fa89e;      // 面より少し濃い
+  const OUTLINE_OPACITY = 0.5;
+  const OUTLINE_W = 3.0;               // world 幅 1〜3m
+  const OUTLINE_Y = 0.10;              // 面のすぐ上
   const FIT_MARGIN = 1.35;             // §15 bbox に対する余裕
   const FIT_MIN_R = 260, FIT_MAX_R = 6200;
   const ANIM_MS = 600;                 // §16 400〜800ms
@@ -10735,45 +10800,102 @@ const AreaSelectionLayer = (function () {
     }
   }
 
-  /** §13/§14 選択した範囲の輪郭と薄い塗り。 */
+  /**
+   * [Mission 35M] 閉じたリングに沿って **world 幅の帯（リボン）** を作る。
+   * WebGL の `linewidth` はほとんどの環境で 1 固定なので、線を重ねても太くならない。
+   * 各頂点でマイター（前後のセグメントの二等分方向）を出し、交差部で二重に重ならない帯にする。
+   * リングの座標そのものは読むだけで、geometry データは変更しない。
+   */
+  function ringRibbon(ring, widthM, y) {
+    const n = ring.length;
+    if (n < 3) return null;
+    const half = widthM / 2;
+    const dir = [];                       // 各セグメント i→i+1 の単位ベクトル
+    for (let i = 0; i < n; i++) {
+      const a = ring[i], b = ring[(i + 1) % n];
+      let dx = b[0] - a[0], dz = b[1] - a[1];
+      const len = Math.hypot(dx, dz) || 1;
+      dir.push([dx / len, dz / len]);
+    }
+    const inner = [], outer = [];
+    for (let i = 0; i < n; i++) {
+      const d0 = dir[(i - 1 + n) % n];     // 入ってくる向き
+      const d1 = dir[i];                   // 出ていく向き
+      // 法線は向きを 90° 回したもの。2 つの法線の平均がマイター方向。
+      let mx = -d0[1] - d1[1], mz = d0[0] + d1[0];
+      const ml = Math.hypot(mx, mz);
+      let nx, nz, scale;
+      if (ml < 1e-6) {                     // 折り返し（180°）は入ってくる側の法線で代用
+        nx = -d0[1]; nz = d0[0]; scale = 1;
+      } else {
+        nx = mx / ml; nz = mz / ml;
+        // マイター長 = half / cos(θ/2)。鋭角でトゲにならないよう上限を付ける。
+        const cos = nx * -d0[1] + nz * d0[0];
+        scale = Math.min(4, 1 / Math.max(0.25, Math.abs(cos)));
+      }
+      const ox = nx * half * scale, oz = nz * half * scale;
+      inner.push([ring[i][0] - ox, ring[i][1] - oz]);
+      outer.push([ring[i][0] + ox, ring[i][1] + oz]);
+    }
+    const pos = [];
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      const i0 = inner[i], i1 = inner[j], o0 = outer[i], o1 = outer[j];
+      pos.push(i0[0], y, i0[1], o0[0], y, o0[1], o1[0], y, o1[1]);
+      pos.push(i0[0], y, i0[1], o1[0], y, o1[1], i1[0], y, i1[1]);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.computeBoundingSphere();
+    return g;
+  }
+
+  /** z-fighting を避けるための共通設定（面を少し手前へ押し出す）。 */
+  function flatMaterial(opacity, extra = {}) {
+    return new THREE.MeshBasicMaterial({
+      color: GROUND_COLOR, transparent: true, opacity,
+      depthWrite: false, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+      ...extra,
+    });
+  }
+
+  /**
+   * §13/§14 選択した範囲を出す。
+   *
+   * [Mission 35N] **地面だけを着色する**。
+   *   - 地表ハイライト: 公式町丁目 polygon をそのまま、road/rail/park/water より下に置く。
+   *     depthTest を効かせるので、道路・鉄道・建物は元の色のまま上に乗る。
+   *   - 補助の輪郭: world 幅 2.2m の細い線。道路を横切る帯にはしない。
+   *   35M にあった depthTest を切った重ね塗り・太い帯・26m の壁・強い rim は削除した。
+   */
   function drawArea(area) {
     clearMeshes();
     if (!area || !boundaryVisible) return;
     ensureGroup();
     for (const ring of (area.rings || [])) {
       if (!Array.isArray(ring) || ring.length < 3) continue;
-      // 輪郭（閉じたループ）
-      const pos = [];
-      for (const p of ring) pos.push(p[0], Y, p[1]);
-      pos.push(ring[0][0], Y, ring[0][1]);
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-      g.computeBoundingSphere();
-      const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: COLOR, transparent: true, opacity: 0.95, depthTest: false }));
-      line.renderOrder = 990;      // 道路・鉄道より上（§13）
-      line.frustumCulled = true;
-      outlineGroup.add(line);
-      // 太く見せるためにわずかに高い位置へもう 1 本（linewidth が効かない環境向け）
-      if (LINE_WIDTH_HINT > 1) {
-        const g2 = g.clone();
-        const arr = g2.getAttribute('position').array;
-        for (let i = 1; i < arr.length; i += 3) arr[i] = Y + 0.6;
-        const line2 = new THREE.Line(g2, new THREE.LineBasicMaterial({ color: COLOR, transparent: true, opacity: 0.55, depthTest: false }));
-        line2.renderOrder = 989; line2.frustumCulled = true;
-        outlineGroup.add(line2);
-      }
-      // 薄い塗り（§14 建物を隠さない）
+
+      // ── 地面のハイライト ────────────────────────────────────────────
       try {
         const shape = new THREE.Shape(ring.map((p) => new THREE.Vector2(p[0], p[1])));
         const fg = new THREE.ShapeGeometry(shape);
         fg.rotateX(Math.PI / 2);
-        const fill = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({
-          color: COLOR, transparent: true, opacity: FILL_OPACITY, depthWrite: false, side: THREE.DoubleSide,
-        }));
-        fill.position.y = Y - 0.6;
-        fill.renderOrder = 988; fill.frustumCulled = true;
+        const fill = new THREE.Mesh(fg, flatMaterial(GROUND_OPACITY, { color: GROUND_COLOR }));
+        fill.position.y = GROUND_Y;
+        fill.renderOrder = 6;        // 地表レイヤー（water/park/road/rail）より先に描く
+        fill.frustumCulled = true;
         fillGroup.add(fill);
       } catch (e) { /* 自己交差などで三角形化できない環境は輪郭だけ */ }
+
+      // ── 補助の輪郭（細い） ──────────────────────────────────────────
+      const band = ringRibbon(ring, OUTLINE_W, OUTLINE_Y);
+      if (band) {
+        const m = new THREE.Mesh(band, flatMaterial(OUTLINE_OPACITY, { color: OUTLINE_COLOR }));
+        m.renderOrder = 7;
+        m.frustumCulled = true;
+        outlineGroup.add(m);
+      }
     }
   }
 
@@ -11696,6 +11818,74 @@ function propertyAreaLabel(d) {
   }
   return ward;
 }
+// ══════════════════════════════════════════════════════════════
+// [Mission 35O §19] BuildingNameStore — 建物名・施設名を建物クリックで引く
+//
+//   ラベル用（building-name-labels.json）とは別に、施設名つきの索引を持つ。
+//   7MB あるので **起動時には読まない**。最初に建物をクリックしたときだけ取りに行く（§20）。
+//   名前は OSM に実在するものだけ（推測していない）。provenance も一緒に持つ。
+// ══════════════════════════════════════════════════════════════
+const BuildingNameStore = (function () {
+  const URL_ = 'map-data/osaka-city/derived/building-facility-index.json';
+  let byId = null, loading = null, failed = false;
+  const stats = { records: 0, loaded: false, error: null };
+
+  function ensure() {
+    if (byId || loading || failed) return loading;
+    loading = (async () => {
+      try {
+        const r = await fetch(URL_);
+        if (!r.ok) { failed = true; stats.error = 'HTTP ' + r.status; return; }
+        const j = await r.json();
+        byId = new Map();
+        for (const b of (j.buildings || [])) byId.set(b.buildingId, b);
+        stats.records = byId.size; stats.loaded = true;
+        console.log('[BuildingNameStore] 建物名 ' + byId.size + ' 件');
+        // 読み終わったら、いま開いているカードを書き直す
+        try { if (typeof refreshBuildingNameRow === 'function') refreshBuildingNameRow(); } catch (e) { /* noop */ }
+      } catch (e) {
+        failed = true; stats.error = String(e && e.message || e);
+        console.warn('[BuildingNameStore] 読み込み失敗（名称なしで継続）:', stats.error);
+      } finally { loading = null; }
+    })();
+    return loading;
+  }
+  function get(id) { if (!id) return null; if (!byId) { ensure(); return null; } return byId.get(id) || null; }
+  return { ensure, get, isLoaded: () => !!byId, getDebug: () => ({ ...stats }) };
+})();
+if (typeof window !== 'undefined') window.__BUILDING_NAME_DEBUG__ = () => BuildingNameStore.getDebug();
+
+/** [Mission 35O §19] いま開いている property card の建物名・施設欄を書き直す。 */
+function refreshBuildingNameRow() {
+  const card = document.getElementById('prop-card');
+  if (!card || card.style.display === 'none') return;
+  const id = card.dataset ? card.dataset.canonicalId : null;
+  if (id) applyBuildingNameRows(id);
+}
+
+/**
+ * [Mission 35O §19] 建物名と施設を card へ出す。
+ *   施設が多いときは全部出さず「施設 18 件」のように件数で示し、上位だけ名前を出す。
+ */
+function applyBuildingNameRows(canonicalId) {
+  const nameRow = document.getElementById('pc-bldgname-row');
+  const facRow = document.getElementById('pc-facility-row');
+  if (!nameRow || !facRow) return;
+  const rec = canonicalId ? BuildingNameStore.get(canonicalId) : null;
+  if (!rec) { nameRow.style.display = 'none'; facRow.style.display = 'none'; return; }
+  const nm = rec.buildingName || rec.primaryFacilityName;
+  if (nm) {
+    document.getElementById('pc-bldgname').textContent = nm;
+    nameRow.style.display = '';
+  } else nameRow.style.display = 'none';
+  const n = rec.n || 0;
+  if (n > 0) {
+    const top = (rec.f || []).slice(0, 3).join(' / ');
+    document.getElementById('pc-facility').textContent = (n > 3) ? (top + ' ほか（施設 ' + n + ' 件）') : top;
+    facRow.style.display = '';
+  } else facRow.style.display = 'none';
+}
+
 function showPropertyCard(d){
   const p = buildPropertyData(d);
   document.getElementById('pr').style.display='none'; // GML解析パネルは隠してカードに切替
@@ -11710,6 +11900,13 @@ function showPropertyCard(d){
   const areaLabel = propertyAreaLabel(d);
   document.getElementById('pc-title').textContent = (landmarkName || usageDisplayName(d)) + (areaLabel ? ' ／ ' + areaLabel : '');
   document.getElementById('pc-id').textContent = d.id||'—';
+  // [Mission 35O §19] 実在する建物名・施設名（OSM 由来）。まだ索引を読んでいなければ取りに行く。
+  {
+    const cid = (d && (d.canonicalId || d.id)) || null;
+    if (card.dataset) card.dataset.canonicalId = cid || '';
+    BuildingNameStore.ensure();
+    applyBuildingNameRows(cid);
+  }
   // [Mission 32S §2/§3/§10] 高さは実測（measuredHeight / LOD 形状 / OSM タグ）のときだけ出す。
   //   「階数×3.0m」や変換時の既定値 3.0m は根拠が無いので数値を出さない（代わりに実階数を出す）。
   //   階数は PLATEAU bldg:storeysAboveGround の実値のみ。高さから推定はしない。
@@ -15171,6 +15368,47 @@ const CanonicalRuntime = (function () {
     hotel:           0xc78f9b, // ダスティローズ（宿泊）
     other:           0xb2bac0, // ニュートラルグレー（その他）
   };
+  // ── [Mission 35N] 用途不明（'other'）の建物を高さで色分けする ──────────────
+  //   灰色の正体は usageCategory が付かない建物。PLATEAU は用途コードを持つが、
+  //   35D/35E で足した OSM fallback（47,259 棟 = 全体の 7.3%）はその 74% が用途不明で、
+  //   すべて CR_USAGE_COLOR.other（0xb2bac0 のニュートラルグレー）1 色になっていた。
+  //   **用途色が付いている建物には触らない**（§8）。色を変えるのは 'other' だけ。
+  //
+  //   単にカラフルにするのではなく、**高さを読めるようにする**（§9）。
+  //   閾値は実測の高さ分布から決めた（647,746 棟）:
+  //     p10 3.3m / p25 6.0m / p50 7.1m / p75 9.6m / p90 12.6m / p97 29m / p99 40.3m
+  const CR_OTHER_HEIGHT_CLASSES = [
+    { id: 'low',      maxH: 6,        color: 0xd9c9a8 },  // 低層: warm sand
+    { id: 'midLow',   maxH: 9,        color: 0xbcc9a8 },  // 中低層: pale sage
+    { id: 'mid',      maxH: 13,       color: 0xa8bcd0 },  // 中層: pale blue
+    { id: 'midHigh',  maxH: 30,       color: 0xd3b784 },  // 中高層: muted gold
+    { id: 'high',     maxH: 60,       color: 0xcfa08c },  // 高層: soft terracotta
+    { id: 'veryHigh', maxH: Infinity, color: 0xb9a3c6 },  // 超高層: light lavender
+  ];
+  /**
+   * 高さから色分けクラスを決める。**高さだけで決まる決定論**なので、
+   * 再読み込みしても同じ建物は必ず同じ色になる（§10。乱数は使わない）。
+   * PLATEAU には measuredHeight の外れ値（9999 など）があるので上限で丸める。
+   */
+  function crOtherHeightClass(h) {
+    const v = (typeof h === 'number' && isFinite(h) && h > 0) ? Math.min(h, 400) : 0;
+    for (const c of CR_OTHER_HEIGHT_CLASSES) if (v < c.maxH) return c.id;
+    return CR_OTHER_HEIGHT_CLASSES[CR_OTHER_HEIGHT_CLASSES.length - 1].id;
+  }
+  const CR_OTHER_CLASS_COLOR = Object.fromEntries(CR_OTHER_HEIGHT_CLASSES.map((c) => [c.id, c.color]));
+  /**
+   * [Mission 35N §12] 高さクラスごとに mesh を分けると draw call が増える（梅田で実測 483 → 608）。
+   * DEPTH プロファイルは既に **頂点カラー**（面ごとの明暗）を焼いているので、そこへ
+   * クラスの色みを掛ければ **mesh も material も増やさずに** 色分けできる。
+   * 頂点カラーは乗算なので、base は各クラス色より明るい必要がある。
+   */
+  const CR_OTHER_BASE = 0xe9e6e0;
+  const CR_OTHER_TINT = Object.fromEntries(CR_OTHER_HEIGHT_CLASSES.map((c) => {
+    const br = (CR_OTHER_BASE >> 16) & 255, bg = (CR_OTHER_BASE >> 8) & 255, bb = CR_OTHER_BASE & 255;
+    const cr = (c.color >> 16) & 255, cg = (c.color >> 8) & 255, cb = c.color & 255;
+    return [c.id, [Math.min(1, cr / br), Math.min(1, cg / bg), Math.min(1, cb / bb)]];
+  }));
+
   const CR_USAGE_CATEGORIES = Object.keys(CR_USAGE_COLOR);
   // §6: 正式カテゴリへ寄せる（null / undefined / 未知コード → 'other'）。
   function crUsageCategory(a) {
@@ -15223,13 +15461,20 @@ const CanonicalRuntime = (function () {
     return (to(hue(h + 1 / 3)) << 16) | (to(hue(h)) << 8) | to(hue(h - 1 / 3));
   }
   const crBuildingMats = new Map();
-  function crBuildingMaterial(cat, band) {
+  function crBuildingMaterial(cat, band, heightClass) {
     // [Mission 35H] profile ごとに別 material（DEPTH は頂点カラーを掛ける）。
     //   同じ key を使い回すと profile を切り替えたとき古い設定の material が残る。
-    const key = cat + '|' + band + '|' + visualProfile;
+    // [Mission 35N] 'other' だけ高さクラスごとに分ける。material は **クラス単位で共有**し、
+    //   建物 1 棟ごとに new しない（§12）。
+    const hc = (cat === 'other' && heightClass) ? heightClass : '';
+    const key = cat + '|' + band + '|' + visualProfile + (hc ? '|' + hc : '');
     let m = crBuildingMats.get(key);
     if (!m) {
-      const base = CR_USAGE_COLOR[cat] || CR_USAGE_COLOR.other;
+      const base = (cat === 'other' && depthEnabled())
+        ? CR_OTHER_BASE                                   // 色みは頂点カラーで付ける（§12 mesh を増やさない）
+        : (cat === 'other' && hc && CR_OTHER_CLASS_COLOR[hc] != null)
+          ? CR_OTHER_CLASS_COLOR[hc]                      // CURRENT プロファイル用の退避経路
+          : (CR_USAGE_COLOR[cat] || CR_USAGE_COLOR.other);
       const WH = depthEnabled() ? CR_USAGE_WHITEN_DEPTH : CR_USAGE_WHITEN;
       const wh = (WH[band] != null) ? WH[band] : 0.24;
       const col0 = (typeof msBlend === 'function') ? msBlend(base, COL.white, wh) : base;
@@ -15258,7 +15503,9 @@ const CanonicalRuntime = (function () {
     const grp = layerGroup.buildings;
     if (grp) grp.traverse((o) => {
       if (!o.isMesh || o.userData.usageCategory == null) return;
-      o.material = want ? crBuildingGrayMaterial() : crBuildingMaterial(o.userData.usageCategory, o.userData.crBuildingBand || 'mid');
+      // [Mission 35N] 戻すときに高さクラスも一緒に渡す（渡さないと other が灰色 1 色へ戻ってしまう）
+      o.material = want ? crBuildingGrayMaterial()
+        : crBuildingMaterial(o.userData.usageCategory, o.userData.crBuildingBand || 'mid', o.userData.crOtherHeightClass);
     });
     return crBuildingDiffGray;
   }
@@ -18501,14 +18748,18 @@ const CanonicalRuntime = (function () {
    * `colors`（任意）を渡すと [Mission 35H] の面ごと・高さごとの明暗を頂点カラーとして同時に焼く。
    * **positions の中身は colors の有無で 1 mm も変わらない**（geometry 不変・§3/§27）。
    */
-  function pushExtrude(positions, geometryType, coordinates, h, colors) {
+  function pushExtrude(positions, geometryType, coordinates, h, colors, tint) {
     const polys = geometryType === 'Polygon' ? [coordinates] : coordinates;
+    // [Mission 35N] tint は [r,g,b]（各 0〜1）。用途不明の建物に高さクラスの色みを掛けるために使う。
+    //   渡されないときは従来どおり無彩色の明暗（= 用途色をそのまま出す）。
+    const tr = tint ? tint[0] : 1, tg = tint ? tint[1] : 1, tb = tint ? tint[2] : 1;
+    const push3 = (c) => colors.push(shadeByte(c * tr / 255), shadeByte(c * tg / 255), shadeByte(c * tb / 255));
     // 6 頂点（壁 1 面 = 三角形 2 枚）ぶんの明暗を一度に積む
     const pushWallShades = (s, yTop) => {
       const c0 = shadeByte(s * heightShade(0, h)), c1 = shadeByte(s * heightShade(yTop, h));
       // 順番は下の positions.push と同じ: (a,0) (b,0) (b,h) / (a,0) (b,h) (a,h)
-      colors.push(c0, c0, c0, c0, c0, c0, c1, c1, c1);
-      colors.push(c0, c0, c0, c1, c1, c1, c1, c1, c1);
+      push3(c0); push3(c0); push3(c1);
+      push3(c0); push3(c1); push3(c1);
     };
     for (const poly of polys) {
       const outer = poly[0];
@@ -18536,7 +18787,7 @@ const CanonicalRuntime = (function () {
         for (const t of tris) for (const idx of t) {
           const v = all[idx];
           positions.push(v.x, h, v.y);
-          if (colors) colors.push(rc, rc, rc);
+          if (colors) push3(rc);
         }
       }
     }
@@ -18989,20 +19240,34 @@ const CanonicalRuntime = (function () {
             }
             const cat = crUsageCategory(a);            // §6: null / 未知 → 'other'
             buildingPalette[cat] = (buildingPalette[cat] || 0) + 1;
-            if (!byCat.has(cat)) byCat.set(cat, { pos: [], col: depthEnabled() ? [] : null });
-            const bucket = byCat.get(cat);
-            pushExtrude(bucket.pos, f.geometryType, f.coordinates, h, bucket.col);
+            // [Mission 35N] 用途不明だけ高さクラスで束ねを分ける。
+            //   用途色が付いている建物の束ね方・色は一切変えない（§8）。
+            // QA 用: 色みを切ると 35N 以前と同じ「灰色 1 色」に戻る（draw call の A/B に使う）
+            const hc = (cat === 'other' && !(typeof window !== 'undefined' && window.__CR_DISABLE_OTHER_TINT__))
+              ? crOtherHeightClass(h) : null;
+            // DEPTH では頂点カラーで色分けするので束ねは 1 つのまま（mesh も draw call も増えない）。
+            //   頂点カラーを使わない CURRENT プロファイルのときだけ、高さクラスで束ねを分ける。
+            const splitByHeight = hc && !depthEnabled();
+            const bkey = splitByHeight ? (cat + '|' + hc) : cat;
+            if (!byCat.has(bkey)) byCat.set(bkey, { cat, heightClass: splitByHeight ? hc : null, pos: [], col: depthEnabled() ? [] : null });
+            const bucket = byCat.get(bkey);
+            pushExtrude(bucket.pos, f.geometryType, f.coordinates, h, bucket.col, hc ? CR_OTHER_TINT[hc] : null);
             if (outer && f.centroid) footprints.push({ canonicalId: f.canonicalId, ring: outer, cx: f.centroid[0], cz: f.centroid[1], h, attributes: a, placement: pp ? pp.policy : 'DISPLAY' });
           }
-          for (const [cat, bucket] of byCat) {
+          for (const bucket of byCat.values()) {
             const pos = bucket.pos;
-            // §7: usageCategory × band 共有 material（feature ごとに new しない）
+            const cat = bucket.cat;
+            // §7: usageCategory × band（+ 35N: other は高さクラス）共有 material。feature ごとに new しない
             const m = meshFromPositions(pos, 0, REN.building, {
-              material: crBuildingDiffGray ? crBuildingGrayMaterial() : crBuildingMaterial(cat, band),
+              material: crBuildingDiffGray ? crBuildingGrayMaterial() : crBuildingMaterial(cat, band, bucket.heightClass),
               colors: bucket.col,   // [Mission 35H] DEPTH のときだけ面ごとの明暗が入る
             });
             // [Mission 34B §22] LOD DIFF で灰色へ差し替え／元へ戻すために cat・band を控えておく
-            if (m) { m.userData.usageCategory = cat; m.userData.crBuildingBand = band; g.add(m); vtx += pos.length / 3; }
+            if (m) {
+              m.userData.usageCategory = cat; m.userData.crBuildingBand = band;
+              if (bucket.heightClass) m.userData.crOtherHeightClass = bucket.heightClass;
+              g.add(m); vtx += pos.length / 3;
+            }
           }
         } else if (layer === 'rail') {
           const seg = { major: [], urban: [], local: [] };
@@ -19584,7 +19849,9 @@ const CanonicalRuntime = (function () {
       return out;
     },
     // [Mission 34A §16] 高 LOD でも LOD1 と同じ用途色を使うため、共有 material を貸し出す
-    buildingMaterial: (cat, band) => crBuildingMaterial(cat, band),
+    buildingMaterial: (cat, band, heightClass) => crBuildingMaterial(cat, band, heightClass),
+    otherHeightClasses: () => CR_OTHER_HEIGHT_CLASSES.map((c) => ({ ...c })),
+    otherHeightClassOf: (h) => crOtherHeightClass(h),
     // [Mission 34D §34] 表示中の建物 footprint を source 付きで返す（QA の色分け用。読むだけ）
     visibleBuildingFootprints(limit = 40000) {
       const out = [];

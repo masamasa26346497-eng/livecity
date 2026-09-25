@@ -242,9 +242,10 @@ test('[34B §22] LOD DIFF は LOD1 灰 / LOD2 青 / LOD3 金', () => {
   assert.match(html, /function setBuildingDiffGray\(on\) \{/);
   assert.match(html, /CanonicalRuntime\.setBuildingDiffGray\(mode === 'diff'\)/);
   // 灰色は diff のときだけ。通常表示では必ず用途色へ戻す
-  assert.match(html, /o\.material = want \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(o\.userData\.usageCategory, o\.userData\.crBuildingBand \|\| 'mid'\);/);
+  // [Mission 35N] 戻すときに高さクラスも渡す（渡さないと用途不明が灰色 1 色へ戻る）
+  assert.match(html, /o\.material = want \? crBuildingGrayMaterial\(\)[\s\S]{0,20}: crBuildingMaterial\(o\.userData\.usageCategory, o\.userData\.crBuildingBand \|\| 'mid', o\.userData\.crOtherHeightClass\);/);
   // diff 中に読み込まれたタイルも灰色になる
-  assert.match(html, /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band\)/);
+  assert.match(html, /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band, bucket\.heightClass\)/);
 });
 
 test('[34B §22] 比較モードは material ではなく頂点カラーを差し替える（draw call を増やさない）', () => {

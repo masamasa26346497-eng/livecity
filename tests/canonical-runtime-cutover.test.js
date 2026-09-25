@@ -256,7 +256,8 @@ test('[31G-FIX5] §2/§5: buildings branch は source で分岐せず usageCateg
 
 test('[31G-FIX5] §7/§8: usageCategory×band で material を共有（feature ごとに new しない）', () => {
   assert.match(html, /const crBuildingMats = new Map\(\);/);
-  assert.match(html, /function crBuildingMaterial\(cat, band\)/);
+  // [Mission 35N] 用途不明の建物へ高さクラスの色みを渡すため引数が 1 つ増えた。共有の仕組みは不変。
+  assert.match(html, /function crBuildingMaterial\(cat, band, heightClass\)/);
   assert.match(html, /m\.userData\.crShared = true;/);
   assert.match(html, /if \(!\(x\.userData && x\.userData\.crShared\)\) x\.dispose\(\)/);   // 共有 material は dispose しない
   // buildings 分岐の末尾までを見る（固定幅だと後続ミッションの追記で範囲外になる。
@@ -265,7 +266,7 @@ test('[31G-FIX5] §7/§8: usageCategory×band で material を共有（feature �
   const e = html.indexOf("} else if (layer === 'rail') {", s);
   assert.ok(e > s, 'buildings 分岐の終端が見つからない');
   // [Mission 35H] colors を渡す引数が増えて複数行になった。共有 material を使うことは不変。
-  assert.match(html.slice(s, e), /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band\),/);
+  assert.match(html.slice(s, e), /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band, bucket\.heightClass\),/);
 });
 
 test('[31G-FIX5] §9: LOD で白寄せ量のみ変える（カテゴリは LOD で変えない）', () => {
@@ -477,9 +478,10 @@ test('[31G-FIX8B] §7/§14: 建物は lighting 対応 material・立体感は di
 test('[31G-FIX8B] §0/§21: geometry / mesh 数は不変（style / lighting のみ変更）', () => {
   // [Mission 35H] pushExtrude に colors（頂点カラー）が、meshFromPositions に colors 渡しが増えた。
   //   positions の積み方・mesh 数・三角形数は不変（頂点カラーは attribute であって geometry ではない）。
-  assert.match(html, /function pushExtrude\(positions, geometryType, coordinates, h, colors\)/);
+  // [Mission 35N] tint（高さクラスの色み）が増えた。座標の積み方は変えていない。
+  assert.match(html, /function pushExtrude\(positions, geometryType, coordinates, h, colors, tint\)/);
   assert.match(html, /function pushPolygon\(positions, geometryType, coordinates, yLevel\)/);
-  assert.match(html, /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band\),/);
+  assert.match(html, /material: crBuildingDiffGray \? crBuildingGrayMaterial\(\) : crBuildingMaterial\(cat, band, bucket\.heightClass\),/);
   assert.match(html, /colors: bucket\.col,/);
   // CanonicalRuntime ブロック内で新規ライト・outline mesh を作っていない
   const s = html.indexOf('const CanonicalRuntime = (function');
