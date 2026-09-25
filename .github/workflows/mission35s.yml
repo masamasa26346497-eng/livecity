@@ -29,7 +29,7 @@ jobs:
         run: npm ci
 
       - name: Install point-cloud experiment dependencies
-        run: pip install --disable-pip-version-check laspy numpy pyproj shapely scipy
+        run: pip install --disable-pip-version-check 'numpy<2.3' laspy pyproj shapely scipy
 
       - name: Record production/protected hashes
         run: |
