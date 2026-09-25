@@ -20,7 +20,7 @@ function dataIfPresent() {
 test('[35S] generator keeps experimental provenance and exact coordinate convention', () => {
   const s = read(GEN);
   assert.match(s, /EXPERIMENTAL_POINT_CLOUD_ROOF/);
-  assert.match(s, /officialPlateauLod2['"]\s*:\s*False/);
+  assert.match(s, /['"]officialPlateauLod2['"]\s*:\s*False/);
   assert.match(s, /znorth-neg-v1/);
   assert.match(s, /runtime-footprint-spatial-match/);
   assert.doesNotMatch(s, /simple_gable|heuristic gable|generated-simple-roof/i);
