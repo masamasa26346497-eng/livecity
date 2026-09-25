@@ -196,19 +196,40 @@ const CustomLod2Layer = (function () {
     getCanonicalId: () => canonicalId };
 })();
 if (typeof window !== 'undefined') {
-  window.__CUSTOM_LOD2_LAYER__ = CustomLod2Layer;
-  window.__CUSTOM_LOD2_DEBUG__ = () => CustomLod2Layer.getDebug();
-  window.__CUSTOM_LOD2_TOGGLE__ = (on) => CustomLod2Layer.setEnabled(on !== false);
-  window.__CUSTOM_LOD2_FOCUS__ = () => CustomLod2Layer.focus();
-  window.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('mission35s-focus')) return;
-    const b = document.createElement('button'); b.id = 'mission35s-focus'; b.textContent = '35S 点群LOD2へ';
-    b.title = '新高のLive City独自点群LOD2プロトタイプへ移動';
-    b.style.cssText = 'position:fixed;right:12px;bottom:76px;z-index:10020;padding:9px 12px;border:1px solid #789;background:rgba(255,255,255,.94);border-radius:8px;font:600 12px system-ui;color:#334;box-shadow:0 2px 8px #0002;';
-    b.addEventListener('click', () => CustomLod2Layer.focus()); document.body.appendChild(b);
-  });
+__MISSION35S_FOCUS_BUTTON__
 }
 '''
+
+# 確認用ボタン。右側のデバッグパネルの裏に隠れないよう **左下** に出す。
+#   この文字列は LAYER の中と、既にパッチ済みの dev HTML を貼り直すときの
+#   両方で使う（どちらか片方だけ直すと、CI の再生成で元へ戻ってしまう）。
+FOCUS_BUTTON = r'''  // [Mission 35S] 表示確認用ボタン。右側のデバッグパネルと重ならないよう左下へ置く。
+  function createMission35SFocusButton() {
+    if (document.getElementById('mission35s-focus')) return;
+
+    const b = document.createElement('button');
+    b.id = 'mission35s-focus';
+    b.textContent = '35S 点群LOD2へ';
+    b.title = '新高のLive City独自点群LOD2プロトタイプへ移動';
+
+    b.style.cssText =
+      'position:fixed;left:20px;bottom:90px;z-index:99999;' +
+      'padding:12px 16px;border:2px solid #1677ff;' +
+      'background:white;border-radius:8px;' +
+      'font:700 14px system-ui;color:#1677ff;box-shadow:0 3px 12px #0004;';
+
+    b.addEventListener('click', () => CustomLod2Layer.focus());
+    document.body.appendChild(b);
+  }
+
+  // DOMContentLoaded を撃ち終えたあとに読み込まれても必ず作る。
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', createMission35SFocusButton);
+  } else {
+    createMission35SFocusButton();
+  }'''
+
+LAYER = LAYER.replace('__MISSION35S_FOCUS_BUTTON__', FOCUS_BUTTON)
 
 
 def one_replace(s: str, old: str, new: str, label: str) -> str:
@@ -218,10 +239,41 @@ def one_replace(s: str, old: str, new: str, label: str) -> str:
     return s.replace(old, new, 1)
 
 
+FOCUS_ANCHOR = "  window.__CUSTOM_LOD2_FOCUS__ = () => CustomLod2Layer.focus();"
+FOCUS_END = chr(10) + "}" + chr(10) + chr(10) + "// " + "═" * 3
+
+
+def refresh_focus_button(s: str) -> str:
+    """既にパッチ済みの dev HTML のボタン定義だけを今の FOCUS_BUTTON に貼り替える。
+
+    パッチ全体は MARK で冪等にしているので、ボタンの見た目や生成タイミングを直しても
+    「もう入っている」と判断されて反映されない。実際、dev HTML は
+    DOMContentLoaded だけの古い形のまま残っていた。CI が再生成しても直りが残るよう、
+    ここだけは毎回上書きする。
+    """
+    i = s.find(FOCUS_ANCHOR)
+    if i < 0:
+        raise RuntimeError('focus button refresh: anchor missing')
+    start = i + len(FOCUS_ANCHOR)
+    j = s.find(FOCUS_END, start)
+    if j < 0:
+        raise RuntimeError('focus button refresh: end marker missing')
+    current = s[start:j]
+    wanted = chr(10) + FOCUS_BUTTON
+    if current == wanted:
+        return s
+    return s[:start] + wanted + s[j:]
+
+
 def main():
     s = DEV.read_text(encoding='utf-8')
     if MARK in s:
-        print('[35S patch] already patched; no-op')
+        updated = refresh_focus_button(s)
+        if updated == s:
+            print('[35S patch] already patched; focus button current; no-op')
+            return
+        DEV.write_text(updated, encoding='utf-8', newline=chr(10))
+        print('[35S patch] already patched; focus button refreshed (left-bottom + readyState)')
         return
 
     maxlod_anchor = '// [Mission 34D §34/§35/§36] MAX LOD QA'

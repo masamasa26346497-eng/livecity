@@ -69,3 +69,26 @@ test('[35S] dev integration contract when patched', () => {
   assert.match(s, /officialPlateauLod2 !== false/);
   assert.match(s, /EXPERIMENTAL_POINT_CLOUD_ROOF/);
 });
+
+test('[35S] focus button is reliably visible on the left-bottom', () => {
+  const s = read(DEV);
+  if (!s.includes('[Mission 35S] CustomLod2Layer')) return;
+  // 右側のデバッグパネルの裏に隠れないよう左下へ置く
+  assert.match(s, /'position:fixed;left:20px;bottom:90px;z-index:99999;'/);
+  // 35S のボタンに right 指定を残さない（ボタン定義の中だけを見る）
+  const i = s.indexOf("b.id = 'mission35s-focus'");
+  assert.ok(i > 0, 'focus ボタンの定義が無い');
+  const block = s.slice(i, i + 700);
+  assert.ok(!/right:\s*\d/.test(block), '35S ボタンに right 指定が残っている');
+  // DOMContentLoaded を撃ち終えたあとでも必ず作る
+  assert.match(s, /if \(document\.readyState === 'loading'\)[\s\S]{0,120}createMission35SFocusButton\(\);/);
+});
+
+test('[35S] patch script is the source of the button (regeneration keeps the fix)', () => {
+  // dev HTML だけ直すと CI の再生成で元へ戻る。生成元にも同じ指定があること。
+  const p = read(PATCH);
+  assert.match(p, /position:fixed;left:20px;bottom:90px;z-index:99999;/);
+  assert.match(p, /document\.readyState === 'loading'/);
+  // パッチ済みでもボタンだけは貼り直す（MARK による no-op で直りが埋もれないように）
+  assert.match(p, /def refresh_focus_button\(/);
+});
