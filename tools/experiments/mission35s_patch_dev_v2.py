@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Mission 35S patch wrapper.
 
-The dev runtime intentionally calls BuildingLODLayer.update() from three lifecycle
-paths. 35S must follow every one of those official high-LOD update hooks rather
-than guessing which occurrence is the 'real' camera hook.
+35S follows the existing official BuildingLODLayer.update() lifecycle hook(s)
+instead of inventing an unrelated refresh loop. Known dev-runtime variants have
+one or three exact hooks; any other count fails closed.
 """
 from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
@@ -17,10 +17,11 @@ spec.loader.exec_module(mod)
 def safe_replace(s: str, old: str, new: str, label: str) -> str:
     n = s.count(old)
     if label == 'camera update':
-        # Existing runtime has exactly three official high-LOD update hooks.
-        # Custom high-LOD must track all three. Fail closed if that contract drifts.
-        if n != 3:
-            raise RuntimeError(f'{label}: expected exactly 3 official high-LOD hooks, got {n}')
+        # Known dev variants contain either one consolidated official high-LOD
+        # update hook or three lifecycle hooks. Follow every exact hook present.
+        if n not in (1, 3):
+            raise RuntimeError(f'{label}: expected 1 or 3 official high-LOD hooks, got {n}')
+        print(f'[35S patch] following {n} official high-LOD update hook(s)')
         return s.replace(old, new)
     if n != 1:
         raise RuntimeError(f'{label}: expected exactly 1 anchor, got {n}')
