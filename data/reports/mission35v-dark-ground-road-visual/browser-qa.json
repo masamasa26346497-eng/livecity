@@ -1,0 +1,677 @@
+{
+  "url": "http://localhost:8080/osaka_3d_buildings.ward-ux-v1.html",
+  "generatedAt": "2026-09-25T19:13:01.854Z",
+  "mission": "35V",
+  "spots": [
+    {
+      "id": "1-umeda-wide",
+      "name": "梅田",
+      "lat": 34.7025,
+      "lon": 135.4959,
+      "r": 1500,
+      "phDeg": 38,
+      "labels": {
+        "band": "near",
+        "visible": 58,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 13,
+        "visibleLandmarks": 1,
+        "visiblePlaces": 11,
+        "spritesShown": 58,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.328,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#ccccdd",
+            "share": 0.07,
+            "lum": 0.805,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#888899",
+            "share": 0.053,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#bbbbbb",
+            "share": 0.044,
+            "lum": 0.733,
+            "blueness": 0
+          },
+          {
+            "hex": "#778899",
+            "share": 0.043,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#dddddd",
+            "share": 0.036,
+            "lum": 0.867,
+            "blueness": 0
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/1-umeda-wide.jpg"
+    },
+    {
+      "id": "2-nakatsu-river-road",
+      "name": "中津",
+      "lat": 34.7106,
+      "lon": 135.4962,
+      "r": 900,
+      "phDeg": 30,
+      "labels": {
+        "band": "near",
+        "visible": 44,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visibleLandmarks": 2,
+        "visiblePlaces": 8,
+        "spritesShown": 44,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.33,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#8899bb",
+            "share": 0.082,
+            "lum": 0.595,
+            "blueness": 0.2
+          },
+          {
+            "hex": "#ccccdd",
+            "share": 0.063,
+            "lum": 0.805,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#778899",
+            "share": 0.056,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#bbbbbb",
+            "share": 0.046,
+            "lum": 0.733,
+            "blueness": 0
+          },
+          {
+            "hex": "#000022",
+            "share": 0.034,
+            "lum": 0.01,
+            "blueness": 0.133
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/2-nakatsu-river-road.jpg"
+    },
+    {
+      "id": "3-honmachi",
+      "name": "本町",
+      "lat": 34.6823,
+      "lon": 135.5024,
+      "r": 900,
+      "phDeg": 40,
+      "labels": {
+        "band": "near",
+        "visible": 52,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visibleLandmarks": 1,
+        "visiblePlaces": 19,
+        "spritesShown": 52,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.238,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#ccccdd",
+            "share": 0.14,
+            "lum": 0.805,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#8899aa",
+            "share": 0.122,
+            "lum": 0.591,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#aaaabb",
+            "share": 0.067,
+            "lum": 0.671,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#000022",
+            "share": 0.043,
+            "lum": 0.01,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#778899",
+            "share": 0.037,
+            "lum": 0.524,
+            "blueness": 0.133
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/3-honmachi.jpg"
+    },
+    {
+      "id": "4-namba",
+      "name": "難波",
+      "lat": 34.6627,
+      "lon": 135.5013,
+      "r": 900,
+      "phDeg": 40,
+      "labels": {
+        "band": "near",
+        "visible": 52,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 5,
+        "visibleLandmarks": 3,
+        "visiblePlaces": 16,
+        "spritesShown": 52,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.682,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#778899",
+            "share": 0.076,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#888899",
+            "share": 0.051,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#bbbbbb",
+            "share": 0.05,
+            "lum": 0.733,
+            "blueness": 0
+          },
+          {
+            "hex": "#cccccc",
+            "share": 0.016,
+            "lum": 0.8,
+            "blueness": 0
+          },
+          {
+            "hex": "#bbbbcc",
+            "share": 0.013,
+            "lum": 0.738,
+            "blueness": 0.067
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/4-namba.jpg"
+    },
+    {
+      "id": "5-building-labels",
+      "name": "梅田(近景)",
+      "lat": 34.7025,
+      "lon": 135.4959,
+      "r": 420,
+      "phDeg": 34,
+      "labels": {
+        "band": "near",
+        "visible": 35,
+        "buildingNames": 20130,
+        "visibleBuildings": 23,
+        "visibleStations": 4,
+        "visibleLandmarks": 3,
+        "visiblePlaces": 4,
+        "spritesShown": 35,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#888899",
+            "share": 0.247,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#334477",
+            "share": 0.212,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#000022",
+            "share": 0.08,
+            "lum": 0.01,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#bbbbcc",
+            "share": 0.054,
+            "lum": 0.738,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#8899aa",
+            "share": 0.051,
+            "lum": 0.591,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#9999bb",
+            "share": 0.037,
+            "lum": 0.61,
+            "blueness": 0.133
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/5-building-labels.jpg"
+    },
+    {
+      "id": "6-juso",
+      "name": "十三",
+      "lat": 34.7203,
+      "lon": 135.483,
+      "r": 1100,
+      "phDeg": 35,
+      "labels": {
+        "band": "near",
+        "visible": 40,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 1,
+        "visibleLandmarks": 0,
+        "visiblePlaces": 8,
+        "spritesShown": 40,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.43,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#99ccdd",
+            "share": 0.202,
+            "lum": 0.762,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#99bbaa",
+            "share": 0.103,
+            "lum": 0.7,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#778899",
+            "share": 0.035,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#888899",
+            "share": 0.029,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#dddddd",
+            "share": 0.016,
+            "lum": 0.867,
+            "blueness": 0
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/6-juso.jpg"
+    },
+    {
+      "id": "7-tennoji",
+      "name": "天王寺",
+      "lat": 34.6457,
+      "lon": 135.5135,
+      "r": 1000,
+      "phDeg": 38,
+      "labels": {
+        "band": "near",
+        "visible": 49,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visibleLandmarks": 3,
+        "visiblePlaces": 14,
+        "spritesShown": 49,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.712,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#778899",
+            "share": 0.07,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#888899",
+            "share": 0.057,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#bbbbbb",
+            "share": 0.024,
+            "lum": 0.733,
+            "blueness": 0
+          },
+          {
+            "hex": "#556688",
+            "share": 0.014,
+            "lum": 0.395,
+            "blueness": 0.2
+          },
+          {
+            "hex": "#445588",
+            "share": 0.012,
+            "lum": 0.334,
+            "blueness": 0.267
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/7-tennoji.jpg"
+    },
+    {
+      "id": "8-niitaka-35s",
+      "name": "新高(35S 実験地点)",
+      "lat": 34.728,
+      "lon": 135.4703,
+      "r": 700,
+      "phDeg": 40,
+      "labels": {
+        "band": "near",
+        "visible": 33,
+        "buildingNames": 20130,
+        "visibleBuildings": 20,
+        "visibleStations": 0,
+        "visibleLandmarks": 0,
+        "visiblePlaces": 13,
+        "spritesShown": 33,
+        "sampleNames": [],
+        "dataError": null
+      },
+      "pixels": {
+        "sampled": 44640,
+        "top": [
+          {
+            "hex": "#334477",
+            "share": 0.781,
+            "lum": 0.267,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#888899",
+            "share": 0.058,
+            "lum": 0.538,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#778899",
+            "share": 0.057,
+            "lum": 0.524,
+            "blueness": 0.133
+          },
+          {
+            "hex": "#ccdddd",
+            "share": 0.02,
+            "lum": 0.852,
+            "blueness": 0.067
+          },
+          {
+            "hex": "#445588",
+            "share": 0.013,
+            "lum": 0.334,
+            "blueness": 0.267
+          },
+          {
+            "hex": "#556688",
+            "share": 0.01,
+            "lum": 0.395,
+            "blueness": 0.2
+          }
+        ]
+      },
+      "shot": "data/reports/mission35v-dark-ground-road-visual/8-niitaka-35s.jpg"
+    }
+  ],
+  "jsErrors": [],
+  "theme": {
+    "theme": "NAVY",
+    "clearColor": "#0d1524",
+    "sceneBackground": "#0d1524",
+    "fog": "#0d1524",
+    "bodyBg": "rgb(13, 21, 36)",
+    "land": "#18233c",
+    "roadStyles": [
+      {
+        "hex": "#b0a488",
+        "meshes": 26
+      },
+      {
+        "hex": "#c4b99e",
+        "meshes": 23
+      },
+      {
+        "hex": "#b7c0cd",
+        "meshes": 49
+      },
+      {
+        "hex": "#9aa0a6",
+        "meshes": 23
+      },
+      {
+        "hex": "#3a7bd5",
+        "meshes": 23
+      },
+      {
+        "hex": "#c0c8d2",
+        "meshes": 23
+      }
+    ]
+  },
+  "summary": {
+    "theme": "NAVY",
+    "clearColor": "#0d1524",
+    "bodyBg": "rgb(13, 21, 36)",
+    "groundIsNavy": true,
+    "groundNavyShare": [
+      {
+        "id": "1-umeda-wide",
+        "hex": "#334477",
+        "share": 0.328
+      },
+      {
+        "id": "2-nakatsu-river-road",
+        "hex": "#334477",
+        "share": 0.33
+      },
+      {
+        "id": "3-honmachi",
+        "hex": "#334477",
+        "share": 0.238
+      },
+      {
+        "id": "4-namba",
+        "hex": "#334477",
+        "share": 0.682
+      },
+      {
+        "id": "5-building-labels",
+        "hex": "#334477",
+        "share": 0.212
+      },
+      {
+        "id": "6-juso",
+        "hex": "#334477",
+        "share": 0.43
+      },
+      {
+        "id": "7-tennoji",
+        "hex": "#334477",
+        "share": 0.712
+      },
+      {
+        "id": "8-niitaka-35s",
+        "hex": "#334477",
+        "share": 0.781
+      }
+    ],
+    "groundSamples": [
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      },
+      {
+        "hex": "#334477",
+        "lum": 0.267,
+        "blueness": 0.267
+      }
+    ],
+    "buildingLabelsLoaded": true,
+    "buildingLabelsVisibleSomewhere": true,
+    "buildingLabelSpots": [
+      {
+        "id": "1-umeda-wide",
+        "visible": 26
+      },
+      {
+        "id": "2-nakatsu-river-road",
+        "visible": 26
+      },
+      {
+        "id": "3-honmachi",
+        "visible": 26
+      },
+      {
+        "id": "4-namba",
+        "visible": 26
+      },
+      {
+        "id": "5-building-labels",
+        "visible": 23
+      },
+      {
+        "id": "6-juso",
+        "visible": 26
+      },
+      {
+        "id": "7-tennoji",
+        "visible": 26
+      },
+      {
+        "id": "8-niitaka-35s",
+        "visible": 20
+      }
+    ],
+    "stationLabelsVisibleSomewhere": true,
+    "labelDataErrors": [],
+    "spots": [
+      "1-umeda-wide",
+      "2-nakatsu-river-road",
+      "3-honmachi",
+      "4-namba",
+      "5-building-labels",
+      "6-juso",
+      "7-tennoji",
+      "8-niitaka-35s"
+    ],
+    "jsErrors": 0
+  }
+}

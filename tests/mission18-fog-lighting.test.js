@@ -150,7 +150,13 @@ test('[Mission18] window.__FOG_LIGHT_DEBUG__ が必要フィールドを返す',
 
 test('[Mission18] Mission17 / drawCalls に影響なし', () => {
   // [Mission 33A] 背景は 0xf6f7f3 へ（明るい neutral のまま）
-  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景色が変わった');
+  // [Mission 35V] 背景の値は CITY_THEME が持つようになった（NAVY = 暗いネイビー地面）。
+  //   「背景色が黙って変わっていないこと」を守るという元の意図は変えず、
+  //   見張る対象を「MS_BG_NEUTRAL がテーマから引かれていること」と
+  //   「テーマ両系統の値そのもの」へ移す。LIGHT を選べば 35U までの 0xf6f7f3 に戻る。
+  assert.ok(/const MS_BG_NEUTRAL = cityTheme\('bg'\);/.test(html), 'Mission17 背景色の出どころが変わった');
+  assert.ok(/bg: 0x0d1524,/.test(html), '35V ネイビー背景色が変わった');
+  assert.ok(/bg: 0xf6f7f3, land: 0xebede6/.test(html), '35U までの明るい背景色（戻し先）が失われた');
   assert.ok(/GROUND_VISUAL_STYLE\.colorReal = MODEL_STYLE\.on \? MS_BG_NEUTRAL/.test(html), 'Mission17 地表色が変わった');
   assert.ok(/drawCalls: 1,/.test(html), 'GroundVisualLayer の Draw Call が変わった');
 });

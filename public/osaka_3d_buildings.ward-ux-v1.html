@@ -5,7 +5,7 @@
 <title>大阪市 都市デジタルツイン</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#f3f4f1}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#0d1524}
 canvas{display:block}
 .panel{position:absolute;background:rgba(5,10,24,0.88);border:1px solid rgba(80,160,255,0.16);
   border-radius:12px;backdrop-filter:blur(14px);color:#b8cef0;font-size:11.5px;
@@ -200,7 +200,11 @@ canvas{display:block}
    （この block は既存 CSS より後に来るのでカスケードで勝つ。geometry/camera/loader は無変更）
    ══════════════════════════════════════════════════════════════ */
 :root{
-  --lc-bg:#f4f6f8; --lc-panel:rgba(255,255,255,0.94); --lc-panel-solid:#ffffff;
+  /* [Mission 35V] Mission19 の UI block は line 8 の html,body より後に来るので、
+     ここが body の背景の最終決定になる。canvas の裏が明るいままだと
+     読み込み中やリサイズの一瞬に明るい枠が見えるので、テーマ背景と揃える。
+     --lc-bg は body の背景にしか使っていない（パネルは --lc-panel）。 */
+  --lc-bg:#0d1524; --lc-panel:rgba(255,255,255,0.94); --lc-panel-solid:#ffffff;
   --lc-border:#e3e7ea; --lc-border-strong:#d3d9de;
   --lc-text:#20252a; --lc-muted:#66717a; --lc-faint:#9aa4ac;
   --lc-accent:#2f6fb3; --lc-accent-soft:#eaf2fb; --lc-accent-line:#cfe0f2;
@@ -928,7 +932,41 @@ const OSM_LABELS = [{"name":"市立苅田北小学校","category":"school","prio
 //   建物白(MS_BUILDING_WHITE 0xeef0ec)よりわずかに明るい・中立で、純白ではない
 //   （純白だと白建物が背景へ溶ける）。scene.background / renderer.clearColor / scene.fog.color /
 //   CSS body / GroundVisualLayer(model) の 5 箇所をこの色へ揃え、有限な四角い地表境界を消す。
-const MS_BG_NEUTRAL = 0xf6f7f3;   // [Mission 33A] 背景を一段明るく（0xf3f4f1 → 0xf6f7f3。neutral は維持）
+// ══════════════════════════════════════════════════════════════
+// [Mission 35V] CITY_THEME — 地面をネイビーへ、道路をその上で映えるグレーへ
+//
+//   これまでの配色は「白い台座に置いた都市模型」（背景・地表とも明るい neutral）だった。
+//   35V では参考イメージに合わせて **地表側だけ** を暗いネイビーへ落とす。
+//   建物の色（用途色 × 35H の頂点カラー）と水色の川はそのまま活かし、
+//   地面が暗くなることで相対的に前へ出るようにする。
+//
+//   触るのは色だけ。geometry・投影・レイヤー順序・Y 座標は一切変えない。
+//   theme を 'LIGHT' へ戻せば 35U までの見え方に戻る（QA 比較用）。
+// ══════════════════════════════════════════════════════════════
+const CITY_THEME = {
+  name: 'NAVY',                       // 'NAVY' | 'LIGHT'
+  navy: {
+    bg: 0x0d1524,                     // 背景・fog。真っ黒にはしない（わずかに青い）
+    land: 0x18233c,                   // 陸。背景より一段明るく、海（青）とは明度で分ける
+    landData: 0x141d33,               // データ表示は一段暗く（データ色を立たせる）
+    parcelSpread: 0.14,               // 地表タイルの明度の振れ幅（パーセル感。うるさくしない）
+    hemiGround: 0x1b2942,             // 地面からの照り返し。暖色のままだと地面が茶色く濁る
+  },
+  light: {                            // 35U までの値（戻すとき用）
+    bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,
+    parcelSpread: 0.05, hemiGround: 0xe8dcc8,
+  },
+};
+/** いま暗い地面かどうか。配色・ラベルの可読性はすべてこれで分岐する。 */
+function cityThemeDark() { return CITY_THEME.name === 'NAVY'; }
+/** テーマの値を引く。 */
+function cityTheme(key) { return (cityThemeDark() ? CITY_THEME.navy : CITY_THEME.light)[key]; }
+
+// [Mission17] 都市模型の背景/地表/fog を統一する tone。
+//   scene.background / renderer.clearColor / scene.fog.color / CSS body /
+//   GroundVisualLayer(model) の 5 箇所をこの色へ揃え、有限な四角い地表境界を消す。
+// [Mission 35V] 値の出どころを CITY_THEME へ移した（const の参照箇所は変えない）。
+const MS_BG_NEUTRAL = cityTheme('bg');
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -2290,7 +2328,10 @@ const GroundVisualLayer = (function(){
     h ^= h >>> 13;
     // [Neutral Base Ground] 明色ベース(0xd0cfca)では旧振れ幅0.88〜1.08は上限側が建物クリーム
     // (0xe8e0c8)へ近づきすぎるため、0.97〜1.02のごく控えめな明度差へ縮小（細かい模様は生成しない）。
-    return 0.97 + (h % 100) / 100 * 0.05;
+    // [Mission 35V] 暗いネイビー地面では 0.05 の振れ幅はまったく見えないので、テーマ側で
+    //   振れ幅を決める（NAVY 0.14）。タイルごとの明度差だけで、模様も線も増やさない＝draw call 不変。
+    const spread = cityTheme('parcelSpread');
+    return (1 - spread / 2) + (h % 100) / 100 * spread;
   }
   // BLDGS+公園+駐車場の座標範囲を算出し、安全余白を加えて表示範囲を返す。
   // OSM_ROADSは除外（区外へ延びる道路端点で地表が巨大化するため。GROUND_VISUAL_STYLE参照）。
@@ -2439,8 +2480,10 @@ const LandSurfaceLayer = (function () {
   const DATA_URL = 'map-data/osaka-city/land-surface/land-surface.json';
   // 陸 tint: 背景 MS_BG_NEUTRAL(0xf3f4f1=243,244,241) より一段暗い warm-neutral。
   //   建物白(0xeef0ec=238,240,236) よりさらに暗く（建物が浮く）、海(0xb7dce6=青) とは色相で明確に分離。
-  const LAND_COLOR_MODEL = 0xebede6;  // 模型スタイル [Mission 33A] 明るく（0xe6e8e3 → 0xebede6）
-  const LAND_COLOR_DATA = 0xe3e5de;   // データスタイルはわずかに暗く（データ色が映える）[Mission 33A] 明るく
+  // [Mission 35V] 陸の色は CITY_THEME が持つ。NAVY では背景(0x0d1524)より一段明るい
+  //   ネイビー(0x18233c)にして、海・背景との境目が明度で読めるようにする。
+  const LAND_COLOR_MODEL = cityTheme('land');
+  const LAND_COLOR_DATA = cityTheme('landData');
   let group = null, mesh = null, material = null;
   let loaded = false, loadingPromise = null, visible = true;
   let meta = { emitted: false, triangleCount: 0, tiles: 0, areaM2: 0, bbox: null, coverage: null, keyPlaces: [], source: DATA_URL };
@@ -10085,6 +10128,11 @@ const CityLabelLayer = (function () {
   const BUILDING_LABEL_Y_MARGIN = 14;             // §8 屋根の少し上
   const BUILDING_LABEL_Y_MAX = 220;               // 遠景で高さを強調しすぎない
   const DENSITY_CAP = { far: 18, mid: 36, near: 58 };  // 画面全体の上限（文字だらけにしない）
+  // [Mission 35V §5] 建物名は 20,130 件あるので、放っておくと画面全体の上限を建物名だけで
+  //   使い切ってしまう（実測: 58 枚中 41 枚が建物名）。駅名・地名・ランドマークの居場所を
+  //   残すため、建物名が占められる割合に上限を掛ける。
+  //   「遠景では主要建物のみ、近景で増える」という §5 の狙いどおり band で変える。
+  const BUILDING_LABEL_SHARE = { far: 0.15, mid: 0.30, near: 0.45 };
   const GRID = { cols: 6, rows: 4, perCell: 3 };       // 画面を分割して 1 セルあたりの上限も掛ける
   const THROTTLE_MS = 200;
   const PLACE_Y = 26, LANDMARK_Y = 40;                 // world y（sprite は depthTest:false で常に前面）
@@ -10111,7 +10159,7 @@ const CityLabelLayer = (function () {
   let prevVisible = new Set(), prevMajor = new Set();
   const prevCell = new Map();          // id → [cellX, cellY]
   const layoutCam = { x: NaN, z: NaN, r: NaN, th: NaN, ph: NaN, band: '', night: false };
-  const stats = { places: 0, landmarks: 0, stations: 0, wards: 0, parks: 0, rivers: 0, visible: 0, visibleLandmarks: 0, visiblePlaces: 0, visibleStations: 0, visibleWards: 0, visibleParks: 0, visibleRivers: 0,
+  const stats = { places: 0, landmarks: 0, stations: 0, wards: 0, parks: 0, rivers: 0, buildingNames: 0, hiddenByBuildingShare: 0, visible: 0, visibleLandmarks: 0, visiblePlaces: 0, visibleStations: 0, visibleWards: 0, visibleParks: 0, visibleRivers: 0, visibleBuildings: 0,
     hiddenByLOD: 0, hiddenByViewport: 0, hiddenByCollision: 0, hiddenByDensityCap: 0, hiddenByGrid: 0,
     createdSprites: 0, createdTextures: 0, cachedTextures: 0, band: 'near', names: [], dataError: null,
     relayouts: 0, transformRefreshes: 0, keptFromPrev: 0, majorsKeptByGridExempt: 0, bandSwitches: 0 };
@@ -10141,10 +10189,19 @@ const CityLabelLayer = (function () {
   // 明るい地図の上では白文字は沈むので、昼は「濃いインク + 白ハロー」、夜は「白文字 + 暗いハロー」。
   function styleOf(kind, importance, item) {
     const night = isNight();
+    // [Mission 35V §5] 地面がネイビーになると、昼の「濃いインク + 白ハロー」は地面に沈む。
+    //   ハローだけのラベル（町名・区名・河川・公園・小さい建物名）は夜と同じ
+    //   「明るい文字 + 暗いハロー」へ寄せる。
+    //   一方、白い pill を持つラベル（駅・ランドマーク・主要建物名）は白のままのほうが
+    //   ネイビーの上でよく読めるので、昼の見た目を保つ（＝参考イメージの白いバブル）。
+    const darkMap = night || ((typeof cityThemeDark === 'function') && cityThemeDark());
+    const inkOnDark = darkMap;                 // ハロー型ラベルを反転するか
+    const tk = darkMap ? (night ? 'n' : 'v') : 'd';   // texture cache key（テーマ違いを混ぜない）
     if (kind === 'landmark') {
       const major = importance === 'MAJOR';
       return {
-        key: 'lm|' + (major ? 'major' : 'sub') + '|' + (night ? 'n' : 'd'),
+        // [Mission 35V] 白い pill はネイビーの上でこそよく読める。night のときだけ暗い pill へ。
+        key: 'lm|' + (major ? 'major' : 'sub') + '|' + tk,
         font: major ? 15 : 13, weight: '700',
         text: night ? '#ffffff' : '#243041',
         halo: night ? 'rgba(4,10,20,0.85)' : 'rgba(255,255,255,0.96)',
@@ -10154,27 +10211,27 @@ const CityLabelLayer = (function () {
     }
     if (kind === 'river') {
       return {
-        key: 'rv|' + importance + '|' + (night ? 'n' : 'd'),
+        key: 'rv|' + importance + '|' + tk,
         font: importance === 'major' ? 13.5 : (importance === 'medium' ? 12 : 11), weight: '600',
-        text: night ? '#9fd8ef' : '#2f7f95',        // 青〜青緑。道路（灰）・鉄道（紺）と混ざらない
-        halo: night ? 'rgba(4,14,22,0.78)' : 'rgba(255,255,255,0.95)',
+        text: inkOnDark ? '#9fd8ef' : '#2f7f95',    // 青〜青緑。道路（灰）・鉄道（紺）と混ざらない
+        halo: inkOnDark ? 'rgba(4,14,22,0.78)' : 'rgba(255,255,255,0.95)',
         pill: null, border: null,
       };
     }
     if (kind === 'ward') {
       return {
-        key: 'wd|' + (night ? 'n' : 'd'), font: 18, weight: '700',
-        text: night ? '#dbe6f7' : '#59636f',
-        halo: night ? 'rgba(4,10,20,0.78)' : 'rgba(255,255,255,0.92)',
+        key: 'wd|' + tk, font: 18, weight: '700',
+        text: inkOnDark ? '#dbe6f7' : '#59636f',
+        halo: inkOnDark ? 'rgba(4,10,20,0.78)' : 'rgba(255,255,255,0.92)',
         pill: null, border: null,
       };
     }
     if (kind === 'park') {
       return {
-        key: 'pk|' + importance + '|' + (night ? 'n' : 'd'),
+        key: 'pk|' + importance + '|' + tk,
         font: importance === 'major' ? 13 : 11.5, weight: '600',
-        text: night ? '#bfe8c6' : '#43784e',
-        halo: night ? 'rgba(4,14,10,0.78)' : 'rgba(255,255,255,0.92)',
+        text: inkOnDark ? '#bfe8c6' : '#43784e',
+        halo: inkOnDark ? 'rgba(4,14,10,0.78)' : 'rgba(255,255,255,0.92)',
         pill: null, border: null,
       };
     }
@@ -10184,7 +10241,7 @@ const CityLabelLayer = (function () {
       const op = (item && item.operator) || null;
       const hex = op ? '#' + (op.color >>> 0).toString(16).padStart(6, '0') : null;
       return {
-        key: 'st|' + importance + '|' + (op ? op.id : '-') + '|' + (night ? 'n' : 'd'),
+        key: 'st|' + importance + '|' + (op ? op.id : '-') + '|' + tk,
         font: f, weight: '700',
         text: night ? '#eaf2ff' : '#2b3441',
         halo: null,
@@ -10198,21 +10255,31 @@ const CityLabelLayer = (function () {
     if (kind === 'building') {
       // [Mission 35O §7] 建物名は地名・駅より控えめ。既存ラベルの見た目を変えない。
       const t = (item && item.tier) || 'veryNear';
-      const f = t === 'mid' ? 13 : (t === 'near' ? 11.5 : 10.5);
+      const f = t === 'mid' ? 13.5 : (t === 'near' ? 11.5 : 10.5);
+      // [Mission 35V §4] 主要ビル（mid）は参考イメージと同じ白い丸バブルで出す。
+      //   近景の細かい建物名まで白箱にすると画面が箱だらけになるので、
+      //   near / veryNear は明るい文字 + 暗いハローに留める。
+      if (t === 'mid' && !night) {
+        return {
+          key: 'bl|mid|pill|' + tk, font: f, weight: '700',
+          text: '#243041', halo: null,
+          pill: 'rgba(255,255,255,0.92)', border: 'rgba(110,132,158,0.34)',
+        };
+      }
       return {
-        key: 'bl|' + t + '|' + (night ? 'n' : 'd'),
-        font: f, weight: t === 'mid' ? '600' : '500',
-        text: night ? '#d9e4f2' : '#4a5563',
-        halo: night ? 'rgba(6,12,22,0.80)' : 'rgba(255,255,255,0.92)',
+        key: 'bl|' + t + '|' + tk,
+        font: f, weight: t === 'mid' ? '700' : '500',
+        text: inkOnDark ? '#d9e4f2' : '#4a5563',
+        halo: inkOnDark ? 'rgba(6,12,22,0.80)' : 'rgba(255,255,255,0.92)',
         pill: null, border: null,
       };
     }
     const f = importance === 'major' ? 17 : (importance === 'medium' ? 14 : 12);
     return {
-      key: 'pl|' + importance + '|' + (night ? 'n' : 'd'),
+      key: 'pl|' + importance + '|' + tk,
       font: f, weight: importance === 'major' ? '700' : '600',
-      text: night ? '#eef4ff' : (importance === 'major' ? '#2b3644' : '#3d4854'),
-      halo: night ? 'rgba(4,10,20,0.82)' : 'rgba(255,255,255,0.94)',
+      text: inkOnDark ? '#eef4ff' : (importance === 'major' ? '#2b3644' : '#3d4854'),
+      halo: inkOnDark ? 'rgba(4,10,20,0.82)' : 'rgba(255,255,255,0.94)',
       pill: null, border: null,
     };
   }
@@ -10441,9 +10508,13 @@ const CityLabelLayer = (function () {
     return 2 * Math.tan(fov * Math.PI / 360) * Math.max(1, dist) / viewportH();
   }
   // NDC 上の半幅・半高（px → NDC。NDC は縦 2 で画面高さ分）
+  // [Mission 35V §5] 余白 0.004（約 3.6px）では、矩形が角でわずかに触れる程度の重なりが
+  //   実機で 58 枚中 3〜7 組残っていた（実測）。pill が無いラベルは下地が透けるので、
+  //   その程度の重なりでも文字同士が被って読めない。余白を広げて触れる前に落とす。
+  const RECT_MARGIN = 0.0085;
   function rectOf(sx, sy, pxHeight, aspect) {
-    const hh = (pxHeight / viewportH()) + 0.004;
-    const hw = hh * aspect;
+    const hh = (pxHeight / viewportH()) + RECT_MARGIN;
+    const hw = hh * aspect + RECT_MARGIN;
     return { sx, sy, hw, hh };
   }
   const hits = (c, q) => Math.abs(c.sx - q.sx) < (c.hw + q.hw) && Math.abs(c.sy - q.sy) < (c.hh + q.hh);
@@ -10468,7 +10539,7 @@ const CityLabelLayer = (function () {
     const b = band(d);
     const cap = DENSITY_CAP[b];
     const camPos = camera.position;
-    Object.assign(stats, { visible: 0, visibleLandmarks: 0, visiblePlaces: 0, visibleStations: 0, visibleWards: 0, visibleParks: 0, visibleRivers: 0, hiddenByLOD: 0, hiddenByViewport: 0, hiddenByCollision: 0, hiddenByDensityCap: 0, hiddenByGrid: 0, band: b, names: [] });
+    Object.assign(stats, { visible: 0, visibleLandmarks: 0, visiblePlaces: 0, visibleStations: 0, visibleWards: 0, visibleParks: 0, visibleRivers: 0, visibleBuildings: 0, hiddenByBuildingShare: 0, hiddenByLOD: 0, hiddenByViewport: 0, hiddenByCollision: 0, hiddenByDensityCap: 0, hiddenByGrid: 0, band: b, names: [] });
 
     // camera 行列は renderer.render() の中で更新されるため、直前にカメラを動かしていると
     //   project() が 1 つ前の視点で計算されてしまう。throttle で再計算も止まるので、
@@ -10503,7 +10574,11 @@ const CityLabelLayer = (function () {
         : item.kind === 'river' ? (item.importance === 'major' ? (b === 'far' ? 1.2 : 3.5) : item.importance === 'medium' ? 5.5 : 7.5)
         : item.kind === 'park' ? (item.importance === 'major' ? 4.5 : 6.5)
         // [Mission 35O §7] 建物名は既存ラベルより後ろ。主要ビルだけ地名と同程度まで上げる。
-        : item.kind === 'building' ? (item.tier === 'mid' ? 5.2 : item.tier === 'near' ? 7.2 : 8.5)
+        // [Mission 35V §5] 優先の目安を「駅名 > 主要建物名 > ランドマーク名 > 町名 > 川・公園」へ。
+        //   主要ビル(mid) を 2.4 にすると、駅(major 0.8 / transfer 2.2) の後ろ、
+        //   ランドマーク A(2.5)・B(3)・町名(major 2 は残すが medium 5 より前) の前に入る。
+        //   ランドマーク S(0) は据え置きなので、重要ランドマークが建物名に消されることはない。
+        : item.kind === 'building' ? (item.tier === 'mid' ? 2.4 : item.tier === 'near' ? 4.8 : 8.5)
         : (item.importance === 'major' ? 2 : item.importance === 'medium' ? 5 : 7);
       // [Mission 33D §12] 前回出ていたかどうかを「同順位内の並び」にだけ使う。
       //   rank そのものを補正すると ランドマーク/駅/地名 の大分類が逆転しうるので加点はしない。
@@ -10540,6 +10615,11 @@ const CityLabelLayer = (function () {
       const isLandmark = c.item.kind === 'landmark';
       const major = isMajorLabel(c.item);
       if (stats.visible >= cap) { stats.hiddenByDensityCap++; if (sprites.has(c.item.id)) sprites.get(c.item.id).sprite.visible = false; continue; }
+      // [Mission 35V §5] 建物名だけで画面を埋めない
+      if (c.item.kind === 'building' && stats.visibleBuildings >= Math.round(cap * BUILDING_LABEL_SHARE[b])) {
+        stats.hiddenByBuildingShare++;
+        if (sprites.has(c.item.id)) sprites.get(c.item.id).sprite.visible = false; continue;
+      }
       const cellIdx = cellOf(c);
       const cell = cellIdx[0] + ',' + cellIdx[1];
       // §15/§16 主要ラベルはセル上限を少し緩める（微小な移動で区名・主要地名が突然消えないように）。
@@ -10575,6 +10655,9 @@ const CityLabelLayer = (function () {
       else if (c.item.kind === 'ward') stats.visibleWards++;
       else if (c.item.kind === 'park') stats.visibleParks++;
       else if (c.item.kind === 'river') stats.visibleRivers++;
+      // [Mission 35V §9] 建物名は最後の else に落ちて「地名」として数えられていた。
+      //   建物名ラベルが出ているかを測れないので、独立した counter にする。
+      else if (c.item.kind === 'building') stats.visibleBuildings++;
       else stats.visiblePlaces++;
       if (stats.names.length < 16) stats.names.push(c.item.name);
     }
@@ -10681,6 +10764,8 @@ const CityLabelLayer = (function () {
       return {
         loaded, dataError: stats.dataError, typeVisible: { ...typeVisible },
         places: places.length, landmarks: landmarks.length, stations: stations.length, wards: wards.length, parks: parks.length, rivers: rivers.length,
+        buildingNames: stats.buildingNames, visibleBuildings: stats.visibleBuildings,   // [Mission 35V §9]
+        hiddenByBuildingShare: stats.hiddenByBuildingShare, rectMargin: RECT_MARGIN,
         band: stats.band, visible: stats.visible, visibleLandmarks: stats.visibleLandmarks, visiblePlaces: stats.visiblePlaces, visibleStations: stats.visibleStations, visibleWards: stats.visibleWards, visibleParks: stats.visibleParks, visibleRivers: stats.visibleRivers,
         hiddenByLOD: stats.hiddenByLOD, hiddenByViewport: stats.hiddenByViewport, hiddenByCollision: stats.hiddenByCollision,
         hiddenByDensityCap: stats.hiddenByDensityCap, hiddenByGrid: stats.hiddenByGrid,
@@ -13124,7 +13209,9 @@ const VISUAL_CONFIG = {
   mode: { current: "real" }, // [確認用修正] 既定をrealに変更（保存済み設定があればそちらを優先）。"real" | "data"
   lighting: {
     day: {
-      hemiSky: 0xbfd8f0, hemiGround: 0xe8dcc8, hemiIntensity: 1.0,
+      // [Mission 35V] hemiGround は「地面からの照り返しの色」。地面がネイビーになったので
+      //   暖色(0xe8dcc8)のままだと建物の足元だけ茶色く浮く。テーマの地面色に合わせる。
+      hemiSky: 0xbfd8f0, hemiGround: cityTheme('hemiGround'), hemiIntensity: 1.0,
       // [Mission 34B §7] azimuth 236°（南西〜西南西）/ elevation 47°。旧値 [2400,1800,1200] は
       //   azimuth 116.6°（東南東）/ elevation 33.9° で、屋根の段差が読み取りにくかった。
       //   水平距離は旧値と同じ 2683m なので影の正射影カメラの near/far はそのまま使える。
@@ -16156,13 +16243,48 @@ const CanonicalRuntime = (function () {
     white: COL.white,
   };
   const COL_CURRENT = { ...COL };
-  /** profile に合わせて COL の中身を入れ替える（参照は保つ）。 */
-  function applyPalette() { Object.assign(COL, depthEnabled() ? COL_DEPTH : COL_CURRENT); }
+  // [Mission 35V §3/§6] 暗いネイビー地面の上での配色。
+  //   明るい地面では「道路を地表より濃く」していたが、地面が暗くなったので **逆** にする。
+  //   道路＝明るいグレー（地面より明確に明るい）／鉄道＝道路より青く明るい／水＝明るいシアン。
+  //   色相の役割（水＝青 / 緑＝緑 / 道路＝無彩色寄り）は 35H から変えていない。
+  const COL_NAVY = {
+    water: 0x3fb3e8, waterHarbor: 0x2f9cd2,        // 川・海は明るいシアン（ネイビーの上でよく映える）
+    road: 0xb7c0cd,                                // 主道路。地面(0x18233c)との明度差を最優先
+    parkReal: 0x5f9e63, parkGreen: 0x568f59, grass: 0x6fae70,  // 暗い地面では原色の緑は光って見えるので落とす
+    railMajor: 0x8e9ac0, railUrban: 0x8d9ee8, railLocal: 0x76809a, // 暗地では元の紺(0x49546a)が沈むので明るく
+    white: COL.white,
+  };
+  /** profile と theme に合わせて COL の中身を入れ替える（参照は保つ）。 */
+  function applyPalette() {
+    const src = (typeof cityThemeDark === 'function' && cityThemeDark()) ? COL_NAVY
+      : (depthEnabled() ? COL_DEPTH : COL_CURRENT);
+    Object.assign(COL, src);
+  }
 
   //   道路の style は COL から作るので、palette を切り替えたら作り直す必要がある。
   let CR_ROAD_RS = null;
   function buildRoadStyles() {
     const mix = (a, b, t) => ((typeof msBlend === 'function') ? msBlend(a, b, t) : a);
+    const dark = (typeof cityThemeDark === 'function') && cityThemeDark();
+    if (dark) {
+      // [Mission 35V §3] 暗い地面の上では明度の向きが反転する。
+      //   明るい地面のときは secondary を「白へ寄せて薄く」していたが、暗い地面では
+      //   それだと支線のほうが目立ってしまう。ここでは **地面色へ寄せて暗くする** ことで
+      //   主道路 > 支線 > 歩道 > 余白 の順に暗くなる階段を作る。
+      //   歩道帯(sidewalk)と余白(faint)は車道より一段暗くするだけで curb（縁石）の見え方になる。
+      //   geometry は一切増やしていない（renderClass ごとの色と不透明度だけ）。
+      const gnd = (typeof cityTheme === 'function') ? cityTheme('land') : 0x18233c;
+      CR_ROAD_RS = {
+        primary:    { col: COL.road,                     y: Y.road,        opacity: 1.0,  transparent: false, ren: REN.road },
+        bridge:     { col: mix(COL.road, COL.white, 0.16), y: Y.roadBridge, opacity: 1.0,  transparent: false, ren: REN.road + 2 },
+        secondary:  { col: mix(COL.road, gnd, 0.34),     y: Y.road - 0.02, opacity: 0.94, transparent: true,  ren: REN.road },
+        pedestrian: { col: mix(COL.road, gnd, 0.50),     y: Y.road - 0.05, opacity: 0.80, transparent: true,  ren: REN.road - 1 },
+        sidewalk:   { col: mix(COL.road, gnd, 0.60),     y: Y.road - 0.06, opacity: 0.74, transparent: true,  ren: REN.road - 1 },
+        median:     { col: mix(0x568f59, gnd, 0.35),     y: Y.road - 0.07, opacity: 0.66, transparent: true,  ren: REN.road - 2 },
+        faint:      { col: mix(COL.road, gnd, 0.74),     y: Y.road - 0.08, opacity: 0.52, transparent: true,  ren: REN.road - 2 },
+      };
+      return CR_ROAD_RS;
+    }
     CR_ROAD_RS = {
       primary:    { col: COL.road, y: Y.road,           opacity: 1.0,  transparent: false, ren: REN.road },
       bridge:     { col: COL.road, y: Y.roadBridge,     opacity: 1.0,  transparent: false, ren: REN.road + 2 },

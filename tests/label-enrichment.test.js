@@ -164,7 +164,9 @@ test('[33C §11/§13/§14] HTML: 河川ラベルの向き・zoom band・優先�
   assert.match(html, /function screenAngleOf\(item\) \{/);
   assert.match(html, /if \(c\.item\.kind === 'river'\) rec\.sprite\.material\.rotation = screenAngleOf\(c\.item\);/);
   // §12 河川の色（青〜青緑・白ハロー）
-  assert.match(html, /text: night \? '#9fd8ef' : '#2f7f95',/);
+  // [Mission 35V] 反転の条件が night から darkMap（夜 + ネイビー地面）へ広がった。
+  //   河川名を「暗い地図では明るい青、明るい地図では濃い青緑」にする意図は変えていない。
+  assert.match(html, /text: inkOnDark \? '#9fd8ef' : '#2f7f95',/);
   // §19 camera 行列の更新は維持
   assert.match(html, /camera\.updateMatrixWorld\(\);/);
   // §20 旧 StationLabelLayer は休止のまま

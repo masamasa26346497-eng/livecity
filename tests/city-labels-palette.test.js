@@ -106,8 +106,11 @@ test('[33A] CityLabelLayer: 3 種のラベルを 1 つの優先度キューで�
   assert.match(html, /try \{ if \(typeof CityLabelLayer !== 'undefined'\) CityLabelLayer\.update\(\); \} catch/);
 });
 
-test('[33A] ラベルの見た目: 明るい地図では濃いインク + 白ハロー、夜は白文字 + 暗ハロー', () => {
-  assert.match(html, /halo: night \? 'rgba\(4,10,20,0\.82\)' : 'rgba\(255,255,255,0\.94\)',/);
+test('[33A] ラベルの見た目: 明るい地図では濃いインク + 白ハロー、暗い地図では白文字 + 暗ハロー', () => {
+  // [Mission 35V] 反転の条件が「夜かどうか」から「地図が暗いかどうか」へ広がった
+  //   （夜 + ネイビー地面）。濃いインク↔白文字を切り替えるという 33A の意図は変えていない。
+  assert.match(html, /const darkMap = night \|\| \(\(typeof cityThemeDark === 'function'\) && cityThemeDark\(\)\);/);
+  assert.match(html, /halo: inkOnDark \? 'rgba\(4,10,20,0\.82\)' : 'rgba\(255,255,255,0\.94\)',/);
   assert.match(html, /ctx\.strokeText\(text, padX, canvas\.height \/ 2 \+ R\);/);
   // 文字サイズの階層（地名 major > 地名 medium > 駅 major）
   const place = html.match(/const f = importance === 'major' \? 17 : \(importance === 'medium' \? 14 : 12\);/);
@@ -118,7 +121,10 @@ test('[33A] ラベルの見た目: 明るい地図では濃いインク + 白ハ
   // 画面ピクセル基準のサイズ（引いても読める。world 固定サイズにしない）
   assert.match(html, /function worldPerPixel\(dist\) \{/);
   assert.match(html, /const h = rec\.pxHeight \* worldPerPixel\(dist\);/);
-  assert.match(html, /const hh = \(pxHeight \/ viewportH\(\)\) \+ 0\.004;/);
+  // [Mission 35V] 余白は定数 RECT_MARGIN になった（0.004 では実機でラベルが角で触れていた）。
+  //   画面ピクセル基準で矩形を作るという 33A の方式は変えていない。
+  assert.match(html, /const hh = \(pxHeight \/ viewportH\(\)\) \+ RECT_MARGIN;/);
+  assert.match(html, /const RECT_MARGIN = [0-9.]+;/);
   // 施設名の括弧補足は地図上では落とす（データ側の名称は変えない）
   assert.match(html, /function labelDisplayName\(name\) \{/);
   // 駅アイコンは控えめ（テクスチャ内の小さな丸。sprite は増やさない）
@@ -153,7 +159,10 @@ test('[33A] UI: 地名 / 施設名 / 駅名 のトグルが通常パネルにあ
 });
 
 test('[33A] 配色 v2: 明るく・少し鮮やかに（建物 geometry は不変）', () => {
-  assert.match(html, /const MS_BG_NEUTRAL = 0xf6f7f3;/);
+  // [Mission 35V] 明るい配色の値そのものは LIGHT テーマとして残っている（戻し先）。
+  //   既定は NAVY になったので、背景は CITY_THEME 経由で引かれる。
+  assert.match(html, /const MS_BG_NEUTRAL = cityTheme\('bg'\);/);
+  assert.match(html, /bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,/);
   assert.match(html, /water: 0x63bfe4, waterHarbor: 0x55a9d0,/);
   assert.match(html, /parkReal: 0x9bd589, parkGreen: 0x8fcd7b, grass: 0xc9e7b6,/);
   assert.match(html, /railMajor: 0x49546a, railUrban: 0x4f5f9e, railLocal: 0x69717f,/);
