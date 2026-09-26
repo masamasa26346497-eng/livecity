@@ -16411,9 +16411,13 @@ const CanonicalRuntime = (function () {
   //   水は少し濃く鮮やかな cyan-blue（ネオンにはしない）、緑は彩度だけ上げる、
   //   道路は blue-gray 寄りに落として建物との差を作る（白くして建物と同化させない）。
   //   **色相の役割（水＝青 / 緑＝緑 / 道路＝無彩色寄り）は変えない。**
+  // [Mission 36A §1] 道路を 1 段濃くする。地表 LAND_COLOR_MODEL(0xebede6) に対する
+  //   コントラスト比 2.91 → 3.41（グラフィック要素の下限 3:1 を超える）。
+  //   railLocal(0x69717f) より明るいまま＝「鉄道は道路より濃い」(§13) の関係は壊さない。
+  //   色相は blue-gray のまま。主要/一般の差は mix(COL.road, COL.white, t) で作っているので比率は不変。
   const COL_DEPTH = {
     water: 0x3fb3e8, waterHarbor: 0x2f9cd2,
-    road: 0x8b929e,
+    road: 0x7e8693,
     parkReal: 0x86cf6d, parkGreen: 0x79c65d, grass: 0xbfe3a6,
     railMajor: 0x49546a, railUrban: 0x4f5f9e, railLocal: 0x69717f,
     white: COL.white,
@@ -17615,7 +17619,16 @@ const CanonicalRuntime = (function () {
   //     (tile の inV2 フラグ)で common / V3-only を判定する（runtime で boolean 演算をしないための近似）。
   //   §13: default は昇格しない。roadVisualMode の既定は 'FIX13' のまま。
   const ROAD_V3_BASE = BASE + '/road-visual-v3';
-  const ROAD_V3_Y = { base: 0.087, carriageway: 0.099, diff: 0.101 };
+  // [Mission 36A §2] 道路 > 水面 の重なり順。
+  //   32I が V3 を「FIX13 の下に敷く比較用オーバーレイ」として作ったときの Y(0.087/0.099) が
+  //   32K で既定へ昇格した後もそのまま残っていた。水面は Y.water=0.14 なので、
+  //   **既定表示の道路面は水面より 0.04m 下**にあり、橋や河川際で水に覆われていた
+  //   （水は transparent・depthWrite:false なので不透明な車道面より後に描かれ、depthTest に勝つ）。
+  //   → V3 の塗りを FIX13 と同じ道路スタック（faint 0.22〜primary 0.30）へ揃える。
+  //   これで水面(0.14)・公園(0.22)より上、鉄道(0.5)・建物より下に収まる。
+  //   depthTest は触らない（建物を透過させない §要件2）。renderOrder も既存のまま
+  //   （REN.water 610 < REN.road 640）で、Y と renderOrder の向きが初めて一致する。
+  const ROAD_V3_Y = { base: Y.road - 0.06, carriageway: Y.road, diff: Y.road + 0.002 };
   const ROAD_V3_COLOR = {
     margin: 0xc4b99e,
     uncertain: 0xb0a488,
@@ -18398,8 +18411,11 @@ const CanonicalRuntime = (function () {
       }
     }
     const specs = [
-      ['RoadV3_Uncertain', posUncertain, ROAD_V3_COLOR.uncertain, REN.road - 1, { transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide }],
-      ['RoadV3_Margin', posMargin, ROAD_V3_COLOR.margin, REN.road - 1, { transparent: true, opacity: 0.45, depthWrite: false, side: THREE.DoubleSide }],
+      // [Mission 36A §1] 引いた画面で道路網の形を作っているのは幅のある道路区域（margin/uncertain）。
+      //   §11 dark paint rule（濃い道路色は CARRIAGEWAY だけ）は守り、**色は変えず opacity だけ**上げて
+      //   地表から分離させる（0.45→0.60 / 0.55→0.66）。depthWrite:false のままなので重なり順には影響しない。
+      ['RoadV3_Uncertain', posUncertain, ROAD_V3_COLOR.uncertain, REN.road - 1, { transparent: true, opacity: 0.66, depthWrite: false, side: THREE.DoubleSide }],
+      ['RoadV3_Margin', posMargin, ROAD_V3_COLOR.margin, REN.road - 1, { transparent: true, opacity: 0.60, depthWrite: false, side: THREE.DoubleSide }],
       ['RoadV3_Carriageway', posCarriageway, ROAD_V3_COLOR.carriageway, REN.road, { side: THREE.DoubleSide }],
       ['RoadV3_DiffCommon', posDiffCommon, ROAD_V3_COLOR.diffCommon, REN.road + 1, { side: THREE.DoubleSide }],
       ['RoadV3_DiffV3Only', posDiffV3Only, ROAD_V3_COLOR.diffV3Only, REN.road + 2, { side: THREE.DoubleSide }],
