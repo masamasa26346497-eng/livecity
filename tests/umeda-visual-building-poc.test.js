@@ -103,8 +103,14 @@ test('[32C §1] Umeda PoC範囲はUmeda中心の限定bboxにscopeされてい�
 test('[32C §26] pickBuilding は Visual Building PoC 表示中に umedaPocGroup / umedaPocFootprints を対象へ含める', () => {
   // §26: PLATEAU tile が範囲内で隠される(applyUmedaPocVisibility)ため、pickBuilding が
   //   umedaPocGroup を raycast対象へ加えないと pick が完全無反応になる（実装漏れの再発防止）。
-  assert.match(html, /const umedaPocPickActive = umedaPocEnabled && umedaPocSource === 'visual' && \(umedaPocGroup\.visible \|\| blockQaGroup\.visible\);/);
+  // [Mission 35Y] pick は faceIndex 方式へ作り替え、候補 mesh の収集は
+  //   pickCandidateMeshes() に切り出した（変数名は pocActive）。
+  //   「PoC 表示中は umedaPocGroup を候補へ入れる」という §26 の条件自体は変えていない。
+  assert.match(html, /const pocActive = umedaPocEnabled && umedaPocSource === 'visual' && \(umedaPocGroup\.visible \|\| blockQaGroup\.visible\);/);
+  assert.match(html, /if \(pocActive\) \{/);
   assert.match(html, /umedaPocGroup\.traverse\(\(o\) => \{ if \(o\.isMesh && o\.visible !== false\) meshes\.push\(o\); \}\);/);
+  // PoC の mesh は対応表を持たないので、footprint の内外判定へ落ちる経路が残っていること
+  assert.match(html, /const f2 = scan\(umedaPocFootprints \|\| \[\]\);/);
   assert.match(html, /umedaPocFootprints/);
   assert.match(html, /canonicalId: f\.canonicalIds\[0\], canonicalIds: f\.canonicalIds,/, '代表canonicalId(先頭)を採用する実装が見つからない');
 });

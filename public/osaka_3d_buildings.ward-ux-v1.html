@@ -20874,10 +20874,21 @@ const CanonicalRuntime = (function () {
             //   頂点カラーを使わない CURRENT プロファイルのときだけ、高さクラスで束ねを分ける。
             const splitByHeight = hc && !depthEnabled();
             const bkey = splitByHeight ? (cat + '|' + hc) : cat;
-            if (!byCat.has(bkey)) byCat.set(bkey, { cat, heightClass: splitByHeight ? hc : null, pos: [], col: depthEnabled() ? [] : null });
+            // [Mission 35Y §2/§4] tri: 三角形ごとの建物 index / fps: この bucket の建物一覧。
+            //   merge しても「どの三角形がどの建物か」を失わないための対応表。
+            if (!byCat.has(bkey)) byCat.set(bkey, { cat, heightClass: splitByHeight ? hc : null, pos: [], col: depthEnabled() ? [] : null, tri: [], fps: [] });
             const bucket = byCat.get(bkey);
+            // [Mission 35Y §2] この建物が bucket のどの三角形を占めるかを控える。
+            //   footprint が無い（centroid 欠損）建物は -1 にして、pick しても空振りさせる。
+            const fpRec = (outer && f.centroid)
+              ? { canonicalId: f.canonicalId, ring: outer, cx: f.centroid[0], cz: f.centroid[1], h, attributes: a, placement: pp ? pp.policy : 'DISPLAY' }
+              : null;
+            const triBefore = bucket.pos.length / 9;
             pushExtrude(bucket.pos, f.geometryType, f.coordinates, h, bucket.col, hc ? CR_OTHER_TINT[hc] : null);
-            if (outer && f.centroid) footprints.push({ canonicalId: f.canonicalId, ring: outer, cx: f.centroid[0], cz: f.centroid[1], h, attributes: a, placement: pp ? pp.policy : 'DISPLAY' });
+            const triAfter = bucket.pos.length / 9;
+            const bIdx = fpRec ? bucket.fps.push(fpRec) - 1 : -1;
+            for (let t = triBefore; t < triAfter; t++) bucket.tri.push(bIdx);
+            if (fpRec) footprints.push(fpRec);
           }
           for (const bucket of byCat.values()) {
             const pos = bucket.pos;
@@ -20891,6 +20902,13 @@ const CanonicalRuntime = (function () {
             if (m) {
               m.userData.usageCategory = cat; m.userData.crBuildingBand = band;
               if (bucket.heightClass) m.userData.crOtherHeightClass = bucket.heightClass;
+              // [Mission 35Y §4] raycast の faceIndex から建物を引くための対応表。
+              //   三角形 1 枚 = 2 or 4 byte。draw call も三角形数も増えない。
+              m.userData.crTriBuilding = (bucket.fps.length < 65535)
+                ? Uint16Array.from(bucket.tri, (v) => (v < 0 ? 65535 : v))
+                : Uint32Array.from(bucket.tri, (v) => (v < 0 ? 0xffffffff : v));
+              m.userData.crTriEmpty = (bucket.fps.length < 65535) ? 65535 : 0xffffffff;
+              m.userData.crBuildingFps = bucket.fps;
               g.add(m); vtx += pos.length / 3;
             }
           }
@@ -20975,6 +20993,7 @@ const CanonicalRuntime = (function () {
       const lp = perf.byLayer[job.layer];
       if (lp) { lp.meshMs += meshMs; lp.tris += Math.round(gb.vertexCount / 3); lp.meshes += (gb.group.children ? gb.group.children.length : 0); }
       const bytesEst = gb.vertexCount * 36 + 2048;
+      if (job.layer === 'buildings') invalidatePickCache();   // [Mission 35Y §14]
       tileCache.set(job.key, {
         group: gb.group, lastUse: performance.now(), layer: job.layer, band: job.band, tx: job.tx, tz: job.tz,
         featureCount: gb.featureCount, vertexCount: gb.vertexCount, footprints: gb.footprints,
@@ -21283,45 +21302,86 @@ const CanonicalRuntime = (function () {
     }
     return inside;
   }
-  function pickBuilding(rayObj) {
-    if (!enabled || !rtRoot) return null;
+  // [Mission 35Y §3/§4] 建物 pick。
+  //   A: 実 mesh へ raycast → B: 当たった三角形（faceIndex）から建物 ID を引く。
+  //   C: 対応表が無い mesh（Umeda PoC 等）のときだけ footprint の point-in-polygon へ落とす。
+  //   **bbox だけ / 一番近い centroid だけ での選択はしない**（§3 の禁止事項）。
+  let pickMeshCache = null, pickMeshCacheKey = '';
+  function pickCandidateMeshes() {
+    // §14 mousemove ごとに全部 traverse し直さない。タイル構成が変わるまで使い回す。
+    const key = tileCache.size + '|' + (layerGroup.buildings.children.length)
+      + '|' + (umedaPocEnabled ? 'u' : '-') + '|' + (blockQaGroup.visible ? 'q' : '-');
+    if (pickMeshCache && pickMeshCacheKey === key) return pickMeshCache;
     const meshes = [];
-    layerGroup.buildings.traverse((o) => { if (o.isMesh && o.visible !== false && o.parent && o.parent.visible !== false) meshes.push(o); });
-    // [Mission 32C §26] Visual Building PoC が ON の間、梅田範囲内は通常 buildings tile を隠しているため
-    //   （applyUmedaPocVisibility）、umedaPocGroup 自体も raycast 対象へ加えないと pick が完全に無反応になる。
-    //   [§27] Block QA overlay 表示中は umedaPocGroup を隠し blockQaGroup(色分けbuilding)を出しているため、
-    //   pick対象もそちらへ切り替える（footprint lookupは共通のumedaPocFootprintsをそのまま使える＝形状同一）。
-    const umedaPocPickActive = umedaPocEnabled && umedaPocSource === 'visual' && (umedaPocGroup.visible || blockQaGroup.visible);
-    if (umedaPocPickActive) {
+    layerGroup.buildings.traverse((o) => {
+      if (o.isMesh && o.visible !== false && o.parent && o.parent.visible !== false) meshes.push(o);
+    });
+    // [Mission 32C §26/§27] Visual Building PoC / Block QA 表示中は通常 tile を隠しているので、
+    //   そちらも候補へ入れないと pick が無反応になる。
+    const pocActive = umedaPocEnabled && umedaPocSource === 'visual' && (umedaPocGroup.visible || blockQaGroup.visible);
+    if (pocActive) {
       umedaPocGroup.traverse((o) => { if (o.isMesh && o.visible !== false) meshes.push(o); });
       if (blockQaGroup.visible) blockQaGroup.traverse((o) => { if (o.isMesh && o.visible !== false && o.name === 'UmedaBlockQaBuildingMesh') meshes.push(o); });
     }
-    if (!meshes.length) return null;
-    const hits = rayObj.intersectObjects(meshes, false);
-    const hit = hits.find((h) => h.object.visible !== false);
-    if (!hit) return null;
+    pickMeshCache = meshes; pickMeshCacheKey = key;
+    return meshes;
+  }
+  function invalidatePickCache() { pickMeshCache = null; pickMeshCacheKey = ''; }
+
+  const pickStats = { calls: 0, byFace: 0, byPolygon: 0, miss: 0, candidateMeshes: 0,
+    lastMs: 0, wallHits: 0, roofHits: 0 };
+
+  /** hit（三角形）から建物を引く。引けなければ null。 */
+  function buildingFromHit(hit) {
+    const ud = hit.object && hit.object.userData;
+    if (ud && ud.crTriBuilding && hit.faceIndex != null) {
+      const bi = ud.crTriBuilding[hit.faceIndex];
+      if (bi !== ud.crTriEmpty) {
+        const fp = ud.crBuildingFps[bi];
+        if (fp) { pickStats.byFace++; return fp; }
+      }
+      return null;              // この三角形は建物に紐づかない（footprint 欠損）
+    }
+    // C: 対応表を持たない mesh だけ、footprint の内外判定へ落とす（centroid は使わない）
     const px = hit.point.x, pz = hit.point.z;
-    let fp = null, fpD = Infinity;
-    for (const [k, e] of tileCache) {
+    const scan = (list) => {
+      for (const f of list) {
+        if (Math.abs(f.cx - px) > 400 || Math.abs(f.cz - pz) > 400) continue;
+        if (pointInRing(px, pz, f.ring)) return f;
+      }
+      return null;
+    };
+    for (const [, e] of tileCache) {
       if (e.layer !== 'buildings' || !e.group.visible) continue;
-      for (const f of e.footprints) {
-        if (Math.abs(f.cx - px) > 400 || Math.abs(f.cz - pz) > 400) continue;
-        if (pointInRing(px, pz, f.ring)) { fp = f; fpD = 0; break; }
-        const d = (f.cx - px) ** 2 + (f.cz - pz) ** 2;
-        if (d < fpD) { fpD = d; if (!fp) fp = f; }
-      }
-      if (fp && fpD === 0) break;
+      const f = scan(e.footprints || []);
+      if (f) { pickStats.byPolygon++; return f; }
     }
-    if ((!fp || fpD > 0) && umedaPocPickActive) {
-      for (const f of umedaPocFootprints) {
-        if (Math.abs(f.cx - px) > 400 || Math.abs(f.cz - pz) > 400) continue;
-        if (pointInRing(px, pz, f.ring)) { fp = f; fpD = 0; break; }
-        const d = (f.cx - px) ** 2 + (f.cz - pz) ** 2;
-        if (d < fpD) { fpD = d; if (!fp) fp = f; }
-      }
+    const f2 = scan(umedaPocFootprints || []);
+    if (f2) { pickStats.byPolygon++; return f2; }
+    return null;
+  }
+
+  function pickBuilding(rayObj) {
+    if (!enabled || !rtRoot) return null;
+    const t0 = performance.now();
+    pickStats.calls++;
+    const meshes = pickCandidateMeshes();
+    pickStats.candidateMeshes = meshes.length;
+    if (!meshes.length) { pickStats.lastMs = performance.now() - t0; return null; }
+    const hits = rayObj.intersectObjects(meshes, false);
+    // §12 同じ canonicalId がタイル境界で重複していても、採るのは手前の 1 枚だけ。
+    for (const hit of hits) {
+      if (hit.object.visible === false) continue;
+      const fp = buildingFromHit(hit);
+      if (!fp) continue;
+      // §6 屋根も壁も同じ建物になる（三角形から引いているので視点に依らない）
+      if (hit.face && Math.abs(hit.face.normal.y) > 0.5) pickStats.roofHits++; else pickStats.wallHits++;
+      pickStats.lastMs = performance.now() - t0;
+      return { d: buildingDataFromFp(fp), distance: hit.distance, canonicalId: fp.canonicalId };
     }
-    if (!fp || fpD > 90000) return null;
-    return { d: buildingDataFromFp(fp), distance: hit.distance };
+    pickStats.miss++;
+    pickStats.lastMs = performance.now() - t0;
+    return null;
   }
   // [Mission 33E §6] footprint → property card へ渡す建物データ。pickBuilding と HD ランドマークの
   //   pick で同じものを使う（card 側のロジックを二重に持たない）。
@@ -21489,11 +21549,19 @@ const CanonicalRuntime = (function () {
     otherHeightClasses: () => CR_OTHER_HEIGHT_CLASSES.map((c) => ({ ...c })),
     otherHeightClassOf: (h) => crOtherHeightClass(h),
     // [Mission 34D §34] 表示中の建物 footprint を source 付きで返す（QA の色分け用。読むだけ）
+    // [Mission 35Y] picking の内訳（faceIndex で引けた / polygon へ落ちた / 外した）
+    getPickDebug: () => ({ ...pickStats }),
+    invalidatePickCache,
     visibleBuildingFootprints(limit = 40000) {
       const out = [];
+      // [Mission 35Y §12] 同じ建物がタイル境界で 2 枚見えていても 1 件にする。
+      //   35T でも同じ重複に引っかかっている（best と second が同一建物になった）。
+      const seen = new Set();
       for (const [k, e] of tileCache) {
         if (e.layer !== 'buildings' || !e.group || e.group.visible === false) continue;
         for (const f of (e.footprints || [])) {
+          if (seen.has(f.canonicalId)) continue;
+          seen.add(f.canonicalId);
           if (out.length >= limit) return out;
           const a2 = f.attributes || {};
           out.push({ canonicalId: f.canonicalId, ring: f.ring, cx: f.cx, cz: f.cz,
