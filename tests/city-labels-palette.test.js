@@ -107,9 +107,9 @@ test('[33A] CityLabelLayer: 3 種のラベルを 1 つの優先度キューで�
 });
 
 test('[33A] ラベルの見た目: 明るい地図では濃いインク + 白ハロー、暗い地図では白文字 + 暗ハロー', () => {
-  // [Mission 35V] 反転の条件が「夜かどうか」から「地図が暗いかどうか」へ広がった
-  //   （夜 + ネイビー地面）。濃いインク↔白文字を切り替えるという 33A の意図は変えていない。
-  assert.match(html, /const darkMap = night \|\| \(\(typeof cityThemeDark === 'function'\) && cityThemeDark\(\)\);/);
+  // [Mission 35W] 35V でネイビー地面ぶんだけ広げた反転条件は、地面を 35V 前へ戻したので
+  //   「夜かどうか」だけに戻した。濃いインク↔白文字を切り替えるという 33A の意図は変えていない。
+  assert.match(html, /const darkMap = night;/);
   assert.match(html, /halo: inkOnDark \? 'rgba\(4,10,20,0\.82\)' : 'rgba\(255,255,255,0\.94\)',/);
   assert.match(html, /ctx\.strokeText\(text, padX, canvas\.height \/ 2 \+ R\);/);
   // 文字サイズの階層（地名 major > 地名 medium > 駅 major）
@@ -159,10 +159,8 @@ test('[33A] UI: 地名 / 施設名 / 駅名 のトグルが通常パネルにあ
 });
 
 test('[33A] 配色 v2: 明るく・少し鮮やかに（建物 geometry は不変）', () => {
-  // [Mission 35V] 明るい配色の値そのものは LIGHT テーマとして残っている（戻し先）。
-  //   既定は NAVY になったので、背景は CITY_THEME 経由で引かれる。
-  assert.match(html, /const MS_BG_NEUTRAL = cityTheme\('bg'\);/);
-  assert.match(html, /bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,/);
+  // [Mission 35W] 35V のネイビーテーマは撤去し、背景は 33A の定数へ戻した。
+  assert.match(html, /const MS_BG_NEUTRAL = 0xf6f7f3;/);
   assert.match(html, /water: 0x63bfe4, waterHarbor: 0x55a9d0,/);
   assert.match(html, /parkReal: 0x9bd589, parkGreen: 0x8fcd7b, grass: 0xc9e7b6,/);
   assert.match(html, /railMajor: 0x49546a, railUrban: 0x4f5f9e, railLocal: 0x69717f,/);

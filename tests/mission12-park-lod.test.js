@@ -123,9 +123,7 @@ test('[Mission12] 他ミッションの成果を壊していない', () => {
   assert.ok(/fillColor: 0x9ed6e6/.test(html), '河川色が変わった');
   assert.ok(/const ROAD_RIBBON_COLOR = \{ major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 \};/.test(html), '道路 ribbon 色が変わった');
   // [Mission 33A] 背景は 0xf3f4f1 → 0xf6f7f3 へ一段明るくした（Mission17 の「明るい neutral」方針は維持）
-  // [Mission 35V] 背景の値は CITY_THEME が持つようになった。明るい配色は LIGHT として残っている。
-  assert.ok(/const MS_BG_NEUTRAL = cityTheme\('bg'\);/.test(html), 'Mission17 背景の出どころ');
-  assert.ok(/bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,/.test(html), 'Mission17 背景色（LIGHT）');
+  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景色が変わった');
   assert.ok(/const MODEL_FOG = \{/.test(html), 'Mission18 fog が消えた');
   assert.ok(/const CITY_CAMERA_PRESET = \{/.test(html), 'Mission16 camera preset が消えた');
 });

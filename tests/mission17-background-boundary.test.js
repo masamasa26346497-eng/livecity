@@ -20,34 +20,14 @@ test('[Mission17] ward-ux-v1.html: インライン <script> の JS 構文が壊�
   try { execFileSync('node', ['--check', f], { stdio: 'pipe' }); } finally { try { fs.unlinkSync(f); } catch { /* noop */ } }
 });
 
-// [Mission 35V] 背景色はテーマが持つようになった。ここで解決して以降の検査に使う。
-//   Mission17 の主眼は「背景・fog・body・地表が同じ色で、四角い境界が見えないこと」で、
-//   それはテーマが変わっても守るべき性質。値そのものの検査はテーマごとに分ける。
-function themeBg() {
-  const t = html.match(/const CITY_THEME = \{\s*name: '(\w+)',/);
-  assert.ok(t, 'CITY_THEME 未定義');
-  const key = (t[1] === 'NAVY') ? 'navy: {' : 'light: {';
-  const i = html.indexOf(key);
-  assert.ok(i > 0, 'テーマ ' + t[1] + ' のブロックが見つからない');
-  const m = html.slice(i, i + 600).match(/bg: (0x[0-9a-f]{6})/);
-  assert.ok(m, 'テーマの bg 未定義');
-  return { name: t[1], hex: m[1], v: parseInt(m[1], 16) };
-}
-
-test('[Mission17] canonical background color: 建物白(#eef0ec)と明確に分離し、純白でない', () => {
-  assert.match(html, /const MS_BG_NEUTRAL = cityTheme\('bg'\);/, 'MS_BG_NEUTRAL がテーマから引かれていない');
-  const bg = themeBg();
-  const r = (bg.v >> 16) & 255, g = (bg.v >> 8) & 255, b = bg.v & 255;
+test('[Mission17] canonical background color: 明るい neutral、建物白(#eef0ec)よりわずかに明るく純白でない', () => {
+  const m = html.match(/const MS_BG_NEUTRAL = (0x[0-9a-f]{6});/);
+  assert.ok(m, 'MS_BG_NEUTRAL 未定義');
+  const v = parseInt(m[1], 16), r = (v >> 16) & 255, g = (v >> 8) & 255, b = v & 255;
   const wall = 0xeef0ec, wr = (wall >> 16) & 255, wg = (wall >> 8) & 255, wb = wall & 255;
+  assert.ok(r >= wr && g >= wg && b >= wb, `背景が建物白より暗い #${m[1].slice(2)}`);
   assert.ok(r < 252 && g < 252 && b < 252, '背景が純白に近すぎる（白建物が溶ける）');
-  if (bg.name === 'NAVY') {
-    // [Mission 35V] 暗い地面。建物白より **明確に暗い** ことで建物が前に出る。
-    assert.ok(wr - r > 80 && wg - g > 80 && wb - b > 80, `背景が建物白と十分離れていない #${bg.hex.slice(2)}`);
-    assert.ok(b > r, `ネイビーなのに青くない #${bg.hex.slice(2)}`);
-  } else {
-    assert.ok(r >= wr && g >= wg && b >= wb, `背景が建物白より暗い #${bg.hex.slice(2)}`);
-    assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 8, '背景に色味が強い（neutral でない）');
-  }
+  assert.ok(Math.max(r, g, b) - Math.min(r, g, b) <= 8, '背景に色味が強い（neutral でない）');
 });
 
 test('[Mission17] scene.background / renderer.clearColor / scene.fog 初期値が MS_BG_NEUTRAL で統一', () => {
@@ -67,12 +47,10 @@ test('[Mission17] applySkyAndFog: 模型・昼は背景=fog=MS_BG_NEUTRAL（fog�
     'legacy 分岐が壊れている');
 });
 
-test('[Mission17] CSS body の背景も現在のテーマ背景へ統一（四角い境界を出さない）', () => {
+test('[Mission17] CSS body の背景も MS_BG_NEUTRAL 相当（#f3f4f1）へ統一', () => {
   const m = html.match(/html,body\{[^}]*background:(#[0-9a-fA-F]{6})[^}]*\}/);
   assert.ok(m, 'body の background 指定が見つからない');
-  // [Mission 35V] 値は変わっても「body と WebGL 背景が同じ色」という条件は変えない。
-  const bg = themeBg();
-  assert.equal(m[1].toLowerCase(), '#' + bg.hex.slice(2), `body 背景がテーマ背景と違う: ${m[1]}`);
+  assert.equal(m[1].toLowerCase(), '#f3f4f1', `body 背景が統一色でない: ${m[1]}`);
   assert.ok(!/background:#0d1117/.test(html), '旧 body 背景(#0d1117)が残っている');
 });
 
@@ -103,23 +81,11 @@ test('[Mission17] shadow receiver を壊さない（GroundVisualLayer は receiv
   assert.ok(!/gnd\.visible = true/.test(html), 'gnd を再表示している');
 });
 
-test('[Mission17] 色階層を維持: 背景・建物白・道路グレーが明度で分かれている', () => {
-  // [Mission 35V] 明度の **向き** はテーマで反転する。
-  //   LIGHT: 背景 > 建物白 > 道路（明るい台座の上の模型）
-  //   NAVY : 背景 < 道路 < 建物白（暗い地面の上で道路と建物が浮く）
-  //   守りたいのは「3 者が明度で十分に離れていて、どれかが他へ溶けないこと」。
-  const bg = themeBg().v;
+test('[Mission17] 色階層を維持: 背景 > 建物白 > 道路グレー、河川シアン・公園グリーンは別系統', () => {
+  const bg = parseInt(html.match(/const MS_BG_NEUTRAL = (0x[0-9a-f]+);/)[1], 16);
   const wall = 0xeef0ec;
   const bright = (v) => ((v >> 16) & 255) + ((v >> 8) & 255) + (v & 255);
-  if (themeBg().name === 'NAVY') {
-    // [Mission 35V 道路色の差し戻し] 道路は 35V で上書きしなくなったので、
-    //   実効値は profile（既定 DEPTH）の値。暗い地面の上でも道路が沈まないことだけ見る。
-    const road = parseInt(html.match(/const COL_DEPTH = \{[\s\S]*?road: (0x[0-9a-f]{6}),/)[1], 16);
-    assert.ok(bright(bg) < bright(road), '道路が地面より暗い（暗い地面では道路が見えない）');
-    assert.ok(bright(road) < bright(wall), '道路が建物白より明るい（道路が建物より前に出る）');
-  } else {
-    assert.ok(bright(bg) >= bright(wall), '背景が建物白より暗い');
-  }
+  assert.ok(bright(bg) >= bright(wall), '背景が建物白より暗い');
   assert.ok(/const ROAD_RIBBON_COLOR = \{ major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 \};/.test(html), '道路色が変わった');
   assert.ok(/fillColor: 0x9ed6e6/.test(html), '河川色が変わった');
 });

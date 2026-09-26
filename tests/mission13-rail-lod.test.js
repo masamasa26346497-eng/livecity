@@ -140,9 +140,7 @@ test('[Mission13] 他ミッションの成果を壊していない', () => {
   assert.ok(/const PARK_AREA_LARGE_M2 = 100000, PARK_AREA_MEDIUM_M2 = 10000;/.test(html), 'Mission12 公園 LOD');
   assert.ok(/const ROAD_RIBBON_COLOR = \{ major: 0xb8bdc3, mid: 0xc4c8cc, local: 0xd0d3d6 \};/.test(html), '道路 ribbon 色');
   // [Mission 33A] 背景は 0xf6f7f3 へ（明るい neutral のまま）
-  // [Mission 35V] 背景の値は CITY_THEME が持つようになった。明るい配色は LIGHT として残っている。
-  assert.ok(/const MS_BG_NEUTRAL = cityTheme\('bg'\);/.test(html), 'Mission17 背景の出どころ');
-  assert.ok(/bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,/.test(html), 'Mission17 背景色（LIGHT）');
+  assert.ok(/const MS_BG_NEUTRAL = 0xf6f7f3;/.test(html), 'Mission17 背景');
 });
 
 test('[Mission13] protected baseline fullward-v3.html は Mission13 の変更を含まない', () => {

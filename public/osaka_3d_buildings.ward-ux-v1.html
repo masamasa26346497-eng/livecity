@@ -5,7 +5,7 @@
 <title>大阪市 都市デジタルツイン</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#0d1524}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#f3f4f1}
 canvas{display:block}
 .panel{position:absolute;background:rgba(5,10,24,0.88);border:1px solid rgba(80,160,255,0.16);
   border-radius:12px;backdrop-filter:blur(14px);color:#b8cef0;font-size:11.5px;
@@ -200,11 +200,7 @@ canvas{display:block}
    （この block は既存 CSS より後に来るのでカスケードで勝つ。geometry/camera/loader は無変更）
    ══════════════════════════════════════════════════════════════ */
 :root{
-  /* [Mission 35V] Mission19 の UI block は line 8 の html,body より後に来るので、
-     ここが body の背景の最終決定になる。canvas の裏が明るいままだと
-     読み込み中やリサイズの一瞬に明るい枠が見えるので、テーマ背景と揃える。
-     --lc-bg は body の背景にしか使っていない（パネルは --lc-panel）。 */
-  --lc-bg:#0d1524; --lc-panel:rgba(255,255,255,0.94); --lc-panel-solid:#ffffff;
+  --lc-bg:#f4f6f8; --lc-panel:rgba(255,255,255,0.94); --lc-panel-solid:#ffffff;
   --lc-border:#e3e7ea; --lc-border-strong:#d3d9de;
   --lc-text:#20252a; --lc-muted:#66717a; --lc-faint:#9aa4ac;
   --lc-accent:#2f6fb3; --lc-accent-soft:#eaf2fb; --lc-accent-line:#cfe0f2;
@@ -932,41 +928,7 @@ const OSM_LABELS = [{"name":"市立苅田北小学校","category":"school","prio
 //   建物白(MS_BUILDING_WHITE 0xeef0ec)よりわずかに明るい・中立で、純白ではない
 //   （純白だと白建物が背景へ溶ける）。scene.background / renderer.clearColor / scene.fog.color /
 //   CSS body / GroundVisualLayer(model) の 5 箇所をこの色へ揃え、有限な四角い地表境界を消す。
-// ══════════════════════════════════════════════════════════════
-// [Mission 35V] CITY_THEME — 地面をネイビーへ、道路をその上で映えるグレーへ
-//
-//   これまでの配色は「白い台座に置いた都市模型」（背景・地表とも明るい neutral）だった。
-//   35V では参考イメージに合わせて **地表側だけ** を暗いネイビーへ落とす。
-//   建物の色（用途色 × 35H の頂点カラー）と水色の川はそのまま活かし、
-//   地面が暗くなることで相対的に前へ出るようにする。
-//
-//   触るのは色だけ。geometry・投影・レイヤー順序・Y 座標は一切変えない。
-//   theme を 'LIGHT' へ戻せば 35U までの見え方に戻る（QA 比較用）。
-// ══════════════════════════════════════════════════════════════
-const CITY_THEME = {
-  name: 'NAVY',                       // 'NAVY' | 'LIGHT'
-  navy: {
-    bg: 0x0d1524,                     // 背景・fog。真っ黒にはしない（わずかに青い）
-    land: 0x18233c,                   // 陸。背景より一段明るく、海（青）とは明度で分ける
-    landData: 0x141d33,               // データ表示は一段暗く（データ色を立たせる）
-    parcelSpread: 0.14,               // 地表タイルの明度の振れ幅（パーセル感。うるさくしない）
-    hemiGround: 0x1b2942,             // 地面からの照り返し。暖色のままだと地面が茶色く濁る
-  },
-  light: {                            // 35U までの値（戻すとき用）
-    bg: 0xf6f7f3, land: 0xebede6, landData: 0xe3e5de,
-    parcelSpread: 0.05, hemiGround: 0xe8dcc8,
-  },
-};
-/** いま暗い地面かどうか。配色・ラベルの可読性はすべてこれで分岐する。 */
-function cityThemeDark() { return CITY_THEME.name === 'NAVY'; }
-/** テーマの値を引く。 */
-function cityTheme(key) { return (cityThemeDark() ? CITY_THEME.navy : CITY_THEME.light)[key]; }
-
-// [Mission17] 都市模型の背景/地表/fog を統一する tone。
-//   scene.background / renderer.clearColor / scene.fog.color / CSS body /
-//   GroundVisualLayer(model) の 5 箇所をこの色へ揃え、有限な四角い地表境界を消す。
-// [Mission 35V] 値の出どころを CITY_THEME へ移した（const の参照箇所は変えない）。
-const MS_BG_NEUTRAL = cityTheme('bg');
+const MS_BG_NEUTRAL = 0xf6f7f3;   // [Mission 33A] 背景を一段明るく（0xf3f4f1 → 0xf6f7f3。neutral は維持）
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -2328,10 +2290,7 @@ const GroundVisualLayer = (function(){
     h ^= h >>> 13;
     // [Neutral Base Ground] 明色ベース(0xd0cfca)では旧振れ幅0.88〜1.08は上限側が建物クリーム
     // (0xe8e0c8)へ近づきすぎるため、0.97〜1.02のごく控えめな明度差へ縮小（細かい模様は生成しない）。
-    // [Mission 35V] 暗いネイビー地面では 0.05 の振れ幅はまったく見えないので、テーマ側で
-    //   振れ幅を決める（NAVY 0.14）。タイルごとの明度差だけで、模様も線も増やさない＝draw call 不変。
-    const spread = cityTheme('parcelSpread');
-    return (1 - spread / 2) + (h % 100) / 100 * spread;
+    return 0.97 + (h % 100) / 100 * 0.05;
   }
   // BLDGS+公園+駐車場の座標範囲を算出し、安全余白を加えて表示範囲を返す。
   // OSM_ROADSは除外（区外へ延びる道路端点で地表が巨大化するため。GROUND_VISUAL_STYLE参照）。
@@ -2480,10 +2439,8 @@ const LandSurfaceLayer = (function () {
   const DATA_URL = 'map-data/osaka-city/land-surface/land-surface.json';
   // 陸 tint: 背景 MS_BG_NEUTRAL(0xf3f4f1=243,244,241) より一段暗い warm-neutral。
   //   建物白(0xeef0ec=238,240,236) よりさらに暗く（建物が浮く）、海(0xb7dce6=青) とは色相で明確に分離。
-  // [Mission 35V] 陸の色は CITY_THEME が持つ。NAVY では背景(0x0d1524)より一段明るい
-  //   ネイビー(0x18233c)にして、海・背景との境目が明度で読めるようにする。
-  const LAND_COLOR_MODEL = cityTheme('land');
-  const LAND_COLOR_DATA = cityTheme('landData');
+  const LAND_COLOR_MODEL = 0xebede6;  // 模型スタイル [Mission 33A] 明るく（0xe6e8e3 → 0xebede6）
+  const LAND_COLOR_DATA = 0xe3e5de;   // データスタイルはわずかに暗く（データ色が映える）[Mission 33A] 明るく
   let group = null, mesh = null, material = null;
   let loaded = false, loadingPromise = null, visible = true;
   let meta = { emitted: false, triangleCount: 0, tiles: 0, areaM2: 0, bbox: null, coverage: null, keyPlaces: [], source: DATA_URL };
@@ -10189,14 +10146,12 @@ const CityLabelLayer = (function () {
   // 明るい地図の上では白文字は沈むので、昼は「濃いインク + 白ハロー」、夜は「白文字 + 暗いハロー」。
   function styleOf(kind, importance, item) {
     const night = isNight();
-    // [Mission 35V §5] 地面がネイビーになると、昼の「濃いインク + 白ハロー」は地面に沈む。
-    //   ハローだけのラベル（町名・区名・河川・公園・小さい建物名）は夜と同じ
-    //   「明るい文字 + 暗いハロー」へ寄せる。
-    //   一方、白い pill を持つラベル（駅・ランドマーク・主要建物名）は白のままのほうが
-    //   ネイビーの上でよく読めるので、昼の見た目を保つ（＝参考イメージの白いバブル）。
-    const darkMap = night || ((typeof cityThemeDark === 'function') && cityThemeDark());
+    // [Mission 35W §1] 地面を 35V 前の明るい配色へ戻したので、ラベルの明暗を反転させる
+    //   条件も「夜かどうか」だけに戻す（35V 以前とまったく同じ見た目になる）。
+    //   書き方（darkMap / inkOnDark / tk）は 35V のまま残す。
+    const darkMap = night;
     const inkOnDark = darkMap;                 // ハロー型ラベルを反転するか
-    const tk = darkMap ? (night ? 'n' : 'v') : 'd';   // texture cache key（テーマ違いを混ぜない）
+    const tk = darkMap ? 'n' : 'd';            // texture cache key
     if (kind === 'landmark') {
       const major = importance === 'MAJOR';
       return {
@@ -13209,9 +13164,7 @@ const VISUAL_CONFIG = {
   mode: { current: "real" }, // [確認用修正] 既定をrealに変更（保存済み設定があればそちらを優先）。"real" | "data"
   lighting: {
     day: {
-      // [Mission 35V] hemiGround は「地面からの照り返しの色」。地面がネイビーになったので
-      //   暖色(0xe8dcc8)のままだと建物の足元だけ茶色く浮く。テーマの地面色に合わせる。
-      hemiSky: 0xbfd8f0, hemiGround: cityTheme('hemiGround'), hemiIntensity: 1.0,
+      hemiSky: 0xbfd8f0, hemiGround: 0xe8dcc8, hemiIntensity: 1.0,
       // [Mission 34B §7] azimuth 236°（南西〜西南西）/ elevation 47°。旧値 [2400,1800,1200] は
       //   azimuth 116.6°（東南東）/ elevation 33.9° で、屋根の段差が読み取りにくかった。
       //   水平距離は旧値と同じ 2683m なので影の正射影カメラの near/far はそのまま使える。
@@ -16243,26 +16196,8 @@ const CanonicalRuntime = (function () {
     white: COL.white,
   };
   const COL_CURRENT = { ...COL };
-  // [Mission 35V §3/§6] 暗いネイビー地面の上での配色。
-  //   鉄道＝暗地で沈まない明度へ／水＝明るいシアン／緑＝原色にしない。
-  //   色相の役割（水＝青 / 緑＝緑 / 道路＝無彩色寄り）は 35H から変えていない。
-  // [Mission 35V 道路色の差し戻し] **道路はここで上書きしない**。
-  //   ユーザー判断で道路の灰色化（0xb7c0cd）は取り消し、35V 以前の見え方へ戻した。
-  //   road を持たないので、下の applyPalette が profile の値（DEPTH なら 0x8b929e）を残す。
-  const COL_NAVY = {
-    water: 0x3fb3e8, waterHarbor: 0x2f9cd2,        // 川・海は明るいシアン（ネイビーの上でよく映える）
-    parkReal: 0x5f9e63, parkGreen: 0x568f59, grass: 0x6fae70,  // 暗い地面では原色の緑は光って見えるので落とす
-    railMajor: 0x8e9ac0, railUrban: 0x8d9ee8, railLocal: 0x76809a, // 暗地では元の紺(0x49546a)が沈むので明るく
-    white: COL.white,
-  };
-  /** profile と theme に合わせて COL の中身を入れ替える（参照は保つ）。
-   *  暗いテーマは profile の配色を **置き換えず、上に重ねる**。
-   *  これにより COL_NAVY が持たないキー（道路）は profile の値のまま残る。 */
-  function applyPalette() {
-    const base = depthEnabled() ? COL_DEPTH : COL_CURRENT;
-    const dark = (typeof cityThemeDark === 'function') && cityThemeDark();
-    Object.assign(COL, base, dark ? COL_NAVY : {});
-  }
+  /** profile に合わせて COL の中身を入れ替える（参照は保つ）。 */
+  function applyPalette() { Object.assign(COL, depthEnabled() ? COL_DEPTH : COL_CURRENT); }
 
   //   道路の style は COL から作るので、palette を切り替えたら作り直す必要がある。
   let CR_ROAD_RS = null;
@@ -17472,6 +17407,394 @@ const CanonicalRuntime = (function () {
   const roadV3Group = new THREE.Group(); roadV3Group.name = 'RoadVisualV3Overlay'; roadV3Group.visible = false;
   tagRuntimeOwnerRecursive(roadV3Group, RUNTIME_OWNER.CANONICAL);
   canonicalRoot.add(roadV3Group);
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // [Mission 35W §2] RoadDetailLayer — 道路を「塗り」から「道路らしい見た目」へ
+  //
+  //   ROAD_V3 が描いているのは車道面（carriageway）と道路区域（margin）の **塗り** だけで、
+  //   車線も縁石も交差点も無い。ここではその塗りの上に、実データから作れる標示だけを重ねる。
+  //
+  //   §3 遵守: 道路 geometry は作り直さない。位置も動かさない。実在しない道路も足さない。
+  //     読むのは map-data/osaka-city/roads（OSM way の centerline + highway/lanes/oneway/bridge）で、
+  //     centerline の座標をそのまま使って、その **まわり** に標示を置くだけ。
+  //
+  //   §4 遵守: 1 道路 1 mesh にしない。タイルごとに
+  //     「暗い縁石」1 mesh ＋「白い標示」1 mesh の **2 draw call** へ merge する。
+  //     material は layer で 2 個だけ共有する。
+  //
+  //   §5 遵守: 全ズームで全部は出さない（下の BANDS を参照）。
+  // ══════════════════════════════════════════════════════════════════════════
+  const RoadDetail = (function () {
+    // centerline は derived ではなく素の roads データセット（BASE は .../derived なので 1 つ上）
+    const SRC = BASE.replace(/\/derived$/, '') + '/roads';
+    const TILE = 2000;                    // roads/manifest.json の tileSize と同じ
+    const RING = 1;                       // camera 中心タイル ± RING
+
+    // 標示は車道面（Y.road=0.30）のすぐ上。鉄道(0.5)より下に収める。
+    const Y_EDGE = Y.road + 0.020;        // 縁石・路肩
+    const Y_MARK = Y.road + 0.035;        // 白線
+    // 高架は車道面と同じだけ持ち上げる（地面に埋もれさせない）
+    const BRIDGE_LIFT = Y.roadBridge - Y.road;
+
+    // §7 道路のリアル化に要るぶんだけ色を足す。地面・建物・河川の色には触らない。
+    const C_EDGE = 0x7c838c;              // 縁石。車道(COL.road)より一段暗い無彩色
+    const C_MARK = 0xf0f1ec;              // 白線。純白にすると飛ぶので少し落とす
+    const LANE_W = 3.0;                   // 1 車線の幅(m)。日本の一般道は 3.0〜3.5
+    const EDGE_W = 0.55;                  // 縁石帯の幅(m)
+
+    // §5 ズーム別。数字は camera 距離 cs.r（m）。
+    //   far  … 標示なし（道路の塗りだけ）
+    //   mid  … 主要道路の中央線 + 縁石。交差点は出さない
+    //   near … 上記 + 生活道路の縁石・車線境界・外側線・停止線・（推定）横断歩道
+    const BANDS = { farM: 2200, midM: 700, veryNearM: 450 };
+    // 実測: この画面では画面 1px ≒ cs.r / 1300 [m]。
+    //   標示を実寸(0.15m)で描くと引いた画面では 0.2px になって完全に消えるので、
+    //   **画面上で 2px 前後になる幅**へ寄せる（地図表現としての誇張。実寸ではない）。
+    const M_PER_PX = (r) => r / 1300;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    function cfgFor(r) {
+      if (r > BANDS.farM) return null;
+      const mpp = M_PER_PX(r);
+      const near = r <= BANDS.midM;
+      const veryNear = r <= BANDS.veryNearM;
+      return {
+        band: veryNear ? 'veryNear' : (near ? 'near' : 'mid'),
+        markTiers: near ? ['major', 'mid'] : ['major'],
+        // 縁石は「道路の形」を出す一番効く要素なので、寄ったら生活道路にも付ける
+        edgeTiers: veryNear ? ['major', 'mid', 'local'] : (near ? ['major', 'mid'] : ['major']),
+        markW: clamp(mpp * 2.2, 0.28, 1.8),
+        edgeW: clamp(mpp * 2.6, 0.45, 2.2),
+        lanes: near, junction: near,
+        // 2000m タイル 9 枚ぶんを毎回作ると、寄った画面では見えない所まで作ってしまう。
+        //   カメラ注視点からこの距離までの feature だけ使う。
+        reach: clamp(r * 2.4, 700, 3400),
+      };
+    }
+    // 連続ズームで作り直し続けないよう、約 1.45 倍ごとの段でだけ作り直す。
+    const STEP_RATIO = 1.45;
+    const zoomStep = (r) => Math.round(Math.log(Math.max(60, r)) / Math.log(STEP_RATIO));
+
+    // 破線の刻み（m）。日本の白線の実寸（線 5m / 空き 5m）に寄せる。
+    const DASH = { on: 5, off: 5 };
+
+    // §6 横断歩道。**このデータセットに crossing 情報は 1 件も無い**（実測）ので、
+    //   交差点の形から位置を推定している。推定であることを隠さない:
+    //     - dev のみ
+    //     - 主要道路どうしの交差点だけ（推定が当たりやすい所に限る）
+    //     - near band のみ
+    //     - debug / レポートで ESTIMATED と明示する
+    const CROSSWALK_ESTIMATED = true;
+    const CW = { stripeW: 0.45, gap: 0.45, depth: 3.4, setback: 1.2 };
+    const STOP_LINE_W = 0.40;
+
+    const group = new THREE.Group();
+    group.name = 'RoadDetailLayer';
+    tagRuntimeOwnerRecursive(group, RUNTIME_OWNER.CANONICAL);
+    canonicalRoot.add(group);
+
+    const data = new Map();        // 'tx_tz' -> tile json
+    const loading = new Set();
+    const built = new Map();       // 'tx_tz|band' -> THREE.Group
+    let curStep = null;
+    let enabled = true;
+    const stats = { tiles: 0, features: 0, edgeTris: 0, markTris: 0, drawCalls: 0,
+      junctions: 0, stopLines: 0, crosswalks: 0, band: 'far', zoomStep: 0, markW: 0, edgeW: 0, reachM: 0,
+      crosswalkSource: 'ESTIMATED_FROM_JUNCTION_GEOMETRY', lastBuildMs: 0 };
+
+    const camR = () => ((typeof cs !== 'undefined' && cs) ? cs.r : 99999);
+
+    /** 片側の車道半幅(m)。lanes があればそれを使い、無ければ highway 種別から。 */
+    function halfWidth(f) {
+      const n = Number(f.lanes);
+      if (Number.isFinite(n) && n >= 1 && n <= 12) return (n * LANE_W) / 2;
+      switch (f.highway) {
+        case 'motorway': case 'trunk': return 7.0;
+        case 'primary': return 6.5;
+        case 'secondary': return 5.5;
+        case 'tertiary': return 5.0;
+        case 'residential': case 'unclassified': return 4.0;
+        case 'service': return 2.5;
+        default: return 4.0;
+      }
+    }
+    /** 車線数（不明なら種別から推定）。 */
+    function laneCount(f) {
+      const n = Number(f.lanes);
+      if (Number.isFinite(n) && n >= 1 && n <= 12) return Math.round(n);
+      return (f.tier === 'major') ? 4 : 2;
+    }
+
+    /** polyline を offset(m) だけ横へずらし、幅 w の帯として三角形を積む。 */
+    function strip(pos, pts, offset, w, y) {
+      const h = w / 2;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const ax = pts[i][0], az = pts[i][1], bx = pts[i + 1][0], bz = pts[i + 1][1];
+        const dx = bx - ax, dz = bz - az;
+        const L = Math.hypot(dx, dz);
+        if (L < 1e-4) continue;
+        const nx = -dz / L, nz = dx / L;
+        const cax = ax + nx * offset, caz = az + nz * offset;
+        const cbx = bx + nx * offset, cbz = bz + nz * offset;
+        pos.push(cax + nx * h, y, caz + nz * h, cbx + nx * h, y, cbz + nz * h, cbx - nx * h, y, cbz - nz * h);
+        pos.push(cax + nx * h, y, caz + nz * h, cbx - nx * h, y, cbz - nz * h, cax - nx * h, y, caz - nz * h);
+      }
+    }
+
+    /** strip の破線版。線に沿った累積長で on/off を切る。 */
+    function dashedStrip(pos, pts, offset, w, y) {
+      const h = w / 2, cyc = DASH.on + DASH.off;
+      let run = 0;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const ax = pts[i][0], az = pts[i][1], bx = pts[i + 1][0], bz = pts[i + 1][1];
+        const dx = bx - ax, dz = bz - az;
+        const L = Math.hypot(dx, dz);
+        if (L < 1e-4) continue;
+        const ux = dx / L, uz = dz / L, nx = -dz / L, nz = dx / L;
+        let t = 0;
+        while (t < L) {
+          const phase = (run + t) % cyc;
+          if (phase < DASH.on) {
+            const seg = Math.min(DASH.on - phase, L - t);
+            const sx = ax + ux * t + nx * offset, sz = az + uz * t + nz * offset;
+            const ex = ax + ux * (t + seg) + nx * offset, ez = az + uz * (t + seg) + nz * offset;
+            pos.push(sx + nx * h, y, sz + nz * h, ex + nx * h, y, ez + nz * h, ex - nx * h, y, ez - nz * h);
+            pos.push(sx + nx * h, y, sz + nz * h, ex - nx * h, y, ez - nz * h, sx - nx * h, y, sz - nz * h);
+            t += seg;
+          } else t += (cyc - phase);
+        }
+        run += L;
+      }
+    }
+
+    /** 1 本の短い帯（停止線・横断歩道の 1 本）。中心 c、方向 u、長さ len、幅 w。 */
+    function bar(pos, cx, cz, ux, uz, len, w, y) {
+      const nx = -uz, nz = ux, hl = len / 2, hw = w / 2;
+      const p = (sx, sz) => pos.push(cx + ux * sx + nx * sz, y, cz + uz * sx + nz * sz);
+      p(-hl, -hw); p(hl, -hw); p(hl, hw);
+      p(-hl, -hw); p(hl, hw); p(-hl, hw);
+    }
+
+    /** タイル内の交差点を「複数の way が共有している頂点」として拾う。 */
+    function junctions(feats) {
+      const seen = new Map();
+      for (const f of feats) {
+        if (!Array.isArray(f.p)) continue;
+        const own = new Set();
+        for (const q of f.p) {
+          const k = Math.round(q[0] * 10) + ',' + Math.round(q[1] * 10);
+          if (own.has(k)) continue;
+          own.add(k);
+          let e = seen.get(k);
+          if (!e) { e = { x: q[0], z: q[1], feats: [] }; seen.set(k, e); }
+          e.feats.push(f);
+        }
+      }
+      const out = [];
+      for (const e of seen.values()) if (e.feats.length >= 3) out.push(e);
+      return out;
+    }
+
+    /** 交差点で、その点から出ていく各道路の向きを求める。 */
+    function armsAt(j) {
+      const arms = [];
+      for (const f of j.feats) {
+        const p = f.p;
+        for (let i = 0; i < p.length; i++) {
+          if (Math.abs(p[i][0] - j.x) > 0.12 || Math.abs(p[i][1] - j.z) > 0.12) continue;
+          for (const k of [i - 1, i + 1]) {
+            if (k < 0 || k >= p.length) continue;
+            const dx = p[k][0] - j.x, dz = p[k][1] - j.z;
+            const L = Math.hypot(dx, dz);
+            if (L < 1.0) continue;
+            arms.push({ ux: dx / L, uz: dz / L, f });
+          }
+          break;
+        }
+      }
+      return arms;
+    }
+
+    async function ensureTile(tx, tz) {
+      const key = tx + '_' + tz;
+      if (data.has(key) || loading.has(key)) return;
+      loading.add(key);
+      try {
+        const res = await fetch(SRC + '/tile_' + tx + '_' + tz + '.json');
+        data.set(key, res.ok ? await res.json() : { features: [] });
+      } catch (e) { data.set(key, { features: [] }); }
+      loading.delete(key);
+    }
+
+    function buildTile(tx, tz, cfg, step) {
+      if (!cfg) return;
+      const key = tx + '_' + tz, bkey = key + '|' + step;
+      if (built.has(bkey)) return;
+      const tile = data.get(key);
+      if (!tile || !Array.isArray(tile.features) || !tile.features.length) return;
+      const t0 = performance.now();
+
+      const posEdge = [], posMark = [];
+      const markTiers = new Set(cfg.markTiers), edgeTiers = new Set(cfg.edgeTiers);
+      const tgx = cs.tgt.x, tgz = cs.tgt.z, reach2 = cfg.reach * cfg.reach;
+      const picked = [];
+      for (const f of tile.features) {
+        if (!Array.isArray(f.p) || f.p.length < 2) continue;
+        const doEdge = edgeTiers.has(f.tier), doMark = markTiers.has(f.tier);
+        if (!doEdge && !doMark) continue;
+        // カメラから遠い feature は作らない（寄った画面で見えない所まで作らない）
+        const mid = f.p[f.p.length >> 1];
+        if ((mid[0] - tgx) * (mid[0] - tgx) + (mid[1] - tgz) * (mid[1] - tgz) > reach2) continue;
+        picked.push(f);
+        const hw = halfWidth(f);
+        const y = f.bridge ? Y_MARK + BRIDGE_LIFT : Y_MARK;
+        const ye = f.bridge ? Y_EDGE + BRIDGE_LIFT : Y_EDGE;
+        // A. 縁石 / 路肩。車道の両端に暗い帯を置くと、遠目にも道路の形が出る。
+        //    高架は縁石を太くして「橋の桁」に見せる（§2-D）。
+        if (doEdge) {
+          const ew = f.bridge ? cfg.edgeW * 1.9 : cfg.edgeW;
+          strip(posEdge, f.p, hw, ew, ye);
+          strip(posEdge, f.p, -hw, ew, ye);
+        }
+        if (!doMark) continue;
+        // B. 中央線。一方通行には引かない（引くと嘘になる）。
+        if (!f.oneway) {
+          if (laneCount(f) >= 4) strip(posMark, f.p, 0, cfg.markW, y);     // 片側 2 車線以上は実線
+          else dashedStrip(posMark, f.p, 0, cfg.markW, y);                  // それ以外は破線
+        }
+        // C/D. 車線境界（破線）と外側線（実線）。near band の幹線だけ。
+        if (cfg.lanes) {
+          const n = laneCount(f);
+          if (n >= 4) {
+            const per = hw * 2 / n;
+            for (let i = 1; i < n; i++) {
+              const off = -hw + per * i;
+              if (Math.abs(off) < 0.2) continue;                            // 中央線とは重ねない
+              dashedStrip(posMark, f.p, off, cfg.markW * 0.85, y);
+            }
+          }
+          if (f.tier === 'major') {                                         // 外側線
+            strip(posMark, f.p, hw - 0.35, cfg.markW * 0.9, y);
+            strip(posMark, f.p, -(hw - 0.35), cfg.markW * 0.9, y);
+          }
+        }
+      }
+
+      // E/F. 交差点。停止線と（推定の）横断歩道。
+      let nJunc = 0, nStop = 0, nCross = 0;
+      if (cfg.junction && picked.length) {
+        for (const j of junctions(picked)) {
+          const arms = armsAt(j);
+          if (arms.length < 3) continue;
+          nJunc++;
+          const majorArms = arms.filter((a) => a.f.tier === 'major');
+          const cross = CROSSWALK_ESTIMATED && majorArms.length >= 3;      // 主要道路どうしのみ
+          for (const a of arms) {
+            if (a.f.tier !== 'major' && a.f.tier !== 'mid') continue;
+            const hw = halfWidth(a.f);
+            const y = a.f.bridge ? Y_MARK + BRIDGE_LIFT : Y_MARK;
+            // 停止線: 交差点の手前へ下げ、進入側の幅ぶんだけ引く
+            const back = hw + CW.setback + (cross ? CW.depth : 0);
+            const sx = j.x + a.ux * back, sz = j.z + a.uz * back;
+            bar(posMark, sx, sz, a.ux, a.uz, hw, STOP_LINE_W, y);
+            nStop++;
+            if (!cross) continue;
+            // 横断歩道（推定）: 停止線の内側へ縞を並べる
+            const step = CW.stripeW + CW.gap;
+            const nStripe = Math.max(2, Math.floor((hw * 2) / step));
+            const d0 = hw + CW.setback + CW.depth / 2;
+            for (let i = 0; i < nStripe; i++) {
+              const lat = -hw + step * (i + 0.5);
+              const cx = j.x + a.ux * d0 + (-a.uz) * lat;
+              const cz = j.z + a.uz * d0 + (a.ux) * lat;
+              bar(posMark, cx, cz, a.ux, a.uz, CW.depth, CW.stripeW, y);
+            }
+            nCross++;
+          }
+        }
+      }
+
+      const g = new THREE.Group();
+      g.name = 'RoadDetailTile_' + key;
+      const mEdge = meshFromPositions(posEdge, C_EDGE, REN.road + 2,
+        { transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide });
+      if (mEdge) { mEdge.name = 'RoadDetailEdge_' + key; tagRuntimeOwnerRecursive(mEdge, RUNTIME_OWNER.CANONICAL); g.add(mEdge); }
+      const mMark = meshFromPositions(posMark, C_MARK, REN.road + 3,
+        { transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide });
+      if (mMark) { mMark.name = 'RoadDetailMark_' + key; tagRuntimeOwnerRecursive(mMark, RUNTIME_OWNER.CANONICAL); g.add(mMark); }
+      if (!g.children.length) { built.set(bkey, null); return; }
+      g.updateMatrix(); g.matrixAutoUpdate = false;
+      g.traverse((o) => { if (o.isMesh) { o.updateMatrix(); o.matrixAutoUpdate = false; o.frustumCulled = true; } });
+      group.add(g);
+      built.set(bkey, g);
+      stats.tiles = built.size;
+      stats.features += picked.length;
+      stats.edgeTris += Math.round(posEdge.length / 9);
+      stats.markTris += Math.round(posMark.length / 9);
+      stats.drawCalls += g.children.length;
+      stats.junctions += nJunc; stats.stopLines += nStop; stats.crosswalks += nCross;
+      stats.lastBuildMs = Math.round(performance.now() - t0);
+    }
+
+    /** ズーム段が変わったら、前の段で作った mesh を捨てる（標示幅が段ごとに違うため）。 */
+    function dropAll() {
+      for (const [, g] of built) {
+        if (!g) continue;
+        group.remove(g);
+        g.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
+      }
+      built.clear();
+      Object.assign(stats, { tiles: 0, features: 0, edgeTris: 0, markTris: 0, drawCalls: 0,
+        junctions: 0, stopLines: 0, crosswalks: 0 });
+    }
+
+    function refresh() {
+      if (!enabled) { group.visible = false; return; }
+      if (typeof cs === 'undefined' || !cs) return;
+      const r = camR();
+      const step = zoomStep(r);
+      const cfg = cfgFor(r);
+      if (step !== curStep) { dropAll(); curStep = step; }
+      group.visible = !!cfg;
+      stats.band = cfg ? cfg.band : 'far';
+      stats.zoomStep = step;
+      stats.markW = cfg ? +cfg.markW.toFixed(2) : 0;
+      stats.edgeW = cfg ? +cfg.edgeW.toFixed(2) : 0;
+      stats.reachM = cfg ? Math.round(cfg.reach) : 0;
+      if (!cfg) return;
+      const ctx = Math.floor(cs.tgt.x / TILE), ctz = Math.floor(cs.tgt.z / TILE);
+      for (let dx = -RING; dx <= RING; dx++) {
+        for (let dz = -RING; dz <= RING; dz++) {
+          const tx = ctx + dx, tz = ctz + dz;
+          // reach の外にしかないタイルは触らない
+          const cxm = (tx + 0.5) * TILE, czm = (tz + 0.5) * TILE;
+          if (Math.hypot(cxm - cs.tgt.x, czm - cs.tgt.z) > cfg.reach + TILE) continue;
+          if (built.has(tx + '_' + tz + '|' + step)) continue;
+          if (data.has(tx + '_' + tz)) buildTile(tx, tz, cfg, step);
+          else ensureTile(tx, tz).then(() => {
+            try { if (zoomStep(camR()) === step) buildTile(tx, tz, cfg, step); } catch (e) { /* noop */ }
+          });
+        }
+      }
+    }
+
+    return {
+      refresh,
+      setEnabled(on) { enabled = !!on; if (!enabled) { dropAll(); group.visible = false; } else refresh(); },
+      isEnabled: () => enabled,
+      getDebug: () => ({
+        ...stats,
+        enabled, source: SRC, tileSize: TILE,
+        bands: { ...BANDS }, bandConfig: cfgFor(camR()),
+        // §6 横断歩道はデータではなく推定。呼び出し側が誤解しないよう明示する。
+        crosswalkIsEstimated: CROSSWALK_ESTIMATED,
+        crosswalkNote: 'OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）',
+      }),
+    };
+  })();
+  if (typeof window !== 'undefined') {
+    window.__ROAD_DETAIL_DEBUG__ = () => RoadDetail.getDebug();
+    window.__ROAD_DETAIL_ENABLED__ = (on) => RoadDetail.setEnabled(on !== false);
+  }
 
   async function ensureRoadV3Tile(tx, tz) {
     const key = tx + '_' + tz;
@@ -20309,6 +20632,9 @@ const CanonicalRuntime = (function () {
       });
       // [Mission 32E §21] roads tileが新規構築されたら、RoadVisualV2が既にON(FIX13以外)のときだけ
       //   同座標のRoadV2 tileを追いかけてfetch/構築する(既定FIX13の間は一切fetchしない=§35 性能配慮)。
+      // [Mission 35W §2] 道路タイルが出来たら、その場所の道路標示も作る。
+      //   RoadDetail 側が band と tile の有無を見て要らなければ即 return する。
+      if (job.layer === 'roads') { try { RoadDetail.refresh(); } catch (e) { /* noop */ } }
       if (job.layer === 'roads' && typeof roadVisualMode !== 'undefined' && (roadVisualMode === 'ROAD_V3' || roadVisualMode === 'DIFF_V2_V3')) {
         // drainBuild は同期関数なので await できない。既存の V2 と同じ fire-and-forget にする。
         ensureRoadV3Tile(job.tx, job.tz).then(() => {
@@ -20566,6 +20892,9 @@ const CanonicalRuntime = (function () {
     // [Mission 31G-ALIGNMENT-RESET §31] GSI Road Edge も同じ throttle cadence で camera 近傍を確認。
     //   独自の fetch/build queue は持たず（layer が軽量なため）、tile cache 判定だけで冪等に呼べる。
     updateGsiRoadEdgeByCamera();
+    // [Mission 35W §2/§5] 道路標示も同じ throttle で camera を見る。
+    //   band（far/mid/near）が変わったときだけ作り直し、それ以外は未取得タイルを足すだけ。
+    try { RoadDetail.refresh(); } catch (e) { /* noop */ }
     // §24/§25 camera dirty: 微小移動 / zoom では tile 再選択しない
     const moved = (lastTgtX == null) || Math.hypot(cs.tgt.x - lastTgtX, cs.tgt.z - lastTgtZ) > CAM_MOVE_EPS_M;
     const zoomed = (lastR == null) || Math.abs(cs.r / lastR - 1) > CAM_ZOOM_EPS;
