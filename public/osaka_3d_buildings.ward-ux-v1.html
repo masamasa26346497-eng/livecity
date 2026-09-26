@@ -7808,7 +7808,7 @@ function makeHighlightSet(color) {
   const fillGeom = new THREE.BufferGeometry();
   fillGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(HL_FILL_TRIS * 3 * 3), 3));
   fillGeom.setDrawRange(0, 0);
-  const fillMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3, side: THREE.FrontSide, depthWrite: false });
+  const fillMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3, side: THREE.FrontSide, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 });
   const fill = new THREE.Mesh(fillGeom, fillMat);
   fill.frustumCulled = false;
   fill.renderOrder = 998;
@@ -7819,7 +7819,7 @@ function makeHighlightSet(color) {
 }
 
 const hoverHL = makeHighlightSet(0x00e5ff);   // ホバー: シアン系発光
-const selectHL = makeHighlightSet(0xff8a00);  // 選択中: オレンジ系（ホバーと別色で保持）
+const selectHL = makeHighlightSet(0x3d8bff);  // 選択中: 青系（ホバーと別色で保持）
 
 // ── 町丁目境界表示（建物ハイライトとは完全に独立した専用実装） ──
 // 理由: 町丁目ポリゴンは町ごとに頂点数が大きく異なる（15〜204点、建物のHL_MAX_VERTS=128では収まらない）
@@ -13045,7 +13045,7 @@ function selectBuilding(e, h){
   // 内部状態は常に最新の選択建物を指すよう、建物選択のたびに必ず呼び出す。
   // 同じ建物を再選択した場合も基準点・表示内容を再計算する(冪等)。
   updateLifeTab(h.d);
-  updateHighlight(selectHL, h.d); // クリック選択中の建物はホバーとは別色（オレンジ）で保持
+  updateHighlight(selectHL, h.d); // クリック選択中の建物はホバーとは別色（青）で保持
   // 建物が属する町丁目の境界線を表示（人口・世帯数・地価の対象範囲を視覚的に明示）
   // 別の建物をクリックした場合、showTownBoundary内部で前の境界を消してから新しい境界を描くため、
   // ここで明示的に前の境界を消す処理は不要（同一町丁目内の別建物なら再描画自体もスキップされる）
