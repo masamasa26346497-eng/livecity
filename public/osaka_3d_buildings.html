@@ -4602,7 +4602,14 @@ function makeHighlightSet(color) {
   const fillGeom = new THREE.BufferGeometry();
   fillGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(HL_FILL_TRIS * 3 * 3), 3));
   fillGeom.setDrawRange(0, 0);
-  const fillMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3, side: THREE.FrontSide, depthWrite: false });
+  // [Mission 36B] fillの頂点座標は対象建物の壁/天井Meshと完全に同一（updateHighlight参照）のため、
+  // 実際の描画面とZ値が一致してしまいZ-fighting（ちらつき・部分的な透け）が起きる。
+  // depthWrite:falseだけでは解消しないため、polygonOffsetでわずかに手前へ押し出して安定させる
+  // （頂点位置自体は変更しないため、輪郭・形状は元建物と完全一致したまま）。
+  const fillMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.3, side: THREE.FrontSide, depthWrite: false,
+    polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4
+  });
   const fill = new THREE.Mesh(fillGeom, fillMat);
   fill.frustumCulled = false;
   fill.renderOrder = 998;
@@ -4612,7 +4619,7 @@ function makeHighlightSet(color) {
 }
 
 const hoverHL = makeHighlightSet(0x00e5ff);   // ホバー: シアン系発光
-const selectHL = makeHighlightSet(0xff8a00);  // 選択中: オレンジ系（ホバーと別色で保持）
+const selectHL = makeHighlightSet(0x3d8bff);  // 選択中: 鮮明な青（既存UIの検索ボックス等のアクセント色 rgba(80,160,255) と調和させる。ホバーとは別色で保持）
 
 // ── 町丁目境界表示（建物ハイライトとは完全に独立した専用実装） ──
 // 理由: 町丁目ポリゴンは町ごとに頂点数が大きく異なる（15〜204点、建物のHL_MAX_VERTS=128では収まらない）
