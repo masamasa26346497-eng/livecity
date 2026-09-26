@@ -17493,7 +17493,7 @@ const CanonicalRuntime = (function () {
     canonicalRoot.add(group);
 
     const data = new Map();        // 'tx_tz' -> tile json
-    const loading = new Set();
+    const loading = new Map();   // key -> 取得中の promise
     const built = new Map();       // 'tx_tz|band' -> THREE.Group
     let curStep = null;
     let enabled = true;
@@ -17614,21 +17614,29 @@ const CanonicalRuntime = (function () {
       return arms;
     }
 
-    async function ensureTile(tx, tz) {
+    function ensureTile(tx, tz) {
       const key = tx + '_' + tz;
-      if (data.has(key) || loading.has(key)) return;
-      loading.add(key);
-      try {
-        const res = await fetch(SRC + '/tile_' + tx + '_' + tz + '.json');
-        data.set(key, res.ok ? await res.json() : { features: [] });
-      } catch (e) { data.set(key, { features: [] }); }
-      loading.delete(key);
+      if (data.has(key)) return Promise.resolve();
+      // [Mission 35X] 取得中なら **その promise を返す**。早期 return すると、呼び出し側が
+      //   まだ data の無い状態で buildTile を呼び、そのタイルを空として確定してしまう。
+      const inflight = loading.get(key);
+      if (inflight) return inflight;
+      const pr = (async () => {
+        try {
+          const res = await fetch(SRC + '/tile_' + tx + '_' + tz + '.json');
+          data.set(key, res.ok ? await res.json() : { features: [] });
+        } catch (e) { data.set(key, { features: [] }); }
+        loading.delete(key);
+      })();
+      loading.set(key, pr);
+      return pr;
     }
 
     function buildTile(tx, tz, cfg, step) {
       if (!cfg) return;
       const key = tx + '_' + tz, bkey = key + '|' + step;
       if (built.has(bkey)) return;
+      if (!data.has(key)) return;          // [Mission 35X] まだ取得できていない。確定させない
       const tile = data.get(key);
       if (!tile || !Array.isArray(tile.features) || !tile.features.length) return;
       const t0 = performance.now();
@@ -17794,6 +17802,349 @@ const CanonicalRuntime = (function () {
   if (typeof window !== 'undefined') {
     window.__ROAD_DETAIL_DEBUG__ = () => RoadDetail.getDebug();
     window.__ROAD_DETAIL_ENABLED__ = (on) => RoadDetail.setEnabled(on !== false);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // [Mission 35X §2-§12] UrbanDetailLayer — 俯瞰したときの「さびしさ」を減らす
+  //
+  //   35W で道路は読めるようになったが、街は道路と建物だけだった。ここでは
+  //   **OSM の実データから抽出した** 都市の小物を足す。
+  //   §1 の実測（tools/audit/urban-detail-source-audit.js）で、歩道・街路樹・信号・
+  //   横断歩道・駐車場・広場・分離帯・バス停はすべて実在すると分かったので、
+  //   **このレイヤーが推定で置いているものは 1 つも無い**。
+  //   （35W は roads データセットに crossing が無いため横断歩道を推定していたが、
+  //     PBF には crossing node 31,112 / crossing way 23,622 が実在した。§5 でそれに置き換える。）
+  //
+  //   §13 遵守: 点ものは InstancedMesh（種類ごとに 1 draw call）。線・面は
+  //     **見えている範囲をまとめて 1 group** へ merge し、draw call をタイル数に依存させない。
+  //   §12 遵守: 遠景では何も出さない。band ごとに出すものを変える。
+  // ══════════════════════════════════════════════════════════════════════════
+  const UrbanDetail = (function () {
+    const SRC = BASE.replace(/\/derived$/, '') + '/urban-detail';
+    const TILE = 2000;
+    const RING = 1;
+
+    // 高さ。道路標示(Y.road+0.035)と鉄道(0.5)の間に収める。
+    const Y_AREA = Y.road - 0.10;      // 駐車場・広場は道路面より下
+    const Y_WALK = Y.road + 0.010;     // 歩道・分離帯
+    const Y_CROSS = Y.road + 0.045;    // 横断歩道は道路標示より少し上
+    const Y_OBJ = 0.0;                 // 樹・信号・marker の足元
+
+    // §7/§9 色。地面(0xebede6)・道路(0x8b929e)と喧嘩しない範囲で。
+    const C = {
+      walk: 0xd8d4cb, cross: 0xf4f5f1, parking: 0xcfcabe, plaza: 0xe2ded2, median: 0x9aa48f,
+      trunk: 0x6d5a45, leaf: 0x6f9e63, poleDark: 0x3a3f46, sigRed: 0xe0503c, poi: 0x4a6fa5,
+    };
+
+    // §12 ズーム別。数字は camera 距離 cs.r（m）。
+    //   far      … 何も出さない（建物・道路・公園・河川・主要ラベルだけ）
+    //   mid      … 歩道 / 駐車場 / 広場 / 分離帯 / 街路樹
+    //   near     … ＋ 横断歩道
+    //   veryNear … ＋ 信号 / バス停などの marker
+    const BANDS = { farM: 2000, midM: 800, veryNearM: 400 };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    function cfgFor(r) {
+      if (r > BANDS.farM) return null;
+      const near = r <= BANDS.midM;
+      const veryNear = r <= BANDS.veryNearM;
+      return {
+        band: veryNear ? 'veryNear' : (near ? 'near' : 'mid'),
+        areas: true, walk: true, median: true, trees: true,
+        // §12 近景（near = 800m 以内）で信号とバス停 marker を出す。
+        //   4.6m のポールは r=800 で約 7px あり、ここから読める（実測）。
+        //   横断歩道は near から。mid（800〜2000m）では縞 1 本が 0.65px になって
+        //   見えないのに三角形だけ増えるので、あえて出さない。
+        crossings: near, markers: near, signals: near,
+        walkW: clamp((r / 1300) * 2.0, 0.6, 2.6),   // 画面 2px 相当（35W と同じ考え方）
+        treeScale: clamp(r / 900, 0.8, 1.6),
+        reach: clamp(r * 2.4, 700, 3000),
+      };
+    }
+    const STEP_RATIO = 1.45;
+    const zoomStep = (r) => Math.round(Math.log(Math.max(60, r)) / Math.log(STEP_RATIO));
+    const camR = () => ((typeof cs !== 'undefined' && cs) ? cs.r : 99999);
+
+    const group = new THREE.Group();
+    group.name = 'UrbanDetailLayer';
+    tagRuntimeOwnerRecursive(group, RUNTIME_OWNER.CANONICAL);
+    canonicalRoot.add(group);
+
+    const udData = new Map();
+    const udLoading = new Map();       // key -> 取得中の promise
+    let batchGroup = null, curStep = null, builtSig = null, udEnabled = true;
+    const udStats = { tiles: 0, band: 'far', zoomStep: 0, drawCalls: 0, triangles: 0,
+      trees: 0, signals: 0, crossings: 0, markers: 0, sidewalks: 0, areas: 0, medians: 0,
+      lastBuildMs: 0 };
+
+    // ── 共有 geometry / material（種類ごとに 1 つだけ作る） ──────────
+    let SG = null;
+    function udShared() {
+      if (SG) return SG;
+      SG = {
+        trunk: new THREE.CylinderGeometry(0.22, 0.30, 2.6, 5),
+        leaf: new THREE.SphereGeometry(1.9, 7, 5),
+        pole: new THREE.CylinderGeometry(0.11, 0.13, 4.6, 5),
+        lamp: new THREE.BoxGeometry(1.05, 0.34, 0.20),
+        marker: new THREE.ConeGeometry(0.85, 2.2, 6),
+        matTrunk: new THREE.MeshLambertMaterial({ color: C.trunk }),
+        matLeaf: new THREE.MeshLambertMaterial({ color: C.leaf }),
+        matPole: new THREE.MeshLambertMaterial({ color: C.poleDark }),
+        matLamp: new THREE.MeshLambertMaterial({ color: C.sigRed }),
+        matMarker: new THREE.MeshLambertMaterial({ color: C.poi }),
+      };
+      SG.trunk.translate(0, 1.3, 0);
+      SG.leaf.translate(0, 3.5, 0);
+      SG.pole.translate(0, 2.3, 0);
+      SG.lamp.translate(0, 4.5, 0);
+      SG.marker.translate(0, 1.1, 0);
+      return SG;
+    }
+
+    /** InstancedMesh を 1 つ作る（§13: 点ものは種類ごとに 1 draw call）。 */
+    function udInstanced(geo, mat, places, name, scale) {
+      if (!places.length) return null;
+      const m = new THREE.InstancedMesh(geo, mat, places.length);
+      const mtx = new THREE.Matrix4();
+      for (let i = 0; i < places.length; i++) {
+        const p = places[i];
+        const s = scale * (p[2] || 1);
+        mtx.makeScale(s, s, s);
+        mtx.setPosition(p[0], Y_OBJ, p[1]);
+        m.setMatrixAt(i, mtx);
+      }
+      m.instanceMatrix.needsUpdate = true;
+      m.name = name;
+      m.castShadow = false; m.receiveShadow = false; m.frustumCulled = false;
+      tagRuntimeOwnerRecursive(m, RUNTIME_OWNER.CANONICAL);
+      return m;
+    }
+
+    /** polyline を幅 w の帯にする（35W の道路標示と同じ作り）。 */
+    function udStrip(pos, pts, w, y) {
+      const h = w / 2;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const ax = pts[i][0], az = pts[i][1], bx = pts[i + 1][0], bz = pts[i + 1][1];
+        const dx = bx - ax, dz = bz - az, L = Math.hypot(dx, dz);
+        if (L < 1e-4 || L > 400) continue;     // 異常に長い辺は使わない
+        const nx = -dz / L * h, nz = dx / L * h;
+        pos.push(ax + nx, y, az + nz, bx + nx, y, bz + nz, bx - nx, y, bz - nz);
+        pos.push(ax + nx, y, az + nz, bx - nx, y, bz - nz, ax - nx, y, az - nz);
+      }
+    }
+
+    /** 単純な多角形を扇状に三角形化（駐車場・広場の塗り）。 */
+    function udFan(pos, ring, y) {
+      if (ring.length < 3) return;
+      const ax = ring[0][0], az = ring[0][1];
+      for (let i = 1; i < ring.length - 1; i++) {
+        pos.push(ax, y, az, ring[i][0], y, ring[i][1], ring[i + 1][0], y, ring[i + 1][1]);
+      }
+    }
+
+    /** 樹の大きさの揺らぎ。座標から決まるので reload しても同じ位置・同じ大きさ。 */
+    function udTreeJitter(x, z) { return 0.85 + ((Math.abs(x * 7 + z * 13) % 40) / 100); }
+
+    /** §5 横断歩道。OSM の crossing way に沿って白い縞を並べる（1 本の白帯にしない）。 */
+    function udZebra(pos, p) {
+      const stripeW = 0.45, gap = 0.45, depth = 2.6;
+      for (let i = 0; i < p.length - 1; i++) {
+        const ax = p[i][0], az = p[i][1], bx = p[i + 1][0], bz = p[i + 1][1];
+        const dx = bx - ax, dz = bz - az, L = Math.hypot(dx, dz);
+        if (L < 0.8 || L > 60) continue;       // 交差点からはみ出す長さは使わない
+        const ux = dx / L, uz = dz / L, nx = -uz, nz = ux;
+        const n = Math.max(2, Math.min(24, Math.floor(L / (stripeW + gap))));
+        const hw = stripeW / 2, hd = depth / 2;
+        for (let s = 0; s < n; s++) {
+          const d = (s + 0.5) * (L / n);
+          const cx = ax + ux * d, cz = az + uz * d;
+          const x1 = cx + ux * hw + nx * hd, z1 = cz + uz * hw + nz * hd;
+          const x2 = cx - ux * hw + nx * hd, z2 = cz - uz * hw + nz * hd;
+          const x3 = cx - ux * hw - nx * hd, z3 = cz - uz * hw - nz * hd;
+          const x4 = cx + ux * hw - nx * hd, z4 = cz + uz * hw - nz * hd;
+          pos.push(x1, Y_CROSS, z1, x2, Y_CROSS, z2, x3, Y_CROSS, z3);
+          pos.push(x1, Y_CROSS, z1, x3, Y_CROSS, z3, x4, Y_CROSS, z4);
+        }
+      }
+    }
+
+    /** §3 並木（tree_row）は線なので、線に沿って実際の樹として置く。
+     *  間隔は OSM に無いので 8m 刻み。均等すぎて機械的に見えないよう横へ揺らす。 */
+    function udTreeRow(out, p) {
+      let run = 0;
+      for (let i = 0; i < p.length - 1; i++) {
+        const ax = p[i][0], az = p[i][1], bx = p[i + 1][0], bz = p[i + 1][1];
+        const dx = bx - ax, dz = bz - az, L = Math.hypot(dx, dz);
+        if (L < 1e-3 || L > 400) continue;
+        const ux = dx / L, uz = dz / L;
+        let d = (8 - (run % 8)) % 8;
+        while (d < L) {
+          const x = ax + ux * d, z = az + uz * d;
+          const j = ((Math.abs(x * 31 + z * 17) % 100) / 100 - 0.5) * 2.2;
+          out.push([x + (-uz) * j, z + ux * j, udTreeJitter(x, z)]);
+          d += 8;
+        }
+        run += L;
+      }
+    }
+
+    function udEnsureTile(tx, tz) {
+      const key = tx + '_' + tz;
+      if (udData.has(key)) return Promise.resolve();
+      // 取得中なら **その promise を返す**。早期 return すると、呼び出し側が
+      //   まだデータの無い状態で組み立ててしまう。
+      const inflight = udLoading.get(key);
+      if (inflight) return inflight;
+      const pr = (async () => {
+        try {
+          const res = await fetch(SRC + '/tile_' + tx + '_' + tz + '.json');
+          udData.set(key, res.ok ? await res.json() : null);
+        } catch (e) { udData.set(key, null); }
+        udLoading.delete(key);
+      })();
+      udLoading.set(key, pr);
+      return pr;
+    }
+
+    /** [§13] 見えている範囲をまとめて 1 group にする。draw call はタイル数に依らず一定。 */
+    function udBuildAll(cfg, keys) {
+      const t0 = performance.now();
+      const tgx = cs.tgt.x, tgz = cs.tgt.z, reach2 = cfg.reach * cfg.reach;
+      const inReach = (x, z) => (x - tgx) * (x - tgx) + (z - tgz) * (z - tgz) <= reach2;
+      const g = new THREE.Group();
+      g.name = 'UrbanDetailBatch';
+      const S = udShared();
+      const posPark = [], posPlaza = [], posWalk = [], posCross = [], posMed = [];
+      const trees = [], signals = [], markers = [];
+      let nArea = 0, nWalk = 0, nCross = 0, nMed = 0;
+
+      for (const key of keys) {
+        const t = udData.get(key);
+        if (!t) continue;
+        // 面: 駐車場 / 広場（§9）
+        if (cfg.areas) {
+          for (const ar of (t.areas || [])) {
+            if (!ar.p || !ar.p.length || !inReach(ar.p[0][0], ar.p[0][1])) continue;
+            udFan(ar.k === 'P' ? posPark : posPlaza, ar.p, Y_AREA);
+            nArea++;
+          }
+        }
+        // 線: 歩道 / 分離帯 / 横断歩道 / 並木（§2/§6/§5/§3）
+        for (const ln of (t.lines || [])) {
+          const p = ln.p;
+          if (!p || !p.length || !inReach(p[0][0], p[0][1])) continue;
+          if (ln.k === 'w' && cfg.walk) { udStrip(posWalk, p, cfg.walkW, Y_WALK); nWalk++; }
+          else if (ln.k === 'm' && cfg.median) { udStrip(posMed, p, Math.max(0.5, cfg.walkW * 0.7), Y_WALK); nMed++; }
+          else if (ln.k === 'xw' && cfg.crossings) { udZebra(posCross, p); nCross++; }
+          else if (ln.k === 'tr' && cfg.trees) udTreeRow(trees, p);
+        }
+        // 点: 街路樹 / 信号 / marker（§3/§4/§11）
+        for (const pt of (t.points || [])) {
+          const x = pt[0], z = pt[1], k = pt[2];
+          if (!inReach(x, z)) continue;
+          if (k === 'T') { if (cfg.trees) trees.push([x, z, udTreeJitter(x, z)]); }
+          else if (k === 'S') { if (cfg.signals) signals.push([x, z, 1]); }
+          else if (k === 'X') { /* 横断歩道ノードは way 側で描くので点では出さない */ }
+          else if (cfg.markers) markers.push([x, z, 1]);
+        }
+      }
+
+      const addMesh = (pos, col, ren, opa, name) => {
+        const m = meshFromPositions(pos, col, ren,
+          { transparent: true, opacity: opa, depthWrite: false, side: THREE.DoubleSide });
+        if (m) { m.name = name; tagRuntimeOwnerRecursive(m, RUNTIME_OWNER.CANONICAL); g.add(m); }
+      };
+      addMesh(posPark, C.parking, REN.road - 4, 0.65, 'UrbanParking');
+      addMesh(posPlaza, C.plaza, REN.road - 4, 0.70, 'UrbanPlaza');
+      addMesh(posWalk, C.walk, REN.road - 1, 0.78, 'UrbanSidewalk');
+      addMesh(posMed, C.median, REN.road + 1, 0.80, 'UrbanMedian');
+      addMesh(posCross, C.cross, REN.road + 4, 0.95, 'UrbanCrosswalk');
+      const inst = [
+        [S.trunk, S.matTrunk, trees, 'UrbanTreeTrunk', cfg.treeScale],
+        [S.leaf, S.matLeaf, trees, 'UrbanTreeLeaf', cfg.treeScale],
+        [S.pole, S.matPole, signals, 'UrbanSignalPole', 1],
+        [S.lamp, S.matLamp, signals, 'UrbanSignalLamp', 1],
+        [S.marker, S.matMarker, markers, 'UrbanPoiMarker', 1],
+      ];
+      for (const row of inst) { const m = udInstanced(row[0], row[1], row[2], row[3], row[4]); if (m) g.add(m); }
+
+      if (!g.children.length) { batchGroup = null; return; }
+      g.updateMatrix(); g.matrixAutoUpdate = false;
+      group.add(g);
+      batchGroup = g;
+      udStats.tiles = keys.length;
+      udStats.drawCalls = g.children.length;
+      udStats.trees = trees.length; udStats.signals = signals.length; udStats.markers = markers.length;
+      udStats.crossings = nCross; udStats.sidewalks = nWalk; udStats.areas = nArea; udStats.medians = nMed;
+      udStats.triangles = Math.round((posPark.length + posPlaza.length + posWalk.length
+        + posCross.length + posMed.length) / 9);
+      udStats.lastBuildMs = Math.round(performance.now() - t0);
+    }
+
+    function udDrop() {
+      if (batchGroup) {
+        group.remove(batchGroup);
+        batchGroup.traverse((o) => {
+          if (!o.isMesh) return;
+          // 共有 geometry / material は捨てない（次の段でも使う）
+          if (o.isInstancedMesh) { o.dispose(); return; }
+          o.geometry.dispose(); o.material.dispose();
+        });
+        batchGroup = null;
+      }
+      builtSig = null;
+      udStats.tiles = 0; udStats.drawCalls = 0; udStats.triangles = 0;
+      udStats.trees = 0; udStats.signals = 0; udStats.markers = 0;
+      udStats.crossings = 0; udStats.sidewalks = 0; udStats.areas = 0; udStats.medians = 0;
+    }
+
+    function udRefresh() {
+      if (!udEnabled) { group.visible = false; return; }
+      if (typeof cs === 'undefined' || !cs) return;
+      const r = camR(), step = zoomStep(r), cfg = cfgFor(r);
+      group.visible = !!cfg;
+      udStats.band = cfg ? cfg.band : 'far';
+      udStats.zoomStep = step;
+      if (!cfg) { if (builtSig !== null) udDrop(); curStep = step; return; }
+      const ctx = Math.floor(cs.tgt.x / TILE), ctz = Math.floor(cs.tgt.z / TILE);
+      const want = [];
+      let missing = false;
+      for (let dx = -RING; dx <= RING; dx++) {
+        for (let dz = -RING; dz <= RING; dz++) {
+          const tx = ctx + dx, tz = ctz + dz;
+          const cxm = (tx + 0.5) * TILE, czm = (tz + 0.5) * TILE;
+          if (Math.hypot(cxm - cs.tgt.x, czm - cs.tgt.z) > cfg.reach + TILE) continue;
+          const key = tx + '_' + tz;
+          want.push(key);
+          if (!udData.has(key)) {
+            missing = true;
+            udEnsureTile(tx, tz).then(function () { try { udRefresh(); } catch (e) { /* noop */ } });
+          }
+        }
+      }
+      if (missing) return;                      // 全部そろってから 1 回だけ作る
+      const sig = step + '|' + want.join(',');
+      if (sig === builtSig) return;
+      udDrop();
+      curStep = step; builtSig = sig;
+      udBuildAll(cfg, want);
+    }
+
+    return {
+      refresh: udRefresh,
+      setEnabled(on) { udEnabled = !!on; if (!udEnabled) { udDrop(); group.visible = false; } else udRefresh(); },
+      isEnabled: () => udEnabled,
+      getDebug: () => ({
+        ...udStats, enabled: udEnabled, source: SRC,
+        bands: { ...BANDS }, bandConfig: cfgFor(camR()),
+        // このレイヤーは OSM の実データだけ。推定で置いたものは無い。
+        allFromRealData: true, estimated: false,
+        note: '歩道/街路樹/信号/横断歩道/駐車場/広場/分離帯/POI はすべて OSM 実データ由来（tools/build-urban-detail.js）',
+      }),
+    };
+  })();
+  if (typeof window !== 'undefined') {
+    window.__URBAN_DETAIL_DEBUG__ = () => UrbanDetail.getDebug();
+    window.__URBAN_DETAIL_ENABLED__ = (on) => UrbanDetail.setEnabled(on !== false);
   }
 
   async function ensureRoadV3Tile(tx, tz) {
@@ -20634,7 +20985,10 @@ const CanonicalRuntime = (function () {
       //   同座標のRoadV2 tileを追いかけてfetch/構築する(既定FIX13の間は一切fetchしない=§35 性能配慮)。
       // [Mission 35W §2] 道路タイルが出来たら、その場所の道路標示も作る。
       //   RoadDetail 側が band と tile の有無を見て要らなければ即 return する。
-      if (job.layer === 'roads') { try { RoadDetail.refresh(); } catch (e) { /* noop */ } }
+      if (job.layer === 'roads') {
+        try { RoadDetail.refresh(); } catch (e) { /* noop */ }
+        try { UrbanDetail.refresh(); } catch (e) { /* noop */ }
+      }
       if (job.layer === 'roads' && typeof roadVisualMode !== 'undefined' && (roadVisualMode === 'ROAD_V3' || roadVisualMode === 'DIFF_V2_V3')) {
         // drainBuild は同期関数なので await できない。既存の V2 と同じ fire-and-forget にする。
         ensureRoadV3Tile(job.tx, job.tz).then(() => {
@@ -20895,6 +21249,8 @@ const CanonicalRuntime = (function () {
     // [Mission 35W §2/§5] 道路標示も同じ throttle で camera を見る。
     //   band（far/mid/near）が変わったときだけ作り直し、それ以外は未取得タイルを足すだけ。
     try { RoadDetail.refresh(); } catch (e) { /* noop */ }
+    // [Mission 35X §12] 都市ディテールも同じ throttle で camera を見る。
+    try { UrbanDetail.refresh(); } catch (e) { /* noop */ }
     // §24/§25 camera dirty: 微小移動 / zoom では tile 再選択しない
     const moved = (lastTgtX == null) || Math.hypot(cs.tgt.x - lastTgtX, cs.tgt.z - lastTgtZ) > CAM_MOVE_EPS_M;
     const zoomed = (lastR == null) || Math.abs(cs.r / lastR - 1) > CAM_ZOOM_EPS;

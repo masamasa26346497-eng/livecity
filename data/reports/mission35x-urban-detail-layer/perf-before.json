@@ -1,0 +1,1995 @@
+{
+  "url": "http://localhost:8080/osaka_3d_buildings.ward-ux-v1.html",
+  "phase": "before",
+  "generatedAt": "2026-09-26T13:05:30.687Z",
+  "mission": "35X",
+  "spots": [
+    {
+      "id": "umeda",
+      "name": "梅田",
+      "lat": 34.7025,
+      "lon": 135.4959,
+      "r": 1500,
+      "phDeg": 38,
+      "perf": {
+        "drawCalls": 172,
+        "triangles": 483870,
+        "geometries": 660,
+        "textures": 111,
+        "meshes": 755,
+        "lines": 64,
+        "sprites": 241,
+        "visibleMeshes": 608
+      },
+      "fps": {
+        "fps": 50.1,
+        "frames": 101
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 35,
+          "RoadV3_Uncertain": 35,
+          "RoadV3_Margin": 32,
+          "RoadV3_Carriageway": 32,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 9,
+          "RoadDetailEdge_*": 9,
+          "RoadDetailMark_*": 9,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 32,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 35
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 32
+          },
+          {
+            "hex": "#8b929e",
+            "n": 64
+          },
+          {
+            "hex": "#7c838c",
+            "n": 9
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 9
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 778,
+          "edgeTris": 27468,
+          "markTris": 2432,
+          "drawCalls": 18,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 20,
+          "markW": 1.8,
+          "edgeW": 2.2,
+          "reachM": 3400,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 6,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.8,
+            "edgeW": 2.2,
+            "lanes": false,
+            "junction": false,
+            "reach": 3400
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 58,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 13,
+        "visiblePlaces": 11,
+        "visibleRivers": 3,
+        "visibleLandmarks": 1,
+        "names": [
+          "グラングリーン大阪",
+          "梅田駅",
+          "梅田",
+          "中津",
+          "福島",
+          "海老江",
+          "宮原",
+          "北新地駅",
+          "南方駅",
+          "イノゲート大阪",
+          "ホワイティうめだ",
+          "ハービスENT",
+          "大阪駅前第2ビル",
+          "EST",
+          "NU茶屋町",
+          "ウエスティンホテル大阪"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-umeda.jpg"
+    },
+    {
+      "id": "nakatsu",
+      "name": "中津",
+      "lat": 34.7106,
+      "lon": 135.4962,
+      "r": 900,
+      "phDeg": 30,
+      "perf": {
+        "drawCalls": 127,
+        "triangles": 345567,
+        "geometries": 661,
+        "textures": 143,
+        "meshes": 759,
+        "lines": 64,
+        "sprites": 362,
+        "visibleMeshes": 612
+      },
+      "fps": {
+        "fps": 58.5,
+        "frames": 117
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 35,
+          "RoadV3_Uncertain": 35,
+          "RoadV3_Margin": 32,
+          "RoadV3_Carriageway": 32,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 8,
+          "RoadDetailEdge_*": 8,
+          "RoadDetailMark_*": 8,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 32,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 35
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 32
+          },
+          {
+            "hex": "#8b929e",
+            "n": 64
+          },
+          {
+            "hex": "#7c838c",
+            "n": 8
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 8
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 409,
+          "edgeTris": 14564,
+          "markTris": 1466,
+          "drawCalls": 16,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 18,
+          "markW": 1.52,
+          "edgeW": 1.8,
+          "reachM": 2160,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.5230769230769232,
+            "edgeW": 1.8,
+            "lanes": false,
+            "junction": false,
+            "reach": 2160
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 44,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visiblePlaces": 8,
+        "visibleRivers": 2,
+        "visibleLandmarks": 2,
+        "names": [
+          "グラングリーン大阪",
+          "中津",
+          "宮原",
+          "南方駅",
+          "阪急茶屋町ビルディング",
+          "NU茶屋町",
+          "ブランズタワー梅田North",
+          "ピアスタワー",
+          "アーバンテラス茶屋町A",
+          "毎日放送ビル B館",
+          "毎日放送ビル M館",
+          "GRAND GREEN OSAKA THE NORTH RESIDENCE",
+          "イオンフードスタイル中崎町店",
+          "ライフ",
+          "水道記念館",
+          "古川商店"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-nakatsu.jpg"
+    },
+    {
+      "id": "juso",
+      "name": "十三",
+      "lat": 34.7203,
+      "lon": 135.483,
+      "r": 1100,
+      "phDeg": 35,
+      "perf": {
+        "drawCalls": 119,
+        "triangles": 351252,
+        "geometries": 694,
+        "textures": 169,
+        "meshes": 792,
+        "lines": 67,
+        "sprites": 420,
+        "visibleMeshes": 639
+      },
+      "fps": {
+        "fps": 59.1,
+        "frames": 119
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 37,
+          "RoadV3_Uncertain": 37,
+          "RoadV3_Margin": 34,
+          "RoadV3_Carriageway": 34,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 8,
+          "RoadDetailEdge_*": 8,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 34,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 37
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 34
+          },
+          {
+            "hex": "#8b929e",
+            "n": 68
+          },
+          {
+            "hex": "#7c838c",
+            "n": 8
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 8,
+          "features": 317,
+          "edgeTris": 7084,
+          "markTris": 1048,
+          "drawCalls": 15,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 19,
+          "markW": 1.8,
+          "edgeW": 2.2,
+          "reachM": 2640,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.8,
+            "edgeW": 2.2,
+            "lanes": false,
+            "junction": false,
+            "reach": 2640
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 40,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 1,
+        "visiblePlaces": 8,
+        "visibleRivers": 2,
+        "visibleLandmarks": 0,
+        "names": [
+          "ライフ",
+          "スーパーマルハチ",
+          "業務用食品館",
+          "阪急OASIS",
+          "フレッシュ清水",
+          "アプロ",
+          "スーパー玉出",
+          "KOHYO",
+          "ライフ三津屋店",
+          "ライフ",
+          "江崎記念館（企業ミュージアム）",
+          "業務スーパー",
+          "藻川",
+          "猪名川",
+          "十三駅",
+          "淀川河川公園 十三野草地区"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-juso.jpg"
+    },
+    {
+      "id": "honmachi",
+      "name": "本町",
+      "lat": 34.6823,
+      "lon": 135.5024,
+      "r": 900,
+      "phDeg": 40,
+      "perf": {
+        "drawCalls": 167,
+        "triangles": 632106,
+        "geometries": 746,
+        "textures": 215,
+        "meshes": 840,
+        "lines": 71,
+        "sprites": 552,
+        "visibleMeshes": 681
+      },
+      "fps": {
+        "fps": 39.2,
+        "frames": 79
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 39,
+          "RoadV3_Uncertain": 39,
+          "RoadV3_Margin": 36,
+          "RoadV3_Carriageway": 36,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 8,
+          "RoadDetailEdge_*": 8,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 36,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 39
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 36
+          },
+          {
+            "hex": "#8b929e",
+            "n": 72
+          },
+          {
+            "hex": "#7c838c",
+            "n": 8
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 497,
+          "edgeTris": 16992,
+          "markTris": 1896,
+          "drawCalls": 15,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 18,
+          "markW": 1.52,
+          "edgeW": 1.8,
+          "reachM": 2160,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.5230769230769232,
+            "edgeW": 1.8,
+            "lanes": false,
+            "junction": false,
+            "reach": 2160
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 52,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visiblePlaces": 19,
+        "visibleRivers": 1,
+        "visibleLandmarks": 1,
+        "names": [
+          "グラングリーン大阪",
+          "船場中央",
+          "本町",
+          "久太郎町",
+          "北久宝寺町",
+          "南久宝寺町",
+          "博労町",
+          "淡路町",
+          "道修町",
+          "阿波座",
+          "今橋",
+          "中之島",
+          "幸町",
+          "梅田",
+          "福島",
+          "野田"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-honmachi.jpg"
+    },
+    {
+      "id": "namba",
+      "name": "難波",
+      "lat": 34.6627,
+      "lon": 135.5013,
+      "r": 900,
+      "phDeg": 40,
+      "perf": {
+        "drawCalls": 155,
+        "triangles": 596217,
+        "geometries": 760,
+        "textures": 256,
+        "meshes": 851,
+        "lines": 71,
+        "sprites": 629,
+        "visibleMeshes": 692
+      },
+      "fps": {
+        "fps": 55.3,
+        "frames": 111
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 39,
+          "RoadV3_Uncertain": 39,
+          "RoadV3_Margin": 36,
+          "RoadV3_Carriageway": 36,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 11,
+          "RoadDetailEdge_*": 11,
+          "RoadDetailMark_*": 9,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 36,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 39
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 36
+          },
+          {
+            "hex": "#8b929e",
+            "n": 72
+          },
+          {
+            "hex": "#7c838c",
+            "n": 11
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 9
+          }
+        ],
+        "roadDetail": {
+          "tiles": 12,
+          "features": 627,
+          "edgeTris": 21288,
+          "markTris": 2550,
+          "drawCalls": 20,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 18,
+          "markW": 1.52,
+          "edgeW": 1.8,
+          "reachM": 2160,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 2,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.5230769230769232,
+            "edgeW": 1.8,
+            "lanes": false,
+            "junction": false,
+            "reach": 2160
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 52,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 5,
+        "visiblePlaces": 16,
+        "visibleRivers": 0,
+        "visibleLandmarks": 3,
+        "names": [
+          "京セラドーム大阪",
+          "博労町",
+          "阿波座",
+          "本町",
+          "今橋",
+          "中之島",
+          "野田",
+          "天神橋",
+          "難波",
+          "元町",
+          "日本橋",
+          "桜川",
+          "南堀江",
+          "新町",
+          "大阪難波駅",
+          "近鉄日本橋駅"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-namba.jpg"
+    },
+    {
+      "id": "tennoji",
+      "name": "天王寺",
+      "lat": 34.6457,
+      "lon": 135.5135,
+      "r": 1000,
+      "phDeg": 38,
+      "perf": {
+        "drawCalls": 174,
+        "triangles": 690257,
+        "geometries": 768,
+        "textures": 290,
+        "meshes": 873,
+        "lines": 73,
+        "sprites": 721,
+        "visibleMeshes": 711
+      },
+      "fps": {
+        "fps": 60.2,
+        "frames": 121
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 40,
+          "RoadV3_Uncertain": 40,
+          "RoadV3_Margin": 37,
+          "RoadV3_Carriageway": 37,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 9,
+          "RoadDetailEdge_*": 9,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 37,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 40
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 37
+          },
+          {
+            "hex": "#8b929e",
+            "n": 74
+          },
+          {
+            "hex": "#7c838c",
+            "n": 9
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 205,
+          "edgeTris": 11236,
+          "markTris": 1452,
+          "drawCalls": 16,
+          "junctions": 0,
+          "stopLines": 0,
+          "crosswalks": 0,
+          "band": "mid",
+          "zoomStep": 19,
+          "markW": 1.69,
+          "edgeW": 2,
+          "reachM": 2400,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 2,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "mid",
+            "markTiers": [
+              "major"
+            ],
+            "edgeTiers": [
+              "major"
+            ],
+            "markW": 1.6923076923076925,
+            "edgeW": 2,
+            "lanes": false,
+            "junction": false,
+            "reach": 2400
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 49,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visiblePlaces": 14,
+        "visibleRivers": 0,
+        "visibleLandmarks": 3,
+        "names": [
+          "京セラドーム大阪",
+          "あべのハルカス",
+          "通天閣",
+          "新今宮駅",
+          "日本橋",
+          "元町",
+          "難波",
+          "博労町",
+          "新町",
+          "中之島",
+          "松崎町",
+          "昭和町",
+          "上汐",
+          "松屋町",
+          "谷町",
+          "天満"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-tennoji.jpg"
+    },
+    {
+      "id": "niitaka",
+      "name": "新高(35S 実験地点)",
+      "lat": 34.728,
+      "lon": 135.4703,
+      "r": 700,
+      "phDeg": 40,
+      "perf": {
+        "drawCalls": 98,
+        "triangles": 251876,
+        "geometries": 785,
+        "textures": 319,
+        "meshes": 895,
+        "lines": 75,
+        "sprites": 772,
+        "visibleMeshes": 727
+      },
+      "fps": {
+        "fps": 60.2,
+        "frames": 121
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 8,
+          "RoadDetailEdge_*": 8,
+          "RoadDetailMark_*": 8,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 8
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 8
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 214,
+          "edgeTris": 8400,
+          "markTris": 14672,
+          "drawCalls": 16,
+          "junctions": 29,
+          "stopLines": 100,
+          "crosswalks": 27,
+          "band": "near",
+          "zoomStep": 18,
+          "markW": 1.18,
+          "edgeW": 1.4,
+          "reachM": 1680,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "near",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid"
+            ],
+            "markW": 1.1846153846153846,
+            "edgeW": 1.4,
+            "lanes": true,
+            "junction": true,
+            "reach": 1680
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 33,
+        "buildingNames": 20130,
+        "visibleBuildings": 20,
+        "visibleStations": 0,
+        "visiblePlaces": 13,
+        "visibleRivers": 0,
+        "visibleLandmarks": 0,
+        "names": [
+          "ライフ三津屋店",
+          "阪急OASIS",
+          "スーパーしみず",
+          "方光寺",
+          "光専寺",
+          "ふたば保育園",
+          "ハートランド淀川",
+          "みつや・めぐみ幼稚園",
+          "淀川警察署神崎川交番",
+          "大阪市立美津島中学校",
+          "大阪市立東淀工業高等学校",
+          "1号館",
+          "桂寿病院",
+          "かしま診療所",
+          "富光寺",
+          "ぺルル加島Ⅱ"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-niitaka.jpg"
+    },
+    {
+      "id": "intersection-close",
+      "name": "本町交差点(近景)",
+      "lat": 34.6823,
+      "lon": 135.5024,
+      "r": 260,
+      "phDeg": 46,
+      "perf": {
+        "drawCalls": 132,
+        "triangles": 530164,
+        "geometries": 783,
+        "textures": 344,
+        "meshes": 902,
+        "lines": 75,
+        "sprites": 809,
+        "visibleMeshes": 734
+      },
+      "fps": {
+        "fps": 46.6,
+        "frames": 94
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 4,
+          "RoadDetailEdge_*": 4,
+          "RoadDetailMark_*": 4,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 4
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 4
+          }
+        ],
+        "roadDetail": {
+          "tiles": 6,
+          "features": 226,
+          "edgeTris": 7840,
+          "markTris": 14330,
+          "drawCalls": 8,
+          "junctions": 54,
+          "stopLines": 48,
+          "crosswalks": 3,
+          "band": "veryNear",
+          "zoomStep": 15,
+          "markW": 0.44,
+          "edgeW": 0.52,
+          "reachM": 700,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 2,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "veryNear",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid",
+              "local"
+            ],
+            "markW": 0.44000000000000006,
+            "edgeW": 0.52,
+            "lanes": true,
+            "junction": true,
+            "reach": 700
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 31,
+        "buildingNames": 20130,
+        "visibleBuildings": 24,
+        "visibleStations": 1,
+        "visiblePlaces": 6,
+        "visibleRivers": 0,
+        "visibleLandmarks": 0,
+        "names": [
+          "船場中央",
+          "本町",
+          "備後町",
+          "淡路町",
+          "平野町",
+          "サンマリオンMBFタワー",
+          "アパホテル",
+          "本町駅",
+          "インペリアル船場",
+          "竹本ビル",
+          "船場センタービル 8号館",
+          "船場センタービル 7号館",
+          "GOMEN江綿 ２ビル",
+          "イトゥビル",
+          "心斎橋会館",
+          "船場センタービル 6号館"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-intersection-close.jpg"
+    },
+    {
+      "id": "major-road",
+      "name": "御堂筋(中景)",
+      "lat": 34.6905,
+      "lon": 135.5006,
+      "r": 520,
+      "phDeg": 34,
+      "perf": {
+        "drawCalls": 167,
+        "triangles": 613412,
+        "geometries": 795,
+        "textures": 373,
+        "meshes": 919,
+        "lines": 75,
+        "sprites": 867,
+        "visibleMeshes": 751
+      },
+      "fps": {
+        "fps": 46,
+        "frames": 92
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 7,
+          "RoadDetailEdge_*": 7,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 7
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 8,
+          "features": 371,
+          "edgeTris": 9620,
+          "markTris": 31812,
+          "drawCalls": 14,
+          "junctions": 53,
+          "stopLines": 173,
+          "crosswalks": 58,
+          "band": "near",
+          "zoomStep": 17,
+          "markW": 0.88,
+          "edgeW": 1.04,
+          "reachM": 1248,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "near",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid"
+            ],
+            "markW": 0.8800000000000001,
+            "edgeW": 1.04,
+            "lanes": true,
+            "junction": true,
+            "reach": 1248
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 43,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visiblePlaces": 10,
+        "visibleRivers": 0,
+        "visibleLandmarks": 2,
+        "names": [
+          "グラングリーン大阪",
+          "梅田駅",
+          "今橋",
+          "高麗橋",
+          "北浜",
+          "伏見町",
+          "幸町",
+          "中之島",
+          "梅田",
+          "福島",
+          "海老江",
+          "宮原",
+          "淀屋橋駅",
+          "淀屋橋駅",
+          "淀屋橋 odona",
+          "三菱UFJ銀行大阪ビル 別館"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-major-road.jpg"
+    },
+    {
+      "id": "elevated-road",
+      "name": "阪神高速(高架)",
+      "lat": 34.696,
+      "lon": 135.499,
+      "r": 430,
+      "phDeg": 20,
+      "perf": {
+        "drawCalls": 152,
+        "triangles": 565496,
+        "geometries": 796,
+        "textures": 394,
+        "meshes": 918,
+        "lines": 75,
+        "sprites": 1733,
+        "visibleMeshes": 750
+      },
+      "fps": {
+        "fps": 46.1,
+        "frames": 93
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 5,
+          "RoadDetailEdge_*": 5,
+          "RoadDetailMark_*": 5,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 5
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 5
+          }
+        ],
+        "roadDetail": {
+          "tiles": 7,
+          "features": 917,
+          "edgeTris": 18304,
+          "markTris": 17906,
+          "drawCalls": 10,
+          "junctions": 231,
+          "stopLines": 393,
+          "crosswalks": 67,
+          "band": "veryNear",
+          "zoomStep": 16,
+          "markW": 0.73,
+          "edgeW": 0.86,
+          "reachM": 1032,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 2,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "veryNear",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid",
+              "local"
+            ],
+            "markW": 0.7276923076923077,
+            "edgeW": 0.86,
+            "lanes": true,
+            "junction": true,
+            "reach": 1032
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 37,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 5,
+        "visiblePlaces": 5,
+        "visibleRivers": 0,
+        "visibleLandmarks": 1,
+        "names": [
+          "グラングリーン大阪",
+          "幸町",
+          "梅田",
+          "福島",
+          "海老江",
+          "宮原",
+          "大江橋駅",
+          "北新地駅",
+          "大阪梅田駅",
+          "福島駅",
+          "パール プラザ",
+          "JRWD堂島タワー",
+          "ハービスOSAKA",
+          "CoDeli",
+          "新 ダイビル",
+          "大阪堂島浜タワー"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-elevated-road.jpg"
+    },
+    {
+      "id": "nakanoshima",
+      "name": "中之島(河川沿い)",
+      "lat": 34.6937,
+      "lon": 135.4956,
+      "r": 620,
+      "phDeg": 26,
+      "perf": {
+        "drawCalls": 159,
+        "triangles": 567869,
+        "geometries": 802,
+        "textures": 410,
+        "meshes": 922,
+        "lines": 75,
+        "sprites": 1776,
+        "visibleMeshes": 754
+      },
+      "fps": {
+        "fps": 49.4,
+        "frames": 99
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 7,
+          "RoadDetailEdge_*": 7,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 7
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 8,
+          "features": 557,
+          "edgeTris": 13584,
+          "markTris": 34370,
+          "drawCalls": 14,
+          "junctions": 97,
+          "stopLines": 327,
+          "crosswalks": 85,
+          "band": "near",
+          "zoomStep": 17,
+          "markW": 1.05,
+          "edgeW": 1.24,
+          "reachM": 1488,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 2,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "near",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid"
+            ],
+            "markW": 1.0492307692307694,
+            "edgeW": 1.2400000000000002,
+            "lanes": true,
+            "junction": true,
+            "reach": 1488
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 39,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 5,
+        "visiblePlaces": 6,
+        "visibleRivers": 1,
+        "visibleLandmarks": 1,
+        "names": [
+          "グラングリーン大阪",
+          "梅田駅",
+          "梅田",
+          "福島",
+          "海老江",
+          "宮原",
+          "中之島",
+          "大江橋駅",
+          "北新地駅",
+          "野田駅",
+          "JRWD堂島タワー",
+          "パール プラザ",
+          "ハービスOSAKA",
+          "EST",
+          "イマージュ",
+          "大阪三井物産ビル"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-nakanoshima.jpg"
+    },
+    {
+      "id": "shinsaibashi",
+      "name": "心斎橋",
+      "lat": 34.6723,
+      "lon": 135.501,
+      "r": 520,
+      "phDeg": 38,
+      "perf": {
+        "drawCalls": 158,
+        "triangles": 695664,
+        "geometries": 816,
+        "textures": 435,
+        "meshes": 927,
+        "lines": 75,
+        "sprites": 1825,
+        "visibleMeshes": 759
+      },
+      "fps": {
+        "fps": 44.2,
+        "frames": 89
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 42,
+          "RoadV3_Uncertain": 42,
+          "RoadV3_Margin": 39,
+          "RoadV3_Carriageway": 39,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 8,
+          "RoadDetailEdge_*": 8,
+          "RoadDetailMark_*": 8,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 39,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 42
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 39
+          },
+          {
+            "hex": "#8b929e",
+            "n": 78
+          },
+          {
+            "hex": "#7c838c",
+            "n": 8
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 8
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 558,
+          "edgeTris": 13756,
+          "markTris": 34700,
+          "drawCalls": 16,
+          "junctions": 97,
+          "stopLines": 327,
+          "crosswalks": 85,
+          "band": "near",
+          "zoomStep": 17,
+          "markW": 0.88,
+          "edgeW": 1.04,
+          "reachM": 1248,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "near",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid"
+            ],
+            "markW": 0.8800000000000001,
+            "edgeW": 1.04,
+            "lanes": true,
+            "junction": true,
+            "reach": 1248
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 38,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 0,
+        "visiblePlaces": 12,
+        "visibleRivers": 0,
+        "visibleLandmarks": 0,
+        "names": [
+          "中之島",
+          "博労町",
+          "北久宝寺町",
+          "船場中央",
+          "新町",
+          "阿波座",
+          "本町",
+          "道修町",
+          "幸町",
+          "野田",
+          "大丸 心斎橋店 南館",
+          "大丸 心斎橋店 本館",
+          "心斎橋PARCO",
+          "ローレルタワー心斎橋",
+          "BrantzTower Minamihorie",
+          "Asoko Minamihorie"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-shinsaibashi.jpg"
+    },
+    {
+      "id": "park-detail",
+      "name": "大阪城公園",
+      "lat": 34.6873,
+      "lon": 135.5262,
+      "r": 700,
+      "phDeg": 34,
+      "perf": {
+        "drawCalls": 181,
+        "triangles": 611587,
+        "geometries": 880,
+        "textures": 471,
+        "meshes": 1001,
+        "lines": 79,
+        "sprites": 1913,
+        "visibleMeshes": 828
+      },
+      "fps": {
+        "fps": 52.5,
+        "frames": 106
+      },
+      "roads": {
+        "groups": {
+          "MapAudit_OSM_ROAD": 1,
+          "RoadVisualV3Overlay": 1,
+          "RoadV3Tile_*": 44,
+          "RoadV3_Uncertain": 44,
+          "RoadV3_Margin": 41,
+          "RoadV3_Carriageway": 41,
+          "RoadDetailLayer": 1,
+          "RoadDetailTile_*": 7,
+          "RoadDetailEdge_*": 7,
+          "RoadDetailMark_*": 7,
+          "CR_roads": 1,
+          "RoadBucket_bridge": 40,
+          "RoadLayer": 1
+        },
+        "colors": [
+          {
+            "hex": "#b0a488",
+            "n": 44
+          },
+          {
+            "hex": "#c4b99e",
+            "n": 41
+          },
+          {
+            "hex": "#8b929e",
+            "n": 81
+          },
+          {
+            "hex": "#7c838c",
+            "n": 7
+          },
+          {
+            "hex": "#f0f1ec",
+            "n": 7
+          }
+        ],
+        "roadDetail": {
+          "tiles": 9,
+          "features": 403,
+          "edgeTris": 15148,
+          "markTris": 32126,
+          "drawCalls": 14,
+          "junctions": 48,
+          "stopLines": 173,
+          "crosswalks": 40,
+          "band": "near",
+          "zoomStep": 18,
+          "markW": 1.18,
+          "edgeW": 1.4,
+          "reachM": 1680,
+          "crosswalkSource": "ESTIMATED_FROM_JUNCTION_GEOMETRY",
+          "lastBuildMs": 1,
+          "enabled": true,
+          "source": "map-data/osaka-city/roads",
+          "tileSize": 2000,
+          "bands": {
+            "farM": 2200,
+            "midM": 700,
+            "veryNearM": 450
+          },
+          "bandConfig": {
+            "band": "near",
+            "markTiers": [
+              "major",
+              "mid"
+            ],
+            "edgeTiers": [
+              "major",
+              "mid"
+            ],
+            "markW": 1.1846153846153846,
+            "edgeW": 1.4,
+            "lanes": true,
+            "junction": true,
+            "reach": 1680
+          },
+          "crosswalkIsEstimated": true,
+          "crosswalkNote": "OSM crossing データがこのデータセットに無いため、交差点形状から推定している（dev 限定・主要道路どうしの交差点のみ）"
+        },
+        "urbanDetail": null
+      },
+      "labels": {
+        "band": "near",
+        "visible": 47,
+        "buildingNames": 20130,
+        "visibleBuildings": 26,
+        "visibleStations": 4,
+        "visiblePlaces": 11,
+        "visibleRivers": 3,
+        "visibleLandmarks": 2,
+        "names": [
+          "大阪城",
+          "グラングリーン大阪",
+          "道修町",
+          "幸町",
+          "中之島",
+          "大手前",
+          "天満",
+          "天神橋",
+          "海老江",
+          "宮原",
+          "下新庄",
+          "天満橋駅",
+          "京橋駅",
+          "大阪天満宮駅",
+          "タイム・カプセル Expo'70",
+          "大阪城 ホール"
+        ],
+        "dataError": null
+      },
+      "shot": "data/reports/mission35x-urban-detail-layer/before-park-detail.jpg"
+    }
+  ],
+  "jsErrors": [],
+  "theme": {
+    "theme": null,
+    "clearColor": "#f6f7f3",
+    "fog": "#f6f7f3",
+    "bodyBg": "rgb(244, 246, 248)",
+    "land": "#ebede6"
+  },
+  "summary": {
+    "phase": "before",
+    "theme": {
+      "theme": null,
+      "clearColor": "#f6f7f3",
+      "fog": "#f6f7f3",
+      "bodyBg": "rgb(244, 246, 248)",
+      "land": "#ebede6"
+    },
+    "drawCallsAvg": 150.8,
+    "trianglesAvg": 533488,
+    "meshesAvg": 873.4,
+    "geometriesAvg": 765.1,
+    "fpsAvg": 51.3,
+    "perSpot": [
+      {
+        "id": "umeda",
+        "drawCalls": 172,
+        "triangles": 483870,
+        "meshes": 755,
+        "geometries": 660,
+        "fps": 50.1
+      },
+      {
+        "id": "nakatsu",
+        "drawCalls": 127,
+        "triangles": 345567,
+        "meshes": 759,
+        "geometries": 661,
+        "fps": 58.5
+      },
+      {
+        "id": "juso",
+        "drawCalls": 119,
+        "triangles": 351252,
+        "meshes": 792,
+        "geometries": 694,
+        "fps": 59.1
+      },
+      {
+        "id": "honmachi",
+        "drawCalls": 167,
+        "triangles": 632106,
+        "meshes": 840,
+        "geometries": 746,
+        "fps": 39.2
+      },
+      {
+        "id": "namba",
+        "drawCalls": 155,
+        "triangles": 596217,
+        "meshes": 851,
+        "geometries": 760,
+        "fps": 55.3
+      },
+      {
+        "id": "tennoji",
+        "drawCalls": 174,
+        "triangles": 690257,
+        "meshes": 873,
+        "geometries": 768,
+        "fps": 60.2
+      },
+      {
+        "id": "niitaka",
+        "drawCalls": 98,
+        "triangles": 251876,
+        "meshes": 895,
+        "geometries": 785,
+        "fps": 60.2
+      },
+      {
+        "id": "intersection-close",
+        "drawCalls": 132,
+        "triangles": 530164,
+        "meshes": 902,
+        "geometries": 783,
+        "fps": 46.6
+      },
+      {
+        "id": "major-road",
+        "drawCalls": 167,
+        "triangles": 613412,
+        "meshes": 919,
+        "geometries": 795,
+        "fps": 46
+      },
+      {
+        "id": "elevated-road",
+        "drawCalls": 152,
+        "triangles": 565496,
+        "meshes": 918,
+        "geometries": 796,
+        "fps": 46.1
+      },
+      {
+        "id": "nakanoshima",
+        "drawCalls": 159,
+        "triangles": 567869,
+        "meshes": 922,
+        "geometries": 802,
+        "fps": 49.4
+      },
+      {
+        "id": "shinsaibashi",
+        "drawCalls": 158,
+        "triangles": 695664,
+        "meshes": 927,
+        "geometries": 816,
+        "fps": 44.2
+      },
+      {
+        "id": "park-detail",
+        "drawCalls": 181,
+        "triangles": 611587,
+        "meshes": 1001,
+        "geometries": 880,
+        "fps": 52.5
+      }
+    ],
+    "buildingLabelSpots": [
+      {
+        "id": "umeda",
+        "visible": 26
+      },
+      {
+        "id": "nakatsu",
+        "visible": 26
+      },
+      {
+        "id": "juso",
+        "visible": 26
+      },
+      {
+        "id": "honmachi",
+        "visible": 26
+      },
+      {
+        "id": "namba",
+        "visible": 26
+      },
+      {
+        "id": "tennoji",
+        "visible": 26
+      },
+      {
+        "id": "niitaka",
+        "visible": 20
+      },
+      {
+        "id": "intersection-close",
+        "visible": 24
+      },
+      {
+        "id": "major-road",
+        "visible": 26
+      },
+      {
+        "id": "elevated-road",
+        "visible": 26
+      },
+      {
+        "id": "nakanoshima",
+        "visible": 26
+      },
+      {
+        "id": "shinsaibashi",
+        "visible": 26
+      },
+      {
+        "id": "park-detail",
+        "visible": 26
+      }
+    ],
+    "buildingLabelsEverywhere": true,
+    "stationLabelsSomewhere": true,
+    "riverLabelsSomewhere": true,
+    "labelDataErrors": [],
+    "urbanDetail": [
+      {
+        "id": "umeda",
+        "ud": null
+      },
+      {
+        "id": "nakatsu",
+        "ud": null
+      },
+      {
+        "id": "juso",
+        "ud": null
+      },
+      {
+        "id": "honmachi",
+        "ud": null
+      },
+      {
+        "id": "namba",
+        "ud": null
+      },
+      {
+        "id": "tennoji",
+        "ud": null
+      },
+      {
+        "id": "niitaka",
+        "ud": null
+      },
+      {
+        "id": "intersection-close",
+        "ud": null
+      },
+      {
+        "id": "major-road",
+        "ud": null
+      },
+      {
+        "id": "elevated-road",
+        "ud": null
+      },
+      {
+        "id": "nakanoshima",
+        "ud": null
+      },
+      {
+        "id": "shinsaibashi",
+        "ud": null
+      },
+      {
+        "id": "park-detail",
+        "ud": null
+      }
+    ],
+    "jsErrors": 0
+  }
+}
