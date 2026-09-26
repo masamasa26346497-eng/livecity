@@ -1,0 +1,753 @@
+{
+  "counts": {
+    "requested": 24,
+    "withPhoto": 24,
+    "noPhoto": 0,
+    "noLicense": 0,
+    "high": 5,
+    "medium": 0,
+    "unresolved": 19,
+    "wikidataMissing": 0,
+    "landmarkLinked": 17,
+    "collisionsDropped": 0,
+    "records": 24,
+    "indexedByCanonicalId": 5,
+    "indexedByLandmarkId": 17
+  },
+  "records": [
+    {
+      "canonicalId": null,
+      "buildingName": "グラングリーン大阪",
+      "curatedName": "グラングリーン大阪",
+      "wikidataId": "Q123951190",
+      "wikidataLabel": "グラングリーン大阪",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B0%E3%83%AA%E3%83%BC%E3%83%B3%E5%A4%A7%E9%98%AA",
+      "landmarkId": "lm:osm:way/1147393980",
+      "lat": 34.703,
+      "lon": 135.493,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 37.5m の「うめきたグリーンプレイス」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Grand_Green_Osaka_South_2025.jpg/330px-Grand_Green_Osaka_South_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Grand_Green_Osaka_South_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 240,
+          "source": "wikimedia-commons",
+          "title": "File:Grand Green Osaka South 2025.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Grand_Green_Osaka_South_2025.jpg",
+          "license": "CC BY 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+          "author": "Fotoinjp",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "グランフロント大阪",
+      "curatedName": "グランフロント大阪",
+      "wikidataId": "Q24899387",
+      "wikidataLabel": "グランフロント大阪",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%A9%E3%83%B3%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E5%A4%A7%E9%98%AA",
+      "landmarkId": "lm:grand-front-osaka",
+      "lat": 34.70577778,
+      "lon": 135.49436111,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 11.2m の「北館」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Grand_Front_Osaka_in_201409.JPG/330px-Grand_Front_Osaka_in_201409.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Grand_Front_Osaka_in_201409.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 200,
+          "source": "wikimedia-commons",
+          "title": "File:Grand Front Osaka in 201409.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Grand_Front_Osaka_in_201409.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Mc681",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_1183ee73-6d8d-4da9-b26b-f430621ffca8",
+      "buildingName": "グランフロント大阪 オーナーズタワー",
+      "curatedName": "グランフロント大阪 オーナーズタワー",
+      "wikidataId": "Q11300380",
+      "wikidataLabel": "グランフロント大阪オーナーズタワー",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%A9%E3%83%B3%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E5%A4%A7%E9%98%AA%E3%82%AA%E3%83%BC%E3%83%8A%E3%83%BC%E3%82%BA%E3%82%BF%E3%83%AF%E3%83%BC",
+      "landmarkId": null,
+      "lat": 34.707306,
+      "lon": 135.494,
+      "matchConfidence": "high",
+      "matchReason": "名前が一致し、Wikidata 座標から 12.9m",
+      "matchDistanceM": 12.9,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Grand_Front_Osaka_Block_C.jpg/330px-Grand_Front_Osaka_Block_C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Grand_Front_Osaka_Block_C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 427,
+          "source": "wikimedia-commons",
+          "title": "File:Grand Front Osaka Block C.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Grand_Front_Osaka_Block_C.jpg",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "author": "Kimiwind1184",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 3.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "あべのハルカス",
+      "curatedName": "あべのハルカス",
+      "wikidataId": "Q16318627",
+      "wikidataLabel": "あべのハルカス",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%81%82%E3%81%B9%E3%81%AE%E3%83%8F%E3%83%AB%E3%82%AB%E3%82%B9",
+      "landmarkId": "lm:abeno-harukas",
+      "lat": 34.645947222222,
+      "lon": 135.51426666667,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 75.1m の「新宿ごちそうビル」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Abeno_Harukas_Osaka_Japan01-r.jpg/330px-Abeno_Harukas_Osaka_Japan01-r.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Abeno_Harukas_Osaka_Japan01-r.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 479,
+          "source": "wikimedia-commons",
+          "title": "File:Abeno Harukas Osaka Japan01-r.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Abeno_Harukas_Osaka_Japan01-r.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "Oilstreet",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪市役所",
+      "curatedName": "大阪市役所",
+      "wikidataId": "Q11440268",
+      "wikidataLabel": "大阪市役所",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E5%B8%82%E5%BD%B9%E6%89%80",
+      "landmarkId": "lm:osaka-city-hall",
+      "lat": 34.693683645015334,
+      "lon": 135.50208106548064,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 106.1m の「大阪府立中之島図書館」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Osaka_City_Hall_Main_Building_in_201407.JPG/330px-Osaka_City_Hall_Main_Building_in_201407.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/11/Osaka_City_Hall_Main_Building_in_201407.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 200,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka City Hall Main Building in 201407.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka_City_Hall_Main_Building_in_201407.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Mc681",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪中之島美術館",
+      "curatedName": "大阪中之島美術館",
+      "wikidataId": "Q50375431",
+      "wikidataLabel": "大阪中之島美術館",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E4%B8%AD%E4%B9%8B%E5%B3%B6%E7%BE%8E%E8%A1%93%E9%A4%A8",
+      "landmarkId": "lm:osm:way/343837388",
+      "lat": 34.692388888888885,
+      "lon": 135.49147222222223,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 98.8m の「大阪大学 中之島センター」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Nakanoshima_Museum_of_Art_Osaka.jpg/330px-Nakanoshima_Museum_of_Art_Osaka.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/48/Nakanoshima_Museum_of_Art_Osaka.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 240,
+          "source": "wikimedia-commons",
+          "title": "File:Nakanoshima Museum of Art Osaka.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Nakanoshima_Museum_of_Art_Osaka.jpg",
+          "license": "CC BY 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+          "author": "Прикли",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪城",
+      "curatedName": "大阪城",
+      "wikidataId": "Q321242",
+      "wikidataLabel": "大坂城",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E5%9D%82%E5%9F%8E",
+      "landmarkId": "lm:osaka-castle",
+      "lat": 34.687222222222,
+      "lon": 135.52583333333,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 21.3m の「金明水井戸屋形」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Osaka_Castle_02bs3200.jpg/330px-Osaka_Castle_02bs3200.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Osaka_Castle_02bs3200.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 209,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka Castle 02bs3200.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka_Castle_02bs3200.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_dda3cf24-7c6f-4443-9e04-aa821def7120",
+      "buildingName": "大阪城 ホール",
+      "curatedName": "大阪城ホール",
+      "wikidataId": "Q1092700",
+      "wikidataLabel": "大阪城ホール",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E5%9F%8E%E3%83%9B%E3%83%BC%E3%83%AB",
+      "landmarkId": null,
+      "lat": 34.689444,
+      "lon": 135.529722,
+      "matchConfidence": "high",
+      "matchReason": "名前が一致し、Wikidata 座標から 41.2m",
+      "matchDistanceM": 41.2,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Osaka-jo_Hall_in_201408.JPG/330px-Osaka-jo_Hall_in_201408.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/59/Osaka-jo_Hall_in_201408.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 180,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka-jo Hall in 201408.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka-jo_Hall_in_201408.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Mc681",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "なんばパークス",
+      "curatedName": "なんばパークス",
+      "wikidataId": "Q6961367",
+      "wikidataLabel": "なんばパークス",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%81%AA%E3%82%93%E3%81%B0%E3%83%91%E3%83%BC%E3%82%AF%E3%82%B9",
+      "landmarkId": "lm:osm:way/451572345",
+      "lat": 34.66147,
+      "lon": 135.5018,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 55.9m の「パークスタワー」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/150328_Namba_Parks_Osaka_Japan01bs3.jpg/330px-150328_Namba_Parks_Osaka_Japan01bs3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0a/150328_Namba_Parks_Osaka_Japan01bs3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 480,
+          "source": "wikimedia-commons",
+          "title": "File:150328 Namba Parks Osaka Japan01bs3.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:150328_Namba_Parks_Osaka_Japan01bs3.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "663highland",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_c51e3bdc-e964-401f-b230-4661126db48b",
+      "buildingName": "パークスタワー",
+      "curatedName": "パークスタワー",
+      "wikidataId": "Q3335430",
+      "wikidataLabel": "パークスタワー",
+      "wikipediaUrl": null,
+      "landmarkId": null,
+      "lat": 34.66159,
+      "lon": 135.501198,
+      "matchConfidence": "high",
+      "matchReason": "名前が一致し、Wikidata 座標から 34.3m",
+      "matchDistanceM": 34.3,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/150328_Namba_Parks_Osaka_Japan04s3.jpg/330px-150328_Namba_Parks_Osaka_Japan04s3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e3/150328_Namba_Parks_Osaka_Japan04s3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 480,
+          "source": "wikimedia-commons",
+          "title": "File:150328 Namba Parks Osaka Japan04s3.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:150328_Namba_Parks_Osaka_Japan04s3.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "663highland",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "通天閣",
+      "curatedName": "通天閣",
+      "wikidataId": "Q1148463",
+      "wikidataLabel": "通天閣",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E9%80%9A%E5%A4%A9%E9%96%A3",
+      "landmarkId": "lm:tsutenkaku",
+      "lat": 34.65222222222222,
+      "lon": 135.50611111111112,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 41.5m の「新世界ニューハイツ」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/New_Tsutenkaku_in_201409_003.JPG/330px-New_Tsutenkaku_in_201409_003.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/New_Tsutenkaku_in_201409_003.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 320,
+          "source": "wikimedia-commons",
+          "title": "File:New Tsutenkaku in 201409 003.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:New_Tsutenkaku_in_201409_003.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Mc681",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "京セラドーム大阪",
+      "curatedName": "京セラドーム大阪",
+      "wikidataId": "Q128836",
+      "wikidataLabel": "大阪ドーム",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E3%83%89%E3%83%BC%E3%83%A0",
+      "landmarkId": "lm:kyocera-dome-osaka",
+      "lat": 34.6693,
+      "lon": 135.47610277778,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 153.4m の「九条変電所」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Kyocera_Dome_Osaka1.jpg/330px-Kyocera_Dome_Osaka1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Kyocera_Dome_Osaka1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 238,
+          "source": "wikimedia-commons",
+          "title": "File:Kyocera Dome Osaka1.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Kyocera_Dome_Osaka1.jpg",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+          "author": "KENPEI",
+          "attribution": "KENPEI's photo",
+          "usageTerms": "Creative Commons Attribution-Share Alike 3.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "梅田スカイビル",
+      "curatedName": "梅田スカイビル",
+      "wikidataId": "Q1151808",
+      "wikidataLabel": "梅田スカイビル",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E6%A2%85%E7%94%B0%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%93%E3%83%AB",
+      "landmarkId": "lm:umeda-sky-building",
+      "lat": 34.705277777778,
+      "lon": 135.48972222222,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 67.2m の「日本 トリム」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/2018_Umeda_Sky_Building.jpg/330px-2018_Umeda_Sky_Building.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f9/2018_Umeda_Sky_Building.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 475,
+          "source": "wikimedia-commons",
+          "title": "File:2018 Umeda Sky Building.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:2018_Umeda_Sky_Building.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Kakidai",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪駅",
+      "curatedName": "大阪駅",
+      "wikidataId": "Q801694",
+      "wikidataLabel": "大阪駅",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E9%A7%85",
+      "landmarkId": null,
+      "lat": 34.7025,
+      "lon": 135.4961111111111,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 93.5m の「サウスゲートビルディング」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/JR_Osaka_Station_20151226.JPG/330px-JR_Osaka_Station_20151226.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7f/JR_Osaka_Station_20151226.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 222,
+          "source": "wikimedia-commons",
+          "title": "File:JR Osaka Station 20151226.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:JR_Osaka_Station_20151226.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "KishujiRapid",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪ステーションシティ",
+      "curatedName": "大阪ステーションシティ",
+      "wikidataId": "Q11439963",
+      "wikidataLabel": "大阪ステーションシティ",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%B7%E3%83%86%E3%82%A3",
+      "landmarkId": null,
+      "lat": 34.702777777777776,
+      "lon": 135.495,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 97.7m の「うめきたシップホール」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Osaka_Station_City.JPG/330px-Osaka_Station_City.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/18/Osaka_Station_City.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 213,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka Station City.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka_Station_City.JPG",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "author": "Own work",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 3.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "HEP FIVE",
+      "curatedName": "HEP FIVE",
+      "wikidataId": "Q138666211",
+      "wikidataLabel": "HEP FIVE",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/HEP%20FIVE",
+      "landmarkId": "lm:osm:way/161451126",
+      "lat": 34.70408264444968,
+      "lon": 135.50046851480596,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 28.3m の「梅田楽天地ビル」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/HEP-FIVE_in_201409_001.JPG/330px-HEP-FIVE_in_201409_001.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/29/HEP-FIVE_in_201409_001.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 200,
+          "source": "wikimedia-commons",
+          "title": "File:HEP-FIVE in 201409 001.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:HEP-FIVE_in_201409_001.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Mc681",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        },
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/HEP_FIVE.jpg/330px-HEP_FIVE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/82/HEP_FIVE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 427,
+          "source": "wikimedia-commons",
+          "title": "File:HEP FIVE.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:HEP_FIVE.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Tokumeigakarinoaoshima",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "海遊館",
+      "curatedName": "海遊館",
+      "wikidataId": "Q1191885",
+      "wikidataLabel": "海遊館",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E6%B5%B7%E9%81%8A%E9%A4%A8",
+      "landmarkId": "lm:kaiyukan",
+      "lat": 34.654472222222,
+      "lon": 135.42888888889,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 91.8m の「大阪文化館・天保山」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Osaka_Kaiyukan01s3872.jpg/330px-Osaka_Kaiyukan01s3872.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Osaka_Kaiyukan01s3872.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 214,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka Kaiyukan01s3872.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka_Kaiyukan01s3872.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "国立国際美術館",
+      "curatedName": "国立国際美術館",
+      "wikidataId": "Q1055037",
+      "wikidataLabel": "国立国際美術館",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%9B%BD%E7%AB%8B%E5%9B%BD%E9%9A%9B%E7%BE%8E%E8%A1%93%E9%A4%A8",
+      "landmarkId": "lm:osm:way/231449189",
+      "lat": 34.691786,
+      "lon": 135.492024,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 44.1m の「中之島第一ビル」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/NMAO01s3200.jpg/330px-NMAO01s3200.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/57/NMAO01s3200.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 480,
+          "source": "wikimedia-commons",
+          "title": "File:NMAO01s3200.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:NMAO01s3200.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "大阪市中央公会堂",
+      "curatedName": "大阪市中央公会堂",
+      "wikidataId": "Q10938355",
+      "wikidataLabel": "大阪市中央公会堂",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E5%B8%82%E4%B8%AD%E5%A4%AE%E5%85%AC%E4%BC%9A%E5%A0%82",
+      "landmarkId": "lm:osm:way/162382613",
+      "lat": 34.693528,
+      "lon": 135.504,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 71.1m の「大阪府立中之島図書館」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Osaka_Nakanoshima_Public_Hall.jpg/330px-Osaka_Nakanoshima_Public_Hall.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/30/Osaka_Nakanoshima_Public_Hall.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 240,
+          "source": "wikimedia-commons",
+          "title": "File:Osaka Nakanoshima Public Hall.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Osaka_Nakanoshima_Public_Hall.jpg",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+          "author": "Sakai Yayoi",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Zero, Public Domain Dedication"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "中之島フェスティバルタワー",
+      "curatedName": "中之島フェスティバルタワー",
+      "wikidataId": "Q3335339",
+      "wikidataLabel": "中之島フェスティバルタワー",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E4%B8%AD%E4%B9%8B%E5%B3%B6%E3%83%95%E3%82%A7%E3%82%B9%E3%83%86%E3%82%A3%E3%83%90%E3%83%AB%E3%82%BF%E3%83%AF%E3%83%BC",
+      "landmarkId": "lm:nakanoshima-festival-tower",
+      "lat": 34.69352778,
+      "lon": 135.49675,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 63.6m の「大阪三井物産ビル」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Nakanoshima_Festival_Tower_Osaka_Japan01.jpg/330px-Nakanoshima_Festival_Tower_Osaka_Japan01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Nakanoshima_Festival_Tower_Osaka_Japan01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 480,
+          "source": "wikimedia-commons",
+          "title": "File:Nakanoshima Festival Tower Osaka Japan01.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Nakanoshima_Festival_Tower_Osaka_Japan01.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "Oilstreet",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_osm_179071378",
+      "buildingName": "大阪府立国際会議場",
+      "curatedName": "大阪府立国際会議場",
+      "wikidataId": "Q7105562",
+      "wikidataLabel": "大阪府立国際会議場",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E5%BA%9C%E7%AB%8B%E5%9B%BD%E9%9A%9B%E4%BC%9A%E8%AD%B0%E5%A0%B4",
+      "landmarkId": null,
+      "lat": 34.6894,
+      "lon": 135.486,
+      "matchConfidence": "high",
+      "matchReason": "名前が一致し、Wikidata 座標から 25m",
+      "matchDistanceM": 25,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/OICC_Osaka_International_Conference_Centre_20080712.jpg/330px-OICC_Osaka_International_Conference_Centre_20080712.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1e/OICC_Osaka_International_Conference_Centre_20080712.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 213,
+          "source": "wikimedia-commons",
+          "title": "File:OICC Osaka International Conference Centre 20080712.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:OICC_Osaka_International_Conference_Centre_20080712.jpg",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "author": "Inoue-hiro",
+          "attribution": "Photograph Taken by Myself (投稿者による撮影)",
+          "usageTerms": "Creative Commons Attribution-Share Alike 3.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "JPタワー大阪",
+      "curatedName": "JPタワー大阪",
+      "wikidataId": "Q117006379",
+      "wikidataLabel": "JPタワー大阪",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/JP%E3%82%BF%E3%83%AF%E3%83%BC%E5%A4%A7%E9%98%AA",
+      "landmarkId": "lm:jp-tower-osaka",
+      "lat": 34.7004922,
+      "lon": 135.4940035,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 98.8m の「ハービスENT」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/JP_Tower_Osaka_south_side.jpg/330px-JP_Tower_Osaka_south_side.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d7/JP_Tower_Osaka_south_side.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 480,
+          "source": "wikimedia-commons",
+          "title": "File:JP Tower Osaka south side.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:JP_Tower_Osaka_south_side.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "掬茶",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": null,
+      "buildingName": "ユニバーサル・スタジオ・ジャパン",
+      "curatedName": "ユニバーサル・スタジオ・ジャパン",
+      "wikidataId": "Q1375103",
+      "wikidataLabel": "ユニバーサル・スタジオ・ジャパン",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E3%83%A6%E3%83%8B%E3%83%90%E3%83%BC%E3%82%B5%E3%83%AB%E3%83%BB%E3%82%B9%E3%82%BF%E3%82%B8%E3%82%AA%E3%83%BB%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3",
+      "landmarkId": "lm:universal-studios-japan",
+      "lat": 34.6647,
+      "lon": 135.433,
+      "matchConfidence": "unresolved",
+      "matchReason": "建物名が一致しないので建物へは結び付けない（最寄りは 93.7m の「Stage 14」だが、近いだけでは根拠にならない）",
+      "matchDistanceM": null,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Harry_Potter_and_the_Forbidden_Journey_USJ.JPG/330px-Harry_Potter_and_the_Forbidden_Journey_USJ.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Harry_Potter_and_the_Forbidden_Journey_USJ.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 240,
+          "source": "wikimedia-commons",
+          "title": "File:Harry Potter and the Forbidden Journey USJ.JPG",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Harry_Potter_and_the_Forbidden_Journey_USJ.JPG",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "author": "Freddo",
+          "attribution": "Own work",
+          "usageTerms": "Creative Commons Attribution-Share Alike 4.0"
+        }
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_640655ff-eea4-4505-b703-f429ca2ff2d0",
+      "buildingName": "大阪歴史博物館",
+      "curatedName": "大阪歴史博物館",
+      "wikidataId": "Q11261312",
+      "wikidataLabel": "大阪歴史博物館",
+      "wikipediaUrl": "https://ja.wikipedia.org/wiki/%E5%A4%A7%E9%98%AA%E6%AD%B4%E5%8F%B2%E5%8D%9A%E7%89%A9%E9%A4%A8",
+      "landmarkId": null,
+      "lat": 34.682722,
+      "lon": 135.520806,
+      "matchConfidence": "high",
+      "matchReason": "名前が一致し、Wikidata 座標から 12.4m",
+      "matchDistanceM": 12.4,
+      "photos": [
+        {
+          "thumbnailUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/140923_Osaka_Museum_of_History_Osaka_Japan02s3.jpg/330px-140923_Osaka_Museum_of_History_Osaka_Japan02s3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/140923_Osaka_Museum_of_History_Osaka_Japan02s3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "width": 320,
+          "height": 482,
+          "source": "wikimedia-commons",
+          "title": "File:140923 Osaka Museum of History Osaka Japan02s3.jpg",
+          "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:140923_Osaka_Museum_of_History_Osaka_Japan02s3.jpg",
+          "license": "CC BY 2.5",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+          "author": "663highland",
+          "attribution": "663highland",
+          "usageTerms": "Creative Commons Attribution 2.5"
+        }
+      ]
+    }
+  ]
+}

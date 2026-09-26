@@ -258,7 +258,11 @@ test('35K クリックの優先順位（ラベル → 施設 → 建物）', () 
 test('35K ドラッグ保護は既存の clickIntent を使う', () => {
   // 既存の仕組みを使い、独自のドラッグ判定を作っていない
   assert.match(html, /if \(!clickIntentAllows\(\)\) return;/);
-  const labelAt = html.indexOf('CityLabelLayer.pickLabel(e.clientX, e.clientY)');
+  // [Mission 35Z] hover でも pickLabel を呼ぶようになったので、単純な indexOf だと
+  //   クリック経路ではなく hover 経路を拾ってしまう。**クリック経路の** pickLabel を見る。
+  const clickBlockAt = html.indexOf('クリックの優先順位');
+  assert.ok(clickBlockAt > 0, 'クリック経路が見つからない');
+  const labelAt = html.indexOf('CityLabelLayer.pickLabel(e.clientX, e.clientY)', clickBlockAt);
   const guardAt = html.lastIndexOf('if (!clickIntentAllows()) return;', labelAt);
   assert.ok(guardAt > 0 && guardAt < labelAt, 'ラベル判定がドラッグ保護より前にある');
 });

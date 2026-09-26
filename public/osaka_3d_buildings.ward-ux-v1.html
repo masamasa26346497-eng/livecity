@@ -209,6 +209,38 @@ canvas{display:block}
   --lc-topbar-h:56px;
 }
 body{background:var(--lc-bg);color:var(--lc-text)}
+
+/* [Mission 35Z §6] 建物 hover の写真カード。地図を隠しすぎないよう右側・幅 280px。 */
+/* 右上はレイヤーパネル、右側は建物カードが占めるので、空いている左下へ置く
+   （§6 地図を隠しすぎない／実機で右側だと隠れて見えなかった）。 */
+#bldg-photo-card{position:absolute;left:20px;bottom:20px;width:280px;z-index:40;
+  background:rgba(255,255,255,0.96);border:1px solid var(--lc-border,#e3e7ea);border-radius:12px;
+  box-shadow:0 8px 26px rgba(20,30,45,0.14);overflow:hidden;display:none;pointer-events:none;
+  font-family:'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif}
+#bldg-photo-card .bp-title{padding:9px 12px 7px;font-size:12.5px;font-weight:700;color:#20252a;
+  line-height:1.35;border-bottom:1px solid #eef1f3}
+#bldg-photo-card .bp-img{display:block;width:100%;height:auto;max-height:200px;object-fit:cover;background:#f2f4f6}
+#bldg-photo-card .bp-meta{display:flex;justify-content:space-between;gap:8px;
+  padding:7px 12px 0;font-size:10px;color:#66717a}
+#bldg-photo-card .bp-src{font-weight:600}
+#bldg-photo-card .bp-lic{color:#2f6fb3}
+#bldg-photo-card .bp-by{padding:2px 12px 0;font-size:10px;color:#8b959d;line-height:1.4}
+#bldg-photo-card .bp-hint{padding:5px 12px 9px;font-size:9.5px;color:#9aa4ac}
+#bldg-photo-card .bp-none{padding:14px 12px;font-size:11px;color:#8b959d;text-align:center}
+/* [Mission 35Z §5] property card の写真欄 */
+#pc-photo-section{margin-top:12px;padding-top:10px;border-top:1px solid rgba(80,160,255,0.12);display:none}
+#pc-photo-section .pc-photo-head{font-size:10px;font-weight:700;color:#5a7aa0;letter-spacing:.3px;margin-bottom:7px}
+#pc-photo-section .pc-photo{margin-bottom:10px}
+#pc-photo-section .pc-photo img{display:block;width:100%;height:auto;max-height:170px;object-fit:cover;
+  border-radius:8px;background:rgba(255,255,255,0.06)}
+#pc-photo-section .pc-photo-cap{padding:5px 2px 0;font-size:9.5px;line-height:1.5;color:#9cb8d8}
+#pc-photo-section .pc-photo-lic{color:#7ab8e0;font-weight:600}
+#pc-photo-section .pc-photo-by{color:#8fa0b4}
+#pc-photo-section .pc-photo-attr{color:#6f8298}
+#pc-photo-section .pc-photo-link{display:inline-block;margin-top:3px;color:#8fc0ff;font-size:9.5px;text-decoration:none}
+#pc-photo-section .pc-photo-link:hover{text-decoration:underline}
+#pc-photo-section .pc-photo-none{font-size:10.5px;color:#5a7aa0;padding:4px 0}
+#pc-photo-section .pc-photo-conf{margin-top:6px;font-size:9px;color:#5a7aa0;line-height:1.4}
 /* file:// 警告バナーは最前面（表示は file:// 時のみ・開発時のみ） */
 #file-protocol-warning{z-index:100000 !important}
 /* キーボードフォーカスを可視化 */
@@ -584,6 +616,7 @@ body.lc-prop-card-open #canonical-runtime-status{right:calc(20px + 280px + 12px)
     <div class="pc-row" id="pc-ward-row"><span class="k">区</span><span class="v" id="pc-ward">—</span></div>
     <div class="pc-row"><span class="k">最寄駅</span><span class="v" id="pc-station">—</span></div>
     <div class="pc-row"><span class="k">用途</span><span class="v" id="pc-usage-full">—</span></div>
+    <div id="pc-photo-section"></div>
     <div class="pc-town-section" id="pc-town-section">
       <div class="pc-town-header">
         <span>町丁目データ（<span id="pc-town-name">—</span>）</span>
@@ -839,6 +872,7 @@ body.lc-prop-card-open #canonical-runtime-status{right:calc(20px + 280px + 12px)
   </div>
 </div>
 
+<div id="bldg-photo-card"></div>
 <div id="tip">
   <div class="th" id="tth">属性</div>
   <div class="tr"><span class="tk" id="tk1"></span><span class="tv" id="tv1"></span></div>
@@ -11698,11 +11732,187 @@ function showTip(e,h){const d=h.d;
     if (tc) BuildingFacts.ensure(tc[0], tc[1]);
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// [Mission 35Z] BuildingPhoto — 建物の実写真を hover / click で出す
+//
+//   §2 遵守: **実行時にネットへ検索をかけない**。事前生成した索引
+//     （derived/building-photo-index.json）を 1 回だけ読むだけ。
+//     画像は Wikimedia Commons の URL を直接参照する（再利用可能なライセンスのものだけ）。
+//   §3 遵守: 索引には名前が一致した building（high）しか canonicalId が入っていない。
+//     「近いから」で別の建物の写真を出すことはしない。
+//   §12 遵守: 35Y の precise picking が返した canonicalId と **完全一致** したときだけ出す。
+// ══════════════════════════════════════════════════════════════
+const BuildingPhoto = (function () {
+  const URL_ = 'map-data/osaka-city/derived/building-photo-index.json';
+  const DWELL_MS = 380;              // §4 hover してすぐには出さない（300〜500ms）
+  const MEM_CACHE = 12;              // §9 直近 hover ぶんだけ持つ
+
+  let index = null, loading = null, loadError = null;
+  const recent = new Map();          // id -> record（直近ぶんのメモリキャッシュ）
+  let dwellTimer = null;
+  let shownFor = null;               // いま出している building / landmark の id
+  let pendingFor = null;
+  const stats = { loads: 0, hoverShown: 0, hoverSkippedNoPhoto: 0, cacheHits: 0,
+    imgErrors: 0, lookups: 0, dwellMs: DWELL_MS };
+
+  function ensure() {
+    if (index || loading) return loading || Promise.resolve(index);
+    loading = fetch(URL_).then((r) => (r.ok ? r.json() : null)).then((j) => {
+      index = j || { byCanonicalId: {}, byLandmarkId: {}, counts: {} };
+      stats.loads++;
+      return index;
+    }).catch((e) => { loadError = String(e && e.message || e); index = { byCanonicalId: {}, byLandmarkId: {} }; return index; });
+    return loading;
+  }
+
+  /** §3/§12 id が索引にあるときだけ返す。無ければ null（＝写真なし）。 */
+  function lookup(id, kind) {
+    stats.lookups++;
+    if (!index || !id) return null;
+    if (recent.has(id)) { stats.cacheHits++; return recent.get(id); }
+    const map = (kind === 'landmark') ? index.byLandmarkId : index.byCanonicalId;
+    const rec = (map && map[id]) || null;
+    if (rec) {
+      recent.set(id, rec);
+      if (recent.size > MEM_CACHE) recent.delete(recent.keys().next().value);
+    }
+    return rec;
+  }
+
+  const el = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  /** 著者・出典は長いことがあるので hover では詰める（click では全文を出す）。 */
+  const shorten = (s, n) => { const t = String(s || '').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+
+  function hide() {
+    const c = el('bldg-photo-card');
+    if (c) c.style.display = 'none';
+    shownFor = null;
+  }
+
+  function render(rec, name) {
+    const c = el('bldg-photo-card');
+    if (!c) return;
+    const p = rec && rec.photos && rec.photos[0];
+    if (!p) {
+      // §11 写真が無くても壊さない。名前だけ出して「写真なし」と言う。
+      c.innerHTML = '<div class="bp-title">' + esc(name || '建物') + '</div>'
+        + '<div class="bp-none">写真は未登録です</div>';
+      c.style.display = 'block';
+      return;
+    }
+    c.innerHTML = '<div class="bp-title">' + esc(rec.wikidataLabel || rec.buildingName || name) + '</div>'
+      + '<img class="bp-img" alt="' + esc(rec.buildingName || name) + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '">'
+      + '<div class="bp-meta">'
+      + '<span class="bp-src">' + esc(p.source === 'wikimedia-commons' ? 'Wikimedia Commons' : p.source) + '</span>'
+      + '<span class="bp-lic">' + esc(shorten(p.license, 22)) + '</span>'
+      + '</div>'
+      + (p.author ? '<div class="bp-by">' + esc(shorten(p.author, 46)) + '</div>' : '')
+      + '<div class="bp-hint">クリックで詳細</div>';
+    // §6 画像が読めなかったときの代替表示
+    const img = c.querySelector('.bp-img');
+    if (img) img.addEventListener('error', () => {
+      stats.imgErrors++;
+      img.remove();
+      const d = document.createElement('div');
+      d.className = 'bp-none'; d.textContent = '写真を読み込めませんでした';
+      c.insertBefore(d, c.firstChild.nextSibling);
+    }, { once: true });
+    c.style.display = 'block';
+    stats.hoverShown++;
+  }
+
+  /**
+   * §4 hover。建物が変わったら一旦消し、同じ建物に DWELL_MS 留まったときだけ出す。
+   * @param {object|null} d  35Y の picking が返した建物データ
+   * @param {object|null} label  ラベル（ランドマーク）に乗っているならそれ
+   */
+  function onHover(d, label) {
+    const isLandmark = !!(label && label.kind === 'landmark' && label.id);
+    const id = isLandmark ? label.id : (d && (d.canonicalId || d.id)) || null;
+    if (!id) { if (dwellTimer) { clearTimeout(dwellTimer); dwellTimer = null; } pendingFor = null; hide(); return; }
+    if (id === shownFor) return;                      // 同じ建物なら作り直さない
+    if (id === pendingFor) return;                    // すでに待っている
+    if (dwellTimer) clearTimeout(dwellTimer);
+    pendingFor = id;
+    hide();
+    dwellTimer = setTimeout(() => {
+      dwellTimer = null;
+      if (pendingFor !== id) return;                  // 待っている間に別の建物へ移った
+      ensure().then(() => {
+        if (pendingFor !== id) return;
+        const rec = lookup(id, isLandmark ? 'landmark' : 'building');
+        if (!rec) { stats.hoverSkippedNoPhoto++; hide(); return; }
+        // §3 hover は high（建物名が一致したもの）だけ。landmark 索引は名前一致で作っている。
+        if (!isLandmark && rec.matchConfidence !== 'high') { stats.hoverSkippedNoPhoto++; hide(); return; }
+        shownFor = id;
+        render(rec, (d && d.buildingName) || (label && label.name) || null);
+      });
+    }, DWELL_MS);
+  }
+
+  /** §5 click。property card の中へ、hover より詳しい写真欄を作る。 */
+  function sectionHtml(rec) {
+    if (!rec || !rec.photos || !rec.photos.length) {
+      return '<div class="pc-photo-none">この建物の写真は未登録です</div>';
+    }
+    let h = '';
+    for (const p of rec.photos.slice(0, 3)) {
+      h += '<div class="pc-photo">'
+        + '<img alt="' + esc(rec.buildingName || '') + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '">'
+        + '<div class="pc-photo-cap">'
+        + '<div class="pc-photo-lic">' + esc(p.license) + '</div>'
+        + (p.author ? '<div class="pc-photo-by">' + esc(p.author) + '</div>' : '')
+        + (p.attribution && p.attribution !== p.author
+          ? '<div class="pc-photo-attr">' + esc(p.attribution) + '</div>' : '')
+        + '<a class="pc-photo-link" target="_blank" rel="noopener noreferrer" href="'
+        + esc(p.sourcePageUrl) + '">出典ページ（' + esc(p.source === 'wikimedia-commons' ? 'Wikimedia Commons' : p.source) + '）</a>'
+        + '</div></div>';
+    }
+    if (rec.wikipediaUrl) {
+      h += '<a class="pc-photo-link" target="_blank" rel="noopener noreferrer" href="'
+        + esc(rec.wikipediaUrl) + '">Wikipedia で見る</a>';
+    }
+    h += '<div class="pc-photo-conf">対応付け: ' + esc(rec.matchConfidence)
+      + (rec.matchReason ? '（' + esc(rec.matchReason) + '）' : '') + '</div>';
+    return h;
+  }
+
+  /** property card が開いたときに呼ぶ。索引が未読なら読んでから差し込む。 */
+  function fillCard(d) {
+    const host = el('pc-photo-section');
+    if (!host) return;
+    const id = d && (d.canonicalId || d.id);
+    if (!id) { host.style.display = 'none'; return; }
+    ensure().then(() => {
+      // §5 click は high / medium の両方を出してよい（索引には high しか入っていない）
+      const rec = lookup(id, 'building');
+      host.style.display = 'block';
+      host.innerHTML = '<div class="pc-photo-head">写真</div>' + sectionHtml(rec);
+    });
+  }
+
+  return {
+    ensure, onHover, fillCard, hide,
+    isLoaded: () => !!index,
+    getDebug: () => ({
+      ...stats, loaded: !!index, loadError, shownFor,
+      counts: index ? index.counts : null,
+      policy: index ? index.policy : null,
+      cached: recent.size,
+    }),
+  };
+})();
+if (typeof window !== 'undefined') window.__BUILDING_PHOTO_DEBUG__ = () => BuildingPhoto.getDebug();
+
 window.addEventListener('mousemove',e=>{
   // [Mission ALIGNMENT-VISIBILITY-FINAL §14] Reference Alignment 中は建物hoverを完全停止
   //   （位置比較の邪魔になるため。通常モードへ戻したら自動復帰＝早期returnのみで状態は変更しない）。
   if (typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.isReferenceAlignmentActive && CanonicalRuntime.isReferenceAlignmentActive()) {
     tip.style.display = 'none';
+    try { BuildingPhoto.hide(); } catch (err) { /* noop */ }
     return;
   }
   if (interactionMode(cs.r) === 'far') {
@@ -11710,11 +11920,22 @@ window.addEventListener('mousemove',e=>{
     tip.style.display='none';
     canvas.style.cursor = cs.drag ? 'grabbing' : 'default';
     updateHighlight(hoverHL, null);
+    try { BuildingPhoto.hide(); } catch (err) { /* noop */ }
     return;
   }
   const h=pickHit(e);
   if(h){showTip(e,h);canvas.style.cursor='pointer';updateHighlight(hoverHL, h.d);}
   else{tip.style.display='none';canvas.style.cursor=cs.drag?'grabbing':'default';updateHighlight(hoverHL, null);}
+  // [Mission 35Z §4/§12] 写真は 35Y の picking が返した建物 ID に対してだけ出す。
+  //   ラベル（ランドマーク）に乗っているときは、そちらの写真を優先する。
+  try {
+    let lbl = null;
+    if (typeof CityLabelLayer !== 'undefined' && CityLabelLayer.pickLabel) {
+      const p = CityLabelLayer.pickLabel(e.clientX, e.clientY);
+      if (p && p.kind === 'landmark') lbl = p;
+    }
+    BuildingPhoto.onHover(h ? h.d : null, lbl);
+  } catch (err) { /* 写真が出せなくても hover は壊さない */ }
   if (typeof BUILDING_HEIGHT_STYLE !== 'undefined') BUILDING_HEIGHT_STYLE.noteHover(h ? h.d : null); // [Mission10] hover 建物の高さ階級を debug へ
   if (typeof LANDMARK_REGISTRY !== 'undefined') LANDMARK_REGISTRY.noteHover(h ? h.d : null); // [Mission11] hover 建物がランドマークか debug へ
   if (typeof LandmarkLayer !== 'undefined') LandmarkLayer.noteHover(h ? h.d : null); // [Mission11B]
@@ -11942,6 +12163,8 @@ function applyBuildingNameRows(canonicalId) {
 
 function showPropertyCard(d){
   const p = buildPropertyData(d);
+  // [Mission 35Z §5] hover より詳しい写真欄（出典・ライセンス・著者・出典ページ）
+  try { BuildingPhoto.fillCard(d); } catch (err) { /* 写真が無くても card は出す */ }
   document.getElementById('pr').style.display='none'; // GML解析パネルは隠してカードに切替
   const card = document.getElementById('prop-card');
   card.style.display='block';
