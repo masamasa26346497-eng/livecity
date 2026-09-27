@@ -17,6 +17,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import https from 'node:https';
+import {
+  resolveByDirectId, resolveByNameAndCoordinate, resolvePriorityCollisions, summarizeCoverage,
+} from './lib/citywide-photo-matching.mjs';
+import { classifyPointToWard } from '../lib/point-in-polygon.js';
 
 const CURATED = 'data/photos/building-photo-curated.json';
 const MANUAL = 'data/photos/building-photo-manual.json';     // §2-4 任意。あれば読む
@@ -225,6 +229,7 @@ for (const ent of entries) {
     landmarkId: lm ? lm.landmarkId : null,
     lat: wd.lat, lon: wd.lon,
     matchConfidence: m.confidence,
+    matchMethod: 'curated',            // [36F] 手法の内訳集計用。35Z 単体の判定は一切変えない
     matchReason: m.reason,
     matchDistanceM: m.distanceM,
     photos,
@@ -259,17 +264,140 @@ stats.collisionsDropped = collisions;
 stats.high = 0; stats.medium = 0; stats.unresolved = 0;
 for (const r of records) stats[r.matchConfidence]++;
 
+// ══════════════════════════════════════════════════════════════
+// [Mission 36F] citywide 拡張。curated（上記・一切変更しない）に加えて、
+//   A. direct-id         : OSM 等の wikidata=Q... タグから座標だけで一意の建物に結ぶ
+//   B. citywide-verified : 直接IDが無い名前付き建物を、名前完全一致 + 座標検証で結ぶ
+// を追加する。判断ロジック自体は tools/photos/lib/citywide-photo-matching.mjs に
+// 切り出してあり、単体テストだけで安全性（近いだけでは決めない・同名/同一建物の
+// 競合は unresolved）を検証できる。
+//
+// 候補ファイルは大阪市全域の Wikidata 走査（ネットワーク）や OSM PBF（ローカル）から
+// ローカルPCで生成する別スクリプトの出力を読む。存在しなければ何もしない
+// （＝ curated だけの 35Z までの動作のまま。壊れない）。
+//   node tools/photos/extract-osm-wikidata-tags.mjs        → CITYWIDE_DIRECT_ID
+//   node tools/photos/fetch-citywide-wikidata-candidates.mjs → CITYWIDE_CANDIDATE_POOL
+const CITYWIDE_DIRECT_ID = 'data/photos/citywide-direct-id-candidates.json';
+const CITYWIDE_CANDIDATE_POOL = 'data/photos/citywide-candidate-pool.json';
+const WARD_POLYGONS = 'data/processed/osaka-city/boundaries/ward-classification-polygons.json';
+
+const citywideRecords = [];
+
+if (fs.existsSync(CITYWIDE_DIRECT_ID)) {
+  const directIdCandidates = (JSON.parse(fs.readFileSync(CITYWIDE_DIRECT_ID, 'utf-8')).candidates || []);
+  console.log('[36F] direct-id 候補 ' + directIdCandidates.length + ' 件を確認する');
+  for (const cand of directIdCandidates) {
+    let wd = null;
+    try { wd = await wikidataEntity(cand.wikidataId); } catch (e) { /* noop */ }
+    if (!wd || wd.lat == null || wd.lon == null) { continue; }
+    const photos = [];
+    for (const f of wd.images.slice(0, 3)) {
+      try { const p = await commonsPhoto(f); if (p) photos.push(p); } catch (e) { /* noop */ }
+      await sleep(900);
+    }
+    if (!photos.length) { await sleep(900); continue; }
+    const m = resolveByDirectId(toLocal(wd.lat, wd.lon), bLabels, { radiusM: 60 });
+    citywideRecords.push({
+      canonicalId: m.canonicalId,
+      buildingName: m.matchedName || cand.name || wd.labelJa || wd.labelEn,
+      curatedName: cand.name || wd.labelJa || wd.labelEn || cand.wikidataId,
+      wikidataId: wd.qid,
+      wikidataLabel: wd.labelJa || wd.labelEn || null,
+      wikipediaUrl: wd.wikipediaJa,
+      landmarkId: null,
+      lat: wd.lat, lon: wd.lon,
+      matchConfidence: m.matchConfidence,
+      matchMethod: 'direct-id',
+      matchReason: m.reason,
+      reasonCode: m.reasonCode,
+      matchDistanceM: m.distanceM,
+      osmId: cand.osmId || null,
+      photos,
+    });
+    console.log('  direct-id ' + (cand.name || cand.wikidataId).padEnd(22), m.matchConfidence.padEnd(10),
+      (photos.length + '枚').padStart(3), m.canonicalId ? m.canonicalId.slice(0, 26) : '(建物未特定)');
+    await sleep(900);
+  }
+}
+
+if (fs.existsSync(CITYWIDE_CANDIDATE_POOL)) {
+  const pool = (JSON.parse(fs.readFileSync(CITYWIDE_CANDIDATE_POOL, 'utf-8')).candidates || []);
+  console.log('[36F] citywide 候補 ' + pool.length + ' 件を確認する');
+  for (const cand of pool) {
+    let wd = null;
+    try { wd = await wikidataEntity(cand.wikidataId); } catch (e) { /* noop */ }
+    if (!wd || wd.lat == null || wd.lon == null) { continue; }
+    const photos = [];
+    for (const f of wd.images.slice(0, 3)) {
+      try { const p = await commonsPhoto(f); if (p) photos.push(p); } catch (e) { /* noop */ }
+      await sleep(900);
+    }
+    if (!photos.length) { await sleep(900); continue; }
+    const names = [cand.name, wd.labelJa, wd.labelEn].filter(Boolean);
+    const m = resolveByNameAndCoordinate(toLocal(wd.lat, wd.lon), bLabels, names, { nameRadiusM: 400, ambiguityMarginM: 30 });
+    const lm = resolveLandmark(cand.name || '', wd);
+    citywideRecords.push({
+      canonicalId: m.canonicalId,
+      buildingName: m.matchedName || cand.name || wd.labelJa || wd.labelEn,
+      curatedName: cand.name || wd.labelJa || wd.labelEn || cand.wikidataId,
+      wikidataId: wd.qid,
+      wikidataLabel: wd.labelJa || wd.labelEn || null,
+      wikipediaUrl: wd.wikipediaJa,
+      landmarkId: lm ? lm.landmarkId : null,
+      lat: wd.lat, lon: wd.lon,
+      matchConfidence: m.matchConfidence,
+      matchMethod: 'citywide-verified',
+      matchReason: m.reason,
+      reasonCode: m.reasonCode,
+      matchDistanceM: m.distanceM,
+      photos,
+    });
+    console.log('  citywide  ' + (cand.name || cand.wikidataId).padEnd(22), m.matchConfidence.padEnd(10),
+      (photos.length + '枚').padStart(3), m.canonicalId ? m.canonicalId.slice(0, 26) : '(建物未特定)');
+    await sleep(900);
+  }
+}
+
+// curated（すでに衝突解決済み）+ direct-id + citywide-verified を、手法をまたいだ
+// 優先順位（curated > direct-id > citywide-verified）で最終的に衝突解決する。
+// 同率で衝突すれば両方 unresolved に落とす（推測でどちらかを選ばない）。
+const allRecords = resolvePriorityCollisions([...records, ...citywideRecords]);
+// counts.high/medium/unresolved は curated + citywide 全体を反映させる（衝突解決後の最終値）
+stats.high = 0; stats.medium = 0; stats.unresolved = 0;
+for (const r of allRecords) stats[r.matchConfidence]++;
+
+// 区別カバレッジ（24区すべてが citywide scan の対象になっていることを機械的に確認する）。
+// ward-classification-polygons.json が無い環境では区が引けないため 'unknown' にまとめる
+// （壊れはしないが、区別集計としては不完全であることが coverage に残る）。
+let namedBuildingsWithWard = bLabels.map((b) => ({ id: b.id, wardId: null }));
+if (fs.existsSync(WARD_POLYGONS)) {
+  const wards = (JSON.parse(fs.readFileSync(WARD_POLYGONS, 'utf-8')).wards || []);
+  namedBuildingsWithWard = bLabels.map((b) => ({ id: b.id, wardId: classifyPointToWard(b.x, b.z, wards).wardId }));
+} else {
+  console.log('[36F] ' + WARD_POLYGONS + ' が無いため区別集計は unknown にまとめる');
+}
+const { wardStats, coverage, unresolvedReasons } = summarizeCoverage(namedBuildingsWithWard, allRecords);
+
 // canonicalId を引けるように索引化。写真ゼロのものは載せない（no-photo は runtime の既定）。
+// 同じ画像URLが複数レコードにまたがって重複しないよう、先着（curated 優先の順序）で除外する。
 const byCanonical = {};
 const byLandmark = {};
-for (const r of records) {
+const seenImageUrls = new Set();
+for (const r of allRecords) {
+  if (!r.photos.length) continue;
+  r.photos = r.photos.filter((p) => {
+    const key = p.imageUrl || p.sourcePageUrl;
+    if (!key || seenImageUrls.has(key)) return false;
+    seenImageUrls.add(key);
+    return true;
+  });
   if (!r.photos.length) continue;
   if (r.canonicalId) byCanonical[r.canonicalId] = r;
   if (r.landmarkId) byLandmark[r.landmarkId] = r;
 }
 
 const out = {
-  version: 1, mission: '35Z', generatedAt: new Date().toISOString(),
+  version: 2, mission: '36F', missionHistory: ['35Z', '36F'], generatedAt: new Date().toISOString(),
   coordinateConvention: 'znorth-neg-v1',
   sources: ['wikidata', 'wikimedia-commons'],
   policy: {
@@ -277,24 +405,33 @@ const out = {
     clickShows: ['high', 'medium'],
     rejectsWithoutLicense: true,
     noLiveLookup: '実行時にネットへ問い合わせない。この JSON だけを読む。',
+    noPhotoWithoutVerifiedMatch: '実写真の存在が確認できない建物には写真を付けない（unresolved のまま）。',
   },
   counts: {
     ...stats,
-    records: records.length,
+    records: allRecords.length,
+    curatedRecords: records.length,
+    citywideRecords: citywideRecords.length,
     indexedByCanonicalId: Object.keys(byCanonical).length,
     indexedByLandmarkId: Object.keys(byLandmark).length,
+    byMatchMethod: coverage.byMethod,
   },
+  coverage,
+  wardStats,
+  unresolvedReasons,
   byCanonicalId: byCanonical,
   byLandmarkId: byLandmark,
-  records,
+  records: allRecords,
 };
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1));
 fs.mkdirSync(REPORT_DIR, { recursive: true });
-fs.writeFileSync(path.join(REPORT_DIR, 'photo-index-build.json'), JSON.stringify({ counts: out.counts, records }, null, 2));
+fs.writeFileSync(path.join(REPORT_DIR, 'photo-index-build.json'), JSON.stringify({ counts: out.counts, coverage, wardStats, unresolvedReasons, records: allRecords }, null, 2));
 
 console.log('\n== 内訳 ==');
 console.log('  high', stats.high, '/ medium', stats.medium, '/ unresolved', stats.unresolved);
 console.log('  写真あり', stats.withPhoto, '/ 写真なし', stats.noPhoto, '/ ライセンス不明で落とした', stats.noLicense);
 console.log('  canonicalId で引ける', Object.keys(byCanonical).length, '/ landmark で引ける', Object.keys(byLandmark).length);
+console.log('  手法別（解決分）', JSON.stringify(coverage.byMethod));
+console.log('  unresolved理由', JSON.stringify(unresolvedReasons));
 console.log('out', OUT, (fs.statSync(OUT).size / 1024).toFixed(0) + 'KB');
