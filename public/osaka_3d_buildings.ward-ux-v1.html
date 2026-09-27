@@ -7769,7 +7769,10 @@ function resolveBuildingFromHit(hit) {
   if (!biAttr || hit.faceIndex === undefined) return null;
   const vIdx = hit.faceIndex * 3; // 三角形の最初の頂点インデックス
   const bi = biAttr.getX(vIdx);
-  return BLDGS[bi] || null;
+  const d = BLDGS[bi];
+  // [Mission 36D §4] legacy bMesh(壁+底面の統合mesh)もkind:'legacyVertexTri'のtriSourceを
+  //   返す。pickHitの戻り値形状({d, triSource, distance?})を他経路と揃える。
+  return d ? { d, triSource: { kind: 'legacyVertexTri', mesh: hit.object, bi } } : null;
 }
 
 // ── ホバー/選択ハイライト ──
@@ -7920,12 +7923,30 @@ function updateHighlight(hl, building) {
   hl.line.geometry.setDrawRange(0, 0);
 }
 
-// [Mission 36C] 選択ハイライトの exact-triangle 抽出 ──
-// 36Bまでの updateHighlight() は building.fp/z0/dz から屋根fan＋壁面を再押し出ししていたが、
-// これは picking(35Y: hit.faceIndex → crTriBuilding → 建物index)とは別の形状再構成であり、
-// 再押し出し側の分割方法が実meshの三角形と一致しない（隣接/付帯形状まで覆って見える）ケースがあった。
-// 選択ハイライトだけは、picking が特定した merged mesh の実三角形（crTriBuilding[t] === bi のものだけ）を
-// そのままコピーして描く。ホバー(hoverHL)は既存の updateHighlight() 方式のまま変更しない(§8)。
+// [Mission 36D] 選択(select)・ホバー(hover)共通の exact-geometry ハイライト ──
+// 36C は選択(クリック)だけを canonical merged mesh の crTriBuilding+bi で exact-triangle化した。
+// しかしホバーは今も building.fp/z0/dz からの footprint 再押し出し(updateHighlight)のままで、
+// マウスが乗っている間だけ実際の建物より大きな半透明領域が出ることがあった。加えて選択も、
+// canonical tiled buildings 以外（Umeda Visual Building PoC merged mesh / PLATEAU 高LOD(LOD2/LOD3)
+// / LandmarkHD procedural model / Mission 35S 独自点群LOD2 / legacy bMesh）では triSource が
+// 取れず、同じ footprint 再押し出しへ落ちていた。梅田の高層ビル周辺で報告された「実際の建物より
+// 広い半透明ハイライト」は主にこの経路（LandmarkHD・高LOD経路で triSource が空だった）が原因。
+//
+// 36D は「選択可能な建物ソースごとに、実描画geometryを一意に特定できる source descriptor」を
+// 統一し(下記 kind 別)、選択・ホバーの両方が必ずそれを解決してから描く設計にする。
+// exact geometry が解決できないときは、巨大な誤表示を出すより「ハイライト無し」を優先し
+// (footprint再押し出しへは絶対に戻さない)、属性カード/tooltipだけは従来どおり出す。
+//
+// triSource kind 一覧:
+//   'tri'            : merged mesh + mesh.userData.crTriBuilding[t]===bi の三角形だけを抽出。
+//                      canonical tiled buildings と Umeda Visual Building PoC merged mesh が該当。
+//   'ranges'         : tile group内の複数バケットmesh(kind別)に跨る index range 方式。
+//                      mesh.userData.lodHigh.ranges=[{start,count,canonicalId}] を持つ
+//                      PLATEAU 高LOD(LOD2/LOD3, BuildingLODLayer) が該当。
+//   'meshList'       : 1棟=1mesh(またはmaterial別の少数mesh群)をまるごと複製。
+//                      LandmarkHD procedural model・Mission 35S 独自点群LOD2 が該当。
+//   'legacyVertexTri': 旧 bMesh（buildingIndex 頂点属性で建物を紐づけた統合壁mesh。Canonical
+//                      Runtime 無効時のみ到達する dev fallback経路）。
 
 // crTriBuilding配列から対象建物(bi)に属する三角形indexだけを抽出する純粋関数。
 // THREE.js/DOMに依存しないため単体テスト可能(tests/exact-triangle-highlight.test.js)。
@@ -7938,74 +7959,251 @@ function crExactTriangleIndices(triBuilding, bi, emptyValue) {
   return out;
 }
 
+// [Mission 36D §11] crTriBuilding配列全体を1回だけ走査してbi→triangle indexのMapを作る純粋関数。
+// pointermoveごとにcrExactTriangleIndicesで配列全体を再スキャンする代わりに、同じmesh(同じ
+// crTriBuilding参照)への2回目以降の呼び出しをO(1)にする。THREE.js非依存で単体テスト可能。
+function crBuildBiTriIndex(triBuilding, emptyValue) {
+  const map = new Map();
+  if (!triBuilding) return map;
+  for (let t = 0; t < triBuilding.length; t++) {
+    const bi = triBuilding[t];
+    if (bi === emptyValue) continue;
+    let arr = map.get(bi);
+    if (!arr) { arr = []; map.set(bi, arr); }
+    arr.push(t);
+  }
+  return map;
+}
+
+// mesh.userData.crBiTriIndex に上のMapをキャッシュし、triBuilding配列の参照が変わらない限り
+// (=meshのgeometryを再構築しない限り)再利用する。同一建物への連続hoverはこのキャッシュのMap
+// 参照そのものを都度取り出すだけなので、対象建物が変わってもtile内の全三角形を再走査しない。
+function crGetBiTriIndex(mesh, triBuilding, emptyValue) {
+  const ud = mesh.userData;
+  const cached = ud.crBiTriIndex;
+  if (cached && cached.source === triBuilding) return cached.map;
+  const map = crBuildBiTriIndex(triBuilding, emptyValue);
+  ud.crBiTriIndex = { source: triBuilding, map };
+  return map;
+}
+
+// [Mission 36D] Vector3.applyMatrix4 相当の純粋関数(THREE非依存)。mesh.matrixWorld.elements
+// (列優先16要素の配列/Float32Array)をそのまま渡せる。§6: source meshにtransformがあっても
+// overlayをworld座標へ正しく変換するための共通土台。呼び出し側はeが無ければ素通しする。
+function crApplyMatrix4(e, x, y, z) {
+  return [
+    e[0] * x + e[4] * y + e[8]  * z + e[12],
+    e[1] * x + e[5] * y + e[9]  * z + e[13],
+    e[2] * x + e[6] * y + e[10] * z + e[14],
+  ];
+}
+
 // source mesh(merged building mesh)のgeometryから、対象建物(bi)が占める三角形の頂点だけを
 // 抜き出してFloat32Arrayにする。屋根・壁面を問わず元meshと完全に同じ頂点座標を使う
 // （bbox/円/footprint再押し出し/scale拡大は一切行わない）。indexed/non-indexedの両方に対応する。
+// mesh.matrixWorldがあれば適用する(§6)。canonical tile / Umeda PoC merged meshは現状すべて単位
+// 行列だが、将来transformを持つmerged meshが増えても正しくworld座標へ変換されるようにする。
 function extractExactBuildingGeometry(mesh, bi) {
   const ud = mesh && mesh.userData;
   const triBuilding = ud && ud.crTriBuilding;
   const geom = mesh && mesh.geometry;
   const posAttr = geom && geom.getAttribute && geom.getAttribute('position');
   if (!triBuilding || !posAttr) return null;
-  const triIdx = crExactTriangleIndices(triBuilding, bi, ud.crTriEmpty);
+  // [Mission 36D §11] 対象meshのbi→triangle indexキャッシュから引く(初回のみ全体スキャン)。
+  const triIdx = (bi == null || bi === ud.crTriEmpty) ? [] : (crGetBiTriIndex(mesh, triBuilding, ud.crTriEmpty).get(bi) || []);
   if (!triIdx.length) return null;
   const idxAttr = geom.index; // 通常のCanonicalRuntime buildingsメッシュはnon-indexedだが念のため両対応
+  const e = (mesh.matrixWorld && mesh.matrixWorld.elements) || null;
   const positions = new Float32Array(triIdx.length * 9);
   let w = 0;
   for (const t of triIdx) {
     for (let k = 0; k < 3; k++) {
       const vi = idxAttr ? idxAttr.getX(t * 3 + k) : (t * 3 + k);
-      positions[w++] = posAttr.getX(vi);
-      positions[w++] = posAttr.getY(vi);
-      positions[w++] = posAttr.getZ(vi);
+      const x = posAttr.getX(vi), y = posAttr.getY(vi), z = posAttr.getZ(vi);
+      if (e) { const p = crApplyMatrix4(e, x, y, z); positions[w++] = p[0]; positions[w++] = p[1]; positions[w++] = p[2]; }
+      else { positions[w++] = x; positions[w++] = y; positions[w++] = z; }
     }
   }
   return { positions, triCount: triIdx.length };
 }
 
-// 選択色(0x3d8bff)はselectHL.fillのmaterialをそのまま共有し、exact overlay専用に新規materialは作らない。
-const selectExactMesh = new THREE.Mesh(new THREE.BufferGeometry(), selectHL.fill.material);
-selectExactMesh.frustumCulled = false;
-selectExactMesh.renderOrder = 998;
-selectExactMesh.name = 'SelectExactTriangleHighlight';
-selectExactMesh.visible = false;
-scene.add(selectExactMesh);
-let selectExactId = null; // 現在exact overlayで表示中のbuilding.id（同一建物への再構築スキップ用）
-
-// [Mission 36C §12] pointermove毎に全mesh/全建物を走査しないよう、この関数はクリック時(selectBuilding)
-// からのみ呼ぶ。triSource.mesh.userData.crTriBuildingという「hitしたmeshのバケット内配列」だけを見るため、
-// 60万棟全体を走査することはない。
-function updateSelectHighlight(building, triSource) {
-  const exact = (building && triSource && triSource.mesh && triSource.bi != null)
-    ? extractExactBuildingGeometry(triSource.mesh, triSource.bi)
-    : null;
-
-  if (exact) {
-    // exact-triangle抽出ができたときは、旧来のfootprint再押し出し(selectHL.fill)側を必ず隠す
-    updateHighlight(selectHL, null);
-    if (selectExactId !== building.id || !selectExactMesh.visible) {
-      const oldGeom = selectExactMesh.geometry;
-      const newGeom = new THREE.BufferGeometry();
-      newGeom.setAttribute('position', new THREE.BufferAttribute(exact.positions, 3));
-      newGeom.computeBoundingSphere();
-      selectExactMesh.geometry = newGeom;
-      // [§10] 選択切替のたびに古いgeometryをdisposeしてGPUバッファリークを防ぐ
-      if (oldGeom) oldGeom.dispose();
-      selectExactMesh.visible = true;
-      selectExactId = building.id;
+// [Mission 36D] 'ranges'方式: PLATEAU 高LOD(BuildingLODLayer)。1 tile内でkind(roof/wall/ground)別に
+// 分かれた複数のbucket meshがあり、各meshのuserData.lodHigh.rangesが対象建物のindex区間
+// (start..start+count、index空間)を持つ。同じ建物のroofとwallが別bucket meshに分かれるため、
+// tileGroup(=同じtileのsibling mesh群)全体を見て、対象canonicalIdのrangeだけを集める。
+function extractExactRangeGeometry(tileGroup, targetCanonicalId) {
+  const children = tileGroup && tileGroup.children;
+  if (!Array.isArray(children) || targetCanonicalId == null) return null;
+  const positions = [];
+  for (const child of children) {
+    const lodHigh = child && child.userData && child.userData.lodHigh;
+    const geom = child && child.geometry;
+    const idxAttr = geom && geom.index;
+    const posAttr = geom && geom.getAttribute && geom.getAttribute('position');
+    if (!lodHigh || !Array.isArray(lodHigh.ranges) || !idxAttr || !posAttr) continue;
+    const e = (child.matrixWorld && child.matrixWorld.elements) || null;
+    for (const r of lodHigh.ranges) {
+      if (r.canonicalId !== targetCanonicalId) continue;
+      for (let i = r.start; i < r.start + r.count; i++) {
+        const vi = idxAttr.getX(i);
+        const x = posAttr.getX(vi), y = posAttr.getY(vi), z = posAttr.getZ(vi);
+        if (e) { const p = crApplyMatrix4(e, x, y, z); positions.push(p[0], p[1], p[2]); }
+        else positions.push(x, y, z);
+      }
     }
+  }
+  if (!positions.length) return null;
+  return { positions: Float32Array.from(positions), triCount: positions.length / 9 };
+}
+
+// [Mission 36D] 1meshをまるごとworld座標へ変換してコピーする(indexed/non-indexed両対応)。
+// 'meshList'方式の内部ヘルパー。1棟=1mesh(またはmaterial別の少数mesh)ソース専用。
+function extractWholeMeshGeometry(mesh) {
+  const geom = mesh && mesh.geometry;
+  const posAttr = geom && geom.getAttribute && geom.getAttribute('position');
+  if (!posAttr) return null;
+  const idxAttr = geom.index;
+  const triCount = idxAttr ? Math.floor(idxAttr.count / 3) : Math.floor(posAttr.count / 3);
+  if (!triCount) return null;
+  const e = (mesh.matrixWorld && mesh.matrixWorld.elements) || null;
+  const positions = new Float32Array(triCount * 9);
+  let w = 0;
+  for (let t = 0; t < triCount; t++) {
+    for (let k = 0; k < 3; k++) {
+      const vi = idxAttr ? idxAttr.getX(t * 3 + k) : (t * 3 + k);
+      const x = posAttr.getX(vi), y = posAttr.getY(vi), z = posAttr.getZ(vi);
+      if (e) { const p = crApplyMatrix4(e, x, y, z); positions[w++] = p[0]; positions[w++] = p[1]; positions[w++] = p[2]; }
+      else { positions[w++] = x; positions[w++] = y; positions[w++] = z; }
+    }
+  }
+  return { positions, triCount };
+}
+
+// [Mission 36D] 'meshList'方式: 複数mesh(LandmarkHDの部材ごとのmesh群、または単一mesh)を
+// まとめて1つのoverlay用頂点配列へ連結する。CustomLod2Layer(35S)は常に1件、LandmarkHDは
+// 部材(roof/wall/stone/trim等)の数だけ渡す。
+function extractMeshListGeometry(meshes) {
+  if (!Array.isArray(meshes) || !meshes.length) return null;
+  const chunks = [];
+  let totalTri = 0;
+  for (const m of meshes) {
+    const r = extractWholeMeshGeometry(m);
+    if (r) { chunks.push(r.positions); totalTri += r.triCount; }
+  }
+  if (!totalTri) return null;
+  const positions = new Float32Array(totalTri * 9);
+  let offset = 0;
+  for (const c of chunks) { positions.set(c, offset); offset += c.length; }
+  return { positions, triCount: totalTri };
+}
+
+// [Mission 36D] 'legacyVertexTri'方式: 旧bMesh(統合壁mesh)。crTriBuildingのような三角形単位の
+// 対応表を持たず、代わりに頂点ごとのbuildingIndex属性を持つ（同じ三角形の3頂点は同じ値）。
+// 三角形の先頭頂点のbuildingIndexが対象biと一致する三角形だけを抽出する。Canonical Runtime
+// 無効時のみ到達するdev fallback経路（既定はCanonical Runtime有効＝この経路は通常通らない）。
+function extractLegacyVertexTriGeometry(mesh, bi) {
+  const geom = mesh && mesh.geometry;
+  const biAttr = geom && geom.getAttribute && geom.getAttribute('buildingIndex');
+  const posAttr = geom && geom.getAttribute && geom.getAttribute('position');
+  if (!biAttr || !posAttr || bi == null) return null;
+  const idxAttr = geom.index;
+  const triCount = idxAttr ? Math.floor(idxAttr.count / 3) : Math.floor(posAttr.count / 3);
+  const e = (mesh.matrixWorld && mesh.matrixWorld.elements) || null;
+  const positions = [];
+  for (let t = 0; t < triCount; t++) {
+    const firstVi = idxAttr ? idxAttr.getX(t * 3) : (t * 3);
+    if (biAttr.getX(firstVi) !== bi) continue;
+    for (let k = 0; k < 3; k++) {
+      const vi = idxAttr ? idxAttr.getX(t * 3 + k) : (t * 3 + k);
+      const x = posAttr.getX(vi), y = posAttr.getY(vi), z = posAttr.getZ(vi);
+      if (e) { const p = crApplyMatrix4(e, x, y, z); positions.push(p[0], p[1], p[2]); }
+      else positions.push(x, y, z);
+    }
+  }
+  if (!positions.length) return null;
+  return { positions: Float32Array.from(positions), triCount: positions.length / 9 };
+}
+
+// [Mission 36D] triSource(kind別descriptor)からexact geometryを解決する唯一の入口。
+// 選択・ホバーの両方がこの関数だけを通る。どのkindでも解決できなければnullを返し、
+// 呼び出し側(updateExactHighlight)はfootprint再押し出しへは絶対に落とさない。
+function resolveExactTriSource(triSource) {
+  if (!triSource) return null;
+  switch (triSource.kind) {
+    case 'tri': return extractExactBuildingGeometry(triSource.mesh, triSource.bi);
+    case 'ranges': return extractExactRangeGeometry(triSource.tileGroup, triSource.canonicalId);
+    case 'meshList': return extractMeshListGeometry(triSource.meshes);
+    case 'legacyVertexTri': return extractLegacyVertexTriGeometry(triSource.mesh, triSource.bi);
+    default:
+      // 後方互換: kind省略({mesh,bi}のみ)は36C由来の'tri'として扱う
+      return (triSource.mesh && triSource.bi != null) ? extractExactBuildingGeometry(triSource.mesh, triSource.bi) : null;
+  }
+}
+
+// [Mission 36D QA] 実機QA用の集計。footprint fallbackを通常経路で使っていないこと(§3)と、
+// exact解決できなかった建物タイプの内訳を後から確認できるようにする(window.__MISSION36D_STATS__)。
+const highlightQaStats = { exactByKind: { tri: 0, ranges: 0, meshList: 0, legacyVertexTri: 0 }, noExact: 0 };
+if (typeof window !== 'undefined') window.__MISSION36D_STATS__ = highlightQaStats;
+
+// select/hover共有のexact overlay mesh。色は既存のselectHL/hoverHL.fill.materialをそのまま
+// 使い回す(§10: 新規materialを増やさず、depthTest等の設定も既存のまま踏襲する)。
+function makeExactOverlay(hl, name) {
+  const m = new THREE.Mesh(new THREE.BufferGeometry(), hl.fill.material);
+  m.frustumCulled = false;
+  m.renderOrder = 998;
+  m.name = name;
+  m.visible = false;
+  scene.add(m);
+  return m;
+}
+const selectExactMesh = makeExactOverlay(selectHL, 'SelectExactTriangleHighlight');
+const hoverExactMesh = makeExactOverlay(hoverHL, 'HoverExactTriangleHighlight');
+const selectExactState = { id: null }; // 現在exact overlayで表示中のbuilding.id（同一建物への再構築スキップ用）
+const hoverExactState = { id: null };
+let currentSelectedBuildingId = null;  // [Mission 36D §8] hover/selected重複時の優先度判定にhoverHL側から使う
+
+// [Mission 36D] 選択(select)・ホバー(hover)共通のexact-geometryハイライト更新。
+// buildingがnullなら完全にクリアする(deselect/mouseout/別棟選択時に前のoverlayを必ず消す。§9)。
+// exact解決できたときだけoverlayを表示し、そうでなければハイライト無しにする
+// (footprint再押し出しへは絶対に戻さない。§3)。同一建物への連続呼び出しは頂点再構築をスキップする
+// (§11: pointermove毎の無駄な再構築を避ける。exact抽出自体は常にヒットしたmesh/tileGroup内部
+// だけを見るため、対象を変えても全建物・全meshの走査にはならない)。
+function updateExactHighlight(hl, exactMesh, state, building, triSource) {
+  if (!building) {
+    if (exactMesh.visible) exactMesh.visible = false;
+    state.id = null;
+    updateHighlight(hl, null);
+    return false;
+  }
+  if (state.id === building.id && exactMesh.visible) return true; // 対象建物が変わっていない
+
+  const exact = resolveExactTriSource(triSource);
+  if (exact) {
+    updateHighlight(hl, null); // exact表示ができるときは旧footprint版を必ず隠す(二重表示防止)
+    const oldGeom = exactMesh.geometry;
+    const newGeom = new THREE.BufferGeometry();
+    newGeom.setAttribute('position', new THREE.BufferAttribute(exact.positions, 3));
+    newGeom.computeBoundingSphere();
+    exactMesh.geometry = newGeom;
+    if (oldGeom) oldGeom.dispose(); // [§9] 古いgeometryを必ずdisposeしてGPUバッファリークを防ぐ
+    exactMesh.visible = true;
+    state.id = building.id;
+    const kind = (triSource && triSource.kind) || 'tri';
+    highlightQaStats.exactByKind[kind] = (highlightQaStats.exactByKind[kind] || 0) + 1;
     // [検証フック] 抽出したtriangle数とcrTriBuilding内の対象bi出現数が一致することをテストから確認できるようにする
     if (typeof window !== 'undefined' && window.__MISSION36C_VERIFY__) {
       try { window.__MISSION36C_VERIFY__({ buildingId: building.id, triCount: exact.triCount }); } catch (err) { /* noop */ }
     }
-    return;
+    return true;
   }
 
-  // triSourceが無い(HD/高LOD/独自点群/footprint内外判定 経由)pickや、deselectのときは
-  // 従来のfootprint再押し出し方式へフォールバックする(§8: 既存動作を壊さない)。
-  selectExactMesh.visible = false;
-  selectExactId = null;
-  updateHighlight(selectHL, building);
+  // [§d] exact geometryが取れない建物タイプ: 巨大な誤表示を出すより、ハイライト無しを優先する。
+  // 旧来のfootprint再押し出し(updateHighlight(hl, building))へは戻さない。
+  highlightQaStats.noExact++;
+  exactMesh.visible = false;
+  state.id = null;
+  updateHighlight(hl, null);
+  return false;
 }
 
 
@@ -11759,7 +11957,9 @@ function pickHit(e){mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/inner
       const lm = window.__LANDMARK_HD_LAYER__.pick(ray);
       if (lm && lm.canonicalId && typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.buildingDataById) {
         const d = CanonicalRuntime.buildingDataById(lm.canonicalId);
-        if (d) return { d: { ...d, landmarkId: lm.landmarkId, landmarkName: lm.cfg.name }, distance: lm.distance };
+        // [Mission 36D §4] lm.triSource(kind:'meshList')をそのまま伝播し、選択/ホバーの
+        //   ハイライトがHDモデルの実meshをそのまま複製できるようにする。
+        if (d) return { d: { ...d, landmarkId: lm.landmarkId, landmarkName: lm.cfg.name }, distance: lm.distance, triSource: lm.triSource };
       }
     } catch (err) { /* HD が拾えなければ通常の建物 pick へ */ }
   }
@@ -11769,7 +11969,9 @@ function pickHit(e){mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/inner
       const hl = window.__BUILDING_LOD_LAYER__.pick(ray);
       if (hl && hl.canonicalId && typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.buildingDataById) {
         const d = CanonicalRuntime.buildingDataById(hl.canonicalId);
-        if (d) return { d: { ...d, displayLod: hl.lod }, distance: hl.distance };
+        // [Mission 36D §4] hl.triSource(kind:'ranges')を伝播。同じ建物のroof/wallが別バケット
+        //   meshに分かれていても、tileGroup内を見て両方まとめて抽出できる。
+        if (d) return { d: { ...d, displayLod: hl.lod }, distance: hl.distance, triSource: hl.triSource };
       }
     } catch (err) { /* 拾えなければ通常の建物 pick へ */ }
   }
@@ -11781,11 +11983,14 @@ function pickHit(e){mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/inner
         const d = CanonicalRuntime.buildingDataById(cl.canonicalId);
         // [Mission 35S §4] 通常の property card に加えて、試作であることが分かる QA カードも出す。
         try { if (window.__MISSION35S_QA_CARD__) window.__MISSION35S_QA_CARD__(); } catch (e2) { /* noop */ }
-        if (d) return { d: { ...d, displayLod: 2, displayLodSource: 'Live City experimental point cloud' }, distance: cl.distance };
+        // [Mission 36D §4] cl.triSource(kind:'meshList', 1件)を伝播。
+        if (d) return { d: { ...d, displayLod: 2, displayLodSource: 'Live City experimental point cloud' }, distance: cl.distance, triSource: cl.triSource };
       }
     } catch (err) { /* 独自高LODが拾えなければ通常建物pickへ */ }
   }
   // [Mission 31G] Canonical Runtime 有効時は canonical 建物へ raycast（旧 bMesh は hidden）。
+  // [Mission 36D §4] cr.triSource(kind:'tri')は canonical tiled buildings と Umeda Visual
+  //   Building PoC merged mesh の両方をカバーする（buildingFromHit側で統一済み）。
   if (typeof CanonicalRuntime !== 'undefined' && CanonicalRuntime.isEnabled && CanonicalRuntime.isEnabled()) {
     try { const cr = CanonicalRuntime.pickBuilding(ray); if (cr) return cr; } catch (err) { /* fall through */ }
   }
@@ -11797,8 +12002,9 @@ function pickHit(e){mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/inner
   // 現在visible(=画面に描画中)なメッシュへの最初のヒットのみを採用する。
   const hit = hits.find(h => h.object.visible !== false);
   if (!hit) return null;
-  const d = resolveBuildingFromHit(hit);
-  return d ? {d} : null;}
+  // [Mission 36D §4] legacy bMesh経路もkind:'legacyVertexTri'のtriSourceを返すようにする
+  //   （Canonical Runtime無効時のdev fallbackでも、footprint再押し出しへは落とさない）。
+  return resolveBuildingFromHit(hit);}
 function showTip(e,h){const d=h.d;
   tip.style.cssText=`display:block;left:${e.clientX+16}px;top:${e.clientY-12}px`;
   document.getElementById('tth').textContent='🏢 建物属性';
@@ -12007,13 +12213,26 @@ window.addEventListener('mousemove',e=>{
     // 広域モード: 建物ホバー無効（誤操作防止のため、判定自体をスキップ）
     tip.style.display='none';
     canvas.style.cursor = cs.drag ? 'grabbing' : 'default';
-    updateHighlight(hoverHL, null);
+    updateExactHighlight(hoverHL, hoverExactMesh, hoverExactState, null, null);
     try { BuildingPhoto.hide(); } catch (err) { /* noop */ }
     return;
   }
   const h=pickHit(e);
-  if(h){showTip(e,h);canvas.style.cursor='pointer';updateHighlight(hoverHL, h.d);}
-  else{tip.style.display='none';canvas.style.cursor=cs.drag?'grabbing':'default';updateHighlight(hoverHL, null);}
+  // [Mission 36D §7/§8] hoverもselectと同じexact-geometry原則に統一する。選択中の建物へ
+  //   hoverしたときは、既に見えている青(selected)の上へシアン(hover)を二重に光らせない。
+  if (h) {
+    showTip(e,h);
+    canvas.style.cursor='pointer';
+    if (currentSelectedBuildingId != null && h.d && h.d.id === currentSelectedBuildingId) {
+      updateExactHighlight(hoverHL, hoverExactMesh, hoverExactState, null, null);
+    } else {
+      updateExactHighlight(hoverHL, hoverExactMesh, hoverExactState, h.d, h.triSource);
+    }
+  } else {
+    tip.style.display='none';
+    canvas.style.cursor=cs.drag?'grabbing':'default';
+    updateExactHighlight(hoverHL, hoverExactMesh, hoverExactState, null, null);
+  }
   // [Mission 35Z §4/§12] 写真は 35Y の picking が返した建物 ID に対してだけ出す。
   //   ラベル（ランドマーク）に乗っているときは、そちらの写真を優先する。
   try {
@@ -12547,7 +12766,8 @@ function showExtendedFacilityCard(record, distanceInfo) {
 function closePropCard(){
   document.getElementById('prop-card').style.display='none';
   document.getElementById('pr').style.display='block';
-  updateSelectHighlight(null, null);
+  updateExactHighlight(selectHL, selectExactMesh, selectExactState, null, null);
+  currentSelectedBuildingId = null;
   clearTownBoundary();
   switchPropCardTab('basic');
   // 生活タブの基準点をクリアする。次回建物選択時にupdateLifeTab()が必ず
@@ -13133,9 +13353,10 @@ function selectBuilding(e, h){
   // 内部状態は常に最新の選択建物を指すよう、建物選択のたびに必ず呼び出す。
   // 同じ建物を再選択した場合も基準点・表示内容を再計算する(冪等)。
   updateLifeTab(h.d);
-  // [Mission 36C] pickBuilding が返す h.triSource（source mesh + building index）が
-  // あれば実三角形をそのまま抽出して描く。無ければ従来のfootprint再押し出しへフォールバックする。
-  updateSelectHighlight(h.d, h.triSource); // クリック選択中の建物はホバーとは別色（青）で保持
+  // [Mission 36D] pickHit が返す h.triSource（source descriptor。kind別。§4）から exact geometry
+  // を解決して描く。解決できなければハイライト無し（footprint再押し出しへは戻さない。§3）。
+  updateExactHighlight(selectHL, selectExactMesh, selectExactState, h.d, h.triSource); // クリック選択中の建物はホバーとは別色（青）で保持
+  currentSelectedBuildingId = h.d ? h.d.id : null; // [Mission 36D §8] hover側の重複抑制に使う
   // 建物が属する町丁目の境界線を表示（人口・世帯数・地価の対象範囲を視覚的に明示）
   // 別の建物をクリックした場合、showTownBoundary内部で前の境界を消してから新しい境界を描くため、
   // ここで明示的に前の境界を消す処理は不要（同一町丁目内の別建物なら再描画自体もスキップされる）
@@ -14304,7 +14525,13 @@ const LandmarkHDLayer = (function () {
     if (!hits.length) return null;
     const ud = hits[0].object.userData.landmarkHd;
     const rec = landmarks.find((r) => r.cfg.landmarkId === ud.landmarkId);
-    return rec ? { landmarkId: ud.landmarkId, canonicalId: rec.cfg.pickCanonicalId, cfg: rec.cfg, distance: hits[0].distance } : null;
+    if (!rec) return null;
+    // [Mission 36D §4/§5] このランドマークの全部材(outline除く。roof/wall/stone/trim等)を
+    //   まるごとexact overlay用に複製できるよう、kind:'meshList'のtriSourceを返す。
+    //   §6: mesh/group変換はgeometryへ build 時に焼き込み済み(単位行列)だが、extractWholeMeshGeometry
+    //   はmesh.matrixWorldを常に適用するため、将来transformを持つ部材が増えても正しく変換される。
+    return { landmarkId: ud.landmarkId, canonicalId: rec.cfg.pickCanonicalId, cfg: rec.cfg, distance: hits[0].distance,
+      triSource: { kind: 'meshList', meshes: rec.meshes.filter((m) => m.userData.landmarkHd.material !== 'outline') } };
   }
 
   function setEnabled(on) {
@@ -14808,7 +15035,14 @@ const BuildingLODLayer = (function () {
     const h = hits[0];
     const ranges = h.object.userData.lodHigh.ranges || [];
     const i3 = h.faceIndex * 3;
-    for (const r of ranges) if (i3 >= r.start && i3 < r.start + r.count) return { canonicalId: r.canonicalId, lod: r.lod, distance: h.distance };
+    for (const r of ranges) {
+      if (i3 < r.start || i3 >= r.start + r.count) continue;
+      // [Mission 36D §4/§5] 同じ建物のroof/wall/groundは kind別の別bucket meshに分かれているため、
+      //   tileGroup(=h.object.parent。このtileのsibling bucket mesh群)全体を渡し、
+      //   exact抽出側(extractExactRangeGeometry)で対象canonicalIdのrangeだけをまとめて集める。
+      return { canonicalId: r.canonicalId, lod: r.lod, distance: h.distance,
+        triSource: { kind: 'ranges', tileGroup: h.object.parent, canonicalId: r.canonicalId } };
+    }
     return null;
   }
 
@@ -15611,7 +15845,11 @@ const CustomLod2Layer = (function () {
   function pick(rayObj) {
     if (!visible || !mesh || !canonicalId) return null;
     const hits = rayObj.intersectObject(mesh, false); if (!hits.length) return null;
-    return { canonicalId, lod: 2, experimental: true, source: 'Live City point cloud prototype', distance: hits[0].distance };
+    // [Mission 36D §4/§5] このレイヤーは対象棟1件だけの単独meshなので、そのままkind:'meshList'
+    //   (1件)として返す。roof/wall/groundはmaterial groupで分かれているだけで同一geometryのため、
+    //   meshをまるごと複製すれば全surfaceが揃う。
+    return { canonicalId, lod: 2, experimental: true, source: 'Live City point cloud prototype', distance: hits[0].distance,
+      triSource: { kind: 'meshList', meshes: [mesh] } };
   }
   function getDebug() {
     const m = (data && data.measurement) || {};
@@ -17210,20 +17448,24 @@ const CanonicalRuntime = (function () {
   //   pickBuilding 側の既存ロジック（point-in-ring→最近傍centroid fallback）をそのまま再利用する。
   //   ONE_TO_MANY/MANY_TO_ONE 等で canonicalIds が複数でも、代表IDとして先頭要素を採用する（§26要件）。
   let umedaPocFootprints = [];
+  // [Mission 36D §4] Umeda Visual Building PoC の1 feature → footprint record への変換。
+  //   buildUmedaPocFootprints()(pickBuilding のC経路用インデックス)と、下のbuildUmedaPocMeshes()
+  //   内で作る crBuildingFps(A経路: crTriBuilding経由のexact-triangle抽出用)の両方で同じ形を使う。
+  function umedaPocFpRecordFor(f) {
+    const ring = f.geometry.coordinates[0];
+    let sx = 0, sz = 0;
+    for (const p of ring) { sx += p[0]; sz += p[1]; }
+    const n = Math.max(1, ring.length);
+    const h = Math.max(3, f.heightM || 8);
+    return {
+      canonicalId: f.canonicalIds[0], canonicalIds: f.canonicalIds,
+      ring, cx: sx / n, cz: sz / n, h,
+      attributes: { heightM: f.heightM, usage: f.usage, usageCategory: f.usageCategory, usageLabel: f.usageLabel, source: 'plateau' },
+      placement: 'DISPLAY',
+    };
+  }
   function buildUmedaPocFootprints() {
-    umedaPocFootprints = umedaPocData.features.map((f) => {
-      const ring = f.geometry.coordinates[0];
-      let sx = 0, sz = 0;
-      for (const p of ring) { sx += p[0]; sz += p[1]; }
-      const n = Math.max(1, ring.length);
-      const h = Math.max(3, f.heightM || 8);
-      return {
-        canonicalId: f.canonicalIds[0], canonicalIds: f.canonicalIds,
-        ring, cx: sx / n, cz: sz / n, h,
-        attributes: { heightM: f.heightM, usage: f.usage, usageCategory: f.usageCategory, usageLabel: f.usageLabel, source: 'plateau' },
-        placement: 'DISPLAY',
-      };
-    });
+    umedaPocFootprints = umedaPocData.features.map(umedaPocFpRecordFor);
   }
   function buildUmedaPocMeshes() {
     if (!umedaPocData || umedaPocGroup.children.length) return;
@@ -17235,14 +17477,33 @@ const CanonicalRuntime = (function () {
     }
     for (const [cat, feats] of byCat) {
       const positions = [];
+      // [Mission 36D §4] canonical tile buildingsと同じcrTriBuilding方式を、このmerged mesh
+      //   にも持たせる。これにより選択/ホバーハイライトがexact-triangle抽出できるようになり、
+      //   従来この経路だけfootprint内外判定(triSource:null)へ落ちて、footprint再押し出しの
+      //   大きな半透明ハイライトが出ていた問題を解消する。
+      const tri = [];   // 三角形ごとの建物index(このbucket内)
+      const fps = [];   // このbucket内の建物footprint一覧
       for (const f of feats) {
         const h = Math.max(3, f.heightM || 8);
+        const triBefore = positions.length / 9;
         pushExtrude(positions, 'Polygon', f.geometry.coordinates, h);
+        const triAfter = positions.length / 9;
+        const bIdx = fps.push(umedaPocFpRecordFor(f)) - 1;
+        for (let t = triBefore; t < triAfter; t++) tri.push(bIdx);
       }
       const baseColor = CR_USAGE_COLOR[cat] || CR_USAGE_COLOR.other;
       const color = msBlend(baseColor, 0xffffff, CR_USAGE_WHITEN.near);
       const mesh = meshFromPositions(positions, color, REN.building);
-      if (mesh) { mesh.name = 'UmedaVisualBuildingMesh'; tagRuntimeOwnerRecursive(mesh, RUNTIME_OWNER.CANONICAL); umedaPocGroup.add(mesh); }
+      if (mesh) {
+        mesh.name = 'UmedaVisualBuildingMesh';
+        tagRuntimeOwnerRecursive(mesh, RUNTIME_OWNER.CANONICAL);
+        mesh.userData.crTriBuilding = (fps.length < 65535)
+          ? Uint16Array.from(tri, (v) => (v < 0 ? 65535 : v))
+          : Uint32Array.from(tri, (v) => (v < 0 ? 0xffffffff : v));
+        mesh.userData.crTriEmpty = (fps.length < 65535) ? 65535 : 0xffffffff;
+        mesh.userData.crBuildingFps = fps;
+        umedaPocGroup.add(mesh);
+      }
     }
     buildUmedaPocFootprints();
   }
@@ -21661,16 +21922,18 @@ const CanonicalRuntime = (function () {
     lastMs: 0, wallHits: 0, roofHits: 0 };
 
   /** hit（三角形）から建物を引く。引けなければ null。
-   *  [Mission 36C §2] crTriBuilding経由で解決できたときは、選択ハイライトが元mesh実三角形を
-   *  そのまま抽出できるよう、source mesh と building index(bi) も一緒に返す
-   *  （footprint内外判定へ落ちるCの経路はmesh単位の三角形対応表を持たないため、triSourceはnull）。 */
+   *  [Mission 36C §2 / 36D §4] crTriBuilding経由で解決できたときは、選択/ホバーハイライトが
+   *  元mesh実三角形をそのまま抽出できるよう、kind:'tri' + source mesh + building index(bi) を
+   *  一緒に返す（canonical tiled buildingsとUmeda Visual Building PoC merged meshの両方が
+   *  この経路を通る。§4）。footprint内外判定へ落ちるCの経路はmesh単位の三角形対応表を
+   *  持たないため、triSourceはnull。 */
   function buildingFromHit(hit) {
     const ud = hit.object && hit.object.userData;
     if (ud && ud.crTriBuilding && hit.faceIndex != null) {
       const bi = ud.crTriBuilding[hit.faceIndex];
       if (bi !== ud.crTriEmpty) {
         const fp = ud.crBuildingFps[bi];
-        if (fp) { pickStats.byFace++; return { fp, triSource: { mesh: hit.object, bi } }; }
+        if (fp) { pickStats.byFace++; return { fp, triSource: { kind: 'tri', mesh: hit.object, bi } }; }
       }
       return null;              // この三角形は建物に紐づかない（footprint 欠損）
     }
