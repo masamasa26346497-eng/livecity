@@ -64,7 +64,12 @@ function loadMission36DHelpers() {
     assert.ok(body, `${name}関数が見つかりません`);
     return body;
   });
-  const factory = new Function(`${bodies.join('\n')}\nreturn { ${FN_NAMES.join(', ')} };`);
+  // [Mission 36E] resolveExactTriSourceはcrTriFragmentsById/crRangeGroupsById(モジュール
+  // スコープの索引)を参照する。このテストはcanonicalIdを持たないtriSource(kind省略や旧来の
+  // {mesh,bi}のみ)しか使わないため索引の中身は無関係だが、参照先が無いとReferenceErrorになる
+  // ため、空のMapとして用意しておく(索引未登録→フォールバック、という36D互換動作を検証する)。
+  const preamble = 'const crTriFragmentsById = new Map();\nconst crRangeGroupsById = new Map();';
+  const factory = new Function(`${preamble}\n${bodies.join('\n')}\nreturn { ${FN_NAMES.join(', ')} };`);
   return factory();
 }
 

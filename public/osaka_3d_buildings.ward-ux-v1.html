@@ -8124,14 +8124,125 @@ function extractLegacyVertexTriGeometry(mesh, bi) {
   return { positions: Float32Array.from(positions), triCount: positions.length / 9 };
 }
 
+// [Mission 36E §1/§3] 選択対象の「logical building」(=canonicalId)が、bucket分け(usageCategory
+// 等)やtile境界をまたぐことで複数mesh/tileGroupに分かれて描画されているケースがある。
+// このとき triSource が指す「hitした1 mesh/tileGroupだけ」を抽出すると、同じ建物の別fragment
+// (別bucketのroof/wall、隣接tileに分かれたfragment等)が欠落し、「同じ1棟なのに一部の面だけ
+// ハイライトされる」partial highlightになる(ユーザー報告と一致)。
+//
+// これを解決するため、tile/bucket mesh構築時に canonicalId → 実描画fragment一覧 の索引を
+// ロード時に作っておき(下記 crRegisterTriFragments 等)、pointermoveごとの全scene走査をせずに
+// O(1)でその建物の全fragmentを引けるようにする。tile破棄時は crUnregister* で索引からも外す。
+//
+// 'tri'方式(canonical tiled buildings / Umeda Visual Building PoC merged mesh)用:
+//   canonicalId -> Array<{mesh, bi}>
+const crTriFragmentsById = new Map();
+// 'ranges'方式(PLATEAU高LOD / BuildingLODLayer)用: 同じ建物が複数tileGroup(tile境界をまたぐ場合)
+// に分かれていても全てunionできるよう、canonicalId -> Array<tileGroup> を別途保持する。
+const crRangeGroupsById = new Map();
+
+// tile/bucket mesh構築時に呼ぶ。fps は mesh.userData.crBuildingFps と同じ配列(bi = fpsの添字)。
+function crRegisterTriFragments(mesh, fps) {
+  if (!Array.isArray(fps)) return;
+  for (let bi = 0; bi < fps.length; bi++) {
+    const canonicalId = fps[bi] && fps[bi].canonicalId;
+    if (canonicalId == null) continue;
+    let arr = crTriFragmentsById.get(canonicalId);
+    if (!arr) { arr = []; crTriFragmentsById.set(canonicalId, arr); }
+    arr.push({ mesh, bi });
+  }
+}
+
+// tile破棄時に呼ぶ。登録時と同じfps配列を渡すことで、crTriFragmentsById全体を走査せず、
+// このmeshが関わるcanonicalIdだけを対象にできる。
+function crUnregisterTriFragments(mesh, fps) {
+  if (!Array.isArray(fps)) return;
+  for (const fpRec of fps) {
+    const canonicalId = fpRec && fpRec.canonicalId;
+    if (canonicalId == null) continue;
+    const arr = crTriFragmentsById.get(canonicalId);
+    if (!arr) continue;
+    const kept = arr.filter((f) => f.mesh !== mesh);
+    if (kept.length) crTriFragmentsById.set(canonicalId, kept);
+    else crTriFragmentsById.delete(canonicalId);
+  }
+}
+
+// BuildingLODLayerのtileGroup構築時に、そのtileが含む各canonicalIdについて呼ぶ。
+function crRegisterRangeGroup(canonicalId, tileGroup) {
+  if (canonicalId == null || !tileGroup) return;
+  let arr = crRangeGroupsById.get(canonicalId);
+  if (!arr) { arr = []; crRangeGroupsById.set(canonicalId, arr); }
+  if (!arr.includes(tileGroup)) arr.push(tileGroup);
+}
+
+// tile破棄時に呼ぶ。ids(そのtileGroupが含んでいたcanonicalIdのSet/配列)を渡すことで、
+// crRangeGroupsById全体を走査しない。
+function crUnregisterRangeGroup(tileGroup, ids) {
+  if (!tileGroup || !ids) return;
+  for (const canonicalId of ids) {
+    const arr = crRangeGroupsById.get(canonicalId);
+    if (!arr) continue;
+    const kept = arr.filter((g) => g !== tileGroup);
+    if (kept.length) crRangeGroupsById.set(canonicalId, kept);
+    else crRangeGroupsById.delete(canonicalId);
+  }
+}
+
+// [Mission 36E] 同一canonicalIdに属する複数の{mesh,bi}fragment(bucket/tileをまたぐ場合)を
+// 全てunionする。'tri'方式(canonical tiled buildings / Umeda Visual Building PoC)が対象。
+// fragmentCountを結果に含め、QA(highlightQaStats)からpartial解決が起きていないか確認できるようにする。
+function extractExactTriUnionGeometry(fragments) {
+  if (!Array.isArray(fragments) || !fragments.length) return null;
+  const chunks = [];
+  let totalTri = 0, resolvedFragments = 0;
+  for (const frag of fragments) {
+    const r = extractExactBuildingGeometry(frag.mesh, frag.bi);
+    if (r) { chunks.push(r.positions); totalTri += r.triCount; resolvedFragments++; }
+  }
+  if (!totalTri) return null;
+  const positions = new Float32Array(totalTri * 9);
+  let offset = 0;
+  for (const c of chunks) { positions.set(c, offset); offset += c.length; }
+  return { positions, triCount: totalTri, fragmentCount: resolvedFragments };
+}
+
+// [Mission 36E] 同一canonicalIdに属する複数tileGroup(tile境界をまたぐ場合)のrangeを
+// 全てunionする。'ranges'方式(PLATEAU高LOD/BuildingLODLayer)が対象。
+function extractExactRangeUnionGeometry(tileGroups, canonicalId) {
+  if (!Array.isArray(tileGroups) || !tileGroups.length || canonicalId == null) return null;
+  const chunks = [];
+  let totalTri = 0, resolvedFragments = 0;
+  for (const tileGroup of tileGroups) {
+    const r = extractExactRangeGeometry(tileGroup, canonicalId);
+    if (r) { chunks.push(r.positions); totalTri += r.triCount; resolvedFragments++; }
+  }
+  if (!totalTri) return null;
+  const positions = new Float32Array(totalTri * 9);
+  let offset = 0;
+  for (const c of chunks) { positions.set(c, offset); offset += c.length; }
+  return { positions, triCount: totalTri, fragmentCount: resolvedFragments };
+}
+
 // [Mission 36D] triSource(kind別descriptor)からexact geometryを解決する唯一の入口。
 // 選択・ホバーの両方がこの関数だけを通る。どのkindでも解決できなければnullを返し、
 // 呼び出し側(updateExactHighlight)はfootprint再押し出しへは絶対に落とさない。
 function resolveExactTriSource(triSource) {
   if (!triSource) return null;
   switch (triSource.kind) {
-    case 'tri': return extractExactBuildingGeometry(triSource.mesh, triSource.bi);
-    case 'ranges': return extractExactRangeGeometry(triSource.tileGroup, triSource.canonicalId);
+    case 'tri': {
+      // [Mission 36E §1/§3] まず索引から同一canonicalIdの全fragmentを引いてunionする。
+      // 索引が無い(未登録の呼び出し元・テスト等)ときだけ triSource自体の{mesh,bi}へ
+      // フォールバックする(36C/36D互換)。
+      const fragments = triSource.canonicalId != null ? crTriFragmentsById.get(triSource.canonicalId) : null;
+      if (fragments && fragments.length) return extractExactTriUnionGeometry(fragments);
+      return extractExactBuildingGeometry(triSource.mesh, triSource.bi);
+    }
+    case 'ranges': {
+      const groups = triSource.canonicalId != null ? crRangeGroupsById.get(triSource.canonicalId) : null;
+      if (groups && groups.length) return extractExactRangeUnionGeometry(groups, triSource.canonicalId);
+      return extractExactRangeGeometry(triSource.tileGroup, triSource.canonicalId);
+    }
     case 'meshList': return extractMeshListGeometry(triSource.meshes);
     case 'legacyVertexTri': return extractLegacyVertexTriGeometry(triSource.mesh, triSource.bi);
     default:
@@ -8142,13 +8253,36 @@ function resolveExactTriSource(triSource) {
 
 // [Mission 36D QA] 実機QA用の集計。footprint fallbackを通常経路で使っていないこと(§3)と、
 // exact解決できなかった建物タイプの内訳を後から確認できるようにする(window.__MISSION36D_STATS__)。
-const highlightQaStats = { exactByKind: { tri: 0, ranges: 0, meshList: 0, legacyVertexTri: 0 }, noExact: 0 };
-if (typeof window !== 'undefined') window.__MISSION36D_STATS__ = highlightQaStats;
+// [Mission 36E QA] multiFragmentByKind: 1棟のexact overlayが複数fragment(bucket/tileをまたいだ
+// {mesh,bi}やtileGroup)のunionで構成された回数。lastResolved: 直近1件の内訳(建物ID/kind/
+// fragmentCount/triCount)。実機で「partial解決(fragmentが本来複数あるのに1つしか拾えていない)」
+// が起きていないかをQAから覗けるようにする(window.__MISSION36E_STATS__)。
+const highlightQaStats = {
+  exactByKind: { tri: 0, ranges: 0, meshList: 0, legacyVertexTri: 0 },
+  noExact: 0,
+  multiFragmentByKind: { tri: 0, ranges: 0, meshList: 0, legacyVertexTri: 0 },
+  lastResolved: null,
+};
+if (typeof window !== 'undefined') {
+  window.__MISSION36D_STATS__ = highlightQaStats;
+  window.__MISSION36E_STATS__ = highlightQaStats;
+}
 
 // select/hover共有のexact overlay mesh。色は既存のselectHL/hoverHL.fill.materialをそのまま
 // 使い回す(§10: 新規materialを増やさず、depthTest等の設定も既存のまま踏襲する)。
+// [Mission 36E §5] hl.fill.material(既存の選択/ホバー色material)を土台にしつつ、exact overlay
+// 専用に side だけ THREE.DoubleSide へ変えたcloneを使う。hl.fill.material自体(旧footprint fan
+// 描画用。7807の対角線対策コメント参照)はFrontSideのまま変えない(fan描画は現在
+// updateHighlight(hl, null)でしか呼ばれておらず実質死んでいるが、念のため既存挙動は保つ)。
+// 実建物側のmaterial(crBuildingMaterial / LandmarkHDLayer / BuildingLODLayer / CustomLod2Layer)
+// はいずれも side: THREE.DoubleSide で描画されている(裏面カリング無し)。overlayをFrontSide固定の
+// ままにすると、凹型/L字建物や壁面を裏側から見る角度で、実際のmeshでは見えている面がoverlay側
+// だけ裏面カリングされて消え、「同じ建物なのに一部の面だけハイライトが欠ける」partial highlightの
+// 原因になっていた(§5監査で確認・全selectable building sourceに共通する経路のため全件に効く)。
 function makeExactOverlay(hl, name) {
-  const m = new THREE.Mesh(new THREE.BufferGeometry(), hl.fill.material);
+  const material = hl.fill.material.clone();
+  material.side = THREE.DoubleSide;
+  const m = new THREE.Mesh(new THREE.BufferGeometry(), material);
   m.frustumCulled = false;
   m.renderOrder = 998;
   m.name = name;
@@ -8166,8 +8300,9 @@ let currentSelectedBuildingId = null;  // [Mission 36D §8] hover/selected重複
 // buildingがnullなら完全にクリアする(deselect/mouseout/別棟選択時に前のoverlayを必ず消す。§9)。
 // exact解決できたときだけoverlayを表示し、そうでなければハイライト無しにする
 // (footprint再押し出しへは絶対に戻さない。§3)。同一建物への連続呼び出しは頂点再構築をスキップする
-// (§11: pointermove毎の無駄な再構築を避ける。exact抽出自体は常にヒットしたmesh/tileGroup内部
-// だけを見るため、対象を変えても全建物・全meshの走査にはならない)。
+// (§11: pointermove毎の無駄な再構築を避ける。exact抽出は[Mission 36E]のcanonicalId索引
+// (crTriFragmentsById/crRangeGroupsById)をO(1)で引くだけなので、対象を変えても全建物・全mesh・
+// 全tileGroupの走査にはならない。索引はそのcanonicalIdに属する既知fragmentだけを返す)。
 function updateExactHighlight(hl, exactMesh, state, building, triSource) {
   if (!building) {
     if (exactMesh.visible) exactMesh.visible = false;
@@ -8190,6 +8325,11 @@ function updateExactHighlight(hl, exactMesh, state, building, triSource) {
     state.id = building.id;
     const kind = (triSource && triSource.kind) || 'tri';
     highlightQaStats.exactByKind[kind] = (highlightQaStats.exactByKind[kind] || 0) + 1;
+    // [Mission 36E QA] 複数fragmentのunionで解決できた回数を種別ごとに記録し、直近1件の内訳も
+    // 保持する。実機QAから「partial解決になっていないか」を確認できるようにする。
+    const fragmentCount = exact.fragmentCount || 1;
+    if (fragmentCount > 1) highlightQaStats.multiFragmentByKind[kind] = (highlightQaStats.multiFragmentByKind[kind] || 0) + 1;
+    highlightQaStats.lastResolved = { buildingId: building.id, kind, fragmentCount, triCount: exact.triCount };
     // [検証フック] 抽出したtriangle数とcrTriBuilding内の対象bi出現数が一致することをテストから確認できるようにする
     if (typeof window !== 'undefined' && window.__MISSION36C_VERIFY__) {
       try { window.__MISSION36C_VERIFY__({ buildingId: building.id, triCount: exact.triCount }); } catch (err) { /* noop */ }
@@ -14886,6 +15026,9 @@ const BuildingLODLayer = (function () {
 
   function disposeTile(rec) {
     if (!rec || !rec.group) return;
+    // [Mission 36E §3] このtileが含んでいたcanonicalIdをcrRangeGroupsById索引からも外す
+    // (残ると、破棄済みtileGroupをexact overlayが読みに行ってしまう)。
+    if (rec.ids) crUnregisterRangeGroup(rec.group, rec.ids);
     rec.group.traverse((o) => { if (o.isMesh && o.geometry) o.geometry.dispose(); });
     if (rec.group.parent) rec.group.parent.remove(rec.group);
   }
@@ -14903,6 +15046,10 @@ const BuildingLODLayer = (function () {
       const doc = JSON.parse(txt);
       const built = buildTileGroup(doc, band);
       ensureGroup().add(built.group);
+      // [Mission 36E §3] このtileが含む各建物をcanonicalId索引へ登録する。tile境界をまたいで
+      // 同じ建物が別tileGroupにも存在する場合、そちらの登録と合わさってexact overlayが
+      // 全fragment(roof/wall/ground)をunionできるようになる。
+      for (const id of built.ids) crRegisterRangeGroup(id, built.group);
       tiles.set(key, { ...built, doc, lastUse: Date.now() });
       // ★ ここで必ず同期的に抑制を反映する。次の update() まで待つと、
       //   「高 LOD は出たが LOD1 がまだ消えていない」フレームが 1 枚描かれて二重に見える
@@ -15019,6 +15166,9 @@ const BuildingLODLayer = (function () {
     disposeTile(rec);
     const built = buildTileGroup(rec.doc, band);
     ensureGroup().add(built.group);
+    // [Mission 36E §3] disposeTile()が古いtileGroupの登録を外した直後なので、再構築した
+    // 新しいtileGroupを索引へ登録し直す(§3参照)。
+    for (const id of built.ids) crRegisterRangeGroup(id, built.group);
     tiles.set(key, { ...built, doc: rec.doc, lastUse: Date.now() });
     markSuppressDirty();
     applySuppress();
@@ -17502,6 +17652,9 @@ const CanonicalRuntime = (function () {
           : Uint32Array.from(tri, (v) => (v < 0 ? 0xffffffff : v));
         mesh.userData.crTriEmpty = (fps.length < 65535) ? 65535 : 0xffffffff;
         mesh.userData.crBuildingFps = fps;
+        // [Mission 36E §1] Umeda PoC merged meshもcanonicalId索引へ登録する
+        // (canonical tile buildingsと同じ'tri'方式を共有しているため)。
+        crRegisterTriFragments(mesh, fps);
         umedaPocGroup.add(mesh);
       }
     }
@@ -21159,7 +21312,13 @@ const CanonicalRuntime = (function () {
   function disposeEntry(e) {
     try {
       layerGroup[e.layer].remove(e.group);
-      e.group.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => { if (!(x.userData && x.userData.crShared)) x.dispose(); }); });
+      e.group.traverse((o) => {
+        // [Mission 36E §1] このtileを捨てるときはcanonicalId索引からも忘れずに外す
+        // (残ると、破棄済みmeshのgeometryをexact overlayが読みに行ってしまう)。
+        if (o.userData && o.userData.crBuildingFps) crUnregisterTriFragments(o, o.userData.crBuildingFps);
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((x) => { if (!(x.userData && x.userData.crShared)) x.dispose(); });
+      });
     } catch (err) { /* noop */ }
   }
 
@@ -21499,6 +21658,10 @@ const CanonicalRuntime = (function () {
                 : Uint32Array.from(bucket.tri, (v) => (v < 0 ? 0xffffffff : v));
               m.userData.crTriEmpty = (bucket.fps.length < 65535) ? 65535 : 0xffffffff;
               m.userData.crBuildingFps = bucket.fps;
+              // [Mission 36E §1] このbucket meshが持つ各建物をcanonicalId索引へ登録する。
+              // 同じ建物が別bucket(用途違い)/別tile(境界をまたぐ)にも存在する場合、そちらの
+              // 登録と合わさってexact overlayが全fragmentをunionできるようになる。
+              crRegisterTriFragments(m, bucket.fps);
               g.add(m); vtx += pos.length / 3;
             }
           }
@@ -21933,7 +22096,9 @@ const CanonicalRuntime = (function () {
       const bi = ud.crTriBuilding[hit.faceIndex];
       if (bi !== ud.crTriEmpty) {
         const fp = ud.crBuildingFps[bi];
-        if (fp) { pickStats.byFace++; return { fp, triSource: { kind: 'tri', mesh: hit.object, bi } }; }
+        // [Mission 36E §1] canonicalIdも一緒に返し、resolveExactTriSourceがcrTriFragmentsById索引
+        // から同一建物の全fragment(別bucket/別tileに分かれている分も含む)をunionできるようにする。
+        if (fp) { pickStats.byFace++; return { fp, triSource: { kind: 'tri', mesh: hit.object, bi, canonicalId: fp.canonicalId } }; }
       }
       return null;              // この三角形は建物に紐づかない（footprint 欠損）
     }
