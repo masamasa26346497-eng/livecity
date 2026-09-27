@@ -7959,6 +7959,34 @@ function crExactTriangleIndices(triBuilding, bi, emptyValue) {
   return out;
 }
 
+// [Mission 36D §11] crTriBuilding配列全体を1回だけ走査してbi→triangle indexのMapを作る純粋関数。
+// pointermoveごとにcrExactTriangleIndicesで配列全体を再スキャンする代わりに、同じmesh(同じ
+// crTriBuilding参照)への2回目以降の呼び出しをO(1)にする。THREE.js非依存で単体テスト可能。
+function crBuildBiTriIndex(triBuilding, emptyValue) {
+  const map = new Map();
+  if (!triBuilding) return map;
+  for (let t = 0; t < triBuilding.length; t++) {
+    const bi = triBuilding[t];
+    if (bi === emptyValue) continue;
+    let arr = map.get(bi);
+    if (!arr) { arr = []; map.set(bi, arr); }
+    arr.push(t);
+  }
+  return map;
+}
+
+// mesh.userData.crBiTriIndex に上のMapをキャッシュし、triBuilding配列の参照が変わらない限り
+// (=meshのgeometryを再構築しない限り)再利用する。同一建物への連続hoverはこのキャッシュのMap
+// 参照そのものを都度取り出すだけなので、対象建物が変わってもtile内の全三角形を再走査しない。
+function crGetBiTriIndex(mesh, triBuilding, emptyValue) {
+  const ud = mesh.userData;
+  const cached = ud.crBiTriIndex;
+  if (cached && cached.source === triBuilding) return cached.map;
+  const map = crBuildBiTriIndex(triBuilding, emptyValue);
+  ud.crBiTriIndex = { source: triBuilding, map };
+  return map;
+}
+
 // [Mission 36D] Vector3.applyMatrix4 相当の純粋関数(THREE非依存)。mesh.matrixWorld.elements
 // (列優先16要素の配列/Float32Array)をそのまま渡せる。§6: source meshにtransformがあっても
 // overlayをworld座標へ正しく変換するための共通土台。呼び出し側はeが無ければ素通しする。
@@ -7981,7 +8009,8 @@ function extractExactBuildingGeometry(mesh, bi) {
   const geom = mesh && mesh.geometry;
   const posAttr = geom && geom.getAttribute && geom.getAttribute('position');
   if (!triBuilding || !posAttr) return null;
-  const triIdx = crExactTriangleIndices(triBuilding, bi, ud.crTriEmpty);
+  // [Mission 36D §11] 対象meshのbi→triangle indexキャッシュから引く(初回のみ全体スキャン)。
+  const triIdx = (bi == null || bi === ud.crTriEmpty) ? [] : (crGetBiTriIndex(mesh, triBuilding, ud.crTriEmpty).get(bi) || []);
   if (!triIdx.length) return null;
   const idxAttr = geom.index; // 通常のCanonicalRuntime buildingsメッシュはnon-indexedだが念のため両対応
   const e = (mesh.matrixWorld && mesh.matrixWorld.elements) || null;

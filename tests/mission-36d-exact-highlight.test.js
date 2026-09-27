@@ -46,6 +46,8 @@ function extractFunctionBody(html, functionName) {
 
 const FN_NAMES = [
   'crExactTriangleIndices',
+  'crBuildBiTriIndex',
+  'crGetBiTriIndex',
   'crApplyMatrix4',
   'extractExactBuildingGeometry',
   'extractExactRangeGeometry',
@@ -219,6 +221,54 @@ test('extractLegacyVertexTriGeometry: buildingIndex頂点属性から対象建�
   assert.equal(r.triCount, 1);
   assert.deepEqual(Array.from(r.positions), flat.slice(0, 3).flat());
   assert.equal(extractLegacyVertexTriGeometry(mesh, 999), null);
+});
+
+test('crBuildBiTriIndex: crExactTriangleIndicesの全biを一度に求めたMapと一致する(§11 キャッシュ基盤)', { skip: SKIP_REASON }, () => {
+  const { crExactTriangleIndices, crBuildBiTriIndex } = loadMission36DHelpers();
+  const triBuilding = [0, 1, 1, 0, 2, 2, 0, 65535, 1];
+  const map = crBuildBiTriIndex(triBuilding, 65535);
+  for (const bi of [0, 1, 2]) {
+    assert.deepEqual(map.get(bi), crExactTriangleIndices(triBuilding, bi, 65535), `bi=${bi}の抽出結果が一致しません`);
+  }
+  assert.equal(map.has(65535), false, '欠損分類(emptyValue)はMapに含まれてはいけません');
+});
+
+test('crGetBiTriIndex: 同じmeshへの2回目の呼び出しはキャッシュ(同じMap参照)を再利用する(§11 pointermove性能)', { skip: SKIP_REASON }, () => {
+  const { crGetBiTriIndex } = loadMission36DHelpers();
+  const triBuilding = [0, 1, 1, 0];
+  const mesh = { userData: {} };
+  const map1 = crGetBiTriIndex(mesh, triBuilding, 65535);
+  const map2 = crGetBiTriIndex(mesh, triBuilding, 65535);
+  assert.equal(map1, map2, '同一meshかつ同一crTriBuilding参照なら再スキャンせずキャッシュを返すはず');
+  assert.deepEqual(map1.get(1), [1, 2]);
+
+  // triBuilding配列の参照自体が変わった(=geometry再構築)場合は新しいMapを作り直す
+  const rebuiltTriBuilding = [2, 2];
+  const map3 = crGetBiTriIndex(mesh, rebuiltTriBuilding, 65535);
+  assert.notEqual(map3, map1, 'crTriBuilding参照が変わったら古いキャッシュを使ってはいけません');
+  assert.deepEqual(map3.get(2), [0, 1]);
+});
+
+test('extractExactBuildingGeometry: 同一meshで異なるbiを連続抽出しても、それぞれ正しい三角形だけを返す(キャッシュ経路の検証)', { skip: SKIP_REASON }, () => {
+  const { extractExactBuildingGeometry } = loadMission36DHelpers();
+  const flat = [
+    [0, 0, 0], [1, 0, 0], [1, 0, 1],       // triangle0 → 建物0
+    [10, 0, 10], [11, 0, 10], [11, 0, 11], // triangle1 → 建物1
+    [10, 3, 10], [11, 3, 10], [11, 3, 11], // triangle2 → 建物1
+  ];
+  const mesh = { userData: { crTriBuilding: [0, 1, 1], crTriEmpty: 65535 }, geometry: mockNonIndexedGeometry(flat) };
+
+  const first = extractExactBuildingGeometry(mesh, 1);
+  assert.equal(first.triCount, 2);
+  assert.deepEqual(Array.from(first.positions), flat.slice(3).flat());
+
+  // 1回目の呼び出しでmesh.userDataにキャッシュが構築されているはず
+  assert.ok(mesh.userData.crBiTriIndex, 'crBiTriIndexキャッシュが構築されていません');
+
+  // キャッシュ構築後に別のbiを抽出しても、他棟の三角形を混ぜずに正しく取れること
+  const second = extractExactBuildingGeometry(mesh, 0);
+  assert.equal(second.triCount, 1);
+  assert.deepEqual(Array.from(second.positions), flat.slice(0, 3).flat());
 });
 
 test('resolveExactTriSource: kind別に正しい抽出関数へ振り分ける', { skip: SKIP_REASON }, () => {
