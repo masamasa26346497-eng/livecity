@@ -281,6 +281,47 @@ test('[36H §5/§9/§12] runPilotMatch はVERIFIEDだけをdurable mappingへ書
   assert.notEqual(hospitalResult.matchConfidence, 'VERIFIED');
 });
 
+// ── follow-up: パイロットCLIは既定のレート保護のまま30件をペースを空けて完走する ──
+test('[36H follow-up] runPilotMatch は既定のレート上限(10/60000ms)のままバッチ間で待って30件を完走する', async () => {
+  let now = 1_700_000_000_000;
+  const sleeps = [];
+  const sleepImpl = async (ms) => { sleeps.push(ms); now += ms; };
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ places: [] }) });
+  // rateGuard は now だけ注入し、maxRequestsPerWindow/windowMs は既定値（10/60000）のまま
+  // ＝ 本番の既定レート保護そのものを使って検証する。sleepImpl のおかげでテストは一切実待ちしない。
+  const r = await runPilotMatch({
+    apiKey: 'FAKE_KEY', fetchImpl, dryRun: true,
+    rateGuard: { now: () => now },
+    sleepImpl,
+  });
+  assert.equal(r.ok, true);
+  assert.equal(r.counts.total, 30);
+  assert.equal(r.unresolved.length + r.counts.verified, 30, '候補が無言で欠落している');
+  // 30候補 / 既定バッチサイズ10 → 10件目・20件目の後に次のウィンドウまで待つ（2回）
+  assert.equal(sleeps.length, 2, 'バッチ境界での待機回数が想定と異なる');
+  for (const ms of sleeps) assert.equal(ms, 60_000 + 1_000);
+});
+
+test('[36H follow-up] バッチ調整をすり抜けてレート上限に当たっても、待って再試行し候補を落とさない', async () => {
+  let now = 1_700_000_000_000;
+  const sleeps = [];
+  const sleepImpl = async (ms) => { sleeps.push(ms); now += ms; };
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ places: [] }) });
+  // わざとバッチサイズ(30=1バッチのみ)をガードの実ウィンドウ上限(4)より大きくして、
+  // 事前ペース調整をすり抜けさせ、RateLimitExceededError → 待って再試行、の安全網を検証する。
+  const r = await runPilotMatch({
+    apiKey: 'FAKE_KEY', fetchImpl, dryRun: true,
+    rateGuard: { now: () => now, maxRequestsPerWindow: 4 },
+    sleepImpl,
+    pilotBatchSize: 30,
+  });
+  assert.equal(r.ok, true);
+  assert.equal(r.counts.total, 30, '候補が無言で欠落している');
+  assert.equal(r.unresolved.length + r.counts.verified, 30);
+  assert.ok(sleeps.length > 0, 'レート上限の再試行で待っていない');
+  for (const ms of sleeps) assert.equal(ms, 60_000 + 1_000);
+});
+
 // ── §4/§8/§10 UI: source separation / attribution / regression ─────────
 test('[36H §4] GooglePlacesPhoto は Wikimedia(#pc-photo-section / #bldg-photo-card)を触らない', () => {
   const g = gpLayer();

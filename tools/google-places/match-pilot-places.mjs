@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveProjectPath, isMainModule } from '../lib/paths.js';
 import { createPlacesClient } from './lib/places-client.mjs';
+import { RateLimitExceededError } from './lib/rate-guard.mjs';
 import { classifyPilotMatch } from './lib/pilot-matching.mjs';
 import { assertDurableRecordSafe } from './lib/persistence-guard.mjs';
 import { loadGooglePlacesApiKeyFromEnv } from './load-api-key.mjs';
@@ -26,12 +27,42 @@ const CANDIDATES = resolveProjectPath('data/photos/google-places-pilot-candidate
 const OUT_MAPPING = resolveProjectPath('public/map-data/osaka-city/derived/google-places-pilot-mapping.json');
 const REPORT_DIR = resolveProjectPath('data/reports/mission36h-google-places-pilot');
 
+// [Mission 36H follow-up] パイロットCLIはビルド時の一括ジョブ（30候補）であり、
+// createPlacesClient の既定レート保護（10リクエスト/60秒・セッション200件）はそのまま維持する
+// （オンデマンド実行時の保護を弱めない）。その代わり、パイロットCLI側が自発的にペースを落として
+// ウィンドウを使い切る前に待つことで、既定の保護に「当たって例外で落ちる」のを避ける。
+const DEFAULT_PILOT_BATCH_SIZE = 10;    // createRequestGuard の既定 maxRequestsPerWindow と揃える
+const DEFAULT_PILOT_WINDOW_MS = 60_000; // createRequestGuard の既定 windowMs と揃える
+const PILOT_WINDOW_PAD_MS = 1_000;      // ウィンドウ境界のタイミングずれに対する安全マージン
+const PILOT_MAX_RATE_LIMIT_RETRIES = 2; // ペース調整をすり抜けてレート上限に当たった場合の再試行上限（無制限リトライはしない）
+
+const defaultSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// レート上限を使い切る前にバッチ間で待っていても、タイミング次第では RateLimitExceededError に
+// 当たることがある（安全マージン）。その場合も候補を無言で飛ばさず、次のウィンドウまで待って
+// 決定的に再試行し、上限回数を超えたら理由付きで unresolved として記録する。
+async function searchTextWithRateLimitRetry(client, candidate, sleepImpl, pilotWindowMs) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await client.searchText({ textQuery: candidate.name, lat: candidate.expectLat, lon: candidate.expectLon });
+    } catch (e) {
+      if (!(e instanceof RateLimitExceededError)) throw e;
+      if (attempt >= PILOT_MAX_RATE_LIMIT_RETRIES) {
+        return { ok: false, reason: 'rate-limited (retries exhausted): ' + e.message };
+      }
+      await sleepImpl(pilotWindowMs + PILOT_WINDOW_PAD_MS);
+    }
+  }
+}
+
 export async function runPilotMatch({
   apiKey = loadGooglePlacesApiKeyFromEnv(), fetchImpl, dryRun = false, requestGuard, rateGuard,
+  sleepImpl = defaultSleep,
+  // 既定は createRequestGuard の既定値と揃える。テスト等で rateGuard を上書きした場合は、
+  // 明示的に pilotBatchSize/pilotWindowMs を渡さない限りそれに追従する（本番既定値は不変）。
+  pilotBatchSize = rateGuard?.maxRequestsPerWindow ?? DEFAULT_PILOT_BATCH_SIZE,
+  pilotWindowMs = rateGuard?.windowMs ?? DEFAULT_PILOT_WINDOW_MS,
 } = {}) {
-  // requestGuard/rateGuard: 通常は createPlacesClient の既定値（本番のレート保護）を使う。
-  // 単体テストだけが、実ネットワークに出ない fetchImpl と一緒に高めの rateGuard を注入して、
-  // 30候補分のループが既定の 10/分 に当たらないようにする（本番の既定値自体は変えない）。
   const input = JSON.parse(fs.readFileSync(CANDIDATES, 'utf-8'));
   const client = createPlacesClient({ apiKey, fetchImpl, requestGuard, rateGuard });
 
@@ -45,8 +76,15 @@ export async function runPilotMatch({
 
   const verified = [];
   const unresolved = [];
-  for (const c of input.candidates) {
-    const search = await client.searchText({ textQuery: c.name, lat: c.expectLat, lon: c.expectLon });
+  const candidates = input.candidates;
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i];
+    // 1バッチ（既定10件 = ウィンドウの上限）を使い切ったら、次の候補に進む前に
+    // 次のウィンドウが開くまで待つ。スロー＝失敗にせず、ここで自発的にペースを落とす。
+    if (i > 0 && i % pilotBatchSize === 0) {
+      await sleepImpl(pilotWindowMs + PILOT_WINDOW_PAD_MS);
+    }
+    const search = await searchTextWithRateLimitRetry(client, c, sleepImpl, pilotWindowMs);
     if (!search.ok) {
       unresolved.push({ facilityId: c.facilityId, name: c.name, matchConfidence: 'UNRESOLVED',
         reason: 'Places API 呼び出し失敗: ' + search.reason });
