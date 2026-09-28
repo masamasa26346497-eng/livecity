@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "mission": "36H",
+  "generatedAt": null,
+  "pending": true,
+  "pendingReason": "Google Places API (New) の解決にはネットワーク接続と GOOGLE_PLACES_API_KEY が必要。このリポジトリのサンドボックス環境では実行できない（CLAUDE.md の環境分離: data:download 系と同じ扱い）。ローカル環境で `GOOGLE_PLACES_API_KEY=xxxx npm run data:google-places:match-pilot` を実行するとこのファイルが更新される。",
+  "policy": {
+    "persistsOnlyLinkage": true,
+    "neverPersists": ["photo binaries", "photo media URLs", "resource names as permanent"],
+    "resolvesPhotosAtDisplayTime": true
+  },
+  "counts": { "verified": 0, "unresolved": 0, "total": 30 },
+  "entries": []
+}

@@ -127,3 +127,7 @@ public/map-data/osaka-city/gsi-building-outline/
 /data/processed/osaka-city/**
 /public/map-data/osaka-city/**
 /data/reports/*-qa/**
+
+# [Mission 36H] Google Places APIキー等、ローカル専用のブラウザ側設定。コミットしない。
+# 雛形は public/local-config.example.js（これは配布物としてコミットする）。
+/public/local-config.js
