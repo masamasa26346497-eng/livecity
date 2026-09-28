@@ -26,9 +26,14 @@ const CANDIDATES = resolveProjectPath('data/photos/google-places-pilot-candidate
 const OUT_MAPPING = resolveProjectPath('public/map-data/osaka-city/derived/google-places-pilot-mapping.json');
 const REPORT_DIR = resolveProjectPath('data/reports/mission36h-google-places-pilot');
 
-export async function runPilotMatch({ apiKey = loadGooglePlacesApiKeyFromEnv(), fetchImpl, dryRun = false } = {}) {
+export async function runPilotMatch({
+  apiKey = loadGooglePlacesApiKeyFromEnv(), fetchImpl, dryRun = false, requestGuard, rateGuard,
+} = {}) {
+  // requestGuard/rateGuard: 通常は createPlacesClient の既定値（本番のレート保護）を使う。
+  // 単体テストだけが、実ネットワークに出ない fetchImpl と一緒に高めの rateGuard を注入して、
+  // 30候補分のループが既定の 10/分 に当たらないようにする（本番の既定値自体は変えない）。
   const input = JSON.parse(fs.readFileSync(CANDIDATES, 'utf-8'));
-  const client = createPlacesClient({ apiKey, fetchImpl });
+  const client = createPlacesClient({ apiKey, fetchImpl, requestGuard, rateGuard });
 
   if (!client.isEnabled()) {
     return {

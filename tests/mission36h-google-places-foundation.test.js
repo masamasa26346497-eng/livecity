@@ -266,7 +266,13 @@ test('[36H §5/§9/§12] runPilotMatch はVERIFIEDだけをdurable mappingへ書
     }
     return { ok: true, json: async () => ({ places: [] }) };
   };
-  const r = await runPilotMatch({ apiKey: 'FAKE_KEY', fetchImpl: fetchImpl2, dryRun: true });
+  // 30候補ぶんループするため、本番既定の 10リクエスト/分 に当たってしまう。
+  // ここはモックfetchで実ネットワークに出ないテストなので、rateGuard だけテスト用に緩める
+  // （本番の既定値 createRequestGuard() 自体は変更しない。§6/§7 のレート保護はそのまま）。
+  const r = await runPilotMatch({
+    apiKey: 'FAKE_KEY', fetchImpl: fetchImpl2, dryRun: true,
+    rateGuard: { maxRequestsPerWindow: 100, maxRequestsPerSession: 100 },
+  });
   assert.equal(r.ok, true);
   assert.equal(r.counts.total, 30);
   assert.ok(r.counts.verified >= 1, 'shrineが検証済みにならなかった');
