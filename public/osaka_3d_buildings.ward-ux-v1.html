@@ -219,7 +219,21 @@ body{background:var(--lc-bg);color:var(--lc-text)}
   font-family:'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif}
 #bldg-photo-card .bp-title{padding:9px 12px 7px;font-size:12.5px;font-weight:700;color:#20252a;
   line-height:1.35;border-bottom:1px solid #eef1f3}
-#bldg-photo-card .bp-img{display:block;width:100%;height:auto;max-height:200px;object-fit:cover;background:#f2f4f6}
+/* [Mission 36A] 建物の外観が切れないよう **crop しない**（cover を使わない）。
+   縦横比は元画像のまま。余白は地図 UI に合う淡いグレーにして黒帯感を出さない。
+   高さは固定せず、向きに応じて上限だけ決める。 */
+#bldg-photo-card .bp-figure{width:100%;background:#eef1f4;border-top:1px solid #eef1f3;
+  border-bottom:1px solid #eef1f3;display:flex;align-items:center;justify-content:center}
+#bldg-photo-card .bp-img{display:block;max-width:100%;max-height:260px;width:auto;height:auto;
+  object-fit:contain}
+/* 向きごとの上限だけ変える（歪ませない） */
+/* width を 100% で固定すると、高さ上限に当たったときに **箱の比** が元画像とずれる
+   （実測: 1.336 の画像が箱では 1.463 になった）。幅は max-width だけにして、
+   中央寄せは figure 側に任せる。これで箱も中身も元の縦横比のまま。 */
+#bldg-photo-card .bp-figure.is-portrait .bp-img{max-height:260px}
+#bldg-photo-card .bp-figure.is-landscape .bp-img{max-height:190px}
+#bldg-photo-card .bp-figure.is-square .bp-img{max-height:220px}
+#bldg-photo-card .bp-figure.is-panorama .bp-img{max-height:130px}
 #bldg-photo-card .bp-meta{display:flex;justify-content:space-between;gap:8px;
   padding:7px 12px 0;font-size:10px;color:#66717a}
 #bldg-photo-card .bp-src{font-weight:600}
@@ -231,8 +245,15 @@ body{background:var(--lc-bg);color:var(--lc-text)}
 #pc-photo-section{margin-top:12px;padding-top:10px;border-top:1px solid rgba(80,160,255,0.12);display:none}
 #pc-photo-section .pc-photo-head{font-size:10px;font-weight:700;color:#5a7aa0;letter-spacing:.3px;margin-bottom:7px}
 #pc-photo-section .pc-photo{margin-bottom:10px}
-#pc-photo-section .pc-photo img{display:block;width:100%;height:auto;max-height:170px;object-fit:cover;
-  border-radius:8px;background:rgba(255,255,255,0.06)}
+/* [Mission 36A] click 側も原則 contain。1 枚目（メイン）は必ず全体を出す。 */
+#pc-photo-section .pc-photo-figure{background:rgba(255,255,255,0.06);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+#pc-photo-section .pc-photo img{display:block;max-width:100%;max-height:230px;width:auto;height:auto;
+  object-fit:contain;border-radius:8px}
+#pc-photo-section .pc-photo-figure.is-landscape img{max-height:200px}
+#pc-photo-section .pc-photo-figure.is-panorama img{max-height:140px}
+/* 2 枚目以降は小さめのサムネイル扱い（メインだけ全体表示を保証する） */
+#pc-photo-section .pc-photo.is-thumb img{max-height:110px}
 #pc-photo-section .pc-photo-cap{padding:5px 2px 0;font-size:9.5px;line-height:1.5;color:#9cb8d8}
 #pc-photo-section .pc-photo-lic{color:#7ab8e0;font-weight:600}
 #pc-photo-section .pc-photo-by{color:#8fa0b4}
@@ -12188,7 +12209,8 @@ const BuildingPhoto = (function () {
   let shownFor = null;               // いま出している building / landmark の id
   let pendingFor = null;
   const stats = { loads: 0, hoverShown: 0, hoverSkippedNoPhoto: 0, cacheHits: 0,
-    imgErrors: 0, lookups: 0, dwellMs: DWELL_MS };
+    imgErrors: 0, lookups: 0, dwellMs: DWELL_MS,
+    orientations: {}, lastOrientation: null, lastAspect: null };
 
   function ensure() {
     if (index || loading) return loading || Promise.resolve(index);
@@ -12238,15 +12260,34 @@ const BuildingPhoto = (function () {
       return;
     }
     c.innerHTML = '<div class="bp-title">' + esc(rec.wikidataLabel || rec.buildingName || name) + '</div>'
-      + '<img class="bp-img" alt="' + esc(rec.buildingName || name) + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '">'
+      + '<div class="bp-figure"><img class="bp-img" alt="' + esc(rec.buildingName || name)
+      + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '"></div>'
       + '<div class="bp-meta">'
       + '<span class="bp-src">' + esc(p.source === 'wikimedia-commons' ? 'Wikimedia Commons' : p.source) + '</span>'
       + '<span class="bp-lic">' + esc(shorten(p.license, 22)) + '</span>'
       + '</div>'
       + (p.author ? '<div class="bp-by">' + esc(shorten(p.author, 46)) + '</div>' : '')
       + '<div class="bp-hint">クリックで詳細</div>';
+    // [Mission 36A] 読み込めたら実寸から向きを判定して class を付ける。
+    //   固定の 16:9 に押し込まず、縦長・横長・正方形・超横長で上限だけ変える。
+    const fig = c.querySelector('.bp-figure');
+    const applyOrientation = (el) => {
+      if (!fig || !el || !el.naturalWidth || !el.naturalHeight) return;
+      const r = el.naturalWidth / el.naturalHeight;
+      const k = (r >= 2.4) ? 'is-panorama' : (r >= 1.15) ? 'is-landscape'
+        : (r <= 0.87) ? 'is-portrait' : 'is-square';
+      fig.classList.remove('is-panorama', 'is-landscape', 'is-portrait', 'is-square');
+      fig.classList.add(k);
+      stats.orientations[k] = (stats.orientations[k] || 0) + 1;
+      stats.lastOrientation = k;
+      stats.lastAspect = +r.toFixed(3);
+    };
     // §6 画像が読めなかったときの代替表示
     const img = c.querySelector('.bp-img');
+    if (img) {
+      if (img.complete && img.naturalWidth) applyOrientation(img);
+      else img.addEventListener('load', () => applyOrientation(img), { once: true });
+    }
     if (img) img.addEventListener('error', () => {
       stats.imgErrors++;
       img.remove();
@@ -12293,9 +12334,13 @@ const BuildingPhoto = (function () {
       return '<div class="pc-photo-none">この建物の写真は未登録です</div>';
     }
     let h = '';
+    let pi = 0;
     for (const p of rec.photos.slice(0, 3)) {
-      h += '<div class="pc-photo">'
-        + '<img alt="' + esc(rec.buildingName || '') + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '">'
+      // [Mission 36A §2/§9] 1 枚目（メイン）は必ず全体表示。2 枚目以降は小さめでよい。
+      const isThumb = pi++ > 0;
+      h += '<div class="pc-photo' + (isThumb ? ' is-thumb' : '') + '">'
+        + '<div class="pc-photo-figure"><img alt="' + esc(rec.buildingName || '')
+        + '" src="' + esc(p.thumbnailUrl || p.imageUrl) + '"></div>'
         + '<div class="pc-photo-cap">'
         + '<div class="pc-photo-lic">' + esc(p.license) + '</div>'
         + (p.author ? '<div class="pc-photo-by">' + esc(p.author) + '</div>' : '')
@@ -12325,6 +12370,18 @@ const BuildingPhoto = (function () {
       const rec = lookup(id, 'building');
       host.style.display = 'block';
       host.innerHTML = '<div class="pc-photo-head">写真</div>' + sectionHtml(rec);
+      // [Mission 36A] click 側も実寸から向きを付ける（歪ませない・切らない）
+      for (const el of host.querySelectorAll('.pc-photo-figure img')) {
+        const set = () => {
+          if (!el.naturalWidth || !el.naturalHeight) return;
+          const r = el.naturalWidth / el.naturalHeight;
+          const fig = el.parentElement;
+          fig.classList.remove('is-panorama', 'is-landscape', 'is-portrait', 'is-square');
+          fig.classList.add((r >= 2.4) ? 'is-panorama' : (r >= 1.15) ? 'is-landscape'
+            : (r <= 0.87) ? 'is-portrait' : 'is-square');
+        };
+        if (el.complete && el.naturalWidth) set(); else el.addEventListener('load', set, { once: true });
+      }
     });
   }
 

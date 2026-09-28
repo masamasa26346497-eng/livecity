@@ -31,7 +31,10 @@ test('[35Z §1] photo index のスキーマ', { skip: !fs.existsSync(INDEX) && '
     for (const k of ['curatedName', 'wikidataId', 'matchConfidence', 'photos']) {
       assert.ok(k in r, 'record に ' + k + ' が無い');
     }
-    assert.ok(['high', 'medium', 'unresolved'].includes(r.matchConfidence), r.matchConfidence);
+    // [Mission 36A] 判定語が footprint 方式のものへ変わった（VERY_HIGH / HIGH / AMBIGUOUS / UNRESOLVED）。
+    //   「決められた値しか入らない」という 35Z の意図は変えていない。
+    assert.ok(['VERY_HIGH', 'HIGH', 'AMBIGUOUS', 'UNRESOLVED', 'high', 'medium', 'unresolved']
+      .includes(r.matchConfidence), r.matchConfidence);
     assert.match(r.wikidataId, /^Q\d+$/);
     for (const p of r.photos) {
       for (const k of ['thumbnailUrl', 'imageUrl', 'source', 'title', 'license', 'sourcePageUrl']) {
@@ -59,13 +62,18 @@ test('[35Z §3] 索引に載るのは名前が一致した building だけ（近
   { skip: !fs.existsSync(INDEX) && 'no index' }, () => {
     const idx = rj(INDEX);
     for (const [cid, r] of Object.entries(idx.byCanonicalId)) {
-      assert.equal(r.matchConfidence, 'high', cid + ' が high でない');
+      // [Mission 36A] hover に載せてよいのは HIGH / VERY_HIGH。
+      //   「弱い根拠のものを hover に出さない」という 35Z の条件はそのまま。
+      assert.ok(['VERY_HIGH', 'HIGH'].includes(r.matchConfidence), cid + ' が HIGH 以上でない');
       assert.ok(r.canonicalId === cid);
     }
     // 生成側: 近さだけで建物を決める経路が無い
     const b = fs.readFileSync(path.join(ROOT, 'tools', 'photos', 'build-building-photo-index.mjs'), 'utf-8');
     assert.match(b, /「近いから」で建物を決めない/);
     assert.ok(!/out\.confidence = 'medium'/.test(b), '近さだけで medium を付ける経路が残っている');
+    // [Mission 36A] 最終的な対応付けは footprint の内外で決めている
+    const fp = fs.readFileSync(path.join(ROOT, 'tools', 'photos', 'lib', 'footprint-photo-matching.mjs'), 'utf-8');
+    assert.ok(!/nearest|Math\.hypot/i.test(fp), '距離で決める処理が入っている');
     // 同じ建物を 2 件が主張したら落とす
     assert.match(b, /同じ canonicalId を 2 件以上が主張したら/);
   });
