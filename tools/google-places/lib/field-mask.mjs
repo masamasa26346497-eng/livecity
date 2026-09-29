@@ -30,6 +30,19 @@ export const DETAILS_FIELD_MASK = Object.freeze([
   'googleMapsUri',
 ]);
 
+/**
+ * 曖昧さ解消（第二段階）用の Place Details。識別に必要な項目のみ。photos は含めない
+ * （写真メタデータ・media参照名を取らない＝コストと永続化リスクの両方を避ける）。
+ */
+export const IDENTITY_FIELD_MASK = Object.freeze([
+  'id',
+  'displayName',
+  'formattedAddress',
+  'location',
+  'primaryType',
+  'types',
+]);
+
 /** 1施設あたりに保持・表示する写真の上限（§7: 3〜5枚）。 */
 export const MIN_PHOTOS_PER_PLACE = 3;
 export const MAX_PHOTOS_PER_PLACE = 5;

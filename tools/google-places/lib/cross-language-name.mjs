@@ -47,6 +47,29 @@ const PLACE_LEXICON = [
   { ja: 'ライフ', ro: 'life' },
 ].sort((a, b) => b.ja.length - a.ja.length);
 
+// 運営主体を表す接頭辞（核名の比較でだけ除去する。固有名の同定には寄与しない）。
+const OPERATOR_PREFIXES = ['医療法人', '社会福祉法人', '学校法人', '錦秀会'];
+
+/**
+ * 行政・運営主体の接頭辞を先頭から除いた「核となる名前」（NFKC・空白除去・小文字）。
+ * 第二段階の曖昧さ解消で「正規化後に完全一致」を判定するために使う（部分一致は使わない）。
+ */
+export function coreName(name) {
+  let s = String(name || '').normalize('NFKC').replace(/[\s・()（）]/g, '');
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const p of [...PREFIXES, ...OPERATOR_PREFIXES]) {
+      if (s.startsWith(p) && s.length > p.length) { s = s.slice(p.length); changed = true; }
+    }
+  }
+  return s.toLowerCase();
+}
+
+/** タイプ情報（primaryType / types）が1つでもあるか。無いなら「互換でない」ではなく「不明」。 */
+export function hasTypeInfo(place) {
+  return !!(place.primaryType || (Array.isArray(place.types) && place.types.length));
+}
+
 function englishWords(s) {
   return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);

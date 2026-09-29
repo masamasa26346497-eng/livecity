@@ -41,10 +41,10 @@ const defaultSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // レート上限を使い切る前にバッチ間で待っていても、タイミング次第では RateLimitExceededError に
 // 当たることがある（安全マージン）。その場合も候補を無言で飛ばさず、次のウィンドウまで待って
 // 決定的に再試行し、上限回数を超えたら理由付きで unresolved として記録する。
-async function searchTextWithRateLimitRetry(client, candidate, sleepImpl, pilotWindowMs) {
+async function withRateLimitRetry(call, sleepImpl, pilotWindowMs) {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await client.searchText({ textQuery: candidate.name, lat: candidate.expectLat, lon: candidate.expectLon });
+      return await call();
     } catch (e) {
       if (!(e instanceof RateLimitExceededError)) throw e;
       if (attempt >= PILOT_MAX_RATE_LIMIT_RETRIES) {
@@ -53,6 +53,29 @@ async function searchTextWithRateLimitRetry(client, candidate, sleepImpl, pilotW
       await sleepImpl(pilotWindowMs + PILOT_WINDOW_PAD_MS);
     }
   }
+}
+
+const searchTextWithRateLimitRetry = (client, candidate, sleepImpl, pilotWindowMs) =>
+  withRateLimitRetry(() => client.searchText({
+    textQuery: candidate.name, lat: candidate.expectLat, lon: candidate.expectLon,
+  }), sleepImpl, pilotWindowMs);
+
+// [第二段階] AMBIGUOUS になった候補にだけ、写真を含まない識別用 Place Details を取る。
+// 1候補あたり・パイロット全体の両方に上限を置く（無制限に広げない）。
+const PILOT_MAX_DETAILS_PER_CANDIDATE = 5;
+const PILOT_MAX_DETAILS_TOTAL = 30;
+
+async function fetchIdentities(client, placeIds, budget, sleepImpl, pilotWindowMs) {
+  const detailsByPlaceId = {};
+  const failures = [];
+  for (const id of placeIds.slice(0, PILOT_MAX_DETAILS_PER_CANDIDATE)) {
+    if (budget.remaining <= 0) { failures.push(id + ': 全体上限に到達'); continue; }
+    budget.remaining--;
+    const r = await withRateLimitRetry(() => client.getPlaceIdentity(id), sleepImpl, pilotWindowMs);
+    if (r.ok && r.place) detailsByPlaceId[id] = r.place;
+    else failures.push(id + ': ' + r.reason);
+  }
+  return { detailsByPlaceId, failures };
 }
 
 export async function runPilotMatch({
@@ -77,6 +100,7 @@ export async function runPilotMatch({
   const verified = [];
   const unresolved = [];
   const candidates = input.candidates;
+  const detailsBudget = { remaining: PILOT_MAX_DETAILS_TOTAL };
   for (let i = 0; i < candidates.length; i++) {
     const c = candidates[i];
     // 1バッチ（既定10件 = ウィンドウの上限）を使い切ったら、次の候補に進む前に
@@ -90,7 +114,17 @@ export async function runPilotMatch({
         reason: 'Places API 呼び出し失敗: ' + search.reason });
       continue;
     }
-    const result = classifyPilotMatch(c, search.places); // c.osmSubcategory をタイプ互換判定に使う
+    let result = classifyPilotMatch(c, search.places); // c.osmSubcategory をタイプ互換判定に使う
+    if (result.matchConfidence === 'AMBIGUOUS' && result.needsDetailsFor?.length) {
+      const { detailsByPlaceId, failures } = await fetchIdentities(
+        client, result.needsDetailsFor, detailsBudget, sleepImpl, pilotWindowMs);
+      if (Object.keys(detailsByPlaceId).length) {
+        result = classifyPilotMatch(c, search.places, { detailsByPlaceId });
+      }
+      if (result.matchConfidence !== 'VERIFIED' && failures.length) {
+        result = { ...result, reason: result.reason + '（Details取得失敗: ' + failures.join('; ') + '）' };
+      }
+    }
     if (result.matchConfidence === 'VERIFIED') {
       const record = assertDurableRecordSafe({
         facilityId: c.facilityId, googlePlaceId: result.googlePlaceId, name: c.name,

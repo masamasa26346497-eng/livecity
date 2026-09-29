@@ -9,7 +9,7 @@
 //
 //   fetchImpl を注入できるようにしてあるのは、テストで実ネットワークを使わずに
 //   （＝このサンドボックスでも）動作を検証するため。実行時は node の組み込み fetch を渡す。
-import { SEARCH_FIELD_MASK, DETAILS_FIELD_MASK, buildFieldMaskHeader, clampPhotoCount }
+import { SEARCH_FIELD_MASK, DETAILS_FIELD_MASK, IDENTITY_FIELD_MASK, buildFieldMaskHeader, clampPhotoCount }
   from './field-mask.mjs';
 import { createRequestGuard } from './rate-guard.mjs';
 
@@ -98,6 +98,31 @@ export function createPlacesClient(opts = {}) {
   }
 
   /**
+   * 曖昧さ解消（第二段階）専用。写真を含まない識別用フィールドだけを取る。
+   * ja の displayName を要求する（Text Search と同じ言語で比較するため）。
+   */
+  async function getPlaceIdentity(placeId) {
+    if (!isEnabled()) { debugCounters.disabledCalls++; return { ok: false, reason: 'no-api-key', place: null }; }
+    if (!fetchImpl) { return { ok: false, reason: 'no-fetch-implementation', place: null }; }
+    return requestGuard.schedule('identity:' + placeId, async () => {
+      debugCounters.detailsCalls++;
+      const res = await fetchImpl(API_BASE + '/places/' + encodeURIComponent(placeId)
+        + '?languageCode=ja&regionCode=JP', { headers: headers(IDENTITY_FIELD_MASK) });
+      if (!res.ok) return { ok: false, reason: 'http-' + res.status, place: null };
+      const p = await res.json();
+      return {
+        ok: true,
+        place: {
+          placeId: p.id || placeId, displayName: p.displayName && p.displayName.text,
+          formattedAddress: p.formattedAddress || null,
+          lat: p.location && p.location.latitude, lon: p.location && p.location.longitude,
+          primaryType: p.primaryType || null, types: Array.isArray(p.types) ? p.types : [],
+        },
+      };
+    });
+  }
+
+  /**
    * §5 写真そのものは表示のたびに解決する（＝これの戻り値・URLを恒久データとして保存しない）。
    * @param {string} photoName  'places/{id}/photos/{ref}' 形式
    */
@@ -116,7 +141,7 @@ export function createPlacesClient(opts = {}) {
   }
 
   return {
-    isEnabled, searchText, getPlaceDetails, getPhotoMediaUrl,
+    isEnabled, searchText, getPlaceDetails, getPlaceIdentity, getPhotoMediaUrl,
     getDebugCounters: () => ({ ...debugCounters, ...requestGuard.getStats() }),
     maxPhotosPerPlace,
   };
