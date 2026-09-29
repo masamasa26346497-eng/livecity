@@ -8732,16 +8732,53 @@ const LabelLayer = (function(){
   // 名称一致・近距離)が新データ側に存在する場合、旧ラベルを非表示にする。
   // FacilityDataStore未読込/読込失敗の場合は判定せず、既存ラベルをそのまま表示する
   // （移行方針1: facilities.json未生成・読込失敗→既存LabelLayerを表示する）。
+  // [Mission 36H] 旧ラベル項目の平面座標。sprites 側は {x, z}、OSM_LABELS 側は p:[x, z] で
+  // 同じ点を持つため、どちらの形でも同じ判定に掛けられるようにここで揃える。
+  function legacyLabelXZ(item) {
+    if (!item) return null;
+    if (typeof item.x === 'number' && typeof item.z === 'number') return [item.x, item.z];
+    if (Array.isArray(item.p) && typeof item.p[0] === 'number' && typeof item.p[1] === 'number') return [item.p[0], item.p[1]];
+    return null;
+  }
+
+  // [Mission 36H] 同値判定(正規化名が完全一致 かつ 100m以内)に当てはまるレコードを「全件」集める。
+  // 判定式は従来の二重表示防止と同一で、あいまい一致も最近傍フォールバックも行わない。
+  // records を引数で受け取るのは、判定そのものを FacilityDataStore の状態から切り離して
+  // テストできるようにするため。
+  function collectEquivalentFacilityRecords(item, records) {
+    const out = [];
+    const xz = legacyLabelXZ(item);
+    if (!xz) return out;
+    const normalizedLegacyName = normalizeTownName(item.name);
+    if (!normalizedLegacyName) return out;
+    for (const r of (records || [])) {
+      if (!r || normalizeTownName(r.name) !== normalizedLegacyName) continue;
+      const dist = Math.hypot(r.localX - xz[0], r.localZ - xz[1]);
+      if (dist <= 100) out.push(r); // 同名かつ100m以内であれば同一施設とみなす
+    }
+    return out;
+  }
+
+  // [Mission 36H] 旧ラベルのクリックをどちらのカードへ回すかを決める。
+  // 対応が「ちょうど1件」に定まったときだけ拡張カードへ回す。0件・複数件のときは
+  // どれか1つを選ぶ推測をせず、従来の旧カードへそのまま落とす。
+  function chooseFacilityCardRoute(item, records) {
+    const matches = collectEquivalentFacilityRecords(item, records);
+    if (matches.length === 1) return { route: 'extended', record: matches[0], candidateCount: 1 };
+    return { route: 'legacy', record: null, candidateCount: matches.length };
+  }
+
+  // [Mission 36H] FacilityDataStore を見て解決する版。未読込・読込失敗時は null を返し、
+  // 呼び出し側は従来どおり旧カードを出す。
+  function resolveEquivalentFacilityRecord(item) {
+    if (typeof FacilityDataStore === 'undefined' || FacilityDataStore.getState() !== 'ready') return null;
+    return chooseFacilityCardRoute(item, FacilityDataStore.getAllRecords()).record;
+  }
+
   function hasEquivalentInFacilityLayer(item) {
     if (typeof FacilityDataStore === 'undefined' || FacilityDataStore.getState() !== 'ready') return false;
-    const normalizedLegacyName = normalizeTownName(item.name);
-    const candidates = FacilityDataStore.getAllRecords();
-    for (const r of candidates) {
-      if (!normalizedLegacyName || normalizeTownName(r.name) !== normalizedLegacyName) continue;
-      const dist = Math.hypot(r.localX - item.x, r.localZ - item.z);
-      if (dist <= 100) return true; // 同名かつ100m以内であれば同一施設とみなす
-    }
-    return false;
+    // 二重表示防止の挙動は変えない: 1件でも該当すれば旧ラベルを隠す。
+    return collectEquivalentFacilityRecords(item, FacilityDataStore.getAllRecords()).length > 0;
   }
 
   function update() {
@@ -8833,9 +8870,15 @@ const LabelLayer = (function(){
       group = null; sprites = [];
     },
     update,
-    pickHit
+    pickHit,
+    // [Mission 36H] 旧ラベルのクリックを新カードへ回すための解決 API。
+    resolveEquivalentFacilityRecord,
+    chooseFacilityCardRoute,
+    collectEquivalentFacilityRecords
   };
 })();
+// [Mission 36H] 判定だけをテストから直接呼べるようにする(FacilityDataStore の状態に依存しない)。
+window.__LEGACY_LABEL_ROUTE__ = (item, records) => LabelLayer.chooseFacilityCardRoute(item, records);
 LabelLayer.show(); // 初期表示: ラベルレイヤーをデフォルトでON
 FacilityLayer.show(); // 初期表示: 施設レイヤーをデフォルトでON(FacilityDataStore読込完了前は空のまま)
 FacilityDataStore.onReady(() => FacilityLayer.rebuildIfReady()); // データ読込完了後に実際のスプライトを構築する
@@ -13840,7 +13883,12 @@ window.addEventListener('click',e=>{
   }
   const facilityHit = LabelLayer.pickHit(mx, my, camera);
   if (facilityHit) {
-    showFacilityCard(facilityHit);
+    // [Mission 36H] 新データ側に対応が「ちょうど1件」定まる旧ラベルは、写真つきの拡張カードへ回す。
+    // 定まらない(0件・複数件)場合は従来どおり旧カードを出す。
+    const equivalentRecord = LabelLayer.resolveEquivalentFacilityRecord
+      ? LabelLayer.resolveEquivalentFacilityRecord(facilityHit) : null;
+    if (equivalentRecord) showExtendedFacilityCard(equivalentRecord, null);
+    else showFacilityCard(facilityHit);
     return;
   }
   const mode = interactionMode(cs.r);
