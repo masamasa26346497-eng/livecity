@@ -41,7 +41,9 @@ export function createPlacesClient(opts = {}) {
     if (!fetchImpl) { return { ok: false, reason: 'no-fetch-implementation', places: [] }; }
     const key = 'searchText:' + params.textQuery + ':' + (params.lat ?? '') + ',' + (params.lon ?? '');
     return requestGuard.schedule(key, async () => {
-      const body = { textQuery: params.textQuery, maxResultCount: 10 };
+      // languageCode/regionCode: 日本語名で検索しているので日本語の displayName を優先して返してもらう
+      // （未指定だと英語/ローマ字表記が返り名前照合が失敗しやすい）。課金には影響しない。
+      const body = { textQuery: params.textQuery, maxResultCount: 10, languageCode: 'ja', regionCode: 'JP' };
       if (params.lat != null && params.lon != null) {
         body.locationBias = { circle: { center: { latitude: params.lat, longitude: params.lon },
           radius: params.radiusMeters ?? 300 } };
@@ -56,7 +58,7 @@ export function createPlacesClient(opts = {}) {
         placeId: p.id, displayName: p.displayName && p.displayName.text,
         formattedAddress: p.formattedAddress || null,
         lat: p.location && p.location.latitude, lon: p.location && p.location.longitude,
-        primaryType: p.primaryType || null,
+        primaryType: p.primaryType || null, types: Array.isArray(p.types) ? p.types : [],
       }));
       return { ok: true, places };
     });

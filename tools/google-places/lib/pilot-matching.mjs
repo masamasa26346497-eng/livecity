@@ -9,6 +9,8 @@
 //
 //   純粋関数のみ（ネットワークI/Oを持たない。単体テストで検証できるようにする）。
 
+import { crossLanguageNameAgree, typesCompatible } from './cross-language-name.mjs';
+
 const EARTH_RADIUS_M = 6371000;
 
 /** 2点間の距離（メートル）。 */
@@ -84,6 +86,23 @@ export function classifyPilotMatch(candidate, places, opts = {}) {
   if (nameAgreeing.length > 1) {
     return { ...base, matchConfidence: 'AMBIGUOUS',
       reason: '座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）' };
+  }
+
+  // 言語違い（日本語名 ↔ 英語/ローマ字 displayName）の救済。距離だけでは採らず、
+  // 近傍候補がちょうど1件・タイプ互換・語彙対応（地名+施設種別）・所在地が大阪、の全てを要求する。
+  if (nearby.length === 1) {
+    const p = nearby[0];
+    const cross = crossLanguageNameAgree(candidate.name, p.displayName);
+    const addressOk = !p.formattedAddress || /osaka|大阪/i.test(p.formattedAddress);
+    if (cross.ok && addressOk && typesCompatible(candidate.osmSubcategory, p)) {
+      return {
+        matchConfidence: 'VERIFIED', googlePlaceId: p.placeId,
+        distanceMeters: Math.round(p.distanceMeters),
+        reason: '座標(' + Math.round(p.distanceMeters) + 'm以内)・タイプ(' + (p.primaryType || 'types') + ')互換・'
+          + cross.reason + ' [cross-language]',
+        candidateCount: places.length,
+      };
+    }
   }
 
   // 座標は近いが名前が一致しない → 別施設の可能性があるので保留（借りてこない）。

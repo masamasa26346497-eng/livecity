@@ -90,7 +90,7 @@ export async function runPilotMatch({
         reason: 'Places API 呼び出し失敗: ' + search.reason });
       continue;
     }
-    const result = classifyPilotMatch(c, search.places);
+    const result = classifyPilotMatch(c, search.places); // c.osmSubcategory をタイプ互換判定に使う
     if (result.matchConfidence === 'VERIFIED') {
       const record = assertDurableRecordSafe({
         facilityId: c.facilityId, googlePlaceId: result.googlePlaceId, name: c.name,
@@ -118,11 +118,11 @@ export async function runPilotMatch({
   // dryRun: テスト用。実ファイル（配信物である public/map-data 配下）を書き換えない。
   if (!dryRun) {
     fs.mkdirSync(path.dirname(OUT_MAPPING), { recursive: true });
-    fs.writeFileSync(OUT_MAPPING, JSON.stringify(mapping, null, 2));
+    fs.writeFileSync(OUT_MAPPING, JSON.stringify(mapping, null, 2), 'utf-8');
 
     fs.mkdirSync(REPORT_DIR, { recursive: true });
     fs.writeFileSync(path.join(REPORT_DIR, 'pilot-match-report.json'),
-      JSON.stringify({ counts: mapping.counts, unresolved, apiUsage: client.getDebugCounters() }, null, 2));
+      JSON.stringify({ counts: mapping.counts, unresolved, apiUsage: client.getDebugCounters() }, null, 2), 'utf-8');
   }
 
   return { ok: true, counts: mapping.counts, unresolved, mapping };
