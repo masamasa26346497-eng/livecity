@@ -1,0 +1,33 @@
+name: Mission 36I - Sumiyoshi Google Places Expansion
+
+on:
+  push:
+    branches:
+      - feature/mission-36i-sumiyoshi-149-google-places-expansion
+  pull_request:
+    paths:
+      - 'tools/google-places/**'
+      - 'public/map-data/osaka-sumiyoshi/facilities/facilities.json'
+      - 'public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json'
+      - 'tests/mission36i-sumiyoshi-google-places.test.js'
+      - '.github/workflows/mission36i.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Mission 36I offline tests
+        run: node --test tests/mission36i-sumiyoshi-google-places.test.js
