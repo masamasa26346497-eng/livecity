@@ -1,5 +1,6 @@
 name: Mission 36H2 facility coordinate migration
 
+# One-shot workflow used only to apply and verify the existing 149-record migration on GitHub.
 on:
   push:
     branches:
