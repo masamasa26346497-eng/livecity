@@ -5,6 +5,7 @@ import {
   normalizeJapaneseVariantName,
   japaneseVariantEvidence,
   classifyConservativeJapaneseVariant,
+  retrySumiyoshiUnresolved,
 } from '../tools/google-places/retry-sumiyoshi-unresolved.mjs';
 
 test('Mission 36I retry normalizes only explicit Japanese display-name variants', () => {
@@ -57,4 +58,33 @@ test('Mission 36I retry variant requires Osaka, compatible type and strict dista
     formattedAddress: '兵庫県神戸市', primaryType: 'high_school', types: ['high_school'],
   }]);
   assert.equal(outsideOsaka.ok, false);
+});
+
+test('Mission 36I retry preserves the 93 verified entries and retries only the remaining 56', async () => {
+  let searchCalls = 0;
+  const fetchImpl = async (url) => {
+    if (url.includes(':searchText')) {
+      searchCalls++;
+      return { ok: true, json: async () => ({ places: [] }) };
+    }
+    throw new Error('unexpected URL in offline retry test: ' + url);
+  };
+
+  const result = await retrySumiyoshiUnresolved({
+    apiKey: 'FAKE_KEY',
+    fetchImpl,
+    dryRun: true,
+    rateGuard: { maxRequestsPerWindow: 1000, maxRequestsPerSession: 1000, windowMs: 1 },
+    sleepImpl: async () => {},
+    now: () => new Date('2026-09-30T00:00:00.000Z'),
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.previousVerified, 93);
+  assert.equal(result.retried, 56);
+  assert.equal(searchCalls, 56);
+  assert.equal(result.counts.verified, 93);
+  assert.equal(result.counts.unresolved, 56);
+  assert.equal(result.counts.total, 149);
+  assert.equal(result.mapping.entries.length, 93);
 });
