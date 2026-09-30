@@ -75,3 +75,23 @@ test('Mission 36I derives relevance metadata only; matching still uses original 
   assert.equal(relevanceClassForFacility({ category: 'shopping' }), 'retail-commercial');
   assert.equal(relevanceClassForFacility({ category: 'park' }), 'park');
 });
+
+test('Mission 36I keeps the Google Places photo mapping on dev HTML only', () => {
+  const dev = fs.readFileSync(new URL('../public/osaka_3d_buildings.ward-ux-v1.html', import.meta.url), 'utf-8');
+  const prod = fs.readFileSync(new URL('../public/osaka_3d_buildings.html', import.meta.url), 'utf-8');
+  const protectedHtml = fs.readFileSync(new URL('../public/osaka_3d_buildings.fullward-v3.html', import.meta.url), 'utf-8');
+
+  assert.match(dev, /google-places-pilot-mapping\.json/,
+    'dev HTML must keep reading the compatibility mapping that 36I replaces after a successful API run');
+  assert.doesNotMatch(prod, /google-places-pilot-mapping\.json/,
+    'production HTML must remain untouched by Mission 36I');
+  assert.doesNotMatch(protectedHtml, /google-places-pilot-mapping\.json/,
+    'protected fullward HTML must remain untouched by Mission 36I');
+
+  const uiMapping = JSON.parse(fs.readFileSync(
+    new URL('../public/map-data/osaka-city/derived/google-places-pilot-mapping.json', import.meta.url), 'utf-8'));
+  assert.ok([30, 149].includes(uiMapping.counts?.total),
+    'UI mapping must be either the preserved 30-item pilot or the completed 149-item Mission 36I mapping');
+  assert.equal(uiMapping.entries.length, uiMapping.counts.verified,
+    'UI mapping must contain VERIFIED linkage entries only');
+});
