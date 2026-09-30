@@ -32,3 +32,59 @@ jobs:
 
       - name: Run Mission 36J offline tests
         run: node --test tests/mission36j-*.test.js
+
+  citywide-osm-ingestion:
+    needs: offline-validation
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36j-ingest]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Acquire and build Osaka 24-ward facilities
+        run: node tools/facilities/osaka-city-photo-facilities.mjs all
+
+      - name: Validate 24-ward dataset
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'public/map-data/osaka-city/facilities/facilities.json';
+          const r = 'data/reports/mission36j-google-places-osaka-city/facility-ingestion.json';
+          const d = JSON.parse(fs.readFileSync(p, 'utf8'));
+          const report = JSON.parse(fs.readFileSync(r, 'utf8'));
+          if (d.wardCount !== 24) throw new Error(`wardCount must be 24, got ${d.wardCount}`);
+          if (Object.keys(d.wardCounts || {}).length !== 24) throw new Error('wardCounts must contain all 24 wards');
+          if (d.recordCount < 1000) throw new Error(`citywide facility count suspiciously low: ${d.recordCount}`);
+          if (report.missingTileCount !== 0) throw new Error(`missing tiles: ${report.missingTileCount}`);
+          if (d.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinate convention mismatch');
+          console.log(JSON.stringify({ records: d.recordCount, wards: d.wardCount, categories: d.categoryCounts }));
+          NODE
+
+      - name: Commit citywide facility artifacts only
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/processed/osaka-city/facilities/facilities.json
+          git add -f public/map-data/osaka-city/facilities/facilities.json
+          git add -f public/map-data/osaka-city/facilities/metadata.json
+          git add -f data/reports/mission36j-google-places-osaka-city/facility-ingestion.json
+          if git diff --cached --quiet; then
+            echo "No citywide facility artifact changes."
+          else
+            git commit -m "data(mission36j): build Osaka 24-ward photo facility dataset"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
