@@ -3,7 +3,7 @@
   "mission": "36I",
   "areaId": "osaka-sumiyoshi",
   "sourceDataset": "public/map-data/osaka-sumiyoshi/facilities/facilities.json",
-  "generatedAt": "2026-09-30T11:02:51.778Z",
+  "generatedAt": "2026-09-30T11:26:27.340Z",
   "maxDistanceMeters": 120,
   "policy": {
     "persistsOnlyVerifiedLinkage": true,
@@ -17,8 +17,8 @@
     "uiCompatibilityMapping": "public/map-data/osaka-city/derived/google-places-pilot-mapping.json"
   },
   "counts": {
-    "verified": 93,
-    "unresolved": 56,
+    "verified": 96,
+    "unresolved": 53,
     "total": 149
   },
   "entries": [
@@ -1044,6 +1044,39 @@
       "distanceMeters": 3,
       "verifiedAt": "2026-09-30T11:02:51.778Z",
       "verifiedBy": "automated-sumiyoshi-149-match"
+    },
+    {
+      "facilityId": "osm-node-1422980337",
+      "googlePlaceId": "ChIJP-uWbjjcAGARRTWTfSxMfVw",
+      "name": "あびこひかり保育園",
+      "relevanceClass": "school",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "Mission 36I retry: 日本語表記差(preschool-type-rename)・タイプ互換・所在地(大阪)・座標(1m)が一意 [conservative-variant]",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-09-30T11:16:01.335Z",
+      "verifiedBy": "automated-sumiyoshi-unresolved-retry"
+    },
+    {
+      "facilityId": "osm-node-1422981708",
+      "googlePlaceId": "ChIJIYHZYT3cAGAR_WXVn84Rdko",
+      "name": "ひまわり幼稚園",
+      "relevanceClass": "school",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 30,
+      "verifiedAt": "2026-09-30T11:16:01.581Z",
+      "verifiedBy": "automated-sumiyoshi-unresolved-retry"
+    },
+    {
+      "facilityId": "osm-node-7274181239",
+      "googlePlaceId": "ChIJqz36ThbcAGARj_pOEAgVFfI",
+      "name": "地下鉄あびこ",
+      "relevanceClass": "station",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(51m以内)と名前が一致",
+      "distanceMeters": 51,
+      "verifiedAt": "2026-09-30T11:21:13.478Z",
+      "verifiedBy": "automated-sumiyoshi-unresolved-retry"
     }
   ]
 }
