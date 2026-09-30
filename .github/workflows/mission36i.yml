@@ -9,6 +9,7 @@ on:
       - 'tools/google-places/**'
       - 'public/map-data/osaka-sumiyoshi/facilities/facilities.json'
       - 'public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json'
+      - 'public/map-data/osaka-city/derived/google-places-pilot-mapping.json'
       - 'tests/mission36i-sumiyoshi-google-places.test.js'
       - '.github/workflows/mission36i.yml'
   workflow_dispatch:
@@ -31,3 +32,78 @@ jobs:
 
       - name: Run Mission 36I offline tests
         run: node --test tests/mission36i-sumiyoshi-google-places.test.js
+
+  online-match:
+    needs: offline-validation
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-places]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    env:
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check Google Places secret availability
+        id: places-key
+        shell: bash
+        run: |
+          if [ -n "${GOOGLE_PLACES_API_KEY:-}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Google Places secret is configured."
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Google Places secret is not configured; online matching will be skipped."
+          fi
+
+      - name: Run 149-facility Places match
+        if: steps.places-key.outputs.available == 'true'
+        run: node tools/google-places/match-sumiyoshi-places.mjs
+
+      - name: Validate generated mapping
+        if: steps.places-key.outputs.available == 'true'
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const canonical = JSON.parse(fs.readFileSync('public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json', 'utf8'));
+          const ui = JSON.parse(fs.readFileSync('public/map-data/osaka-city/derived/google-places-pilot-mapping.json', 'utf8'));
+          if (canonical.counts?.total !== 149) throw new Error('canonical mapping total must be 149');
+          if (ui.counts?.total !== 149) throw new Error('UI mapping total must be 149');
+          if (canonical.counts.verified !== canonical.entries.length) throw new Error('verified count mismatch');
+          if (JSON.stringify(canonical) !== JSON.stringify(ui)) throw new Error('UI mapping is not synchronized');
+          for (const entry of canonical.entries) {
+            if (entry.matchConfidence !== 'VERIFIED') throw new Error('non-VERIFIED entry persisted');
+            for (const key of Object.keys(entry)) {
+              if (/photo|resourceName|mediaUrl|base64|binary/i.test(key)) throw new Error('forbidden persisted key: ' + key);
+            }
+          }
+          console.log(JSON.stringify(canonical.counts));
+          NODE
+
+      - name: Commit verified mapping and report
+        if: steps.places-key.outputs.available == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json
+          git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+          git add -f data/reports/mission36i-google-places-sumiyoshi/match-report.json
+          if git diff --cached --quiet; then
+            echo "No generated mapping changes to commit."
+          else
+            git commit -m "data(mission36i): record 149-facility Places match"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
