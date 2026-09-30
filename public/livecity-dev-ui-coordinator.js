@@ -11,6 +11,8 @@
   const TOGGLE_ID = 'livecity-dev-tuning-toggle';
 
   let arbitrationQueued = false;
+  let cardsObserverInstalled = false;
+  let tuningToggleInstalled = false;
 
   function isVisible(el) {
     if (!el || el.hidden) return false;
@@ -43,8 +45,8 @@
     const facilityHasPhoto = cardHasPhoto(facility);
     const buildingHasPhoto = cardHasPhoto(building);
 
-    // A photo is the strongest signal. If both/neither have one, a facility click wins the collision:
-    // the double-card bug originates from the same facility interaction also reaching the building picker.
+    // A photo is the strongest signal. If both/neither have one, the facility card wins the collision:
+    // this duplicate-card state is caused by one facility interaction also reaching the building picker.
     if (buildingHasPhoto && !facilityHasPhoto) hideCard(facility);
     else hideCard(building);
   }
@@ -56,6 +58,7 @@
   }
 
   function observeCards() {
+    if (cardsObserverInstalled) return true;
     const facility = document.getElementById(FACILITY_CARD_ID);
     const building = document.getElementById(BUILDING_CARD_ID);
     if (!facility || !building) return false;
@@ -73,6 +76,7 @@
       }
     }, true);
 
+    cardsObserverInstalled = true;
     queueCardArbitration();
     return true;
   }
@@ -88,8 +92,13 @@
   }
 
   function installTuningPanelToggle() {
+    if (tuningToggleInstalled) return true;
     const panel = document.getElementById(TUNING_PANEL_ID);
-    if (!panel || document.getElementById(TOGGLE_ID)) return false;
+    if (!panel) return false;
+    if (document.getElementById(TOGGLE_ID)) {
+      tuningToggleInstalled = true;
+      return true;
+    }
 
     const button = document.createElement('button');
     button.id = TOGGLE_ID;
@@ -117,6 +126,7 @@
     });
 
     document.body.appendChild(button);
+    tuningToggleInstalled = true;
     render();
     return true;
   }
