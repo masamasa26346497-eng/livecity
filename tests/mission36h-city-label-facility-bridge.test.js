@@ -17,6 +17,7 @@ const HTML = path.join(ROOT, 'public/osaka_3d_buildings.ward-ux-v1.html');
 const html = fs.readFileSync(HTML, 'utf-8');
 const FACILITIES = path.join(ROOT, 'public/map-data/osaka-sumiyoshi/facilities/facilities.json');
 const BUILDING_LABELS = path.join(ROOT, 'public/map-data/osaka-city/derived/building-name-labels.json');
+const HAS_BUILDING_LABELS = fs.existsSync(BUILDING_LABELS);
 
 const bldgLabel = (name, x, z) => ({ id: 'bldg:' + name, kind: 'building', name, x, z });
 /** facilities.json と同じ現行 runtime 形式（znorth-neg-v1 / 北=-Z）。 */
@@ -40,7 +41,8 @@ function win() {
 const decide = (label, records) => win().__FACILITY_LABEL_DECIDE__(label, records);
 
 // ── 実データでの検証（ミッションの指定確認対象） ───────────────────────────
-test('[36H] 実データ: スーパー玉出 アビコ店 が osm-node-750515219 に解決する', () => {
+// building-name-labels.json はローカル生成物のため、GitHub CI に存在しない場合だけ skip する。
+test('[36H] 実データ: スーパー玉出 アビコ店 が osm-node-750515219 に解決する', { skip: !HAS_BUILDING_LABELS }, () => {
   const records = JSON.parse(fs.readFileSync(FACILITIES, 'utf-8')).records;
   const labels = JSON.parse(fs.readFileSync(BUILDING_LABELS, 'utf-8')).labels;
   const hit = labels.filter((l) => l.name === 'スーパー玉出 アビコ店');
@@ -53,7 +55,7 @@ test('[36H] 実データ: スーパー玉出 アビコ店 が osm-node-750515219
   assert.ok(d.candidates[0].distanceM < 50, '距離 ' + d.candidates[0].distanceM + 'm');
 });
 
-test('[36H] 実データ: 同名の別店舗（鶴見橋店・支店名なし）を巻き込まない', () => {
+test('[36H] 実データ: 同名の別店舗（鶴見橋店・支店名なし）を巻き込まない', { skip: !HAS_BUILDING_LABELS }, () => {
   const records = JSON.parse(fs.readFileSync(FACILITIES, 'utf-8')).records;
   const labels = JSON.parse(fs.readFileSync(BUILDING_LABELS, 'utf-8')).labels;
   // 支店名のない「スーパー玉出」ラベルは、住吉の施設データに同名レコードが無いので解決しない
@@ -77,10 +79,15 @@ test('[36H2] 実データ: 施設座標は znorth-neg-v1 で緯度経度から�
   const t = records.find((r) => r.id === 'osm-node-750515219');
   assert.equal(t.localX, -1591.3);
   assert.equal(t.localZ, 373.31);
-  const labels = JSON.parse(fs.readFileSync(BUILDING_LABELS, 'utf-8')).labels;
-  const l = labels.find((x) => x.name === 'スーパー玉出 アビコ店');
-  assert.ok(Math.hypot(t.localX - l.x, t.localZ - l.z) < 50,
-    'FacilityLayer の実座標と建物ラベルが同じ場所に揃うこと');
+
+  // ローカル生成ラベルが利用可能な環境では、FacilityLayer 座標と建物ラベルも同位置か確認する。
+  if (HAS_BUILDING_LABELS) {
+    const labels = JSON.parse(fs.readFileSync(BUILDING_LABELS, 'utf-8')).labels;
+    const l = labels.find((x) => x.name === 'スーパー玉出 アビコ店');
+    assert.ok(l, 'スーパー玉出 アビコ店の建物ラベルが存在すること');
+    assert.ok(Math.hypot(t.localX - l.x, t.localZ - l.z) < 50,
+      'FacilityLayer の実座標と建物ラベルが同じ場所に揃うこと');
+  }
 });
 
 // ── 分岐の確認（合成データ） ─────────────────────────────────────────
@@ -196,7 +203,7 @@ test('[36H] 診断ヘルパーが dev HTML にある', () => {
 });
 
 // ラベルデータ・施設データの読み込みを待って、実際に走らせた結果を見る。
-test('[36H] 診断: 読み込み済みのデータで スーパー玉出 アビコ店 → osm-node-750515219', async () => {
+test('[36H] 診断: 読み込み済みのデータで スーパー玉出 アビコ店 → osm-node-750515219', { skip: !HAS_BUILDING_LABELS }, async () => {
   const w = win();
   const diag = () => w.__FACILITY_LABEL_DIAG__('スーパー玉出 アビコ店');
   for (let i = 0; i < 200; i++) {
