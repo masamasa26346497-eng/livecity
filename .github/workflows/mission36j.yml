@@ -53,10 +53,60 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Acquire and build Osaka 24-ward facilities
-        run: node tools/facilities/osaka-city-photo-facilities.mjs all
+      - name: Restore resumable OSM tile cache
+        uses: actions/cache@v4
+        with:
+          path: data/raw/osaka-city/facilities-tiles
+          key: mission36j-osm-tiles-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            mission36j-osm-tiles-
+
+      - name: Acquire Osaka tiles in checkpointed batches
+        id: ingest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          COMPLETE=false
+          for round in $(seq 1 8); do
+            echo "=== Mission 36J acquisition batch ${round}/8 ==="
+            node tools/facilities/osaka-city-photo-facilities.mjs download --max-tiles 6 --inter-tile-delay-ms 5000
+
+            REMAINING=$(node -e "const p=require('./data/reports/mission36j-google-places-osaka-city/ingestion-progress.json'); process.stdout.write(String(p.remaining))")
+            DOWNLOADED=$(node -e "const p=require('./data/reports/mission36j-google-places-osaka-city/ingestion-progress.json'); process.stdout.write(String(p.downloadedThisRun))")
+            COMPLETED=$(node -e "const p=require('./data/reports/mission36j-google-places-osaka-city/ingestion-progress.json'); process.stdout.write(String(p.completedTileCount))")
+            FAILED=$(node -e "const p=require('./data/reports/mission36j-google-places-osaka-city/ingestion-progress.json'); process.stdout.write(String(p.failedThisRun))")
+            echo "completed=${COMPLETED} remaining=${REMAINING} downloaded_this_batch=${DOWNLOADED} failed_this_batch=${FAILED}"
+
+            if [ "${REMAINING}" -eq 0 ]; then
+              COMPLETE=true
+              break
+            fi
+            if [ "${DOWNLOADED}" -eq 0 ]; then
+              echo "No progress in this batch; stop rather than hammer Overpass. A later run will retry."
+              break
+            fi
+            sleep 30
+          done
+
+          git add -f data/reports/mission36j-google-places-osaka-city/ingestion-progress.json
+          if git diff --cached --quiet; then
+            echo "No progress report changes to commit."
+          else
+            git commit -m "data(mission36j): checkpoint Osaka facility tile ingestion"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+          echo "complete=${COMPLETE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build complete 24-ward facility dataset
+        if: steps.ingest.outputs.complete == 'true'
+        run: node tools/facilities/osaka-city-photo-facilities.mjs build
 
       - name: Validate 24-ward dataset
+        if: steps.ingest.outputs.complete == 'true'
         shell: bash
         run: |
           node - <<'NODE'
@@ -70,10 +120,12 @@ jobs:
           if (d.recordCount < 1000) throw new Error(`citywide facility count suspiciously low: ${d.recordCount}`);
           if (report.missingTileCount !== 0) throw new Error(`missing tiles: ${report.missingTileCount}`);
           if (d.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinate convention mismatch');
+          if (d.maxDistancePolicyForGooglePlaces && d.maxDistancePolicyForGooglePlaces !== 120) throw new Error('Google Places distance policy changed');
           console.log(JSON.stringify({ records: d.recordCount, wards: d.wardCount, categories: d.categoryCounts }));
           NODE
 
-      - name: Commit citywide facility artifacts only
+      - name: Commit complete citywide facility artifacts only
+        if: steps.ingest.outputs.complete == 'true'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -82,6 +134,7 @@ jobs:
           git add -f public/map-data/osaka-city/facilities/facilities.json
           git add -f public/map-data/osaka-city/facilities/metadata.json
           git add -f data/reports/mission36j-google-places-osaka-city/facility-ingestion.json
+          git add -f data/reports/mission36j-google-places-osaka-city/ingestion-progress.json
           if git diff --cached --quiet; then
             echo "No citywide facility artifact changes."
           else
