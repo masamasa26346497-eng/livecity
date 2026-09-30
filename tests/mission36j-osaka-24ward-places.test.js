@@ -132,3 +132,12 @@ test('Mission 36J candidate selection resumes safely and supports ward/priority/
   });
   assert.deepEqual(highSumiyoshi.map((c) => c.facilityId), ['d']);
 });
+
+test('Mission 36J does not leak citywide Google Places wiring into production/protected HTML', () => {
+  const prod = fs.readFileSync(new URL('../public/osaka_3d_buildings.html', import.meta.url), 'utf8');
+  const protectedHtml = fs.readFileSync(new URL('../public/osaka_3d_buildings.fullward-v3.html', import.meta.url), 'utf8');
+  for (const html of [prod, protectedHtml]) {
+    assert.doesNotMatch(html, /google-places-osaka-city-mapping\.json/);
+    assert.doesNotMatch(html, /match-osaka-city-places/);
+  }
+});
