@@ -114,6 +114,7 @@ export function crossLanguageNameAgree(jaName, enName) {
 const COMPATIBLE_TYPES = {
   hospital: ['hospital', 'general_hospital', 'medical_center'],
   clinic: ['doctor', 'medical_clinic', 'hospital', 'health'],
+  kindergarten: ['preschool', 'school', 'educational_institution'],
   school: ['school', 'primary_school', 'secondary_school', 'middle_school', 'high_school', 'preschool', 'educational_institution'],
   college: ['university', 'college', 'school', 'educational_institution'],
   station: ['train_station', 'subway_station', 'transit_station', 'light_rail_station'],
