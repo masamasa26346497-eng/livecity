@@ -22,28 +22,75 @@ export const PROCESSED_PATH = resolveProjectPath('data/processed/osaka-city/faci
 export const PUBLIC_PATH = resolveProjectPath('public/map-data/osaka-city/facilities/facilities.json');
 export const METADATA_PATH = resolveProjectPath('public/map-data/osaka-city/facilities/metadata.json');
 export const REPORT_PATH = resolveProjectPath('data/reports/mission36j-google-places-osaka-city/facility-ingestion.json');
+export const PROGRESS_PATH = resolveProjectPath('data/reports/mission36j-google-places-osaka-city/ingestion-progress.json');
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8').replace(/^﻿/, ''));
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function escapeOverpassString(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function escapeOverpassRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function selectorToOverpass(selector) {
   const eq = selector.indexOf('=');
-  if (eq < 0) return `["${selector}"]`;
+  if (eq < 0) return `["${escapeOverpassString(selector)}"]`;
   const key = selector.slice(0, eq);
   const value = selector.slice(eq + 1);
-  return `["${key}"="${value}"]`;
+  return `["${escapeOverpassString(key)}"="${escapeOverpassString(value)}"]`;
+}
+
+// Collapse many node/way/relation selectors into a small set of nwr selectors grouped by tag key.
+// A key-only selector (e.g. shop) already covers shop=supermarket etc., so same-key exact selectors
+// are deliberately suppressed. This keeps the semantics while greatly reducing Overpass parser/load cost.
+export function buildCompactOverpassSelectors(selectors = []) {
+  const keyOrder = [];
+  const wildcardKeys = new Set();
+  const exactByKey = new Map();
+
+  for (const selector of selectors) {
+    const eq = selector.indexOf('=');
+    const key = eq < 0 ? selector : selector.slice(0, eq);
+    if (!keyOrder.includes(key)) keyOrder.push(key);
+    if (eq < 0) {
+      wildcardKeys.add(key);
+      continue;
+    }
+    if (!exactByKey.has(key)) exactByKey.set(key, []);
+    const value = selector.slice(eq + 1);
+    if (!exactByKey.get(key).includes(value)) exactByKey.get(key).push(value);
+  }
+
+  const filters = [];
+  for (const key of keyOrder) {
+    const safeKey = escapeOverpassString(key);
+    if (wildcardKeys.has(key)) {
+      filters.push(`["${safeKey}"]`);
+      continue;
+    }
+    const values = exactByKey.get(key) || [];
+    if (values.length === 1) {
+      filters.push(`["${safeKey}"="${escapeOverpassString(values[0])}"]`);
+    } else if (values.length > 1) {
+      const pattern = values.map(escapeOverpassRegex).join('|');
+      filters.push(`["${safeKey}"~"^(${pattern})$"]`);
+    }
+  }
+  return filters;
 }
 
 export function buildPhotoFacilityTileQuery(bbox, profile, timeoutSec = 90) {
   const bboxStr = `${bbox.south},${bbox.west},${bbox.north},${bbox.east}`;
-  const statements = [];
-  for (const selector of profile.osmFilters || []) {
-    const filter = selectorToOverpass(selector);
-    for (const type of ['node', 'way', 'relation']) {
-      statements.push(`  ${type}${filter}(${bboxStr});`);
-    }
-  }
+  const statements = buildCompactOverpassSelectors(profile.osmFilters || [])
+    .map((filter) => `  nwr${filter}(${bboxStr});`);
   return `[out:json][timeout:${timeoutSec}];\n(\n${statements.join('\n')}\n);\nout center;`;
 }
 
@@ -103,7 +150,26 @@ function countsBy(records, key) {
   return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
 }
 
-export async function downloadCityFacilityTiles({ force = false, maxTiles = Infinity, onProgress = console.log } = {}) {
+function tileFilename(tx, tz) {
+  return `tile_${tx}_${tz}.json`;
+}
+
+function readPreviousFailedTileIds() {
+  if (!fs.existsSync(PROGRESS_PATH)) return new Set();
+  try {
+    const p = readJson(PROGRESS_PATH);
+    return new Set(p.failedTileIds || []);
+  } catch {
+    return new Set();
+  }
+}
+
+export async function downloadCityFacilityTiles({
+  force = false,
+  maxTiles = Infinity,
+  interTileDelayMs = 3000,
+  onProgress = console.log,
+} = {}) {
   const area = await loadAreaConfig(AREA_ID);
   const profile = readJson(PROFILE_PATH);
   const grid = createCityTileGrid({
@@ -113,35 +179,78 @@ export async function downloadCityFacilityTiles({ force = false, maxTiles = Infi
     bufferMeters: profile.bufferMeters ?? 120,
   });
   await ensureDir(TILE_DIR);
+  await ensureDir(path.dirname(PROGRESS_PATH));
 
+  const allTiles = grid.allTiles().map(({ tx, tz }) => ({ tx, tz, filename: tileFilename(tx, tz) }));
+  const existingBefore = new Set(fs.existsSync(TILE_DIR) ? await fsp.readdir(TILE_DIR) : []);
+  const previousFailed = readPreviousFailedTileIds();
+  let pending = force ? allTiles : allTiles.filter((tile) => !existingBefore.has(tile.filename));
+
+  // Previously failed tiles are retried after fresh missing tiles so one difficult area cannot block the citywide crawl.
+  if (!force && previousFailed.size) {
+    pending = pending.sort((a, b) => Number(previousFailed.has(a.filename)) - Number(previousFailed.has(b.filename)));
+  }
+
+  const finiteLimit = Number.isFinite(maxTiles) ? Math.max(0, Math.floor(maxTiles)) : pending.length;
+  const selected = pending.slice(0, finiteLimit);
   let downloaded = 0;
-  let cached = 0;
-  let considered = 0;
-  for (const { tx, tz } of grid.allTiles()) {
-    const filename = `tile_${tx}_${tz}.json`;
+  const failed = [];
+
+  for (let i = 0; i < selected.length; i++) {
+    const { tx, tz, filename } = selected[i];
     const filePath = path.join(TILE_DIR, filename);
-    if (!force && fs.existsSync(filePath)) {
-      cached++;
-      continue;
-    }
-    if (considered >= maxTiles) break;
-    considered++;
     const bbox = grid.latLonBboxForTile(tx, tz);
     const query = buildPhotoFacilityTileQuery(bbox, profile);
     onProgress(`[36J facilities] ${filename} download...`);
-    const data = await runOverpassQuery(query, {
-      onRetry: (attempt, reason) => onProgress(`[36J facilities] retry ${filename} #${attempt}: ${reason}`),
-    });
-    await writeJson(filePath, {
-      mission: '36J',
-      tileId: `${tx}_${tz}`,
-      bbox: { south: bbox.south, west: bbox.west, north: bbox.north, east: bbox.east },
-      downloadedAt: new Date().toISOString(),
-      elements: data.elements || [],
-    });
-    downloaded++;
+    try {
+      const data = await runOverpassQuery(query, {
+        onRetry: (attempt, reason) => onProgress(`[36J facilities] retry ${filename} #${attempt}: ${reason}`),
+      });
+      await writeJson(filePath, {
+        mission: '36J',
+        tileId: `${tx}_${tz}`,
+        bbox: { south: bbox.south, west: bbox.west, north: bbox.north, east: bbox.east },
+        downloadedAt: new Date().toISOString(),
+        elements: data.elements || [],
+      });
+      downloaded++;
+    } catch (error) {
+      const reason = error?.message || String(error);
+      failed.push({ filename, tileId: `${tx}_${tz}`, reason });
+      onProgress(`[36J facilities] skip ${filename} for this batch: ${reason}`);
+    }
+    if (interTileDelayMs > 0 && i < selected.length - 1) await sleep(interTileDelayMs);
   }
-  return { tileCount: grid.tileCount, downloaded, cached, tileDir: TILE_DIR };
+
+  const existingAfter = new Set(fs.existsSync(TILE_DIR) ? await fsp.readdir(TILE_DIR) : []);
+  const completedTileCount = allTiles.filter((tile) => existingAfter.has(tile.filename)).length;
+  const remaining = allTiles.length - completedTileCount;
+  const progress = {
+    mission: '36J',
+    updatedAt: new Date().toISOString(),
+    totalTiles: allTiles.length,
+    completedTileCount,
+    remaining,
+    completedBeforeThisRun: allTiles.filter((tile) => existingBefore.has(tile.filename)).length,
+    attemptedThisRun: selected.length,
+    downloadedThisRun: downloaded,
+    failedThisRun: failed.length,
+    failedTileIds: failed.map((item) => item.filename),
+    failures: failed,
+    maxDistancePolicyForGooglePlaces: 120,
+  };
+  await writeJson(PROGRESS_PATH, progress);
+
+  return {
+    tileCount: grid.tileCount,
+    downloaded,
+    cached: progress.completedBeforeThisRun,
+    completed: completedTileCount,
+    remaining,
+    failed: failed.length,
+    progressPath: PROGRESS_PATH,
+    tileDir: TILE_DIR,
+  };
 }
 
 export async function buildCityFacilityDataset({ requireComplete = true, now = () => new Date() } = {}) {
@@ -157,7 +266,7 @@ export async function buildCityFacilityDataset({ requireComplete = true, now = (
     bufferMeters: profile.bufferMeters ?? 120,
   });
 
-  const expectedFiles = grid.allTiles().map(({ tx, tz }) => `tile_${tx}_${tz}.json`);
+  const expectedFiles = grid.allTiles().map(({ tx, tz }) => tileFilename(tx, tz));
   const existing = fs.existsSync(TILE_DIR) ? new Set(await fsp.readdir(TILE_DIR)) : new Set();
   const missingTiles = expectedFiles.filter((f) => !existing.has(f));
   if (requireComplete && missingTiles.length) {
@@ -240,12 +349,13 @@ export async function buildCityFacilityDataset({ requireComplete = true, now = (
 }
 
 function parseCli(argv) {
-  const args = { command: 'all', force: false, maxTiles: Infinity, partial: false };
+  const args = { command: 'all', force: false, maxTiles: Infinity, partial: false, interTileDelayMs: 3000 };
   if (argv[0] && !argv[0].startsWith('--')) args.command = argv[0];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--force') args.force = true;
     else if (argv[i] === '--partial') args.partial = true;
     else if (argv[i] === '--max-tiles') args.maxTiles = Number(argv[++i] || Infinity);
+    else if (argv[i] === '--inter-tile-delay-ms') args.interTileDelayMs = Number(argv[++i] || 0);
   }
   return args;
 }
@@ -253,10 +363,19 @@ function parseCli(argv) {
 if (isMainModule(import.meta.url)) {
   const args = parseCli(process.argv.slice(2));
   try {
+    let downloadResult = null;
     if (args.command === 'download' || args.command === 'all') {
-      const d = await downloadCityFacilityTiles({ force: args.force, maxTiles: args.maxTiles });
-      console.log('[36J facilities download]', JSON.stringify(d));
+      downloadResult = await downloadCityFacilityTiles({
+        force: args.force,
+        maxTiles: args.maxTiles,
+        interTileDelayMs: args.interTileDelayMs,
+      });
+      console.log('[36J facilities download]', JSON.stringify(downloadResult));
       if (args.command === 'download') process.exit(0);
+      if (downloadResult.remaining > 0 && !args.partial) {
+        console.log(`[36J facilities] ${downloadResult.remaining} tiles remain; build deferred until acquisition is complete.`);
+        process.exit(0);
+      }
     }
     if (args.command === 'build' || args.command === 'all') {
       const b = await buildCityFacilityDataset({ requireComplete: !args.partial });
