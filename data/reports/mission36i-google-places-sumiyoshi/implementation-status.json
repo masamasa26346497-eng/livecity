@@ -1,0 +1,41 @@
+{
+  "mission": "36I",
+  "subject": "Sumiyoshi 149-facility Google Places expansion",
+  "status": "IMPLEMENTED_PENDING_API_RUN",
+  "sourceDataset": "public/map-data/osaka-sumiyoshi/facilities/facilities.json",
+  "sourceFacilityCount": 149,
+  "runner": "tools/google-places/match-sumiyoshi-places.mjs",
+  "test": "tests/mission36i-sumiyoshi-google-places.test.js",
+  "workflow": ".github/workflows/mission36i.yml",
+  "durableMapping": "public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json",
+  "matchingPolicy": {
+    "reusesMission36HClassifier": true,
+    "maxDistanceMeters": 120,
+    "persistsOnlyVerified": true,
+    "ambiguousAndUnresolvedAreNotPersisted": true,
+    "photoBinariesPersisted": false,
+    "photoMediaUrlsPersisted": false,
+    "photoResourceNamesPersisted": false
+  },
+  "apiBudget": {
+    "textSearchMaximum": 149,
+    "placeDetailsMaximum": 30,
+    "nominalMaximumRequests": 179,
+    "clientSessionLimit": 200
+  },
+  "currentDurableMapping": {
+    "status": "pending-api-run",
+    "verified": 0,
+    "unresolved": 149,
+    "total": 149,
+    "note": "No Google Place IDs are fabricated or committed before a real API run."
+  },
+  "execution": {
+    "requires": [
+      "network access",
+      "GOOGLE_PLACES_API_KEY"
+    ],
+    "command": "GOOGLE_PLACES_API_KEY=xxxx node tools/google-places/match-sumiyoshi-places.mjs",
+    "offlineTestCommand": "node --test tests/mission36i-sumiyoshi-google-places.test.js"
+  }
+}
