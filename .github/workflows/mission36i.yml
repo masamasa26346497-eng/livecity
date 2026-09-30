@@ -10,7 +10,7 @@ on:
       - 'public/map-data/osaka-sumiyoshi/facilities/facilities.json'
       - 'public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json'
       - 'public/map-data/osaka-city/derived/google-places-pilot-mapping.json'
-      - 'tests/mission36i-sumiyoshi-google-places.test.js'
+      - 'tests/mission36i-*.test.js'
       - '.github/workflows/mission36i.yml'
   workflow_dispatch:
 
@@ -31,7 +31,7 @@ jobs:
           node-version: '20'
 
       - name: Run Mission 36I offline tests
-        run: node --test tests/mission36i-sumiyoshi-google-places.test.js
+        run: node --test tests/mission36i-*.test.js
 
   online-match:
     needs: offline-validation
