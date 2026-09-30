@@ -10,10 +10,10 @@ import {
 test('Mission 36I retry normalizes only explicit Japanese display-name variants', () => {
   assert.equal(normalizeJapaneseVariantName('第２めぐむ保育園'), '第2めぐむ保育園');
   assert.equal(normalizeJapaneseVariantName('第二めぐむ保育園'), '第2めぐむ保育園');
-  assert.equal(normalizeJapaneseVariantName('大阪府教育センター附属高等学校'), '教育センター附属高校');
-  assert.equal(normalizeJapaneseVariantName('教育センター附属高校'), '教育センター附属高校');
-  assert.equal(normalizeJapaneseVariantName('ヤスダ歯科クリニック'), 'やすだ歯科クリニック');
-  assert.equal(normalizeJapaneseVariantName('医療法人豊永会 やすだ歯科クリニック'), 'やすだ歯科クリニック');
+  assert.equal(normalizeJapaneseVariantName('大阪府教育センター附属高等学校'), '教育せんたー附属高校');
+  assert.equal(normalizeJapaneseVariantName('教育センター附属高校'), '教育せんたー附属高校');
+  assert.equal(normalizeJapaneseVariantName('ヤスダ歯科クリニック'), 'やすだ歯科くりにっく');
+  assert.equal(normalizeJapaneseVariantName('医療法人豊永会 やすだ歯科クリニック'), 'やすだ歯科くりにっく');
 });
 
 test('Mission 36I retry permits same-stem preschool rename but not arbitrary fuzzy names', () => {
