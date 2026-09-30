@@ -11271,6 +11271,17 @@ const CityLabelLayer = (function () {
       return best;
     },
     getClickableCount: () => clickableLabels.length,
+    /**
+     * [Mission 36H] 名前からラベル項目を引く。表示状態は問わない(診断用)。
+     * 返すのは読み込み済みの全種別(建物名・ランドマーク・駅・地名・区・公園・河川)。
+     */
+    findItemsByName(name) {
+      const q = String(name == null ? '' : name);
+      if (!q) return [];
+      const out = [];
+      for (const it of itemById.values()) if (it && it.name === q) out.push(it);
+      return out;
+    },
     getDebug() {
       return {
         loaded, dataError: stats.dataError, typeVisible: { ...typeVisible },
@@ -13152,6 +13163,97 @@ function showFacilityCard(item){
   flyTo(item.p[0], item.p[1], {r: Math.max(cs.minR, Math.min(cs.r, 400))});
 }
 
+// ══════════════════════════════════════════════════════════════
+// [Mission 36H] 見えているラベル → 新施設データ(FacilityDataStore) の橋渡し
+// --------------------------------------------------------------
+// 「スーパー玉出 アビコ店」のように、地図に出ているのが CityLabelLayer の建物名ラベルで、
+// 橙色の FacilityLayer スプライトではない施設があった。CityLabel のクリック処理は
+// station / place / ward だけを明示的に扱っていたため、建物名・ランドマーク名のラベルは
+// 何も起きずに落ち、写真を差し込む showExtendedFacilityCard() を通らなかった。
+//
+// 【座標系の注意・実測】facilities.json(osaka-sumiyoshi / 2026-06-29 生成)の localZ は
+// znorth-neg-v1 へ移行する前の「北 = +Z」で入っている。149/149 件で localX は geoToThree()
+// と一致するのに localZ だけが符号反転していることを確認済み。ラベル側は znorth-neg-v1 なので、
+// localZ をそのまま使うと南北が反転して近接判定が成立しない。ここでは符号を手で反転させる
+// 推測はせず、record 自身の lat/lon を凍結済みの geoToThree() に通して znorth-neg-v1 へ揃える。
+const FACILITY_LABEL_MATCH_RADIUS_M = 100; // 既存の同値判定(LabelLayer)と同じしきい値
+// 建物名・ランドマーク名だけを橋渡しの対象にする。
+// station / place / ward / park / river の既存の挙動は一切変えない。
+const FACILITY_LABEL_BRIDGE_KINDS = Object.freeze(['building', 'landmark']);
+
+/** [Mission 36H] 施設レコードの位置を znorth-neg-v1 に揃えて返す。 */
+function facilityRecordLocalXZ(record) {
+  if (!record) return null;
+  if (Number.isFinite(record.latitude) && Number.isFinite(record.longitude) && typeof geoToThree === 'function') {
+    try {
+      const p = geoToThree(record.latitude, record.longitude);
+      if (Number.isFinite(p.x) && Number.isFinite(p.z)) return [p.x, p.z];
+    } catch (err) { /* 初期化順で使えないときは下の localX/localZ へ落ちる */ }
+  }
+  if (Number.isFinite(record.localX) && Number.isFinite(record.localZ)) return [record.localX, record.localZ];
+  return null;
+}
+
+/**
+ * [Mission 36H] ラベルに対応する施設レコードを決める純粋関数。
+ * 採用条件は「正規化名の完全一致」かつ「{radius}m 以内」が **ちょうど1件** のときだけ。
+ * あいまい一致・部分一致・最近傍フォールバックは使わない。0件・複数件では何も選ばない。
+ * records を引数で受け取るのは、判定を FacilityDataStore の状態から切り離してテストするため。
+ * @returns {{route:'extended'|'unchanged', record:object|null, candidateCount:number,
+ *            candidates:Array, reason:string}}
+ */
+function decideFacilityRecordForLabel(label, records) {
+  const out = { route: 'unchanged', record: null, candidateCount: 0, candidates: [], reason: 'no-label' };
+  if (!label) return out;
+  if (!FACILITY_LABEL_BRIDGE_KINDS.includes(label.kind)) { out.reason = 'kind-not-bridged'; return out; }
+  const wanted = normalizeTownName(label.name);
+  if (!wanted) { out.reason = 'no-name'; return out; }
+  if (!Number.isFinite(label.x) || !Number.isFinite(label.z)) { out.reason = 'no-position'; return out; }
+  for (const r of (records || [])) {
+    if (!r || normalizeTownName(r.name) !== wanted) continue;
+    const xz = facilityRecordLocalXZ(r);
+    if (!xz) continue;
+    const distanceM = Math.hypot(xz[0] - label.x, xz[1] - label.z);
+    if (distanceM <= FACILITY_LABEL_MATCH_RADIUS_M) out.candidates.push({ id: r.id, name: r.name, distanceM, record: r });
+  }
+  out.candidateCount = out.candidates.length;
+  if (out.candidateCount === 1) { out.route = 'extended'; out.record = out.candidates[0].record; out.reason = 'unique-match'; }
+  else out.reason = (out.candidateCount === 0) ? 'no-match' : 'ambiguous';
+  return out;
+}
+
+/** [Mission 36H] クリック時に使う版。FacilityDataStore が ready でなければ何もしない。 */
+function resolveFacilityRecordForCityLabel(label) {
+  if (typeof FacilityDataStore === 'undefined' || FacilityDataStore.getState() !== 'ready') return null;
+  return decideFacilityRecordForLabel(label, FacilityDataStore.getAllRecords()).record;
+}
+
+if (typeof window !== 'undefined') {
+  // [Mission 36H] 判定だけを取り出して確かめる(records を渡すのでストアの状態に依存しない)。
+  window.__FACILITY_LABEL_DECIDE__ = (label, records) => decideFacilityRecordForLabel(label, records);
+  // [Mission 36H] 実機診断。ラベル名から、いま読み込まれている施設データへの対応を返す。
+  //   例: __FACILITY_LABEL_DIAG__('スーパー玉出 アビコ店').results[0].resolvedId
+  //       → 'osm-node-750515219'
+  window.__FACILITY_LABEL_DIAG__ = (name) => {
+    const items = (typeof CityLabelLayer !== 'undefined' && CityLabelLayer.findItemsByName)
+      ? CityLabelLayer.findItemsByName(name) : [];
+    const storeState = (typeof FacilityDataStore !== 'undefined') ? FacilityDataStore.getState() : 'missing';
+    const records = (storeState === 'ready') ? FacilityDataStore.getAllRecords() : [];
+    return {
+      query: name, facilityStoreState: storeState, recordCount: records.length, labelsFound: items.length,
+      results: items.map((it) => {
+        const d = decideFacilityRecordForLabel(it, records);
+        return {
+          labelId: it.id, kind: it.kind, labelXZ: [it.x, it.z],
+          route: d.route, reason: d.reason, candidateCount: d.candidateCount,
+          resolvedId: d.record ? d.record.id : null,
+          candidates: d.candidates.map((c) => ({ id: c.id, name: c.name, distanceM: +c.distanceM.toFixed(1) })),
+        };
+      }),
+    };
+  };
+}
+
 /**
  * FacilityLayer(拡張施設データ)のクリック時に詳細を表示する。既存のshowFacilityCard
  * (LabelLayer用)とは完全に分離し、互いに影響しない。
@@ -13874,6 +13976,11 @@ window.addEventListener('click',e=>{
         const sel = AreaSelectionLayer.selectFromLabel(labelHit);
         if (sel !== null || AreaSelectionLayer.hasAreaForLabel(labelHit.id)) { updateAreaSelectionUI(); return; }
       }
+      // [Mission 36H] 建物名・ランドマーク名のラベルは今まで何も起きずに落ちていた。
+      //   新施設データに対応が「ちょうど1件」定まるときだけ、写真つきの拡張カードを開く。
+      //   0件・複数件のときは何もせず、従来どおり後段(施設→建物)の判定へ落ちる。
+      const labelFacilityRecord = resolveFacilityRecordForCityLabel(labelHit);
+      if (labelFacilityRecord) { showExtendedFacilityCard(labelFacilityRecord, null); return; }
     }
   } catch (err) { /* ラベル判定で落ちても建物クリックは従来どおり動かす */ }
   const extendedFacilityHit = FacilityLayer.pickHit(mx, my, camera);
