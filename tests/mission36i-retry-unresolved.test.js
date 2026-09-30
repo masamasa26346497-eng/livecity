@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import {
   normalizeJapaneseVariantName,
@@ -60,7 +61,12 @@ test('Mission 36I retry variant requires Osaka, compatible type and strict dista
   assert.equal(outsideOsaka.ok, false);
 });
 
-test('Mission 36I retry preserves the 93 verified entries and retries only the remaining 56', async () => {
+test('Mission 36I retry preserves every current VERIFIED entry and retries only the remainder', async () => {
+  const currentMapping = JSON.parse(fs.readFileSync(
+    new URL('../public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json', import.meta.url), 'utf8'));
+  const currentVerified = currentMapping.entries.filter((entry) => entry.matchConfidence === 'VERIFIED').length;
+  const expectedRetried = 149 - currentVerified;
+
   let searchCalls = 0;
   const fetchImpl = async (url) => {
     if (url.includes(':searchText')) {
@@ -80,11 +86,11 @@ test('Mission 36I retry preserves the 93 verified entries and retries only the r
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.previousVerified, 93);
-  assert.equal(result.retried, 56);
-  assert.equal(searchCalls, 56);
-  assert.equal(result.counts.verified, 93);
-  assert.equal(result.counts.unresolved, 56);
+  assert.equal(result.previousVerified, currentVerified);
+  assert.equal(result.retried, expectedRetried);
+  assert.equal(searchCalls, expectedRetried);
+  assert.equal(result.counts.verified, currentVerified);
+  assert.equal(result.counts.unresolved, expectedRetried);
   assert.equal(result.counts.total, 149);
-  assert.equal(result.mapping.entries.length, 93);
+  assert.equal(result.mapping.entries.length, currentVerified);
 });
