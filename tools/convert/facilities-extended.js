@@ -5,7 +5,7 @@
 // 軽量形式({name,category,priority,p})を生成する古い実装であり、7カテゴリのみを対象とする。
 // 本ファイルは新しい拡張施設レコード形式(緯度経度を保持し、住所・営業時間等の項目を持つ)を
 // 生成する別の変換処理であり、既存ファイルは変更せず保持する(移行期間中は両方が並存する)。
-import { geoToLocal } from '../lib/projection.js';
+import { geoToRuntimeLocal } from '../lib/projection.js';
 import { haversineDistanceMeters } from '../lib/distance.js';
 import { normalizeChochoName } from '../lib/chocho-normalize.js'; // 全角半角統一等、町丁目名と同じ正規化規則を流用する
 
@@ -109,6 +109,7 @@ export function normalizeFacilityName(name) {
 
 /**
  * OSM要素配列を拡張施設レコードへ変換する。
+ * localX/localZ は現行 LiveCity runtime の znorth-neg-v1 (north=-Z) で生成する。
  * @param {object[]} rawElements Overpass APIの`elements`配列
  * @param {object} projection areaConfig.projection
  * @param {object} bbox areaConfig.bbox（対象範囲外の座標を除外するため）
@@ -142,7 +143,7 @@ export function convertFacilitiesExtended(rawElements, projection, bbox, facilit
     }
 
     const { category, subcategory, classifiedBy } = classifyTags(tags, name, facilityConfig);
-    const { x, z } = geoToLocal(center.lat, center.lon, projection);
+    const { x, z } = geoToRuntimeLocal(center.lat, center.lon, projection);
 
     records.push({
       id: `osm-${el.type}-${el.id}`,
@@ -165,12 +166,12 @@ export function convertFacilitiesExtended(rawElements, projection, bbox, facilit
       sourceId: `${el.type}/${el.id}`,
       license: sourceMeta.license,
       attribution: sourceMeta.attribution,
-      referenceDate: null, // OSMには公式な「基準日」が無いため、データ自体の日付情報は無いことを明示する
+      referenceDate: null,
       downloadedAt: sourceMeta.downloadedAt,
-      calculationMode: null, // 個別施設データ自体には適用されない(周辺検索結果に付与するフィールド)
+      calculationMode: null,
       sources: [sourceMeta.provider],
       sourceIds: [`${el.type}/${el.id}`],
-      duplicateCandidates: [], // detectDuplicateCandidates()で後段から設定する
+      duplicateCandidates: [],
       preferredSource: sourceMeta.provider,
     });
   }
@@ -189,7 +190,7 @@ export function detectDuplicateCandidates(records, distanceThresholdM = 50) {
   for (let i = 0; i < records.length; i++) {
     for (let j = i + 1; j < records.length; j++) {
       const a = records[i], b = records[j];
-      if (a.category !== b.category) continue; // カテゴリが異なる場合は重複候補としない
+      if (a.category !== b.category) continue;
 
       const nameMatch = a.normalizedName && b.normalizedName && (
         a.normalizedName === b.normalizedName ||
