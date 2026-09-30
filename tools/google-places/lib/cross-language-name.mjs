@@ -11,10 +11,8 @@
 //   タイプ互換（typesCompatible）と「近傍候補がちょうど1件」の条件は呼び出し側
 //   （pilot-matching.mjs）で別途要求する。
 
-// 施設名の前に付く、同定に寄与しない行政・格式の接頭辞（長い順に除去）。
 const PREFIXES = ['大阪市消防局', '式内大社', '大阪市立', '大阪府立', '大阪市', '市立', '府立'];
 
-// 施設種別語 → 英語表現（いずれか1つが英語名に含まれればよい）。notEn は含まれてはいけない語。
 const TERMS = [
   { ja: '高等学校', en: ['high school'], notEn: ['junior'] },
   { ja: '中学校', en: ['junior high school', 'middle school'] },
@@ -32,7 +30,6 @@ const TERMS = [
   { ja: 'スーパー', en: ['supermarket', 'super'] },
 ].sort((a, b) => b.ja.length - a.ja.length);
 
-// 地名・固有名語彙 → ローマ字（パイロット候補に現れる語のみ。増やすときはここへ明示的に追加する）。
 const PLACE_LEXICON = [
   { ja: '中臣須牟地', ro: 'nakatomi sumuchi' },
   { ja: '東住吉', ro: 'higashisumiyoshi' },
@@ -47,13 +44,8 @@ const PLACE_LEXICON = [
   { ja: 'ライフ', ro: 'life' },
 ].sort((a, b) => b.ja.length - a.ja.length);
 
-// 運営主体を表す接頭辞（核名の比較でだけ除去する。固有名の同定には寄与しない）。
 const OPERATOR_PREFIXES = ['医療法人', '社会福祉法人', '学校法人', '錦秀会'];
 
-/**
- * 行政・運営主体の接頭辞を先頭から除いた「核となる名前」（NFKC・空白除去・小文字）。
- * 第二段階の曖昧さ解消で「正規化後に完全一致」を判定するために使う（部分一致は使わない）。
- */
 export function coreName(name) {
   let s = String(name || '').normalize('NFKC').replace(/[\s・()（）]/g, '');
   for (let changed = true; changed;) {
@@ -65,7 +57,6 @@ export function coreName(name) {
   return s.toLowerCase();
 }
 
-/** タイプ情報（primaryType / types）が1つでもあるか。無いなら「互換でない」ではなく「不明」。 */
 export function hasTypeInfo(place) {
   return !!(place.primaryType || (Array.isArray(place.types) && place.types.length));
 }
@@ -83,7 +74,6 @@ function hasPhrase(words, phrase) {
   return false;
 }
 
-/** 英語/ローマ字名が含みうる日本語名か。@returns {{ok:boolean, reason:string}} */
 export function crossLanguageNameAgree(jaName, enName) {
   let s = String(jaName || '').normalize('NFKC').replace(/[\s・()（）]/g, '');
   const words = englishWords(enName);
@@ -110,16 +100,20 @@ export function crossLanguageNameAgree(jaName, enName) {
   return { ok: true, reason: '日本語名と英語名が語彙対応で一致（地名: ' + places.map((l) => l.ro).join('+') + '）' };
 }
 
-// OSM subcategory → Google Places のタイプ（primaryType / types のいずれかに含まれればよい）。
+// OSM subcategory → Google Places (New) type compatibility.
+// Mission 36J extends this table for citywide dining/lodging/shopping coverage, but never uses type alone to verify.
 const COMPATIBLE_TYPES = {
   hospital: ['hospital', 'general_hospital', 'medical_center'],
   clinic: ['doctor', 'medical_clinic', 'hospital', 'health'],
   dentist: ['dentist', 'dental_clinic', 'doctor', 'health'],
   pharmacy: ['pharmacy', 'drugstore', 'health', 'store'],
   drugstore: ['drugstore', 'pharmacy', 'store'],
+  healthcare_other: ['doctor', 'medical_clinic', 'hospital', 'health', 'pharmacy', 'dentist'],
   kindergarten: ['preschool', 'school', 'educational_institution'],
+  childcare: ['preschool', 'school', 'child_care_agency', 'educational_institution'],
   school: ['school', 'primary_school', 'secondary_school', 'middle_school', 'high_school', 'preschool', 'educational_institution'],
   college: ['university', 'college', 'school', 'educational_institution'],
+  university: ['university', 'college', 'school', 'educational_institution'],
   station: ['train_station', 'subway_station', 'transit_station', 'light_rail_station'],
   government: ['city_hall', 'local_government_office', 'government_office'],
   library: ['library'],
@@ -129,14 +123,48 @@ const COMPATIBLE_TYPES = {
   post_office: ['post_office'],
   supermarket: ['supermarket', 'grocery_store', 'grocery_or_supermarket'],
   convenience: ['convenience_store', 'grocery_store', 'store'],
+  shopping_center: ['shopping_mall', 'shopping_center', 'store'],
+  department_store: ['department_store', 'shopping_mall', 'store'],
+  marketplace: ['market', 'shopping_mall', 'store'],
+  shop_other: ['store', 'shopping_mall'],
   bank: ['bank', 'atm', 'finance'],
+  atm: ['atm', 'bank', 'finance'],
   parking: ['parking', 'parking_lot'],
   bicycle_parking: ['parking', 'parking_lot'],
   park: ['park'],
+  playground: ['playground', 'park'],
+  sports_centre: ['sports_complex', 'gym', 'fitness_center', 'stadium'],
+  pitch: ['sports_complex', 'stadium', 'athletic_field'],
+  garden: ['garden', 'park', 'tourist_attraction'],
+  leisure_other: ['park', 'sports_complex', 'gym', 'fitness_center', 'stadium', 'playground'],
+  restaurant: ['restaurant'],
+  cafe: ['cafe', 'coffee_shop'],
+  fast_food: ['fast_food_restaurant', 'restaurant'],
+  bar: ['bar'],
+  pub: ['bar', 'pub'],
+  food_court: ['food_court', 'restaurant'],
+  ice_cream: ['ice_cream_shop', 'dessert_shop', 'cafe'],
+  nightclub: ['night_club', 'bar'],
+  hotel: ['hotel'],
+  hostel: ['hostel', 'hotel'],
+  guest_house: ['guest_house', 'hotel', 'bed_and_breakfast'],
+  lodging_apartment: ['extended_stay_hotel', 'hotel'],
+  motel: ['motel', 'hotel'],
+  attraction: ['tourist_attraction'],
+  museum: ['museum'],
+  art_gallery: ['art_gallery'],
+  viewpoint: ['tourist_attraction'],
+  theatre: ['performing_arts_theater'],
+  cinema: ['movie_theater'],
+  arts_centre: ['cultural_center', 'art_gallery', 'performing_arts_theater'],
+  tower: ['tourist_attraction'],
+  tourism_other: ['tourist_attraction', 'museum', 'art_gallery', 'park', 'place_of_worship'],
+  shrine: ['shinto_shrine', 'place_of_worship', 'tourist_attraction'],
+  temple: ['buddhist_temple', 'place_of_worship', 'tourist_attraction'],
+  place_of_worship: ['place_of_worship', 'shinto_shrine', 'buddhist_temple', 'church', 'mosque'],
   historic_memorial: ['shinto_shrine', 'place_of_worship', 'hindu_temple', 'buddhist_temple', 'tourist_attraction'],
 };
 
-/** Google側のタイプ情報が候補のOSM分類と両立するか。タイプ情報が無い場合は false（証拠不足）。 */
 export function typesCompatible(osmSubcategory, place) {
   const allowed = COMPATIBLE_TYPES[osmSubcategory];
   if (!allowed) return false;
