@@ -1,0 +1,42 @@
+name: Mission 36J - Osaka 24 Ward Google Places Expansion
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  pull_request:
+    paths:
+      - 'tools/facilities/osaka-city-photo-facilities.mjs'
+      - 'tools/google-places/**'
+      - 'config/facilities/osaka-city-photo-profile.json'
+      - 'config/wards/registry.json'
+      - 'tests/mission36j-*.test.js'
+      - '.github/workflows/mission36j.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Mission 36J offline tests
+        run: node --test tests/mission36j-*.test.js
+
+      - name: Verify production HTML is untouched by citywide Places work
+        shell: bash
+        run: |
+          git diff --exit-code HEAD^ HEAD -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html || {
+            echo 'Mission 36J must not modify production/protected HTML';
+            exit 1;
+          }
