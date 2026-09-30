@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 import {
   selectorToOverpass,
+  buildCompactOverpassSelectors,
   buildPhotoFacilityTileQuery,
   mergeOsmElements,
   buildFacilityConfig,
@@ -33,7 +34,7 @@ test('Mission 36J targets exactly all 24 Osaka wards', () => {
   assert.equal(wardPolygons.wards.length, 24);
 });
 
-test('Mission 36J citywide source is tiled and includes broad photo-worthy categories', () => {
+test('Mission 36J citywide source is tiled and uses compact nwr selectors for broad photo-worthy categories', () => {
   assert.equal(profile.tileSizeMeters, 2000);
   for (const selector of ['shop', 'tourism', 'leisure', 'amenity=restaurant', 'amenity=cafe',
     'amenity=hospital', 'amenity=school', 'railway=station']) {
@@ -42,11 +43,31 @@ test('Mission 36J citywide source is tiled and includes broad photo-worthy categ
   assert.equal(selectorToOverpass('shop'), '["shop"]');
   assert.equal(selectorToOverpass('amenity=restaurant'), '["amenity"="restaurant"]');
 
+  const compact = buildCompactOverpassSelectors(profile.osmFilters);
+  assert.ok(compact.includes('["shop"]'));
+  assert.ok(compact.includes('["tourism"]'));
+  assert.ok(compact.some((f) => f.startsWith('["amenity"~') && f.includes('restaurant') && f.includes('school')));
+  assert.ok(compact.length < 20, `compact selector count should stay small, got ${compact.length}`);
+
   const q = buildPhotoFacilityTileQuery({ south: 34.6, west: 135.4, north: 34.61, east: 135.41 }, profile);
-  assert.match(q, /node\["shop"\]/);
-  assert.match(q, /way\["amenity"="restaurant"\]/);
-  assert.match(q, /relation\["tourism"\]/);
+  assert.match(q, /nwr\["shop"\]/);
+  assert.match(q, /nwr\["tourism"\]/);
+  assert.match(q, /nwr\["amenity"~/);
+  assert.match(q, /restaurant/);
   assert.match(q, /out center;/);
+  assert.doesNotMatch(q, /\n\s*(?:node|way|relation)\[/, 'query must not expand every filter three times');
+});
+
+test('Mission 36J compact selector keeps wildcard semantics and suppresses redundant same-key exact selectors', () => {
+  const compact = buildCompactOverpassSelectors([
+    'shop', 'shop=supermarket', 'shop=convenience',
+    'amenity=restaurant', 'amenity=cafe', 'office=government',
+  ]);
+  assert.deepEqual(compact, [
+    '["shop"]',
+    '["amenity"~"^(restaurant|cafe)$"]',
+    '["office"="government"]',
+  ]);
 });
 
 test('Mission 36J tile overlap is de-duplicated by OSM type/id deterministically', () => {
