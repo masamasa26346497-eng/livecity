@@ -25,18 +25,18 @@ test('Mission 36I retry permits same-stem preschool rename but not arbitrary fuz
 test('Mission 36I retry variant requires Osaka, compatible type and strict distance', () => {
   const candidate = {
     facilityId: 'x',
-    name: '第二めぐむ保育園',
+    name: 'あびこひかり保育園',
     osmSubcategory: 'kindergarten',
     expectLat: 34.6000,
     expectLon: 135.5000,
   };
 
-  // kindergarten is intentionally not in the Google type compatibility table, so no unsafe rescue.
-  const noTypeEvidence = classifyConservativeJapaneseVariant(candidate, [{
-    placeId: 'p1', displayName: '第２めぐむ保育園', lat: 34.6001, lon: 135.5000,
+  const preschoolRename = classifyConservativeJapaneseVariant(candidate, [{
+    placeId: 'p1', displayName: 'あびこひかりこども園', lat: 34.60001, lon: 135.5000,
     formattedAddress: '大阪府大阪市', primaryType: 'preschool', types: ['preschool'],
   }]);
-  assert.equal(noTypeEvidence.ok, false);
+  assert.equal(preschoolRename.ok, true);
+  assert.equal(preschoolRename.googlePlaceId, 'p1');
 
   const schoolCandidate = { ...candidate, name: '教育センター附属高校', osmSubcategory: 'school' };
   const ok = classifyConservativeJapaneseVariant(schoolCandidate, [{
@@ -51,4 +51,10 @@ test('Mission 36I retry variant requires Osaka, compatible type and strict dista
     formattedAddress: '大阪府大阪市', primaryType: 'high_school', types: ['high_school'],
   }]);
   assert.equal(tooFar.ok, false);
+
+  const outsideOsaka = classifyConservativeJapaneseVariant(schoolCandidate, [{
+    placeId: 'p4', displayName: '大阪府教育センター附属高等学校', lat: 34.6001, lon: 135.5000,
+    formattedAddress: '兵庫県神戸市', primaryType: 'high_school', types: ['high_school'],
+  }]);
+  assert.equal(outsideOsaka.ok, false);
 });
