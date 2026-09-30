@@ -7,6 +7,8 @@
 // - VERIFIED の linkage だけを durable mapping に保存する。
 // - AMBIGUOUS / UNRESOLVED は report に理由だけを残し、Place ID を確定保存しない。
 // - 写真バイナリ / media URL / photo resource name は永続化しない。
+// - 149件照合が成功した場合だけ、36H UI が既に読む pilot mapping path に同内容を同期する。
+//   これにより既存UIを壊さず、30件Pilot → 149件へ切り替える。
 //
 // 実行例（ネットワーク接続可能なローカル環境）:
 //   GOOGLE_PLACES_API_KEY=xxxx node tools/google-places/match-sumiyoshi-places.mjs
@@ -22,6 +24,8 @@ import { loadGooglePlacesApiKeyFromEnv } from './load-api-key.mjs';
 
 export const SUMIYOSHI_SOURCE = resolveProjectPath('public/map-data/osaka-sumiyoshi/facilities/facilities.json');
 export const SUMIYOSHI_OUT_MAPPING = resolveProjectPath('public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json');
+// Mission 36H の写真UIが現在参照している既存path。36Iの照合成功時のみ同じdurable mappingを同期する。
+export const SUMIYOSHI_UI_MAPPING = resolveProjectPath('public/map-data/osaka-city/derived/google-places-pilot-mapping.json');
 export const SUMIYOSHI_REPORT_DIR = resolveProjectPath('data/reports/mission36i-google-places-sumiyoshi');
 export const EXPECTED_SUMIYOSHI_FACILITY_COUNT = 149;
 
@@ -218,6 +222,7 @@ export async function runSumiyoshiMatch({
       neverPersists: ['photo binaries', 'photo media URLs', 'photo resource names'],
       resolvesPhotosAtDisplayTime: true,
       ambiguousMatchesAreNotPersisted: true,
+      uiCompatibilityMapping: 'public/map-data/osaka-city/derived/google-places-pilot-mapping.json',
     },
     counts: {
       verified: verified.length,
@@ -228,8 +233,12 @@ export async function runSumiyoshiMatch({
   };
 
   if (!dryRun) {
+    const serializedMapping = JSON.stringify(mapping, null, 2);
     fs.mkdirSync(path.dirname(SUMIYOSHI_OUT_MAPPING), { recursive: true });
-    fs.writeFileSync(SUMIYOSHI_OUT_MAPPING, JSON.stringify(mapping, null, 2), 'utf-8');
+    fs.writeFileSync(SUMIYOSHI_OUT_MAPPING, serializedMapping, 'utf-8');
+    // 既存の36H写真UIはこのpathを読む。API実照合が最後まで完了した後だけ同期されるため、
+    // APIキー無し・途中失敗では従来のPilot mappingを壊さない。
+    fs.writeFileSync(SUMIYOSHI_UI_MAPPING, serializedMapping, 'utf-8');
 
     fs.mkdirSync(SUMIYOSHI_REPORT_DIR, { recursive: true });
     fs.writeFileSync(path.join(SUMIYOSHI_REPORT_DIR, 'match-report.json'), JSON.stringify({
@@ -237,6 +246,7 @@ export async function runSumiyoshiMatch({
       generatedAt,
       sourceCount: candidates.length,
       maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS,
+      uiMappingPath: 'public/map-data/osaka-city/derived/google-places-pilot-mapping.json',
       counts: mapping.counts,
       unresolved,
       apiUsage: client.getDebugCounters(),
