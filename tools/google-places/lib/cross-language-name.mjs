@@ -114,6 +114,9 @@ export function crossLanguageNameAgree(jaName, enName) {
 const COMPATIBLE_TYPES = {
   hospital: ['hospital', 'general_hospital', 'medical_center'],
   clinic: ['doctor', 'medical_clinic', 'hospital', 'health'],
+  dentist: ['dentist', 'dental_clinic', 'doctor', 'health'],
+  pharmacy: ['pharmacy', 'drugstore', 'health', 'store'],
+  drugstore: ['drugstore', 'pharmacy', 'store'],
   kindergarten: ['preschool', 'school', 'educational_institution'],
   school: ['school', 'primary_school', 'secondary_school', 'middle_school', 'high_school', 'preschool', 'educational_institution'],
   college: ['university', 'college', 'school', 'educational_institution'],
@@ -125,7 +128,11 @@ const COMPATIBLE_TYPES = {
   police: ['police', 'police_station'],
   post_office: ['post_office'],
   supermarket: ['supermarket', 'grocery_store', 'grocery_or_supermarket'],
+  convenience: ['convenience_store', 'grocery_store', 'store'],
   bank: ['bank', 'atm', 'finance'],
+  parking: ['parking', 'parking_lot'],
+  bicycle_parking: ['parking', 'parking_lot'],
+  park: ['park'],
   historic_memorial: ['shinto_shrine', 'place_of_worship', 'hindu_temple', 'buddhist_temple', 'tourist_attraction'],
 };
 
