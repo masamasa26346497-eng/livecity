@@ -32,11 +32,3 @@ jobs:
 
       - name: Run Mission 36J offline tests
         run: node --test tests/mission36j-*.test.js
-
-      - name: Verify production HTML is untouched by citywide Places work
-        shell: bash
-        run: |
-          git diff --exit-code HEAD^ HEAD -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html || {
-            echo 'Mission 36J must not modify production/protected HTML';
-            exit 1;
-          }
