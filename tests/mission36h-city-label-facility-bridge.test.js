@@ -19,13 +19,13 @@ const FACILITIES = path.join(ROOT, 'public/map-data/osaka-sumiyoshi/facilities/f
 const BUILDING_LABELS = path.join(ROOT, 'public/map-data/osaka-city/derived/building-name-labels.json');
 
 const bldgLabel = (name, x, z) => ({ id: 'bldg:' + name, kind: 'building', name, x, z });
-/** facilities.json と同じ形（lat/lon が正、localZ は移行前の「北=+Z」）。 */
+/** facilities.json と同じ現行 runtime 形式（znorth-neg-v1 / 北=-Z）。 */
 function facility(id, name, lat, lon) {
   const CLAT = 34.604208, CLON = 135.525020, MPD = 111320;
   return {
     id, name, category: 'shopping', latitude: lat, longitude: lon,
     localX: (lon - CLON) * Math.cos((CLAT * Math.PI) / 180) * MPD,
-    localZ: (lat - CLAT) * MPD, // 移行前の符号（あえてこのまま）
+    localZ: -(lat - CLAT) * MPD,
   };
 }
 
@@ -64,21 +64,23 @@ test('[36H] 実データ: 同名の別店舗（鶴見橋店・支店名なし）
   }
 });
 
-test('[36H] 実データ: 施設データの localZ は znorth-neg-v1 と符号が逆（橋渡しは lat/lon から揃える）', () => {
-  const records = JSON.parse(fs.readFileSync(FACILITIES, 'utf-8')).records;
+test('[36H2] 実データ: 施設座標は znorth-neg-v1 で緯度経度から再投影済み', () => {
+  const dataset = JSON.parse(fs.readFileSync(FACILITIES, 'utf-8'));
+  const records = dataset.records;
   const CLAT = 34.604208, MPD = 111320;
-  let flipped = 0;
+  assert.equal(dataset.coordinateConvention, 'znorth-neg-v1');
   for (const r of records) {
-    const zNeg = -((r.latitude - CLAT) * MPD); // znorth-neg-v1
-    if (Math.abs(zNeg - r.localZ) > Math.abs(-zNeg - r.localZ)) flipped++;
+    const expectedZ = Math.round((-(r.latitude - CLAT) * MPD) * 100) / 100;
+    assert.ok(Math.abs(expectedZ - r.localZ) < 0.001,
+      `${r.id}: localZ=${r.localZ}, expected=${expectedZ}`);
   }
-  assert.equal(flipped, records.length,
-    'facilities.json の localZ が移行前の「北=+Z」であるという前提が崩れている（' + flipped + '/' + records.length + '）');
-  // localZ をそのまま使うと解決しないこと＝lat/lon 経由の揃えが効いていること
   const t = records.find((r) => r.id === 'osm-node-750515219');
+  assert.equal(t.localX, -1591.3);
+  assert.equal(t.localZ, 373.31);
   const labels = JSON.parse(fs.readFileSync(BUILDING_LABELS, 'utf-8')).labels;
   const l = labels.find((x) => x.name === 'スーパー玉出 アビコ店');
-  assert.ok(Math.hypot(t.localX - l.x, t.localZ - l.z) > 100, 'localZ 直使いでは 100m を超えて離れている');
+  assert.ok(Math.hypot(t.localX - l.x, t.localZ - l.z) < 50,
+    'FacilityLayer の実座標と建物ラベルが同じ場所に揃うこと');
 });
 
 // ── 分岐の確認（合成データ） ─────────────────────────────────────────
