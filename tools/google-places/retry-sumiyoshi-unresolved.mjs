@@ -26,7 +26,9 @@ const MAX_RATE_LIMIT_RETRIES = 2;
 const MAX_DETAILS_PER_CANDIDATE = 5;
 const MAX_DETAILS_TOTAL = 30;
 const VARIANT_MAX_DISTANCE_METERS = 60;
+const CANONICAL_EXACT_MAX_DISTANCE_METERS = 80;
 const PRESCHOOL_VARIANT_MAX_DISTANCE_METERS = 20;
+const KNOWN_BRAND_ALIAS_MAX_DISTANCE_METERS = 20;
 const OSAKA_RE = /osaka|大阪/i;
 
 const defaultSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -61,6 +63,12 @@ export function normalizeJapaneseVariantName(name) {
   for (const [from, to] of ORDINALS) s = s.split(from).join(to);
   s = s.replace(/高等学校/g, '高校');
   s = s.replace(/我孫子/g, 'あびこ');
+
+  // Mission 36I: explicit, observed historical/display-name variants only.
+  // Do not generalize these into fuzzy matching.
+  if (s === '天宗学園瓜破園') s = '天宗瓜破園';
+  if (s === '南住吉大空小学校') s = '大空小学校';
+
   s = s.replace(/[\s　・･!！?？,，.。'’"“”「」【】]/g, '');
   return s;
 }
@@ -79,28 +87,44 @@ export function japaneseVariantEvidence(a, b) {
   if (ma && mb && ma[1].length >= 4 && ma[1] === mb[1]) {
     return { ok: true, kind: 'preschool-type-rename' };
   }
+
+  // Explicit convenience-store abbreviation observed in OSM. Require a very short distance in the caller.
+  const famima = (na === 'ふぁみま' && nb.startsWith('ふぁみりーまーと'))
+    || (nb === 'ふぁみま' && na.startsWith('ふぁみりーまーと'));
+  if (famima) return { ok: true, kind: 'known-brand-alias' };
+
   return { ok: false, kind: null };
+}
+
+function distanceLimitForEvidence(kind, maxDistanceMeters) {
+  if (kind === 'canonical-exact') {
+    return Math.min(maxDistanceMeters, CANONICAL_EXACT_MAX_DISTANCE_METERS);
+  }
+  if (kind === 'preschool-type-rename') {
+    return Math.min(maxDistanceMeters, PRESCHOOL_VARIANT_MAX_DISTANCE_METERS);
+  }
+  if (kind === 'known-brand-alias') {
+    return Math.min(maxDistanceMeters, KNOWN_BRAND_ALIAS_MAX_DISTANCE_METERS);
+  }
+  return Math.min(maxDistanceMeters, VARIANT_MAX_DISTANCE_METERS);
 }
 
 /**
  * Conservative fallback after the Mission 36H classifier remains unresolved/ambiguous.
- * Never widens the 120m ceiling; variant matches use <=60m, preschool-type renames <=20m.
+ * Never widens the 120m ceiling. Canonical exact variants may use <=80m; rename/brand aliases are much tighter.
  */
 export function classifyConservativeJapaneseVariant(candidate, places, maxDistanceMeters = DEFAULT_MAX_DISTANCE_METERS) {
   if (!Array.isArray(places) || !places.length) return { ok: false };
-  const hardMax = Math.min(maxDistanceMeters, VARIANT_MAX_DISTANCE_METERS);
   const evaluated = places.map((p) => ({
     ...p,
     distanceMeters: haversineMeters(candidate.expectLat, candidate.expectLon, p.lat, p.lon),
     evidence: japaneseVariantEvidence(candidate.name, p.displayName),
   })).filter((p) => Number.isFinite(p.distanceMeters)
-    && p.distanceMeters <= hardMax
+    && p.evidence.ok
+    && p.distanceMeters <= distanceLimitForEvidence(p.evidence.kind, maxDistanceMeters)
     && !!p.formattedAddress
     && OSAKA_RE.test(p.formattedAddress)
-    && typesCompatible(candidate.osmSubcategory, p)
-    && p.evidence.ok)
-    .filter((p) => p.evidence.kind !== 'preschool-type-rename'
-      || p.distanceMeters <= PRESCHOOL_VARIANT_MAX_DISTANCE_METERS);
+    && typesCompatible(candidate.osmSubcategory, p));
 
   if (evaluated.length !== 1) return { ok: false, candidateCount: evaluated.length };
   const p = evaluated[0];
