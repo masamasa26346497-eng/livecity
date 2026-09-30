@@ -15,6 +15,7 @@ import {
   writeJson,
   writeJsonCompact,
 } from './lib/area.js';
+import { isMainModule } from './lib/paths.js';
 import {
   geoToRuntimeLocal,
   RUNTIME_COORDINATE_CONVENTION,
@@ -81,9 +82,7 @@ export async function run(args) {
     throw new Error(`施設データが見つかりません: ${args.area}`);
   }
 
-  let canonicalResult = null;
-  if (processed) canonicalResult = normalizedDataset(processed, areaConfig.projection);
-  else canonicalResult = normalizedDataset(publicData, areaConfig.projection);
+  const canonicalResult = normalizedDataset(processed || publicData, areaConfig.projection);
 
   if (canonicalResult.missingCoordinates.length) {
     throw new Error(
@@ -120,7 +119,7 @@ export async function run(args) {
   return canonicalResult;
 }
 
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (isMainModule(import.meta.url)) {
   run(parseArgs(process.argv.slice(2))).catch((err) => {
     console.error('[facility-coordinate-migration]', err.message);
     process.exit(1);
