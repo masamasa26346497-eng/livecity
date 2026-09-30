@@ -20,6 +20,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
+const DEV_UI_HTML = 'osaka_3d_buildings.ward-ux-v1.html';
+const DEV_UI_SCRIPT = '/livecity-dev-ui-coordinator.js';
 
 function parseArgs(argv) {
   const args = { port: 8000, area: 'osaka-sumiyoshi' };
@@ -52,6 +54,17 @@ function resolveSafe(urlPath) {
   const abs = path.normalize(path.join(PUBLIC_DIR, rel));
   if (abs !== PUBLIC_DIR && !abs.startsWith(PUBLIC_DIR + path.sep)) return null;
   return abs;
+}
+
+// Mission 36I: 開発版HTMLだけにUI coordinatorを注入する。
+// 巨大な地図HTMLそのものを書き換えず、production/protected HTMLへ一切影響させない。
+function injectDevUiCoordinator(abs, body) {
+  if (path.basename(abs) !== DEV_UI_HTML) return body;
+  const html = body.toString('utf8');
+  if (html.includes(DEV_UI_SCRIPT)) return body;
+  const tag = `<script src="${DEV_UI_SCRIPT}"></script>`;
+  const injected = html.includes('</body>') ? html.replace('</body>', `${tag}\n</body>`) : `${html}\n${tag}`;
+  return Buffer.from(injected, 'utf8');
 }
 
 // 起動前に、HTMLが読み込む4つの統計JSONの存在を確認して警告する（生成はしない）。
@@ -95,7 +108,8 @@ async function main() {
         res.writeHead(403); res.end('Directory listing disabled'); return;
       }
       const ext = path.extname(abs).toLowerCase();
-      const body = await readFile(abs);
+      let body = await readFile(abs);
+      body = injectDevUiCoordinator(abs, body);
       res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
       res.end(body);
     } catch {
