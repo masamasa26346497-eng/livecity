@@ -1516,6 +1516,13 @@ const DEMOGRAPHICS_CONFIG = Object.freeze({
   basePath: 'map-data', // このHTMLから見た public/map-data への相対パス
 });
 
+// [Mission 36J] 人口統計は既存の住吉区データを維持し、施設レイヤーだけ24区全域へ拡張する。
+const FACILITY_CONFIG = Object.freeze({
+  areaId: 'osaka-city',
+  basePath: 'map-data',
+});
+if (typeof window !== 'undefined') window.__LIVE_CITY_FACILITY_CONFIG__ = FACILITY_CONFIG;
+
 const DemographicsDataStore = (function () {
   // 状態は loading | ready | error | no-data のいずれか一つ。
   // no-data: フェッチ自体は成功したが、当該エリアのデータがまだ生成されていない場合
@@ -1727,8 +1734,8 @@ const FacilityDataStore = (function () {
   const readyCallbacks = []; // state==='ready'になった時点で1回ずつ呼び出すコールバック群
 
   async function load() {
-    const url = `${DEMOGRAPHICS_CONFIG.basePath}/${DEMOGRAPHICS_CONFIG.areaId}/facilities/facilities.json`;
-    const metaUrl = `${DEMOGRAPHICS_CONFIG.basePath}/${DEMOGRAPHICS_CONFIG.areaId}/facilities/metadata.json`;
+    const url = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/facilities.json`;
+    const metaUrl = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/metadata.json`;
     try {
       const [dataRes, metaRes] = await Promise.all([fetch(url), fetch(metaUrl)]);
       if (!dataRes.ok) {
@@ -12501,7 +12508,10 @@ if (typeof window !== 'undefined') window.__BUILDING_PHOTO_DEBUG__ = () => Build
 //     （帰属表示を黙って削らない）。
 // ══════════════════════════════════════════════════════════════
 const GooglePlacesPhoto = (function () {
-  const MAPPING_URL = 'map-data/osaka-city/derived/google-places-pilot-mapping.json';
+  const MAPPING_URLS = [
+    'map-data/osaka-city/derived/google-places-osaka-city-mapping.json',
+    'map-data/osaka-city/derived/google-places-pilot-mapping.json',
+  ];
   const DETAILS_FIELD_MASK = 'id,displayName,formattedAddress,location,primaryType,'
     + 'photos.name,photos.widthPx,photos.heightPx,photos.authorAttributions,googleMapsUri';
   const MAX_PHOTOS = 4;                 // §7: 施設あたり 3〜5 枚
@@ -12528,12 +12538,23 @@ const GooglePlacesPhoto = (function () {
 
   function ensureMapping() {
     if (mapping || mappingLoading) return mappingLoading || Promise.resolve(mapping);
-    mappingLoading = fetch(MAPPING_URL).then((r) => (r.ok ? r.json() : null)).then((j) => {
-      const byFacilityId = {};
-      for (const e of (j && j.entries) || []) if (e.facilityId) byFacilityId[e.facilityId] = e;
-      mapping = { byFacilityId, raw: j };
+    mappingLoading = (async () => {
+      for (const url of MAPPING_URLS) {
+        try {
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) continue;
+          const j = await r.json();
+          const byFacilityId = {};
+          for (const e of (j && j.entries) || []) {
+            if (e.facilityId && e.googlePlaceId && e.matchConfidence === 'VERIFIED') byFacilityId[e.facilityId] = e;
+          }
+          mapping = { byFacilityId, raw: j, sourceUrl: url };
+          return mapping;
+        } catch (_) { /* 次のmappingへフォールバック */ }
+      }
+      mapping = { byFacilityId: {}, raw: null, sourceUrl: null };
       return mapping;
-    }).catch(() => { mapping = { byFacilityId: {}, raw: null }; return mapping; });
+    })();
     return mappingLoading;
   }
 
@@ -12638,8 +12659,8 @@ const GooglePlacesPhoto = (function () {
 
   /**
    * 施設カード（showExtendedFacilityCard）が開いたときに呼ぶ。
-   * §5/§12 事前生成された pilot mapping に facilityId が無ければ何もしない
-   *   （＝このMissionの検証パイロット対象 30施設以外では、今は何も出ない。全施設対象ではない）。
+   * §5/§12 事前生成された24区Google Places mappingにVERIFIED facilityIdが無ければ何もしない
+   *   （＝24区mappingでVERIFIED済みの施設だけ表示し、未照合・曖昧な施設では何も出さない）。
    * @param {object} record  FacilityDataStore のレコード（record.id が facilityId）
    */
   function fillFacilityCard(record) {
