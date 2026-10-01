@@ -35,16 +35,22 @@ jobs:
           set -euo pipefail
           node tools/mission36k-discover-osaka-building-source.mjs
 
-      - name: Commit source discovery report
+      - name: Probe 3D Tiles and MVT archive without full download
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-probe-plateau-runtime-zip.mjs
+
+      - name: Commit source discovery reports
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/reports/mission36k-building-source-discovery.json
+          git add -f data/reports/mission36k-building-source-discovery.json data/reports/mission36k-runtime-zip-probe.json
           if git diff --cached --quiet; then
             echo 'No discovery changes.'
             exit 0
           fi
-          git commit -m 'data(mission36k): record Osaka PLATEAU building source options'
+          git commit -m 'data(mission36k): inspect Osaka PLATEAU runtime archive'
           git push origin "HEAD:${GITHUB_REF_NAME}"
