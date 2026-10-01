@@ -1829,8 +1829,10 @@ const FacilityDataStore = (function () {
     if (wardLoadPromises.has(resolved)) return wardLoadPromises.get(resolved);
 
     const base = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities`;
-    const p = fetch(`${base}/${entry.url}`).then(async (res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status} for ${entry.url}`);
+    const shardPath = entry.path || entry.url;
+    if (!shardPath) throw new Error(`ward shard path missing for ${resolved}`);
+    const p = fetch(`${base}/${shardPath}`).then(async (res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${shardPath}`);
       const doc = await res.json();
       const records = normalizeRecords(doc);
       const added = mergeRecords(records);
