@@ -1727,119 +1727,210 @@ const TownStatsDataStore = (function () {
 // 常に distanceMode: "straight-line" を明示し、「直線距離。実際の徒歩経路・所要時間とは
 // 異なります」を画面に表示する(徒歩時間として表示しない)。
 const FacilityDataStore = (function () {
+  // [Mission 36J LAZY] 24-ward facility lazy loading
+  // 大阪市40,585件を一括fetchせず、24区shardを選択区ごとに追加読込する。
+  // 読み込んだ区はキャッシュし、施設スプライト自体はFacilityLayer側で上限描画する。
   let state = 'loading';
   let allRecords = [];
   let recordsById = new Map();
   let metadata = null;
-  const readyCallbacks = []; // state==='ready'になった時点で1回ずつ呼び出すコールバック群
+  let manifest = null;
+  let baseLoadPromise = null;
+  const loadedWardIds = new Set();
+  const wardLoadPromises = new Map();
+  const readyCallbacks = [];
 
-  async function load() {
-    const url = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/facilities-startup.json`;
-    const metaUrl = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/metadata.json`;
-    try {
-      const [dataRes, metaRes] = await Promise.all([fetch(url), fetch(metaUrl)]);
-      if (!dataRes.ok) {
-        state = 'no-data';
-        console.warn(`[FacilityDataStore] データ未生成 (HTTP ${dataRes.status})。` +
-          `ローカルPCで npm run data:import:facilities -- --area ${DEMOGRAPHICS_CONFIG.areaId} を実行してください。`);
-        return;
-      }
-      const data = await dataRes.json();
-      metadata = metaRes.ok ? await metaRes.json() : null;
-      if (!data.records || data.records.length === 0) {
-        state = 'no-data';
-        return;
-      }
-      allRecords = data.records;
-      recordsById = new Map(allRecords.map((r) => [r.id, r]));
-      state = 'ready';
-      console.log(`[FacilityDataStore] ${allRecords.length}件の施設データを読み込みました。`);
-      for (const cb of readyCallbacks) { try { cb(); } catch (e) { console.error('[FacilityDataStore] readyCallback実行エラー:', e); } }
-    } catch (err) {
-      state = 'error';
-      console.error('[FacilityDataStore] 読み込みエラー:', err.message);
+  function notifyReady() {
+    if (state !== 'ready') return;
+    while (readyCallbacks.length) {
+      const cb = readyCallbacks.shift();
+      try { cb(); } catch (e) { console.warn('[FacilityDataStore] onReady callback failed:', e); }
     }
   }
 
-  load(); // ページ初期化を妨げない非同期呼び出し。建物・道路・公園等の表示は本ストアの
-          // 読み込み完了を待たずに進む（facilities.jsonが無くても地図は起動する）。
+  async function ensureBaseLoaded() {
+    if (manifest) return true;
+    if (baseLoadPromise) return baseLoadPromise;
+    const base = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities`;
+    baseLoadPromise = Promise.all([
+      fetch(`${base}/ward-manifest.json`),
+      fetch(`${base}/metadata.json`).catch(() => null),
+    ]).then(async ([manifestRes, metaRes]) => {
+      if (!manifestRes || !manifestRes.ok) {
+        state = 'no-data';
+        console.warn('[FacilityDataStore] ward-manifest.json not available');
+        return false;
+      }
+      manifest = await manifestRes.json();
+      if (!manifest || !Array.isArray(manifest.wards) || !manifest.wards.length) {
+        state = 'no-data';
+        console.warn('[FacilityDataStore] ward manifest is empty');
+        return false;
+      }
+      if (metaRes && metaRes.ok) {
+        try { metadata = await metaRes.json(); } catch (e) { metadata = null; }
+      }
+      return true;
+    }).catch((e) => {
+      state = 'error';
+      console.error('[FacilityDataStore] base load failed:', e);
+      return false;
+    });
+    return baseLoadPromise;
+  }
 
-  return {
+  function resolveWardId(wardId) {
+    const raw = String(wardId || '').trim();
+    if (!raw) return null;
+    if (manifest && manifest.wards.some((w) => w.wardId === raw)) return raw;
+    const def = (typeof WardModeManager !== 'undefined' && Array.isArray(WardModeManager.WARD_DEFS))
+      ? WardModeManager.WARD_DEFS.find((w) => w.id === raw || w.code === raw || w.datasetId === raw)
+      : null;
+    if (def && manifest && manifest.wards.some((w) => w.wardId === def.id)) return def.id;
+    return raw.replace(/^ward-/, '').replace(/^osaka-/, '');
+  }
+
+  function normalizeRecords(doc) {
+    if (Array.isArray(doc)) return doc;
+    if (doc && Array.isArray(doc.records)) return doc.records;
+    if (doc && Array.isArray(doc.facilities)) return doc.facilities;
+    return [];
+  }
+
+  function mergeRecords(records) {
+    let added = 0;
+    for (const record of records) {
+      if (!record || !record.id) continue;
+      const prior = recordsById.get(record.id);
+      if (!prior) {
+        allRecords.push(record);
+        added++;
+      } else {
+        const i = allRecords.indexOf(prior);
+        if (i >= 0) allRecords[i] = record;
+      }
+      recordsById.set(record.id, record);
+    }
+    return added;
+  }
+
+  async function loadWard(wardId) {
+    const baseReady = await ensureBaseLoaded();
+    if (!baseReady) return { ok: false, wardId: null, added: 0, totalLoaded: allRecords.length };
+    const resolved = resolveWardId(wardId);
+    const entry = manifest.wards.find((w) => w.wardId === resolved);
+    if (!entry) {
+      console.warn('[FacilityDataStore] unknown ward:', wardId);
+      return { ok: false, wardId: resolved, added: 0, totalLoaded: allRecords.length };
+    }
+    if (loadedWardIds.has(resolved)) {
+      return { ok: true, cached: true, wardId: resolved, added: 0, totalLoaded: allRecords.length };
+    }
+    if (wardLoadPromises.has(resolved)) return wardLoadPromises.get(resolved);
+
+    const base = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities`;
+    const p = fetch(`${base}/${entry.url}`).then(async (res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${entry.url}`);
+      const doc = await res.json();
+      const records = normalizeRecords(doc);
+      const added = mergeRecords(records);
+      loadedWardIds.add(resolved);
+      state = 'ready';
+      notifyReady();
+      console.log('[FacilityDataStore] ward loaded:', resolved, 'records=', records.length, 'added=', added, 'total=', allRecords.length);
+      return { ok: true, cached: false, wardId: resolved, added, recordCount: records.length, totalLoaded: allRecords.length };
+    }).catch((e) => {
+      console.error('[FacilityDataStore] ward load failed:', resolved, e);
+      if (!allRecords.length) state = 'error';
+      throw e;
+    }).finally(() => wardLoadPromises.delete(resolved));
+    wardLoadPromises.set(resolved, p);
+    return p;
+  }
+
+  async function load() {
+    state = 'loading';
+    const ok = await ensureBaseLoaded();
+    if (!ok) return false;
+    const current = (typeof WardModeManager !== 'undefined' && WardModeManager.currentWardId)
+      ? WardModeManager.currentWardId : 'sumiyoshi';
+    await loadWard(current);
+    return state === 'ready';
+  }
+
+  async function reload() {
+    state = 'loading';
+    allRecords = [];
+    recordsById = new Map();
+    metadata = null;
+    manifest = null;
+    baseLoadPromise = null;
+    loadedWardIds.clear();
+    wardLoadPromises.clear();
+    return load();
+  }
+
+  function nearbyRecords(x, z, subcategories, radiusM = Infinity) {
+    const cats = Array.isArray(subcategories) ? subcategories : [];
+    const maxR = Number.isFinite(Number(radiusM)) ? Number(radiusM) : Infinity;
+    const out = [];
+    for (const r of allRecords) {
+      if (cats.length && !cats.includes(r.subcategory)) continue;
+      const dx = Number(r.localX) - Number(x);
+      const dz = Number(r.localZ) - Number(z);
+      const d = Math.hypot(dx, dz);
+      if (!Number.isFinite(d) || d > maxR) continue;
+      out.push({ record: r, distanceM: d });
+    }
+    out.sort((a, b) => a.distanceM - b.distanceM);
+    return out;
+  }
+
+  // 従来APIを維持する。既存UI/生活利便性/検索/CityLabel連携を壊さない。
+  const api = {
+    load,
+    reload,
+    loadWard,
+    async loadWards(ids) { return Promise.all((ids || []).map((id) => loadWard(id))); },
     getState() { return state; },
     getMetadata() { return metadata; },
+    getManifest() { return manifest; },
+    getLoadedWardIds() { return Array.from(loadedWardIds); },
     getAllRecords() { return state === 'ready' ? allRecords : []; },
     getById(id) { return recordsById.get(id) || null; },
-    // state==='ready'になった時点で1回だけ呼び出されるコールバックを登録する。
-    // 登録時点で既にreadyであれば即座に呼び出す(load()完了とonReady呼び出しのタイミング競合に対応)。
     onReady(cb) {
-      if (state === 'ready') cb();
-      else readyCallbacks.push(cb);
+      if (typeof cb !== 'function') return;
+      if (state === 'ready') cb(); else readyCallbacks.push(cb);
     },
-    getDuplicateCandidateRecords(record) {
-      if (!record || !record.duplicateCandidates) return [];
-      return record.duplicateCandidates.map((d) => recordsById.get(d.id)).filter(Boolean);
-    },
-    /**
-     * 指定座標(Three.jsローカル座標x,z)から半径radiusM以内の施設を検索する。
-     * @param {number} x
-     * @param {number} z
-     * @param {{radiusM?: number, categories?: string[], limit?: number, nameQuery?: string}} options
-     * @returns {Array<object & {distanceMeters: number, distanceMode: 'straight-line'}>} 距離昇順
-     */
-    searchNearby(x, z, options = {}) {
-      if (state !== 'ready') return [];
-      const { radiusM = 500, categories = null, limit = null, nameQuery = null } = options;
-      let results = allRecords
-        .map((r) => ({ r, distanceMeters: Math.hypot(r.localX - x, r.localZ - z) }))
-        .filter(({ distanceMeters }) => distanceMeters <= radiusM);
-
-      if (categories && categories.length) {
-        results = results.filter(({ r }) => categories.includes(r.category));
-      }
-      if (nameQuery) {
-        const q = normalizeTownName(nameQuery); // 既存の正規化関数を再利用(全角半角・空白統一)
-        results = results.filter(({ r }) => normalizeTownName(r.name).includes(q));
-      }
-
-      results.sort((a, b) => a.distanceMeters - b.distanceMeters); // 距離昇順
-      if (limit != null) results = results.slice(0, limit);
-
-      return results.map(({ r, distanceMeters }) => ({
-        ...r,
-        distanceMeters: Math.round(distanceMeters * 10) / 10,
-        distanceMode: 'straight-line',
-      }));
-    },
-    /**
-     * 指定座標から半径radiusM以内の、指定カテゴリ(またはサブカテゴリ)の件数を数える。
-     * 「生活」タブの客観的集計表示用。0件とデータ未取得を区別するため、stateがreadyでない
-     * 場合はnullを返す(0を返さない)。
-     */
     countNearbyBySubcategory(x, z, radiusM, subcategories) {
       if (state !== 'ready') return null;
-      return allRecords.filter((r) => {
-        if (!subcategories.includes(r.subcategory)) return false;
-        const d = Math.hypot(r.localX - x, r.localZ - z);
-        return d <= radiusM;
-      }).length;
+      return nearbyRecords(x, z, subcategories, radiusM).length;
     },
-    /**
-     * 指定座標から最も近い、指定カテゴリ(またはサブカテゴリ)の施設までの距離を返す。
-     * 該当施設が無い場合はnullを返す。
-     */
     nearestBySubcategory(x, z, subcategories) {
       if (state !== 'ready') return null;
-      let nearest = null;
-      let nearestDist = Infinity;
-      for (const r of allRecords) {
-        if (!subcategories.includes(r.subcategory)) continue;
-        const d = Math.hypot(r.localX - x, r.localZ - z);
-        if (d < nearestDist) { nearestDist = d; nearest = r; }
-      }
-      return nearest ? { record: nearest, distanceMeters: Math.round(nearestDist * 10) / 10, distanceMode: 'straight-line' } : null;
+      const hit = nearbyRecords(x, z, subcategories, Infinity)[0];
+      if (!hit) return null;
+      return { ...hit.record, distanceM: hit.distanceM, distanceMode: 'straight-line' };
     },
   };
+
+  // 現在区だけを最初に読み、以降はWardModeManager.switchWardに追従する。
+  Promise.resolve().then(() => load()).catch((e) => console.error('[FacilityDataStore] initial lazy load failed:', e));
+  return api;
 })();
+if (typeof window !== 'undefined') {
+  window.__LIVE_CITY_FACILITY_DATA_STORE__ = FacilityDataStore;
+  window.__FACILITY_LAZY_DEBUG__ = () => {
+    const m = FacilityDataStore.getManifest();
+    return {
+      sourceRecordCount: m && m.sourceRecordCount || null,
+      manifestWardCount: m && m.wardCount || 0,
+      loadedWardIds: FacilityDataStore.getLoadedWardIds(),
+      loadedRecordCount: FacilityDataStore.getAllRecords().length,
+      layer: (typeof window.__FACILITY_LAYER_PERF__ === 'function') ? window.__FACILITY_LAYER_PERF__() : null,
+    };
+  };
+}
 
 // 地面
 const gnd = new THREE.Mesh(
@@ -6714,6 +6805,17 @@ const WardModeManager = (function () {
   function switchWard(wardId) {
     const def = WARD_DEFS.find((w) => w.id === wardId);
     if (!def) return false;
+    // [Mission 36J LAZY] 24-ward facility lazy loading: 建物区切替と同じ区の施設shardを非同期で追加読込する。
+    if (typeof window !== 'undefined') setTimeout(() => {
+      const store = window.__LIVE_CITY_FACILITY_DATA_STORE__;
+      if (!store || typeof store.loadWard !== 'function') return;
+      store.loadWard(def.id).then((result) => {
+        if (result && result.added > 0 && typeof FacilityLayer !== 'undefined' && FacilityLayer.rebuildIfReady) {
+          FacilityLayer.rebuildIfReady(true);
+        }
+        if (typeof updateFacilityPanelStatus === 'function') updateFacilityPanelStatus();
+      }).catch((e) => console.warn('[FacilityDataStore] switchWard lazy load failed:', def.id, e));
+    }, 0);
     const prev = currentWardId;
     if (prev === wardId) return true;
     // [Mission 31G-FIX3 §9] Canonical Runtime が base layer を所有している間は、legacy building tile を
@@ -8687,12 +8789,23 @@ const FacilityLayer = (function () {
       const item = sprites.find((s) => s.sprite === hitSprite);
       return item ? item.record : null;
     },
-    rebuildIfReady() {
-      if (!built && FacilityDataStore.getState() === 'ready') {
-        if (group) scene.remove(group);
-        build();
-        if (visible) scene.add(group);
+    rebuildIfReady(force = false) {
+      if (FacilityDataStore.getState() !== 'ready') return false;
+      if (built && !force) return false;
+      if (group) {
+        scene.remove(group);
+        for (const s of sprites) {
+          if (s.sprite && s.sprite.material) {
+            if (s.sprite.material.map) s.sprite.material.map.dispose();
+            s.sprite.material.dispose();
+          }
+        }
       }
+      group = null; sprites = []; built = false;
+      build();
+      if (visible && group) scene.add(group);
+      update();
+      return true;
     },
     update,
   };
@@ -12195,7 +12308,13 @@ function updateFacilityPanelStatus() {
   if (!statusEl) return;
   const state = FacilityDataStore.getState();
   if (state === 'loading') statusEl.textContent = '施設データ読込中…';
-  else if (state === 'ready') statusEl.textContent = `${FacilityDataStore.getAllRecords().length}件の施設を表示中`;
+  else if (state === 'ready') {
+    const manifest = FacilityDataStore.getManifest ? FacilityDataStore.getManifest() : null;
+    const loaded = FacilityDataStore.getAllRecords().length;
+    const total = manifest && manifest.sourceRecordCount;
+    const wards = FacilityDataStore.getLoadedWardIds ? FacilityDataStore.getLoadedWardIds().length : 0;
+    statusEl.textContent = total ? `${loaded.toLocaleString()}件読込（${wards}/24区） / 大阪市${Number(total).toLocaleString()}件` : `${loaded.toLocaleString()}件の施設を表示中`;
+  }
   else if (state === 'no-data') statusEl.textContent = '施設データが未生成です（npm run data:import:facilities で生成してください）';
   else if (state === 'error') statusEl.textContent = '施設データの読込に失敗しました';
 }
