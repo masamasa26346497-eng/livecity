@@ -65,7 +65,8 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/map-data/osaka-city/facilities/facilities-startup.json public/osaka_3d_buildings.ward-ux-v1.html
+          git add -f public/map-data/osaka-city/facilities/facilities-startup.json
+          git add public/osaka_3d_buildings.ward-ux-v1.html
           if git diff --cached --quiet; then
             echo 'No stabilization changes to commit.'
             exit 0
