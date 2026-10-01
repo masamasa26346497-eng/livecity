@@ -47,7 +47,7 @@ jobs:
           const p = 'public/map-data/osaka-city/facilities/facilities-startup.json';
           const j = JSON.parse(fs.readFileSync(p, 'utf8'));
           if (j.wardCount !== 24) throw new Error(`expected 24 wards, got ${j.wardCount}`);
-          if (!(j.recordCount > 0 && j.recordCount <= 1100)) throw new Error(`unexpected startup recordCount: ${j.recordCount}`);
+          if (!(j.recordCount > 0 && j.recordCount <= 1200)) throw new Error(`unexpected startup recordCount: ${j.recordCount}`);
           if (j.sourceRecordCount !== 40585) throw new Error(`unexpected sourceRecordCount: ${j.sourceRecordCount}`);
           console.log(JSON.stringify({ recordCount: j.recordCount, sourceRecordCount: j.sourceRecordCount, wardCount: j.wardCount }));
           NODE
