@@ -35,13 +35,14 @@ jobs:
           set -euo pipefail
           sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
 
-      - name: Test range ZIP and B3DM validation logic
+      - name: Test range ZIP, B3DM, and ward extractor logic
         shell: bash
         run: |
           set -euo pipefail
           node --test \
             tests/mission36k-ward-building-manifest.test.js \
-            tests/mission36k-b3dm-smoke.test.js
+            tests/mission36k-b3dm-smoke.test.js \
+            tests/mission36k-ward-building-extractor.test.js
 
       - name: Discover current Osaka PLATEAU building resources
         shell: bash
@@ -67,7 +68,18 @@ jobs:
           set -euo pipefail
           node tools/mission36k-smoke-b3dm.mjs --ward=sumiyoshi
 
-      - name: Validate 24-ward building coverage and real geometry extraction
+      - name: Selectively extract a small real Sumiyoshi ward package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/mission36k-ward-extract
+          node tools/mission36k-fetch-ward-building-source.mjs \
+            --ward=sumiyoshi \
+            --lod=1 \
+            --max-files=3 \
+            --out=/tmp/mission36k-ward-extract
+
+      - name: Validate 24-ward coverage and selective geometry extraction
         shell: bash
         run: |
           set -euo pipefail
@@ -83,14 +95,25 @@ jobs:
             if (!(w.preferredLod1?.b3dmCount > 0)) throw new Error(`missing LOD1 B3DM geometry: ${id}`);
           }
           const r = JSON.parse(fs.readFileSync('data/reports/mission36k-building-ward-manifest.json', 'utf8'));
-          if (r.smoke?.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi tileset range smoke fetch did not complete');
-          if (!r.smoke?.assetVersion) throw new Error('Fetched Sumiyoshi tileset is not valid 3D Tiles JSON');
+          if (r.smoke?.wardId !== 'sumiyoshi' || !r.smoke?.assetVersion) throw new Error('Sumiyoshi tileset range smoke failed');
           const b = JSON.parse(fs.readFileSync('data/reports/mission36k-b3dm-smoke.json', 'utf8'));
-          if (!b.verified || b.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi B3DM range smoke fetch did not verify');
-          if (b.header?.magic !== 'b3dm' || b.header?.version !== 1) throw new Error('B3DM header validation failed');
-          if (b.header?.glbMagic !== 'glTF') throw new Error('Embedded GLB validation failed');
-          console.log(JSON.stringify({ coverage: m.coverage, tilesetSmoke: r.smoke, b3dmSmoke: b }, null, 2));
+          if (!b.verified || b.header?.magic !== 'b3dm' || b.header?.glbMagic !== 'glTF') throw new Error('B3DM range smoke failed');
+          const x = JSON.parse(fs.readFileSync('data/reports/mission36k-ward-extract-sumiyoshi-lod1.json', 'utf8'));
+          if (x.wardId !== 'sumiyoshi' || x.lod !== 1 || x.mode !== 'limited') throw new Error('Ward extractor report identity failed');
+          if (x.selectedFiles !== 3 || x.extracted?.length !== 3) throw new Error(`Unexpected extracted file count: ${x.selectedFiles}`);
+          if (!x.extracted.some((e) => e.relativePath === 'tileset.json')) throw new Error('Extracted package lacks tileset.json');
+          const b3dm = x.extracted.filter((e) => e.b3dm);
+          if (!b3dm.length || b3dm.some((e) => e.b3dm.version !== 1 || e.b3dm.glbVersion !== 2)) throw new Error('Extracted B3DM/GLB validation failed');
+          console.log(JSON.stringify({ coverage: m.coverage, b3dmSmoke: b, wardExtract: x }, null, 2));
           NODE
+
+      - name: Upload selective Sumiyoshi extraction smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission36k-sumiyoshi-lod1-range-smoke
+          path: /tmp/mission36k-ward-extract/sumiyoshi-lod1
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Guard protected production HTML after Mission 36K
         shell: bash
@@ -109,11 +132,12 @@ jobs:
             data/reports/mission36k-runtime-zip-probe.json \
             data/reports/mission36k-building-ward-manifest.json \
             data/reports/mission36k-b3dm-smoke.json \
+            data/reports/mission36k-ward-extract-sumiyoshi-lod1.json \
             public/map-data/osaka-city/buildings/manifest.json
           if git diff --cached --quiet; then
             echo 'No Mission36K manifest changes.'
             exit 0
           fi
-          git commit -m 'data(mission36k): verify remote PLATEAU B3DM geometry extraction'
+          git commit -m 'data(mission36k): verify selective ward building extraction'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
