@@ -13,8 +13,22 @@ const MARKER = '[Mission 36J LAZY] 24-ward facility lazy loading';
 const protectedBefore = new Map(PROTECTED.map((p) => [p, fs.readFileSync(p, 'utf8')]));
 let html = fs.readFileSync(DEV, 'utf8');
 
+// すでに旧パッチが適用済みでも、manifest の実フィールド path へ安全に移行する。
 if (html.includes(MARKER)) {
-  console.log('[36J LAZY] already applied');
+  const before = html;
+  html = html.replace(
+    '    const p = fetch(`${base}/${entry.url}`).then(async (res) => {\n      if (!res.ok) throw new Error(`HTTP ${res.status} for ${entry.url}`);',
+    '    const shardPath = entry.path || entry.url;\n    if (!shardPath) throw new Error(`ward shard path missing for ${resolved}`);\n    const p = fetch(`${base}/${shardPath}`).then(async (res) => {\n      if (!res.ok) throw new Error(`HTTP ${res.status} for ${shardPath}`);'
+  );
+  if (html !== before) {
+    fs.writeFileSync(DEV, html, 'utf8');
+    for (const [p, protectedText] of protectedBefore) {
+      if (fs.readFileSync(p, 'utf8') !== protectedText) throw new Error('protected production HTML changed: ' + path.basename(p));
+    }
+    console.log('[36J LAZY] migrated existing dev UI to manifest path field');
+  } else {
+    console.log('[36J LAZY] already applied');
+  }
   process.exit(0);
 }
 
@@ -126,8 +140,10 @@ const store = `const FacilityDataStore = (function () {
     if (wardLoadPromises.has(resolved)) return wardLoadPromises.get(resolved);
 
     const base = \`\${FACILITY_CONFIG.basePath}/\${FACILITY_CONFIG.areaId}/facilities\`;
-    const p = fetch(\`\${base}/\${entry.url}\`).then(async (res) => {
-      if (!res.ok) throw new Error(\`HTTP \${res.status} for \${entry.url}\`);
+    const shardPath = entry.path || entry.url;
+    if (!shardPath) throw new Error(\`ward shard path missing for \${resolved}\`);
+    const p = fetch(\`\${base}/\${shardPath}\`).then(async (res) => {
+      if (!res.ok) throw new Error(\`HTTP \${res.status} for \${shardPath}\`);
       const doc = await res.json();
       const records = normalizeRecords(doc);
       const added = mergeRecords(records);
@@ -242,6 +258,7 @@ if (html.includes(statusNeedle)) {
 // Safety assertions.
 if (!html.includes(MARKER)) throw new Error('lazy marker missing');
 if (!html.includes('ward-manifest.json')) throw new Error('ward manifest wiring missing');
+if (!html.includes('const shardPath = entry.path || entry.url')) throw new Error('manifest shard path wiring missing');
 if (!html.includes('loadWard,')) throw new Error('loadWard API missing');
 if (!html.includes('__FACILITY_LAZY_DEBUG__')) throw new Error('lazy debug hook missing');
 if (!html.includes('rebuildIfReady(force = false)')) throw new Error('force rebuild missing');
