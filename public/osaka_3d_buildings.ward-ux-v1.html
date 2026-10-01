@@ -1734,7 +1734,7 @@ const FacilityDataStore = (function () {
   const readyCallbacks = []; // state==='ready'になった時点で1回ずつ呼び出すコールバック群
 
   async function load() {
-    const url = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/facilities.json`;
+    const url = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/facilities-startup.json`;
     const metaUrl = `${FACILITY_CONFIG.basePath}/${FACILITY_CONFIG.areaId}/facilities/metadata.json`;
     try {
       const [dataRes, metaRes] = await Promise.all([fetch(url), fetch(metaUrl)]);
@@ -8498,8 +8498,8 @@ const FacilityLayer = (function () {
   // [Mission 36J PERF] bounded facility renderer
   // 40,585件を一括CanvasTexture/Sprite化するとブラウザが固まるため、
   // カメラ中心付近だけを上限付きで描画する。元データ40,585件はDataStoreに保持する。
-  const MAX_RENDERED_FACILITIES = 800;
-  const FACILITY_RENDER_RADIUS_METERS = 4500;
+  const MAX_RENDERED_FACILITIES = 200;
+  const FACILITY_RENDER_RADIUS_METERS = 2500;
   let renderedFacilityCount = 0;
   let totalFacilityCount = 0;
   let group = null;
