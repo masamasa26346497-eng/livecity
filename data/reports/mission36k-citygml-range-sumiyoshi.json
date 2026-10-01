@@ -1,0 +1,59 @@
+{
+  "mission": "36K-citygml-ward-range",
+  "generatedAt": "2026-10-01T16:03:51.320Z",
+  "wardId": "sumiyoshi",
+  "wardName": "住吉区",
+  "wardCode": "27120",
+  "wardRuntimeBounds": {
+    "minX": -3431.4,
+    "maxX": -128.54,
+    "minZ": -2286.99,
+    "maxZ": 1842.6
+  },
+  "wardGeoBbox": {
+    "south": 34.58765571828962,
+    "north": 34.62475228674093,
+    "west": 135.48757029817935,
+    "east": 135.5236171368328
+  },
+  "selectionMethod": "third-level mesh bbox intersects historical N03-classified ward building bbox; deliberate safe overfetch, final buildings must still be N03 point-in-polygon classified",
+  "candidateEntries": 15,
+  "candidateMeshes": [
+    "51357309",
+    "51357319",
+    "51357329",
+    "51357339",
+    "51357349",
+    "51357400",
+    "51357401",
+    "51357410",
+    "51357411",
+    "51357420",
+    "51357421",
+    "51357430",
+    "51357431",
+    "51357440",
+    "51357441"
+  ],
+  "compressedBytes": 24897722,
+  "uncompressedBytes": 616849986,
+  "dryRun": false,
+  "maxFiles": 3,
+  "extracted": [
+    {
+      "mesh": "51357309",
+      "file": "/tmp/mission36k-citygml-sumiyoshi/51357309_bldg_6697_op.gml",
+      "bytes": 786901
+    },
+    {
+      "mesh": "51357319",
+      "file": "/tmp/mission36k-citygml-sumiyoshi/51357319_bldg_6697_op.gml",
+      "bytes": 38524308
+    },
+    {
+      "mesh": "51357329",
+      "file": "/tmp/mission36k-citygml-sumiyoshi/51357329_bldg_6697_op.gml",
+      "bytes": 80468948
+    }
+  ]
+}
