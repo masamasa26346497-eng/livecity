@@ -35,11 +35,13 @@ jobs:
           set -euo pipefail
           sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
 
-      - name: Test range ZIP manifest logic
+      - name: Test range ZIP and B3DM validation logic
         shell: bash
         run: |
           set -euo pipefail
-          node --test tests/mission36k-ward-building-manifest.test.js
+          node --test \
+            tests/mission36k-ward-building-manifest.test.js \
+            tests/mission36k-b3dm-smoke.test.js
 
       - name: Discover current Osaka PLATEAU building resources
         shell: bash
@@ -59,7 +61,13 @@ jobs:
           set -euo pipefail
           node tools/mission36k-build-ward-building-manifest.mjs --smoke-ward=sumiyoshi
 
-      - name: Validate 24-ward building coverage
+      - name: Range-fetch and validate one real Sumiyoshi B3DM geometry tile
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-smoke-b3dm.mjs --ward=sumiyoshi
+
+      - name: Validate 24-ward building coverage and real geometry extraction
         shell: bash
         run: |
           set -euo pipefail
@@ -72,11 +80,16 @@ jobs:
           if (Object.keys(m.wards || {}).length !== 24) throw new Error('manifest does not contain 24 ward records');
           for (const [id, w] of Object.entries(m.wards)) {
             if (!w.preferredLod1?.tilesetPath) throw new Error(`missing preferred LOD1 tileset: ${id}`);
+            if (!(w.preferredLod1?.b3dmCount > 0)) throw new Error(`missing LOD1 B3DM geometry: ${id}`);
           }
           const r = JSON.parse(fs.readFileSync('data/reports/mission36k-building-ward-manifest.json', 'utf8'));
-          if (r.smoke?.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi range smoke fetch did not complete');
+          if (r.smoke?.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi tileset range smoke fetch did not complete');
           if (!r.smoke?.assetVersion) throw new Error('Fetched Sumiyoshi tileset is not valid 3D Tiles JSON');
-          console.log(JSON.stringify({ coverage: m.coverage, smoke: r.smoke }, null, 2));
+          const b = JSON.parse(fs.readFileSync('data/reports/mission36k-b3dm-smoke.json', 'utf8'));
+          if (!b.verified || b.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi B3DM range smoke fetch did not verify');
+          if (b.header?.magic !== 'b3dm' || b.header?.version !== 1) throw new Error('B3DM header validation failed');
+          if (b.header?.glbMagic !== 'glTF') throw new Error('Embedded GLB validation failed');
+          console.log(JSON.stringify({ coverage: m.coverage, tilesetSmoke: r.smoke, b3dmSmoke: b }, null, 2));
           NODE
 
       - name: Guard protected production HTML after Mission 36K
@@ -95,11 +108,12 @@ jobs:
             data/reports/mission36k-building-source-discovery.json \
             data/reports/mission36k-runtime-zip-probe.json \
             data/reports/mission36k-building-ward-manifest.json \
+            data/reports/mission36k-b3dm-smoke.json \
             public/map-data/osaka-city/buildings/manifest.json
           if git diff --cached --quiet; then
             echo 'No Mission36K manifest changes.'
             exit 0
           fi
-          git commit -m 'data(mission36k): verify 24-ward PLATEAU range building source'
+          git commit -m 'data(mission36k): verify remote PLATEAU B3DM geometry extraction'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
