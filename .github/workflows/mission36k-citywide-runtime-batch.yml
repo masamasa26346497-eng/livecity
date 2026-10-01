@@ -55,12 +55,12 @@ jobs:
           const missing=[];
           for (const w of registry.wards || []) {
             const d=byId.get(w.id);
-            const manifest=d?.manifest ? `public/map-data/osaka-city/buildings/${d.manifest}` : `public/map-data/osaka-city/buildings/osaka-${w.id}/manifest.json`;
+            const rel=String(d?.manifest || `osaka-${w.id}/manifest.json`).replace(/^\.\//,'');
+            const manifest=`public/map-data/osaka-city/buildings/${rel}`;
             if (!fs.existsSync(manifest)) missing.push(w.id);
           }
           const selected=missing.slice(0,2);
           fs.writeFileSync('/tmp/mission36k-selected-wards.txt',selected.join('\n')+(selected.length?'\n':''));
-          fs.writeFileSync('/tmp/mission36k-selection.json',JSON.stringify({generatedAt:new Date().toISOString(),missingBefore:missing,selected},null,2)+'\n');
           console.log(JSON.stringify({missingCount:missing.length,selected}));
           NODE
           WARDS=$(paste -sd, /tmp/mission36k-selected-wards.txt || true)
@@ -102,30 +102,10 @@ jobs:
               --force
 
             TARGET="$OUT/osaka-${WARD}"
-            test -f "$TARGET/manifest.json"
-            WARD="$WARD" TARGET="$TARGET" node --input-type=module <<'NODE'
-            import fs from 'node:fs';
-            const ward=process.env.WARD;
-            const dir=process.env.TARGET;
-            const p=`${dir}/manifest.json`;
-            const m=JSON.parse(fs.readFileSync(p,'utf8'));
-            if (m.id !== `osaka-${ward}`) throw new Error(`dataset id=${m.id}`);
-            if (m.coordinateConvention !== 'znorth-neg-v1') throw new Error(`coordinate=${m.coordinateConvention}`);
-            if (m.layout !== 'flat' || m.tileSize !== 500) throw new Error('runtime layout mismatch');
-            if (!(m.totalBuildings > 1000)) throw new Error(`suspiciously low building count=${m.totalBuildings}`);
-            if (!(m.tileCount > 0) || !Array.isArray(m.tiles) || m.tiles.length !== m.tileCount) throw new Error('tile list mismatch');
-            let counted=0;
-            for (const t of m.tiles) {
-              const f=`${dir}/${t.file}`;
-              if (!fs.existsSync(f)) throw new Error(`missing tile ${f}`);
-              const j=JSON.parse(fs.readFileSync(f,'utf8'));
-              if (j.count !== j.buildings?.length) throw new Error(`tile count mismatch ${t.file}`);
-              counted += j.count;
-            }
-            if (counted !== m.totalBuildings) throw new Error(`manifest total ${m.totalBuildings} != tile total ${counted}`);
-            fs.writeFileSync(`/tmp/mission36k-batch-results/${ward}.json`,JSON.stringify({wardId:ward,totalBuildings:m.totalBuildings,tileCount:m.tileCount,bounds:m.bounds},null,2)+'\n');
-            console.log(JSON.stringify({ward,totalBuildings:m.totalBuildings,tileCount:m.tileCount}));
-            NODE
+            node tools/mission36k-validate-runtime-ward.mjs \
+              --ward "$WARD" \
+              --dir "$TARGET" \
+              --result-dir /tmp/mission36k-batch-results
 
             rm -rf "public/map-data/osaka-city/buildings/osaka-${WARD}"
             cp -R "$TARGET" "public/map-data/osaka-city/buildings/osaka-${WARD}"
@@ -152,15 +132,18 @@ jobs:
             d.bounds=m.bounds;
             d.sourceVersion='PLATEAU CityGML v4 2024';
             d.runtimeReady=true;
-            d.manifest=`osaka-${ward}/manifest.json`;
+            d.manifest=`./osaka-${ward}/manifest.json`;
             results.push({wardId:ward,totalBuildings:m.totalBuildings,tileCount:m.tileCount});
           }
           root.buildingCount=root.datasets.reduce((n,x)=>n+Number(x.buildings||0),0);
           root.tileCount=root.datasets.reduce((n,x)=>n+Number(x.tiles||0),0);
           root.generatedAt=new Date().toISOString();
-          root.migration='Mission36K: runtime ward datasets progressively rebuilt from PLATEAU 2024 CityGML; only runtimeReady=true entries are confirmed present on this branch.';
+          root.migration='Mission36K: runtime ward datasets progressively rebuilt from PLATEAU 2024 CityGML; runtimeReady=true entries are confirmed present on this branch.';
           fs.writeFileSync(rootPath,JSON.stringify(root,null,2)+'\n');
-          const ready=root.datasets.filter((d)=>d.runtimeReady && fs.existsSync(`public/map-data/osaka-city/buildings/${d.manifest}`));
+          const ready=root.datasets.filter((d)=>{
+            const rel=String(d.manifest||'').replace(/^\.\//,'');
+            return d.runtimeReady && fs.existsSync(`public/map-data/osaka-city/buildings/${rel}`);
+          });
           const report={mission:'36K-citywide-runtime-batch',generatedAt:new Date().toISOString(),selected,results,runtimeReadyWardCount:ready.length,remainingWardCount:24-ready.length,rootBuildingCount:root.buildingCount,rootTileCount:root.tileCount};
           fs.writeFileSync('data/reports/mission36k-citywide-runtime-batch.json',JSON.stringify(report,null,2)+'\n');
           console.log(JSON.stringify(report,null,2));
@@ -177,7 +160,8 @@ jobs:
           if (!Array.isArray(root.datasets) || root.datasets.length !== 24) throw new Error(`runtime datasets=${root.datasets?.length}`);
           if (root.coordinateConvention !== 'znorth-neg-v1' || root.layout !== 'flat' || root.tileSize !== 500) throw new Error('root runtime contract mismatch');
           for (const d of root.datasets.filter((x)=>x.runtimeReady)) {
-            const p=`public/map-data/osaka-city/buildings/${d.manifest}`;
+            const rel=String(d.manifest||'').replace(/^\.\//,'');
+            const p=`public/map-data/osaka-city/buildings/${rel}`;
             if (!fs.existsSync(p)) throw new Error(`runtimeReady dataset missing: ${p}`);
           }
           console.log(JSON.stringify({datasets:root.datasets.length,runtimeReady:root.datasets.filter((d)=>d.runtimeReady).length,buildingCount:root.buildingCount,tileCount:root.tileCount}));
