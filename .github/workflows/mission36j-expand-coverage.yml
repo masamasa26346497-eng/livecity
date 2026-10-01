@@ -1,0 +1,64 @@
+name: Mission 36J - Expand Facility Coverage
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-ward-shards:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36j-coverage]')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync latest branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build 24 ward facility shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36j-build-facility-ward-shards.mjs
+      - name: Validate coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='public/map-data/osaka-city/facilities/ward-manifest.json';
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(j.wardCount!==24) throw new Error(`wardCount ${j.wardCount}`);
+          if(j.sourceRecordCount!==40585) throw new Error(`sourceRecordCount ${j.sourceRecordCount}`);
+          const sum=j.wards.reduce((n,w)=>n+w.recordCount,0);
+          if(sum!==40585) throw new Error(`sum ${sum}`);
+          console.log(JSON.stringify({wardCount:j.wardCount,sourceRecordCount:j.sourceRecordCount,sum}));
+          NODE
+          if git status --short -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html | grep -q .; then
+            echo 'Protected production HTML changed unexpectedly.' >&2
+            exit 1
+          fi
+      - name: Commit ward shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f public/map-data/osaka-city/facilities/ward-manifest.json public/map-data/osaka-city/facilities/wards/*.json
+          if git diff --cached --quiet; then
+            echo 'No shard changes.'
+            exit 0
+          fi
+          git commit -m 'data(mission36j): shard citywide facilities by ward'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
