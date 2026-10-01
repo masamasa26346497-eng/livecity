@@ -6,7 +6,7 @@ import zlib from 'node:zlib';
 const ROOT = process.cwd();
 const PROBE_PATH = path.resolve(ROOT, 'data/reports/mission36k-citygml-zip-probe.json');
 const AREA_PATH = path.resolve(ROOT, 'config/areas/osaka-city.json');
-const BUILD_REPORT_PATH = path.resolve(ROOT, 'data/reports/building-dataset-generation.json');
+const RUNTIME_MANIFEST_PATH = path.resolve(ROOT, 'public/map-data/osaka-city/buildings/manifest.json');
 const REGISTRY_PATH = path.resolve(ROOT, 'config/wards/registry.json');
 
 function parseArgs(argv) {
@@ -88,12 +88,18 @@ async function extractEntry(url, entry, dest) {
 const args = parseArgs(process.argv.slice(2));
 const probe = JSON.parse(fs.readFileSync(PROBE_PATH, 'utf8'));
 const area = JSON.parse(fs.readFileSync(AREA_PATH, 'utf8'));
-const buildReport = JSON.parse(fs.readFileSync(BUILD_REPORT_PATH, 'utf8'));
+const runtimeManifest = JSON.parse(fs.readFileSync(RUNTIME_MANIFEST_PATH, 'utf8'));
 const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
 const ward = registry.wards.find((w) => w.id === args.ward);
 if (!ward) throw new Error(`Unknown ward id: ${args.ward}`);
-const wb = buildReport.wardBounds?.[args.ward];
-if (!wb) throw new Error(`No historical ward bounds: ${args.ward}`);
+if (!Array.isArray(runtimeManifest.datasets) || runtimeManifest.datasets.length !== 24) {
+  throw new Error(`Runtime building manifest must contain 24 datasets; got ${runtimeManifest.datasets?.length}`);
+}
+const runtimeDataset = runtimeManifest.datasets.find((d) => d.wardId === args.ward);
+const wb = runtimeDataset?.bounds;
+if (!wb || ![wb.minX, wb.maxX, wb.minZ, wb.maxZ].every(Number.isFinite)) {
+  throw new Error(`No valid runtime ward bounds: ${args.ward}`);
+}
 
 const geoCorners = [
   runtimeToGeo(wb.minX, wb.minZ, area.projection),
@@ -120,6 +126,7 @@ const compressedBytes = candidates.reduce((n, e) => n + e.compressedBytes, 0);
 const uncompressedBytes = candidates.reduce((n, e) => n + e.uncompressedBytes, 0);
 const url = probe.source?.url;
 if (!url) throw new Error('Probe report does not contain source URL');
+if (!candidates.length) throw new Error(`No CityGML building meshes intersect runtime bounds for ward=${args.ward}`);
 
 const extracted = [];
 if (!args.dryRun) {
@@ -141,7 +148,8 @@ const report = {
   wardCode: ward.code,
   wardRuntimeBounds: wb,
   wardGeoBbox,
-  selectionMethod: 'third-level mesh bbox intersects historical N03-classified ward building bbox; deliberate safe overfetch, final buildings must still be N03 point-in-polygon classified',
+  runtimeManifestGeneratedAt: runtimeManifest.generatedAt || null,
+  selectionMethod: 'third-level mesh bbox intersects 24-ward runtime manifest bounds; deliberate safe overfetch, final buildings are N03 point-in-polygon classified',
   candidateEntries: candidates.length,
   candidateMeshes: uniqueMeshes,
   compressedBytes,
