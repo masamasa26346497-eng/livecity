@@ -55,7 +55,7 @@ jobs:
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const r = JSON.parse(fs.readFileSync('data/reports/mission36k-citygml-range-sumiyoshi.json','utf8'));
-          if (!(r.candidateEntries > 0 && r.candidateEntries < 60)) throw new Error(`Suspicious Sumiyoshi mesh selection: ${r.candidateEntries}`);
+          if (r.candidateEntries !== 15) throw new Error(`Unexpected Sumiyoshi mesh selection: ${r.candidateEntries}`);
           if (!(r.compressedBytes > 0 && r.uncompressedBytes > r.compressedBytes)) throw new Error('Invalid Sumiyoshi range byte plan');
           console.log(JSON.stringify({candidateEntries:r.candidateEntries,meshes:r.candidateMeshes,compressedMB:+(r.compressedBytes/1048576).toFixed(1),uncompressedMB:+(r.uncompressedBytes/1048576).toFixed(1)}));
           NODE
@@ -71,13 +71,41 @@ jobs:
             --out=/tmp/mission36k-citygml-sumiyoshi
           test "$(find /tmp/mission36k-citygml-sumiyoshi -maxdepth 1 -type f -name '*.gml' | wc -l)" -eq 3
           grep -q '<bldg:Building' /tmp/mission36k-citygml-sumiyoshi/*.gml
+
+      - name: Convert sample CityGML directly to Live City canonical runtime coordinates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-convert-citygml-runtime.mjs \
+            --input /tmp/mission36k-citygml-sumiyoshi \
+            --output /tmp/mission36k-sumiyoshi-sample.jsonl \
+            --ward-hint sumiyoshi
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const lines = fs.readFileSync('/tmp/mission36k-sumiyoshi-sample.jsonl','utf8').trim().split('\n').filter(Boolean);
+          if (lines.length < 100) throw new Error(`Too few converted buildings: ${lines.length}`);
+          let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+          for (const line of lines.slice(0, 5000)) {
+            const b = JSON.parse(line);
+            if (b.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinate convention mismatch');
+            if (!Array.isArray(b.fp) || b.fp.length < 3 || !(b.h > 0)) throw new Error('invalid converted building');
+            for (const [x,z] of b.fp) {
+              if (!Number.isFinite(x) || !Number.isFinite(z) || Math.abs(x) > 30000 || Math.abs(z) > 30000) throw new Error(`suspicious runtime coordinate ${x},${z}`);
+              minX=Math.min(minX,x); maxX=Math.max(maxX,x); minZ=Math.min(minZ,z); maxZ=Math.max(maxZ,z);
+            }
+          }
+          console.log(JSON.stringify({converted:lines.length,sampleBounds:{minX,maxX,minZ,maxZ}}));
+          NODE
           sha256sum -c /tmp/protected.sha256
 
-      - name: Upload Sumiyoshi CityGML sample artifact
+      - name: Upload Sumiyoshi CityGML and converted sample artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mission36k-sumiyoshi-citygml-range-sample
-          path: /tmp/mission36k-citygml-sumiyoshi
+          name: mission36k-sumiyoshi-citygml-runtime-sample
+          path: |
+            /tmp/mission36k-citygml-sumiyoshi
+            /tmp/mission36k-sumiyoshi-sample.jsonl
+            /tmp/mission36k-sumiyoshi-sample.report.json
           if-no-files-found: error
           retention-days: 7
 
@@ -91,6 +119,6 @@ jobs:
             data/reports/mission36k-citygml-zip-probe.json \
             data/reports/mission36k-citygml-range-sumiyoshi.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'data(mission36k): verify Sumiyoshi CityGML range extraction'
+          git commit -m 'data(mission36k): validate canonical Sumiyoshi runtime conversion'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
