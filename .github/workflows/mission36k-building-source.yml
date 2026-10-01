@@ -1,0 +1,50 @@
+name: Mission 36K - Restore Osaka Building Coverage
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  discover-building-source:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36k-buildings]')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync mission branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Discover current Osaka PLATEAU building resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-discover-osaka-building-source.mjs
+
+      - name: Commit source discovery report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/reports/mission36k-building-source-discovery.json
+          if git diff --cached --quiet; then
+            echo 'No discovery changes.'
+            exit 0
+          fi
+          git commit -m 'data(mission36k): record Osaka PLATEAU building source options'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
