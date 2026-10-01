@@ -1,0 +1,57 @@
+name: Mission 36K - CityGML Ward PoC
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe-citygml:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36k-citygml-poc]')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync mission branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Guard protected production HTML
+        shell: bash
+        run: sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/protected.sha256
+      - name: Probe 2024 CityGML ZIP by HTTP Range
+        shell: bash
+        run: node tools/mission36k-probe-citygml-zip.mjs
+      - name: Validate CityGML probe
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const r = JSON.parse(fs.readFileSync('data/reports/mission36k-citygml-zip-probe.json','utf8'));
+          if (!r.zip?.rangeSupported) throw new Error('Range support missing');
+          if (!(r.zip?.buildingGmlCount > 0)) throw new Error('No building GML found');
+          if (!(r.zip?.entriesParsed > 0)) throw new Error('No ZIP entries parsed');
+          console.log(JSON.stringify({entries:r.zip.entriesParsed,gml:r.zip.gmlCount,buildingGml:r.zip.buildingGmlCount,meshCodes:r.zip.meshCodeCount}));
+          NODE
+          sha256sum -c /tmp/protected.sha256
+      - name: Commit probe report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/reports/mission36k-citygml-zip-probe.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'data(mission36k): inspect 2024 CityGML archive layout'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
