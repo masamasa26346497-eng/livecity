@@ -35,6 +35,12 @@ jobs:
           set -euo pipefail
           sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
 
+      - name: Separate PLATEAU source manifest from Live City runtime manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-fix-manifest-collision.mjs
+
       - name: Test range ZIP, B3DM, and ward extractor logic
         shell: bash
         run: |
@@ -56,7 +62,7 @@ jobs:
           set -euo pipefail
           node tools/mission36k-probe-plateau-runtime-zip.mjs
 
-      - name: Build 24-ward building source manifest and smoke-fetch Sumiyoshi tileset
+      - name: Build 24-ward PLATEAU source manifest and smoke-fetch Sumiyoshi tileset
         shell: bash
         run: |
           set -euo pipefail
@@ -79,21 +85,41 @@ jobs:
             --max-files=3 \
             --out=/tmp/mission36k-ward-extract
 
-      - name: Validate 24-ward coverage and selective geometry extraction
+      - name: Validate runtime building coverage and PLATEAU source separation
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const p = 'public/map-data/osaka-city/buildings/manifest.json';
-          const m = JSON.parse(fs.readFileSync(p, 'utf8'));
-          if (m.wardCount !== 24) throw new Error(`wardCount=${m.wardCount}`);
-          if (m.coverage?.lod1Wards !== 24) throw new Error(`lod1Wards=${m.coverage?.lod1Wards}`);
-          if (Object.keys(m.wards || {}).length !== 24) throw new Error('manifest does not contain 24 ward records');
-          for (const [id, w] of Object.entries(m.wards)) {
+
+          const runtimePath = 'public/map-data/osaka-city/buildings/manifest.json';
+          const sourcePath = 'public/map-data/osaka-city/building-sources/plateau-2024-manifest.json';
+          const runtime = JSON.parse(fs.readFileSync(runtimePath, 'utf8'));
+          const source = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+
+          if (!Array.isArray(runtime.datasets) || runtime.datasets.length !== 24) {
+            throw new Error(`runtime datasets=${runtime.datasets?.length}`);
+          }
+          if (runtime.buildingCount !== 574112) throw new Error(`runtime buildingCount=${runtime.buildingCount}`);
+          if (runtime.tileCount !== 1096) throw new Error(`runtime tileCount=${runtime.tileCount}`);
+          if (runtime.coordinateConvention !== 'znorth-neg-v1') throw new Error('runtime coordinate convention mismatch');
+          if (runtime.layout !== 'flat' || runtime.tileSize !== 500) throw new Error('runtime tile layout mismatch');
+          if (runtime.mission === '36K' || runtime.wards) throw new Error('PLATEAU source manifest leaked into runtime path');
+          for (const d of runtime.datasets) {
+            if (!d.id || !d.wardId || !d.manifest || !(d.buildings > 0) || !(d.tiles > 0)) {
+              throw new Error(`invalid runtime dataset: ${JSON.stringify(d)}`);
+            }
+          }
+
+          if (source.mission !== '36K') throw new Error('PLATEAU source manifest identity missing');
+          if (source.wardCount !== 24) throw new Error(`source wardCount=${source.wardCount}`);
+          if (source.coverage?.lod1Wards !== 24) throw new Error(`source lod1Wards=${source.coverage?.lod1Wards}`);
+          if (Object.keys(source.wards || {}).length !== 24) throw new Error('source manifest does not contain 24 ward records');
+          for (const [id, w] of Object.entries(source.wards)) {
             if (!w.preferredLod1?.tilesetPath) throw new Error(`missing preferred LOD1 tileset: ${id}`);
             if (!(w.preferredLod1?.b3dmCount > 0)) throw new Error(`missing LOD1 B3DM geometry: ${id}`);
           }
+
           const r = JSON.parse(fs.readFileSync('data/reports/mission36k-building-ward-manifest.json', 'utf8'));
           if (r.smoke?.wardId !== 'sumiyoshi' || !r.smoke?.assetVersion) throw new Error('Sumiyoshi tileset range smoke failed');
           const b = JSON.parse(fs.readFileSync('data/reports/mission36k-b3dm-smoke.json', 'utf8'));
@@ -102,9 +128,12 @@ jobs:
           if (x.wardId !== 'sumiyoshi' || x.lod !== 1 || x.mode !== 'limited') throw new Error('Ward extractor report identity failed');
           if (x.selectedFiles !== 3 || x.extracted?.length !== 3) throw new Error(`Unexpected extracted file count: ${x.selectedFiles}`);
           if (!x.extracted.some((e) => e.relativePath === 'tileset.json')) throw new Error('Extracted package lacks tileset.json');
-          const b3dm = x.extracted.filter((e) => e.b3dm);
-          if (!b3dm.length || b3dm.some((e) => e.b3dm.version !== 1 || e.b3dm.glbVersion !== 2)) throw new Error('Extracted B3DM/GLB validation failed');
-          console.log(JSON.stringify({ coverage: m.coverage, b3dmSmoke: b, wardExtract: x }, null, 2));
+
+          console.log(JSON.stringify({
+            runtime: { wards: runtime.datasets.length, buildings: runtime.buildingCount, tiles: runtime.tileCount },
+            plateau: { coverage: source.coverage, sourcePath },
+            smokeWard: r.smoke?.wardId,
+          }, null, 2));
           NODE
 
       - name: Upload selective Sumiyoshi extraction smoke artifact
@@ -121,7 +150,7 @@ jobs:
           set -euo pipefail
           sha256sum -c /tmp/mission36k-protected.sha256
 
-      - name: Commit Mission 36K source manifests and reports
+      - name: Commit separated manifests, repaired tools, and reports
         shell: bash
         run: |
           set -euo pipefail
@@ -133,11 +162,15 @@ jobs:
             data/reports/mission36k-building-ward-manifest.json \
             data/reports/mission36k-b3dm-smoke.json \
             data/reports/mission36k-ward-extract-sumiyoshi-lod1.json \
-            public/map-data/osaka-city/buildings/manifest.json
+            public/map-data/osaka-city/building-sources/plateau-2024-manifest.json \
+            public/map-data/osaka-city/buildings/manifest.json \
+            tools/mission36k-build-ward-building-manifest.mjs \
+            tools/mission36k-fetch-ward-building-source.mjs \
+            tools/mission36k-smoke-b3dm.mjs
           if git diff --cached --quiet; then
-            echo 'No Mission36K manifest changes.'
+            echo 'No Mission36K repair changes.'
             exit 0
           fi
-          git commit -m 'data(mission36k): verify selective ward building extraction'
+          git commit -m 'fix(mission36k): separate PLATEAU source and runtime manifests'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
