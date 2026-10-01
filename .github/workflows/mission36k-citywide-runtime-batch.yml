@@ -74,13 +74,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/mission36k-batch-results
+          mkdir -p /tmp/mission36k-batch-results temp
           while IFS= read -r WARD; do
             [ -n "$WARD" ] || continue
             echo "=== Mission 36K runtime rebuild: ${WARD} ==="
             SRC="/tmp/mission36k-citygml-${WARD}"
             JSONL="/tmp/mission36k-${WARD}-2024.jsonl"
-            OUT="/tmp/mission36k-datasets-${WARD}"
+            OUT="temp/mission36k-datasets-${WARD}"
             rm -rf "$SRC" "$OUT"
             rm -f "$JSONL" "${JSONL%.jsonl}.report.json"
 
