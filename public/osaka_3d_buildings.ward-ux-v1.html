@@ -8495,6 +8495,13 @@ const FACILITY_CATEGORY_STYLE = {
 };
 
 const FacilityLayer = (function () {
+  // [Mission 36J PERF] bounded facility renderer
+  // 40,585件を一括CanvasTexture/Sprite化するとブラウザが固まるため、
+  // カメラ中心付近だけを上限付きで描画する。元データ40,585件はDataStoreに保持する。
+  const MAX_RENDERED_FACILITIES = 800;
+  const FACILITY_RENDER_RADIUS_METERS = 4500;
+  let renderedFacilityCount = 0;
+  let totalFacilityCount = 0;
   let group = null;
   let sprites = [];
   let visibleCategories = Object.keys(FACILITY_CATEGORY_STYLE);
@@ -8549,7 +8556,24 @@ const FacilityLayer = (function () {
     sprites = [];
     if (FacilityDataStore.getState() !== 'ready') return group;
 
-    for (const record of FacilityDataStore.getAllRecords()) {
+    const allFacilityRecords = FacilityDataStore.getAllRecords();
+    totalFacilityCount = allFacilityRecords.length;
+    const centerX = (typeof cs !== 'undefined' && Number.isFinite(cs.tx)) ? cs.tx : 0;
+    const centerZ = (typeof cs !== 'undefined' && Number.isFinite(cs.tz)) ? cs.tz : 0;
+    const radiusSq = FACILITY_RENDER_RADIUS_METERS * FACILITY_RENDER_RADIUS_METERS;
+    const selectedFacilityRecords = allFacilityRecords
+      .map((record) => {
+        const dx = Number(record.localX) - centerX;
+        const dz = Number(record.localZ) - centerZ;
+        return { record, d2: dx * dx + dz * dz };
+      })
+      .filter((x) => Number.isFinite(x.d2) && x.d2 <= radiusSq)
+      .sort((a, b) => Number(!!b.record.majorFacility) - Number(!!a.record.majorFacility) || a.d2 - b.d2)
+      .slice(0, MAX_RENDERED_FACILITIES)
+      .map((x) => x.record);
+    renderedFacilityCount = selectedFacilityRecords.length;
+
+    for (const record of selectedFacilityRecords) {
       const style = FACILITY_CATEGORY_STYLE[record.category] || FACILITY_CATEGORY_STYLE.unknown;
       const { tex, aspect } = makeIconTexture(record.name, style);
       const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false, depthWrite: false, transparent: true });
@@ -8616,7 +8640,17 @@ const FacilityLayer = (function () {
     }
   }
 
+  function getPerformanceDebug() {
+    return {
+      totalFacilityCount,
+      renderedFacilityCount,
+      maxRenderedFacilities: MAX_RENDERED_FACILITIES,
+      renderRadiusMeters: FACILITY_RENDER_RADIUS_METERS,
+    };
+  }
+
   return {
+    getPerformanceDebug,
     show() { visible = true; if (!built) build(); update(); },
     hide() { visible = false; if (group) group.visible = false; },
     dispose() {
@@ -8663,6 +8697,7 @@ const FacilityLayer = (function () {
     update,
   };
 })();
+if (typeof window !== 'undefined') window.__FACILITY_LAYER_PERF__ = () => FacilityLayer.getPerformanceDebug();
 
 const LABEL_PRIORITY = { station: 1, government: 2, hospital: 3, university: 4, school: 5, library: 5, park: 6 };
 const LABEL_STYLE = {
