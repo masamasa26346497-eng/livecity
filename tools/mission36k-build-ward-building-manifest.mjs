@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 
 const DISCOVERY = path.resolve('data/reports/mission36k-building-source-discovery.json');
 const WARDS = path.resolve('config/wards/registry.json');
-const OUT_PUBLIC = path.resolve('public/map-data/osaka-city/buildings/manifest.json');
+const OUT_PUBLIC = path.resolve('public/map-data/osaka-city/building-sources/plateau-2024-manifest.json');
 const OUT_REPORT = path.resolve('data/reports/mission36k-building-ward-manifest.json');
 const TAIL_BYTES = 262144;
 const MAX_CD_BYTES = 128 * 1024 * 1024;

@@ -1,0 +1,1062 @@
+{
+  "version": 1,
+  "mission": "36K",
+  "generatedAt": "2026-10-01T15:53:10.829Z",
+  "strategy": "remote-zip-range",
+  "city": "大阪市",
+  "cityCode": "27100",
+  "wardCount": 24,
+  "source": {
+    "packageId": "plateau-27100-osaka-shi-2024",
+    "name": "3D Tiles, MVT（v4）",
+    "format": "ZIP",
+    "url": "https://assets.cms.plateau.reearth.io/assets/ac/88f17c-afe2-48f9-9b7e-c20a27bbb61d/27100_osaka-shi_city_2024_3dtiles_mvt_1_op.zip",
+    "sizeBytes": 1314295221,
+    "etag": "\"5a393b3c60a56f0f550032ae57b59a67\"",
+    "lastModified": "Mon, 31 Mar 2025 02:44:36 GMT",
+    "rangeSupported": true,
+    "zipEntries": 23785
+  },
+  "coverage": {
+    "lod1Wards": 24,
+    "lod2Wards": 11,
+    "lod3Wards": 2
+  },
+  "wards": {
+    "kita": {
+      "id": "kita",
+      "name": "北区",
+      "code": "27127",
+      "datasetId": "osaka-kita",
+      "slug": "kita-ku",
+      "lodLevels": [
+        1,
+        2,
+        3
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": true,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod1/tileset.json",
+        "fileCount": 72,
+        "b3dmCount": 71,
+        "compressedBytes": 12818227,
+        "uncompressedBytes": 126676386
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod1/tileset.json",
+          "fileCount": 72,
+          "b3dmCount": 71,
+          "compressedBytes": 12818227,
+          "uncompressedBytes": 126676386
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod2/tileset.json",
+          "fileCount": 72,
+          "b3dmCount": 71,
+          "compressedBytes": 18321022,
+          "uncompressedBytes": 139273652
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod2_no_texture/tileset.json",
+          "fileCount": 72,
+          "b3dmCount": 71,
+          "compressedBytes": 14693895,
+          "uncompressedBytes": 135317976
+        },
+        {
+          "lod": 3,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod3",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod3/tileset.json",
+          "fileCount": 72,
+          "b3dmCount": 71,
+          "compressedBytes": 20014933,
+          "uncompressedBytes": 141111832
+        },
+        {
+          "lod": 3,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod3_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27127_kita-ku_lod3_no_texture/tileset.json",
+          "fileCount": 72,
+          "b3dmCount": 71,
+          "compressedBytes": 14710265,
+          "uncompressedBytes": 135402960
+        }
+      ]
+    },
+    "miyakojima": {
+      "id": "miyakojima",
+      "name": "都島区",
+      "code": "27102",
+      "datasetId": "osaka-miyakojima",
+      "slug": "miyakojima-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod1/tileset.json",
+        "fileCount": 69,
+        "b3dmCount": 68,
+        "compressedBytes": 11424157,
+        "uncompressedBytes": 125278963
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod1/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 11424157,
+          "uncompressedBytes": 125278963
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod2/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 11786309,
+          "uncompressedBytes": 125780321
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27102_miyakojima-ku_lod2_no_texture/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 11440346,
+          "uncompressedBytes": 125390441
+        }
+      ]
+    },
+    "fukushima": {
+      "id": "fukushima",
+      "name": "福島区",
+      "code": "27103",
+      "datasetId": "osaka-fukushima",
+      "slug": "fukushima-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod1/tileset.json",
+        "fileCount": 21,
+        "b3dmCount": 20,
+        "compressedBytes": 8000631,
+        "uncompressedBytes": 86633006
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod1/tileset.json",
+          "fileCount": 21,
+          "b3dmCount": 20,
+          "compressedBytes": 8000631,
+          "uncompressedBytes": 86633006
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27103_fukushima-ku_lod2/tileset.json",
+          "fileCount": 21,
+          "b3dmCount": 20,
+          "compressedBytes": 8009211,
+          "uncompressedBytes": 86674424
+        }
+      ]
+    },
+    "konohana": {
+      "id": "konohana",
+      "name": "此花区",
+      "code": "27104",
+      "datasetId": "osaka-konohana",
+      "slug": "konohana-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod1/tileset.json",
+        "fileCount": 138,
+        "b3dmCount": 137,
+        "compressedBytes": 11208580,
+        "uncompressedBytes": 113710830
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod1/tileset.json",
+          "fileCount": 138,
+          "b3dmCount": 137,
+          "compressedBytes": 11208580,
+          "uncompressedBytes": 113710830
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod2/tileset.json",
+          "fileCount": 138,
+          "b3dmCount": 137,
+          "compressedBytes": 16166500,
+          "uncompressedBytes": 120031936
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27104_konohana-ku_lod2_no_texture/tileset.json",
+          "fileCount": 138,
+          "b3dmCount": 137,
+          "compressedBytes": 11404846,
+          "uncompressedBytes": 114737588
+        }
+      ]
+    },
+    "chuo": {
+      "id": "chuo",
+      "name": "中央区",
+      "code": "27128",
+      "datasetId": "osaka-chuo",
+      "slug": "chuo-ku",
+      "lodLevels": [
+        1,
+        2,
+        3
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": true,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod1/tileset.json",
+        "fileCount": 74,
+        "b3dmCount": 73,
+        "compressedBytes": 11381407,
+        "uncompressedBytes": 112762931
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod1/tileset.json",
+          "fileCount": 74,
+          "b3dmCount": 73,
+          "compressedBytes": 11381407,
+          "uncompressedBytes": 112762931
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod2/tileset.json",
+          "fileCount": 74,
+          "b3dmCount": 73,
+          "compressedBytes": 23325820,
+          "uncompressedBytes": 139238154
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod2_no_texture/tileset.json",
+          "fileCount": 74,
+          "b3dmCount": 73,
+          "compressedBytes": 14752358,
+          "uncompressedBytes": 129515330
+        },
+        {
+          "lod": 3,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod3",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod3/tileset.json",
+          "fileCount": 74,
+          "b3dmCount": 73,
+          "compressedBytes": 23965390,
+          "uncompressedBytes": 140070014
+        },
+        {
+          "lod": 3,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod3_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27128_chuo-ku_lod3_no_texture/tileset.json",
+          "fileCount": 74,
+          "b3dmCount": 73,
+          "compressedBytes": 14783472,
+          "uncompressedBytes": 129659074
+        }
+      ]
+    },
+    "nishi": {
+      "id": "nishi",
+      "name": "西区",
+      "code": "27106",
+      "datasetId": "osaka-nishi",
+      "slug": "nishi-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod1/tileset.json",
+        "fileCount": 20,
+        "b3dmCount": 19,
+        "compressedBytes": 7684733,
+        "uncompressedBytes": 77009239
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod1/tileset.json",
+          "fileCount": 20,
+          "b3dmCount": 19,
+          "compressedBytes": 7684733,
+          "uncompressedBytes": 77009239
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27106_nishi-ku_lod2/tileset.json",
+          "fileCount": 20,
+          "b3dmCount": 19,
+          "compressedBytes": 7829094,
+          "uncompressedBytes": 77695875
+        }
+      ]
+    },
+    "minato": {
+      "id": "minato",
+      "name": "港区",
+      "code": "27107",
+      "datasetId": "osaka-minato",
+      "slug": "minato-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27107_minato-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27107_minato-ku_lod1/tileset.json",
+        "fileCount": 60,
+        "b3dmCount": 59,
+        "compressedBytes": 10130410,
+        "uncompressedBytes": 105676811
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27107_minato-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27107_minato-ku_lod1/tileset.json",
+          "fileCount": 60,
+          "b3dmCount": 59,
+          "compressedBytes": 10130410,
+          "uncompressedBytes": 105676811
+        }
+      ]
+    },
+    "taisho": {
+      "id": "taisho",
+      "name": "大正区",
+      "code": "27108",
+      "datasetId": "osaka-taisho",
+      "slug": "taisho-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27108_taisho-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27108_taisho-ku_lod1/tileset.json",
+        "fileCount": 69,
+        "b3dmCount": 68,
+        "compressedBytes": 11056207,
+        "uncompressedBytes": 116527239
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27108_taisho-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27108_taisho-ku_lod1/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 11056207,
+          "uncompressedBytes": 116527239
+        }
+      ]
+    },
+    "tennoji": {
+      "id": "tennoji",
+      "name": "天王寺区",
+      "code": "27109",
+      "datasetId": "osaka-tennoji",
+      "slug": "tennoji-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27109_tennoji-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27109_tennoji-ku_lod1/tileset.json",
+        "fileCount": 20,
+        "b3dmCount": 19,
+        "compressedBytes": 8329607,
+        "uncompressedBytes": 82251420
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27109_tennoji-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27109_tennoji-ku_lod1/tileset.json",
+          "fileCount": 20,
+          "b3dmCount": 19,
+          "compressedBytes": 8329607,
+          "uncompressedBytes": 82251420
+        }
+      ]
+    },
+    "naniwa": {
+      "id": "naniwa",
+      "name": "浪速区",
+      "code": "27111",
+      "datasetId": "osaka-naniwa",
+      "slug": "naniwa-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod1/tileset.json",
+        "fileCount": 21,
+        "b3dmCount": 20,
+        "compressedBytes": 6392498,
+        "uncompressedBytes": 65930083
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod1/tileset.json",
+          "fileCount": 21,
+          "b3dmCount": 20,
+          "compressedBytes": 6392498,
+          "uncompressedBytes": 65930083
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27111_naniwa-ku_lod2/tileset.json",
+          "fileCount": 21,
+          "b3dmCount": 20,
+          "compressedBytes": 6397744,
+          "uncompressedBytes": 65953391
+        }
+      ]
+    },
+    "nishiyodogawa": {
+      "id": "nishiyodogawa",
+      "name": "西淀川区",
+      "code": "27113",
+      "datasetId": "osaka-nishiyodogawa",
+      "slug": "nishiyodogawa-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27113_nishiyodogawa-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27113_nishiyodogawa-ku_lod1/tileset.json",
+        "fileCount": 60,
+        "b3dmCount": 59,
+        "compressedBytes": 16892337,
+        "uncompressedBytes": 188826872
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27113_nishiyodogawa-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27113_nishiyodogawa-ku_lod1/tileset.json",
+          "fileCount": 60,
+          "b3dmCount": 59,
+          "compressedBytes": 16892337,
+          "uncompressedBytes": 188826872
+        }
+      ]
+    },
+    "yodogawa": {
+      "id": "yodogawa",
+      "name": "淀川区",
+      "code": "27123",
+      "datasetId": "osaka-yodogawa",
+      "slug": "yodogawa-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod1/tileset.json",
+        "fileCount": 59,
+        "b3dmCount": 58,
+        "compressedBytes": 23707578,
+        "uncompressedBytes": 261593423
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod1/tileset.json",
+          "fileCount": 59,
+          "b3dmCount": 58,
+          "compressedBytes": 23707578,
+          "uncompressedBytes": 261593423
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod2/tileset.json",
+          "fileCount": 203,
+          "b3dmCount": 202,
+          "compressedBytes": 63310519,
+          "uncompressedBytes": 311277206
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27123_yodogawa-ku_lod2_no_texture/tileset.json",
+          "fileCount": 203,
+          "b3dmCount": 202,
+          "compressedBytes": 25672206,
+          "uncompressedBytes": 270918414
+        }
+      ]
+    },
+    "higashiyodogawa": {
+      "id": "higashiyodogawa",
+      "name": "東淀川区",
+      "code": "27114",
+      "datasetId": "osaka-higashiyodogawa",
+      "slug": "higashiyodogawa-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod1/tileset.json",
+        "fileCount": 54,
+        "b3dmCount": 53,
+        "compressedBytes": 22594817,
+        "uncompressedBytes": 249019764
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod1/tileset.json",
+          "fileCount": 54,
+          "b3dmCount": 53,
+          "compressedBytes": 22594817,
+          "uncompressedBytes": 249019764
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod2/tileset.json",
+          "fileCount": 54,
+          "b3dmCount": 53,
+          "compressedBytes": 31087921,
+          "uncompressedBytes": 258359664
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27114_higashiyodogawa-ku_lod2_no_texture/tileset.json",
+          "fileCount": 54,
+          "b3dmCount": 53,
+          "compressedBytes": 22666071,
+          "uncompressedBytes": 249458840
+        }
+      ]
+    },
+    "higashinari": {
+      "id": "higashinari",
+      "name": "東成区",
+      "code": "27115",
+      "datasetId": "osaka-higashinari",
+      "slug": "higashinari-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod1/tileset.json",
+        "fileCount": 22,
+        "b3dmCount": 21,
+        "compressedBytes": 12877487,
+        "uncompressedBytes": 144358177
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod1/tileset.json",
+          "fileCount": 22,
+          "b3dmCount": 21,
+          "compressedBytes": 12877487,
+          "uncompressedBytes": 144358177
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod2/tileset.json",
+          "fileCount": 22,
+          "b3dmCount": 21,
+          "compressedBytes": 13145251,
+          "uncompressedBytes": 144737630
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27115_higashinari-ku_lod2_no_texture/tileset.json",
+          "fileCount": 22,
+          "b3dmCount": 21,
+          "compressedBytes": 12891871,
+          "uncompressedBytes": 144449594
+        }
+      ]
+    },
+    "ikuno": {
+      "id": "ikuno",
+      "name": "生野区",
+      "code": "27116",
+      "datasetId": "osaka-ikuno",
+      "slug": "ikuno-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27116_ikuno-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27116_ikuno-ku_lod1/tileset.json",
+        "fileCount": 77,
+        "b3dmCount": 76,
+        "compressedBytes": 25120505,
+        "uncompressedBytes": 278264174
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27116_ikuno-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27116_ikuno-ku_lod1/tileset.json",
+          "fileCount": 77,
+          "b3dmCount": 76,
+          "compressedBytes": 25120505,
+          "uncompressedBytes": 278264174
+        }
+      ]
+    },
+    "asahi": {
+      "id": "asahi",
+      "name": "旭区",
+      "code": "27117",
+      "datasetId": "osaka-asahi",
+      "slug": "asahi-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27117_asahi-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27117_asahi-ku_lod1/tileset.json",
+        "fileCount": 63,
+        "b3dmCount": 62,
+        "compressedBytes": 14561479,
+        "uncompressedBytes": 155081364
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27117_asahi-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27117_asahi-ku_lod1/tileset.json",
+          "fileCount": 63,
+          "b3dmCount": 62,
+          "compressedBytes": 14561479,
+          "uncompressedBytes": 155081364
+        }
+      ]
+    },
+    "joto": {
+      "id": "joto",
+      "name": "城東区",
+      "code": "27118",
+      "datasetId": "osaka-joto",
+      "slug": "joto-ku",
+      "lodLevels": [
+        1,
+        2
+      ],
+      "hasLod1": true,
+      "hasLod2": true,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod1/tileset.json",
+        "fileCount": 80,
+        "b3dmCount": 79,
+        "compressedBytes": 19694960,
+        "uncompressedBytes": 219786101
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod1/tileset.json",
+          "fileCount": 80,
+          "b3dmCount": 79,
+          "compressedBytes": 19694960,
+          "uncompressedBytes": 219786101
+        },
+        {
+          "lod": 2,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod2",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod2/tileset.json",
+          "fileCount": 80,
+          "b3dmCount": 79,
+          "compressedBytes": 20823952,
+          "uncompressedBytes": 221532605
+        },
+        {
+          "lod": 2,
+          "noTexture": true,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod2_no_texture",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27118_joto-ku_lod2_no_texture/tileset.json",
+          "fileCount": 80,
+          "b3dmCount": 79,
+          "compressedBytes": 19798147,
+          "uncompressedBytes": 220329705
+        }
+      ]
+    },
+    "tsurumi": {
+      "id": "tsurumi",
+      "name": "鶴見区",
+      "code": "27124",
+      "datasetId": "osaka-tsurumi",
+      "slug": "tsurumi-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27124_tsurumi-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27124_tsurumi-ku_lod1/tileset.json",
+        "fileCount": 69,
+        "b3dmCount": 68,
+        "compressedBytes": 15436013,
+        "uncompressedBytes": 165004970
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27124_tsurumi-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27124_tsurumi-ku_lod1/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 15436013,
+          "uncompressedBytes": 165004970
+        }
+      ]
+    },
+    "abeno": {
+      "id": "abeno",
+      "name": "阿倍野区",
+      "code": "27119",
+      "datasetId": "osaka-abeno",
+      "slug": "abeno-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27119_abeno-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27119_abeno-ku_lod1/tileset.json",
+        "fileCount": 68,
+        "b3dmCount": 67,
+        "compressedBytes": 15273132,
+        "uncompressedBytes": 152874715
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27119_abeno-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27119_abeno-ku_lod1/tileset.json",
+          "fileCount": 68,
+          "b3dmCount": 67,
+          "compressedBytes": 15273132,
+          "uncompressedBytes": 152874715
+        }
+      ]
+    },
+    "suminoe": {
+      "id": "suminoe",
+      "name": "住之江区",
+      "code": "27125",
+      "datasetId": "osaka-suminoe",
+      "slug": "suminoe-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27125_suminoe-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27125_suminoe-ku_lod1/tileset.json",
+        "fileCount": 208,
+        "b3dmCount": 207,
+        "compressedBytes": 17607993,
+        "uncompressedBytes": 185651071
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27125_suminoe-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27125_suminoe-ku_lod1/tileset.json",
+          "fileCount": 208,
+          "b3dmCount": 207,
+          "compressedBytes": 17607993,
+          "uncompressedBytes": 185651071
+        }
+      ]
+    },
+    "sumiyoshi": {
+      "id": "sumiyoshi",
+      "name": "住吉区",
+      "code": "27120",
+      "datasetId": "osaka-sumiyoshi",
+      "slug": "sumiyoshi-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/tileset.json",
+        "fileCount": 75,
+        "b3dmCount": 74,
+        "compressedBytes": 20319219,
+        "uncompressedBytes": 211549123
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/tileset.json",
+          "fileCount": 75,
+          "b3dmCount": 74,
+          "compressedBytes": 20319219,
+          "uncompressedBytes": 211549123
+        }
+      ]
+    },
+    "higashisumiyoshi": {
+      "id": "higashisumiyoshi",
+      "name": "東住吉区",
+      "code": "27121",
+      "datasetId": "osaka-higashisumiyoshi",
+      "slug": "higashisumiyoshi-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27121_higashisumiyoshi-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27121_higashisumiyoshi-ku_lod1/tileset.json",
+        "fileCount": 70,
+        "b3dmCount": 69,
+        "compressedBytes": 22178935,
+        "uncompressedBytes": 239250440
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27121_higashisumiyoshi-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27121_higashisumiyoshi-ku_lod1/tileset.json",
+          "fileCount": 70,
+          "b3dmCount": 69,
+          "compressedBytes": 22178935,
+          "uncompressedBytes": 239250440
+        }
+      ]
+    },
+    "hirano": {
+      "id": "hirano",
+      "name": "平野区",
+      "code": "27126",
+      "datasetId": "osaka-hirano",
+      "slug": "hirano-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27126_hirano-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27126_hirano-ku_lod1/tileset.json",
+        "fileCount": 69,
+        "b3dmCount": 68,
+        "compressedBytes": 27048659,
+        "uncompressedBytes": 293367849
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27126_hirano-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27126_hirano-ku_lod1/tileset.json",
+          "fileCount": 69,
+          "b3dmCount": 68,
+          "compressedBytes": 27048659,
+          "uncompressedBytes": 293367849
+        }
+      ]
+    },
+    "nishinari": {
+      "id": "nishinari",
+      "name": "西成区",
+      "code": "27122",
+      "datasetId": "osaka-nishinari",
+      "slug": "nishinari-ku",
+      "lodLevels": [
+        1
+      ],
+      "hasLod1": true,
+      "hasLod2": false,
+      "hasLod3": false,
+      "preferredLod1": {
+        "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27122_nishinari-ku_lod1",
+        "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27122_nishinari-ku_lod1/tileset.json",
+        "fileCount": 73,
+        "b3dmCount": 72,
+        "compressedBytes": 18287387,
+        "uncompressedBytes": 203481426
+      },
+      "variants": [
+        {
+          "lod": 1,
+          "noTexture": false,
+          "root": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27122_nishinari-ku_lod1",
+          "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27122_nishinari-ku_lod1/tileset.json",
+          "fileCount": 73,
+          "b3dmCount": 72,
+          "compressedBytes": 18287387,
+          "uncompressedBytes": 203481426
+        }
+      ]
+    }
+  }
+}

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { fetchZipEntry, readRemoteZipIndex } from './mission36k-build-ward-building-manifest.mjs';
 
-const MANIFEST = path.resolve('public/map-data/osaka-city/buildings/manifest.json');
+const MANIFEST = path.resolve('public/map-data/osaka-city/building-sources/plateau-2024-manifest.json');
 const OUT_REPORT = path.resolve('data/reports/mission36k-b3dm-smoke.json');
 
 export function parseB3dmHeader(bytes) {

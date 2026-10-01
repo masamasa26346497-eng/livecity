@@ -9,7 +9,7 @@ import {
 } from './mission36k-build-ward-building-manifest.mjs';
 import { parseB3dmHeader } from './mission36k-smoke-b3dm.mjs';
 
-const MANIFEST_PATH = path.resolve('public/map-data/osaka-city/buildings/manifest.json');
+const MANIFEST_PATH = path.resolve('public/map-data/osaka-city/building-sources/plateau-2024-manifest.json');
 const DEFAULT_OUT = path.resolve('.cache/mission36k-buildings');
 
 function argValue(name, fallback = null) {
