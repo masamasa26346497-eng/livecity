@@ -3,14 +3,14 @@
   "city": "osaka-city",
   "cityName": "大阪市",
   "cityCode": "27100",
-  "generatedAt": "2026-10-01T15:53:06.920Z",
+  "generatedAt": "2026-10-01T16:09:15.807Z",
   "coordinateSystem": "meters-local",
   "coordinateConvention": "znorth-neg-v1",
   "tileSize": 500,
   "layout": "flat",
   "wardCount": 24,
-  "buildingCount": 574112,
-  "tileCount": 1096,
+  "buildingCount": 574213,
+  "tileCount": 1097,
   "datasets": [
     {
       "id": "osaka-kita",
@@ -338,15 +338,17 @@
       "ward": "住吉区",
       "wardCode": "27120",
       "manifest": "./osaka-sumiyoshi/manifest.json",
-      "buildings": 34930,
-      "tiles": 51,
+      "buildings": 35031,
+      "tiles": 52,
       "bounds": {
-        "minX": -3431.4,
-        "maxX": -128.54,
-        "minZ": -2286.99,
-        "maxZ": 1842.6
+        "minX": -3441.02,
+        "maxX": -120.59,
+        "minZ": -2303.56,
+        "maxZ": 1865.59
       },
-      "dataReadyCandidate": true
+      "dataReadyCandidate": true,
+      "sourceVersion": "PLATEAU CityGML v4 2024",
+      "runtimeReady": true
     },
     {
       "id": "osaka-higashisumiyoshi",
@@ -402,5 +404,6 @@
     "policy": "not force-assigned; authoritative N03 point-in-polygon only"
   },
   "sourceReport": "../../../data/reports/building-dataset-generation.json",
-  "note": "Live City runtime building manifest. PLATEAU source/acquisition metadata is intentionally stored separately under building-sources/."
+  "note": "Live City runtime building manifest. PLATEAU source/acquisition metadata is intentionally stored separately under building-sources/.",
+  "migration": "Mission36K: Sumiyoshi runtime tiles rebuilt from PLATEAU 2024 CityGML; remaining wards retain prior manifest metadata until rebuilt."
 }
