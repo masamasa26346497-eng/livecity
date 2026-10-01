@@ -1,0 +1,2386 @@
+{
+  "mission": "36J",
+  "generatedAt": "2026-10-01T11:35:55.883Z",
+  "expectedTileCount": 156,
+  "loadedTileCount": 156,
+  "missingTileCount": 0,
+  "rawElementCountAfterTileDedup": 106857,
+  "convertedRecordCount": 60212,
+  "insideOsakaCityCount": 40585,
+  "outsideCount": 19626,
+  "ambiguousWardCount": 1,
+  "skippedCount": 46645,
+  "wardCounts": {
+    "abeno": 851,
+    "asahi": 1097,
+    "chuo": 5084,
+    "fukushima": 967,
+    "higashinari": 918,
+    "higashisumiyoshi": 1025,
+    "higashiyodogawa": 2922,
+    "hirano": 1116,
+    "ikuno": 3325,
+    "joto": 1051,
+    "kita": 5655,
+    "konohana": 1309,
+    "minato": 612,
+    "miyakojima": 1444,
+    "naniwa": 1363,
+    "nishi": 2071,
+    "nishinari": 854,
+    "nishiyodogawa": 880,
+    "suminoe": 617,
+    "sumiyoshi": 965,
+    "taisho": 649,
+    "tennoji": 1611,
+    "tsurumi": 842,
+    "yodogawa": 3357
+  },
+  "categoryCounts": {
+    "dining": 12157,
+    "education": 1491,
+    "lodging": 584,
+    "medical": 2529,
+    "park": 1555,
+    "public": 1647,
+    "shopping": 9807,
+    "tourism": 4563,
+    "transport": 6252
+  },
+  "missingTiles": [],
+  "outside": [
+    {
+      "id": "osm-node-10001222203",
+      "name": "Craftbeer Tavern",
+      "status": "outside",
+      "localX": 3694.02,
+      "localZ": -6704.89
+    },
+    {
+      "id": "osm-node-10002393226",
+      "name": "ＪＲ西宮駅北",
+      "status": "outside",
+      "localX": -16228.64,
+      "localZ": -15363.71
+    },
+    {
+      "id": "osm-node-10003514306",
+      "name": "とりあん",
+      "status": "outside",
+      "localX": 3472.38,
+      "localZ": -6835
+    },
+    {
+      "id": "osm-node-10003514307",
+      "name": "やきとり舞吉",
+      "status": "outside",
+      "localX": 3472.48,
+      "localZ": -6829.14
+    },
+    {
+      "id": "osm-node-10005704235",
+      "name": "プラスワン",
+      "status": "outside",
+      "localX": 3506.96,
+      "localZ": -6921.41
+    },
+    {
+      "id": "osm-node-10005704236",
+      "name": "カフェ・ベーム",
+      "status": "outside",
+      "localX": 3512.53,
+      "localZ": -6919.28
+    },
+    {
+      "id": "osm-node-10005704237",
+      "name": "つばさ薬局",
+      "status": "outside",
+      "localX": 3500.82,
+      "localZ": -6921.97
+    },
+    {
+      "id": "osm-node-10005704238",
+      "name": "わたなべメンタルクリニックS",
+      "status": "outside",
+      "localX": 3502.24,
+      "localZ": -6924.29
+    },
+    {
+      "id": "osm-node-10005704239",
+      "name": "くまのて整骨院",
+      "status": "outside",
+      "localX": 3500.56,
+      "localZ": -6933.28
+    },
+    {
+      "id": "osm-node-10005704240",
+      "name": "KITAYOSHI",
+      "status": "outside",
+      "localX": 3500.79,
+      "localZ": -6948.49
+    },
+    {
+      "id": "osm-node-10005704241",
+      "name": "カジワラ",
+      "status": "outside",
+      "localX": 3472.46,
+      "localZ": -6913.67
+    },
+    {
+      "id": "osm-node-10005704243",
+      "name": "HAIR SALON IWASAKI",
+      "status": "outside",
+      "localX": 3525.55,
+      "localZ": -6919.77
+    },
+    {
+      "id": "osm-node-10005704248",
+      "name": "おうじ薬局",
+      "status": "outside",
+      "localX": 3513.42,
+      "localZ": -6934.02
+    },
+    {
+      "id": "osm-node-10006017494",
+      "name": "美容室Bing",
+      "status": "outside",
+      "localX": -14909.43,
+      "localZ": -15648.13
+    },
+    {
+      "id": "osm-node-10006017496",
+      "name": "癒やし空間なちゅらる",
+      "status": "outside",
+      "localX": -14768.73,
+      "localZ": -15714.78
+    },
+    {
+      "id": "osm-node-10006017497",
+      "name": "つつみ鍼灸整骨院",
+      "status": "outside",
+      "localX": -14724.21,
+      "localZ": -15745.88
+    },
+    {
+      "id": "osm-node-10006652550",
+      "name": "くいせこどもの駅",
+      "status": "outside",
+      "localX": -7718.57,
+      "localZ": -13159.79
+    },
+    {
+      "id": "osm-node-10007859534",
+      "name": "トーシン東大阪補聴器センター",
+      "status": "outside",
+      "localX": 3568.31,
+      "localZ": -6769.27
+    },
+    {
+      "id": "osm-node-10007859537",
+      "name": "ヴェル・ノール布施無料駐輪場",
+      "status": "outside",
+      "localX": 3518.82,
+      "localZ": -6906.82
+    },
+    {
+      "id": "osm-node-10007903371",
+      "name": "ルジャンドル",
+      "status": "outside",
+      "localX": 3581.22,
+      "localZ": -6694.24
+    },
+    {
+      "id": "osm-node-10007903372",
+      "name": "七輪焼肉 安安",
+      "status": "outside",
+      "localX": 3650.89,
+      "localZ": -6706.95
+    },
+    {
+      "id": "osm-node-10007903382",
+      "name": "華舞台 星天座",
+      "status": "outside",
+      "localX": 3775.5,
+      "localZ": -6892.79
+    },
+    {
+      "id": "osm-node-10008010844",
+      "name": "ザッツ・ピザ",
+      "status": "outside",
+      "localX": 3396.53,
+      "localZ": -7029.02
+    },
+    {
+      "id": "osm-node-10008010847",
+      "name": "冨士薬局",
+      "status": "outside",
+      "localX": 3396.77,
+      "localZ": -7017.3
+    },
+    {
+      "id": "osm-node-10008010848",
+      "name": "自家製麺うどん屋島",
+      "status": "outside",
+      "localX": 3381.04,
+      "localZ": -7016.25
+    },
+    {
+      "id": "osm-node-10008010854",
+      "name": "地酒＆ワイン いわさき",
+      "status": "outside",
+      "localX": 3383.99,
+      "localZ": -7004.17
+    },
+    {
+      "id": "osm-node-10008010855",
+      "name": "ガクブチの大和",
+      "status": "outside",
+      "localX": 3401.19,
+      "localZ": -6971.99
+    },
+    {
+      "id": "osm-node-10008010856",
+      "name": "花屋",
+      "status": "outside",
+      "localX": 3399.41,
+      "localZ": -6930.79
+    },
+    {
+      "id": "osm-node-10008010857",
+      "name": "ランドリーデザイン",
+      "status": "outside",
+      "localX": 3387.56,
+      "localZ": -6930.24
+    },
+    {
+      "id": "osm-node-10008010859",
+      "name": "ぎょうざの丸岡",
+      "status": "outside",
+      "localX": 3387.13,
+      "localZ": -6916.92
+    },
+    {
+      "id": "osm-node-10008010860",
+      "name": "来来軒",
+      "status": "outside",
+      "localX": 3399.17,
+      "localZ": -6926.5
+    },
+    {
+      "id": "osm-node-10008333744",
+      "name": "スマイルランドリー",
+      "status": "outside",
+      "localX": -9668.76,
+      "localZ": -18040.74
+    },
+    {
+      "id": "osm-node-10010326877",
+      "name": "wewe",
+      "status": "outside",
+      "localX": -15792.07,
+      "localZ": -15607.61
+    },
+    {
+      "id": "osm-node-10010326889",
+      "name": "さくら薬局",
+      "status": "outside",
+      "localX": -15394.71,
+      "localZ": -15560.38
+    },
+    {
+      "id": "osm-node-10010326890",
+      "name": "ヘアデザインアクスト",
+      "status": "outside",
+      "localX": -15397.67,
+      "localZ": -15557.29
+    },
+    {
+      "id": "osm-node-10010326892",
+      "name": "ガーデンズキッチン",
+      "status": "outside",
+      "localX": -15016.58,
+      "localZ": -15577.84
+    },
+    {
+      "id": "osm-node-10010740701",
+      "name": "麭屋",
+      "status": "outside",
+      "localX": -13919.45,
+      "localZ": -15372.72
+    },
+    {
+      "id": "osm-node-10010754422",
+      "name": "ICHI",
+      "status": "outside",
+      "localX": -13211.76,
+      "localZ": -16391.22
+    },
+    {
+      "id": "osm-node-10010754440",
+      "name": "えぶりぃ",
+      "status": "outside",
+      "localX": -13249.25,
+      "localZ": -17122.18
+    },
+    {
+      "id": "osm-node-10015707190",
+      "name": "TERRAS",
+      "status": "outside",
+      "localX": -10902.45,
+      "localZ": -12785.8
+    },
+    {
+      "id": "osm-node-10026254303",
+      "name": "ヘアーサロン マルビ",
+      "status": "outside",
+      "localX": 3649.37,
+      "localZ": -6908.35
+    },
+    {
+      "id": "osm-node-10026502316",
+      "name": "メガネの卸センター Kメガネ",
+      "status": "outside",
+      "localX": 3654.36,
+      "localZ": -6906.73
+    },
+    {
+      "id": "osm-node-10026519217",
+      "name": "ヘアーサロン オブジェ",
+      "status": "outside",
+      "localX": 3659.04,
+      "localZ": -6906.69
+    },
+    {
+      "id": "osm-node-10026549420",
+      "name": "タイガー電器",
+      "status": "outside",
+      "localX": 3598.54,
+      "localZ": -6927.93
+    },
+    {
+      "id": "osm-node-10026642706",
+      "name": "アローザ テニスショップ",
+      "status": "outside",
+      "localX": 3627.88,
+      "localZ": -6789.62
+    },
+    {
+      "id": "osm-node-10026642707",
+      "name": "串カツ専門店 大谷",
+      "status": "outside",
+      "localX": 3625.52,
+      "localZ": -6776.67
+    },
+    {
+      "id": "osm-node-10030908505",
+      "name": "Be-fit light24",
+      "status": "outside",
+      "localX": 3799.68,
+      "localZ": -6666.87
+    },
+    {
+      "id": "osm-node-10030972139",
+      "name": "彩華ラーメン",
+      "status": "outside",
+      "localX": 3773.55,
+      "localZ": -6582.14
+    },
+    {
+      "id": "osm-node-10030972148",
+      "name": "鈴木診療所",
+      "status": "outside",
+      "localX": 3770.47,
+      "localZ": -6569.41
+    },
+    {
+      "id": "osm-node-10030972149",
+      "name": "お食事処 あさひ",
+      "status": "outside",
+      "localX": 3772.06,
+      "localZ": -6548.28
+    },
+    {
+      "id": "osm-node-10030972150",
+      "name": "串揚げ処 法善寺 別家",
+      "status": "outside",
+      "localX": 3773.85,
+      "localZ": -6539.96
+    },
+    {
+      "id": "osm-node-10030972151",
+      "name": "ANGELICA",
+      "status": "outside",
+      "localX": 3774.17,
+      "localZ": -6532.61
+    },
+    {
+      "id": "osm-node-10030997409",
+      "name": "オレンジ薬局",
+      "status": "outside",
+      "localX": 3796.62,
+      "localZ": -6528.86
+    },
+    {
+      "id": "osm-node-10030997410",
+      "name": "かわぐち呼吸器内科",
+      "status": "outside",
+      "localX": 3794.61,
+      "localZ": -6568.24
+    },
+    {
+      "id": "osm-node-10031202166",
+      "name": "フイホウ",
+      "status": "outside",
+      "localX": -8102.48,
+      "localZ": -13158.91
+    },
+    {
+      "id": "osm-node-10039086052",
+      "name": "きてい",
+      "status": "outside",
+      "localX": -7915.57,
+      "localZ": -12746.63
+    },
+    {
+      "id": "osm-node-10039086053",
+      "name": "元基",
+      "status": "outside",
+      "localX": -7934.75,
+      "localZ": -12694.97
+    },
+    {
+      "id": "osm-node-10042895833",
+      "name": "北西駐輪場",
+      "status": "outside",
+      "localX": -15301.45,
+      "localZ": -15554.1
+    },
+    {
+      "id": "osm-node-10042895834",
+      "name": "南駐輪場",
+      "status": "outside",
+      "localX": -15078.92,
+      "localZ": -15455.35
+    },
+    {
+      "id": "osm-node-10046375063",
+      "name": "はぴねす鍼灸整骨院",
+      "status": "outside",
+      "localX": -10094.3,
+      "localZ": -16485.09
+    },
+    {
+      "id": "osm-node-10047582472",
+      "name": "ホルモン第一本舗",
+      "status": "outside",
+      "localX": -16543.2,
+      "localZ": -15328.31
+    },
+    {
+      "id": "osm-node-10048423425",
+      "name": "リリアン",
+      "status": "outside",
+      "localX": -10104.81,
+      "localZ": -13017.99
+    },
+    {
+      "id": "osm-node-10048423426",
+      "name": "呑菜家",
+      "status": "outside",
+      "localX": -10140.49,
+      "localZ": -12924.99
+    },
+    {
+      "id": "osm-node-10048423427",
+      "name": "セブン-イレブン",
+      "status": "outside",
+      "localX": -10350.78,
+      "localZ": -13106.34
+    },
+    {
+      "id": "osm-node-10048596025",
+      "name": "野神さん",
+      "status": "outside",
+      "localX": 6775.13,
+      "localZ": -17477.38
+    },
+    {
+      "id": "osm-node-10048606867",
+      "name": "ペットスタイル",
+      "status": "outside",
+      "localX": -10267.93,
+      "localZ": -12911.26
+    },
+    {
+      "id": "osm-node-10048606868",
+      "name": "illusie300",
+      "status": "outside",
+      "localX": -10253.1,
+      "localZ": -12918.67
+    },
+    {
+      "id": "osm-node-10048606869",
+      "name": "中村園",
+      "status": "outside",
+      "localX": -10261.6,
+      "localZ": -12909.36
+    },
+    {
+      "id": "osm-node-10048606870",
+      "name": "ワンワン屋",
+      "status": "outside",
+      "localX": -10248.64,
+      "localZ": -12919.35
+    },
+    {
+      "id": "osm-node-10048606872",
+      "name": "小西薬店",
+      "status": "outside",
+      "localX": -10250.91,
+      "localZ": -12904.69
+    },
+    {
+      "id": "osm-node-10048606873",
+      "name": "よしや",
+      "status": "outside",
+      "localX": -10243.85,
+      "localZ": -12903.1
+    },
+    {
+      "id": "osm-node-10048606877",
+      "name": "ダイソー",
+      "status": "outside",
+      "localX": -10220.99,
+      "localZ": -12894.57
+    },
+    {
+      "id": "osm-node-10048606878",
+      "name": "Beauty Labo",
+      "status": "outside",
+      "localX": -10207.96,
+      "localZ": -12885.25
+    },
+    {
+      "id": "osm-node-10048606879",
+      "name": "TIRANA",
+      "status": "outside",
+      "localX": -10205.69,
+      "localZ": -12891.69
+    },
+    {
+      "id": "osm-node-10048606884",
+      "name": "auショップ",
+      "status": "outside",
+      "localX": -10193.1,
+      "localZ": -12888.32
+    },
+    {
+      "id": "osm-node-10048606885",
+      "name": "尼崎焼きそばセンター",
+      "status": "outside",
+      "localX": -10151.07,
+      "localZ": -12873.84
+    },
+    {
+      "id": "osm-node-10048606886",
+      "name": "美容室Win",
+      "status": "outside",
+      "localX": -10138.72,
+      "localZ": -12871.86
+    },
+    {
+      "id": "osm-node-10048606888",
+      "name": "焼肉ライク",
+      "status": "outside",
+      "localX": -10089.87,
+      "localZ": -12857.33
+    },
+    {
+      "id": "osm-node-10048606889",
+      "name": "マツモトキヨシ",
+      "status": "outside",
+      "localX": -10098.36,
+      "localZ": -12854.75
+    },
+    {
+      "id": "osm-node-10048606892",
+      "name": "メガネ イシガミ",
+      "status": "outside",
+      "localX": -10082.26,
+      "localZ": -12856.1
+    },
+    {
+      "id": "osm-node-10048606893",
+      "name": "ごん兵衛",
+      "status": "outside",
+      "localX": -10044.04,
+      "localZ": -12857.45
+    },
+    {
+      "id": "osm-node-10048606895",
+      "name": "尼崎肉劇場",
+      "status": "outside",
+      "localX": -10036.91,
+      "localZ": -12857.03
+    },
+    {
+      "id": "osm-node-10048606897",
+      "name": "餃子の王将",
+      "status": "outside",
+      "localX": -10031.51,
+      "localZ": -12840.27
+    },
+    {
+      "id": "osm-node-10048606898",
+      "name": "三豊麺",
+      "status": "outside",
+      "localX": -10027.46,
+      "localZ": -12839.29
+    },
+    {
+      "id": "osm-node-10049114755",
+      "name": "上海花園",
+      "status": "outside",
+      "localX": -10467.25,
+      "localZ": -13008.44
+    },
+    {
+      "id": "osm-node-10049114760",
+      "name": "元禄寿司",
+      "status": "outside",
+      "localX": -10490.66,
+      "localZ": -12998.32
+    },
+    {
+      "id": "osm-node-10049114764",
+      "name": "冨士屋クリーニング",
+      "status": "outside",
+      "localX": -10558.97,
+      "localZ": -12938.13
+    },
+    {
+      "id": "osm-node-10049114765",
+      "name": "食肉館",
+      "status": "outside",
+      "localX": -10644.38,
+      "localZ": -12973.41
+    },
+    {
+      "id": "osm-node-10049114767",
+      "name": "かごもと",
+      "status": "outside",
+      "localX": -10634.05,
+      "localZ": -12932.91
+    },
+    {
+      "id": "osm-node-10049114768",
+      "name": "三和食肉株式会社",
+      "status": "outside",
+      "localX": -10622.13,
+      "localZ": -12917.52
+    },
+    {
+      "id": "osm-node-10049114769",
+      "name": "豆腐の店 ありき",
+      "status": "outside",
+      "localX": -10626.87,
+      "localZ": -12918.99
+    },
+    {
+      "id": "osm-node-10049114772",
+      "name": "こにし",
+      "status": "outside",
+      "localX": -10628.4,
+      "localZ": -12837.39
+    },
+    {
+      "id": "osm-node-10049114795",
+      "name": "八百屋の福ちゃん",
+      "status": "outside",
+      "localX": -10631.35,
+      "localZ": -12794.37
+    },
+    {
+      "id": "osm-node-10049114796",
+      "name": "キムチの山田",
+      "status": "outside",
+      "localX": -10603.89,
+      "localZ": -12779.84
+    },
+    {
+      "id": "osm-node-10049114797",
+      "name": "キムチ いはら",
+      "status": "outside",
+      "localX": -10605.61,
+      "localZ": -12785.11
+    },
+    {
+      "id": "osm-node-10049114808",
+      "name": "グリーンハウス",
+      "status": "outside",
+      "localX": -10691.62,
+      "localZ": -12810.08
+    },
+    {
+      "id": "osm-node-10049114809",
+      "name": "東京屋",
+      "status": "outside",
+      "localX": -10677.06,
+      "localZ": -12818.31
+    },
+    {
+      "id": "osm-node-10049114810",
+      "name": "東京屋",
+      "status": "outside",
+      "localX": -10677.37,
+      "localZ": -12829.41
+    },
+    {
+      "id": "osm-node-10049114815",
+      "name": "よしや",
+      "status": "outside",
+      "localX": -10651.69,
+      "localZ": -12910.83
+    },
+    {
+      "id": "osm-node-10049223217",
+      "name": "うまいや",
+      "status": "outside",
+      "localX": -10633.57,
+      "localZ": -12944.95
+    },
+    {
+      "id": "osm-node-10049223218",
+      "name": "マルゼン薬局",
+      "status": "outside",
+      "localX": -10629.01,
+      "localZ": -12971.94
+    },
+    {
+      "id": "osm-node-10049223219",
+      "name": "アワスポーツ",
+      "status": "outside",
+      "localX": -10694.39,
+      "localZ": -12986.97
+    },
+    {
+      "id": "osm-node-10049223229",
+      "name": "喫茶 三鈴",
+      "status": "outside",
+      "localX": -10723.45,
+      "localZ": -13005.68
+    },
+    {
+      "id": "osm-node-10049223234",
+      "name": "MAMA'S",
+      "status": "outside",
+      "localX": -10696.48,
+      "localZ": -13032.31
+    },
+    {
+      "id": "osm-node-10049223237",
+      "name": "さかな館",
+      "status": "outside",
+      "localX": -10655.31,
+      "localZ": -13038.14
+    },
+    {
+      "id": "osm-node-10049223238",
+      "name": "延原歯科",
+      "status": "outside",
+      "localX": -10646.65,
+      "localZ": -13035.93
+    },
+    {
+      "id": "osm-node-10049223242",
+      "name": "じゃんぼ総本店",
+      "status": "outside",
+      "localX": -10622.08,
+      "localZ": -13026.49
+    },
+    {
+      "id": "osm-node-10049223243",
+      "name": "ニューロン薬局",
+      "status": "outside",
+      "localX": -10605.55,
+      "localZ": -13023.23
+    },
+    {
+      "id": "osm-node-10049223252",
+      "name": "シャンティかんだ",
+      "status": "outside",
+      "localX": -10596.7,
+      "localZ": -12997.4
+    },
+    {
+      "id": "osm-node-10049223253",
+      "name": "パレット",
+      "status": "outside",
+      "localX": -10512.53,
+      "localZ": -13003.97
+    },
+    {
+      "id": "osm-node-10049223254",
+      "name": "花ichiba",
+      "status": "outside",
+      "localX": -10502.15,
+      "localZ": -12990.78
+    },
+    {
+      "id": "osm-node-10049223259",
+      "name": "ソフトバンクショップ",
+      "status": "outside",
+      "localX": -10511.36,
+      "localZ": -12980.03
+    },
+    {
+      "id": "osm-node-10049223260",
+      "name": "FUJIYA",
+      "status": "outside",
+      "localX": -10498.34,
+      "localZ": -12975.99
+    },
+    {
+      "id": "osm-node-10049223261",
+      "name": "Smart IT",
+      "status": "outside",
+      "localX": -10495.45,
+      "localZ": -12989.61
+    },
+    {
+      "id": "osm-node-10049223263",
+      "name": "理髪館",
+      "status": "outside",
+      "localX": -10470.99,
+      "localZ": -12968.08
+    },
+    {
+      "id": "osm-node-10049223264",
+      "name": "美粧館",
+      "status": "outside",
+      "localX": -10464.36,
+      "localZ": -12966.18
+    },
+    {
+      "id": "osm-node-10049223265",
+      "name": "まじま歯科",
+      "status": "outside",
+      "localX": -10449.36,
+      "localZ": -12980.03
+    },
+    {
+      "id": "osm-node-10049223266",
+      "name": "わかば整骨鍼灸院",
+      "status": "outside",
+      "localX": -10458.76,
+      "localZ": -12982.49
+    },
+    {
+      "id": "osm-node-10049223267",
+      "name": "りらくる",
+      "status": "outside",
+      "localX": -10428.91,
+      "localZ": -12969.97
+    },
+    {
+      "id": "osm-node-10049223268",
+      "name": "スギ薬局",
+      "status": "outside",
+      "localX": -10432.53,
+      "localZ": -12956.85
+    },
+    {
+      "id": "osm-node-10049223272",
+      "name": "なごみ屋",
+      "status": "outside",
+      "localX": -10391.18,
+      "localZ": -12947.43
+    },
+    {
+      "id": "osm-node-10049223273",
+      "name": "尼崎整骨院",
+      "status": "outside",
+      "localX": -10381.41,
+      "localZ": -12957.16
+    },
+    {
+      "id": "osm-node-10049223274",
+      "name": "くらし快援隊",
+      "status": "outside",
+      "localX": -10350.14,
+      "localZ": -12929.29
+    },
+    {
+      "id": "osm-node-10049223275",
+      "name": "NOA Hair Salon",
+      "status": "outside",
+      "localX": -10331.83,
+      "localZ": -12941.02
+    },
+    {
+      "id": "osm-node-10049223277",
+      "name": "サンドラッグ",
+      "status": "outside",
+      "localX": -10305.35,
+      "localZ": -12919.18
+    },
+    {
+      "id": "osm-node-10049223278",
+      "name": "枡千",
+      "status": "outside",
+      "localX": -10303.26,
+      "localZ": -12934.39
+    },
+    {
+      "id": "osm-node-10049223279",
+      "name": "寝具の今井",
+      "status": "outside",
+      "localX": -10276.6,
+      "localZ": -12927.27
+    },
+    {
+      "id": "osm-node-10049223280",
+      "name": "はなえい",
+      "status": "outside",
+      "localX": -10282.12,
+      "localZ": -12929.17
+    },
+    {
+      "id": "osm-node-10050419004",
+      "name": "木市呉服店跡",
+      "status": "outside",
+      "localX": -10237.67,
+      "localZ": -12884.83
+    },
+    {
+      "id": "osm-node-10050522521",
+      "name": "スギ薬局",
+      "status": "outside",
+      "localX": -10629.01,
+      "localZ": -13056.61
+    },
+    {
+      "id": "osm-node-10050522522",
+      "name": "花桜",
+      "status": "outside",
+      "localX": -10611.5,
+      "localZ": -13062.87
+    },
+    {
+      "id": "osm-node-10050522523",
+      "name": "三笠屋",
+      "status": "outside",
+      "localX": -10602.35,
+      "localZ": -13082
+    },
+    {
+      "id": "osm-node-10050522525",
+      "name": "伊東鍼灸整骨院",
+      "status": "outside",
+      "localX": -10613.29,
+      "localZ": -13106.43
+    },
+    {
+      "id": "osm-node-10050522526",
+      "name": "メルクパン",
+      "status": "outside",
+      "localX": -10614.52,
+      "localZ": -13101.83
+    },
+    {
+      "id": "osm-node-10050522532",
+      "name": "餃子の王将",
+      "status": "outside",
+      "localX": -10655.69,
+      "localZ": -13132.62
+    },
+    {
+      "id": "osm-node-10050522546",
+      "name": "KIIROYA",
+      "status": "outside",
+      "localX": -10697.09,
+      "localZ": -13150.54
+    },
+    {
+      "id": "osm-node-10050522547",
+      "name": "さと",
+      "status": "outside",
+      "localX": -10637.5,
+      "localZ": -13148.82
+    },
+    {
+      "id": "osm-node-10050522548",
+      "name": "熊本さん",
+      "status": "outside",
+      "localX": -10593.08,
+      "localZ": -13122.94
+    },
+    {
+      "id": "osm-node-10050522549",
+      "name": "モンセ分店薬局",
+      "status": "outside",
+      "localX": -10590.13,
+      "localZ": -13137.11
+    },
+    {
+      "id": "osm-node-10050522550",
+      "name": "いちとく",
+      "status": "outside",
+      "localX": -10588.1,
+      "localZ": -13145.27
+    },
+    {
+      "id": "osm-node-10050522552",
+      "name": "ピンクのうさぎ",
+      "status": "outside",
+      "localX": -10593.17,
+      "localZ": -13172.66
+    },
+    {
+      "id": "osm-node-10050522579",
+      "name": "カギの救急車",
+      "status": "outside",
+      "localX": -10527.27,
+      "localZ": -13160.17
+    },
+    {
+      "id": "osm-node-10050522580",
+      "name": "らーめんStand R&R",
+      "status": "outside",
+      "localX": -10535.2,
+      "localZ": -13203.61
+    },
+    {
+      "id": "osm-node-10050522599",
+      "name": "麺家 徳",
+      "status": "outside",
+      "localX": -10491.39,
+      "localZ": -13191.46
+    },
+    {
+      "id": "osm-node-10050522600",
+      "name": "クスノセ歯科",
+      "status": "outside",
+      "localX": -10501.47,
+      "localZ": -13193.86
+    },
+    {
+      "id": "osm-node-10050527626",
+      "name": "エコリング",
+      "status": "outside",
+      "localX": -10455.33,
+      "localZ": -13180.72
+    },
+    {
+      "id": "osm-node-10050527627",
+      "name": "ライゼボックス",
+      "status": "outside",
+      "localX": -10441.38,
+      "localZ": -13180.23
+    },
+    {
+      "id": "osm-node-10050527628",
+      "name": "3mega",
+      "status": "outside",
+      "localX": -10442.42,
+      "localZ": -13176.68
+    },
+    {
+      "id": "osm-node-10050527630",
+      "name": "補聴器のアマガン",
+      "status": "outside",
+      "localX": -10428.6,
+      "localZ": -13174.1
+    },
+    {
+      "id": "osm-node-10050527671",
+      "name": "お好み村",
+      "status": "outside",
+      "localX": -10438.18,
+      "localZ": -13117.84
+    },
+    {
+      "id": "osm-node-10050527672",
+      "name": "一家",
+      "status": "outside",
+      "localX": -10449.31,
+      "localZ": -13080.85
+    },
+    {
+      "id": "osm-node-10050527673",
+      "name": "夢",
+      "status": "outside",
+      "localX": -10461.04,
+      "localZ": -13084.52
+    },
+    {
+      "id": "osm-node-10050527674",
+      "name": "しんちゃん",
+      "status": "outside",
+      "localX": -10465.71,
+      "localZ": -13071.95
+    },
+    {
+      "id": "osm-node-10050527675",
+      "name": "たまりば",
+      "status": "outside",
+      "localX": -10467.06,
+      "localZ": -13067.16
+    },
+    {
+      "id": "osm-node-10050527676",
+      "name": "マルキュー",
+      "status": "outside",
+      "localX": -10447.65,
+      "localZ": -13078.21
+    },
+    {
+      "id": "osm-node-10050527677",
+      "name": "寿司 小川",
+      "status": "outside",
+      "localX": -10450.72,
+      "localZ": -13075.69
+    },
+    {
+      "id": "osm-node-10050527683",
+      "name": "盛田屋",
+      "status": "outside",
+      "localX": -10455.63,
+      "localZ": -13056.67
+    },
+    {
+      "id": "osm-node-10050527684",
+      "name": "アマサカバ ナガイ",
+      "status": "outside",
+      "localX": -10459.26,
+      "localZ": -13047.59
+    },
+    {
+      "id": "osm-node-10050527685",
+      "name": "MUKUDORI",
+      "status": "outside",
+      "localX": -10459.81,
+      "localZ": -13044.77
+    },
+    {
+      "id": "osm-node-10050527686",
+      "name": "割烹 小門",
+      "status": "outside",
+      "localX": -10460.36,
+      "localZ": -13042.13
+    },
+    {
+      "id": "osm-node-10050527687",
+      "name": "美々也",
+      "status": "outside",
+      "localX": -10460.98,
+      "localZ": -13037.65
+    },
+    {
+      "id": "osm-node-10050780670",
+      "name": "プラザ",
+      "status": "outside",
+      "localX": -15135.44,
+      "localZ": -15635.44
+    },
+    {
+      "id": "osm-node-10050780671",
+      "name": "ローゲンマイヤー",
+      "status": "outside",
+      "localX": -15062.94,
+      "localZ": -15534.1
+    },
+    {
+      "id": "osm-node-10050780673",
+      "name": "丸福珈琲店",
+      "status": "outside",
+      "localX": -15152.4,
+      "localZ": -15500.01
+    },
+    {
+      "id": "osm-node-10050780674",
+      "name": "無印良品",
+      "status": "outside",
+      "localX": -15029.03,
+      "localZ": -15529.69
+    },
+    {
+      "id": "osm-node-10050873093",
+      "name": "八栄",
+      "status": "outside",
+      "localX": -10409.25,
+      "localZ": -12891.57
+    },
+    {
+      "id": "osm-node-10050873096",
+      "name": "たいよう鍼灸整骨院",
+      "status": "outside",
+      "localX": -10424.67,
+      "localZ": -12910.53
+    },
+    {
+      "id": "osm-node-10050873098",
+      "name": "おでんでん",
+      "status": "outside",
+      "localX": -10422.7,
+      "localZ": -12931.81
+    },
+    {
+      "id": "osm-node-10050873100",
+      "name": "豚々屋",
+      "status": "outside",
+      "localX": -10422.83,
+      "localZ": -12935.01
+    },
+    {
+      "id": "osm-node-10050873101",
+      "name": "金のやきいも",
+      "status": "outside",
+      "localX": -10421.29,
+      "localZ": -12940.83
+    },
+    {
+      "id": "osm-node-10050873102",
+      "name": "穂乃香",
+      "status": "outside",
+      "localX": -10419.56,
+      "localZ": -12948.86
+    },
+    {
+      "id": "osm-node-10050893820",
+      "name": "焼肉問屋",
+      "status": "outside",
+      "localX": -10402.24,
+      "localZ": -13002.68
+    },
+    {
+      "id": "osm-node-10050893821",
+      "name": "闇市",
+      "status": "outside",
+      "localX": -10405.07,
+      "localZ": -12994.88
+    },
+    {
+      "id": "osm-node-10050893822",
+      "name": "のびのび鍼灸整骨院",
+      "status": "outside",
+      "localX": -10392.04,
+      "localZ": -12991.63
+    },
+    {
+      "id": "osm-node-10050893830",
+      "name": "味八喜多",
+      "status": "outside",
+      "localX": -10456.83,
+      "localZ": -12965.62
+    },
+    {
+      "id": "osm-node-10050893832",
+      "name": "すずらん",
+      "status": "outside",
+      "localX": -10544.53,
+      "localZ": -12991.51
+    },
+    {
+      "id": "osm-node-10050893833",
+      "name": "いときち整骨院",
+      "status": "outside",
+      "localX": -10564.32,
+      "localZ": -12996.11
+    },
+    {
+      "id": "osm-node-10050893834",
+      "name": "マルコシカオスショップ",
+      "status": "outside",
+      "localX": -10580.79,
+      "localZ": -13014.82
+    },
+    {
+      "id": "osm-node-10050893837",
+      "name": "ファミリーランド",
+      "status": "outside",
+      "localX": -10612.73,
+      "localZ": -13012.06
+    },
+    {
+      "id": "osm-node-10050893838",
+      "name": "宝くじ",
+      "status": "outside",
+      "localX": -10616.3,
+      "localZ": -13024.34
+    },
+    {
+      "id": "osm-node-10050893839",
+      "name": "ジンミ",
+      "status": "outside",
+      "localX": -10619.06,
+      "localZ": -13025.32
+    },
+    {
+      "id": "osm-node-10051022252",
+      "name": "大阪王将",
+      "status": "outside",
+      "localX": -10017.13,
+      "localZ": -12786.28
+    },
+    {
+      "id": "osm-node-10051022253",
+      "name": "あさひ",
+      "status": "outside",
+      "localX": -10041.47,
+      "localZ": -12793.03
+    },
+    {
+      "id": "osm-node-10051022254",
+      "name": "白樺",
+      "status": "outside",
+      "localX": -10062.48,
+      "localZ": -12799.35
+    },
+    {
+      "id": "osm-node-10051022255",
+      "name": "天竹",
+      "status": "outside",
+      "localX": -10087.97,
+      "localZ": -12807.27
+    },
+    {
+      "id": "osm-node-10051022256",
+      "name": "拾八番",
+      "status": "outside",
+      "localX": -10098.29,
+      "localZ": -12809.23
+    },
+    {
+      "id": "osm-node-10051022257",
+      "name": "焼肉 成山",
+      "status": "outside",
+      "localX": -10102.2,
+      "localZ": -12822.75
+    },
+    {
+      "id": "osm-node-10051022258",
+      "name": "セップ イーサン",
+      "status": "outside",
+      "localX": -10105.36,
+      "localZ": -12823.4
+    },
+    {
+      "id": "osm-node-10051022259",
+      "name": "更科",
+      "status": "outside",
+      "localX": -10116.08,
+      "localZ": -12827.54
+    },
+    {
+      "id": "osm-node-10051022260",
+      "name": "てっちゃん鍋 やすもり",
+      "status": "outside",
+      "localX": -10134.97,
+      "localZ": -12811.37
+    },
+    {
+      "id": "osm-node-10051022266",
+      "name": "立呑 にこ",
+      "status": "outside",
+      "localX": -10155.74,
+      "localZ": -12834.26
+    },
+    {
+      "id": "osm-node-10051022267",
+      "name": "寺小舎",
+      "status": "outside",
+      "localX": -10159.58,
+      "localZ": -12835.24
+    },
+    {
+      "id": "osm-node-10051022283",
+      "name": "ベトナム食品",
+      "status": "outside",
+      "localX": -10296.56,
+      "localZ": -12874.41
+    },
+    {
+      "id": "osm-node-10051022292",
+      "name": "サロンEC",
+      "status": "outside",
+      "localX": -10265.04,
+      "localZ": -12867.7
+    },
+    {
+      "id": "osm-node-10051022293",
+      "name": "正一位 稲荷大神",
+      "status": "outside",
+      "localX": -10281.08,
+      "localZ": -12859.23
+    },
+    {
+      "id": "osm-node-10051022311",
+      "name": "あわじ",
+      "status": "outside",
+      "localX": -10243.42,
+      "localZ": -12874.26
+    },
+    {
+      "id": "osm-node-10051022312",
+      "name": "あまとら薬局",
+      "status": "outside",
+      "localX": -10232.11,
+      "localZ": -12869.61
+    },
+    {
+      "id": "osm-node-10051022313",
+      "name": "浜ちゃん",
+      "status": "outside",
+      "localX": -10242.38,
+      "localZ": -12879.9
+    },
+    {
+      "id": "osm-node-10051034624",
+      "name": "整骨院",
+      "status": "outside",
+      "localX": -10360.15,
+      "localZ": -12950.4
+    },
+    {
+      "id": "osm-node-10051034625",
+      "name": "Used shop mix",
+      "status": "outside",
+      "localX": -10362.92,
+      "localZ": -12938.69
+    }
+  ],
+  "ambiguousWard": [
+    {
+      "id": "osm-way-435142950",
+      "name": "石井鍼灸院",
+      "status": "ambiguous",
+      "localX": 3518.6,
+      "localZ": -6016.77
+    }
+  ],
+  "skippedSample": [
+    {
+      "sourceId": "node/10007859535",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10007859536",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10009193576",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10010326891",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10010754435",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10010754441",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7793366,
+      "lon": 135.3802927
+    },
+    {
+      "sourceId": "node/10010754442",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7795982,
+      "lon": 135.3797585
+    },
+    {
+      "sourceId": "node/10010754443",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7789241,
+      "lon": 135.3795627
+    },
+    {
+      "sourceId": "node/10010754448",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7788373,
+      "lon": 135.378604
+    },
+    {
+      "sourceId": "node/10010754459",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7818582,
+      "lon": 135.3808915
+    },
+    {
+      "sourceId": "node/10012672828",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10012703526",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10012724440",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10017294417",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10017294418",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10017294429",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10017294436",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10018047039",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10018047040",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10018047041",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10027552705",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10031202171",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10032185974",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10032186040",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10032708881",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5817687,
+      "lon": 135.4670351
+    },
+    {
+      "sourceId": "node/10048544496",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7568703,
+      "lon": 135.6080984
+    },
+    {
+      "sourceId": "node/10048544500",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7568039,
+      "lon": 135.6081057
+    },
+    {
+      "sourceId": "node/10048544505",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7568824,
+      "lon": 135.608042
+    },
+    {
+      "sourceId": "node/10048544506",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7568912,
+      "lon": 135.607985
+    },
+    {
+      "sourceId": "node/10048544516",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7565304,
+      "lon": 135.6078871
+    },
+    {
+      "sourceId": "node/10048595917",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.756542,
+      "lon": 135.6079575
+    },
+    {
+      "sourceId": "node/10048595921",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7565386,
+      "lon": 135.608044
+    },
+    {
+      "sourceId": "node/10048595963",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7565373,
+      "lon": 135.6079813
+    },
+    {
+      "sourceId": "node/10048595964",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10048595965",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10048595966",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10048596028",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10048596030",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10048596031",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7641709,
+      "lon": 135.6101348
+    },
+    {
+      "sourceId": "node/10048596032",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7628885,
+      "lon": 135.6077287
+    },
+    {
+      "sourceId": "node/10048596033",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7632055,
+      "lon": 135.6079079
+    },
+    {
+      "sourceId": "node/10048596042",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7630228,
+      "lon": 135.6078907
+    },
+    {
+      "sourceId": "node/10048596043",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7630516,
+      "lon": 135.6078539
+    },
+    {
+      "sourceId": "node/10048596048",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7628042,
+      "lon": 135.6077933
+    },
+    {
+      "sourceId": "node/10048596049",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7628326,
+      "lon": 135.6078
+    },
+    {
+      "sourceId": "node/10048596050",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7628601,
+      "lon": 135.6077631
+    },
+    {
+      "sourceId": "node/10048596051",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7628959,
+      "lon": 135.6076917
+    },
+    {
+      "sourceId": "node/10048596055",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7629407,
+      "lon": 135.6075891
+    },
+    {
+      "sourceId": "node/10048596133",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7629965,
+      "lon": 135.6044056
+    },
+    {
+      "sourceId": "node/10048596162",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7638286,
+      "lon": 135.6029794
+    },
+    {
+      "sourceId": "node/10048596163",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7639426,
+      "lon": 135.6029685
+    },
+    {
+      "sourceId": "node/10048596168",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7639974,
+      "lon": 135.6030803
+    },
+    {
+      "sourceId": "node/10048596173",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7640822,
+      "lon": 135.6030082
+    },
+    {
+      "sourceId": "node/10049114754",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10049114770",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10049114811",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10049223276",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10050873099",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10051034628",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10051034633",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10079180914",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7732522,
+      "lon": 135.5248057
+    },
+    {
+      "sourceId": "node/10079225364",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7733359,
+      "lon": 135.5300357
+    },
+    {
+      "sourceId": "node/10079982509",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.771147,
+      "lon": 135.4906659
+    },
+    {
+      "sourceId": "node/10079982514",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7737584,
+      "lon": 135.5196545
+    },
+    {
+      "sourceId": "node/10083213359",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.6661192,
+      "lon": 135.6071738
+    },
+    {
+      "sourceId": "node/10083213361",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.6645265,
+      "lon": 135.6074393
+    },
+    {
+      "sourceId": "node/10086400794",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10086469917",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7804228,
+      "lon": 135.4660102
+    },
+    {
+      "sourceId": "node/10086480019",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7709228,
+      "lon": 135.4661159
+    },
+    {
+      "sourceId": "node/10091645047",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7778528,
+      "lon": 135.5393622
+    },
+    {
+      "sourceId": "node/10092007621",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10092007633",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10097240971",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10099940093",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5744346,
+      "lon": 135.4845139
+    },
+    {
+      "sourceId": "node/10099973671",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5753762,
+      "lon": 135.4843902
+    },
+    {
+      "sourceId": "node/10099978468",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5737468,
+      "lon": 135.4839806
+    },
+    {
+      "sourceId": "node/10099979772",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5763432,
+      "lon": 135.4841697
+    },
+    {
+      "sourceId": "node/10102381737",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102383480",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102383481",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102393620",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102393621",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102415604",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10102572417",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10107910062",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10110813459",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10112467513",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10114318310",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10114359231",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10115896336",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10116668309",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10117697401",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10118106374",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10118106375",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10118130437",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10118143471",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10120001855",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10120001869",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10120001870",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10120001871",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10125310706",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10125314336",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10125355975",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10125355980",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10125534915",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10127271797",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10127275723",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10127407624",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10127618702",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5672181,
+      "lon": 135.497683
+    },
+    {
+      "sourceId": "node/10127677978",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10128021579",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10129286881",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10129466065",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10131463390",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10136533567",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10136663210",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5785567,
+      "lon": 135.4812125
+    },
+    {
+      "sourceId": "node/10136703873",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5819911,
+      "lon": 135.4700997
+    },
+    {
+      "sourceId": "node/10136703874",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5826124,
+      "lon": 135.4705142
+    },
+    {
+      "sourceId": "node/10136703875",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5823916,
+      "lon": 135.4703562
+    },
+    {
+      "sourceId": "node/10136703956",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5753152,
+      "lon": 135.5097173
+    },
+    {
+      "sourceId": "node/10138706888",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7786455,
+      "lon": 135.4653767
+    },
+    {
+      "sourceId": "node/10138706889",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7794703,
+      "lon": 135.4646203
+    },
+    {
+      "sourceId": "node/10138955114",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10139085435",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10139380633",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7797162,
+      "lon": 135.4671603
+    },
+    {
+      "sourceId": "node/10139380639",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7788179,
+      "lon": 135.4679798
+    },
+    {
+      "sourceId": "node/10139380666",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7793455,
+      "lon": 135.4647665
+    },
+    {
+      "sourceId": "node/10140094016",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.6387717,
+      "lon": 135.6039515
+    },
+    {
+      "sourceId": "node/10143036482",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.6307979,
+      "lon": 135.6029392
+    },
+    {
+      "sourceId": "node/10147421267",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10154286637",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10154342529",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5915779,
+      "lon": 135.6110018
+    },
+    {
+      "sourceId": "node/10155841965",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10156074250",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10156277761",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10158367780",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10158435761",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10158965134",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10159787917",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10161604372",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.7785728,
+      "lon": 135.5063541
+    },
+    {
+      "sourceId": "node/10167835304",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10170572809",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10172926581",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10175250621",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10180747282",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10185752717",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10196693517",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10201953417",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10202088020",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10202153462",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10202153463",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203269563",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203302203",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203333456",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203340309",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203340310",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203420243",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203635961",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10203787027",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10206678650",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10206678661",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10207731199",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10207745355",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10208464924",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10208685175",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10209096110",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10210169944",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5825124,
+      "lon": 135.5175437
+    },
+    {
+      "sourceId": "node/10210534739",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10210534740",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10210534756",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10210534772",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10210543121",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10211057329",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10211619045",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10212169775",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10212169780",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10216648603",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10217005895",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10217076591",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10217076596",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10217398324",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10218824210",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10219089062",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10220844478",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10220844480",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10220883579",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10220904838",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10220926534",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10221118024",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10222682236",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10225009552",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10225236619",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10226251117",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5747201,
+      "lon": 135.4830628
+    },
+    {
+      "sourceId": "node/10226706996",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5735352,
+      "lon": 135.4735988
+    },
+    {
+      "sourceId": "node/10226770258",
+      "reason": "invalid-or-out-of-bbox-coordinates",
+      "lat": 34.5705764,
+      "lon": 135.4740614
+    },
+    {
+      "sourceId": "node/10227051297",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10229760326",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10229760327",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10230121305",
+      "reason": "no-name"
+    },
+    {
+      "sourceId": "node/10230127482",
+      "reason": "no-name"
+    }
+  ]
+}
