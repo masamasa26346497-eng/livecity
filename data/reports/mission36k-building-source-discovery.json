@@ -1,0 +1,104 @@
+{
+  "mission": "36K",
+  "packageId": "plateau-27100-osaka-shi-2024",
+  "packageTitle": "3D都市モデル（Project PLATEAU）大阪市（2024年度）",
+  "generatedAt": "2026-10-01T13:25:48.312Z",
+  "totalResources": 9,
+  "citygmlCandidates": [
+    {
+      "id": "d68704bd-f6b9-49c7-bad6-373b78cc3af5",
+      "name": "CityGML（v4）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip",
+      "created": "2025-03-21T01:47:08.072040",
+      "lastModified": null,
+      "score": 110
+    }
+  ],
+  "lighterRuntimeCandidates": [
+    {
+      "id": "7b496ea9-83de-414e-a68c-572beab06ec5",
+      "name": "3D Tiles, MVT（v4）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/ac/88f17c-afe2-48f9-9b7e-c20a27bbb61d/27100_osaka-shi_city_2024_3dtiles_mvt_1_op.zip",
+      "created": "2025-03-21T01:47:08.777276",
+      "lastModified": null,
+      "score": 100
+    }
+  ],
+  "relevantResources": [
+    {
+      "id": "d68704bd-f6b9-49c7-bad6-373b78cc3af5",
+      "name": "CityGML（v4）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip",
+      "created": "2025-03-21T01:47:08.072040",
+      "lastModified": null,
+      "score": 110
+    },
+    {
+      "id": "7b496ea9-83de-414e-a68c-572beab06ec5",
+      "name": "3D Tiles, MVT（v4）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/ac/88f17c-afe2-48f9-9b7e-c20a27bbb61d/27100_osaka-shi_city_2024_3dtiles_mvt_1_op.zip",
+      "created": "2025-03-21T01:47:08.777276",
+      "lastModified": null,
+      "score": 100
+    },
+    {
+      "id": "993dd357-0242-43bc-ba80-62dddd1b2c18",
+      "name": "関連データセット（v4）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/31/e8a574-d63e-455c-b5df-d4526d76a181/27100_osaka-shi_2022_related.zip",
+      "created": "2025-03-21T01:47:09.397506",
+      "lastModified": null,
+      "score": 10
+    },
+    {
+      "id": "16d6d26b-9863-4108-81b5-566b0bed7fcd",
+      "name": "GeoTIFF(v4)",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/df/87de24-26d3-42a6-bc07-e50fceb3fdb0/27100_osaka-shi_city_2024_ortho_1_op.zip",
+      "created": "2025-03-27T06:46:34.748401",
+      "lastModified": null,
+      "score": 10
+    },
+    {
+      "id": "f9f4a3c6-758f-4670-9905-8aa1a2420d97",
+      "name": "太陽光発電導入ポテンシャル",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/79/b0fab9-3528-47f9-986b-e0bd08ce2108/uc_ec24-0431_27100_osaka-shi_aas_2024_solor-potential_3Dmodel.zip",
+      "created": "2025-03-21T01:47:10.754043",
+      "lastModified": null,
+      "score": 10
+    },
+    {
+      "id": "4fdcb474-bf44-4c0d-a7e4-07f6407d9b1d",
+      "name": "シナリオ別エネルギー消費量・CO2排出量・CO2削減量シミュレーション結果（BAUシナリオ）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/b7/5f63ac-1b42-4782-bf62-9a2d0a619c51/uc_ec24-0431_27100_osaka-shi_aas_2024_BAUsinario-CO2simulation_250m-mesh.zip",
+      "created": "2025-03-21T01:47:11.692152",
+      "lastModified": null,
+      "score": 10
+    },
+    {
+      "id": "82eabdf7-0674-4053-8462-9b6ed75d0f76",
+      "name": "シナリオ別エネルギー消費量・CO2排出量・CO2削減量シミュレーション結果（高位シナリオ）",
+      "format": "ZIP",
+      "size": null,
+      "url": "https://assets.cms.plateau.reearth.io/assets/74/0f89e7-8b2b-4714-b5d3-d991b1c49c15/uc_ec24-0431_27100_osaka-shi_aas_2024_kouisinario-CO2simulation_250m-mesh.zip",
+      "created": "2025-03-21T01:47:12.335405",
+      "lastModified": null,
+      "score": 10
+    }
+  ],
+  "recommendation": "Prefer a runtime-friendly lighter resource when it preserves building footprint coverage; keep CityGML as the authoritative regeneration source."
+}
