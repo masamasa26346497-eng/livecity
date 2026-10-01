@@ -29,9 +29,11 @@ jobs:
       - name: Guard protected production HTML
         shell: bash
         run: sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/protected.sha256
+
       - name: Probe 2024 CityGML ZIP by HTTP Range
         shell: bash
         run: node tools/mission36k-probe-citygml-zip.mjs
+
       - name: Validate CityGML probe
         shell: bash
         run: |
@@ -39,19 +41,56 @@ jobs:
           import fs from 'node:fs';
           const r = JSON.parse(fs.readFileSync('data/reports/mission36k-citygml-zip-probe.json','utf8'));
           if (!r.zip?.rangeSupported) throw new Error('Range support missing');
-          if (!(r.zip?.buildingGmlCount > 0)) throw new Error('No building GML found');
+          if (r.zip?.buildingGmlCount !== 270) throw new Error(`Unexpected building GML count: ${r.zip?.buildingGmlCount}`);
+          if (r.zip?.meshCodeCount !== 270) throw new Error(`Unexpected mesh count: ${r.zip?.meshCodeCount}`);
           if (!(r.zip?.entriesParsed > 0)) throw new Error('No ZIP entries parsed');
           console.log(JSON.stringify({entries:r.zip.entriesParsed,gml:r.zip.gmlCount,buildingGml:r.zip.buildingGmlCount,meshCodes:r.zip.meshCodeCount}));
           NODE
+
+      - name: Plan Sumiyoshi-only CityGML range selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-fetch-citygml-ward-range.mjs --ward=sumiyoshi --dry-run
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const r = JSON.parse(fs.readFileSync('data/reports/mission36k-citygml-range-sumiyoshi.json','utf8'));
+          if (!(r.candidateEntries > 0 && r.candidateEntries < 60)) throw new Error(`Suspicious Sumiyoshi mesh selection: ${r.candidateEntries}`);
+          if (!(r.compressedBytes > 0 && r.uncompressedBytes > r.compressedBytes)) throw new Error('Invalid Sumiyoshi range byte plan');
+          console.log(JSON.stringify({candidateEntries:r.candidateEntries,meshes:r.candidateMeshes,compressedMB:+(r.compressedBytes/1048576).toFixed(1),uncompressedMB:+(r.uncompressedBytes/1048576).toFixed(1)}));
+          NODE
+
+      - name: Range-extract three real Sumiyoshi-overlapping building GML files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/mission36k-citygml-sumiyoshi
+          node tools/mission36k-fetch-citygml-ward-range.mjs \
+            --ward=sumiyoshi \
+            --max-files=3 \
+            --out=/tmp/mission36k-citygml-sumiyoshi
+          test "$(find /tmp/mission36k-citygml-sumiyoshi -maxdepth 1 -type f -name '*.gml' | wc -l)" -eq 3
+          grep -q '<bldg:Building' /tmp/mission36k-citygml-sumiyoshi/*.gml
           sha256sum -c /tmp/protected.sha256
-      - name: Commit probe report
+
+      - name: Upload Sumiyoshi CityGML sample artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission36k-sumiyoshi-citygml-range-sample
+          path: /tmp/mission36k-citygml-sumiyoshi
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Commit probe and ward-range reports
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/reports/mission36k-citygml-zip-probe.json
+          git add -f \
+            data/reports/mission36k-citygml-zip-probe.json \
+            data/reports/mission36k-citygml-range-sumiyoshi.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'data(mission36k): inspect 2024 CityGML archive layout'
+          git commit -m 'data(mission36k): verify Sumiyoshi CityGML range extraction'
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
