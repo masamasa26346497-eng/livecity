@@ -1,0 +1,74 @@
+name: Mission 36J - Stabilize Dev UI
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  stabilize-dev-ui:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36j-stabilize]')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync latest mission branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build startup-lite facilities and patch dev UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36j-stabilize-startup-facilities.mjs
+
+      - name: Validate startup-lite dataset and protected files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f public/map-data/osaka-city/facilities/facilities-startup.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p = 'public/map-data/osaka-city/facilities/facilities-startup.json';
+          const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (j.wardCount !== 24) throw new Error(`expected 24 wards, got ${j.wardCount}`);
+          if (!(j.recordCount > 0 && j.recordCount <= 1100)) throw new Error(`unexpected startup recordCount: ${j.recordCount}`);
+          if (j.sourceRecordCount !== 40585) throw new Error(`unexpected sourceRecordCount: ${j.sourceRecordCount}`);
+          console.log(JSON.stringify({ recordCount: j.recordCount, sourceRecordCount: j.sourceRecordCount, wardCount: j.wardCount }));
+          NODE
+          grep -q 'facilities-startup.json' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'MAX_RENDERED_FACILITIES = 200' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'FACILITY_RENDER_RADIUS_METERS = 2500' public/osaka_3d_buildings.ward-ux-v1.html
+          if git status --short -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html | grep -q .; then
+            echo 'Protected production HTML changed unexpectedly.' >&2
+            exit 1
+          fi
+
+      - name: Commit startup stabilization artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/map-data/osaka-city/facilities/facilities-startup.json public/osaka_3d_buildings.ward-ux-v1.html
+          if git diff --cached --quiet; then
+            echo 'No stabilization changes to commit.'
+            exit 0
+          fi
+          git commit -m 'fix(mission36j): switch dev UI to startup-lite facilities'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
