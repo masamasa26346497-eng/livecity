@@ -29,6 +29,18 @@ jobs:
         with:
           node-version: 20
 
+      - name: Guard protected production HTML before Mission 36K
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
+
+      - name: Test range ZIP manifest logic
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/mission36k-ward-building-manifest.test.js
+
       - name: Discover current Osaka PLATEAU building resources
         shell: bash
         run: |
@@ -41,16 +53,53 @@ jobs:
           set -euo pipefail
           node tools/mission36k-probe-plateau-runtime-zip.mjs
 
-      - name: Commit source discovery reports
+      - name: Build 24-ward building source manifest and smoke-fetch Sumiyoshi tileset
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-build-ward-building-manifest.mjs --smoke-ward=sumiyoshi
+
+      - name: Validate 24-ward building coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p = 'public/map-data/osaka-city/buildings/manifest.json';
+          const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (m.wardCount !== 24) throw new Error(`wardCount=${m.wardCount}`);
+          if (m.coverage?.lod1Wards !== 24) throw new Error(`lod1Wards=${m.coverage?.lod1Wards}`);
+          if (Object.keys(m.wards || {}).length !== 24) throw new Error('manifest does not contain 24 ward records');
+          for (const [id, w] of Object.entries(m.wards)) {
+            if (!w.preferredLod1?.tilesetPath) throw new Error(`missing preferred LOD1 tileset: ${id}`);
+          }
+          const r = JSON.parse(fs.readFileSync('data/reports/mission36k-building-ward-manifest.json', 'utf8'));
+          if (r.smoke?.wardId !== 'sumiyoshi') throw new Error('Sumiyoshi range smoke fetch did not complete');
+          if (!r.smoke?.assetVersion) throw new Error('Fetched Sumiyoshi tileset is not valid 3D Tiles JSON');
+          console.log(JSON.stringify({ coverage: m.coverage, smoke: r.smoke }, null, 2));
+          NODE
+
+      - name: Guard protected production HTML after Mission 36K
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum -c /tmp/mission36k-protected.sha256
+
+      - name: Commit Mission 36K source manifests and reports
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/reports/mission36k-building-source-discovery.json data/reports/mission36k-runtime-zip-probe.json
+          git add -f \
+            data/reports/mission36k-building-source-discovery.json \
+            data/reports/mission36k-runtime-zip-probe.json \
+            data/reports/mission36k-building-ward-manifest.json \
+            public/map-data/osaka-city/buildings/manifest.json
           if git diff --cached --quiet; then
-            echo 'No discovery changes.'
+            echo 'No Mission36K manifest changes.'
             exit 0
           fi
-          git commit -m 'data(mission36k): inspect Osaka PLATEAU runtime archive'
+          git commit -m 'data(mission36k): verify 24-ward PLATEAU range building source'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
