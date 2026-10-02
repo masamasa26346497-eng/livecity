@@ -8602,8 +8602,10 @@ const FacilityLayer = (function () {
   // [Mission 36J PERF] bounded facility renderer
   // 40,585件を一括CanvasTexture/Sprite化するとブラウザが固まるため、
   // カメラ中心付近だけを上限付きで描画する。元データ40,585件はDataStoreに保持する。
+  // [Mission 36J CLICK PERF V2] screen-space facility picking
   const MAX_RENDERED_FACILITIES = 200;
   const FACILITY_RENDER_RADIUS_METERS = 2500;
+  const FACILITY_PICK_RADIUS_NDC = 0.055;
   let renderedFacilityCount = 0;
   let totalFacilityCount = 0;
   let group = null;
@@ -8613,8 +8615,7 @@ const FacilityLayer = (function () {
   let selectedRecordId = null;
   let visible = true;
   let built = false;
-  const facilityRaycaster = new THREE.Raycaster();
-  const facilityMouse = new THREE.Vector2();
+  let pickCandidates = []; // { item, sx, sy }; rebuilt by update(), max 200
 
   function makeIconTexture(name, style) {
     const canvas = document.createElement('canvas');
@@ -8656,14 +8657,15 @@ const FacilityLayer = (function () {
       scene.remove(group);
       for (const s of sprites) { if (s.sprite.material.map) s.sprite.material.map.dispose(); }
     }
-    group = new THREE.Group(); group.name = 'FacilityLayer'; // [Mission 32Q] 共存レイヤー（COEXIST_NAME で判定できるよう命名のみ）
+    group = new THREE.Group(); group.name = 'FacilityLayer';
+    pickCandidates = []; // [Mission 32Q] 共存レイヤー（COEXIST_NAME で判定できるよう命名のみ）
     sprites = [];
     if (FacilityDataStore.getState() !== 'ready') return group;
 
     const allFacilityRecords = FacilityDataStore.getAllRecords();
     totalFacilityCount = allFacilityRecords.length;
-    const centerX = (typeof cs !== 'undefined' && Number.isFinite(cs.tx)) ? cs.tx : 0;
-    const centerZ = (typeof cs !== 'undefined' && Number.isFinite(cs.tz)) ? cs.tz : 0;
+    const centerX = (typeof cs !== 'undefined' && cs.tgt && Number.isFinite(cs.tgt.x)) ? cs.tgt.x : 0;
+    const centerZ = (typeof cs !== 'undefined' && cs.tgt && Number.isFinite(cs.tgt.z)) ? cs.tgt.z : 0;
     const radiusSq = FACILITY_RENDER_RADIUS_METERS * FACILITY_RENDER_RADIUS_METERS;
     const selectedFacilityRecords = allFacilityRecords
       .map((record) => {
@@ -8696,6 +8698,7 @@ const FacilityLayer = (function () {
   function update() {
     if (!group || !visible) {
       if (group) group.visible = false;
+      pickCandidates = [];
       return;
     }
     group.visible = true;
@@ -8732,6 +8735,8 @@ const FacilityLayer = (function () {
       placed.push(p);
       finalVisible.add(p.item);
     }
+    // Reuse the projection work above. Building clicks no longer wait for a sprite Raycaster pass.
+    pickCandidates = placed.map((p) => ({ item: p.item, sx: p.sx, sy: p.sy }));
 
     for (const item of sprites) {
       const shouldShow = finalVisible.has(item);
@@ -8750,6 +8755,9 @@ const FacilityLayer = (function () {
       renderedFacilityCount,
       maxRenderedFacilities: MAX_RENDERED_FACILITIES,
       renderRadiusMeters: FACILITY_RENDER_RADIUS_METERS,
+      pickCandidateCount: pickCandidates.length,
+      pickMode: 'screen-space-nearest',
+      pickRadiusNdc: FACILITY_PICK_RADIUS_NDC,
     };
   }
 
@@ -8762,7 +8770,7 @@ const FacilityLayer = (function () {
         scene.remove(group);
         for (const s of sprites) { if (s.sprite.material.map) s.sprite.material.map.dispose(); s.sprite.material.dispose(); }
       }
-      group = null; sprites = []; built = false;
+      group = null; sprites = []; pickCandidates = []; built = false;
     },
     setCategory(category, isVisible) {
       if (isVisible) {
@@ -8781,15 +8789,17 @@ const FacilityLayer = (function () {
     setSelected(recordId) { selectedRecordId = recordId; },
     getGroup() { return group; },
     pickHit(mouseX, mouseY, camera) {
-      if (!group) return null;
-      facilityMouse.set(mouseX, mouseY);
-      facilityRaycaster.setFromCamera(facilityMouse, camera);
-      const visibleSprites = sprites.filter((item) => item.sprite.visible).map((item) => item.sprite);
-      const hits = facilityRaycaster.intersectObjects(visibleSprites, false);
-      if (!hits.length) return null;
-      const hitSprite = hits[0].object;
-      const item = sprites.find((s) => s.sprite === hitSprite);
-      return item ? item.record : null;
+      if (!group || !visible || !pickCandidates.length) return null;
+      const maxD2 = FACILITY_PICK_RADIUS_NDC * FACILITY_PICK_RADIUS_NDC;
+      let best = null;
+      let bestD2 = maxD2;
+      for (const candidate of pickCandidates) {
+        const dx = mouseX - candidate.sx;
+        const dy = mouseY - candidate.sy;
+        const d2 = dx * dx + dy * dy;
+        if (d2 <= bestD2) { bestD2 = d2; best = candidate.item; }
+      }
+      return best ? best.record : null;
     },
     rebuildIfReady(force = false) {
       if (FacilityDataStore.getState() !== 'ready') return false;
@@ -8803,7 +8813,7 @@ const FacilityLayer = (function () {
           }
         }
       }
-      group = null; sprites = []; built = false;
+      group = null; sprites = []; pickCandidates = []; built = false;
       build();
       if (visible && group) scene.add(group);
       update();

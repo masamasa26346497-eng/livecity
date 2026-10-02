@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/mission-36j-osaka-24ward-google-places-expansion
+      - fix/mission-36j-building-click-performance
   workflow_dispatch:
 
 permissions:
@@ -13,7 +14,9 @@ jobs:
   patch-dev-ui:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36j-ui-perf]'))
+      (github.event_name == 'push' &&
+       (contains(github.event.head_commit.message, '[run-36j-ui-perf]') ||
+        contains(github.event.head_commit.message, '[run-36j-ui-perf-v2]')))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -39,6 +42,9 @@ jobs:
       - name: Apply bounded facility renderer to dev UI only
         run: node tools/mission36j-patch-facility-performance.mjs
 
+      - name: Apply non-blocking facility click picker
+        run: node tools/mission36j-patch-building-click-performance-v2.mjs
+
       - name: Verify protected production HTML is not staged
         shell: bash
         run: |
@@ -47,10 +53,17 @@ jobs:
             echo 'Protected production HTML changed unexpectedly.' >&2
             exit 1
           fi
-          grep -q 'MAX_RENDERED_FACILITIES = 800' public/osaka_3d_buildings.ward-ux-v1.html
-          grep -q 'for (const record of selectedFacilityRecords)' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'MAX_RENDERED_FACILITIES = 200' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'FACILITY_RENDER_RADIUS_METERS = 2500' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q "pickMode: 'screen-space-nearest'" public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'cs.tgt && Number.isFinite(cs.tgt.x)' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'ward-manifest.json' public/osaka_3d_buildings.ward-ux-v1.html
           grep -q "areaId: 'osaka-city'" public/osaka_3d_buildings.ward-ux-v1.html
           grep -q 'google-places-osaka-city-mapping.json' public/osaka_3d_buildings.ward-ux-v1.html
+          if sed -n '/const FacilityLayer = (function () {/,/^})();/p' public/osaka_3d_buildings.ward-ux-v1.html | grep -q 'facilityRaycaster.intersectObjects'; then
+            echo 'FacilityLayer still uses sprite Raycaster picking.' >&2
+            exit 1
+          fi
 
       - name: Commit dev UI performance fix
         shell: bash
@@ -63,5 +76,5 @@ jobs:
             echo 'No dev UI performance changes to commit.'
             exit 0
           fi
-          git commit -m 'fix(mission36j): bound citywide facility sprites in dev UI'
+          git commit -m 'fix(mission36j): keep building picking responsive with facility culling'
           git push origin "HEAD:${GITHUB_REF_NAME}"
