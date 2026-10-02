@@ -2191,14 +2191,504 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
       "attemptedAt": "2026-10-02T13:09:18.012Z"
+    },
+    {
+      "facilityId": "osm-node-12153325697",
+      "name": "とりば",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8121m）",
+      "attemptedAt": "2026-10-02T13:10:25.427Z"
+    },
+    {
+      "facilityId": "osm-node-12153325698",
+      "name": "SALOWIN",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:10:30.404Z"
+    },
+    {
+      "facilityId": "osm-node-12153384703",
+      "name": "ササセ皮膚科",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "healthcare_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"ササセ皮フ科 茶屋町院\"",
+      "attemptedAt": "2026-10-02T13:10:35.676Z"
+    },
+    {
+      "facilityId": "osm-node-12153384705",
+      "name": "焼肉ふうふう亭",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 28221m）",
+      "attemptedAt": "2026-10-02T13:10:36.691Z"
+    },
+    {
+      "facilityId": "osm-node-12153384707",
+      "name": "焼肉六甲",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"焼肉こじま離れ 茶屋町\"",
+      "attemptedAt": "2026-10-02T13:10:38.757Z"
+    },
+    {
+      "facilityId": "osm-node-12153384709",
+      "name": "IQOS",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 207m）",
+      "attemptedAt": "2026-10-02T13:10:39.810Z"
+    },
+    {
+      "facilityId": "osm-node-12153384710",
+      "name": "セカンドストリート",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:10:42.714Z"
+    },
+    {
+      "facilityId": "osm-node-12153384711",
+      "name": "Kindal",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:10:45.787Z"
+    },
+    {
+      "facilityId": "osm-node-12153384712",
+      "name": "JK Planet",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:10:48.860Z"
+    },
+    {
+      "facilityId": "osm-node-12153384714",
+      "name": "P’s-first",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:10:52.955Z"
+    },
+    {
+      "facilityId": "osm-node-12153384718",
+      "name": "COO&RIKU",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 386m）",
+      "attemptedAt": "2026-10-02T13:10:56.191Z"
+    },
+    {
+      "facilityId": "osm-node-12153384719",
+      "name": "勝男",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 184m）",
+      "attemptedAt": "2026-10-02T13:10:57.169Z"
+    },
+    {
+      "facilityId": "osm-node-12153384722",
+      "name": "Sabon",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 414m）",
+      "attemptedAt": "2026-10-02T13:10:59.246Z"
+    },
+    {
+      "facilityId": "osm-node-12153650946",
+      "name": "Nobu",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:11:02.192Z"
+    },
+    {
+      "facilityId": "osm-node-12153650949",
+      "name": "Kindal",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:11:08.311Z"
+    },
+    {
+      "facilityId": "osm-node-12153650954",
+      "name": "BARMICHE",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"梅田ワイン酒場 バルミチェ\"",
+      "attemptedAt": "2026-10-02T13:11:13.579Z"
+    },
+    {
+      "facilityId": "osm-node-12153650955",
+      "name": "新世界　いっとく",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"新世界串カツいっとく三番街店\"",
+      "attemptedAt": "2026-10-02T13:11:14.737Z"
+    },
+    {
+      "facilityId": "osm-node-12153650956",
+      "name": "大松",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:11:17.583Z"
+    },
+    {
+      "facilityId": "osm-node-12153650962",
+      "name": "Metro cafe KARATO",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"メトロカフェカラト 中津店\"",
+      "attemptedAt": "2026-10-02T13:11:22.797Z"
+    },
+    {
+      "facilityId": "osm-node-12153650964",
+      "name": "MENIE",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"MENTE 梅田店\"",
+      "attemptedAt": "2026-10-02T13:11:24.847Z"
+    },
+    {
+      "facilityId": "osm-node-12153650966",
+      "name": "ORANGE",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:11:28.837Z"
+    },
+    {
+      "facilityId": "osm-node-12153650971",
+      "name": "密教",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1025m）",
+      "attemptedAt": "2026-10-02T13:11:34.090Z"
+    },
+    {
+      "facilityId": "osm-node-12153650973",
+      "name": "乾杯屋",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(23m)が名前が一致しない: \"大衆酒場ぎふや梅田芝田店\"",
+      "attemptedAt": "2026-10-02T13:11:35.129Z"
+    },
+    {
+      "facilityId": "osm-node-12153650974",
+      "name": "仙酢",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"鮨仙酢 本店 大阪駅前\"",
+      "attemptedAt": "2026-10-02T13:11:36.151Z"
+    },
+    {
+      "facilityId": "osm-node-12153650977",
+      "name": "濱屋",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 580m）",
+      "attemptedAt": "2026-10-02T13:11:39.265Z"
+    },
+    {
+      "facilityId": "osm-node-12153650978",
+      "name": "九州",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 494325m）",
+      "attemptedAt": "2026-10-02T13:11:40.185Z"
+    },
+    {
+      "facilityId": "osm-node-12153650981",
+      "name": "地鶏網焼Shu",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"地鶏網焼＆Bar Shu\"",
+      "attemptedAt": "2026-10-02T13:11:43.331Z"
+    },
+    {
+      "facilityId": "osm-node-12153650982",
+      "name": "宝くじ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"ギャザ阪急 チャンスセンター\"",
+      "attemptedAt": "2026-10-02T13:11:44.356Z"
+    },
+    {
+      "facilityId": "osm-node-12153650983",
+      "name": "たこ伊焼",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 387m）",
+      "attemptedAt": "2026-10-02T13:11:45.405Z"
+    },
+    {
+      "facilityId": "osm-node-12153650984",
+      "name": "勝男",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"阪急梅田応援団 大分からあげと鉄板焼 勝男\"",
+      "attemptedAt": "2026-10-02T13:11:46.401Z"
+    },
+    {
+      "facilityId": "osm-node-12153650986",
+      "name": "漁火",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:11:50.378Z"
+    },
+    {
+      "facilityId": "osm-node-12154532612",
+      "name": "ファミリマート",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "convenience",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:11:54.472Z"
+    },
+    {
+      "facilityId": "osm-node-12156931583",
+      "name": "HOTEL Chocolat",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 450m）",
+      "attemptedAt": "2026-10-02T13:11:55.670Z"
+    },
+    {
+      "facilityId": "osm-node-12156931587",
+      "name": "CUE’S BAR",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"Bar CUE'S\"",
+      "attemptedAt": "2026-10-02T13:11:58.734Z"
+    },
+    {
+      "facilityId": "osm-node-12156931589",
+      "name": "アロッタ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:12:01.667Z"
+    },
+    {
+      "facilityId": "osm-node-12156931591",
+      "name": "農絆卓恵",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:12:04.719Z"
+    },
+    {
+      "facilityId": "osm-node-12156973607",
+      "name": "Frill",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"フリルアイビューティバイトリコ 茶屋町店\"",
+      "attemptedAt": "2026-10-02T13:12:05.864Z"
+    },
+    {
+      "facilityId": "osm-node-12156973610",
+      "name": "Akanece",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"アカネス大阪\"",
+      "attemptedAt": "2026-10-02T13:12:07.905Z"
+    },
+    {
+      "facilityId": "osm-node-12157787194",
+      "name": "ニンテンドーオオサカ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(28m)が名前が一致しない: \"Nintendo OSAKA\"",
+      "attemptedAt": "2026-10-02T13:12:08.943Z"
+    },
+    {
+      "facilityId": "osm-node-12159102651",
+      "name": "瑞炎",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"個室居酒屋 炭火焼き瑞炎 梅田店\"",
+      "attemptedAt": "2026-10-02T13:12:10.971Z"
+    },
+    {
+      "facilityId": "osm-node-12159102654",
+      "name": "3.6.5酒場",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"格安ビールと鉄鍋餃子3・6・5酒場 梅田HEP通り店\"",
+      "attemptedAt": "2026-10-02T13:12:13.061Z"
+    },
+    {
+      "facilityId": "osm-node-12159842462",
+      "name": "Griante",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ステーキ＆ワイン グリアンテ梅田\"",
+      "attemptedAt": "2026-10-02T13:12:14.029Z"
+    },
+    {
+      "facilityId": "osm-node-12159842463",
+      "name": "和菜美✖️いろり屋",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-02T13:12:16.001Z"
+    },
+    {
+      "facilityId": "osm-node-12159842470",
+      "name": "SHIRAISHI",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"銀座ダイヤモンドシライシ 大阪店\"",
+      "attemptedAt": "2026-10-02T13:12:22.278Z"
+    },
+    {
+      "facilityId": "osm-node-12161367937",
+      "name": "FULL BLOOM1",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "tourism_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"「FULL BLOOM Ⅰ & Ⅱ」 金子潤\"",
+      "attemptedAt": "2026-10-02T13:12:25.363Z"
+    },
+    {
+      "facilityId": "osm-node-12161382721",
+      "name": "Chillpple",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(36m)が名前が一致しない: \"チルプル\"",
+      "attemptedAt": "2026-10-02T13:12:26.382Z"
+    },
+    {
+      "facilityId": "osm-node-12161386223",
+      "name": "THE JACKSON GARDEN",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"ザ ジャクソンガーデン\"",
+      "attemptedAt": "2026-10-02T13:12:27.360Z"
+    },
+    {
+      "facilityId": "osm-node-12162726782",
+      "name": "ウエスティンホテル大阪",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(33m)が名前が一致しない: \"The Westin Osaka\"",
+      "attemptedAt": "2026-10-02T13:12:29.440Z"
+    },
+    {
+      "facilityId": "osm-node-12167192901",
+      "name": "Nakanoshima Qross Cafe",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1317m）",
+      "attemptedAt": "2026-10-02T13:12:33.504Z"
     }
   ],
-  "generatedAt": "2026-10-02T13:09:19.218Z",
+  "generatedAt": "2026-10-02T13:12:34.593Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 477,
-    "unresolved": 219,
-    "unattempted": 39889,
+    "verified": 528,
+    "unresolved": 268,
+    "unattempted": 39789,
     "total": 40585
   },
   "wardCounts": {
@@ -2264,9 +2754,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 381,
-      "unresolvedOrAmbiguous": 219,
-      "unattempted": 5055
+      "verified": 432,
+      "unresolvedOrAmbiguous": 268,
+      "unattempted": 4955
     },
     "konohana": {
       "total": 1309,
