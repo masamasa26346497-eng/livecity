@@ -157,6 +157,7 @@
   const DEFAULT_RENDER_CAP = 800;
   const grid = new Map();
   const indexedIds = new Set();
+  const recordsById = new Map();
   const stats = {
     indexPasses: 0,
     indexedRecords: 0,
@@ -180,7 +181,9 @@
   function indexRecords(records) {
     stats.indexPasses++;
     for (const record of records || []) {
-      if (!record || !record.id || indexedIds.has(record.id)) continue;
+      if (!record || !record.id) continue;
+      recordsById.set(record.id, record);
+      if (indexedIds.has(record.id)) continue;
       const x = Number(record.localX);
       const z = Number(record.localZ);
       if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
@@ -209,7 +212,6 @@
     // keep their original implementation so no user-facing search semantics change.
     if (!Number.isFinite(qx) || !Number.isFinite(qz) || !Number.isFinite(radius) || radius < 0) return null;
 
-    const byId = new Map((store.getAllRecords() || []).map((record) => [record.id, record]));
     const radiusSq = radius * radius;
     const minCx = cellCoord(qx - radius);
     const maxCx = cellCoord(qx + radius);
@@ -226,7 +228,7 @@
         for (const id of ids) {
           if (seen.has(id)) continue;
           seen.add(id);
-          const record = byId.get(id);
+          const record = recordsById.get(id);
           if (!record) continue;
           if (subcategories.length && !subcategories.includes(record.subcategory)) continue;
           const dx = Number(record.localX) - qx;
@@ -285,6 +287,7 @@
       cellMeters: CELL_METERS,
       gridCells: grid.size,
       indexedIds: indexedIds.size,
+      indexedRecordMap: recordsById.size,
       loadedRecords: store.getAllRecords().length,
       ...stats,
     });
