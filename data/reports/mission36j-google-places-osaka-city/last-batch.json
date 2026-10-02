@@ -1,15 +1,15 @@
 {
   "mission": "36J",
-  "generatedAt": "2026-10-02T13:25:06.663Z",
+  "generatedAt": "2026-10-02T13:28:06.809Z",
   "wardFilter": null,
   "maxPriority": 0,
   "requestedLimit": 100,
   "processed": 100,
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 771,
-    "unresolvedOrAmbiguous": 425,
-    "unattempted": 39389,
+    "verified": 832,
+    "unresolvedOrAmbiguous": 464,
+    "unattempted": 39289,
     "byWard": {
       "abeno": {
         "total": 851,
@@ -73,9 +73,9 @@
       },
       "kita": {
         "total": 5655,
-        "verified": 675,
-        "unresolvedOrAmbiguous": 425,
-        "unattempted": 4555
+        "verified": 736,
+        "unresolvedOrAmbiguous": 464,
+        "unattempted": 4455
       },
       "konohana": {
         "total": 1309,
@@ -159,817 +159,817 @@
   },
   "apiUsage": {
     "searchCalls": 100,
-    "detailsCalls": 30,
+    "detailsCalls": 15,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 130,
+    "executed": 115,
     "inFlight": 0,
-    "windowCount": 12,
-    "sessionCount": 130
+    "windowCount": 56,
+    "sessionCount": 115
   },
   "results": [
     {
-      "facilityId": "osm-node-13363788955",
+      "facilityId": "osm-node-13608695001",
       "name": "セブン-イレブン",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
+      "distanceMeters": 107,
+      "reason": "座標(107m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13364044001",
-      "name": "Alice in Fantasy Land",
+      "facilityId": "osm-node-13617759915",
+      "name": "あぼがどや",
       "wardId": "kita",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"幻想の国のアリス\""
-    },
-    {
-      "facilityId": "osm-node-13367455707",
-      "name": "みどり薬局",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 4561,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4561m）"
-    },
-    {
-      "facilityId": "osm-node-13367455712",
-      "name": "活寿会記念クリニック",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 47,
-      "reason": "座標(47m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13367455713",
-      "name": "ハイメディック大阪中之島",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 42,
-      "reason": "座標(42m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13367455714",
-      "name": "大阪中之島整形外科",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 41,
-      "reason": "座標(41m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13367455715",
-      "name": "中之島アイセンターCLINIC",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 41,
-      "reason": "座標(41m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13367455716",
-      "name": "サラヤ中之島歯科クリニック",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 43,
-      "reason": "座標(43m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13375801963",
-      "name": "Menya Char Siu Dream (Jinrui Mina Menrui)",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 10,
-      "reason": "座標は近い(10m)が名前が一致しない: \"麺や チャーシュードリーム\""
-    },
-    {
-      "facilityId": "osm-node-13384642501",
-      "name": "めん屋こがね",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13387550573",
-      "name": "FOTAN",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
+      "reason": "座標は近い(1m)が名前が一致しない: \"アボカド屋\""
     },
     {
-      "facilityId": "osm-node-13387760984",
-      "name": "駅逓司大阪郵便役所跡",
+      "facilityId": "osm-node-13617759917",
+      "name": "囲茶菓家 MAR",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 5,
       "reason": "座標(5m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13390509093",
-      "name": "青春",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1097,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1097m）"
-    },
-    {
-      "facilityId": "osm-node-13390509094",
-      "name": "自由亭跡",
+      "facilityId": "osm-node-13635192694",
+      "name": "焼鳥と焼野菜ぎんすけ",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13390512041",
-      "name": "中之島公園",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 37,
-      "reason": "座標(37m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13392637065",
-      "name": "大阪銀行集会所跡",
+      "facilityId": "osm-node-13647113413",
+      "name": "Salon de Royal",
       "wardId": "kita",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"大阪銀行集会所 大阪銀行協会跡\""
+      "distanceMeters": 7,
+      "reason": "座標は近い(7m)が名前が一致しない: \"サロンドロワイヤル 阪急三番街店\""
     },
     {
-      "facilityId": "osm-node-13410581659",
-      "name": "博多焼鳥たとり",
+      "facilityId": "osm-node-13687784301",
+      "name": "THE CITY BAKERY 中之島フェスティバルプラザ",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
+      "distanceMeters": 32,
+      "reason": "座標(32m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13410581660",
-      "name": "鮨 かわ上",
+      "facilityId": "osm-node-13687784302",
+      "name": "THE CITY BAKERY 中之島フェスティバルプラザ",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
+      "distanceMeters": 32,
+      "reason": "座標(32m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13410581674",
-      "name": "中華そば ひよこ",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 2591,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2591m）"
-    },
-    {
-      "facilityId": "osm-node-13410581675",
-      "name": "パティスリー なん菓",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13425850398",
-      "name": "焼き鳥居酒屋 千成",
+      "facilityId": "osm-node-13701309917",
+      "name": "まきの",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 10,
       "reason": "座標(10m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13428606285",
-      "name": "四季自然喰処 たちばな",
+      "facilityId": "osm-node-13701309918",
+      "name": "金の華",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13722339516",
+      "name": "らーめん　やまちゃん",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13725275717",
+      "name": "TRIBE",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13725275718",
+      "name": "みちくさ処 ぬか",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"ぬか\""
+    },
+    {
+      "facilityId": "osm-node-13725275733",
+      "name": "林家とん平",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13725275734",
+      "name": "トラットリア あるふぁ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13760690577",
+      "name": "ベリーベリーフィジー",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 11,
+      "reason": "座標は近い(11m)が名前が一致しない: \"VERY VERY FIZZY\""
+    },
+    {
+      "facilityId": "osm-node-13772912089",
+      "name": "ホテル ドンルクール 大阪梅田",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"ホテルジオメティック大阪梅田\""
+    },
+    {
+      "facilityId": "osm-node-13807625769",
+      "name": "SAVOY",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2078,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2078m）"
+    },
+    {
+      "facilityId": "osm-node-13821024266",
+      "name": "七つ家",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13821024267",
+      "name": "J's Bar",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 111,
+      "reason": "座標(111m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13834872886",
+      "name": "Cafe Fate",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 0,
+      "reason": "座標(0m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13840534296",
+      "name": "ノワ・ド・ココ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13864647410",
+      "name": "甘味堂",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 290,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 290m）"
+    },
+    {
+      "facilityId": "osm-node-13864647411",
+      "name": "MUSTARDSEEDクリスチャン株会",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 7,
+      "reason": "座標は近い(7m)が名前が一致しない: \"MUSTARD SEEDクリスチャン教会\""
+    },
+    {
+      "facilityId": "osm-node-13869972311",
+      "name": "夕霧そば瓢亭 バルチカ03店",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882022507",
+      "name": "焼鳥 裕 一番弟子",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 14,
+      "reason": "座標は近い(14m)が名前が一致しない: \"焼鳥祐 一番弟子\""
+    },
+    {
+      "facilityId": "osm-node-13882022508",
+      "name": "雲隠れ",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 13,
+      "reason": "座標は近い(13m)が名前が一致しない: \"居酒屋 雲隠レ 梅田お初天神店\""
+    },
+    {
+      "facilityId": "osm-node-13882022509",
+      "name": "まつ井",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-13882022510",
+      "name": "串カツ専門店 縁日",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"縁日\""
+    },
+    {
+      "facilityId": "osm-node-13882022511",
+      "name": "焼肉忍鬨",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 16,
+      "reason": "座標は近い(16m)が名前が一致しない: \"YAKINIKUEN 忍鬨(にんぐ) 梅田店\""
+    },
+    {
+      "facilityId": "osm-node-13882067069",
+      "name": "KIRIN KELLER yamato",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"キリンケラーヤマト 曽根崎店\""
+    },
+    {
+      "facilityId": "osm-node-13882067070",
+      "name": "匠",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"手羽先唐揚・鳥料理 匠 梅田店\""
+    },
+    {
+      "facilityId": "osm-node-13882067071",
+      "name": "FUJI",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882067072",
+      "name": "酒庫",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 0,
+      "reason": "座標は近い(0m)が名前が一致しない: \"The酒庫\""
+    },
+    {
+      "facilityId": "osm-node-13882067073",
+      "name": "笠松",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 136784,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 136784m）"
+    },
+    {
+      "facilityId": "osm-node-13882067074",
+      "name": "飛鳥座",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882067075",
+      "name": "誉",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"SAKEBAR 誉\""
+    },
+    {
+      "facilityId": "osm-node-13882067076",
+      "name": "なかの食鶏",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882067077",
+      "name": "アレグロペッシェ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882093090",
+      "name": "ヤキニク キナシ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882093092",
+      "name": "HUONG SEN",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882093093",
+      "name": "MORROW",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13882124016",
+      "name": "雅",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"お好み焼 雅\""
+    },
+    {
+      "facilityId": "osm-node-13882124018",
+      "name": "Bar Marin",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 445,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 445m）"
+    },
+    {
+      "facilityId": "osm-node-13882570723",
+      "name": "ニューミュンヘン",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13909514340",
+      "name": "寅虎軒",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13925723484",
+      "name": "グリル ロア",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 12,
+      "reason": "座標(12m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13925723485",
+      "name": "NORTH BAR",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13925723486",
+      "name": "Tsucusi",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"Tucusi (ツクシ)\""
+    },
+    {
+      "facilityId": "osm-node-13948063951",
+      "name": "中之島公園",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 81,
+      "reason": "座標(81m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13948835263",
+      "name": "関市長顕彰碑",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 19,
+      "reason": "座標(19m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13962672035",
+      "name": "天下一品",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-13971050501",
+      "name": "FrenZ-FrenZY Rainbow Haven",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"大阪ゲイバー FrenZ-FrenZY\""
+    },
+    {
+      "facilityId": "osm-node-13971613539",
+      "name": "土鍋うどん なかい山",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3,
+      "reason": "座標は近い(3m)が名前が一致しない: \"土鍋うどん♨なかい山\""
+    },
+    {
+      "facilityId": "osm-node-13985482901",
+      "name": "Hotel Noum",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14000225409",
+      "name": "ZEN",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14000225411",
+      "name": "PBN MY PLACE CLINIC",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 8,
+      "reason": "座標は近い(8m)が名前が一致しない: \"iPS細胞の再生医療 形成外科専門医のRBN myplace clinic\""
+    },
+    {
+      "facilityId": "osm-node-14000225412",
+      "name": "歯科だんらび",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14000225413",
+      "name": "attrait",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14000225414",
+      "name": "YUCCA",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 9,
       "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13429805982",
-      "name": "ニューすしセンター",
+      "facilityId": "osm-node-14000225415",
+      "name": "Fix",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13430095595",
-      "name": "エキマル ア・ラ・モード",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 73,
-      "reason": "座標(73m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13446754692",
-      "name": "旧町名継承碑「新川崎町」",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"旧町名継承碑『新川崎町』\""
-    },
-    {
-      "facilityId": "osm-node-13446754975",
-      "name": "洗心洞旧跡",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"洗心洞跡\""
-    },
-    {
-      "facilityId": "osm-node-13446754976",
-      "name": "洗心洞跡",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13446754977",
-      "name": "造幣局用地",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 127,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 127m）"
-    },
-    {
-      "facilityId": "osm-node-13446754978",
-      "name": "造幣局用地",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 229,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 229m）"
-    },
-    {
-      "facilityId": "osm-node-13446754988",
-      "name": "造幣局用地",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 231,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 231m）"
-    },
-    {
-      "facilityId": "osm-node-13446754993",
-      "name": "大塩の乱槐跡",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 87,
-      "reason": "座標は近い(87m)が名前が一致しない: \"大塩の乱 槐(えんじゅ)跡\""
-    },
-    {
-      "facilityId": "osm-node-13446755051",
-      "name": "明治天皇聖躅",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13446755110",
-      "name": "めがね橋",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1805,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1805m）"
-    },
-    {
-      "facilityId": "osm-node-13462150686",
-      "name": "Zen Laboratory",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"善 laboratory\""
-    },
-    {
-      "facilityId": "osm-node-13462150687",
-      "name": "やよい軒",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "座標(14m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13462150688",
-      "name": "佐勘",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13478202351",
-      "name": "中之島と大阪大学",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 31,
-      "reason": "座標は近い(31m)が名前が一致しない: \"大阪大学中之島センター\""
-    },
-    {
-      "facilityId": "osm-node-13478207483",
-      "name": "旧町名継承碑 常安町",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"旧町名継承碑『常安町』\""
-    },
-    {
-      "facilityId": "osm-node-13478211490",
-      "name": "萬庵",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"萬庵 中之島店\""
-    },
-    {
-      "facilityId": "osm-node-13478211491",
-      "name": "北村兼子ゆかりの地",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13478211493",
-      "name": "大阪中之島美術館",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 33,
-      "reason": "座標(33m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13483829894",
-      "name": "コメダ珈琲店",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13483829895",
-      "name": "ブランドオフ",
+      "facilityId": "osm-node-14000225416",
+      "name": "豚そば月や",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 4,
       "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13514150116",
-      "name": "STEAK RON",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"ステーキロン\""
-    },
-    {
-      "facilityId": "osm-node-13515984604",
-      "name": "ニトリ",
+      "facilityId": "osm-node-14000225417",
+      "name": "ごかもん",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13516134101",
-      "name": "浪花ひとくち餃子 チャオチャオ天満店",
+      "facilityId": "osm-node-14006601888",
+      "name": "珈琲館",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14014265475",
+      "name": "吉野家",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14014265476",
+      "name": "都由",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6,
+      "reason": "座標は近い(6m)が名前が一致しない: \"都由 堂島店\""
+    },
+    {
+      "facilityId": "osm-node-14016577233",
+      "name": "三田製麺所",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13516134201",
-      "name": "ゲームバーPicoty 大阪梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516357601",
-      "name": "エレメカ研究所",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516823501",
-      "name": "食膳軒",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918757",
-      "name": "LUCE PREMIUM",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 993,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 993m）"
-    },
-    {
-      "facilityId": "osm-node-13516918758",
-      "name": "球児先生",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918759",
-      "name": "竜のしっぽ",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918765",
-      "name": "filo",
+      "facilityId": "osm-node-14016577234",
+      "name": "杵屋",
       "wardId": "kita",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"fiio.\""
-    },
-    {
-      "facilityId": "osm-node-13516918768",
-      "name": "ブランドハンズ",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918769",
-      "name": "Coo&RIKU",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918770",
-      "name": "北区芝田",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 217,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 217m）"
-    },
-    {
-      "facilityId": "osm-node-13516918772",
-      "name": "GRAND FRONT OSAKA Information",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13516918778",
-      "name": "ギョーザの勝男",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918779",
-      "name": "口八町",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918780",
-      "name": "はなれ",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918781",
-      "name": "四季彩",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918782",
-      "name": "藁蔵",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 21,
-      "reason": "座標は近い(21m)が名前が一致しない: \"藁焼きと熟成肉 藁蔵 ～wakura～ 梅田グランフロント前店\""
-    },
-    {
-      "facilityId": "osm-node-13516918783",
-      "name": "アップル歯科",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516918784",
-      "name": "焼肉左近",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13516943556",
-      "name": "こなれ梅田店",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13524449423",
-      "name": "AVANCE.",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(4m)が一意 [conservative-variant]"
-    },
-    {
-      "facilityId": "osm-node-13531564723",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13531564752",
-      "name": "橋梁顕彰碑『蜆川』",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564760",
-      "name": "播鳥",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"播鳥 北新地本店｜焼き鳥 居酒屋\""
-    },
-    {
-      "facilityId": "osm-node-13531564763",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564764",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564766",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564769",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564770",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-node-13531564772",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）"
-    },
-    {
-      "facilityId": "osm-node-13531564773",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）"
-    },
-    {
-      "facilityId": "osm-node-13531564775",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 83,
-      "reason": "座標(83m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13531564787",
-      "name": "わが北新地",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 30,
-      "reason": "座標(30m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13531564801",
-      "name": "PREMIUM 播鳥",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13531564868",
-      "name": "山下酒店",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"山下商店\""
-    },
-    {
-      "facilityId": "osm-node-13531564871",
-      "name": "Total Beauty Salon SINCE+",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"ネイル＆アイ・パラジェル認定サロンSINCE＋（まつげパーマ/眉毛）\""
-    },
-    {
-      "facilityId": "osm-node-13531564873",
-      "name": "髪質改善 エレナ バイ アルテフィーチェ",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"髪質改善 elena by artefice\""
-    },
-    {
-      "facilityId": "osm-node-13531564874",
-      "name": "アイラッシュサロン デイジー バイ アルテフィーチェ",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"daisy by artefice\""
-    },
-    {
-      "facilityId": "osm-node-13531564875",
-      "name": "美容室ベルタ",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"belta by artefice\""
-    },
-    {
-      "facilityId": "osm-node-13531564877",
-      "name": "カラダメンテ",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
       "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
+      "reason": "座標は近い(16m)が名前が一致しない: \"自家製麺 杵屋 梅田堂島地下街店\""
     },
     {
-      "facilityId": "osm-node-13531564893",
-      "name": "鯨料理・割烹 柴田",
+      "facilityId": "osm-node-14019751416",
+      "name": "中央軒",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 22,
+      "reason": "座標(22m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063012",
+      "name": "Perfect Suits FActory",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"P.S.FA Perfect Suit FActory ドージマ地下センター店\""
+    },
+    {
+      "facilityId": "osm-node-14022063013",
+      "name": "KIEFEL COFFEE",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063014",
+      "name": "Leonidas",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"レオニダス 大阪梅田店\""
+    },
+    {
+      "facilityId": "osm-node-14022063015",
+      "name": "インデアンカレー",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063016",
+      "name": "new KOBE",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 4,
       "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13539340179",
-      "name": "住野敏郎",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-node-13539433941",
-      "name": "国道１号",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 165666,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 165666m）"
-    },
-    {
-      "facilityId": "osm-node-13539433942",
-      "name": "梅新東交差点北西角",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）"
-    },
-    {
-      "facilityId": "osm-node-13539441822",
-      "name": "北区曽根崎",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 207,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 207m）"
-    },
-    {
-      "facilityId": "osm-node-13540613325",
-      "name": "食堂はま",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）"
-    },
-    {
-      "facilityId": "osm-node-13540613326",
-      "name": "らーめん　伊藝",
+      "facilityId": "osm-node-14022063017",
+      "name": "福井県の酒蔵",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 3,
       "reason": "座標(3m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13540613327",
-      "name": "ル・マケランシュ",
+      "facilityId": "osm-node-14022063018",
+      "name": "ミスタークイックマン",
       "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"モロッコ料理店/halal Le Marrakech\""
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13550954981",
-      "name": "大阪市立大阪北小学校跡地",
+      "facilityId": "osm-node-14022063019",
+      "name": "ダル食堂",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063020",
+      "name": "CAFÉ ONthe",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 8,
+      "reason": "座標は近い(8m)が名前が一致しない: \"CAFE ONthe(カフェオンザ)ドーチカ\""
+    },
+    {
+      "facilityId": "osm-node-14022063021",
+      "name": "コクミン",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-14022063022",
+      "name": "CHIHIRO",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063024",
+      "name": "クックデリ御膳",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063025",
+      "name": "ダイソー",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13566731225",
-      "name": "焼き鳥 歩",
+      "facilityId": "osm-node-14022063026",
+      "name": "東京油組総本店",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063027",
+      "name": "おおさか内分泌診療所",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063028",
+      "name": "J.market",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"J・マーケット 大阪ドーチカ店\""
+    },
+    {
+      "facilityId": "osm-node-14022063029",
+      "name": "あいち",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 167825,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 167825m）"
+    },
+    {
+      "facilityId": "osm-node-14022063030",
+      "name": "おらが蕎麦",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063031",
+      "name": "お酒の美術館",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063032",
+      "name": "浪花串カツ",
       "wardId": "kita",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 7,
-      "reason": "座標は近い(7m)が名前が一致しない: \"焼鳥 歩\""
+      "reason": "座標は近い(7m)が名前が一致しない: \"串家物語 ドーチカ店\""
     },
     {
-      "facilityId": "osm-node-13566731239",
-      "name": "ぷらす整骨院",
+      "facilityId": "osm-node-14022063033",
+      "name": "Barber the GM",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063034",
+      "name": "かっぽうぎ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063035",
+      "name": "おたからや",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063036",
+      "name": "コクミン",
       "wardId": "kita",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 14,
-      "reason": "座標は近い(14m)が名前が一致しない: \"ぷらす鍼灸整骨院 天六院\""
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-node-13586987401",
-      "name": "Yatt",
+      "facilityId": "osm-node-14022063038",
+      "name": "KENFORD",
       "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 8,
+      "reason": "座標は近い(8m)が名前が一致しない: \"ケンフォード 堂島地下街店\""
     },
     {
-      "facilityId": "osm-node-13598531629",
-      "name": "大阪サンセイ",
+      "facilityId": "osm-node-14022063039",
+      "name": "もりわき骨盤鍼灸整骨院",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 65,
-      "reason": "座標(65m以内)と名前が一致"
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-node-13602076429",
-      "name": "MASHU chayamachi",
+      "facilityId": "osm-node-14022063040",
+      "name": "TRARIUM",
       "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1963,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1963m）"
     },
     {
-      "facilityId": "osm-node-13602125005",
-      "name": "Lumier de mashu",
+      "facilityId": "osm-node-14022063041",
+      "name": "Buena.",
+      "wardId": "kita",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 411,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 411m）"
+    },
+    {
+      "facilityId": "osm-node-14022063042",
+      "name": "西梅田眼科クリニック",
       "wardId": "kita",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-node-14022063043",
+      "name": "OZ",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"リフレッシュ工房 オズ 堂島店\""
+    },
+    {
+      "facilityId": "osm-node-14022063044",
+      "name": "コクミン",
+      "wardId": "kita",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-14022063045",
+      "name": "ちぐさ",
+      "wardId": "kita",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
     }
   ]
 }
