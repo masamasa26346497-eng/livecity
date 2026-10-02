@@ -3,7 +3,7 @@
   "mission": "36J",
   "areaId": "osaka-city",
   "sourceDataset": "public/map-data/osaka-city/facilities/facilities.json",
-  "generatedAt": "2026-10-02T13:49:46.607Z",
+  "generatedAt": "2026-10-02T13:53:00.843Z",
   "maxDistanceMeters": 120,
   "policy": {
     "persistsOnlyVerifiedLinkage": true,
@@ -17,9 +17,9 @@
     "resumableBatches": true
   },
   "counts": {
-    "verified": 1237,
-    "unresolved": 759,
-    "unattempted": 38589,
+    "verified": 1270,
+    "unresolved": 826,
+    "unattempted": 38489,
     "total": 40585
   },
   "wardCounts": {
@@ -85,9 +85,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 1141,
-      "unresolvedOrAmbiguous": 759,
-      "unattempted": 3755
+      "verified": 1174,
+      "unresolvedOrAmbiguous": 826,
+      "unattempted": 3655
     },
     "konohana": {
       "total": 1309,
@@ -13774,6 +13774,369 @@
       "matchReason": "座標(2m以内)と名前が一致",
       "distanceMeters": 2,
       "verifiedAt": "2026-10-02T13:49:41.379Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2064207387",
+      "googlePlaceId": "ChIJg8jA-wHnAGARJXgBqgmgUQs",
+      "name": "かいこう",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(20m以内)と名前が一致",
+      "distanceMeters": 20,
+      "verifiedAt": "2026-10-02T13:50:52.911Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2064207432",
+      "googlePlaceId": "ChIJTdNXjdrmAGARFU7Kg0_Gz44",
+      "name": "Cafe Di Espresso",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-02T13:50:59.039Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2064207550",
+      "googlePlaceId": "ChIJV3bxb8TmAGARaElzwwSigw4",
+      "name": "東宝電気",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-02T13:51:13.355Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2064207553",
+      "googlePlaceId": "ChIJvWJMM8XmAGAR3rA9A_jyqPo",
+      "name": "復刻西洋食堂 紅梅ダイナー",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-02T13:51:15.390Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2064207555",
+      "googlePlaceId": "ChIJAQAfZcTmAGARegC5i_vdbjs",
+      "name": "魚屋太郎",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-02T13:51:16.397Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2081845451",
+      "googlePlaceId": "ChIJW7x5a9vmAGARebVzD_MkjZg",
+      "name": "COCONANO",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-02T13:51:18.436Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2085343978",
+      "googlePlaceId": "ChIJ0ftAZMPmAGARxyaHE_on2lw",
+      "name": "ファミリーマート",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-02T13:51:27.683Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2085426359",
+      "googlePlaceId": "ChIJ3xRkk9rmAGARnCnT4CTnLI4",
+      "name": "ココペリカレー",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-02T13:51:35.868Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2088085392",
+      "googlePlaceId": "ChIJjcj6Z5PmAGARU90PonEJIls",
+      "name": "ドン・キホーテ",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(17m以内)と名前が一致",
+      "distanceMeters": 17,
+      "verifiedAt": "2026-10-02T13:51:37.954Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2138692050",
+      "googlePlaceId": "ChIJDQ16nLjmAGARFhSxWSkMH2g",
+      "name": "ままや",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-02T13:51:39.025Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2146215202",
+      "googlePlaceId": "ChIJmbtraIvmAGARxV6M_tIL9DY",
+      "name": "スターバックス",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:51:41.039Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2150173309",
+      "googlePlaceId": "ChIJhw1C68bmAGARjh-9WHmn9D4",
+      "name": "かしわ屋将軍",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-02T13:51:42.031Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2193698131",
+      "googlePlaceId": "ChIJJ-IRRI7mAGARS8E-KAxgzxc",
+      "name": "ダイコクドラッグ",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:51:43.079Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2210987376",
+      "googlePlaceId": "ChIJFRkWztfmAGARhyoeLT3fxJ4",
+      "name": "ローソン",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-02T13:51:47.171Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2237154264",
+      "googlePlaceId": "ChIJQ5hqVrnmAGARO5fBcmgJvn0",
+      "name": "阪急オアシス",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(10m以内)と名前が一致",
+      "distanceMeters": 10,
+      "verifiedAt": "2026-10-02T13:51:48.211Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2246312151",
+      "googlePlaceId": "ChIJXec8B7zmAGARHnIy3qRA4Wc",
+      "name": "松本歯科医院",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(dental_clinic)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:51:49.242Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288746732",
+      "googlePlaceId": "ChIJZe3zP7nmAGARNJCgKfegRy8",
+      "name": "中川歯科",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:51:51.302Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288750029",
+      "googlePlaceId": "ChIJrbu0T7jmAGARcsnNZEOMJx0",
+      "name": "ローソンストア100",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-02T13:51:52.308Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288753838",
+      "googlePlaceId": "ChIJZe3zP7nmAGARG57zBD01PPI",
+      "name": "福効医院",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-02T13:51:53.302Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288761733",
+      "googlePlaceId": "ChIJLYpP1b7mAGARDL_jqhhJb84",
+      "name": "コメダ珈琲店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:51:55.401Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288762655",
+      "googlePlaceId": "ChIJ68i91LjmAGAReVy9FowV9p4",
+      "name": "松井歯科",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-02T13:51:56.385Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288781808",
+      "googlePlaceId": "ChIJ-457x77mAGARRx7UHCEwvjM",
+      "name": "大阪王将",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:52:02.578Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288783150",
+      "googlePlaceId": "ChIJ6XNJM7nmAGARZrQEPGD8sKE",
+      "name": "ジン・メンタル クリニック",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:52:03.582Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2288783450",
+      "googlePlaceId": "ChIJD91pt77mAGARzJ7a0RxED7k",
+      "name": "ヒグチ歯科医院",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-02T13:52:04.609Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289927535",
+      "googlePlaceId": "ChIJIWsx1rjmAGARR7IjY9_RdDE",
+      "name": "カルダモン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-02T13:52:09.692Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289931216",
+      "googlePlaceId": "ChIJA4QfTbnmAGARIWxbW0wb4JI",
+      "name": "美粧館",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:52:10.777Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289933787",
+      "googlePlaceId": "ChIJ9zyLW7nmAGARBOZ0atMKgaU",
+      "name": "丸八寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:52:11.770Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289938075",
+      "googlePlaceId": "ChIJ8T55B7zmAGARz7ItgsJ2ya8",
+      "name": "世界の山ちゃん 天六店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-02T13:52:14.854Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289945711",
+      "googlePlaceId": "ChIJM3eYi7vmAGARmvHmbAhsnPA",
+      "name": "アトリエ・アルション",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:52:17.901Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2289954421",
+      "googlePlaceId": "ChIJ3WFIJlDnAGARZSnb0pSVuMc",
+      "name": "LAUNDRY83",
+      "relevanceClass": "retail-commercial",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-02T13:52:21.999Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2290073256",
+      "googlePlaceId": "ChIJ3anI8bjmAGARR6aQLkIRC8U",
+      "name": "石井クリニック",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(medical_clinic)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 15,
+      "verifiedAt": "2026-10-02T13:52:32.273Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2290080417",
+      "googlePlaceId": "ChIJmXCl7rjmAGARQ3apMkSU67k",
+      "name": "仲鍼灸院",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-02T13:52:36.297Z",
+      "verifiedBy": "automated-osaka-24ward-batch"
+    },
+    {
+      "facilityId": "osm-node-2290086799",
+      "googlePlaceId": "ChIJqzEPmbjmAGARyL7fneTUo6o",
+      "name": "天五診療所",
+      "relevanceClass": "hospital",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-02T13:52:43.505Z",
       "verifiedBy": "automated-osaka-24ward-batch"
     }
   ]
