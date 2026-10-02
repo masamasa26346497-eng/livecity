@@ -7,12 +7,14 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEV = path.join(ROOT, 'public', 'osaka_3d_buildings.ward-ux-v1.html');
 const COORDINATOR = path.join(ROOT, 'public', 'livecity-dev-ui-coordinator.js');
+const CLICK_GATE = path.join(ROOT, 'public', 'livecity-building-click-performance.js');
 const PROD = path.join(ROOT, 'public', 'osaka_3d_buildings.html');
 const PROTECTED = path.join(ROOT, 'public', 'osaka_3d_buildings.fullward-v3.html');
 const PREVIEW = path.join(ROOT, 'tools', 'preview.js');
 
 const html = fs.readFileSync(DEV, 'utf8');
 const coordinator = fs.readFileSync(COORDINATOR, 'utf8');
+const clickGate = fs.readFileSync(CLICK_GATE, 'utf8');
 const preview = fs.readFileSync(PREVIEW, 'utf8');
 
 function extract(source, start, end) {
@@ -67,6 +69,14 @@ test('[36K PERF] facility layer rebuild is bounded to nearby candidates', () => 
   assert.doesNotMatch(layerPatch, /indexRecords\(store\.getAllRecords\(\)\)/);
 });
 
+test('[36K PERF] facility pick gate cheaply rejects ordinary building clicks', () => {
+  assert.match(clickGate, /queryNearbySpatial/);
+  assert.match(clickGate, /PICK_RADIUS_PX = 42/);
+  assert.match(clickGate, /if \(exactNeeded === false\)[\s\S]*return null/);
+  assert.match(clickGate, /return originalPickHit\(mouseX, mouseY, camera\)/);
+  assert.match(clickGate, /__MISSION36K_BUILDING_CLICK_PERF__/);
+});
+
 test('[36K PERF] existing 24-ward source and exact building picking remain intact', () => {
   assert.match(html, /\[Mission 36J LAZY\] 24-ward facility lazy loading/);
   assert.match(html, /areaId: 'osaka-city'/);
@@ -77,12 +87,17 @@ test('[36K PERF] existing 24-ward source and exact building picking remain intac
   assert.match(html, /CanonicalRuntime\.pickBuilding\(ray\)/);
 });
 
-test('[36K PERF] optimization stays dev-preview-only', () => {
-  assert.match(preview, /DEV_UI_SCRIPT = '\/livecity-dev-ui-coordinator\.js'/);
+test('[36K PERF] optimization stays dev-preview-only and loads in dependency order', () => {
+  assert.match(preview, /DEV_UI_SCRIPTS = \[/);
+  const coordinatorIndex = preview.indexOf('/livecity-dev-ui-coordinator.js');
+  const clickGateIndex = preview.indexOf('/livecity-building-click-performance.js');
+  assert.ok(coordinatorIndex >= 0);
+  assert.ok(clickGateIndex > coordinatorIndex);
   assert.match(preview, /path\.basename\(abs\) !== DEV_UI_HTML/);
   for (const p of [PROD, PROTECTED]) {
     const source = fs.readFileSync(p, 'utf8');
     assert.doesNotMatch(source, /Mission 36K PERF/);
     assert.doesNotMatch(source, /livecity-dev-ui-coordinator\.js/);
+    assert.doesNotMatch(source, /livecity-building-click-performance\.js/);
   }
 });
