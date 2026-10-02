@@ -1,0 +1,73 @@
+name: Mission 36K - Building Click and Facility Spatial Performance
+
+on:
+  push:
+    branches:
+      - feature/mission-36k-building-click-performance
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  patch-and-verify:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36k-click-perf]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync latest mission branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Apply 36K spatial performance patch to dev UI
+        run: node tools/mission36k-patch-facility-spatial-index.mjs
+
+      - name: Run focused facility and building picking regression tests
+        run: >-
+          node --test
+          tests/mission36k-facility-spatial-performance.test.js
+          tests/mission35y-precise-building-picking.test.js
+
+      - name: Verify protected production HTML is untouched
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git status --short -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html | grep -q .; then
+            echo 'Protected production HTML changed unexpectedly.' >&2
+            exit 1
+          fi
+          grep -q '\[Mission 36K PERF\] facility spatial index' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'FACILITY_GRID_CELL_METERS = 500' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'FacilityDataStore.queryNearby(centerX, centerZ, FACILITY_RENDER_RADIUS_METERS' public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q 'ud.crTriBuilding\[hit.faceIndex\]' public/osaka_3d_buildings.ward-ux-v1.html
+
+      - name: Commit patched dev UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/osaka_3d_buildings.ward-ux-v1.html
+          if git diff --cached --quiet; then
+            echo 'No dev UI changes to commit.'
+            exit 0
+          fi
+          git commit -m 'fix(mission36k): spatially bound facility runtime for responsive building clicks'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
