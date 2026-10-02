@@ -12,6 +12,7 @@ import path from 'node:path';
 import { resolveProjectPath, isMainModule } from '../lib/paths.js';
 import { createPlacesClient } from './lib/places-client.mjs';
 import { RateLimitExceededError } from './lib/rate-guard.mjs';
+import { createPacedCityGuard } from './lib/city-batch-guard.mjs';
 import { classifyPilotMatch, DEFAULT_MAX_DISTANCE_METERS } from './lib/pilot-matching.mjs';
 import { assertDurableRecordSafe } from './lib/persistence-guard.mjs';
 import { loadGooglePlacesApiKeyFromEnv } from './load-api-key.mjs';
@@ -126,7 +127,18 @@ export function selectBatchCandidates(candidates, {
 async function withRateLimitRetry(call, sleepImpl, windowMs) {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await call();
+      const result = await call();
+      if (result?.ok === false && /^http-(429|5\d\d)$/.test(result.reason || '')) {
+        if (attempt >= MAX_RATE_LIMIT_RETRIES) {
+          throw new Error('Transient Places failure; batch stopped without marking this facility unresolved: ' + result.reason);
+        }
+        await sleepImpl(Math.max(windowMs + WINDOW_PAD_MS, 60_000) * (attempt + 1));
+        continue;
+      }
+      if (result?.ok === false && /^http-(401|403)$/.test(result.reason || '')) {
+        throw new Error('Places authentication/billing failure; batch stopped: ' + result.reason);
+      }
+      return result;
     } catch (e) {
       if (!(e instanceof RateLimitExceededError)) throw e;
       if (attempt >= MAX_RATE_LIMIT_RETRIES) return { ok: false, reason: 'rate-limited: ' + e.message };
@@ -366,21 +378,25 @@ export async function runCityMatchBatch({
 }
 
 function parseCli(argv) {
-  const args = { ward: null, limit: DEFAULT_LIMIT, maxPriority: 3, retryUnresolved: false };
+  const args = { ward: null, limit: DEFAULT_LIMIT, maxPriority: 3, retryUnresolved: false, requestsPerMinute: 60 };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--ward') args.ward = argv[++i];
     else if (argv[i] === '--limit') args.limit = Math.min(DEFAULT_LIMIT, Math.max(1, Number(argv[++i]) || DEFAULT_LIMIT));
     else if (argv[i] === '--priority') {
       const v = argv[++i];
       args.maxPriority = v === 'high' ? 0 : v === 'normal' ? 1 : v === 'medium' ? 2 : 3;
-    } else if (argv[i] === '--retry-unresolved') args.retryUnresolved = true;
+    } else if (argv[i] === '--requests-per-minute') args.requestsPerMinute = Number(argv[++i]);
+    else if (argv[i] === '--retry-unresolved') args.retryUnresolved = true;
   }
   return args;
 }
 
 if (isMainModule(import.meta.url)) {
   const args = parseCli(process.argv.slice(2));
-  runCityMatchBatch(args).then((r) => {
+  runCityMatchBatch({ ...args,
+    requestGuard: createPacedCityGuard({ requestsPerMinute: args.requestsPerMinute }),
+    batchSize: Infinity,
+  }).then((r) => {
     if (!r.ok) { console.error('[36J places]', r.message || r.reason); process.exit(1); }
     console.log('[36J places]', JSON.stringify({ selected: r.selected, processed: r.processed || 0, counts: r.counts }));
     process.exit(0);

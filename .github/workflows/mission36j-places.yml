@@ -64,9 +64,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          for round in 1 2 3; do
-            echo "=== Mission 36J Google Places high-priority batch ${round}/3 ==="
-            node tools/google-places/match-osaka-city-places.mjs --priority high --limit 100
+          started_at=$SECONDS
+          for round in $(seq 1 20); do
+            if [ $((SECONDS - started_at)) -ge 9000 ]; then
+              echo "150-minute batch budget reached; resume from checkpoints next time."
+              break
+            fi
+            echo "=== Mission 36J Google Places high-priority batch ${round}/20 ==="
+            node tools/google-places/match-osaka-city-places.mjs --priority high --limit 100 --requests-per-minute 60
 
             node - <<'NODE'
           const fs = require('fs');
@@ -97,7 +102,7 @@ jobs:
             git rebase "origin/${MISSION_BRANCH}"
             git push origin "HEAD:${MISSION_BRANCH}"
 
-            if [ "${round}" -lt 3 ]; then
+            if [ "${round}" -lt 20 ]; then
               echo "Cooling down 61s before next API session."
               sleep 61
             fi
