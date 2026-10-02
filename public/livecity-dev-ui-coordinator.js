@@ -272,13 +272,11 @@
     const originalCountNearby = typeof store.countNearbyBySubcategory === 'function'
       ? store.countNearbyBySubcategory.bind(store) : null;
     store.countNearbyBySubcategory = (x, z, radiusM, subcategories) => {
-      indexRecords(store.getAllRecords());
       const hits = queryNearby(store, x, z, radiusM, { subcategories });
       return hits ? hits.length : (originalCountNearby ? originalCountNearby(x, z, radiusM, subcategories) : null);
     };
 
     store.queryNearbySpatial = (x, z, radiusM, options = {}) => {
-      indexRecords(store.getAllRecords());
       return queryNearby(store, x, z, radiusM, options) || [];
     };
 
@@ -336,7 +334,6 @@
       const radius = Number(perf && perf.renderRadiusMeters) || DEFAULT_RENDER_RADIUS_METERS;
       const cap = Number(perf && perf.maxRenderedFacilities) || DEFAULT_RENDER_CAP;
       const center = getRenderCenter();
-      indexRecords(store.getAllRecords());
       const nearby = queryNearby(store, center.x, center.z, radius, {
         limit: cap,
         prioritizeMajor: true,
