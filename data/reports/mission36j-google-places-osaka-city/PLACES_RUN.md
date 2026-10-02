@@ -7,3 +7,6 @@ Safety policy:
 - persist VERIFIED linkage only
 - never persist photo binaries, photo URLs, media URLs, or photo resource names
 - batch checkpoints are committed after each 100 facilities
+
+Resume requested: 2026-10-02T05:04:18Z
+Run the existing bounded workflow: up to 3 batches of 100 high-priority facilities, resuming from persisted checkpoints.
