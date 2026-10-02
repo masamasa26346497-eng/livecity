@@ -1,0 +1,33 @@
+{
+  "mission": "36K",
+  "generatedAt": "2026-10-01T15:53:10.829Z",
+  "source": {
+    "packageId": "plateau-27100-osaka-shi-2024",
+    "name": "3D Tiles, MVT（v4）",
+    "format": "ZIP",
+    "url": "https://assets.cms.plateau.reearth.io/assets/ac/88f17c-afe2-48f9-9b7e-c20a27bbb61d/27100_osaka-shi_city_2024_3dtiles_mvt_1_op.zip",
+    "sizeBytes": 1314295221,
+    "etag": "\"5a393b3c60a56f0f550032ae57b59a67\"",
+    "lastModified": "Mon, 31 Mar 2025 02:44:36 GMT",
+    "rangeSupported": true,
+    "zipEntries": 23785
+  },
+  "coverage": {
+    "lod1Wards": 24,
+    "lod2Wards": 11,
+    "lod3Wards": 2
+  },
+  "wardCount": 24,
+  "smoke": {
+    "wardId": "sumiyoshi",
+    "wardCode": "27120",
+    "tilesetPath": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/tileset.json",
+    "compressedBytes": 6192,
+    "uncompressedBytes": 42971,
+    "assetVersion": "1.0",
+    "geometricError": 189.80508412823409,
+    "rootHasContent": true,
+    "rootChildren": 4
+  },
+  "decision": "All 24 wards have PLATEAU LOD1 and can be acquired selectively from the remote ZIP with HTTP Range requests."
+}

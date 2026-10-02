@@ -1,0 +1,63 @@
+name: Mission 36J - Apply Citywide Photo UI
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apply-citywide-photo-ui:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36j-ui]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync latest mission branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Apply citywide facility/photo UI patch
+        run: node tools/mission36j/apply-citywide-photo-ui.mjs
+
+      - name: Verify protected production HTML unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html
+          grep -q "const FACILITY_CONFIG = Object.freeze" public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q "google-places-osaka-city-mapping.json" public/osaka_3d_buildings.ward-ux-v1.html
+          grep -q "matchConfidence === 'VERIFIED'" public/osaka_3d_buildings.ward-ux-v1.html
+
+      - name: Commit development UI integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/osaka_3d_buildings.ward-ux-v1.html
+          if git diff --cached --quiet; then
+            echo "No UI changes to commit."
+          else
+            git commit -m "feat(mission36j): wire 24-ward facilities and Google photos into dev UI"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

@@ -1,0 +1,176 @@
+name: Mission 36K - Restore Osaka Building Coverage
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  discover-building-source:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36k-buildings]')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync mission branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Guard protected production HTML before Mission 36K
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
+
+      - name: Separate PLATEAU source manifest from Live City runtime manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-fix-manifest-collision.mjs
+
+      - name: Test range ZIP, B3DM, and ward extractor logic
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test \
+            tests/mission36k-ward-building-manifest.test.js \
+            tests/mission36k-b3dm-smoke.test.js \
+            tests/mission36k-ward-building-extractor.test.js
+
+      - name: Discover current Osaka PLATEAU building resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-discover-osaka-building-source.mjs
+
+      - name: Probe 3D Tiles and MVT archive without full download
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-probe-plateau-runtime-zip.mjs
+
+      - name: Build 24-ward PLATEAU source manifest and smoke-fetch Sumiyoshi tileset
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-build-ward-building-manifest.mjs --smoke-ward=sumiyoshi
+
+      - name: Range-fetch and validate one real Sumiyoshi B3DM geometry tile
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-smoke-b3dm.mjs --ward=sumiyoshi
+
+      - name: Selectively extract a small real Sumiyoshi ward package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/mission36k-ward-extract
+          node tools/mission36k-fetch-ward-building-source.mjs \
+            --ward=sumiyoshi \
+            --lod=1 \
+            --max-files=3 \
+            --out=/tmp/mission36k-ward-extract
+
+      - name: Validate runtime building coverage and PLATEAU source separation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const runtimePath = 'public/map-data/osaka-city/buildings/manifest.json';
+          const sourcePath = 'public/map-data/osaka-city/building-sources/plateau-2024-manifest.json';
+          const runtime = JSON.parse(fs.readFileSync(runtimePath, 'utf8'));
+          const source = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+
+          if (!Array.isArray(runtime.datasets) || runtime.datasets.length !== 24) {
+            throw new Error(`runtime datasets=${runtime.datasets?.length}`);
+          }
+          if (runtime.buildingCount !== 574112) throw new Error(`runtime buildingCount=${runtime.buildingCount}`);
+          if (runtime.tileCount !== 1096) throw new Error(`runtime tileCount=${runtime.tileCount}`);
+          if (runtime.coordinateConvention !== 'znorth-neg-v1') throw new Error('runtime coordinate convention mismatch');
+          if (runtime.layout !== 'flat' || runtime.tileSize !== 500) throw new Error('runtime tile layout mismatch');
+          if (runtime.mission === '36K' || runtime.wards) throw new Error('PLATEAU source manifest leaked into runtime path');
+          for (const d of runtime.datasets) {
+            if (!d.id || !d.wardId || !d.manifest || !(d.buildings > 0) || !(d.tiles > 0)) {
+              throw new Error(`invalid runtime dataset: ${JSON.stringify(d)}`);
+            }
+          }
+
+          if (source.mission !== '36K') throw new Error('PLATEAU source manifest identity missing');
+          if (source.wardCount !== 24) throw new Error(`source wardCount=${source.wardCount}`);
+          if (source.coverage?.lod1Wards !== 24) throw new Error(`source lod1Wards=${source.coverage?.lod1Wards}`);
+          if (Object.keys(source.wards || {}).length !== 24) throw new Error('source manifest does not contain 24 ward records');
+          for (const [id, w] of Object.entries(source.wards)) {
+            if (!w.preferredLod1?.tilesetPath) throw new Error(`missing preferred LOD1 tileset: ${id}`);
+            if (!(w.preferredLod1?.b3dmCount > 0)) throw new Error(`missing LOD1 B3DM geometry: ${id}`);
+          }
+
+          const r = JSON.parse(fs.readFileSync('data/reports/mission36k-building-ward-manifest.json', 'utf8'));
+          if (r.smoke?.wardId !== 'sumiyoshi' || !r.smoke?.assetVersion) throw new Error('Sumiyoshi tileset range smoke failed');
+          const b = JSON.parse(fs.readFileSync('data/reports/mission36k-b3dm-smoke.json', 'utf8'));
+          if (!b.verified || b.header?.magic !== 'b3dm' || b.header?.glbMagic !== 'glTF') throw new Error('B3DM range smoke failed');
+          const x = JSON.parse(fs.readFileSync('data/reports/mission36k-ward-extract-sumiyoshi-lod1.json', 'utf8'));
+          if (x.wardId !== 'sumiyoshi' || x.lod !== 1 || x.mode !== 'limited') throw new Error('Ward extractor report identity failed');
+          if (x.selectedFiles !== 3 || x.extracted?.length !== 3) throw new Error(`Unexpected extracted file count: ${x.selectedFiles}`);
+          if (!x.extracted.some((e) => e.relativePath === 'tileset.json')) throw new Error('Extracted package lacks tileset.json');
+
+          console.log(JSON.stringify({
+            runtime: { wards: runtime.datasets.length, buildings: runtime.buildingCount, tiles: runtime.tileCount },
+            plateau: { coverage: source.coverage, sourcePath },
+            smokeWard: r.smoke?.wardId,
+          }, null, 2));
+          NODE
+
+      - name: Upload selective Sumiyoshi extraction smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission36k-sumiyoshi-lod1-range-smoke
+          path: /tmp/mission36k-ward-extract/sumiyoshi-lod1
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Guard protected production HTML after Mission 36K
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum -c /tmp/mission36k-protected.sha256
+
+      - name: Commit separated manifests, repaired tools, and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f \
+            data/reports/mission36k-building-source-discovery.json \
+            data/reports/mission36k-runtime-zip-probe.json \
+            data/reports/mission36k-building-ward-manifest.json \
+            data/reports/mission36k-b3dm-smoke.json \
+            data/reports/mission36k-ward-extract-sumiyoshi-lod1.json \
+            public/map-data/osaka-city/building-sources/plateau-2024-manifest.json \
+            public/map-data/osaka-city/buildings/manifest.json \
+            tools/mission36k-build-ward-building-manifest.mjs \
+            tools/mission36k-fetch-ward-building-source.mjs \
+            tools/mission36k-smoke-b3dm.mjs
+          if git diff --cached --quiet; then
+            echo 'No Mission36K repair changes.'
+            exit 0
+          fi
+          git commit -m 'fix(mission36k): separate PLATEAU source and runtime manifests'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

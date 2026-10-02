@@ -1,0 +1,100 @@
+{
+  "before": {
+    "records": 2596,
+    "indexedByCanonicalId": 266,
+    "byConfidence": {
+      "unresolved": 2100,
+      "high": 496
+    },
+    "byMethod": {
+      "curated": 24,
+      "direct-id": 1293,
+      "citywide-verified": 1279
+    }
+  },
+  "after": {
+    "requested": 24,
+    "withPhoto": 1792,
+    "noPhoto": 0,
+    "noLicense": 0,
+    "high": 496,
+    "medium": 0,
+    "unresolved": 2100,
+    "wikidataMissing": 0,
+    "landmarkLinked": 17,
+    "collisionsDropped": 0,
+    "records": 2596,
+    "curatedRecords": 24,
+    "citywideRecords": 2572,
+    "indexedByCanonicalId": 574,
+    "indexedByLandmarkId": 17,
+    "byMatchMethod": {
+      "curated": 5,
+      "direct-id": 251,
+      "citywide-verified": 240
+    },
+    "insideAnyFootprint": 1273,
+    "byConfidence": {
+      "VERY_HIGH": 345,
+      "HIGH": 231,
+      "AMBIGUOUS": 530,
+      "UNRESOLVED": 1490
+    },
+    "byMatchType": {
+      "unresolved": 1490,
+      "exact-building": 952,
+      "complex": 146,
+      "building-part": 8
+    },
+    "byNameEvidence": {
+      "conflict": 167,
+      "name": 556,
+      "landmark": 20,
+      "no-name": 146,
+      "none": 384
+    },
+    "ambiguityReasons": {
+      "complex-facility": 146,
+      "building-part-overlap": 8
+    },
+    "wardCoverage": {
+      "kita": 274,
+      "abeno": 33,
+      "chuo": 174,
+      "naniwa": 29,
+      "nishi": 42,
+      "minato": 17,
+      "hirano": 20,
+      "konohana": 51,
+      "nishinari": 18,
+      "sumiyoshi": 13,
+      "tennoji": 82,
+      "yodogawa": 11,
+      "higashiyodogawa": 22,
+      "joto": 13,
+      "ikuno": 15,
+      "miyakojima": 24,
+      "tsurumi": 11,
+      "taisho": 13,
+      "asahi": 6,
+      "higashisumiyoshi": 24,
+      "higashinari": 7,
+      "fukushima": 32,
+      "suminoe": 19,
+      "nishiyodogawa": 2
+    },
+    "changedFromPreviousMatching": 877,
+    "preferredPhotoApplied": 0,
+    "nameConflictRejected": 167,
+    "sharedBuildingDemoted": 27,
+    "duplicateRecordsDropped": 349
+  },
+  "lookup": {
+    "tileReads": 2479,
+    "tileMisses": 2352,
+    "pointTests": 2596,
+    "ringTests": 1798,
+    "cachedTiles": 900
+  },
+  "elapsedSec": 35
+}

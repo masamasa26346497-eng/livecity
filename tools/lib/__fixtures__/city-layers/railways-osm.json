@@ -1,0 +1,66 @@
+{
+ "elements": [
+  {
+   "type": "way",
+   "id": 20,
+   "tags": {
+    "railway": "rail"
+   },
+   "geometry": [
+    {
+     "lat": 34.6131911,
+     "lon": 135.5031923
+    },
+    {
+     "lat": 34.6131911,
+     "lon": 135.52502
+    },
+    {
+     "lat": 34.6140894,
+     "lon": 135.5468477
+    },
+    {
+     "lat": 34.6131911,
+     "lon": 135.5686753
+    }
+   ]
+  },
+  {
+   "type": "way",
+   "id": 21,
+   "tags": {
+    "railway": "subway"
+   },
+   "geometry": [
+    {
+     "lat": 34.6086996,
+     "lon": 135.5304769
+    },
+    {
+     "lat": 34.6095979,
+     "lon": 135.5413907
+    }
+   ]
+  },
+  {
+   "type": "node",
+   "id": 22,
+   "tags": {
+    "railway": "station",
+    "name:ja": "テスト駅"
+   },
+   "lat": 34.612742,
+   "lon": 135.532114
+  },
+  {
+   "type": "node",
+   "id": 23,
+   "tags": {
+    "railway": "station",
+    "name": "Sumiyoshi"
+   },
+   "lat": 34.6076216,
+   "lon": 135.5026467
+  }
+ ]
+}

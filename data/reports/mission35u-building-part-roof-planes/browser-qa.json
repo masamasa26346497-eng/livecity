@@ -1,0 +1,519 @@
+{
+  "url": "http://localhost:8080/osaka_3d_buildings.ward-ux-v1.html",
+  "generatedAt": "2026-09-25T18:04:34.647Z",
+  "mission": "35U",
+  "views": [
+    {
+      "view": "oblique",
+      "label": "斜め",
+      "mode": "RAW",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.003,
+          0.173
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 429,
+        "ndc": [
+          0.003,
+          0.279
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 170,
+      "shot": "data/reports/mission35u-building-part-roof-planes/oblique-raw.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/oblique-raw-nobldg.jpg"
+    },
+    {
+      "view": "oblique",
+      "label": "斜め",
+      "mode": "PLANAR",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 103,
+        "ndc": [
+          0.003,
+          0.173
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.003,
+          0.279
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 170,
+      "shot": "data/reports/mission35u-building-part-roof-planes/oblique-planar.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/oblique-planar-nobldg.jpg"
+    },
+    {
+      "view": "oblique",
+      "label": "斜め",
+      "mode": "BOTH",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.003,
+          0.173
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.003,
+          0.279
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 170,
+      "shot": "data/reports/mission35u-building-part-roof-planes/oblique-both.jpg",
+      "shotNoBuildings": null
+    },
+    {
+      "view": "top-down",
+      "label": "真上",
+      "mode": "RAW",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.004,
+          0.007
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 429,
+        "ndc": [
+          0.004,
+          0.015
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 150,
+      "shot": "data/reports/mission35u-building-part-roof-planes/top-down-raw.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/top-down-raw-nobldg.jpg"
+    },
+    {
+      "view": "top-down",
+      "label": "真上",
+      "mode": "PLANAR",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 103,
+        "ndc": [
+          0.004,
+          0.007
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.004,
+          0.015
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 150,
+      "shot": "data/reports/mission35u-building-part-roof-planes/top-down-planar.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/top-down-planar-nobldg.jpg"
+    },
+    {
+      "view": "top-down",
+      "label": "真上",
+      "mode": "BOTH",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.004,
+          0.007
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.004,
+          0.015
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 150,
+      "shot": "data/reports/mission35u-building-part-roof-planes/top-down-both.jpg",
+      "shotNoBuildings": null
+    },
+    {
+      "view": "side",
+      "label": "真横",
+      "mode": "RAW",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.002,
+          0.115
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 429,
+        "ndc": [
+          0.002,
+          0.178
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 300,
+      "shot": "data/reports/mission35u-building-part-roof-planes/side-raw.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/side-raw-nobldg.jpg"
+    },
+    {
+      "view": "side",
+      "label": "真横",
+      "mode": "PLANAR",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": false,
+        "triangles": 103,
+        "ndc": [
+          0.002,
+          0.115
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.002,
+          0.178
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 300,
+      "shot": "data/reports/mission35u-building-part-roof-planes/side-planar.jpg",
+      "shotNoBuildings": "data/reports/mission35u-building-part-roof-planes/side-planar-nobldg.jpg"
+    },
+    {
+      "view": "side",
+      "label": "真横",
+      "mode": "BOTH",
+      "raw35S": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 103,
+        "ndc": [
+          0.002,
+          0.115
+        ],
+        "inView": true
+      },
+      "planar35U": {
+        "visible": true,
+        "parentVisible": true,
+        "triangles": 429,
+        "ndc": [
+          0.002,
+          0.178
+        ],
+        "inView": true
+      },
+      "label35U": true,
+      "lod1SuppressedCount": 0,
+      "cameraR": 300,
+      "shot": "data/reports/mission35u-building-part-roof-planes/side-both.jpg",
+      "shotNoBuildings": null
+    }
+  ],
+  "jsErrors": [],
+  "debug35U": {
+    "enabled": true,
+    "loaded": true,
+    "visible": false,
+    "mode": "PLANAR",
+    "modes": [
+      "RAW",
+      "PLANAR",
+      "BOTH"
+    ],
+    "url": "map-data/osaka-city/experimental/mission35u/part-roof-planes-267613423.json",
+    "officialPlateauLod2": false,
+    "status": "EXPERIMENTAL_POINT_CLOUD_PLANAR_ROOF",
+    "error": null,
+    "triangles": 429,
+    "roofTriangles": 319,
+    "wallTriangles": 110,
+    "planeCount": 5,
+    "roofType": "UNKNOWN_PLANAR_ROOF",
+    "partVerdict": "BUILDING_PART_CANDIDATE",
+    "partChecks": {
+      "sourceCoveredRatio>=0.90": true,
+      "candidateCoveredRatio 0.25-0.75": true,
+      "source centroid inside candidate": true,
+      "second candidate weak": true,
+      "source area < candidate area": true
+    },
+    "partFailed": [],
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "lod1SuppressionAllowed": false,
+    "planes": [
+      {
+        "index": 0,
+        "support": 812,
+        "slopeDeg": 10.042,
+        "rmsErrorM": 0.1357,
+        "triangles": 67,
+        "polygonAreaM2": 167.79
+      },
+      {
+        "index": 1,
+        "support": 250,
+        "slopeDeg": 6.458,
+        "rmsErrorM": 0.1339,
+        "triangles": 50,
+        "polygonAreaM2": 50.68
+      },
+      {
+        "index": 2,
+        "support": 104,
+        "slopeDeg": 29.944,
+        "rmsErrorM": 0.2065,
+        "triangles": 66,
+        "polygonAreaM2": 248.72
+      },
+      {
+        "index": 3,
+        "support": 87,
+        "slopeDeg": 37.793,
+        "rmsErrorM": 0.1696,
+        "triangles": 51,
+        "polygonAreaM2": 362.66
+      },
+      {
+        "index": 4,
+        "support": 68,
+        "slopeDeg": 0.963,
+        "rmsErrorM": 0.1061,
+        "triangles": 85,
+        "polygonAreaM2": 170.88
+      }
+    ],
+    "roofCandidatePoints": 1886,
+    "containment": {
+      "vertices": 460,
+      "outsideFootprint": 0,
+      "toleranceM": 0.75,
+      "ok": true
+    },
+    "labelText": "35U PLANAR ROOF",
+    "qaColors": {
+      "roof": "#35d17a",
+      "wall": "#1b7a4b"
+    }
+  },
+  "debug35S": {
+    "enabled": true,
+    "loaded": true,
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "visible": true,
+    "suppressActive": false,
+    "url": "map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json",
+    "maxCameraR": 2500,
+    "officialPlateauLod2": false,
+    "status": "EXPERIMENTAL_POINT_CLOUD_ROOF",
+    "matched": false,
+    "matchDistanceM": 21.48,
+    "areaRatio": 1.604,
+    "triangles": 103,
+    "error": null,
+    "lod1SuppressedCount": 0,
+    "matchConfidence": "UNMATCHED",
+    "bestCandidate": {
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "centroidDistanceM": 21.48,
+      "areaRatio": 1.604,
+      "candidateAreaM2": 1636.5,
+      "iou": 0.5778,
+      "sourceCoveredRatio": 0.963,
+      "candidateCoveredRatio": 0.5909,
+      "heightM": 76
+    },
+    "secondCandidate": {
+      "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+      "centroidDistanceM": 21.19,
+      "areaRatio": 0.023,
+      "candidateAreaM2": 23.3,
+      "iou": 0.0037,
+      "sourceCoveredRatio": 0.0038,
+      "candidateCoveredRatio": 0.1644,
+      "heightM": 3.4
+    },
+    "iou": 0.5778,
+    "sourceCoveredRatio": 0.963,
+    "candidateCoveredRatio": 0.5909,
+    "centroidDistanceM": 21.48,
+    "heightDeltaM": 49.49,
+    "candidateCount": 60,
+    "ambiguousReason": null,
+    "lod1SuppressionAllowed": false,
+    "matchReason": "基準未達（IoU 0.5778 / 重心 21.48m / 面積比 1.604）",
+    "labelText": "35S CUSTOM LOD2",
+    "heightMedianM": 26.512,
+    "heightP90M": 50.472,
+    "roofType": "measured-triangulated-surface",
+    "sourceFootprintAreaM2": 1020.161,
+    "osmWayId": 267613423,
+    "officialOwnsCanonical": false,
+    "landmarkOwnsCanonical": false,
+    "matchRules": {
+      "HIGH": {
+        "iou": 0.75,
+        "centroidM": 10,
+        "areaRatio": [
+          0.8,
+          1.25
+        ]
+      },
+      "MEDIUM": {
+        "iou": 0.6,
+        "centroidM": 15,
+        "areaRatio": [
+          0.7,
+          1.4
+        ]
+      },
+      "AMBIGUOUS": {
+        "iouGap": 0.1,
+        "centroidGapM": 3
+      }
+    },
+    "candidateRadiusM": 100,
+    "focusR": 150,
+    "labelWorld": {
+      "x": -3974.01,
+      "y": 63.75,
+      "z": -14806.02
+    },
+    "labelVisible": true,
+    "qaColors": {
+      "roof": "#2f9bff",
+      "wall": "#10399c",
+      "ground": "#8b949c"
+    }
+  },
+  "restore": [
+    {
+      "view": "oblique",
+      "mode": "RAW",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    },
+    {
+      "view": "oblique",
+      "mode": "PLANAR",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    },
+    {
+      "view": "top-down",
+      "mode": "RAW",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    },
+    {
+      "view": "top-down",
+      "mode": "PLANAR",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    },
+    {
+      "view": "side",
+      "mode": "RAW",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    },
+    {
+      "view": "side",
+      "mode": "PLANAR",
+      "hidden": true,
+      "lod1AfterRestore": 0
+    }
+  ],
+  "summary": {
+    "partVerdict": "BUILDING_PART_CANDIDATE",
+    "planeCount": 5,
+    "roofType": "UNKNOWN_PLANAR_ROOF",
+    "rawTriangles": 103,
+    "planarTriangles": 429,
+    "planarRoofTriangles": 319,
+    "planarWallTriangles": 110,
+    "roofCandidatePoints": 1886,
+    "containment": {
+      "vertices": 460,
+      "outsideFootprint": 0,
+      "toleranceM": 0.75,
+      "ok": true
+    },
+    "rawModeShowsRawOnly": true,
+    "planarModeShowsPlanarOnly": true,
+    "bothModeShowsBoth": true,
+    "lod1NeverSuppressed": true,
+    "planarInViewAllViews": true,
+    "views": [
+      "oblique",
+      "top-down",
+      "side"
+    ],
+    "buildingsRestored": true,
+    "jsErrors": 0
+  }
+}

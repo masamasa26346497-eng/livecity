@@ -1,0 +1,53 @@
+{
+  "mission": "36K",
+  "generatedAt": "2026-10-01T15:53:18.717Z",
+  "sourceEtag": "\"5a393b3c60a56f0f550032ae57b59a67\"",
+  "wardId": "sumiyoshi",
+  "wardName": "住吉区",
+  "wardCode": "27120",
+  "lod": 1,
+  "noTexture": false,
+  "variantRoot": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1",
+  "destinationRoot": "/tmp/mission36k-ward-extract/sumiyoshi-lod1",
+  "mode": "limited",
+  "selectedFiles": 3,
+  "variantFiles": 75,
+  "variantB3dmCount": 74,
+  "selectedCompressedBytes": 189788,
+  "selectedUncompressedBytes": 1861639,
+  "fullVariantCompressedBytes": 20319219,
+  "fullVariantUncompressedBytes": 211549123,
+  "extracted": [
+    {
+      "entry": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/tileset.json",
+      "relativePath": "tileset.json",
+      "compressedBytes": 6192,
+      "uncompressedBytes": 42971,
+      "b3dm": null
+    },
+    {
+      "entry": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/data/data0.b3dm",
+      "relativePath": "data/data0.b3dm",
+      "compressedBytes": 5094,
+      "uncompressedBytes": 33216,
+      "b3dm": {
+        "version": 1,
+        "byteLength": 33216,
+        "glbVersion": 2,
+        "glbByteLength": 6416
+      }
+    },
+    {
+      "entry": "27100_osaka-shi_city_2024_citygml_1_op_bldg_3dtiles_27120_sumiyoshi-ku_lod1/data/data1.b3dm",
+      "relativePath": "data/data1.b3dm",
+      "compressedBytes": 178502,
+      "uncompressedBytes": 1785452,
+      "b3dm": {
+        "version": 1,
+        "byteLength": 1785452,
+        "glbVersion": 2,
+        "glbByteLength": 434600
+      }
+    }
+  ]
+}

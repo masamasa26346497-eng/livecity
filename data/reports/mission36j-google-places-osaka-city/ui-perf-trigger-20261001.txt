@@ -1,0 +1,4 @@
+Mission 36J dev UI performance patch trigger.
+Cause: citywide 40,585 facilities were being converted to CanvasTexture/Sprite objects synchronously.
+Fix target: public/osaka_3d_buildings.ward-ux-v1.html only.
+Protected production HTML must remain unchanged.

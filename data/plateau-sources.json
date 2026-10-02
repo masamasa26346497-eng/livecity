@@ -11,7 +11,9 @@
   "patterns": {
     "_comment": "ZIP内エントリの判定に使う正規表現。",
     "gmlPattern": "\\.gml$",
-    "bldgPattern": "(^|/)[^/]*bldg[^/]*\\.gml$"
+    "bldgPattern": "(^|/)[^/]*bldg[^/]*\\.gml$",
+    "_tranComment": "[Mission 31D §20] PLATEAU 交通モデル tran:Road（道路縁ポリゴン）取得用。tools/fetch-plateau.js は現状 bldg のみ取得するため未使用。tran 取得は fetch-plateau.js への --layer tran 対応追加が必要（data/reports/road-polygon-source-acquisition.json 参照）。",
+    "tranPattern": "(^|/)[^/]*tran[^/]*\\.gml$"
   },
   "cities": {
     "_comment": "市単位の配布ZIP。",

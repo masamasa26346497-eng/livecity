@@ -1,50 +1,61 @@
 #!/usr/bin/env node
 'use strict';
-/* build-ward-poc-data.cjs — Ward Mode PoC専用データセット生成ツール。
+/* build-ward-poc-data.cjs — Ward Mode PoC専用データセット生成ツール（v2: Ward Registry駆動）。
  *
- * 【重要な制約の明記】
- * このツールは汎用的に設計されており、--source-jsonl（建物データのJSONL、znorth-neg-v1変換済み）
- * を入力として受け取る。本ツールの開発・動作確認を行ったサンドボックス環境には、
- * 実際の本番remote 584,490棟のタイル本体が存在しない（876タイルはユーザーのローカル環境にのみ実在）。
- * そのため、このツール自体を実際に584,490棟へ適用する実行は、ユーザーの実機で行う必要がある。
+ * 【v2での変更点】
+ * v1は住吉区・東住吉区の2区をスクリプト内にハードコードしていたが、大阪市24区への拡張に伴い、
+ * config/wards/registry.json（Ward Registry、24区分の id/name/kana/code/townPrefix/datasetId）を
+ * 読み込んで対象区を決定する方式に変更した。スクリプト本体を区ごとに書き換える必要はなくなった。
  *
- * 【分類方法（v2）】STEP1
- *   行政区ポリゴン（TOWN_POLYGONS実データ、住吉区101町丁目・東住吉区100町丁目）による
- *   座標判定のみを正本とする。building.ward属性は一切、分類の拒否条件・ルーティング条件に
- *   使用しない（診断記録専用）。
+ * 【区が「生成対象」になる条件（自動判定・ハードコードなし）】
+ *   1. Ward Registryに載っている
+ *   2. --town-polygons のキーに、その区のtownPrefixで始まるものが1件以上ある
+ *      （TOWN_POLYGONSに実際の町丁目境界データが無い区は、Registryに載っていても自動的に対象外＝
+ *       「実データ・polygonが存在しない区を無理に生成しない」をコード側で保証する）
+ *   さらに --only <id1,id2,...> を指定すると、上記の条件を満たす区のうち指定IDのみに絞り込む
+ *   （既存datasetへ新しい区を追加する際、対象区を明示して誤爆を防ぐために使う）。
  *
- *   1. footprint重心が住吉区polygon内のみ         → sumiyoshi
- *   2. footprint重心が東住吉区polygon内のみ       → higashisumiyoshi
- *   3. footprint重心が両区のpolygonに同時ヒット   → ambiguous
- *   4. footprint重心がどちらのpolygonにもヒットしない → outsideTarget
+ * 【分類方法】STEP1
+ *   行政区ポリゴン（TOWN_POLYGONS実データ）による座標判定のみを正本とする。building.ward属性は
+ *   一切、分類の拒否条件・ルーティング条件に使用しない（診断記録専用）。
+ *
+ *   1. footprint重心がちょうど1つの対象区polygon内            → その区
+ *   2. footprint重心が複数の対象区polygonに同時ヒット          → ambiguous
+ *   3. footprint重心がどの対象区polygonにもヒットしない        → outsideTarget
  *      （不正データ: fp欠落・頂点数<3等で重心を計算できない建物も、
  *       行政区を確認しようがないため outsideTarget に算入する。件数は別途内訳表示する）
- *   5. 重心がsumiyoshi/higashisumiyoshiに解決した場合、footprint全頂点についても
- *      同じ判定を行い、頂点のいずれかが重心と異なる区分類になれば
- *      → boundaryStraddle（区境界をfootprintがまたぐ。PoCからは除外）
+ *   4. 重心がいずれかの区に解決した場合、footprint全頂点についても同じ判定を行い、
+ *      頂点のいずれかが重心と異なる区分類になれば → boundaryStraddle（区境界をまたぐ。除外）
  *
  *   building.ward / building.town は診断専用。座標分類との一致・不一致を
- *   wardAttrMatch / wardAttrMismatch として記録するのみで、不一致でも
- *   分類（sumiyoshi/higashisumiyoshi/ambiguous/outsideTarget/boundaryStraddle）には一切影響しない。
+ *   wardAttrMatch / wardAttrMismatch として記録するのみで、不一致でも分類には一切影響しない。
  *
- *   恒等式: sumiyoshi + higashisumiyoshi + outsideTarget + boundaryStraddle + ambiguous = 入力総数
+ *   恒等式: Σ(各区の件数) + outsideTarget + boundaryStraddle + ambiguous = 入力総数
  *
  * 【高速化】
- *   各行政区（住吉区・東住吉区）のpolygon群のbbox(minX,maxX,minZ,maxZ)を事前計算し、
- *   判定対象の点がbbox外であればpoint-in-polygon（pointInRingのO(頂点数)ループ）を
- *   一切実行しない（bboxの矩形判定4回のみで済ませる）。
+ *   各行政区のpolygon群のbbox(minX,maxX,minZ,maxZ)を事前計算し、判定対象の点がbbox外であれば
+ *   point-in-polygon（pointInRingのO(頂点数)ループ）を一切実行しない。
  *
  * 【出力先の安全制約】
  *   public/__test__/ward-poc/ 配下、または temp/ 配下にのみ書き込みを許可する。
  *   production releases (public/data/buildings/releases/znorth-neg-v1/等)へは
  *   絶対に書き込めない（ハードコードされた拒否リストで二重に保護）。
  *
+ * 【既存datasetの非破壊性】
+ *   区単位のmanifest.json・tile_*.jsonは、既に存在するファイルへの上書きを常に拒否する
+ *   （＝一度生成した区は、このツールの再実行では変更されない）。
+ *   root manifest.json（datasets一覧）のみ、新規追加分だけをマージする特別扱いとする
+ *   （既存datasetエントリの内容は一切変更せず、末尾に新しいdatasetを追記するだけ。
+ *    追加しようとしたdatasetIdが既にroot manifestへ登録済みの場合は安全側に倒して停止する）。
+ *
  * usage:
  *   node tools/build-ward-poc-data.cjs \
  *     --project-root <dir> \
  *     --source-jsonl <znorth-neg-v1建物JSONL> \
  *     --town-polygons <TOWN_POLYGONS.json (znorth-neg-v1変換済み、同一jsonファイル)> \
+ *     --ward-registry config/wards/registry.json \
  *     --out public/__test__/ward-poc/buildings \
+ *     [--only hirano,abeno] \
  *     [--dry-run|--apply]
  */
 const fs = require('fs');
@@ -62,8 +73,8 @@ function parseArgs(argv) {
 const A = parseArgs(process.argv.slice(2));
 const MODE = A.apply ? 'apply' : 'dry-run';
 
-if (!A['project-root'] || !A['source-jsonl'] || !A['town-polygons'] || !A.out) {
-  console.error('usage: --project-root <dir> --source-jsonl <file> --town-polygons <file> --out <dir> [--dry-run|--apply]');
+if (!A['project-root'] || !A['source-jsonl'] || !A['town-polygons'] || !A['ward-registry'] || !A.out) {
+  console.error('usage: --project-root <dir> --source-jsonl <file> --town-polygons <file> --ward-registry <file> --out <dir> [--only id1,id2] [--dry-run|--apply]');
   process.exit(1);
 }
 const ROOT = path.resolve(A['project-root']);
@@ -106,14 +117,31 @@ function pointInRing(x, z, ring) {
   return inside;
 }
 
-// ── TOWN_POLYGONSから対象2区分だけを抽出（新規座標データは作らず、既存データの分類のみ） ──
-// 【重要】分類対象は住吉区・東住吉区の2区のみ。平野区等は「outsideTarget」に含まれるため、
-// 個別のポリゴン保持は不要（分類ロジック上は住吉区/東住吉区の2ポリゴン群だけで十分）。
+// ── Ward Registryを読み込み、TOWN_POLYGONSに実際に町丁目境界データがある区だけを対象にする ──
 const townPolygons = JSON.parse(fs.readFileSync(path.resolve(A['town-polygons']), 'utf8'));
-const WARD_DEFS = [
-  { id: 'sumiyoshi', name: '住吉区', townPrefix: '住吉区' },
-  { id: 'higashisumiyoshi', name: '東住吉区', townPrefix: '東住吉区' },
-];
+const registryRaw = JSON.parse(fs.readFileSync(path.resolve(A['ward-registry']), 'utf8'));
+const registryWards = registryRaw.wards || [];
+const onlyFilter = (typeof A.only === 'string') ? new Set(A.only.split(',').map((s) => s.trim()).filter(Boolean)) : null;
+
+const townKeysByPrefix = (prefix) => Object.keys(townPolygons).filter((k) => k.indexOf(prefix) === 0);
+
+const WARD_DEFS = [];
+const skippedNoPolygon = [];
+const skippedNotInOnlyFilter = [];
+for (const w of registryWards) {
+  if (onlyFilter && !onlyFilter.has(w.id)) { skippedNotInOnlyFilter.push(w.id); continue; }
+  const townKeys = townKeysByPrefix(w.townPrefix);
+  if (townKeys.length === 0) { skippedNoPolygon.push(w.id); continue; }
+  WARD_DEFS.push({ id: w.id, name: w.name, townPrefix: w.townPrefix, wardCode: w.code || null, datasetId: w.datasetId, townCount: townKeys.length });
+}
+console.log(`[build-ward-poc-data] Ward Registry: ${registryWards.length}区中、対象=${WARD_DEFS.length}区` +
+  (skippedNoPolygon.length ? ` / TOWN_POLYGONS未整備でスキップ=${skippedNoPolygon.length}区(${skippedNoPolygon.join(',')})` : '') +
+  (skippedNotInOnlyFilter.length ? ` / --onlyで除外=${skippedNotInOnlyFilter.length}区` : ''));
+if (WARD_DEFS.length === 0) {
+  console.error('[stop] 対象区が0件です（--onlyの指定、またはTOWN_POLYGONSのtownPrefix整備状況を確認してください）。');
+  process.exit(2);
+}
+
 const wardRings = {};
 const wardBBox = {}; // ── 高速化: 行政区ごとのbbox事前計算 ──
 for (const w of WARD_DEFS) {
@@ -129,7 +157,7 @@ for (const w of WARD_DEFS) {
     }
   }
   wardBBox[w.id] = bbox;
-  console.log(`[build-ward-poc-data] ${w.name}: town数=${Object.keys(townPolygons).filter((k) => k.indexOf(w.townPrefix) === 0).length} ring数=${wardRings[w.id].length} bbox=${JSON.stringify(bbox)}`);
+  console.log(`[build-ward-poc-data] ${w.name}: town数=${w.townCount} ring数=${wardRings[w.id].length} bbox=${JSON.stringify(bbox)}`);
 }
 // bbox外はpoint-in-polygonを一切実行しない（高速化）
 function pointInWard(x, z, wardId) {
@@ -138,26 +166,25 @@ function pointInWard(x, z, wardId) {
   for (const ring of wardRings[wardId]) { if (pointInRing(x, z, ring)) return true; }
   return false;
 }
-// 点(x,z)が住吉区/東住吉区どちらの判定になるか('sumiyoshi'|'higashisumiyoshi'|'ambiguous'|'outsideTarget')
+// 点(x,z)がどの対象区に属するか('<wardId>'|'ambiguous'|'outsideTarget')。複数区に同時ヒットしたらambiguous。
 function classifyPoint(x, z) {
-  const sumi = pointInWard(x, z, 'sumiyoshi');
-  const higa = pointInWard(x, z, 'higashisumiyoshi');
-  if (sumi && higa) return 'ambiguous';
-  if (sumi) return 'sumiyoshi';
-  if (higa) return 'higashisumiyoshi';
-  return 'outsideTarget';
+  let hit = null, hitCount = 0;
+  for (const w of WARD_DEFS) {
+    if (pointInWard(x, z, w.id)) { hit = w.id; hitCount++; if (hitCount > 1) return 'ambiguous'; }
+  }
+  return hitCount === 1 ? hit : 'outsideTarget';
 }
 
 // ── building.ward属性 → 診断専用の対象区マッピング（分類には一切使用しない） ──
 function attrImpliesTarget(wardStr) {
-  if (wardStr === '住吉区') return 'sumiyoshi';
-  if (wardStr === '東住吉区') return 'higashisumiyoshi';
-  return null; // 平野区・その他・未定義は「対象2区ではない」= null
+  const w = WARD_DEFS.find((d) => d.name === wardStr);
+  return w ? w.id : null; // 対象区以外・未定義は「対象区ではない」= null
 }
 
 // ── STEP1: 分類本体 ──
 async function classifyAll() {
-  const buckets = { sumiyoshi: [], higashisumiyoshi: [], outsideTarget: [], boundaryStraddle: [], ambiguous: [] };
+  const buckets = { outsideTarget: [], boundaryStraddle: [], ambiguous: [] };
+  for (const w of WARD_DEFS) buckets[w.id] = [];
   let total = 0, invalidCountedAsOutsideTarget = 0;
   let hasWardAttr = 0, wardAttrMatch = 0, wardAttrMismatch = 0;
   const mismatchSamples = [];
@@ -168,8 +195,6 @@ async function classifyAll() {
     total++;
 
     // 不正データ(fp欠落・頂点数<3等)は行政区を判定しようがないため outsideTarget へ算入する
-    // （恒等式 sumiyoshi+higashisumiyoshi+outsideTarget+boundaryStraddle+ambiguous=総数 を
-    //   常に満たすため。件数は invalidCountedAsOutsideTarget として別途内訳表示する）。
     if (!b || !Array.isArray(b.fp) || b.fp.length < 3) {
       buckets.outsideTarget.push(b);
       invalidCountedAsOutsideTarget++;
@@ -179,8 +204,8 @@ async function classifyAll() {
     const { cx, cz } = polyAreaCentroid(b.fp);
     let bucket = classifyPoint(cx, cz);
 
-    // 重心がsumiyoshi/higashisumiyoshiに解決した場合のみ、footprint全頂点の境界またぎを検証
-    if (bucket === 'sumiyoshi' || bucket === 'higashisumiyoshi') {
+    // 重心がいずれかの対象区に解決した場合のみ、footprint全頂点の境界またぎを検証
+    if (bucket !== 'outsideTarget' && bucket !== 'ambiguous') {
       let straddles = false;
       for (const p of b.fp) {
         if (classifyPoint(p[0], p[1]) !== bucket) { straddles = true; break; }
@@ -193,8 +218,8 @@ async function classifyAll() {
     // [診断専用] building.ward属性と座標判定の一致検査。不一致でも分類(bucket)には一切影響しない。
     if (Object.prototype.hasOwnProperty.call(b, 'ward')) {
       hasWardAttr++;
-      const attrTarget = attrImpliesTarget(b.ward); // 'sumiyoshi'|'higashisumiyoshi'|null
-      const coordTarget = (bucket === 'sumiyoshi' || bucket === 'higashisumiyoshi') ? bucket : null;
+      const attrTarget = attrImpliesTarget(b.ward);
+      const coordTarget = WARD_DEFS.some((w) => w.id === bucket) ? bucket : null;
       if (attrTarget === coordTarget) {
         wardAttrMatch++;
       } else {
@@ -225,6 +250,7 @@ function buildDataset(datasetId, wardName, wardCode, buildings, outRoot) {
     for (const p of b.fp) { if (p[0] < bounds.minX) bounds.minX = p[0]; if (p[0] > bounds.maxX) bounds.maxX = p[0]; if (p[1] < bounds.minZ) bounds.minZ = p[1]; if (p[1] > bounds.maxZ) bounds.maxZ = p[1]; }
   }
   const dsDir = path.join(outRoot, datasetId);
+  if (fs.existsSync(dsDir)) { console.error('[stop] dataset出力先が既に存在します(既存区の上書き防止):', dsDir); process.exit(3); }
   const tilesOut = [];
   for (const { tx, tz, buildings: tb } of tileMap.values()) {
     const fname = `tile_${tx}_${tz}.json`;
@@ -252,23 +278,45 @@ function buildDataset(datasetId, wardName, wardCode, buildings, outRoot) {
   return manifest;
 }
 
+// ── root manifest.json: 既存datasetは一切変更せず、新規分だけを末尾に追記する ──
+function mergeRootManifest(outRoot, newEntries) {
+  const rmp = path.join(outRoot, 'manifest.json');
+  let existing = null;
+  if (fs.existsSync(rmp)) {
+    existing = JSON.parse(fs.readFileSync(rmp, 'utf8'));
+    const existingIds = new Set((existing.datasets || []).map((d) => d.id));
+    for (const e of newEntries) {
+      if (existingIds.has(e.id)) { console.error('[stop] root manifestに同一datasetIdが既に存在します(意図しない上書き防止):', e.id); process.exit(3); }
+    }
+  }
+  const merged = existing
+    ? { ...existing, datasets: [...existing.datasets, ...newEntries] }
+    : {
+        version: 1, city: 'osaka-ward-poc', coordinateSystem: 'meters-local', coordinateConvention: 'znorth-neg-v1',
+        tileSize: TILE_SIZE, origin: null, datasets: newEntries,
+      };
+  if (MODE === 'apply') {
+    fs.mkdirSync(outRoot, { recursive: true });
+    fs.writeFileSync(rmp, JSON.stringify(merged, null, 2));
+  }
+  return { path: rmp, manifest: merged, wasExisting: !!existing };
+}
+
 async function main() {
   const t0 = Date.now();
   const { buckets, total, invalidCountedAsOutsideTarget, hasWardAttr, wardAttrMatch, wardAttrMismatch, mismatchSamples } = await classifyAll();
   const elapsedMs = Date.now() - t0;
 
-  const sumiyoshi = buckets.sumiyoshi.length;
-  const higashisumiyoshi = buckets.higashisumiyoshi.length;
   const outsideTarget = buckets.outsideTarget.length;
   const boundaryStraddle = buckets.boundaryStraddle.length;
   const ambiguous = buckets.ambiguous.length;
-  const classificationSum = sumiyoshi + higashisumiyoshi + outsideTarget + boundaryStraddle + ambiguous;
+  let classificationSum = outsideTarget + boundaryStraddle + ambiguous;
+  for (const w of WARD_DEFS) classificationSum += buckets[w.id].length;
 
   console.log('total:', total);
-  console.log('sumiyoshi:', sumiyoshi);
-  console.log('higashisumiyoshi:', higashisumiyoshi);
+  for (const w of WARD_DEFS) console.log(`${w.id}(${w.name}):`, buckets[w.id].length);
   console.log('outsideTarget:', outsideTarget, `(うち不正データ算入分=${invalidCountedAsOutsideTarget})`);
-  console.log('boundaryStraddle:', boundaryStraddle, '(PoCから除外)');
+  console.log('boundaryStraddle:', boundaryStraddle, '(除外)');
   console.log('ambiguous:', ambiguous);
   console.log('');
   console.log('wardAttrMatch:', wardAttrMatch);
@@ -281,48 +329,40 @@ async function main() {
   console.log('classificationSum:', classificationSum);
   console.log('classificationSum === total:', classificationSum === total);
   console.log('');
-  console.log(`sumiyoshi > 0: ${sumiyoshi > 0 ? 'OK' : 'NG'}`);
-  console.log(`higashisumiyoshi > 0: ${higashisumiyoshi > 0 ? 'OK' : 'NG'}`);
+  for (const w of WARD_DEFS) console.log(`${w.id} > 0: ${buckets[w.id].length > 0 ? 'OK' : 'NG'}`);
   console.log(`分類処理時間: ${elapsedMs}ms（bbox事前フィルタ適用済み）`);
 
   if (MODE === 'apply') {
     // 【安全チェック】--apply時のみ必須。満たさなければ書き込みを一切行わない。
-    const invariantOk = classificationSum === total && sumiyoshi > 0 && higashisumiyoshi > 0;
+    const invariantOk = classificationSum === total && WARD_DEFS.every((w) => buckets[w.id].length > 0);
     if (!invariantOk) {
-      console.error('[stop] 安全チェック不成立(classificationSum===total / sumiyoshi>0 / higashisumiyoshi>0)。PoCデータは生成しません。');
+      console.error('[stop] 安全チェック不成立(classificationSum===total / 全対象区でbuildings>0)。データは生成しません。');
       process.exit(4);
     }
-    console.log('=== STEP2 PoCデータ生成 ===');
-    const sumiMan = buildDataset('osaka-sumiyoshi', '住吉区', null, buckets.sumiyoshi, OUT);
-    const higaMan = buildDataset('osaka-higashisumiyoshi', '東住吉区', '27121', buckets.higashisumiyoshi, OUT);
-    console.log('  osaka-sumiyoshi:', sumiMan.totalBuildings, '棟', sumiMan.tileCount, 'タイル bounds=', JSON.stringify(sumiMan.bounds));
-    console.log('  osaka-higashisumiyoshi:', higaMan.totalBuildings, '棟', higaMan.tileCount, 'タイル bounds=', JSON.stringify(higaMan.bounds));
+    console.log('=== STEP2 データ生成 ===');
+    const newEntries = [];
+    for (const w of WARD_DEFS) {
+      const man = buildDataset(w.datasetId, w.name, w.wardCode, buckets[w.id], OUT);
+      console.log(`  ${w.datasetId}:`, man.totalBuildings, '棟', man.tileCount, 'タイル bounds=', JSON.stringify(man.bounds));
+      newEntries.push({ id: w.datasetId, ward: w.name, wardCode: w.wardCode, manifest: `./${w.datasetId}/manifest.json`, enabled: true, buildings: man.totalBuildings, tiles: man.tileCount });
+    }
 
-    const rootManifest = {
-      version: 1, city: 'osaka-ward-poc', coordinateSystem: 'meters-local', coordinateConvention: 'znorth-neg-v1',
-      tileSize: TILE_SIZE, origin: null,
-      datasets: [
-        { id: 'osaka-sumiyoshi', ward: '住吉区', wardCode: null, manifest: './osaka-sumiyoshi/manifest.json', enabled: true, buildings: sumiMan.totalBuildings, tiles: sumiMan.tileCount },
-        { id: 'osaka-higashisumiyoshi', ward: '東住吉区', wardCode: '27121', manifest: './osaka-higashisumiyoshi/manifest.json', enabled: true, buildings: higaMan.totalBuildings, tiles: higaMan.tileCount },
-      ],
-    };
-    const rmp = path.join(OUT, 'manifest.json');
-    if (fs.existsSync(rmp)) { console.error('[stop] 既存ファイルへの上書きは拒否:', rmp); process.exit(3); }
-    fs.mkdirSync(OUT, { recursive: true });
-    fs.writeFileSync(rmp, JSON.stringify(rootManifest, null, 2));
-    console.log('  root manifest:', rmp);
+    const { path: rmp, wasExisting } = mergeRootManifest(OUT, newEntries);
+    console.log(`  root manifest(${wasExisting ? '既存へ追記' : '新規作成'}):`, rmp);
 
     // outsideTarget/boundaryStraddle/ambiguousは参考用に別途保存（本番データには一切影響しない）
-    const diagPath = path.join(OUT, 'CLASSIFICATION_REPORT.json');
+    const diagPath = path.join(OUT, `CLASSIFICATION_REPORT.${WARD_DEFS.map((w) => w.id).join('-')}.json`);
+    const counts = { outsideTarget, boundaryStraddle, ambiguous };
+    for (const w of WARD_DEFS) counts[w.id] = buckets[w.id].length;
     fs.writeFileSync(diagPath, JSON.stringify({
       total, invalidCountedAsOutsideTarget, hasWardAttr, wardAttrMatch, wardAttrMismatch, mismatchSamples,
-      counts: { sumiyoshi, higashisumiyoshi, outsideTarget, boundaryStraddle, ambiguous },
+      counts,
       boundaryStraddleSampleIds: buckets.boundaryStraddle.slice(0, 50).map((b) => b.id),
       ambiguousSampleIds: buckets.ambiguous.slice(0, 50).map((b) => b.id),
     }, null, 2));
     console.log('  分類レポート:', diagPath);
   } else {
-    console.log('[dry-run] --apply を付けると public/__test__/ward-poc/buildings/ 配下へ書き出します。');
+    console.log('[dry-run] --apply を付けると', OUT, '配下へ書き出します。');
   }
   process.exit(0);
 }

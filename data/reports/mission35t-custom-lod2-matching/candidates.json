@@ -1,0 +1,467 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-25T15:13:48.036Z",
+  "missionId": "35T",
+  "coordinateConvention": "znorth-neg-v1",
+  "rules": {
+    "HIGH": {
+      "iou": 0.75,
+      "centroidM": 10,
+      "areaRatio": [
+        0.8,
+        1.25
+      ]
+    },
+    "MEDIUM": {
+      "iou": 0.6,
+      "centroidM": 15,
+      "areaRatio": [
+        0.7,
+        1.4
+      ]
+    },
+    "AMBIGUOUS": {
+      "iouGap": 0.1,
+      "centroidGapM": 3
+    },
+    "CANDIDATE_RADIUS_M": 100
+  },
+  "source": {
+    "osmWayId": 267613423,
+    "osmUrl": "https://api.openstreetmap.org/api/0.6/way/267613423/full",
+    "buildingTag": "residential",
+    "name": null,
+    "ring": [
+      [
+        -3994.1173,
+        -14784.5873
+      ],
+      [
+        -3983.4336,
+        -14774.9915
+      ],
+      [
+        -3941.9083,
+        -14821.1003
+      ],
+      [
+        -3953.9205,
+        -14831.8872
+      ],
+      [
+        -3959.0516,
+        -14826.1876
+      ],
+      [
+        -3961.0033,
+        -14827.9465
+      ],
+      [
+        -3962.0295,
+        -14826.7999
+      ],
+      [
+        -3964.3294,
+        -14828.8704
+      ],
+      [
+        -3966.1894,
+        -14826.7999
+      ],
+      [
+        -3961.9379,
+        -14822.9816
+      ],
+      [
+        -3983.4061,
+        -14799.148
+      ],
+      [
+        -3986.1824,
+        -14801.6415
+      ],
+      [
+        -3987.74,
+        -14799.9049
+      ],
+      [
+        -3984.6889,
+        -14797.1665
+      ],
+      [
+        -3993.0636,
+        -14787.8824
+      ],
+      [
+        -3992.0098,
+        -14786.9362
+      ]
+    ],
+    "vertexCount": 16,
+    "areaM2": 1020.16,
+    "declaredAreaM2": 1020.161,
+    "centroid": [
+      -3968.473,
+      -14803.99
+    ],
+    "declaredCentroid": [
+      -3968.4731,
+      -14803.9897
+    ],
+    "bbox": {
+      "minX": -3994.12,
+      "maxX": -3941.91,
+      "minZ": -14831.89,
+      "maxZ": -14774.99
+    },
+    "coordinateConvention": "znorth-neg-v1"
+  },
+  "candidateRadiusM": 100,
+  "candidateCount": 60,
+  "top10": [
+    {
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "centroid": [
+        -3957.82,
+        -14823.24
+      ],
+      "centroidDistanceM": 22,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 1741.3,
+      "areaRatio": 1.707,
+      "intersectionM2": 1003.24,
+      "unionM2": 1741.47,
+      "iou": 0.5761,
+      "sourceCoveredRatio": 0.9815,
+      "candidateCoveredRatio": 0.5824,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 2970.5,
+      "hausdorffM": 47.7,
+      "heightM": 76,
+      "usageCategory": "commercial",
+      "sourceType": "plateau-building",
+      "vertexCount": 62
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+      "centroid": [
+        -3948.65,
+        -14811.47
+      ],
+      "centroidDistanceM": 21.18,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 23.3,
+      "areaRatio": 0.023,
+      "intersectionM2": 3.86,
+      "unionM2": 1039.92,
+      "iou": 0.0037,
+      "sourceCoveredRatio": 0.0038,
+      "candidateCoveredRatio": 0.1644,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 47.3,
+      "hausdorffM": 49.55,
+      "heightM": 3.4,
+      "usageCategory": "office",
+      "sourceType": "plateau-building",
+      "vertexCount": 4
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_cc4d5245-7ad7-4dc3-a476-fe373144c8c6",
+      "centroid": [
+        -3957.38,
+        -14801.97
+      ],
+      "centroidDistanceM": 11.27,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 11.2,
+      "areaRatio": 0.011,
+      "intersectionM2": 1.7,
+      "unionM2": 1029.45,
+      "iou": 0.0017,
+      "sourceCoveredRatio": 0.0017,
+      "candidateCoveredRatio": 0.1528,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 22.5,
+      "hausdorffM": 38.55,
+      "heightM": 3.1,
+      "usageCategory": "office",
+      "sourceType": "plateau-building",
+      "vertexCount": 4
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_2b0d1641-b042-43d0-a97a-1e5a9ea1601e",
+      "centroid": [
+        -3975.52,
+        -14812.07
+      ],
+      "centroidDistanceM": 10.72,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 140.1,
+      "areaRatio": 0.137,
+      "intersectionM2": 0,
+      "unionM2": 1155.01,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 1153,
+      "hausdorffM": 20.9,
+      "heightM": 5.6,
+      "usageCategory": "commercial",
+      "sourceType": "plateau-building",
+      "vertexCount": 16
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_552258d5-a968-44c0-b377-2e35caff7e75",
+      "centroid": [
+        -3986.16,
+        -14814.45
+      ],
+      "centroidDistanceM": 20.55,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 1021.5,
+      "areaRatio": 1.001,
+      "intersectionM2": 0,
+      "unionM2": 2025.41,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 1701,
+      "hausdorffM": 24.1,
+      "heightM": 9,
+      "usageCategory": "residential_low",
+      "sourceType": "plateau-building",
+      "vertexCount": 30
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_7de541c2-4720-40f5-baaa-e8139f37725d",
+      "centroid": [
+        -3952.07,
+        -14775.56
+      ],
+      "centroidDistanceM": 32.82,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 101.4,
+      "areaRatio": 0.099,
+      "intersectionM2": 0,
+      "unionM2": 1118.92,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 86.3,
+      "hausdorffM": 50.12,
+      "heightM": 14,
+      "usageCategory": "commercial",
+      "sourceType": "plateau-building",
+      "vertexCount": 4
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_e78da052-c84b-4a3e-baf0-d8e4e66a337e",
+      "centroid": [
+        -3949.83,
+        -14764.04
+      ],
+      "centroidDistanceM": 44.08,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 124.1,
+      "areaRatio": 0.122,
+      "intersectionM2": 0,
+      "unionM2": 1145.78,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": false,
+      "bboxIntersectionM2": 0,
+      "hausdorffM": 61.55,
+      "heightM": 16.8,
+      "usageCategory": "hotel",
+      "sourceType": "plateau-building",
+      "vertexCount": 6
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_5bc5d6c3-fe5e-4739-b3dc-4cfc109c67a9",
+      "centroid": [
+        -3960.11,
+        -14851.05
+      ],
+      "centroidDistanceM": 47.8,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 86.7,
+      "areaRatio": 0.085,
+      "intersectionM2": 0,
+      "unionM2": 1108.53,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": false,
+      "bboxIntersectionM2": 0,
+      "hausdorffM": 72.24,
+      "heightM": 6.5,
+      "usageCategory": "residential_low",
+      "sourceType": "plateau-building",
+      "vertexCount": 4
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_11319ac9-a3a2-4810-9d12-3e17e1cab7c1",
+      "centroid": [
+        -3967.22,
+        -14753.11
+      ],
+      "centroidDistanceM": 50.9,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 318.9,
+      "areaRatio": 0.313,
+      "intersectionM2": 0,
+      "unionM2": 1342.45,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": false,
+      "bboxIntersectionM2": 0,
+      "hausdorffM": 65.95,
+      "heightM": 31.9,
+      "usageCategory": "industrial",
+      "sourceType": "plateau-building",
+      "vertexCount": 11
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_9590cf46-9ea7-41f0-9d4d-7a6dffb22036",
+      "centroid": [
+        -3915.68,
+        -14789.22
+      ],
+      "centroidDistanceM": 54.83,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 10,
+      "areaRatio": 0.01,
+      "intersectionM2": 0,
+      "unionM2": 1030.58,
+      "iou": 0,
+      "sourceCoveredRatio": 0,
+      "candidateCoveredRatio": 0,
+      "bboxOverlap": false,
+      "bboxIntersectionM2": 0,
+      "hausdorffM": 76.43,
+      "heightM": 3,
+      "usageCategory": "office",
+      "sourceType": "plateau-building",
+      "vertexCount": 4
+    }
+  ],
+  "best": {
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "centroid": [
+      -3957.82,
+      -14823.24
+    ],
+    "centroidDistanceM": 22,
+    "sourceAreaM2": 1020.2,
+    "candidateAreaM2": 1741.3,
+    "areaRatio": 1.707,
+    "intersectionM2": 1003.24,
+    "unionM2": 1741.47,
+    "iou": 0.5761,
+    "sourceCoveredRatio": 0.9815,
+    "candidateCoveredRatio": 0.5824,
+    "bboxOverlap": true,
+    "bboxIntersectionM2": 2970.5,
+    "hausdorffM": 47.7,
+    "heightM": 76,
+    "usageCategory": "commercial",
+    "sourceType": "plateau-building",
+    "vertexCount": 62
+  },
+  "second": {
+    "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+    "centroid": [
+      -3948.65,
+      -14811.47
+    ],
+    "centroidDistanceM": 21.18,
+    "sourceAreaM2": 1020.2,
+    "candidateAreaM2": 23.3,
+    "areaRatio": 0.023,
+    "intersectionM2": 3.86,
+    "unionM2": 1039.92,
+    "iou": 0.0037,
+    "sourceCoveredRatio": 0.0038,
+    "candidateCoveredRatio": 0.1644,
+    "bboxOverlap": true,
+    "bboxIntersectionM2": 47.3,
+    "hausdorffM": 49.55,
+    "heightM": 3.4,
+    "usageCategory": "office",
+    "sourceType": "plateau-building",
+    "vertexCount": 4
+  },
+  "matchConfidence": "UNMATCHED",
+  "lod1SuppressionAllowed": false,
+  "reason": "基準未達（IoU 0.5761 / 重心 22m / 面積比 1.707）",
+  "ambiguousReason": null,
+  "heightCheck": {
+    "pointCloud": {
+      "heightMedianM": 26.512,
+      "heightP90M": 50.472,
+      "roofMinM": 12.095,
+      "roofMaxM": 41.75,
+      "localGroundAltitudeM": 4.431,
+      "roofCandidatePoints": 62639,
+      "roofSupportPoints": 40,
+      "roofType": "measured-triangulated-surface",
+      "note": "点群の高さは localGroundAltitude を 0 とした相対高さ。roofSupportPoints が 40 点しかなく、屋根面の支持が薄い。"
+    },
+    "canonical": {
+      "heightM": 76,
+      "attributeKeys": [
+        "usage",
+        "normalizedUsage",
+        "usageCategory",
+        "usageLabel",
+        "heightM",
+        "source",
+        "wardId"
+      ],
+      "heightAttribute": "attributes.heightM",
+      "source": "plateau-building",
+      "usageCategory": "commercial",
+      "note": "canonical の高さは PLATEAU 由来の attributes.heightM のみ。取得元（measuredHeight / storeysAboveGround のどちらか）は canonical に残っていない。"
+    },
+    "heightDeltaM": 49.49,
+    "findings": [
+      "best の footprint が source の 1.707 倍。source は建物全体ではなく一部（棟の片側）か、canonical 側が複数棟をまとめた形の可能性がある。",
+      "屋根面を支える点が 40 点しかない。中央値 26.512m は建物全体の代表値として弱く、樹木・設備の混入も否定できない。",
+      "canonical 76m と点群中央値 26.512m の差が 49.49m。高さだけで別建物と断定はしないが、照合の信頼度を下げる材料になる。"
+    ]
+  },
+  "mission35s": {
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "stillBest": true,
+    "metrics": {
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "centroid": [
+        -3957.82,
+        -14823.24
+      ],
+      "centroidDistanceM": 22,
+      "sourceAreaM2": 1020.2,
+      "candidateAreaM2": 1741.3,
+      "areaRatio": 1.707,
+      "intersectionM2": 1003.24,
+      "unionM2": 1741.47,
+      "iou": 0.5761,
+      "sourceCoveredRatio": 0.9815,
+      "candidateCoveredRatio": 0.5824,
+      "bboxOverlap": true,
+      "bboxIntersectionM2": 2970.5,
+      "hausdorffM": 47.7,
+      "heightM": 76,
+      "usageCategory": "commercial",
+      "sourceType": "plateau-building",
+      "vertexCount": 62
+    },
+    "verdict": "棄却（UNMATCHED: 基準未達（IoU 0.5761 / 重心 22m / 面積比 1.707））"
+  },
+  "elapsedMs": 390
+}

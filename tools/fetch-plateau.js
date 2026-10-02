@@ -394,7 +394,8 @@ async function verifyRemoteZipHasCityGml(url) {
   for (const e of bldgFirst.slice(0, 3)) { // 最大3ファイルまで中身を確認
     try {
       const head = await fetchEntryText(url, e, 256 * 1024); // 先頭256KB展開で十分
-      if (/<bldg:Building[\s>]|<[a-zA-Z]+:CityModel[\s>]|<CityModel[\s>]/.test(head)) {
+      // [Mission 31C2] bldg / tran どちらの CityGML モジュールでも CityModel を含めば ok。
+      if (/<bldg:Building[\s>]|<tran:(Road|TrafficArea|AuxiliaryTrafficArea)[\s>]|<[a-zA-Z]+:CityModel[\s>]|<CityModel[\s>]/.test(head)) {
         return { ok: true, gmlCount: gmls.length, sampledName: e.name, hasBuildingTag: true };
       }
     } catch (err) { /* 次の候補へ */ }
@@ -638,8 +639,14 @@ async function main() {
     .map(x => new RegExp(x, 'i'));
   const bldgPatterns = toList(cfg.bldgPatterns || cfg.bldgPattern, ['bldg', 'building', '建築物', '建物'])
     .map(x => new RegExp(x, 'i'));
+  // [Mission 31C2] --layer で取得対象モジュールを切替（既定 bldg＝従来と完全に同一挙動）。
+  //   tran は道路モデル（tran:Road / TrafficArea polygon）。data/plateau-sources.json の tranPattern を使う。
+  const layerKind = (args.layer === 'tran' || args.layer === 'road') ? 'tran' : 'bldg';
+  const tranPatterns = toList(cfg.tranPatterns || cfg.tranPattern, ['tran', 'transportation', 'road', '道路', '交通'])
+    .map(x => new RegExp(x, 'i'));
+  const layerPatterns = layerKind === 'tran' ? tranPatterns : bldgPatterns;
   const isGml = n => gmlPatterns.some(r => r.test(n));
-  const isBldg = n => bldgPatterns.some(r => r.test(n));
+  const isBldg = n => layerPatterns.some(r => r.test(n)); // 名前は据え置き（下流の呼び出し互換）。実体は layerKind に従う。
   const wardCode = args['ward-code'] ? String(args['ward-code']) : null;
 
   // ── 診断モード: リソース選択の内訳だけを表示する（取得は行わない）──
@@ -709,7 +716,8 @@ async function main() {
   const datasetId = args.dataset;
   if (!datasetId) {
     console.error('usage: node tools/fetch-plateau.js --dataset <id> [--ward-code 27121] [--city-code 27100]');
-    console.error('       [--url <zip url>] [--out data/raw/<id>] [--cache .cache/plateau] [--keep-archive] [--ckan-base <url>] [--query <検索語>] [--resource-index N] [--dry-run] [--list] [--force] [--diagnose [saved.json]] [--no-verify]');
+    console.error('       [--layer bldg|tran] [--url <zip url>] [--out data/raw/<id>] [--cache .cache/plateau] [--keep-archive] [--ckan-base <url>] [--query <検索語>] [--resource-index N] [--dry-run] [--list] [--force] [--diagnose [saved.json]] [--no-verify]');
+    console.error('       --layer tran: PLATEAU 交通モデル tran:Road（道路面 polygon）を取得。既定 bldg（建物）。[Mission 31C2]');
     process.exit(1);
   }
   // 明示指定 > LIVECITY_DATA_ROOT配下。旧data/raw等は使わない（setup-area側が後方互換を扱う）。

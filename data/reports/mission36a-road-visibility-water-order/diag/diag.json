@@ -1,0 +1,36 @@
+[
+  {
+    "spot": "juso",
+    "probe": {
+      "waterSamples": 94,
+      "samplesWithRoadAbove": 3,
+      "roadMeshCount": 225,
+      "waterMeshCount": 6,
+      "roadHitNames": {
+        "RoadDetailEdge": 2,
+        "RoadBucket_bridge": 6
+      },
+      "roadYMin": 3,
+      "roadYMax": 3.02,
+      "waterY": 0.14
+    }
+  },
+  {
+    "spot": "nakanoshima",
+    "probe": {
+      "waterSamples": 32,
+      "samplesWithRoadAbove": 6,
+      "roadMeshCount": 244,
+      "waterMeshCount": 9,
+      "roadHitNames": {
+        "RoadBucket_bridge": 4,
+        "RoadV3_Uncertain": 2,
+        "RoadDetailEdge": 1,
+        "RoadBucket_primary": 2
+      },
+      "roadYMin": 0.087,
+      "roadYMax": 3.02,
+      "waterY": 0.14
+    }
+  }
+]

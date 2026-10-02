@@ -1,0 +1,92 @@
+[
+  {
+    "file": "1-single-building-hover",
+    "name": "本町",
+    "lat": 34.6823,
+    "lon": 135.5024,
+    "r": 300,
+    "ph": 42,
+    "mode": "normal",
+    "click": false,
+    "found": {
+      "id": "cg_bldg_osm_828689908",
+      "sx": 786.4206528078864,
+      "sy": 568.0488561857609,
+      "d": 135.45196774573728,
+      "areaM2": 2776.8,
+      "verts": 4
+    }
+  },
+  {
+    "file": "2-adjacent-buildings",
+    "name": "住宅密集地",
+    "lat": 34.6398,
+    "lon": 135.5474,
+    "r": 240,
+    "ph": 46,
+    "mode": "normal",
+    "click": false,
+    "found": {
+      "id": "cg_bldg_bldg_67fdb70c-9d88-483c-afad-c5f8aa5f47c6",
+      "sx": 884.9644981852697,
+      "sy": 660.4049305300265,
+      "d": 267.3640223606443,
+      "areaM2": 511.1,
+      "verts": 14
+    }
+  },
+  {
+    "file": "3-dense-umeda",
+    "name": "梅田",
+    "lat": 34.7025,
+    "lon": 135.4959,
+    "r": 420,
+    "ph": 45,
+    "mode": "normal",
+    "click": false,
+    "found": {
+      "id": "cg_bldg_bldg_51cf4b64-5eb3-47fd-86f3-772acb30db80",
+      "sx": 619.1183725879213,
+      "sy": 506.4976881930191,
+      "d": 115.62478765587024,
+      "areaM2": 432.2,
+      "verts": 4
+    }
+  },
+  {
+    "file": "4-small-building",
+    "name": "住宅密集地(小)",
+    "lat": 34.6398,
+    "lon": 135.5474,
+    "r": 200,
+    "ph": 48,
+    "mode": "small",
+    "click": false,
+    "found": {
+      "id": "cg_bldg_bldg_25476805-1515-48b1-a06f-ba04d2c153de",
+      "sx": 793.8322602362917,
+      "sy": 405.97229619870944,
+      "d": 85.9630231763267,
+      "areaM2": 45,
+      "verts": 6
+    }
+  },
+  {
+    "file": "6-selected-building",
+    "name": "本町(選択)",
+    "lat": 34.6823,
+    "lon": 135.5024,
+    "r": 300,
+    "ph": 42,
+    "mode": "normal",
+    "click": true,
+    "found": {
+      "id": "cg_bldg_osm_828689908",
+      "sx": 786.4206528078864,
+      "sy": 568.0488561857609,
+      "d": 135.45196774573728,
+      "areaM2": 2776.8,
+      "verts": 4
+    }
+  }
+]

@@ -1,0 +1,409 @@
+{
+  "mission": "36H",
+  "generatedAt": "2026-09-30T01:46:38.428Z",
+  "subject": "CityLabel(building/landmark) -> FacilityDataStore bridge",
+  "rule": {
+    "name": "normalized exact match (normalizeTownName)",
+    "radiusM": 100,
+    "accept": "exactly one candidate",
+    "fuzzy": false,
+    "nearestFallback": false,
+    "bridgedKinds": [
+      "building",
+      "landmark"
+    ],
+    "unchangedKinds": [
+      "station",
+      "place",
+      "ward",
+      "park",
+      "river"
+    ]
+  },
+  "coordinateFinding": {
+    "file": "public/map-data/osaka-sumiyoshi/facilities/facilities.json",
+    "records": 149,
+    "localXMatchesGeoToThree": true,
+    "localZIsNegationOfZnorthNegV1": true,
+    "recordsWithFlippedZ": 149,
+    "note": "localZ predates znorth-neg-v1 (north=+Z). The bridge re-projects each record from its own lat/lon through the frozen geoToThree(), it does not flip the sign by hand.",
+    "alsoAffectedButNotChangedInThisMission": [
+      "FacilityLayer sprite positions (sprite.position.set(record.localX, FACILITY_Y, record.localZ))",
+      "LabelLayer.hasEquivalentInFacilityLayer duplicate-label suppression",
+      "showExtendedFacilityCard distance text and flyTo(record.localX, record.localZ)",
+      "FacilityDataStore nearest/within-radius queries"
+    ]
+  },
+  "coverage": {
+    "buildingNameLabels": 20130,
+    "facilityRecords": 149,
+    "labelsResolvingToExactlyOne": 58,
+    "labelsLeftAmbiguous": 1,
+    "distinctFacilitiesReached": 58,
+    "distanceM": {
+      "min": 0.5,
+      "median": 6.4,
+      "max": 96.1
+    }
+  },
+  "verification": {
+    "label": "スーパー玉出 アビコ店",
+    "expectedFacilityId": "osm-node-750515219",
+    "resolved": {
+      "labelName": "スーパー玉出 アビコ店",
+      "labelId": "bldg:cg_bldg_bldg_c7e5f446-f9f2-4a82-9966-55b9d4d5ce6c",
+      "facilityId": "osm-node-750515219",
+      "distanceM": 9.7
+    }
+  },
+  "resolvedPairs": [
+    {
+      "labelName": "市立矢田西中学校",
+      "labelId": "bldg:cg_bldg_bldg_b70d4f87-0fe0-4109-b4e3-ea105245cebc",
+      "facilityId": "osm-way-160553307",
+      "distanceM": 44.2
+    },
+    {
+      "labelName": "セブン-イレブン",
+      "labelId": "bldg:cg_bldg_bldg_4947f77d-7355-4dab-be1f-83999bbc3331",
+      "facilityId": "osm-way-594875276",
+      "distanceM": 2.1
+    },
+    {
+      "labelName": "サンディ長居公園南店",
+      "labelId": "bldg:cg_bldg_bldg_a73ed801-6611-4ce0-a7f2-f3cb472d863f",
+      "facilityId": "osm-way-1007567827",
+      "distanceM": 6.9
+    },
+    {
+      "labelName": "市立苅田北小学校",
+      "labelId": "bldg:cg_bldg_bldg_e5bbfeaa-9891-44d2-8204-40b040d3b693",
+      "facilityId": "osm-way-160600315",
+      "distanceM": 41.1
+    },
+    {
+      "labelName": "ウエルシア薬局",
+      "labelId": "bldg:cg_bldg_bldg_6aba9454-bb76-439e-ac76-b18a86b5837f",
+      "facilityId": "osm-way-1007569147",
+      "distanceM": 4.4
+    },
+    {
+      "labelName": "大阪府教育センター附属高等学校",
+      "labelId": "bldg:cg_bldg_bldg_d5fe7e6d-ef2b-46ac-9626-055f1cec2633",
+      "facilityId": "osm-way-160600317",
+      "distanceM": 82.2
+    },
+    {
+      "labelName": "市立苅田小学校",
+      "labelId": "bldg:cg_bldg_bldg_5d96b58e-4b7b-4edf-a062-fa975a7b1303",
+      "facilityId": "osm-way-172737988",
+      "distanceM": 53.6
+    },
+    {
+      "labelName": "市立東我孫子中学校",
+      "labelId": "bldg:cg_bldg_bldg_0dc753ea-5863-463b-bc7c-f470db37e951",
+      "facilityId": "osm-way-160600322",
+      "distanceM": 34.3
+    },
+    {
+      "labelName": "セブン-イレブン",
+      "labelId": "bldg:cg_bldg_bldg_de0ce71e-bd55-4263-be32-c9ad1dca10ea",
+      "facilityId": "osm-way-587359461",
+      "distanceM": 5.4
+    },
+    {
+      "labelName": "ローソン",
+      "labelId": "bldg:cg_bldg_bldg_4fce8fa1-4439-4db8-ab88-98fd55504380",
+      "facilityId": "osm-way-588032815",
+      "distanceM": 3.8
+    },
+    {
+      "labelName": "ウエルシア",
+      "labelId": "bldg:cg_bldg_osm_828721416",
+      "facilityId": "osm-way-828721416",
+      "distanceM": 3.5
+    },
+    {
+      "labelName": "大阪市立南住吉小学校",
+      "labelId": "bldg:cg_bldg_bldg_eb7b084f-dba5-4a55-8c69-98d47a60c8dd",
+      "facilityId": "osm-way-172349505",
+      "distanceM": 43.4
+    },
+    {
+      "labelName": "市立三稜中学校",
+      "labelId": "bldg:cg_bldg_bldg_5d5d0bd2-b3d0-4842-b305-6cc973b8b38e",
+      "facilityId": "osm-way-173054853",
+      "distanceM": 61
+    },
+    {
+      "labelName": "大阪市立住吉図書館",
+      "labelId": "bldg:cg_bldg_bldg_e6944636-a360-420e-902e-949a5ad84fe2",
+      "facilityId": "osm-way-271460800",
+      "distanceM": 7
+    },
+    {
+      "labelName": "住吉区役所",
+      "labelId": "bldg:cg_bldg_bldg_9bb03184-7503-4c5e-b1ee-52fbaa8ca3db",
+      "facilityId": "osm-way-304194186",
+      "distanceM": 39.8
+    },
+    {
+      "labelName": "ツルハドラッグ",
+      "labelId": "bldg:cg_bldg_bldg_9d710809-a083-4571-a0f2-2b05b165937b",
+      "facilityId": "osm-way-597137503",
+      "distanceM": 2.7
+    },
+    {
+      "labelName": "沢之町公園",
+      "labelId": "bldg:cg_bldg_bldg_767910e1-52d5-4db0-bf56-41d0f451c7eb",
+      "facilityId": "osm-way-173055633",
+      "distanceM": 88
+    },
+    {
+      "labelName": "ローソン",
+      "labelId": "bldg:cg_bldg_bldg_7d712dc6-9ef5-4a63-87cb-fdb49d7d65b0",
+      "facilityId": "osm-way-317310585",
+      "distanceM": 2.1
+    },
+    {
+      "labelName": "ファミリーマート",
+      "labelId": "bldg:cg_bldg_bldg_647afc42-698b-4f51-ac5b-f216907aae16",
+      "facilityId": "osm-way-172046665",
+      "distanceM": 2.5
+    },
+    {
+      "labelName": "市立矢田西小学校",
+      "labelId": "bldg:cg_bldg_bldg_2de716e6-e14b-4515-b7fe-946ffe90da7a",
+      "facilityId": "osm-way-160553310",
+      "distanceM": 13.7
+    },
+    {
+      "labelName": "大阪府立東住吉支援学校",
+      "labelId": "bldg:cg_bldg_bldg_4b88f4b0-1057-417c-860d-d907ade56f75",
+      "facilityId": "osm-way-160553309",
+      "distanceM": 67.8
+    },
+    {
+      "labelName": "市立やたなか小中一貫校",
+      "labelId": "bldg:cg_bldg_bldg_b7a65558-7921-4fd2-999f-571dc3869c12",
+      "facilityId": "osm-way-160553311",
+      "distanceM": 96.1
+    },
+    {
+      "labelName": "ローソン",
+      "labelId": "bldg:cg_bldg_bldg_f11e6c31-7624-4d83-97da-676f24fd4447",
+      "facilityId": "osm-way-317313058",
+      "distanceM": 2.4
+    },
+    {
+      "labelName": "のぞみ信用組合",
+      "labelId": "bldg:cg_bldg_bldg_3011136c-6084-493f-afcb-949c8efee613",
+      "facilityId": "osm-way-1187621774",
+      "distanceM": 3.4
+    },
+    {
+      "labelName": "矢田住道公園",
+      "labelId": "bldg:cg_bldg_bldg_44ee577f-9ce4-4876-a2ad-70f4f2ee94b2",
+      "facilityId": "osm-way-1187621796",
+      "distanceM": 12.7
+    },
+    {
+      "labelName": "ローソン",
+      "labelId": "bldg:cg_bldg_bldg_bdb84a55-c44d-412f-afe1-1f5941a8aefd",
+      "facilityId": "osm-way-962481462",
+      "distanceM": 3.1
+    },
+    {
+      "labelName": "大阪市消防局東住吉消防署矢田出張所",
+      "labelId": "bldg:cg_bldg_bldg_0554376d-baa2-4eea-a850-ca86e60f4bd8",
+      "facilityId": "osm-way-1272626033",
+      "distanceM": 2.9
+    },
+    {
+      "labelName": "矢田公園",
+      "labelId": "bldg:cg_bldg_bldg_426777ee-96d1-4894-8d9c-570e2167d171",
+      "facilityId": "osm-way-160597633",
+      "distanceM": 52.9
+    },
+    {
+      "labelName": "市立矢田中学校",
+      "labelId": "bldg:cg_bldg_bldg_10beeb0c-804d-4fe9-a82b-175d429b8785",
+      "facilityId": "osm-way-160604490",
+      "distanceM": 41.4
+    },
+    {
+      "labelName": "東住吉警察署住道矢田交番",
+      "labelId": "bldg:cg_bldg_bldg_546bcf23-2565-4a39-9e47-018a283799c2",
+      "facilityId": "osm-way-1272654471",
+      "distanceM": 0.8
+    },
+    {
+      "labelName": "大阪市立矢田東小学校",
+      "labelId": "bldg:cg_bldg_bldg_1d342d9f-07fc-45aa-aab3-e7e114bfd8ae",
+      "facilityId": "osm-way-160605451",
+      "distanceM": 30.4
+    },
+    {
+      "labelName": "平野警察署瓜破西交番",
+      "labelId": "bldg:cg_bldg_bldg_bc87d48d-bb70-4927-b668-1f625200fd2b",
+      "facilityId": "osm-way-1272654805",
+      "distanceM": 0.8
+    },
+    {
+      "labelName": "市立瓜破西小学校",
+      "labelId": "bldg:cg_bldg_bldg_6ebb9d33-4805-40da-89fe-9124eb831ff6",
+      "facilityId": "osm-way-160497980",
+      "distanceM": 33
+    },
+    {
+      "labelName": "ローソン",
+      "labelId": "bldg:cg_bldg_osm_1007573164",
+      "facilityId": "osm-way-1007573164",
+      "distanceM": 1.9
+    },
+    {
+      "labelName": "スーパー玉出 アビコ店",
+      "labelId": "bldg:cg_bldg_bldg_c7e5f446-f9f2-4a82-9966-55b9d4d5ce6c",
+      "facilityId": "osm-node-750515219",
+      "distanceM": 9.7
+    },
+    {
+      "labelName": "あびこひかり保育園",
+      "labelId": "bldg:cg_bldg_bldg_146354cd-9804-47a0-8438-a933ce92a14b",
+      "facilityId": "osm-node-1422980337",
+      "distanceM": 4.5
+    },
+    {
+      "labelName": "あびこ幼稚園",
+      "labelId": "bldg:cg_bldg_bldg_47bf4dac-2e20-4540-94a1-1e1a3cb1e7bf",
+      "facilityId": "osm-node-1422980341",
+      "distanceM": 0.8
+    },
+    {
+      "labelName": "あびこ病院",
+      "labelId": "bldg:cg_bldg_bldg_771acade-a2c9-4bdb-8f11-90df54cf8f88",
+      "facilityId": "osm-node-1422980350",
+      "distanceM": 9
+    },
+    {
+      "labelName": "ひまわり乳児保育園",
+      "labelId": "bldg:cg_bldg_bldg_8825972f-94cd-44d5-9bee-c45c88f2e685",
+      "facilityId": "osm-node-1422981700",
+      "distanceM": 0.5
+    },
+    {
+      "labelName": "ひまわり幼稚園",
+      "labelId": "bldg:cg_bldg_bldg_43f7a119-2669-4fca-98a3-a42b116cbbb7",
+      "facilityId": "osm-node-1422981708",
+      "distanceM": 31.8
+    },
+    {
+      "labelName": "よさみ幼稚園",
+      "labelId": "bldg:cg_bldg_bldg_d4712266-5e6e-492a-81c0-f1804deaf196",
+      "facilityId": "osm-node-1422982305",
+      "distanceM": 14.6
+    },
+    {
+      "labelName": "プール幼稚園",
+      "labelId": "bldg:cg_bldg_bldg_e3a80573-ef33-4fb6-83e0-11f9a69f3886",
+      "facilityId": "osm-node-1422983574",
+      "distanceM": 4.4
+    },
+    {
+      "labelName": "大阪市立矢田教育の森保育所",
+      "labelId": "bldg:cg_bldg_bldg_14fa6de7-5911-421c-9637-ae36ec8da0a7",
+      "facilityId": "osm-node-1422989693",
+      "distanceM": 31.8
+    },
+    {
+      "labelName": "大阪市立矢田第１保育所",
+      "labelId": "bldg:cg_bldg_bldg_018c6eb9-d209-4841-88d2-c926da6752df",
+      "facilityId": "osm-node-1422989694",
+      "distanceM": 4.7
+    },
+    {
+      "labelName": "大阪市立矢田第３保育所",
+      "labelId": "bldg:cg_bldg_bldg_ef038e5a-fb6d-44df-9e76-291f293913be",
+      "facilityId": "osm-node-1422989695",
+      "distanceM": 2.4
+    },
+    {
+      "labelName": "大阪市立矢田第４保育所",
+      "labelId": "bldg:cg_bldg_bldg_aaaa2654-0d5e-4ee6-a78e-2989721b3fb4",
+      "facilityId": "osm-node-1422989696",
+      "distanceM": 6.4
+    },
+    {
+      "labelName": "天宗東住吉園",
+      "labelId": "bldg:cg_bldg_bldg_7c92898f-70fe-437d-aba9-7ecbd4046acd",
+      "facilityId": "osm-node-1422991403",
+      "distanceM": 6.6
+    },
+    {
+      "labelName": "東よさみ幼稚園",
+      "labelId": "bldg:cg_bldg_bldg_0ab5a7dc-8d80-4639-bd19-07fe04386e00",
+      "facilityId": "osm-node-1423000953",
+      "distanceM": 1.6
+    },
+    {
+      "labelName": "東住吉警察署矢田駅前交番",
+      "labelId": "bldg:cg_bldg_bldg_c7ff71b9-4483-4ae1-bfba-549c2db85be5",
+      "facilityId": "osm-node-1423000987",
+      "distanceM": 1.1
+    },
+    {
+      "labelName": "大阪府立大阪南視覚支援学校",
+      "labelId": "bldg:cg_bldg_bldg_13b895af-7b9c-4630-a5e9-2f2944d95742",
+      "facilityId": "osm-node-1423007022",
+      "distanceM": 4.8
+    },
+    {
+      "labelName": "城南学園中学校",
+      "labelId": "bldg:cg_bldg_bldg_2fa07780-f74b-43aa-bff4-456d6994c9a6",
+      "facilityId": "osm-node-1423008802",
+      "distanceM": 5.2
+    },
+    {
+      "labelName": "城南学園高等学校",
+      "labelId": "bldg:cg_bldg_bldg_038a18c1-ab64-43df-bcb2-286ef67104ad",
+      "facilityId": "osm-node-1423008804",
+      "distanceM": 15.7
+    },
+    {
+      "labelName": "第２めぐむ保育園",
+      "labelId": "bldg:cg_bldg_bldg_3aaa2d0a-5b6c-4273-ba44-a39e6c44e5c8",
+      "facilityId": "osm-node-1423010404",
+      "distanceM": 2.6
+    },
+    {
+      "labelName": "錦秀会阪和住吉総合病院",
+      "labelId": "bldg:cg_bldg_bldg_ef3be94e-ff1b-4174-acd2-646dd9c4542d",
+      "facilityId": "osm-node-1423017165",
+      "distanceM": 5.1
+    },
+    {
+      "labelName": "錦秀会阪和病院",
+      "labelId": "bldg:cg_bldg_bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
+      "facilityId": "osm-node-1423017166",
+      "distanceM": 28.6
+    },
+    {
+      "labelName": "錦秀会阪和第二病院",
+      "labelId": "bldg:cg_bldg_bldg_f47d65bd-855c-4690-961f-dc02fce2181e",
+      "facilityId": "osm-node-1423017170",
+      "distanceM": 13.9
+    },
+    {
+      "labelName": "認定こども園きりん保育園",
+      "labelId": "bldg:cg_bldg_bldg_8a8f54c3-5cc5-4fa1-8a89-352a2067aa26",
+      "facilityId": "osm-node-1423017193",
+      "distanceM": 3.1
+    },
+    {
+      "labelName": "ライフ",
+      "labelId": "bldg:cg_bldg_bldg_9927f780-4414-4ee8-a0e5-6bbac7df984d",
+      "facilityId": "osm-node-2041401496",
+      "distanceM": 2
+    }
+  ]
+}

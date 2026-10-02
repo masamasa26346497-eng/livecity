@@ -1,0 +1,370 @@
+{
+  "generatedAt": "2026-08-31T19:55:25.842Z",
+  "datasetRoot": "data/processed/osaka-city/buildings",
+  "ok": true,
+  "checks": [
+    {
+      "name": "all-datasets-present",
+      "pass": true,
+      "detail": "24区 dataset 存在",
+      "severity": "error"
+    },
+    {
+      "name": "no-registry-external-dataset",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "building-id-unique",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "no-building-in-two-wards",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "coords-finite",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "tile-bbox-consistent",
+      "pass": true,
+      "detail": "OK",
+      "severity": "error"
+    },
+    {
+      "name": "classified-plus-unclassified-equals-input",
+      "pass": true,
+      "detail": "input 584490 = classified 574112 + unclassified 10378 + dup 0（root manifest 恒等式: true）",
+      "severity": "error"
+    },
+    {
+      "name": "input-total-matches-jsonl",
+      "pass": true,
+      "detail": "root manifest input 584490 / 実 JSONL 行数 584490",
+      "severity": "error"
+    },
+    {
+      "name": "known-3-wards-count-stable",
+      "pass": true,
+      "detail": "sumiyoshi: 33594→34930 (+4.0%) / higashisumiyoshi: 38266→38489 (+0.6%) / hirano: 43843→44434 (+1.3%)",
+      "severity": "error"
+    }
+  ],
+  "perWard": {
+    "miyakojima": {
+      "manifestCount": 13199,
+      "scannedCount": 13199,
+      "tileCount": 33,
+      "manifestTileCount": 33,
+      "bounds": {
+        "minX": -670.62,
+        "maxX": 1453.65,
+        "minZ": -14252.16,
+        "maxZ": -9729.81
+      }
+    },
+    "fukushima": {
+      "manifestCount": 11159,
+      "scannedCount": 11159,
+      "tileCount": 25,
+      "manifestTileCount": 25,
+      "bounds": {
+        "minX": -5717.2,
+        "maxX": -3129.73,
+        "minZ": -11035.85,
+        "maxZ": -8560.07
+      }
+    },
+    "konohana": {
+      "manifestCount": 13437,
+      "scannedCount": 13437,
+      "tileCount": 58,
+      "manifestTileCount": 58,
+      "bounds": {
+        "minX": -12402.84,
+        "maxX": -4931.72,
+        "minZ": -10158.51,
+        "maxZ": -4553.86
+      }
+    },
+    "nishi": {
+      "manifestCount": 12098,
+      "scannedCount": 12098,
+      "tileCount": 29,
+      "manifestTileCount": 29,
+      "bounds": {
+        "minX": -5774.72,
+        "maxX": -2510.64,
+        "minZ": -9818.17,
+        "maxZ": -7006.05
+      }
+    },
+    "minato": {
+      "manifestCount": 15489,
+      "scannedCount": 15489,
+      "tileCount": 34,
+      "manifestTileCount": 34,
+      "bounds": {
+        "minX": -8319.07,
+        "maxX": -4684.98,
+        "minZ": -8110.02,
+        "maxZ": -5123.33
+      }
+    },
+    "taisho": {
+      "manifestCount": 17363,
+      "scannedCount": 17363,
+      "tileCount": 40,
+      "manifestTileCount": 40,
+      "bounds": {
+        "minX": -6826.97,
+        "maxX": -3924.27,
+        "minZ": -7049.88,
+        "maxZ": -3236.97
+      }
+    },
+    "tennoji": {
+      "manifestCount": 14244,
+      "scannedCount": 14244,
+      "tileCount": 30,
+      "manifestTileCount": 30,
+      "bounds": {
+        "minX": -1685.41,
+        "maxX": 776.32,
+        "minZ": -7986.55,
+        "maxZ": -4591.56
+      }
+    },
+    "naniwa": {
+      "manifestCount": 10133,
+      "scannedCount": 10133,
+      "tileCount": 30,
+      "manifestTileCount": 30,
+      "bounds": {
+        "minX": -4046.54,
+        "maxX": -1306.61,
+        "minZ": -7310.46,
+        "maxZ": -4873.34
+      }
+    },
+    "nishiyodogawa": {
+      "manifestCount": 23242,
+      "scannedCount": 23242,
+      "tileCount": 47,
+      "manifestTileCount": 47,
+      "bounds": {
+        "minX": -9013.26,
+        "maxX": -4864.41,
+        "minZ": -13719.38,
+        "maxZ": -9519.58
+      }
+    },
+    "higashiyodogawa": {
+      "manifestCount": 34685,
+      "scannedCount": 34685,
+      "tileCount": 66,
+      "manifestTileCount": 66,
+      "bounds": {
+        "minX": -2117.53,
+        "maxX": 3230.8,
+        "minZ": -17993.53,
+        "maxZ": -13401.36
+      }
+    },
+    "higashinari": {
+      "manifestCount": 21976,
+      "scannedCount": 21976,
+      "tileCount": 29,
+      "manifestTileCount": 29,
+      "bounds": {
+        "minX": 518.63,
+        "maxX": 3506.1,
+        "minZ": -8800.27,
+        "maxZ": -6686.14
+      }
+    },
+    "ikuno": {
+      "manifestCount": 46212,
+      "scannedCount": 46212,
+      "tileCount": 50,
+      "manifestTileCount": 50,
+      "bounds": {
+        "minX": -28.18,
+        "maxX": 3531.4,
+        "minZ": -6914.06,
+        "maxZ": -3216.46
+      }
+    },
+    "asahi": {
+      "manifestCount": 22424,
+      "scannedCount": 22424,
+      "tileCount": 35,
+      "manifestTileCount": 35,
+      "bounds": {
+        "minX": 310.07,
+        "maxX": 3898.43,
+        "minZ": -15453.78,
+        "maxZ": -11946.48
+      }
+    },
+    "joto": {
+      "manifestCount": 32447,
+      "scannedCount": 32447,
+      "tileCount": 48,
+      "manifestTileCount": 48,
+      "bounds": {
+        "minX": 860.07,
+        "maxX": 3724.92,
+        "minZ": -12382.25,
+        "maxZ": -8223.07
+      }
+    },
+    "abeno": {
+      "manifestCount": 26924,
+      "scannedCount": 26924,
+      "tileCount": 38,
+      "manifestTileCount": 38,
+      "bounds": {
+        "minX": -2661.39,
+        "maxX": 390.54,
+        "minZ": -4921.34,
+        "maxZ": -1316.64
+      }
+    },
+    "sumiyoshi": {
+      "manifestCount": 34930,
+      "scannedCount": 34930,
+      "tileCount": 51,
+      "manifestTileCount": 51,
+      "bounds": {
+        "minX": -3431.4,
+        "maxX": -128.54,
+        "minZ": -2286.99,
+        "maxZ": 1842.6
+      }
+    },
+    "higashisumiyoshi": {
+      "manifestCount": 38489,
+      "scannedCount": 38489,
+      "tileCount": 59,
+      "manifestTileCount": 59,
+      "bounds": {
+        "minX": -1003.89,
+        "maxX": 2084.65,
+        "minZ": -4472.81,
+        "maxZ": 1427.8
+      }
+    },
+    "nishinari": {
+      "manifestCount": 29204,
+      "scannedCount": 29204,
+      "tileCount": 40,
+      "manifestTileCount": 40,
+      "bounds": {
+        "minX": -4548.4,
+        "maxX": -1527.24,
+        "minZ": -5881.92,
+        "maxZ": -1949.9
+      }
+    },
+    "yodogawa": {
+      "manifestCount": 34289,
+      "scannedCount": 34289,
+      "tileCount": 62,
+      "manifestTileCount": 62,
+      "bounds": {
+        "minX": -6659.9,
+        "maxX": -1674.24,
+        "minZ": -16222,
+        "maxZ": -11652.77
+      }
+    },
+    "tsurumi": {
+      "manifestCount": 22068,
+      "scannedCount": 22068,
+      "tileCount": 46,
+      "manifestTileCount": 46,
+      "bounds": {
+        "minX": 3099.06,
+        "maxX": 6743.14,
+        "minZ": -12646.83,
+        "maxZ": -9239.05
+      }
+    },
+    "suminoe": {
+      "manifestCount": 21608,
+      "scannedCount": 21608,
+      "tileCount": 67,
+      "manifestTileCount": 67,
+      "bounds": {
+        "minX": -10312.73,
+        "maxX": -2955.57,
+        "minZ": -3400.23,
+        "maxZ": 720.74
+      }
+    },
+    "hirano": {
+      "manifestCount": 44434,
+      "scannedCount": 44434,
+      "tileCount": 83,
+      "manifestTileCount": 83,
+      "bounds": {
+        "minX": 1437.19,
+        "maxX": 5702.18,
+        "minZ": -4440.08,
+        "maxZ": 1482.2
+      }
+    },
+    "kita": {
+      "manifestCount": 15779,
+      "scannedCount": 15779,
+      "tileCount": 44,
+      "manifestTileCount": 44,
+      "bounds": {
+        "minX": -4342.87,
+        "maxX": -131.7,
+        "minZ": -12493.33,
+        "maxZ": -9393.2
+      }
+    },
+    "chuo": {
+      "manifestCount": 18279,
+      "scannedCount": 18279,
+      "tileCount": 52,
+      "manifestTileCount": 52,
+      "bounds": {
+        "minX": -2588.68,
+        "maxX": 1034.28,
+        "minZ": -10142.6,
+        "maxZ": -6490.91
+      }
+    },
+    "__unclassified__": {
+      "manifestCount": 10378,
+      "scannedCount": 10378,
+      "invalidFootprints": 0
+    }
+  },
+  "summary": {
+    "datasetCount": 24,
+    "classifiedScanned": 574112,
+    "unclassifiedScanned": 10378,
+    "rootTotals": {
+      "input": 584490,
+      "classified": 574112,
+      "unclassified": 10378,
+      "duplicateIdsSkipped": 0,
+      "invariant": true
+    },
+    "errorFailCount": 0,
+    "warningCount": 0
+  }
+}

@@ -17,6 +17,7 @@ import {
 } from '../../lib/area.js';
 import { convertFacilitiesExtended, detectDuplicateCandidates } from '../../convert/facilities-extended.js';
 import { isMainModule, toProjectRelativePath } from '../../lib/paths.js';
+import { RUNTIME_COORDINATE_CONVENTION } from '../../lib/projection.js';
 
 function parseArgs(argv) {
   const args = { area: null };
@@ -111,6 +112,7 @@ export async function run(args) {
   const output = {
     areaId: args.area,
     generatedAt: new Date().toISOString(),
+    coordinateConvention: RUNTIME_COORDINATE_CONVENTION,
     recordCount: records.length,
     categoryCounts,
     records,
@@ -122,12 +124,14 @@ export async function run(args) {
     attribution: sourceMeta.attribution,
     downloadedAt: sourceMeta.downloadedAt,
     bbox: areaConfig.bbox,
+    coordinateConvention: RUNTIME_COORDINATE_CONVENTION,
     recordCount: records.length,
     skippedCount: skipped.length,
   };
   const validationReport = {
     areaId: args.area,
     generatedAt: new Date().toISOString(),
+    coordinateConvention: RUNTIME_COORDINATE_CONVENTION,
     recordCount: records.length,
     skippedDuringConversion: skipped,
     issueCount: validation.issues.length,
@@ -154,6 +158,7 @@ export async function run(args) {
     skippedCount: skipped.length,
     categoryCounts,
     issueCount: validation.issues.length,
+    coordinateConvention: RUNTIME_COORDINATE_CONVENTION,
     outPublicFacilities: toProjectRelativePath(outPublicFacilities),
   };
 }

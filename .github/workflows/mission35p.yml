@@ -1,0 +1,52 @@
+name: Mission 35P LOD2/LOD3 Audit
+
+on:
+  push:
+    branches:
+      - feature/mission-35p-lod2-audit
+    paths:
+      - 'tools/audit/mission35p-remote-lod-audit.js'
+      - 'tools/audit/plateau-source-inventory.js'
+      - 'tools/audit/max-lod-reaudit.js'
+      - 'tests/mission35p-lod-audit.test.js'
+      - '.github/workflows/mission35p.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lod-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # The full Mission 34D test file also checks gitignored canonical/report artifacts.
+      # Those do not exist in a clean Actions checkout, so 35P runs a dedicated parser
+      # regression here without weakening or changing the historical 34D assertions.
+      - name: Mission 35P LOD parser regression
+        run: node --test tests/mission35p-lod-audit.test.js
+
+      - name: Audit latest official Osaka PLATEAU building CityGML
+        env:
+          MISSION35P_MAX_BLDG_MB: '2500'
+        run: node --max-old-space-size=6144 tools/audit/mission35p-remote-lod-audit.js
+
+      - name: Upload Mission 35P audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission35p-lod-audit
+          path: |
+            data/reports/mission35p/lod-audit.json
+            data/reports/mission35p/SUMMARY.md
+          if-no-files-found: warn
+          retention-days: 14

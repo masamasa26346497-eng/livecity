@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-09-01T12:17:47.597Z",
+  "source": "public/osaka_3d_buildings.html",
+  "ok": true,
+  "summary": {
+    "total": 124,
+    "areas": 34,
+    "lines": 90,
+    "offenders": 0,
+    "oversizedSegments": 0,
+    "selfIntersections": 0,
+    "nonFiniteCoords": 0,
+    "degenerate": 0
+  },
+  "offenders": [],
+  "checks": [
+    {
+      "name": "coords-finite",
+      "pass": true,
+      "detail": "OK"
+    },
+    {
+      "name": "no-degenerate-area-rings",
+      "pass": true,
+      "detail": "OK"
+    },
+    {
+      "name": "no-oversized-segments",
+      "pass": true,
+      "detail": "OK"
+    },
+    {
+      "name": "no-area-self-intersections",
+      "pass": true,
+      "detail": "OK"
+    }
+  ]
+}

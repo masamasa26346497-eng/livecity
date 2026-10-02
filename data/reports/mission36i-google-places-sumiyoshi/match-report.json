@@ -1,0 +1,363 @@
+{
+  "mission": "36I",
+  "generatedAt": "2026-09-30T11:02:51.778Z",
+  "sourceCount": 149,
+  "maxDistanceMeters": 120,
+  "uiMappingPath": "public/map-data/osaka-city/derived/google-places-pilot-mapping.json",
+  "counts": {
+    "verified": 93,
+    "unresolved": 56,
+    "total": 149
+  },
+  "unresolved": [
+    {
+      "facilityId": "osm-node-1422980337",
+      "name": "あびこひかり保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"あびこひかりこども園\""
+    },
+    {
+      "facilityId": "osm-node-1422981708",
+      "name": "ひまわり幼稚園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-1422984789",
+      "name": "３",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 320m）"
+    },
+    {
+      "facilityId": "osm-node-1422986193",
+      "name": "四恩みろく保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-node-1422986195",
+      "name": "四恩るり保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"四恩学園保育園\""
+    },
+    {
+      "facilityId": "osm-node-1422986197",
+      "name": "四恩乳児保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-node-1422986198",
+      "name": "四恩児童館もんじゅ",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-node-1422989694",
+      "name": "大阪市立矢田第１保育所",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"矢田北保育園\""
+    },
+    {
+      "facilityId": "osm-node-1422991415",
+      "name": "天宗瓜破園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"天宗学園瓜破園\""
+    },
+    {
+      "facilityId": "osm-node-1423010404",
+      "name": "第２めぐむ保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(61m)が名前が一致しない: \"第二めぐむ保育園\""
+    },
+    {
+      "facilityId": "osm-node-1423017165",
+      "name": "錦秀会阪和住吉総合病院",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-node-1423017170",
+      "name": "錦秀会阪和第二病院",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1733m）"
+    },
+    {
+      "facilityId": "osm-node-1423017190",
+      "name": "長居保育園",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 411m）"
+    },
+    {
+      "facilityId": "osm-node-1633693556",
+      "name": "四恩学園診療所",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-node-1832650550",
+      "name": "長居幼稚園前",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-3077653657",
+      "name": "セブン-イレブン",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 363m）"
+    },
+    {
+      "facilityId": "osm-node-3632173764",
+      "name": "矢田",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 543m）"
+    },
+    {
+      "facilityId": "osm-node-6382983587",
+      "name": "ファミマ!!",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"ファミリーマート 東住吉矢田店\""
+    },
+    {
+      "facilityId": "osm-node-6822255985",
+      "name": "ウエルシア 平野瓜破西店",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-6946735527",
+      "name": "ミニストップ",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-7005094071",
+      "name": "百度石",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4308m）"
+    },
+    {
+      "facilityId": "osm-node-7274181239",
+      "name": "地下鉄あびこ",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-7274181244",
+      "name": "地下鉄あびこ駅前",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-node-7274217648",
+      "name": "我孫子3丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 192m）"
+    },
+    {
+      "facilityId": "osm-node-7274217649",
+      "name": "我孫子3丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 129m）"
+    },
+    {
+      "facilityId": "osm-node-7274220925",
+      "name": "JRあびこ町駅",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJdfRYUz_cAGARAqys6RzggmU: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-7274220926",
+      "name": "JRあびこ町駅",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJqREWWj_cAGARJRQU-k1NQ3A: Details全体上限に到達; ChIJfxAMTUfcAGARRaLuwQqfvms: Details全体上限に到達; ChIJdfRYUz_cAGARAqys6RzggmU: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-7276109862",
+      "name": "南住吉住宅前",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJpUYrkUXcAGARkENjxUCEhT4: Details全体上限に到達; ChIJq1DSlkXcAGARIMHgCAqrXjY: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-7276121863",
+      "name": "南住吉2丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 222m）"
+    },
+    {
+      "facilityId": "osm-node-7276121865",
+      "name": "南住吉3丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 138m）"
+    },
+    {
+      "facilityId": "osm-node-7276121866",
+      "name": "南住吉2丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 212m）"
+    },
+    {
+      "facilityId": "osm-node-7276121867",
+      "name": "南住吉3丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 190m）"
+    },
+    {
+      "facilityId": "osm-node-7276126308",
+      "name": "南住吉",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 386m）"
+    },
+    {
+      "facilityId": "osm-node-7276126309",
+      "name": "南住吉",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 395m）"
+    },
+    {
+      "facilityId": "osm-node-7276136543",
+      "name": "住吉区役所区民センター（恵楽苑前）",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJDbopWkHcAGARmBsheapdb1I: Details全体上限に到達; ChIJA08EE0_cAGAR5O9wWlBwgMw: Details全体上限に到達; ChIJ0whKQU_cAGARC0evQmE8WhA: Details全体上限に到達; ChIJO97FPk_cAGARRU7M5Sqe16Y: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-7276136545",
+      "name": "住吉区役所区民センター（恵楽苑前）",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJA08EE0_cAGAR5O9wWlBwgMw: Details全体上限に到達; ChIJ0whKQU_cAGARC0evQmE8WhA: Details全体上限に到達; ChIJDbopWkHcAGARmBsheapdb1I: Details全体上限に到達; ChIJO97FPk_cAGARRU7M5Sqe16Y: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-7736052618",
+      "name": "ヤスダ歯科クリニック",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"医療法人豊永会 やすだ歯科クリニック\""
+    },
+    {
+      "facilityId": "osm-node-8366716637",
+      "name": "矢田小学校西",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 162m）"
+    },
+    {
+      "facilityId": "osm-node-8366725211",
+      "name": "教育センター高校前",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details取得失敗: ChIJ3xWt5x7cAGARmlB6ozPL2YQ: Details全体上限に到達; ChIJYRnB5B7cAGARkjuhCacob1g: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-8366725212",
+      "name": "教育センター高校前",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details取得失敗: ChIJ3xWt5x7cAGARmlB6ozPL2YQ: Details全体上限に到達; ChIJYRnB5B7cAGARkjuhCacob1g: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-10249981514",
+      "name": "住道矢田北口",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJlQgzKLreAGARM1W0PY6uWmM: Details全体上限に到達; ChIJRXK01LveAGARUAKUNLE2UeU: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-10249981519",
+      "name": "住道矢田北口",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJlQgzKLreAGARM1W0PY6uWmM: Details全体上限に到達; ChIJRXK01LveAGARUAKUNLE2UeU: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-node-13957541239",
+      "name": "教育センター附属高校",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(35m)が名前が一致しない: \"大阪府教育センター附属高等学校\""
+    },
+    {
+      "facilityId": "osm-node-13957541241",
+      "name": "苅田3丁目",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 277m）"
+    },
+    {
+      "facilityId": "osm-way-160553311",
+      "name": "市立やたなか小中一貫校",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(110m)が名前が一致しない: \"やたなか小中一貫校（大阪市立矢田小学校、大阪市立矢田南中学校）\""
+    },
+    {
+      "facilityId": "osm-way-172351268",
+      "name": "大阪市立南住吉大空小学校",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"大阪市立大空小学校\""
+    },
+    {
+      "facilityId": "osm-way-586763031",
+      "name": "三井のリパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJRTmAzgfdAGARto46_s0H1kQ: Details全体上限に到達; ChIJLRNv2Z3dAGARcofMOXqIN_w: Details全体上限に到達; ChIJw65kpjvcAGARjvXXSWs-4Fg: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-592023703",
+      "name": "ワンパーク",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 476m）"
+    },
+    {
+      "facilityId": "osm-way-597137503",
+      "name": "ツルハドラッグ",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJkRZd06zdAGARoHhWVxtUWaU: Details全体上限に到達; ChIJqTLMyNbdAGARVQxcvD4LDgM: Details全体上限に到達; ChIJie3AfshvAWARUouZY9ORRv8: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-606251531",
+      "name": "リパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJlXqEaLLdAGARTENqL-EWWGE: Details全体上限に到達; ChIJYTULKBjcAGARFVoKvn16M5Y: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-828694901",
+      "name": "イズミヤ従業員専用",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2526m）"
+    },
+    {
+      "facilityId": "osm-way-828700264",
+      "name": "地下鉄我孫子駅自転車駐車場",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(26m)が名前が一致しない: \"大阪市立 地下鉄あびこ駅自転車駐車場(有料)\""
+    },
+    {
+      "facilityId": "osm-way-828721416",
+      "name": "ウエルシア",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details取得失敗: ChIJnVXduN_dAGARPJciW9vgZ7s: Details全体上限に到達; ChIJ9ZMS-WjdAGARpG31JaxpWfw: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-1007569147",
+      "name": "ウエルシア薬局",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1034m）"
+    },
+    {
+      "facilityId": "osm-way-1187621774",
+      "name": "のぞみ信用組合",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2292m）"
+    },
+    {
+      "facilityId": "osm-way-1187621793",
+      "name": "GSパーク",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 166m）"
+    }
+  ],
+  "apiUsage": {
+    "searchCalls": 149,
+    "detailsCalls": 30,
+    "photoMediaCalls": 0,
+    "disabledCalls": 0,
+    "deduped": 0,
+    "rateLimited": 6,
+    "sessionLimited": 0,
+    "executed": 179,
+    "inFlight": 0,
+    "windowCount": 9,
+    "sessionCount": 179
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "generatedAt": "2026-08-31T11:25:30.454Z",
+  "buildings": "temp/ward-poc-all-buildings.jsonl",
+  "wardPolygons": "data/processed/osaka-city/boundaries/ward-classification-polygons.json",
+  "total": 584490,
+  "counts": {
+    "miyakojima": 13199,
+    "fukushima": 11159,
+    "konohana": 13437,
+    "nishi": 12098,
+    "minato": 15489,
+    "taisho": 17363,
+    "tennoji": 14244,
+    "naniwa": 10133,
+    "nishiyodogawa": 23242,
+    "higashiyodogawa": 34685,
+    "higashinari": 21976,
+    "ikuno": 46212,
+    "asahi": 22424,
+    "joto": 32447,
+    "abeno": 26924,
+    "sumiyoshi": 34930,
+    "higashisumiyoshi": 38489,
+    "nishinari": 29204,
+    "yodogawa": 34289,
+    "tsurumi": 22068,
+    "suminoe": 21608,
+    "hirano": 44434,
+    "kita": 15779,
+    "chuo": 18279
+  },
+  "outsideCity": 10374,
+  "ambiguous": 4,
+  "boundaryResolved": 1,
+  "invalid": 0,
+  "invariant": true,
+  "methodCounts": {
+    "centroid": 581921,
+    "interior-scanline": 2569,
+    "bbox-center": 0,
+    "vertex-mean": 0
+  },
+  "attr": {
+    "hasWardAttr": 584490,
+    "attrMatch": 38489,
+    "attrMismatch": 535623,
+    "attrOutsideCity": 10378,
+    "mismatchSamples": [
+      {
+        "id": "bldg_4e412845-52bb-4e42-9bf0-80fb82ab2ea4",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4572.73,
+        "z": -259.68
+      },
+      {
+        "id": "bldg_0200257a-33f0-4a12-a48d-9d77035b5503",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4552,
+        "z": -199.66
+      },
+      {
+        "id": "bldg_c985baa9-e89f-4d76-932f-c0cda97bb766",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4529.31,
+        "z": -387.22
+      },
+      {
+        "id": "bldg_8f569733-5c05-4fbd-9f0c-73aaf255fe31",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4545.54,
+        "z": -262.11
+      },
+      {
+        "id": "bldg_6a5e3e06-c608-4a5c-8b33-3d4dc5787e10",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4537.5,
+        "z": -451.7
+      },
+      {
+        "id": "bldg_a4e3102d-dc46-4b3c-ab13-724f301e75d7",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4572.86,
+        "z": -491.47
+      },
+      {
+        "id": "bldg_acae3dbd-58b4-4211-92f3-ddcb33a7250a",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4553.31,
+        "z": -221.89
+      },
+      {
+        "id": "bldg_0d6c4038-0f3c-4a17-9d04-d4b012e217e1",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4562.75,
+        "z": -394.7
+      },
+      {
+        "id": "bldg_7ca2e655-86d1-4b88-9398-0dc13113f487",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4576.81,
+        "z": -325.14
+      },
+      {
+        "id": "bldg_5a35c1af-9a32-47c7-9f92-2c0b502e6fdb",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4508.76,
+        "z": -75.86
+      },
+      {
+        "id": "bldg_d21f40fd-d56b-4414-a2cc-b204542d6994",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4542.45,
+        "z": -487.34
+      },
+      {
+        "id": "bldg_4e95b0b1-4855-4ad3-801a-4e1e6733c2b1",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4500.27,
+        "z": -49.61
+      },
+      {
+        "id": "bldg_e492a562-ec60-4575-a086-9af42058f2fd",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4514.78,
+        "z": -346.42
+      },
+      {
+        "id": "bldg_afb92eb8-a5ca-4b0a-8ad6-5fe59f06ab98",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4551.66,
+        "z": -503.34
+      },
+      {
+        "id": "bldg_dd40828f-f459-446e-bcfb-827ff0155c86",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4566.56,
+        "z": -205.56
+      },
+      {
+        "id": "bldg_20c35e92-a43a-4483-946a-db3ee4f5039f",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4523.63,
+        "z": -110.88
+      },
+      {
+        "id": "bldg_62a5010c-a2d5-4159-9c33-0b5175bee526",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4563.02,
+        "z": -258.59
+      },
+      {
+        "id": "bldg_aa022e0b-2555-47f9-aea1-048431d9e4b5",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4581.94,
+        "z": -132.89
+      },
+      {
+        "id": "bldg_e16d1de6-7e22-4af7-a21a-dcfe07b4fbb6",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4570.42,
+        "z": -217.93
+      },
+      {
+        "id": "bldg_f37e2ba1-c57e-4e23-bb63-e09c53c59755",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4551.67,
+        "z": -391.84
+      },
+      {
+        "id": "bldg_e1b8d7b8-b63d-4d80-8a03-0b976e7a7959",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4507.1,
+        "z": -277.72
+      },
+      {
+        "id": "bldg_db137092-f2f5-4a63-a789-582d8f37849c",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4523.33,
+        "z": -210.13
+      },
+      {
+        "id": "bldg_fb979145-a017-4534-b330-2b2ceb932f1f",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4540.97,
+        "z": -115.16
+      },
+      {
+        "id": "bldg_7027b856-4d6b-44be-b571-fd8ee27187b5",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4513.53,
+        "z": -413.04
+      },
+      {
+        "id": "bldg_9864fe9c-1534-4300-92cb-3dee2340115b",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4524.69,
+        "z": -100.47
+      },
+      {
+        "id": "bldg_b9782943-dfe1-4919-b46b-6000d1059681",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4558.81,
+        "z": -3.19
+      },
+      {
+        "id": "bldg_345e5687-b070-4d82-b177-095db3b59650",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4567.76,
+        "z": -487.87
+      },
+      {
+        "id": "bldg_d2f78094-04c8-4528-9f7f-7f9bd7f7c0e3",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4518.03,
+        "z": -210.21
+      },
+      {
+        "id": "bldg_7375fdfe-5b66-4089-aae4-e3f3a2832aaa",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4520.03,
+        "z": -195.81
+      },
+      {
+        "id": "bldg_a661920c-2e59-4908-8784-c0121e51446b",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4583.82,
+        "z": -303.5
+      },
+      {
+        "id": "bldg_6cff0b5d-86be-43d9-8f9f-521a6b10fffa",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4563.9,
+        "z": -431.87
+      },
+      {
+        "id": "bldg_9052f7e8-ef0d-451b-b867-ac424425f1a4",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4547.75,
+        "z": -429.84
+      },
+      {
+        "id": "bldg_1a449783-3831-4549-81e8-9a8609105553",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4504.53,
+        "z": -40.77
+      },
+      {
+        "id": "bldg_aa283166-ce3e-4411-9ea1-9f76236eaf27",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4557.02,
+        "z": -200.29
+      },
+      {
+        "id": "bldg_10c4e5c3-7424-45f8-b7f1-835fb939d33c",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4509.82,
+        "z": -239.77
+      },
+      {
+        "id": "bldg_759ba283-acb8-4b97-b2b6-34b625bd0e2d",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4579.33,
+        "z": -275.86
+      },
+      {
+        "id": "bldg_c0830d73-5e5d-40e5-8165-3d8924780ae9",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4544.63,
+        "z": -344.88
+      },
+      {
+        "id": "bldg_d4fe6f50-cd5d-4b9e-a422-f1b3577e9394",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4545.92,
+        "z": -198.4
+      },
+      {
+        "id": "bldg_29796f83-2c69-44a7-8f4b-4d84f2f3060f",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4583.45,
+        "z": -127.45
+      },
+      {
+        "id": "bldg_42ead168-55b5-4b3e-8fd7-5047f9a511d2",
+        "attrWard": "東住吉区",
+        "n03Ward": "住之江区",
+        "x": -4582.14,
+        "z": -58.03
+      }
+    ]
+  },
+  "knownWardBreakdown": {
+    "sumiyoshi": {
+      "attrCount": 0,
+      "n03Same": 0,
+      "n03Other": {},
+      "n03OutsideCity": 0,
+      "n03Ambiguous": 0
+    },
+    "higashisumiyoshi": {
+      "attrCount": 584490,
+      "n03Same": 38489,
+      "n03Other": {
+        "suminoe": 21608,
+        "taisho": 17363,
+        "minato": 15489,
+        "nishi": 12098,
+        "fukushima": 11159,
+        "konohana": 13437,
+        "yodogawa": 34289,
+        "nishiyodogawa": 23242,
+        "nishinari": 29204,
+        "sumiyoshi": 34930,
+        "tennoji": 14244,
+        "abeno": 26924,
+        "ikuno": 46212,
+        "chuo": 18279,
+        "miyakojima": 13199,
+        "kita": 15779,
+        "higashiyodogawa": 34685,
+        "naniwa": 10133,
+        "asahi": 22424,
+        "hirano": 44434,
+        "tsurumi": 22068,
+        "higashinari": 21976,
+        "joto": 32447
+      },
+      "n03OutsideCity": 10374,
+      "n03Ambiguous": 4
+    },
+    "hirano": {
+      "attrCount": 0,
+      "n03Same": 0,
+      "n03Other": {},
+      "n03OutsideCity": 0,
+      "n03Ambiguous": 0
+    }
+  }
+}

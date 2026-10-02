@@ -22,7 +22,7 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { loadAreaConfig, writeJson } from '../lib/area.js';
 import { normalizeChochoName } from '../lib/chocho-normalize.js';
-import { convertCoordsArray } from '../lib/projection.js';
+import { convertGeometryToRings } from '../lib/geojson-geometry.js';
 import { toProjectRelativePath } from '../lib/paths.js';
 
 function parseArgs(argv) {
@@ -68,67 +68,6 @@ function splitKeyCode(keyCode) {
 function extractWard(cityName) {
   const m = (cityName || '').match(/大阪市(.+区)$/);
   return m ? m[1] : null;
-}
-
-/**
- * GeoJSONのgeometryをThree.js座標系のリング配列(boundaryコードと同じ [[x,z],...] の配列の配列)
- * へ変換する。Polygon/MultiPolygonの両方に対応する。不正なgeometry(型不明、coordinates欠落、
- * 座標が数値でない等)は黙って空配列にせず、明確な例外として呼び出し側に伝える。
- */
-function convertGeometryToRings(geometry, projection) {
-  if (!geometry || typeof geometry !== 'object') {
-    throw new Error('geometryが存在しません。');
-  }
-  const { type, coordinates } = geometry;
-  if (!coordinates || !Array.isArray(coordinates)) {
-    throw new Error(`geometry.coordinatesが配列ではありません(type: ${type})。`);
-  }
-
-  function convertRing(ring) {
-    if (!Array.isArray(ring) || ring.length === 0) {
-      throw new Error('リングが空、または配列ではありません。');
-    }
-    for (const pt of ring) {
-      if (!Array.isArray(pt) || pt.length < 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
-        throw new Error(`座標点が不正です: ${JSON.stringify(pt)}`);
-      }
-      if (!Number.isFinite(pt[0]) || !Number.isFinite(pt[1])) {
-        throw new Error(`座標点が有限値ではありません: ${JSON.stringify(pt)}`);
-      }
-    }
-    return convertCoordsArray(ring, projection);
-  }
-
-  if (type === 'Point') {
-    // 図形中心点のみ(ポリゴン形状が未取得のレコード)。1点だけのリングとして表現する。
-    // 既存のTOWN_POLYGONS形式(リング配列)とは異質なデータであるため、呼び出し側で
-    // hasFullPolygon: false として明示し、地図上のポリゴン描画には使わない前提とする。
-    const pt = coordinates;
-    if (!Array.isArray(pt) || pt.length < 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
-      throw new Error(`Point座標が不正です: ${JSON.stringify(pt)}`);
-    }
-    if (!Number.isFinite(pt[0]) || !Number.isFinite(pt[1])) {
-      throw new Error(`Point座標が有限値ではありません: ${JSON.stringify(pt)}`);
-    }
-    return [convertCoordsArray([pt], projection)];
-  }
-  if (type === 'Polygon') {
-    // Polygon.coordinates = [外周リング, 穴リング1, 穴リング2, ...]
-    return coordinates.map(convertRing);
-  }
-  if (type === 'MultiPolygon') {
-    // MultiPolygon.coordinates = [Polygon1のリング群, Polygon2のリング群, ...]
-    // 既存のTOWN_POLYGONS形式(リングの配列)と互換にするため、全Polygonの外周・穴リングを
-    // フラットに1つの配列へまとめる(複数ポリゴンを持つ町丁目=飛び地として扱う既存設計を踏襲)。
-    const rings = [];
-    for (const polygonCoords of coordinates) {
-      for (const ring of polygonCoords) {
-        rings.push(convertRing(ring));
-      }
-    }
-    return rings;
-  }
-  throw new Error(`未対応のgeometry.type: "${type}" (Point/Polygon/MultiPolygonのみ対応)`);
 }
 
 async function main(args) {

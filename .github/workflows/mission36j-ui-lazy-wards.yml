@@ -1,0 +1,74 @@
+name: Mission 36J - Lazy Ward Facility UI
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+
+permissions:
+  contents: write
+
+jobs:
+  patch-lazy-ward-ui:
+    if: contains(github.event.head_commit.message, '[run-36j-lazy]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mission-36j-osaka-24ward-google-places-expansion
+          fetch-depth: 0
+
+      - name: Sync latest branch
+        shell: bash
+        run: |
+          git fetch origin feature/mission-36j-osaka-24ward-google-places-expansion
+          git reset --hard origin/feature/mission-36j-osaka-24ward-google-places-expansion
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Hash protected production HTML
+        shell: bash
+        run: |
+          sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/protected-before.sha256
+
+      - name: Apply lazy ward facility patch
+        run: node tools/mission36j-patch-facility-ward-lazy.mjs
+
+      - name: Validate lazy loading contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          HTML=public/osaka_3d_buildings.ward-ux-v1.html
+          grep -Fq '[Mission 36J LAZY] 24-ward facility lazy loading' "$HTML"
+          grep -Fq 'ward-manifest.json' "$HTML"
+          grep -Fq 'loadWard,' "$HTML"
+          grep -Fq '__FACILITY_LAZY_DEBUG__' "$HTML"
+          grep -Fq 'rebuildIfReady(force = false)' "$HTML"
+          if sed -n '/const FacilityDataStore = (function () {/,/})();/p' "$HTML" | grep -Fq 'facilities-startup.json'; then
+            echo 'ERROR: startup subset fetch remains in FacilityDataStore' >&2
+            exit 1
+          fi
+          if sed -n '/const FacilityDataStore = (function () {/,/})();/p' "$HTML" | grep -Fq '/facilities.json'; then
+            echo 'ERROR: monolithic facilities.json fetch remains in FacilityDataStore' >&2
+            exit 1
+          fi
+          sha256sum -c /tmp/protected-before.sha256
+
+      - name: Commit dev UI only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/osaka_3d_buildings.ward-ux-v1.html
+          if git diff --cached --quiet; then
+            echo 'No UI changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat(mission36j): lazy-load facility coverage by ward'
+          git pull --rebase origin feature/mission-36j-osaka-24ward-google-places-expansion
+          git push origin HEAD:feature/mission-36j-osaka-24ward-google-places-expansion

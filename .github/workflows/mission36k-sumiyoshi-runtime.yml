@@ -1,0 +1,155 @@
+name: Mission 36K - Sumiyoshi Runtime Rebuild
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-sumiyoshi:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36k-sumiyoshi-runtime]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync mission branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Guard protected production HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
+
+      - name: Probe current 2024 CityGML archive
+        shell: bash
+        run: node tools/mission36k-probe-citygml-zip.mjs
+
+      - name: Range-extract all Sumiyoshi-overlapping building meshes
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/mission36k-citygml-sumiyoshi
+          node tools/mission36k-fetch-citygml-ward-range.mjs \
+            --ward=sumiyoshi \
+            --out=/tmp/mission36k-citygml-sumiyoshi
+          test "$(find /tmp/mission36k-citygml-sumiyoshi -maxdepth 1 -type f -name '*.gml' | wc -l)" -eq 15
+
+      - name: Convert CityGML to canonical Live City JSONL
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f /tmp/mission36k-sumiyoshi-2024.jsonl /tmp/mission36k-sumiyoshi-2024.report.json
+          node tools/mission36k-convert-citygml-runtime.mjs \
+            --input /tmp/mission36k-citygml-sumiyoshi \
+            --output /tmp/mission36k-sumiyoshi-2024.jsonl \
+            --ward-hint sumiyoshi
+          test -s /tmp/mission36k-sumiyoshi-2024.jsonl
+
+      - name: N03 classify and build 500m flat runtime tiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf temp/mission36k-sumiyoshi-datasets
+          node tools/build-ward-building-datasets.js \
+            --buildings /tmp/mission36k-sumiyoshi-2024.jsonl \
+            --ward-polygons data/processed/osaka-city/boundaries/ward-classification-polygons.json \
+            --out temp/mission36k-sumiyoshi-datasets \
+            --tile-size 500 \
+            --layout flat \
+            --force
+
+      - name: Validate and install Sumiyoshi runtime dataset
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='temp/mission36k-sumiyoshi-datasets/osaka-sumiyoshi/manifest.json';
+          const m=JSON.parse(fs.readFileSync(p,'utf8'));
+          if (m.id !== 'osaka-sumiyoshi') throw new Error(`dataset id=${m.id}`);
+          if (m.coordinateConvention !== 'znorth-neg-v1') throw new Error(`coordinate=${m.coordinateConvention}`);
+          if (m.layout !== 'flat') throw new Error(`layout=${m.layout}`);
+          if (m.tileSize !== 500) throw new Error(`tileSize=${m.tileSize}`);
+          if (!(m.totalBuildings > 30000 && m.totalBuildings < 45000)) throw new Error(`suspicious Sumiyoshi building count=${m.totalBuildings}`);
+          if (!(m.tileCount > 35 && m.tileCount < 80)) throw new Error(`suspicious Sumiyoshi tile count=${m.tileCount}`);
+          if (!Array.isArray(m.tiles) || m.tiles.length !== m.tileCount) throw new Error('tile list mismatch');
+          for (const t of m.tiles) {
+            const f=`temp/mission36k-sumiyoshi-datasets/osaka-sumiyoshi/${t.file}`;
+            if (!fs.existsSync(f)) throw new Error(`missing tile ${f}`);
+            const j=JSON.parse(fs.readFileSync(f,'utf8'));
+            if (j.count !== j.buildings?.length) throw new Error(`tile count mismatch ${t.file}`);
+          }
+          console.log(JSON.stringify({totalBuildings:m.totalBuildings,tileCount:m.tileCount,bounds:m.bounds}));
+          NODE
+
+          rm -rf public/map-data/osaka-city/buildings/osaka-sumiyoshi
+          cp -R temp/mission36k-sumiyoshi-datasets/osaka-sumiyoshi public/map-data/osaka-city/buildings/osaka-sumiyoshi
+
+      - name: Update root runtime manifest with rebuilt Sumiyoshi counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const rootPath='public/map-data/osaka-city/buildings/manifest.json';
+          const wardPath='public/map-data/osaka-city/buildings/osaka-sumiyoshi/manifest.json';
+          const root=JSON.parse(fs.readFileSync(rootPath,'utf8'));
+          const ward=JSON.parse(fs.readFileSync(wardPath,'utf8'));
+          const d=root.datasets.find((x)=>x.wardId==='sumiyoshi');
+          if (!d) throw new Error('Sumiyoshi root dataset entry missing');
+          d.buildings=ward.totalBuildings;
+          d.tiles=ward.tileCount;
+          d.bounds=ward.bounds;
+          d.sourceVersion='PLATEAU CityGML v4 2024';
+          d.runtimeReady=true;
+          root.buildingCount=root.datasets.reduce((n,x)=>n+Number(x.buildings||0),0);
+          root.tileCount=root.datasets.reduce((n,x)=>n+Number(x.tiles||0),0);
+          root.generatedAt=new Date().toISOString();
+          root.migration='Mission36K: Sumiyoshi runtime tiles rebuilt from PLATEAU 2024 CityGML; remaining wards retain prior manifest metadata until rebuilt.';
+          fs.writeFileSync(rootPath,JSON.stringify(root,null,2)+'\n');
+          console.log(JSON.stringify({buildingCount:root.buildingCount,tileCount:root.tileCount,sumiyoshi:d}));
+          NODE
+
+      - name: Final guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum -c /tmp/mission36k-protected.sha256
+          test -f public/map-data/osaka-city/buildings/osaka-sumiyoshi/manifest.json
+          test "$(find public/map-data/osaka-city/buildings/osaka-sumiyoshi -maxdepth 1 -type f -name 'tile_*.json' | wc -l)" -gt 35
+
+      - name: Commit Sumiyoshi runtime tiles and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f \
+            public/map-data/osaka-city/buildings/manifest.json \
+            public/map-data/osaka-city/buildings/osaka-sumiyoshi \
+            data/reports/mission36k-citygml-zip-probe.json \
+            data/reports/mission36k-citygml-range-sumiyoshi.json \
+            data/reports/building-dataset-generation.json
+          if git diff --cached --quiet; then
+            echo 'No runtime changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data(mission36k): rebuild Sumiyoshi runtime building tiles from PLATEAU 2024'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

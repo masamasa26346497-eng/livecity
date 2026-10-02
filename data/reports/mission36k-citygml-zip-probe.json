@@ -1,0 +1,2231 @@
+{
+  "mission": "36K-citygml-poc",
+  "generatedAt": "2026-10-01T16:08:58.978Z",
+  "source": {
+    "id": "d68704bd-f6b9-49c7-bad6-373b78cc3af5",
+    "name": "CityGML（v4）",
+    "url": "https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip"
+  },
+  "head": {
+    "status": 200,
+    "headers": {
+      "content-length": "1523942100",
+      "content-type": "application/zip",
+      "accept-ranges": "bytes",
+      "etag": "\"982370acee7a5cc63a94fa2e9b0b33fe\"",
+      "last-modified": "Mon, 31 Mar 2025 02:41:20 GMT",
+      "content-range": null
+    }
+  },
+  "zip": {
+    "rangeSupported": true,
+    "contentLength": 1523942100,
+    "zip64": false,
+    "entriesDeclared": 6917,
+    "entriesParsed": 6917,
+    "centralDirectoryOffset": 1523231030,
+    "centralDirectorySize": 711048,
+    "fileCount": 6854,
+    "gmlCount": 1149,
+    "buildingGmlCount": 270,
+    "meshCodeCount": 270,
+    "meshCodes": [
+      "51357309",
+      "51357318",
+      "51357319",
+      "51357326",
+      "51357327",
+      "51357328",
+      "51357329",
+      "51357332",
+      "51357333",
+      "51357334",
+      "51357335",
+      "51357336",
+      "51357337",
+      "51357338",
+      "51357339",
+      "51357341",
+      "51357342",
+      "51357343",
+      "51357344",
+      "51357345",
+      "51357346",
+      "51357347",
+      "51357348",
+      "51357349",
+      "51357351",
+      "51357352",
+      "51357353",
+      "51357354",
+      "51357355",
+      "51357356",
+      "51357357",
+      "51357358",
+      "51357359",
+      "51357361",
+      "51357362",
+      "51357363",
+      "51357364",
+      "51357365",
+      "51357366",
+      "51357367",
+      "51357368",
+      "51357369",
+      "51357370",
+      "51357371",
+      "51357372",
+      "51357373",
+      "51357374",
+      "51357375",
+      "51357376",
+      "51357377",
+      "51357378",
+      "51357379",
+      "51357380",
+      "51357381",
+      "51357382",
+      "51357383",
+      "51357384",
+      "51357385",
+      "51357386",
+      "51357387",
+      "51357388",
+      "51357389",
+      "51357390",
+      "51357391",
+      "51357392",
+      "51357393",
+      "51357394",
+      "51357395",
+      "51357396",
+      "51357397",
+      "51357398",
+      "51357399",
+      "51357400",
+      "51357401",
+      "51357402",
+      "51357405",
+      "51357410",
+      "51357411",
+      "51357412",
+      "51357413",
+      "51357414",
+      "51357415",
+      "51357416",
+      "51357420",
+      "51357421",
+      "51357422",
+      "51357423",
+      "51357424",
+      "51357425",
+      "51357426",
+      "51357430",
+      "51357431",
+      "51357432",
+      "51357433",
+      "51357434",
+      "51357435",
+      "51357436",
+      "51357440",
+      "51357441",
+      "51357442",
+      "51357443",
+      "51357444",
+      "51357445",
+      "51357446",
+      "51357450",
+      "51357451",
+      "51357452",
+      "51357453",
+      "51357454",
+      "51357455",
+      "51357456",
+      "51357460",
+      "51357461",
+      "51357462",
+      "51357463",
+      "51357464",
+      "51357465",
+      "51357470",
+      "51357471",
+      "51357472",
+      "51357473",
+      "51357474",
+      "51357480",
+      "51357481",
+      "51357482",
+      "51357483",
+      "51357484",
+      "51357485",
+      "51357490",
+      "51357491",
+      "51357492",
+      "51357493",
+      "51357494",
+      "51357495",
+      "52350301",
+      "52350302",
+      "52350303",
+      "52350304",
+      "52350305",
+      "52350306",
+      "52350307",
+      "52350308",
+      "52350309",
+      "52350312",
+      "52350313",
+      "52350314",
+      "52350315",
+      "52350316",
+      "52350317",
+      "52350318",
+      "52350319",
+      "52350322",
+      "52350323",
+      "52350324",
+      "52350325",
+      "52350326",
+      "52350327",
+      "52350328",
+      "52350329",
+      "52350332",
+      "52350333",
+      "52350334",
+      "52350335",
+      "52350336",
+      "52350337",
+      "52350338",
+      "52350339",
+      "52350343",
+      "52350344",
+      "52350345",
+      "52350346",
+      "52350347",
+      "52350348",
+      "52350349",
+      "52350354",
+      "52350355",
+      "52350356",
+      "52350357",
+      "52350358",
+      "52350359",
+      "52350365",
+      "52350366",
+      "52350367",
+      "52350368",
+      "52350369",
+      "52350375",
+      "52350376",
+      "52350377",
+      "52350378",
+      "52350379",
+      "52350386",
+      "52350387",
+      "52350388",
+      "52350389",
+      "52350398",
+      "52350399",
+      "52350400",
+      "52350401",
+      "52350402",
+      "52350403",
+      "52350404",
+      "52350405",
+      "52350410",
+      "52350411",
+      "52350412",
+      "52350413",
+      "52350414",
+      "52350415",
+      "52350420",
+      "52350421",
+      "52350422",
+      "52350423",
+      "52350424",
+      "52350425",
+      "52350426",
+      "52350430",
+      "52350431",
+      "52350432",
+      "52350433",
+      "52350434",
+      "52350435",
+      "52350436",
+      "52350437",
+      "52350440",
+      "52350441",
+      "52350442",
+      "52350443",
+      "52350444",
+      "52350445",
+      "52350446",
+      "52350447",
+      "52350450",
+      "52350451",
+      "52350452",
+      "52350453",
+      "52350454",
+      "52350455",
+      "52350456",
+      "52350457",
+      "52350460",
+      "52350461",
+      "52350462",
+      "52350463",
+      "52350464",
+      "52350465",
+      "52350466",
+      "52350470",
+      "52350471",
+      "52350472",
+      "52350473",
+      "52350474",
+      "52350480",
+      "52350481",
+      "52350482",
+      "52350483",
+      "52350484",
+      "52350490",
+      "52350491",
+      "52350492",
+      "52350493",
+      "52350494",
+      "52351309",
+      "52351402",
+      "52351403",
+      "52351404",
+      "52351412",
+      "52351413",
+      "52351414",
+      "52351423",
+      "52351424"
+    ],
+    "extensions": [
+      [
+        ".jpg",
+        5634
+      ],
+      [
+        ".gml",
+        1149
+      ],
+      [
+        ".xml",
+        64
+      ],
+      [
+        ".xsd",
+        2
+      ],
+      [
+        ".pdf",
+        2
+      ],
+      [
+        ".csv",
+        1
+      ],
+      [
+        ".xlsx",
+        1
+      ],
+      [
+        ".md",
+        1
+      ]
+    ],
+    "buildingEntries": [
+      {
+        "name": "udx/bldg/51357309_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 29534,
+        "uncompressedBytes": 786901,
+        "localOffset": 167360006
+      },
+      {
+        "name": "udx/bldg/51357318_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 408792,
+        "uncompressedBytes": 11229266,
+        "localOffset": 167389620
+      },
+      {
+        "name": "udx/bldg/51357319_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1524242,
+        "uncompressedBytes": 38524308,
+        "localOffset": 167798492
+      },
+      {
+        "name": "udx/bldg/51357326_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 162538,
+        "uncompressedBytes": 4336975,
+        "localOffset": 169322814
+      },
+      {
+        "name": "udx/bldg/51357327_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 931873,
+        "uncompressedBytes": 23999321,
+        "localOffset": 169485432
+      },
+      {
+        "name": "udx/bldg/51357328_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2167207,
+        "uncompressedBytes": 57076938,
+        "localOffset": 170417385
+      },
+      {
+        "name": "udx/bldg/51357329_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3123732,
+        "uncompressedBytes": 80468948,
+        "localOffset": 172584672
+      },
+      {
+        "name": "udx/bldg/51357332_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 82235,
+        "uncompressedBytes": 2081173,
+        "localOffset": 175708484
+      },
+      {
+        "name": "udx/bldg/51357333_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 70024,
+        "uncompressedBytes": 1786930,
+        "localOffset": 175790799
+      },
+      {
+        "name": "udx/bldg/51357334_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 120155,
+        "uncompressedBytes": 2961646,
+        "localOffset": 175860903
+      },
+      {
+        "name": "udx/bldg/51357335_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 222238,
+        "uncompressedBytes": 5438093,
+        "localOffset": 175981138
+      },
+      {
+        "name": "udx/bldg/51357336_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 465192,
+        "uncompressedBytes": 11972421,
+        "localOffset": 176203456
+      },
+      {
+        "name": "udx/bldg/51357337_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 609613,
+        "uncompressedBytes": 15324296,
+        "localOffset": 176668728
+      },
+      {
+        "name": "udx/bldg/51357338_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2361243,
+        "uncompressedBytes": 62858978,
+        "localOffset": 177278421
+      },
+      {
+        "name": "udx/bldg/51357339_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2675996,
+        "uncompressedBytes": 65656632,
+        "localOffset": 179639744
+      },
+      {
+        "name": "udx/bldg/51357341_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 6140,
+        "uncompressedBytes": 137230,
+        "localOffset": 182315820
+      },
+      {
+        "name": "udx/bldg/51357342_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 69357,
+        "uncompressedBytes": 1536724,
+        "localOffset": 182322040
+      },
+      {
+        "name": "udx/bldg/51357343_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 52696,
+        "uncompressedBytes": 1181809,
+        "localOffset": 182391477
+      },
+      {
+        "name": "udx/bldg/51357344_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 107536,
+        "uncompressedBytes": 2610972,
+        "localOffset": 182444253
+      },
+      {
+        "name": "udx/bldg/51357345_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 185738,
+        "uncompressedBytes": 4603062,
+        "localOffset": 182551869
+      },
+      {
+        "name": "udx/bldg/51357346_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 263476,
+        "uncompressedBytes": 6578143,
+        "localOffset": 182737687
+      },
+      {
+        "name": "udx/bldg/51357347_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 699715,
+        "uncompressedBytes": 17931825,
+        "localOffset": 183001243
+      },
+      {
+        "name": "udx/bldg/51357348_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2177452,
+        "uncompressedBytes": 57174487,
+        "localOffset": 183701038
+      },
+      {
+        "name": "udx/bldg/51357349_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2897753,
+        "uncompressedBytes": 70021953,
+        "localOffset": 185878570
+      },
+      {
+        "name": "udx/bldg/51357351_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 8150,
+        "uncompressedBytes": 164910,
+        "localOffset": 188776403
+      },
+      {
+        "name": "udx/bldg/51357352_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 63319,
+        "uncompressedBytes": 1457806,
+        "localOffset": 188784633
+      },
+      {
+        "name": "udx/bldg/51357353_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 231314,
+        "uncompressedBytes": 5529832,
+        "localOffset": 188848032
+      },
+      {
+        "name": "udx/bldg/51357354_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 250854,
+        "uncompressedBytes": 5759836,
+        "localOffset": 189079426
+      },
+      {
+        "name": "udx/bldg/51357355_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 36507,
+        "uncompressedBytes": 881360,
+        "localOffset": 189330360
+      },
+      {
+        "name": "udx/bldg/51357356_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 232529,
+        "uncompressedBytes": 6092844,
+        "localOffset": 189366947
+      },
+      {
+        "name": "udx/bldg/51357357_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 267503,
+        "uncompressedBytes": 6407377,
+        "localOffset": 189599556
+      },
+      {
+        "name": "udx/bldg/51357358_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1502627,
+        "uncompressedBytes": 39582987,
+        "localOffset": 189867139
+      },
+      {
+        "name": "udx/bldg/51357359_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2972893,
+        "uncompressedBytes": 73755485,
+        "localOffset": 191369846
+      },
+      {
+        "name": "udx/bldg/51357361_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2066,
+        "uncompressedBytes": 13584,
+        "localOffset": 194342819
+      },
+      {
+        "name": "udx/bldg/51357362_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 113079,
+        "uncompressedBytes": 2177756,
+        "localOffset": 194344965
+      },
+      {
+        "name": "udx/bldg/51357363_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 249614,
+        "uncompressedBytes": 5437546,
+        "localOffset": 194458124
+      },
+      {
+        "name": "udx/bldg/51357364_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 186618,
+        "uncompressedBytes": 4464254,
+        "localOffset": 194707818
+      },
+      {
+        "name": "udx/bldg/51357365_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 15404,
+        "uncompressedBytes": 319148,
+        "localOffset": 194894516
+      },
+      {
+        "name": "udx/bldg/51357366_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 788302,
+        "uncompressedBytes": 20840880,
+        "localOffset": 194910000
+      },
+      {
+        "name": "udx/bldg/51357367_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1633883,
+        "uncompressedBytes": 43613880,
+        "localOffset": 195698382
+      },
+      {
+        "name": "udx/bldg/51357368_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1378317,
+        "uncompressedBytes": 36149587,
+        "localOffset": 197332345
+      },
+      {
+        "name": "udx/bldg/51357369_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3419439,
+        "uncompressedBytes": 89664843,
+        "localOffset": 198710742
+      },
+      {
+        "name": "udx/bldg/51357370_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 5851,
+        "uncompressedBytes": 96376,
+        "localOffset": 202130261
+      },
+      {
+        "name": "udx/bldg/51357371_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 23411,
+        "uncompressedBytes": 299495,
+        "localOffset": 202279312
+      },
+      {
+        "name": "udx/bldg/51357372_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 17705,
+        "uncompressedBytes": 348745,
+        "localOffset": 202302803
+      },
+      {
+        "name": "udx/bldg/51357373_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 77116,
+        "uncompressedBytes": 1648637,
+        "localOffset": 202320588
+      },
+      {
+        "name": "udx/bldg/51357374_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 9090,
+        "uncompressedBytes": 178334,
+        "localOffset": 202397784
+      },
+      {
+        "name": "udx/bldg/51357375_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 113741,
+        "uncompressedBytes": 2850019,
+        "localOffset": 202406954
+      },
+      {
+        "name": "udx/bldg/51357376_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 312229,
+        "uncompressedBytes": 7722823,
+        "localOffset": 202520775
+      },
+      {
+        "name": "udx/bldg/51357377_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1001837,
+        "uncompressedBytes": 26196796,
+        "localOffset": 202833084
+      },
+      {
+        "name": "udx/bldg/51357378_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1239744,
+        "uncompressedBytes": 32358172,
+        "localOffset": 203835001
+      },
+      {
+        "name": "udx/bldg/51357379_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2910805,
+        "uncompressedBytes": 75260215,
+        "localOffset": 205074825
+      },
+      {
+        "name": "udx/bldg/51357380_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 5933,
+        "uncompressedBytes": 127451,
+        "localOffset": 207985710
+      },
+      {
+        "name": "udx/bldg/51357381_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 34289,
+        "uncompressedBytes": 575155,
+        "localOffset": 208268590
+      },
+      {
+        "name": "udx/bldg/51357382_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 5961,
+        "uncompressedBytes": 73954,
+        "localOffset": 208310774
+      },
+      {
+        "name": "udx/bldg/51357383_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 57901,
+        "uncompressedBytes": 1491126,
+        "localOffset": 208316815
+      },
+      {
+        "name": "udx/bldg/51357384_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 477281,
+        "uncompressedBytes": 11850774,
+        "localOffset": 208374796
+      },
+      {
+        "name": "udx/bldg/51357385_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1248439,
+        "uncompressedBytes": 32796812,
+        "localOffset": 208852157
+      },
+      {
+        "name": "udx/bldg/51357386_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 395558,
+        "uncompressedBytes": 9965422,
+        "localOffset": 210100676
+      },
+      {
+        "name": "udx/bldg/51357387_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1762279,
+        "uncompressedBytes": 45855986,
+        "localOffset": 210496314
+      },
+      {
+        "name": "udx/bldg/51357388_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1178389,
+        "uncompressedBytes": 28872988,
+        "localOffset": 212258673
+      },
+      {
+        "name": "udx/bldg/51357389_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1328668,
+        "uncompressedBytes": 32195516,
+        "localOffset": 213437142
+      },
+      {
+        "name": "udx/bldg/51357390_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 6344,
+        "uncompressedBytes": 136636,
+        "localOffset": 214765890
+      },
+      {
+        "name": "udx/bldg/51357391_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 456431,
+        "uncompressedBytes": 6108851,
+        "localOffset": 216022081
+      },
+      {
+        "name": "udx/bldg/51357392_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 410420,
+        "uncompressedBytes": 4883938,
+        "localOffset": 220027545
+      },
+      {
+        "name": "udx/bldg/51357393_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 194403,
+        "uncompressedBytes": 4977497,
+        "localOffset": 220438045
+      },
+      {
+        "name": "udx/bldg/51357394_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 491352,
+        "uncompressedBytes": 9727572,
+        "localOffset": 220632528
+      },
+      {
+        "name": "udx/bldg/51357395_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 850349,
+        "uncompressedBytes": 21848252,
+        "localOffset": 221123960
+      },
+      {
+        "name": "udx/bldg/51357396_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2171023,
+        "uncompressedBytes": 55399701,
+        "localOffset": 221974389
+      },
+      {
+        "name": "udx/bldg/51357397_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2188991,
+        "uncompressedBytes": 55108453,
+        "localOffset": 224145492
+      },
+      {
+        "name": "udx/bldg/51357398_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1719419,
+        "uncompressedBytes": 42319613,
+        "localOffset": 226334563
+      },
+      {
+        "name": "udx/bldg/51357399_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1392193,
+        "uncompressedBytes": 34534516,
+        "localOffset": 228054062
+      },
+      {
+        "name": "udx/bldg/51357400_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 296287,
+        "uncompressedBytes": 7108305,
+        "localOffset": 229446335
+      },
+      {
+        "name": "udx/bldg/51357401_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 7227,
+        "uncompressedBytes": 106076,
+        "localOffset": 229742702
+      },
+      {
+        "name": "udx/bldg/51357402_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 5477,
+        "uncompressedBytes": 107482,
+        "localOffset": 229750009
+      },
+      {
+        "name": "udx/bldg/51357405_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 82991,
+        "uncompressedBytes": 2163669,
+        "localOffset": 229755566
+      },
+      {
+        "name": "udx/bldg/51357410_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1813376,
+        "uncompressedBytes": 44981054,
+        "localOffset": 229838637
+      },
+      {
+        "name": "udx/bldg/51357411_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1392803,
+        "uncompressedBytes": 36285298,
+        "localOffset": 231652093
+      },
+      {
+        "name": "udx/bldg/51357412_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 305650,
+        "uncompressedBytes": 7917990,
+        "localOffset": 233044976
+      },
+      {
+        "name": "udx/bldg/51357413_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 178029,
+        "uncompressedBytes": 4529760,
+        "localOffset": 233350706
+      },
+      {
+        "name": "udx/bldg/51357414_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 352321,
+        "uncompressedBytes": 9225646,
+        "localOffset": 233528815
+      },
+      {
+        "name": "udx/bldg/51357415_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 790507,
+        "uncompressedBytes": 19872935,
+        "localOffset": 233881216
+      },
+      {
+        "name": "udx/bldg/51357416_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 275072,
+        "uncompressedBytes": 7253312,
+        "localOffset": 234671803
+      },
+      {
+        "name": "udx/bldg/51357420_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1643717,
+        "uncompressedBytes": 41274768,
+        "localOffset": 234946955
+      },
+      {
+        "name": "udx/bldg/51357421_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1702724,
+        "uncompressedBytes": 43299269,
+        "localOffset": 236590752
+      },
+      {
+        "name": "udx/bldg/51357422_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1936366,
+        "uncompressedBytes": 51305511,
+        "localOffset": 238293556
+      },
+      {
+        "name": "udx/bldg/51357423_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1776534,
+        "uncompressedBytes": 46486901,
+        "localOffset": 240230002
+      },
+      {
+        "name": "udx/bldg/51357424_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1636439,
+        "uncompressedBytes": 43949800,
+        "localOffset": 242006616
+      },
+      {
+        "name": "udx/bldg/51357425_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1334105,
+        "uncompressedBytes": 34390879,
+        "localOffset": 243643135
+      },
+      {
+        "name": "udx/bldg/51357426_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1205356,
+        "uncompressedBytes": 31666941,
+        "localOffset": 244977320
+      },
+      {
+        "name": "udx/bldg/51357430_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2315644,
+        "uncompressedBytes": 56428544,
+        "localOffset": 246182756
+      },
+      {
+        "name": "udx/bldg/51357431_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 665127,
+        "uncompressedBytes": 15550563,
+        "localOffset": 248498480
+      },
+      {
+        "name": "udx/bldg/51357432_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2173237,
+        "uncompressedBytes": 57867171,
+        "localOffset": 249163687
+      },
+      {
+        "name": "udx/bldg/51357433_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1392213,
+        "uncompressedBytes": 35299494,
+        "localOffset": 251337004
+      },
+      {
+        "name": "udx/bldg/51357434_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2224457,
+        "uncompressedBytes": 59265595,
+        "localOffset": 252729297
+      },
+      {
+        "name": "udx/bldg/51357435_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1356716,
+        "uncompressedBytes": 35025639,
+        "localOffset": 254953834
+      },
+      {
+        "name": "udx/bldg/51357436_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 502196,
+        "uncompressedBytes": 13080455,
+        "localOffset": 256310630
+      },
+      {
+        "name": "udx/bldg/51357440_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2244922,
+        "uncompressedBytes": 55367385,
+        "localOffset": 256812906
+      },
+      {
+        "name": "udx/bldg/51357441_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2564638,
+        "uncompressedBytes": 60989982,
+        "localOffset": 259057908
+      },
+      {
+        "name": "udx/bldg/51357442_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2866101,
+        "uncompressedBytes": 75629356,
+        "localOffset": 261622626
+      },
+      {
+        "name": "udx/bldg/51357443_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1801217,
+        "uncompressedBytes": 46667508,
+        "localOffset": 264488807
+      },
+      {
+        "name": "udx/bldg/51357444_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2411297,
+        "uncompressedBytes": 63936896,
+        "localOffset": 266290104
+      },
+      {
+        "name": "udx/bldg/51357445_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1113116,
+        "uncompressedBytes": 29276595,
+        "localOffset": 268701481
+      },
+      {
+        "name": "udx/bldg/51357446_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 18103,
+        "uncompressedBytes": 409998,
+        "localOffset": 269814677
+      },
+      {
+        "name": "udx/bldg/51357450_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2785971,
+        "uncompressedBytes": 68506385,
+        "localOffset": 269832860
+      },
+      {
+        "name": "udx/bldg/51357451_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2452883,
+        "uncompressedBytes": 61024478,
+        "localOffset": 272618911
+      },
+      {
+        "name": "udx/bldg/51357452_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2782851,
+        "uncompressedBytes": 73145727,
+        "localOffset": 275071874
+      },
+      {
+        "name": "udx/bldg/51357453_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1865427,
+        "uncompressedBytes": 48623693,
+        "localOffset": 277854805
+      },
+      {
+        "name": "udx/bldg/51357454_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1960611,
+        "uncompressedBytes": 50920289,
+        "localOffset": 279720312
+      },
+      {
+        "name": "udx/bldg/51357455_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1654817,
+        "uncompressedBytes": 43250986,
+        "localOffset": 281681003
+      },
+      {
+        "name": "udx/bldg/51357456_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 46828,
+        "uncompressedBytes": 1211789,
+        "localOffset": 283335900
+      },
+      {
+        "name": "udx/bldg/51357460_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3026650,
+        "uncompressedBytes": 74256410,
+        "localOffset": 283382808
+      },
+      {
+        "name": "udx/bldg/51357461_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2399555,
+        "uncompressedBytes": 58487790,
+        "localOffset": 286409538
+      },
+      {
+        "name": "udx/bldg/51357462_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2724189,
+        "uncompressedBytes": 70211463,
+        "localOffset": 288809173
+      },
+      {
+        "name": "udx/bldg/51357463_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1327861,
+        "uncompressedBytes": 33976638,
+        "localOffset": 291533442
+      },
+      {
+        "name": "udx/bldg/51357464_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1419132,
+        "uncompressedBytes": 37064666,
+        "localOffset": 292861383
+      },
+      {
+        "name": "udx/bldg/51357465_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 552715,
+        "uncompressedBytes": 14584308,
+        "localOffset": 294280595
+      },
+      {
+        "name": "udx/bldg/51357470_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1580967,
+        "uncompressedBytes": 38608463,
+        "localOffset": 294833390
+      },
+      {
+        "name": "udx/bldg/51357471_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1781709,
+        "uncompressedBytes": 41737406,
+        "localOffset": 296414437
+      },
+      {
+        "name": "udx/bldg/51357472_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3259152,
+        "uncompressedBytes": 84749281,
+        "localOffset": 298196226
+      },
+      {
+        "name": "udx/bldg/51357473_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2495188,
+        "uncompressedBytes": 66819456,
+        "localOffset": 301455458
+      },
+      {
+        "name": "udx/bldg/51357474_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1602563,
+        "uncompressedBytes": 41212108,
+        "localOffset": 303950726
+      },
+      {
+        "name": "udx/bldg/51357480_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1447834,
+        "uncompressedBytes": 35895989,
+        "localOffset": 305553369
+      },
+      {
+        "name": "udx/bldg/51357481_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1821771,
+        "uncompressedBytes": 45419497,
+        "localOffset": 307001283
+      },
+      {
+        "name": "udx/bldg/51357482_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3197481,
+        "uncompressedBytes": 82153349,
+        "localOffset": 308823134
+      },
+      {
+        "name": "udx/bldg/51357483_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2595294,
+        "uncompressedBytes": 70290731,
+        "localOffset": 312020695
+      },
+      {
+        "name": "udx/bldg/51357484_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1909415,
+        "uncompressedBytes": 50415467,
+        "localOffset": 314616069
+      },
+      {
+        "name": "udx/bldg/51357485_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 74945,
+        "uncompressedBytes": 2056146,
+        "localOffset": 316525564
+      },
+      {
+        "name": "udx/bldg/51357490_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1755350,
+        "uncompressedBytes": 43054025,
+        "localOffset": 316600589
+      },
+      {
+        "name": "udx/bldg/51357491_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1426524,
+        "uncompressedBytes": 34905251,
+        "localOffset": 318356019
+      },
+      {
+        "name": "udx/bldg/51357492_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3245947,
+        "uncompressedBytes": 82097585,
+        "localOffset": 319782623
+      },
+      {
+        "name": "udx/bldg/51357493_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3101992,
+        "uncompressedBytes": 83396045,
+        "localOffset": 323028650
+      },
+      {
+        "name": "udx/bldg/51357494_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2414979,
+        "uncompressedBytes": 64075046,
+        "localOffset": 326130722
+      },
+      {
+        "name": "udx/bldg/51357495_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3434,
+        "uncompressedBytes": 40188,
+        "localOffset": 328545781
+      },
+      {
+        "name": "udx/bldg/52350301_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 92382,
+        "uncompressedBytes": 1594991,
+        "localOffset": 328707857
+      },
+      {
+        "name": "udx/bldg/52350302_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 377933,
+        "uncompressedBytes": 4961421,
+        "localOffset": 331237236
+      },
+      {
+        "name": "udx/bldg/52350303_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 133376,
+        "uncompressedBytes": 3475762,
+        "localOffset": 331615249
+      },
+      {
+        "name": "udx/bldg/52350304_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 408951,
+        "uncompressedBytes": 8462402,
+        "localOffset": 331748705
+      },
+      {
+        "name": "udx/bldg/52350305_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 221905,
+        "uncompressedBytes": 5149761,
+        "localOffset": 332157736
+      },
+      {
+        "name": "udx/bldg/52350306_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1152107,
+        "uncompressedBytes": 30086399,
+        "localOffset": 332379721
+      },
+      {
+        "name": "udx/bldg/52350307_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1798914,
+        "uncompressedBytes": 44956857,
+        "localOffset": 333531908
+      },
+      {
+        "name": "udx/bldg/52350308_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1261961,
+        "uncompressedBytes": 30305449,
+        "localOffset": 335330902
+      },
+      {
+        "name": "udx/bldg/52350309_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2552673,
+        "uncompressedBytes": 41927319,
+        "localOffset": 336592943
+      },
+      {
+        "name": "udx/bldg/52350312_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 7286,
+        "uncompressedBytes": 143346,
+        "localOffset": 339145696
+      },
+      {
+        "name": "udx/bldg/52350313_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 259039,
+        "uncompressedBytes": 6552989,
+        "localOffset": 339153062
+      },
+      {
+        "name": "udx/bldg/52350314_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 509496,
+        "uncompressedBytes": 13250184,
+        "localOffset": 339412181
+      },
+      {
+        "name": "udx/bldg/52350315_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1261097,
+        "uncompressedBytes": 31758564,
+        "localOffset": 339921757
+      },
+      {
+        "name": "udx/bldg/52350316_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1470163,
+        "uncompressedBytes": 38259129,
+        "localOffset": 341182934
+      },
+      {
+        "name": "udx/bldg/52350317_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1929348,
+        "uncompressedBytes": 48012768,
+        "localOffset": 342653177
+      },
+      {
+        "name": "udx/bldg/52350318_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1160354,
+        "uncompressedBytes": 28777203,
+        "localOffset": 344582605
+      },
+      {
+        "name": "udx/bldg/52350319_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2087279,
+        "uncompressedBytes": 36260231,
+        "localOffset": 345743039
+      },
+      {
+        "name": "udx/bldg/52350322_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4835,
+        "uncompressedBytes": 74624,
+        "localOffset": 347830398
+      },
+      {
+        "name": "udx/bldg/52350323_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 36004,
+        "uncompressedBytes": 864867,
+        "localOffset": 347835313
+      },
+      {
+        "name": "udx/bldg/52350324_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 70128,
+        "uncompressedBytes": 1748888,
+        "localOffset": 347871397
+      },
+      {
+        "name": "udx/bldg/52350325_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 701967,
+        "uncompressedBytes": 18230792,
+        "localOffset": 347941605
+      },
+      {
+        "name": "udx/bldg/52350326_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1879205,
+        "uncompressedBytes": 47812797,
+        "localOffset": 348643652
+      },
+      {
+        "name": "udx/bldg/52350327_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1797565,
+        "uncompressedBytes": 46289066,
+        "localOffset": 350522937
+      },
+      {
+        "name": "udx/bldg/52350328_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1633867,
+        "uncompressedBytes": 38296096,
+        "localOffset": 352320582
+      },
+      {
+        "name": "udx/bldg/52350329_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1847030,
+        "uncompressedBytes": 31725915,
+        "localOffset": 354029661
+      },
+      {
+        "name": "udx/bldg/52350332_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 70550,
+        "uncompressedBytes": 1707347,
+        "localOffset": 355876771
+      },
+      {
+        "name": "udx/bldg/52350333_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 248809,
+        "uncompressedBytes": 6309817,
+        "localOffset": 355947401
+      },
+      {
+        "name": "udx/bldg/52350334_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 341016,
+        "uncompressedBytes": 8632197,
+        "localOffset": 356196290
+      },
+      {
+        "name": "udx/bldg/52350335_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 916356,
+        "uncompressedBytes": 24130264,
+        "localOffset": 356537386
+      },
+      {
+        "name": "udx/bldg/52350336_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 344368,
+        "uncompressedBytes": 8839488,
+        "localOffset": 357453822
+      },
+      {
+        "name": "udx/bldg/52350337_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1620122,
+        "uncompressedBytes": 42908687,
+        "localOffset": 357798270
+      },
+      {
+        "name": "udx/bldg/52350338_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1956462,
+        "uncompressedBytes": 50821793,
+        "localOffset": 359418472
+      },
+      {
+        "name": "udx/bldg/52350339_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2456303,
+        "uncompressedBytes": 31641406,
+        "localOffset": 361375014
+      },
+      {
+        "name": "udx/bldg/52350343_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 126999,
+        "uncompressedBytes": 3134748,
+        "localOffset": 363831397
+      },
+      {
+        "name": "udx/bldg/52350344_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1260707,
+        "uncompressedBytes": 31952772,
+        "localOffset": 363958476
+      },
+      {
+        "name": "udx/bldg/52350345_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1917362,
+        "uncompressedBytes": 50376490,
+        "localOffset": 365219263
+      },
+      {
+        "name": "udx/bldg/52350346_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2530626,
+        "uncompressedBytes": 67531451,
+        "localOffset": 367136705
+      },
+      {
+        "name": "udx/bldg/52350347_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 573702,
+        "uncompressedBytes": 15217433,
+        "localOffset": 369667411
+      },
+      {
+        "name": "udx/bldg/52350348_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1174626,
+        "uncompressedBytes": 29642153,
+        "localOffset": 370241193
+      },
+      {
+        "name": "udx/bldg/52350349_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2331293,
+        "uncompressedBytes": 28783340,
+        "localOffset": 379690093
+      },
+      {
+        "name": "udx/bldg/52350354_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 336593,
+        "uncompressedBytes": 8307979,
+        "localOffset": 382021466
+      },
+      {
+        "name": "udx/bldg/52350355_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1463683,
+        "uncompressedBytes": 36641879,
+        "localOffset": 382358139
+      },
+      {
+        "name": "udx/bldg/52350356_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1662572,
+        "uncompressedBytes": 43068603,
+        "localOffset": 383821902
+      },
+      {
+        "name": "udx/bldg/52350357_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2597997,
+        "uncompressedBytes": 68010488,
+        "localOffset": 385484554
+      },
+      {
+        "name": "udx/bldg/52350358_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 385208,
+        "uncompressedBytes": 9655799,
+        "localOffset": 388082631
+      },
+      {
+        "name": "udx/bldg/52350359_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1271983,
+        "uncompressedBytes": 27757348,
+        "localOffset": 388467919
+      },
+      {
+        "name": "udx/bldg/52350365_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 221541,
+        "uncompressedBytes": 5752884,
+        "localOffset": 389739982
+      },
+      {
+        "name": "udx/bldg/52350366_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1251461,
+        "uncompressedBytes": 32885152,
+        "localOffset": 389961603
+      },
+      {
+        "name": "udx/bldg/52350367_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2566441,
+        "uncompressedBytes": 68544104,
+        "localOffset": 391213144
+      },
+      {
+        "name": "udx/bldg/52350368_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 12088230,
+        "uncompressedBytes": 115184737,
+        "localOffset": 495522838
+      },
+      {
+        "name": "udx/bldg/52350369_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1071674,
+        "uncompressedBytes": 28464042,
+        "localOffset": 507611148
+      },
+      {
+        "name": "udx/bldg/52350375_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 113501,
+        "uncompressedBytes": 2861554,
+        "localOffset": 508682902
+      },
+      {
+        "name": "udx/bldg/52350376_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1843144,
+        "uncompressedBytes": 47803894,
+        "localOffset": 508796483
+      },
+      {
+        "name": "udx/bldg/52350377_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1997155,
+        "uncompressedBytes": 52989381,
+        "localOffset": 510639707
+      },
+      {
+        "name": "udx/bldg/52350378_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4970474,
+        "uncompressedBytes": 69659847,
+        "localOffset": 534873443
+      },
+      {
+        "name": "udx/bldg/52350379_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3641901,
+        "uncompressedBytes": 46008390,
+        "localOffset": 598269735
+      },
+      {
+        "name": "udx/bldg/52350386_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 7765,
+        "uncompressedBytes": 149111,
+        "localOffset": 601911716
+      },
+      {
+        "name": "udx/bldg/52350387_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 14948,
+        "uncompressedBytes": 319400,
+        "localOffset": 601919561
+      },
+      {
+        "name": "udx/bldg/52350388_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1342235,
+        "uncompressedBytes": 35438983,
+        "localOffset": 601934589
+      },
+      {
+        "name": "udx/bldg/52350389_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2839679,
+        "uncompressedBytes": 40854737,
+        "localOffset": 662674553
+      },
+      {
+        "name": "udx/bldg/52350398_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 295665,
+        "uncompressedBytes": 7926887,
+        "localOffset": 665514312
+      },
+      {
+        "name": "udx/bldg/52350399_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1933841,
+        "uncompressedBytes": 51244759,
+        "localOffset": 665810057
+      },
+      {
+        "name": "udx/bldg/52350400_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4699019,
+        "uncompressedBytes": 68621748,
+        "localOffset": 667743978
+      },
+      {
+        "name": "udx/bldg/52350401_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1917784,
+        "uncompressedBytes": 47625727,
+        "localOffset": 672443077
+      },
+      {
+        "name": "udx/bldg/52350402_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2344679,
+        "uncompressedBytes": 56940605,
+        "localOffset": 674360941
+      },
+      {
+        "name": "udx/bldg/52350403_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3057495,
+        "uncompressedBytes": 82235558,
+        "localOffset": 676705700
+      },
+      {
+        "name": "udx/bldg/52350404_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2300373,
+        "uncompressedBytes": 60568534,
+        "localOffset": 679763275
+      },
+      {
+        "name": "udx/bldg/52350405_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4832,
+        "uncompressedBytes": 81029,
+        "localOffset": 682063728
+      },
+      {
+        "name": "udx/bldg/52350410_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3159265,
+        "uncompressedBytes": 46174519,
+        "localOffset": 682502859
+      },
+      {
+        "name": "udx/bldg/52350411_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1709423,
+        "uncompressedBytes": 34487387,
+        "localOffset": 688406375
+      },
+      {
+        "name": "udx/bldg/52350412_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1975840,
+        "uncompressedBytes": 38283121,
+        "localOffset": 693190592
+      },
+      {
+        "name": "udx/bldg/52350413_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2618638,
+        "uncompressedBytes": 69406130,
+        "localOffset": 695166512
+      },
+      {
+        "name": "udx/bldg/52350414_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1842212,
+        "uncompressedBytes": 46787998,
+        "localOffset": 697785230
+      },
+      {
+        "name": "udx/bldg/52350415_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 173729,
+        "uncompressedBytes": 4584165,
+        "localOffset": 699627522
+      },
+      {
+        "name": "udx/bldg/52350420_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2929203,
+        "uncompressedBytes": 37915795,
+        "localOffset": 703297485
+      },
+      {
+        "name": "udx/bldg/52350421_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1830830,
+        "uncompressedBytes": 26602955,
+        "localOffset": 712923573
+      },
+      {
+        "name": "udx/bldg/52350422_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 943553,
+        "uncompressedBytes": 11613353,
+        "localOffset": 717755429
+      },
+      {
+        "name": "udx/bldg/52350423_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2231098,
+        "uncompressedBytes": 58204139,
+        "localOffset": 718699062
+      },
+      {
+        "name": "udx/bldg/52350424_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1863689,
+        "uncompressedBytes": 47254719,
+        "localOffset": 720930240
+      },
+      {
+        "name": "udx/bldg/52350425_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1435825,
+        "uncompressedBytes": 37238250,
+        "localOffset": 722794009
+      },
+      {
+        "name": "udx/bldg/52350426_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 387994,
+        "uncompressedBytes": 10081328,
+        "localOffset": 724229914
+      },
+      {
+        "name": "udx/bldg/52350430_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2335233,
+        "uncompressedBytes": 37496330,
+        "localOffset": 724617988
+      },
+      {
+        "name": "udx/bldg/52350431_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1144641,
+        "uncompressedBytes": 26930954,
+        "localOffset": 727316343
+      },
+      {
+        "name": "udx/bldg/52350432_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1360104,
+        "uncompressedBytes": 31737010,
+        "localOffset": 729485103
+      },
+      {
+        "name": "udx/bldg/52350433_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2802204,
+        "uncompressedBytes": 73566221,
+        "localOffset": 730845287
+      },
+      {
+        "name": "udx/bldg/52350434_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2065948,
+        "uncompressedBytes": 53052687,
+        "localOffset": 733647571
+      },
+      {
+        "name": "udx/bldg/52350435_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2084801,
+        "uncompressedBytes": 54626511,
+        "localOffset": 735713599
+      },
+      {
+        "name": "udx/bldg/52350436_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1309708,
+        "uncompressedBytes": 33923412,
+        "localOffset": 737798480
+      },
+      {
+        "name": "udx/bldg/52350437_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 9035,
+        "uncompressedBytes": 196499,
+        "localOffset": 739108268
+      },
+      {
+        "name": "udx/bldg/52350440_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2151475,
+        "uncompressedBytes": 45675427,
+        "localOffset": 739117383
+      },
+      {
+        "name": "udx/bldg/52350441_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1615780,
+        "uncompressedBytes": 31836926,
+        "localOffset": 749438542
+      },
+      {
+        "name": "udx/bldg/52350442_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2869783,
+        "uncompressedBytes": 76235184,
+        "localOffset": 751054402
+      },
+      {
+        "name": "udx/bldg/52350443_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2316398,
+        "uncompressedBytes": 59818106,
+        "localOffset": 753924265
+      },
+      {
+        "name": "udx/bldg/52350444_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1790495,
+        "uncompressedBytes": 44385330,
+        "localOffset": 756240743
+      },
+      {
+        "name": "udx/bldg/52350445_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1859267,
+        "uncompressedBytes": 47595916,
+        "localOffset": 758031318
+      },
+      {
+        "name": "udx/bldg/52350446_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1512262,
+        "uncompressedBytes": 38581827,
+        "localOffset": 759890665
+      },
+      {
+        "name": "udx/bldg/52350447_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 647131,
+        "uncompressedBytes": 16641417,
+        "localOffset": 761403007
+      },
+      {
+        "name": "udx/bldg/52350450_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2088570,
+        "uncompressedBytes": 52005990,
+        "localOffset": 762050218
+      },
+      {
+        "name": "udx/bldg/52350451_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1346820,
+        "uncompressedBytes": 32332164,
+        "localOffset": 764138868
+      },
+      {
+        "name": "udx/bldg/52350452_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2289989,
+        "uncompressedBytes": 60207257,
+        "localOffset": 765485768
+      },
+      {
+        "name": "udx/bldg/52350453_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2708287,
+        "uncompressedBytes": 69307703,
+        "localOffset": 767775837
+      },
+      {
+        "name": "udx/bldg/52350454_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1617005,
+        "uncompressedBytes": 39131579,
+        "localOffset": 770484204
+      },
+      {
+        "name": "udx/bldg/52350455_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 665520,
+        "uncompressedBytes": 16922333,
+        "localOffset": 772101289
+      },
+      {
+        "name": "udx/bldg/52350456_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1065937,
+        "uncompressedBytes": 25305121,
+        "localOffset": 772766889
+      },
+      {
+        "name": "udx/bldg/52350457_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 989064,
+        "uncompressedBytes": 24622876,
+        "localOffset": 773832906
+      },
+      {
+        "name": "udx/bldg/52350460_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 268601,
+        "uncompressedBytes": 6616380,
+        "localOffset": 774822050
+      },
+      {
+        "name": "udx/bldg/52350461_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1036943,
+        "uncompressedBytes": 25903185,
+        "localOffset": 775090731
+      },
+      {
+        "name": "udx/bldg/52350462_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2006075,
+        "uncompressedBytes": 51190897,
+        "localOffset": 776127754
+      },
+      {
+        "name": "udx/bldg/52350463_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2416989,
+        "uncompressedBytes": 63265476,
+        "localOffset": 778133909
+      },
+      {
+        "name": "udx/bldg/52350464_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 3077619,
+        "uncompressedBytes": 79917815,
+        "localOffset": 780550978
+      },
+      {
+        "name": "udx/bldg/52350465_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 645975,
+        "uncompressedBytes": 16723161,
+        "localOffset": 783628677
+      },
+      {
+        "name": "udx/bldg/52350466_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 196700,
+        "uncompressedBytes": 4883499,
+        "localOffset": 784274732
+      },
+      {
+        "name": "udx/bldg/52350470_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4131255,
+        "uncompressedBytes": 47048418,
+        "localOffset": 838410863
+      },
+      {
+        "name": "udx/bldg/52350471_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 519273,
+        "uncompressedBytes": 12943512,
+        "localOffset": 842542198
+      },
+      {
+        "name": "udx/bldg/52350472_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1382566,
+        "uncompressedBytes": 35362461,
+        "localOffset": 843061551
+      },
+      {
+        "name": "udx/bldg/52350473_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1673875,
+        "uncompressedBytes": 43255426,
+        "localOffset": 844444197
+      },
+      {
+        "name": "udx/bldg/52350474_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1121479,
+        "uncompressedBytes": 28782676,
+        "localOffset": 846118152
+      },
+      {
+        "name": "udx/bldg/52350480_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 4673844,
+        "uncompressedBytes": 69887966,
+        "localOffset": 915238583
+      },
+      {
+        "name": "udx/bldg/52350481_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1923213,
+        "uncompressedBytes": 48830717,
+        "localOffset": 919912507
+      },
+      {
+        "name": "udx/bldg/52350482_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1333048,
+        "uncompressedBytes": 34635642,
+        "localOffset": 921835800
+      },
+      {
+        "name": "udx/bldg/52350483_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1076081,
+        "uncompressedBytes": 28131163,
+        "localOffset": 923168928
+      },
+      {
+        "name": "udx/bldg/52350484_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 495317,
+        "uncompressedBytes": 12727521,
+        "localOffset": 924245089
+      },
+      {
+        "name": "udx/bldg/52350490_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 657649,
+        "uncompressedBytes": 16986343,
+        "localOffset": 924740486
+      },
+      {
+        "name": "udx/bldg/52350491_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1822247,
+        "uncompressedBytes": 47449214,
+        "localOffset": 925398215
+      },
+      {
+        "name": "udx/bldg/52350492_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1915822,
+        "uncompressedBytes": 49706545,
+        "localOffset": 927220542
+      },
+      {
+        "name": "udx/bldg/52350493_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 2119039,
+        "uncompressedBytes": 54677879,
+        "localOffset": 929136444
+      },
+      {
+        "name": "udx/bldg/52350494_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 530143,
+        "uncompressedBytes": 13903370,
+        "localOffset": 931255563
+      },
+      {
+        "name": "udx/bldg/52351309_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 44950,
+        "uncompressedBytes": 1147598,
+        "localOffset": 931785786
+      },
+      {
+        "name": "udx/bldg/52351402_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1039424,
+        "uncompressedBytes": 27422146,
+        "localOffset": 931830816
+      },
+      {
+        "name": "udx/bldg/52351403_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1816972,
+        "uncompressedBytes": 46948403,
+        "localOffset": 932870320
+      },
+      {
+        "name": "udx/bldg/52351404_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 628557,
+        "uncompressedBytes": 15917156,
+        "localOffset": 934687372
+      },
+      {
+        "name": "udx/bldg/52351412_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 130424,
+        "uncompressedBytes": 3403569,
+        "localOffset": 935316009
+      },
+      {
+        "name": "udx/bldg/52351413_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 1495375,
+        "uncompressedBytes": 38846571,
+        "localOffset": 935446513
+      },
+      {
+        "name": "udx/bldg/52351414_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 81882,
+        "uncompressedBytes": 2107687,
+        "localOffset": 936941968
+      },
+      {
+        "name": "udx/bldg/52351423_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 134894,
+        "uncompressedBytes": 3408514,
+        "localOffset": 937023930
+      },
+      {
+        "name": "udx/bldg/52351424_bldg_6697_op.gml",
+        "method": 8,
+        "compressedBytes": 6892,
+        "uncompressedBytes": 126350,
+        "localOffset": 937158904
+      }
+    ]
+  }
+}

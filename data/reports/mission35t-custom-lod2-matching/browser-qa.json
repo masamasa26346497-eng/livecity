@@ -1,0 +1,251 @@
+{
+  "url": "http://localhost:8080/osaka_3d_buildings.ward-ux-v1.html",
+  "generatedAt": "2026-09-25T15:12:30.239Z",
+  "mission": "35T",
+  "steps": {
+    "debug": {
+      "enabled": true,
+      "loaded": true,
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "visible": true,
+      "suppressActive": false,
+      "url": "map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json",
+      "maxCameraR": 2500,
+      "officialPlateauLod2": false,
+      "status": "EXPERIMENTAL_POINT_CLOUD_ROOF",
+      "matched": false,
+      "matchDistanceM": 21.48,
+      "areaRatio": 1.604,
+      "triangles": 103,
+      "error": null,
+      "lod1SuppressedCount": 0,
+      "matchConfidence": "UNMATCHED",
+      "bestCandidate": {
+        "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+        "centroidDistanceM": 21.48,
+        "areaRatio": 1.604,
+        "candidateAreaM2": 1636.5,
+        "iou": 0.5778,
+        "sourceCoveredRatio": 0.963,
+        "candidateCoveredRatio": 0.5909,
+        "heightM": 76
+      },
+      "secondCandidate": {
+        "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+        "centroidDistanceM": 21.19,
+        "areaRatio": 0.023,
+        "candidateAreaM2": 23.3,
+        "iou": 0.0037,
+        "sourceCoveredRatio": 0.0038,
+        "candidateCoveredRatio": 0.1644,
+        "heightM": 3.4
+      },
+      "iou": 0.5778,
+      "sourceCoveredRatio": 0.963,
+      "candidateCoveredRatio": 0.5909,
+      "centroidDistanceM": 21.48,
+      "heightDeltaM": 49.49,
+      "candidateCount": 60,
+      "ambiguousReason": null,
+      "lod1SuppressionAllowed": false,
+      "matchReason": "基準未達（IoU 0.5778 / 重心 21.48m / 面積比 1.604）",
+      "labelText": "35S CUSTOM LOD2",
+      "heightMedianM": 26.512,
+      "heightP90M": 50.472,
+      "roofType": "measured-triangulated-surface",
+      "sourceFootprintAreaM2": 1020.161,
+      "osmWayId": 267613423,
+      "officialOwnsCanonical": false,
+      "landmarkOwnsCanonical": false,
+      "matchRules": {
+        "HIGH": {
+          "iou": 0.75,
+          "centroidM": 10,
+          "areaRatio": [
+            0.8,
+            1.25
+          ]
+        },
+        "MEDIUM": {
+          "iou": 0.6,
+          "centroidM": 15,
+          "areaRatio": [
+            0.7,
+            1.4
+          ]
+        },
+        "AMBIGUOUS": {
+          "iouGap": 0.1,
+          "centroidGapM": 3
+        }
+      },
+      "candidateRadiusM": 100,
+      "focusR": 150,
+      "labelWorld": {
+        "x": -3974.01,
+        "y": 63.75,
+        "z": -14806.02
+      },
+      "labelVisible": true,
+      "qaColors": {
+        "roof": "#2f9bff",
+        "wall": "#10399c",
+        "ground": "#8b949c"
+      }
+    },
+    "overlay": {
+      "group": true,
+      "visible": true,
+      "rings": 3,
+      "markers": 3,
+      "labels": 3,
+      "colors": [
+        "#ff2d2d",
+        "#2f6bff",
+        "#ffc400"
+      ],
+      "prototypeOpacity": 0.45,
+      "cameraR": 150
+    },
+    "shot1": "data/reports/mission35t-custom-lod2-matching/1-source-vs-canonical.jpg",
+    "shot2": "data/reports/mission35t-custom-lod2-matching/2-candidate-comparison.jpg",
+    "final": {
+      "enabled": true,
+      "loaded": true,
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "visible": true,
+      "suppressActive": false,
+      "url": "map-data/osaka-city/experimental/mission35s/custom-lod2-267613423.json",
+      "maxCameraR": 2500,
+      "officialPlateauLod2": false,
+      "status": "EXPERIMENTAL_POINT_CLOUD_ROOF",
+      "matched": false,
+      "matchDistanceM": 21.48,
+      "areaRatio": 1.604,
+      "triangles": 103,
+      "error": null,
+      "lod1SuppressedCount": 0,
+      "matchConfidence": "UNMATCHED",
+      "bestCandidate": {
+        "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+        "centroidDistanceM": 21.48,
+        "areaRatio": 1.604,
+        "candidateAreaM2": 1636.5,
+        "iou": 0.5778,
+        "sourceCoveredRatio": 0.963,
+        "candidateCoveredRatio": 0.5909,
+        "heightM": 76
+      },
+      "secondCandidate": {
+        "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+        "centroidDistanceM": 21.19,
+        "areaRatio": 0.023,
+        "candidateAreaM2": 23.3,
+        "iou": 0.0037,
+        "sourceCoveredRatio": 0.0038,
+        "candidateCoveredRatio": 0.1644,
+        "heightM": 3.4
+      },
+      "iou": 0.5778,
+      "sourceCoveredRatio": 0.963,
+      "candidateCoveredRatio": 0.5909,
+      "centroidDistanceM": 21.48,
+      "heightDeltaM": 49.49,
+      "candidateCount": 60,
+      "ambiguousReason": null,
+      "lod1SuppressionAllowed": false,
+      "matchReason": "基準未達（IoU 0.5778 / 重心 21.48m / 面積比 1.604）",
+      "labelText": "35S CUSTOM LOD2",
+      "heightMedianM": 26.512,
+      "heightP90M": 50.472,
+      "roofType": "measured-triangulated-surface",
+      "sourceFootprintAreaM2": 1020.161,
+      "osmWayId": 267613423,
+      "officialOwnsCanonical": false,
+      "landmarkOwnsCanonical": false,
+      "matchRules": {
+        "HIGH": {
+          "iou": 0.75,
+          "centroidM": 10,
+          "areaRatio": [
+            0.8,
+            1.25
+          ]
+        },
+        "MEDIUM": {
+          "iou": 0.6,
+          "centroidM": 15,
+          "areaRatio": [
+            0.7,
+            1.4
+          ]
+        },
+        "AMBIGUOUS": {
+          "iouGap": 0.1,
+          "centroidGapM": 3
+        }
+      },
+      "candidateRadiusM": 100,
+      "focusR": 150,
+      "labelWorld": {
+        "x": -3974.01,
+        "y": 63.75,
+        "z": -14806.02
+      },
+      "labelVisible": true,
+      "qaColors": {
+        "roof": "#2f9bff",
+        "wall": "#10399c",
+        "ground": "#8b949c"
+      }
+    },
+    "shot3": "data/reports/mission35t-custom-lod2-matching/3-final-match.jpg"
+  },
+  "jsErrors": [],
+  "summary": {
+    "matchConfidence": "UNMATCHED",
+    "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+    "bestCandidate": {
+      "canonicalId": "cg_bldg_bldg_be65d290-931f-441a-ac8c-b71f09c8728d",
+      "centroidDistanceM": 21.48,
+      "areaRatio": 1.604,
+      "candidateAreaM2": 1636.5,
+      "iou": 0.5778,
+      "sourceCoveredRatio": 0.963,
+      "candidateCoveredRatio": 0.5909,
+      "heightM": 76
+    },
+    "secondCandidate": {
+      "canonicalId": "cg_bldg_bldg_9bac4ac5-1d2e-487c-a25c-0f6bcf81ed8c",
+      "centroidDistanceM": 21.19,
+      "areaRatio": 0.023,
+      "candidateAreaM2": 23.3,
+      "iou": 0.0037,
+      "sourceCoveredRatio": 0.0038,
+      "candidateCoveredRatio": 0.1644,
+      "heightM": 3.4
+    },
+    "iou": 0.5778,
+    "centroidDistanceM": 21.48,
+    "areaRatio": 1.604,
+    "sourceCoveredRatio": 0.963,
+    "candidateCoveredRatio": 0.5909,
+    "candidateCount": 60,
+    "heightDeltaM": 49.49,
+    "ambiguousReason": null,
+    "matchReason": "基準未達（IoU 0.5778 / 重心 21.48m / 面積比 1.604）",
+    "lod1SuppressionAllowed": false,
+    "lod1SuppressedCount": 0,
+    "suppressActive": false,
+    "visible": true,
+    "overlayRings": 3,
+    "overlayLabels": 3,
+    "overlayColors": [
+      "#ff2d2d",
+      "#2f6bff",
+      "#ffc400"
+    ],
+    "prototypeOpacityWithOverlay": 0.45,
+    "jsErrors": 0
+  }
+}

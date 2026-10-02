@@ -1,0 +1,57 @@
+{
+  "mission": "36I",
+  "subject": "Sumiyoshi 149-facility Google Places expansion",
+  "status": "READY_BLOCKED_MISSING_GITHUB_SECRET",
+  "sourceDataset": "public/map-data/osaka-sumiyoshi/facilities/facilities.json",
+  "sourceFacilityCount": 149,
+  "runner": "tools/google-places/match-sumiyoshi-places.mjs",
+  "test": "tests/mission36i-sumiyoshi-google-places.test.js",
+  "workflow": ".github/workflows/mission36i.yml",
+  "durableMapping": "public/map-data/osaka-city/derived/google-places-sumiyoshi-mapping.json",
+  "uiCompatibilityMapping": "public/map-data/osaka-city/derived/google-places-pilot-mapping.json",
+  "matchingPolicy": {
+    "reusesMission36HClassifier": true,
+    "maxDistanceMeters": 120,
+    "persistsOnlyVerified": true,
+    "ambiguousAndUnresolvedAreNotPersisted": true,
+    "photoBinariesPersisted": false,
+    "photoMediaUrlsPersisted": false,
+    "photoResourceNamesPersisted": false
+  },
+  "apiBudget": {
+    "textSearchMaximum": 149,
+    "placeDetailsMaximum": 30,
+    "nominalMaximumRequests": 179,
+    "clientSessionLimit": 200
+  },
+  "currentDurableMapping": {
+    "status": "pending-api-run",
+    "verified": 0,
+    "unresolved": 149,
+    "total": 149,
+    "note": "No Google Place IDs are fabricated or committed before a real API run."
+  },
+  "githubActions": {
+    "runId": 36699791484,
+    "offlineValidation": "success",
+    "onlineJob": "success-with-online-match-skipped",
+    "googlePlacesSecretConfigured": false,
+    "observedAt": "2026-09-30T10:01:33Z",
+    "note": "The workflow reached the secured online job, detected an empty GOOGLE_PLACES_API_KEY secret, and skipped API matching, validation, and generated-data commit."
+  },
+  "photoUiIntegration": {
+    "existingMission36HMappingPathReused": true,
+    "switchCondition": "A complete successful 149-facility API run writes the same VERIFIED-only mapping to the canonical 36I path and the existing Mission 36H UI mapping path.",
+    "currentPilotMappingPreservedUntilSuccessfulRun": true
+  },
+  "execution": {
+    "requires": [
+      "network access",
+      "GitHub Actions repository secret GOOGLE_PLACES_API_KEY"
+    ],
+    "githubSecretName": "GOOGLE_PLACES_API_KEY",
+    "trigger": "workflow_dispatch, or a push commit whose message contains [run-places]",
+    "localCommand": "GOOGLE_PLACES_API_KEY=xxxx node tools/google-places/match-sumiyoshi-places.mjs",
+    "offlineTestCommand": "node --test tests/mission36i-sumiyoshi-google-places.test.js"
+  }
+}

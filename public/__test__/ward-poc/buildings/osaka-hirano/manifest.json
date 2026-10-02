@@ -1,0 +1,515 @@
+{
+  "version": 1,
+  "id": "osaka-hirano",
+  "ward": "平野区",
+  "wardCode": "27126",
+  "coordinateSystem": "meters-local",
+  "coordinateConvention": "znorth-neg-v1",
+  "origin": null,
+  "tileSize": 500,
+  "lod": 1,
+  "totalBuildings": 43843,
+  "tileCount": 82,
+  "bounds": {
+    "minX": 1429.16,
+    "maxX": 5699.36,
+    "minZ": -4463.76,
+    "maxZ": 1478.62
+  },
+  "invalidSkipped": 0,
+  "duplicateSkipped": 0,
+  "tiles": [
+    {
+      "tx": 10,
+      "tz": -1,
+      "file": "tile_10_-1.json",
+      "count": 737
+    },
+    {
+      "tx": 10,
+      "tz": 0,
+      "file": "tile_10_0.json",
+      "count": 383
+    },
+    {
+      "tx": 10,
+      "tz": 1,
+      "file": "tile_10_1.json",
+      "count": 6
+    },
+    {
+      "tx": 10,
+      "tz": 2,
+      "file": "tile_10_2.json",
+      "count": 6
+    },
+    {
+      "tx": 11,
+      "tz": -1,
+      "file": "tile_11_-1.json",
+      "count": 266
+    },
+    {
+      "tx": 2,
+      "tz": -2,
+      "file": "tile_2_-2.json",
+      "count": 6
+    },
+    {
+      "tx": 2,
+      "tz": -3,
+      "file": "tile_2_-3.json",
+      "count": 48
+    },
+    {
+      "tx": 2,
+      "tz": -4,
+      "file": "tile_2_-4.json",
+      "count": 88
+    },
+    {
+      "tx": 2,
+      "tz": -5,
+      "file": "tile_2_-5.json",
+      "count": 93
+    },
+    {
+      "tx": 3,
+      "tz": -1,
+      "file": "tile_3_-1.json",
+      "count": 275
+    },
+    {
+      "tx": 3,
+      "tz": -2,
+      "file": "tile_3_-2.json",
+      "count": 440
+    },
+    {
+      "tx": 3,
+      "tz": -3,
+      "file": "tile_3_-3.json",
+      "count": 869
+    },
+    {
+      "tx": 3,
+      "tz": -4,
+      "file": "tile_3_-4.json",
+      "count": 866
+    },
+    {
+      "tx": 3,
+      "tz": -5,
+      "file": "tile_3_-5.json",
+      "count": 787
+    },
+    {
+      "tx": 3,
+      "tz": -6,
+      "file": "tile_3_-6.json",
+      "count": 706
+    },
+    {
+      "tx": 3,
+      "tz": -7,
+      "file": "tile_3_-7.json",
+      "count": 188
+    },
+    {
+      "tx": 3,
+      "tz": 0,
+      "file": "tile_3_0.json",
+      "count": 460
+    },
+    {
+      "tx": 3,
+      "tz": 1,
+      "file": "tile_3_1.json",
+      "count": 56
+    },
+    {
+      "tx": 3,
+      "tz": 2,
+      "file": "tile_3_2.json",
+      "count": 1
+    },
+    {
+      "tx": 4,
+      "tz": -1,
+      "file": "tile_4_-1.json",
+      "count": 570
+    },
+    {
+      "tx": 4,
+      "tz": -2,
+      "file": "tile_4_-2.json",
+      "count": 701
+    },
+    {
+      "tx": 4,
+      "tz": -3,
+      "file": "tile_4_-3.json",
+      "count": 951
+    },
+    {
+      "tx": 4,
+      "tz": -4,
+      "file": "tile_4_-4.json",
+      "count": 855
+    },
+    {
+      "tx": 4,
+      "tz": -5,
+      "file": "tile_4_-5.json",
+      "count": 1098
+    },
+    {
+      "tx": 4,
+      "tz": -6,
+      "file": "tile_4_-6.json",
+      "count": 635
+    },
+    {
+      "tx": 4,
+      "tz": -7,
+      "file": "tile_4_-7.json",
+      "count": 300
+    },
+    {
+      "tx": 4,
+      "tz": -8,
+      "file": "tile_4_-8.json",
+      "count": 20
+    },
+    {
+      "tx": 4,
+      "tz": 0,
+      "file": "tile_4_0.json",
+      "count": 1062
+    },
+    {
+      "tx": 4,
+      "tz": 1,
+      "file": "tile_4_1.json",
+      "count": 156
+    },
+    {
+      "tx": 5,
+      "tz": -1,
+      "file": "tile_5_-1.json",
+      "count": 931
+    },
+    {
+      "tx": 5,
+      "tz": -2,
+      "file": "tile_5_-2.json",
+      "count": 1051
+    },
+    {
+      "tx": 5,
+      "tz": -3,
+      "file": "tile_5_-3.json",
+      "count": 1529
+    },
+    {
+      "tx": 5,
+      "tz": -4,
+      "file": "tile_5_-4.json",
+      "count": 1465
+    },
+    {
+      "tx": 5,
+      "tz": -5,
+      "file": "tile_5_-5.json",
+      "count": 1398
+    },
+    {
+      "tx": 5,
+      "tz": -6,
+      "file": "tile_5_-6.json",
+      "count": 691
+    },
+    {
+      "tx": 5,
+      "tz": -7,
+      "file": "tile_5_-7.json",
+      "count": 739
+    },
+    {
+      "tx": 5,
+      "tz": -8,
+      "file": "tile_5_-8.json",
+      "count": 705
+    },
+    {
+      "tx": 5,
+      "tz": -9,
+      "file": "tile_5_-9.json",
+      "count": 573
+    },
+    {
+      "tx": 5,
+      "tz": 0,
+      "file": "tile_5_0.json",
+      "count": 1288
+    },
+    {
+      "tx": 5,
+      "tz": 1,
+      "file": "tile_5_1.json",
+      "count": 68
+    },
+    {
+      "tx": 6,
+      "tz": -1,
+      "file": "tile_6_-1.json",
+      "count": 552
+    },
+    {
+      "tx": 6,
+      "tz": -2,
+      "file": "tile_6_-2.json",
+      "count": 786
+    },
+    {
+      "tx": 6,
+      "tz": -3,
+      "file": "tile_6_-3.json",
+      "count": 916
+    },
+    {
+      "tx": 6,
+      "tz": -4,
+      "file": "tile_6_-4.json",
+      "count": 785
+    },
+    {
+      "tx": 6,
+      "tz": -5,
+      "file": "tile_6_-5.json",
+      "count": 886
+    },
+    {
+      "tx": 6,
+      "tz": -6,
+      "file": "tile_6_-6.json",
+      "count": 1007
+    },
+    {
+      "tx": 6,
+      "tz": -7,
+      "file": "tile_6_-7.json",
+      "count": 895
+    },
+    {
+      "tx": 6,
+      "tz": -8,
+      "file": "tile_6_-8.json",
+      "count": 489
+    },
+    {
+      "tx": 6,
+      "tz": -9,
+      "file": "tile_6_-9.json",
+      "count": 139
+    },
+    {
+      "tx": 6,
+      "tz": 0,
+      "file": "tile_6_0.json",
+      "count": 228
+    },
+    {
+      "tx": 6,
+      "tz": 1,
+      "file": "tile_6_1.json",
+      "count": 28
+    },
+    {
+      "tx": 7,
+      "tz": -1,
+      "file": "tile_7_-1.json",
+      "count": 645
+    },
+    {
+      "tx": 7,
+      "tz": -2,
+      "file": "tile_7_-2.json",
+      "count": 730
+    },
+    {
+      "tx": 7,
+      "tz": -3,
+      "file": "tile_7_-3.json",
+      "count": 339
+    },
+    {
+      "tx": 7,
+      "tz": -4,
+      "file": "tile_7_-4.json",
+      "count": 274
+    },
+    {
+      "tx": 7,
+      "tz": -5,
+      "file": "tile_7_-5.json",
+      "count": 991
+    },
+    {
+      "tx": 7,
+      "tz": -6,
+      "file": "tile_7_-6.json",
+      "count": 765
+    },
+    {
+      "tx": 7,
+      "tz": -7,
+      "file": "tile_7_-7.json",
+      "count": 718
+    },
+    {
+      "tx": 7,
+      "tz": -8,
+      "file": "tile_7_-8.json",
+      "count": 319
+    },
+    {
+      "tx": 7,
+      "tz": 0,
+      "file": "tile_7_0.json",
+      "count": 573
+    },
+    {
+      "tx": 7,
+      "tz": 1,
+      "file": "tile_7_1.json",
+      "count": 409
+    },
+    {
+      "tx": 7,
+      "tz": 2,
+      "file": "tile_7_2.json",
+      "count": 17
+    },
+    {
+      "tx": 8,
+      "tz": -1,
+      "file": "tile_8_-1.json",
+      "count": 612
+    },
+    {
+      "tx": 8,
+      "tz": -2,
+      "file": "tile_8_-2.json",
+      "count": 1080
+    },
+    {
+      "tx": 8,
+      "tz": -3,
+      "file": "tile_8_-3.json",
+      "count": 33
+    },
+    {
+      "tx": 8,
+      "tz": -4,
+      "file": "tile_8_-4.json",
+      "count": 549
+    },
+    {
+      "tx": 8,
+      "tz": -5,
+      "file": "tile_8_-5.json",
+      "count": 709
+    },
+    {
+      "tx": 8,
+      "tz": -6,
+      "file": "tile_8_-6.json",
+      "count": 963
+    },
+    {
+      "tx": 8,
+      "tz": -7,
+      "file": "tile_8_-7.json",
+      "count": 433
+    },
+    {
+      "tx": 8,
+      "tz": 0,
+      "file": "tile_8_0.json",
+      "count": 823
+    },
+    {
+      "tx": 8,
+      "tz": 1,
+      "file": "tile_8_1.json",
+      "count": 963
+    },
+    {
+      "tx": 8,
+      "tz": 2,
+      "file": "tile_8_2.json",
+      "count": 217
+    },
+    {
+      "tx": 9,
+      "tz": -1,
+      "file": "tile_9_-1.json",
+      "count": 508
+    },
+    {
+      "tx": 9,
+      "tz": -2,
+      "file": "tile_9_-2.json",
+      "count": 88
+    },
+    {
+      "tx": 9,
+      "tz": -3,
+      "file": "tile_9_-3.json",
+      "count": 1
+    },
+    {
+      "tx": 9,
+      "tz": -4,
+      "file": "tile_9_-4.json",
+      "count": 141
+    },
+    {
+      "tx": 9,
+      "tz": -5,
+      "file": "tile_9_-5.json",
+      "count": 85
+    },
+    {
+      "tx": 9,
+      "tz": -6,
+      "file": "tile_9_-6.json",
+      "count": 83
+    },
+    {
+      "tx": 9,
+      "tz": -7,
+      "file": "tile_9_-7.json",
+      "count": 38
+    },
+    {
+      "tx": 9,
+      "tz": 0,
+      "file": "tile_9_0.json",
+      "count": 380
+    },
+    {
+      "tx": 9,
+      "tz": 1,
+      "file": "tile_9_1.json",
+      "count": 440
+    },
+    {
+      "tx": 9,
+      "tz": 2,
+      "file": "tile_9_2.json",
+      "count": 139
+    }
+  ]
+}

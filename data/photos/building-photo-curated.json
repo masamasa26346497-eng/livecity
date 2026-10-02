@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "mission": "35Z",
+  "note": "建物 → Wikidata の対応は **手で確認して固定** している。名前で検索した結果をそのまま採用しない（同名・類似名で別の建物に当たるため）。expectLat/expectLon は Wikidata 側の座標で、ビルド時に実データと突き合わせて食い違えば採用しない。",
+  "source": "Wikidata（各 Q-id は tools/photos の候補出力を目視で確認して確定）",
+  "verifiedAt": "2026-09-26",
+  "entries": [
+    { "name": "グラングリーン大阪", "wikidataId": "Q123951190", "expectLat": 34.70300, "expectLon": 135.49300 },
+    { "name": "グランフロント大阪", "wikidataId": "Q24899387", "expectLat": 34.70578, "expectLon": 135.49436 },
+    { "name": "グランフロント大阪 オーナーズタワー", "wikidataId": "Q11300380", "expectLat": 34.70731, "expectLon": 135.49400 },
+    { "name": "あべのハルカス", "wikidataId": "Q16318627", "expectLat": 34.64595, "expectLon": 135.51427 },
+    { "name": "大阪市役所", "wikidataId": "Q11440268", "expectLat": 34.69368, "expectLon": 135.50208 },
+    { "name": "大阪中之島美術館", "wikidataId": "Q50375431", "expectLat": 34.69239, "expectLon": 135.49147 },
+    { "name": "大阪城", "wikidataId": "Q321242", "expectLat": 34.68722, "expectLon": 135.52583 },
+    { "name": "大阪城ホール", "wikidataId": "Q1092700", "expectLat": 34.68944, "expectLon": 135.52972 },
+    { "name": "なんばパークス", "wikidataId": "Q6961367", "expectLat": 34.66147, "expectLon": 135.50180 },
+    { "name": "パークスタワー", "wikidataId": "Q3335430", "expectLat": 34.66159, "expectLon": 135.50120 },
+    { "name": "通天閣", "wikidataId": "Q1148463", "expectLat": 34.65222, "expectLon": 135.50611 },
+    { "name": "京セラドーム大阪", "wikidataId": "Q128836", "expectLat": 34.66930, "expectLon": 135.47610 },
+    { "name": "梅田スカイビル", "wikidataId": "Q1151808", "expectLat": 34.70528, "expectLon": 135.48972 },
+    { "name": "大阪駅", "wikidataId": "Q801694", "expectLat": 34.70250, "expectLon": 135.49611 },
+    { "name": "大阪ステーションシティ", "wikidataId": "Q11439963", "expectLat": 34.70278, "expectLon": 135.49500 },
+    { "name": "HEP FIVE", "wikidataId": "Q138666211", "expectLat": 34.70408, "expectLon": 135.50047 },
+    { "name": "海遊館", "wikidataId": "Q1191885", "expectLat": 34.65447, "expectLon": 135.42889 },
+    { "name": "国立国際美術館", "wikidataId": "Q1055037", "expectLat": 34.69179, "expectLon": 135.49202 },
+    { "name": "大阪市中央公会堂", "wikidataId": "Q10938355", "expectLat": 34.69353, "expectLon": 135.50400 },
+    { "name": "中之島フェスティバルタワー", "wikidataId": "Q3335339", "expectLat": 34.69353, "expectLon": 135.49675 },
+    { "name": "大阪府立国際会議場", "wikidataId": "Q7105562", "expectLat": 34.68940, "expectLon": 135.48600 },
+    { "name": "JPタワー大阪", "wikidataId": "Q117006379", "expectLat": 34.70049, "expectLon": 135.49400 },
+    { "name": "ユニバーサル・スタジオ・ジャパン", "wikidataId": "Q1375103", "expectLat": 34.66470, "expectLon": 135.43300 },
+    { "name": "大阪歴史博物館", "wikidataId": "Q11261312", "expectLat": 34.68272, "expectLon": 135.52081 }
+  ]
+}

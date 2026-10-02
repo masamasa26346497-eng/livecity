@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "city": "osaka-city",
+  "cityName": "大阪市",
+  "cityCode": "27100",
+  "generatedAt": "2026-10-01T16:09:15.807Z",
+  "coordinateSystem": "meters-local",
+  "coordinateConvention": "znorth-neg-v1",
+  "tileSize": 500,
+  "layout": "flat",
+  "wardCount": 24,
+  "buildingCount": 574213,
+  "tileCount": 1097,
+  "datasets": [
+    {
+      "id": "osaka-kita",
+      "wardId": "kita",
+      "ward": "北区",
+      "wardCode": "27127",
+      "manifest": "./osaka-kita/manifest.json",
+      "buildings": 15779,
+      "tiles": 44,
+      "bounds": {
+        "minX": -4342.87,
+        "maxX": -131.7,
+        "minZ": -12493.33,
+        "maxZ": -9393.2
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-miyakojima",
+      "wardId": "miyakojima",
+      "ward": "都島区",
+      "wardCode": "27102",
+      "manifest": "./osaka-miyakojima/manifest.json",
+      "buildings": 13199,
+      "tiles": 33,
+      "bounds": {
+        "minX": -670.62,
+        "maxX": 1453.65,
+        "minZ": -14252.16,
+        "maxZ": -9729.81
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-fukushima",
+      "wardId": "fukushima",
+      "ward": "福島区",
+      "wardCode": "27103",
+      "manifest": "./osaka-fukushima/manifest.json",
+      "buildings": 11159,
+      "tiles": 25,
+      "bounds": {
+        "minX": -5717.2,
+        "maxX": -3129.73,
+        "minZ": -11035.85,
+        "maxZ": -8560.07
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-konohana",
+      "wardId": "konohana",
+      "ward": "此花区",
+      "wardCode": "27104",
+      "manifest": "./osaka-konohana/manifest.json",
+      "buildings": 13437,
+      "tiles": 58,
+      "bounds": {
+        "minX": -12402.84,
+        "maxX": -4931.72,
+        "minZ": -10158.51,
+        "maxZ": -4553.86
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-chuo",
+      "wardId": "chuo",
+      "ward": "中央区",
+      "wardCode": "27128",
+      "manifest": "./osaka-chuo/manifest.json",
+      "buildings": 18279,
+      "tiles": 52,
+      "bounds": {
+        "minX": -2588.68,
+        "maxX": 1034.28,
+        "minZ": -10142.6,
+        "maxZ": -6490.91
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-nishi",
+      "wardId": "nishi",
+      "ward": "西区",
+      "wardCode": "27106",
+      "manifest": "./osaka-nishi/manifest.json",
+      "buildings": 12098,
+      "tiles": 29,
+      "bounds": {
+        "minX": -5774.72,
+        "maxX": -2510.64,
+        "minZ": -9818.17,
+        "maxZ": -7006.05
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-minato",
+      "wardId": "minato",
+      "ward": "港区",
+      "wardCode": "27107",
+      "manifest": "./osaka-minato/manifest.json",
+      "buildings": 15489,
+      "tiles": 34,
+      "bounds": {
+        "minX": -8319.07,
+        "maxX": -4684.98,
+        "minZ": -8110.02,
+        "maxZ": -5123.33
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-taisho",
+      "wardId": "taisho",
+      "ward": "大正区",
+      "wardCode": "27108",
+      "manifest": "./osaka-taisho/manifest.json",
+      "buildings": 17363,
+      "tiles": 40,
+      "bounds": {
+        "minX": -6826.97,
+        "maxX": -3924.27,
+        "minZ": -7049.88,
+        "maxZ": -3236.97
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-tennoji",
+      "wardId": "tennoji",
+      "ward": "天王寺区",
+      "wardCode": "27109",
+      "manifest": "./osaka-tennoji/manifest.json",
+      "buildings": 14244,
+      "tiles": 30,
+      "bounds": {
+        "minX": -1685.41,
+        "maxX": 776.32,
+        "minZ": -7986.55,
+        "maxZ": -4591.56
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-naniwa",
+      "wardId": "naniwa",
+      "ward": "浪速区",
+      "wardCode": "27111",
+      "manifest": "./osaka-naniwa/manifest.json",
+      "buildings": 10133,
+      "tiles": 30,
+      "bounds": {
+        "minX": -4046.54,
+        "maxX": -1306.61,
+        "minZ": -7310.46,
+        "maxZ": -4873.34
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-nishiyodogawa",
+      "wardId": "nishiyodogawa",
+      "ward": "西淀川区",
+      "wardCode": "27113",
+      "manifest": "./osaka-nishiyodogawa/manifest.json",
+      "buildings": 23242,
+      "tiles": 47,
+      "bounds": {
+        "minX": -9013.26,
+        "maxX": -4864.41,
+        "minZ": -13719.38,
+        "maxZ": -9519.58
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-yodogawa",
+      "wardId": "yodogawa",
+      "ward": "淀川区",
+      "wardCode": "27123",
+      "manifest": "./osaka-yodogawa/manifest.json",
+      "buildings": 34289,
+      "tiles": 62,
+      "bounds": {
+        "minX": -6659.9,
+        "maxX": -1674.24,
+        "minZ": -16222,
+        "maxZ": -11652.77
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-higashiyodogawa",
+      "wardId": "higashiyodogawa",
+      "ward": "東淀川区",
+      "wardCode": "27114",
+      "manifest": "./osaka-higashiyodogawa/manifest.json",
+      "buildings": 34685,
+      "tiles": 66,
+      "bounds": {
+        "minX": -2117.53,
+        "maxX": 3230.8,
+        "minZ": -17993.53,
+        "maxZ": -13401.36
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-higashinari",
+      "wardId": "higashinari",
+      "ward": "東成区",
+      "wardCode": "27115",
+      "manifest": "./osaka-higashinari/manifest.json",
+      "buildings": 21976,
+      "tiles": 29,
+      "bounds": {
+        "minX": 518.63,
+        "maxX": 3506.1,
+        "minZ": -8800.27,
+        "maxZ": -6686.14
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-ikuno",
+      "wardId": "ikuno",
+      "ward": "生野区",
+      "wardCode": "27116",
+      "manifest": "./osaka-ikuno/manifest.json",
+      "buildings": 46212,
+      "tiles": 50,
+      "bounds": {
+        "minX": -28.18,
+        "maxX": 3531.4,
+        "minZ": -6914.06,
+        "maxZ": -3216.46
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-asahi",
+      "wardId": "asahi",
+      "ward": "旭区",
+      "wardCode": "27117",
+      "manifest": "./osaka-asahi/manifest.json",
+      "buildings": 22424,
+      "tiles": 35,
+      "bounds": {
+        "minX": 310.07,
+        "maxX": 3898.43,
+        "minZ": -15453.78,
+        "maxZ": -11946.48
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-joto",
+      "wardId": "joto",
+      "ward": "城東区",
+      "wardCode": "27118",
+      "manifest": "./osaka-joto/manifest.json",
+      "buildings": 32447,
+      "tiles": 48,
+      "bounds": {
+        "minX": 860.07,
+        "maxX": 3724.92,
+        "minZ": -12382.25,
+        "maxZ": -8223.07
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-tsurumi",
+      "wardId": "tsurumi",
+      "ward": "鶴見区",
+      "wardCode": "27124",
+      "manifest": "./osaka-tsurumi/manifest.json",
+      "buildings": 22068,
+      "tiles": 46,
+      "bounds": {
+        "minX": 3099.06,
+        "maxX": 6743.14,
+        "minZ": -12646.83,
+        "maxZ": -9239.05
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-abeno",
+      "wardId": "abeno",
+      "ward": "阿倍野区",
+      "wardCode": "27119",
+      "manifest": "./osaka-abeno/manifest.json",
+      "buildings": 26924,
+      "tiles": 38,
+      "bounds": {
+        "minX": -2661.39,
+        "maxX": 390.54,
+        "minZ": -4921.34,
+        "maxZ": -1316.64
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-suminoe",
+      "wardId": "suminoe",
+      "ward": "住之江区",
+      "wardCode": "27125",
+      "manifest": "./osaka-suminoe/manifest.json",
+      "buildings": 21608,
+      "tiles": 67,
+      "bounds": {
+        "minX": -10312.73,
+        "maxX": -2955.57,
+        "minZ": -3400.23,
+        "maxZ": 720.74
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-sumiyoshi",
+      "wardId": "sumiyoshi",
+      "ward": "住吉区",
+      "wardCode": "27120",
+      "manifest": "./osaka-sumiyoshi/manifest.json",
+      "buildings": 35031,
+      "tiles": 52,
+      "bounds": {
+        "minX": -3441.02,
+        "maxX": -120.59,
+        "minZ": -2303.56,
+        "maxZ": 1865.59
+      },
+      "dataReadyCandidate": true,
+      "sourceVersion": "PLATEAU CityGML v4 2024",
+      "runtimeReady": true
+    },
+    {
+      "id": "osaka-higashisumiyoshi",
+      "wardId": "higashisumiyoshi",
+      "ward": "東住吉区",
+      "wardCode": "27121",
+      "manifest": "./osaka-higashisumiyoshi/manifest.json",
+      "buildings": 38489,
+      "tiles": 59,
+      "bounds": {
+        "minX": -1003.89,
+        "maxX": 2084.65,
+        "minZ": -4472.81,
+        "maxZ": 1427.8
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-hirano",
+      "wardId": "hirano",
+      "ward": "平野区",
+      "wardCode": "27126",
+      "manifest": "./osaka-hirano/manifest.json",
+      "buildings": 44434,
+      "tiles": 83,
+      "bounds": {
+        "minX": 1437.19,
+        "maxX": 5702.18,
+        "minZ": -4440.08,
+        "maxZ": 1482.2
+      },
+      "dataReadyCandidate": true
+    },
+    {
+      "id": "osaka-nishinari",
+      "wardId": "nishinari",
+      "ward": "西成区",
+      "wardCode": "27122",
+      "manifest": "./osaka-nishinari/manifest.json",
+      "buildings": 29204,
+      "tiles": 40,
+      "bounds": {
+        "minX": -4548.4,
+        "maxX": -1527.24,
+        "minZ": -5881.92,
+        "maxZ": -1949.9
+      },
+      "dataReadyCandidate": true
+    }
+  ],
+  "unclassified": {
+    "count": 10378,
+    "policy": "not force-assigned; authoritative N03 point-in-polygon only"
+  },
+  "sourceReport": "../../../data/reports/building-dataset-generation.json",
+  "note": "Live City runtime building manifest. PLATEAU source/acquisition metadata is intentionally stored separately under building-sources/.",
+  "migration": "Mission36K: Sumiyoshi runtime tiles rebuilt from PLATEAU 2024 CityGML; remaining wards retain prior manifest metadata until rebuilt."
+}

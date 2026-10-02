@@ -1,0 +1,123 @@
+name: Mission 36J - Google Places Citywide Matching
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mission36j-google-places-citywide
+  cancel-in-progress: false
+
+jobs:
+  google-places-match:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36j-places]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    env:
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+      MISSION_BRANCH: feature/mission-36j-osaka-24ward-google-places-expansion
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.MISSION_BRANCH }}
+          fetch-depth: 0
+
+      - name: Sync latest mission branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${MISSION_BRANCH}"
+          git reset --hard "origin/${MISSION_BRANCH}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify API key is configured without printing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${GOOGLE_PLACES_API_KEY:-}" ]; then
+            echo "GOOGLE_PLACES_API_KEY GitHub Secret is not configured."
+            exit 2
+          fi
+          echo "Google Places API key is configured."
+
+      - name: Run Mission 36J offline safety tests
+        run: node --test tests/mission36j-*.test.js
+
+      - name: Match high-priority facilities in checkpointed batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          started_at=$SECONDS
+          for round in $(seq 1 20); do
+            if [ $((SECONDS - started_at)) -ge 9000 ]; then
+              echo "150-minute batch budget reached; resume from checkpoints next time."
+              break
+            fi
+            echo "=== Mission 36J Google Places high-priority batch ${round}/20 ==="
+            node tools/google-places/match-osaka-city-places.mjs --priority high --limit 100 --requests-per-minute 60
+
+            node - <<'NODE'
+          const fs = require('fs');
+          const p = 'public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json';
+          const d = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (d.maxDistanceMeters !== 120) throw new Error(`maxDistanceMeters changed: ${d.maxDistanceMeters}`);
+          if (!d.policy?.persistsOnlyVerifiedLinkage) throw new Error('VERIFIED-only policy missing');
+          if ((d.entries || []).some((e) => e.matchConfidence !== 'VERIFIED')) throw new Error('non-VERIFIED entry persisted');
+          const raw = JSON.stringify(d).toLowerCase();
+          for (const banned of ['photoname', 'photouri', 'mediaurl', 'base64']) {
+            if (raw.includes(banned)) throw new Error(`forbidden persisted photo/media field: ${banned}`);
+          }
+          console.log(JSON.stringify(d.counts));
+          NODE
+
+            git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
+            git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+            git add -f data/reports/mission36j-google-places-osaka-city/progress.json
+            git add -f data/reports/mission36j-google-places-osaka-city/last-batch.json
+
+            if git diff --cached --quiet; then
+              echo "No Google Places changes in batch ${round}; stopping."
+              break
+            fi
+
+            git commit -m "data(mission36j): checkpoint Google Places high-priority batch ${round}"
+            git fetch origin "${MISSION_BRANCH}"
+            git rebase "origin/${MISSION_BRANCH}"
+            git push origin "HEAD:${MISSION_BRANCH}"
+
+            if [ "${round}" -lt 20 ]; then
+              echo "Cooling down 61s before next API session."
+              sleep 61
+            fi
+          done
+
+      - name: Final Google Places summary
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = 'public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json';
+          if (!fs.existsSync(p)) {
+            console.log('No citywide mapping was produced.');
+            process.exit(0);
+          }
+          const d = JSON.parse(fs.readFileSync(p, 'utf8'));
+          console.log(JSON.stringify({ counts: d.counts, wardCounts: d.wardCounts }, null, 2));
+          NODE

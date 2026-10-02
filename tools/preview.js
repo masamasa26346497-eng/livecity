@@ -20,6 +20,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
+const DEV_UI_HTML = 'osaka_3d_buildings.ward-ux-v1.html';
+const DEV_UI_SCRIPT = '/livecity-dev-ui-coordinator.js';
 
 function parseArgs(argv) {
   const args = { port: 8000, area: 'osaka-sumiyoshi' };
@@ -54,6 +56,17 @@ function resolveSafe(urlPath) {
   return abs;
 }
 
+// Mission 36I: 開発版HTMLだけにUI coordinatorを注入する。
+// 巨大な地図HTMLそのものを書き換えず、production/protected HTMLへ一切影響させない。
+function injectDevUiCoordinator(abs, body) {
+  if (path.basename(abs) !== DEV_UI_HTML) return body;
+  const html = body.toString('utf8');
+  if (html.includes(DEV_UI_SCRIPT)) return body;
+  const tag = `<script src="${DEV_UI_SCRIPT}"></script>`;
+  const injected = html.includes('</body>') ? html.replace('</body>', `${tag}\n</body>`) : `${html}\n${tag}`;
+  return Buffer.from(injected, 'utf8');
+}
+
 // 起動前に、HTMLが読み込む4つの統計JSONの存在を確認して警告する（生成はしない）。
 function checkMapData(areaId) {
   const base = path.join(PUBLIC_DIR, 'map-data', areaId);
@@ -84,7 +97,7 @@ async function main() {
 
   const server = http.createServer(async (req, res) => {
     let urlPath = req.url || '/';
-    if (urlPath === '/') urlPath = '/osaka_3d_buildings.html';
+    if (urlPath.split('?')[0] === '/') urlPath = '/' + DEV_UI_HTML;
     const abs = resolveSafe(urlPath);
     if (!abs) {
       res.writeHead(403); res.end('Forbidden'); return;
@@ -95,8 +108,12 @@ async function main() {
         res.writeHead(403); res.end('Directory listing disabled'); return;
       }
       const ext = path.extname(abs).toLowerCase();
-      const body = await readFile(abs);
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      let body = await readFile(abs);
+      body = injectDevUiCoordinator(abs, body);
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || 'application/octet-stream',
+        'Cache-Control': 'no-store',
+      });
       res.end(body);
     } catch {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -114,7 +131,7 @@ async function main() {
   });
 
   server.listen(args.port, () => {
-    const url = `http://localhost:${args.port}/osaka_3d_buildings.html`;
+    const url = `http://localhost:${args.port}/${DEV_UI_HTML}`;
     console.log('\n==================================================');
     console.log('Live City プレビューサーバーを起動しました。');
     console.log(`  ${url}`);

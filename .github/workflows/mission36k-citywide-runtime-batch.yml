@@ -1,0 +1,189 @@
+name: Mission 36K - Citywide Runtime Building Batch
+
+on:
+  push:
+    branches:
+      - feature/mission-36j-osaka-24ward-google-places-expansion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-next-wards:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-36k-citywide-batch]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync mission branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Guard protected production HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum public/osaka_3d_buildings.html public/osaka_3d_buildings.fullward-v3.html > /tmp/mission36k-protected.sha256
+
+      - name: Probe current PLATEAU 2024 CityGML archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/mission36k-probe-citygml-zip.mjs
+
+      - name: Select next two missing runtime wards
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const registry=JSON.parse(fs.readFileSync('config/wards/registry.json','utf8'));
+          const root=JSON.parse(fs.readFileSync('public/map-data/osaka-city/buildings/manifest.json','utf8'));
+          const byId=new Map((root.datasets||[]).map((d)=>[d.wardId,d]));
+          const missing=[];
+          for (const w of registry.wards || []) {
+            const d=byId.get(w.id);
+            const rel=String(d?.manifest || `osaka-${w.id}/manifest.json`).replace(/^\.\//,'');
+            const manifest=`public/map-data/osaka-city/buildings/${rel}`;
+            if (!fs.existsSync(manifest)) missing.push(w.id);
+          }
+          const selected=missing.slice(0,2);
+          fs.writeFileSync('/tmp/mission36k-selected-wards.txt',selected.join('\n')+(selected.length?'\n':''));
+          console.log(JSON.stringify({missingCount:missing.length,selected}));
+          NODE
+          WARDS=$(paste -sd, /tmp/mission36k-selected-wards.txt || true)
+          echo "wards=${WARDS}" >> "$GITHUB_OUTPUT"
+          if [ -z "${WARDS}" ]; then
+            echo 'All 24 runtime ward datasets are already present.'
+          fi
+
+      - name: Rebuild selected wards from PLATEAU 2024 CityGML
+        if: steps.select.outputs.wards != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mission36k-batch-results temp
+          while IFS= read -r WARD; do
+            [ -n "$WARD" ] || continue
+            echo "=== Mission 36K runtime rebuild: ${WARD} ==="
+            SRC="/tmp/mission36k-citygml-${WARD}"
+            JSONL="/tmp/mission36k-${WARD}-2024.jsonl"
+            OUT="temp/mission36k-datasets-${WARD}"
+            rm -rf "$SRC" "$OUT"
+            rm -f "$JSONL" "${JSONL%.jsonl}.report.json"
+
+            node tools/mission36k-fetch-citygml-ward-range.mjs --ward="$WARD" --out="$SRC"
+            test "$(find "$SRC" -maxdepth 1 -type f -name '*.gml' | wc -l)" -gt 0
+
+            node tools/mission36k-convert-citygml-runtime.mjs \
+              --input "$SRC" \
+              --output "$JSONL" \
+              --ward-hint "$WARD"
+            test -s "$JSONL"
+
+            node tools/build-ward-building-datasets.js \
+              --buildings "$JSONL" \
+              --ward-polygons data/processed/osaka-city/boundaries/ward-classification-polygons.json \
+              --out "$OUT" \
+              --tile-size 500 \
+              --layout flat \
+              --force
+
+            TARGET="$OUT/osaka-${WARD}"
+            node tools/mission36k-validate-runtime-ward.mjs \
+              --ward "$WARD" \
+              --dir "$TARGET" \
+              --result-dir /tmp/mission36k-batch-results
+
+            rm -rf "public/map-data/osaka-city/buildings/osaka-${WARD}"
+            cp -R "$TARGET" "public/map-data/osaka-city/buildings/osaka-${WARD}"
+          done < /tmp/mission36k-selected-wards.txt
+
+      - name: Update root runtime manifest and batch report
+        if: steps.select.outputs.wards != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const rootPath='public/map-data/osaka-city/buildings/manifest.json';
+          const root=JSON.parse(fs.readFileSync(rootPath,'utf8'));
+          const selected=fs.readFileSync('/tmp/mission36k-selected-wards.txt','utf8').trim().split(/\s+/).filter(Boolean);
+          const results=[];
+          for (const ward of selected) {
+            const wardPath=`public/map-data/osaka-city/buildings/osaka-${ward}/manifest.json`;
+            const m=JSON.parse(fs.readFileSync(wardPath,'utf8'));
+            const d=root.datasets.find((x)=>x.wardId===ward);
+            if (!d) throw new Error(`root dataset missing ${ward}`);
+            d.buildings=m.totalBuildings;
+            d.tiles=m.tileCount;
+            d.bounds=m.bounds;
+            d.sourceVersion='PLATEAU CityGML v4 2024';
+            d.runtimeReady=true;
+            d.manifest=`./osaka-${ward}/manifest.json`;
+            results.push({wardId:ward,totalBuildings:m.totalBuildings,tileCount:m.tileCount});
+          }
+          root.buildingCount=root.datasets.reduce((n,x)=>n+Number(x.buildings||0),0);
+          root.tileCount=root.datasets.reduce((n,x)=>n+Number(x.tiles||0),0);
+          root.generatedAt=new Date().toISOString();
+          root.migration='Mission36K: runtime ward datasets progressively rebuilt from PLATEAU 2024 CityGML; runtimeReady=true entries are confirmed present on this branch.';
+          fs.writeFileSync(rootPath,JSON.stringify(root,null,2)+'\n');
+          const ready=root.datasets.filter((d)=>{
+            const rel=String(d.manifest||'').replace(/^\.\//,'');
+            return d.runtimeReady && fs.existsSync(`public/map-data/osaka-city/buildings/${rel}`);
+          });
+          const report={mission:'36K-citywide-runtime-batch',generatedAt:new Date().toISOString(),selected,results,runtimeReadyWardCount:ready.length,remainingWardCount:24-ready.length,rootBuildingCount:root.buildingCount,rootTileCount:root.tileCount};
+          fs.writeFileSync('data/reports/mission36k-citywide-runtime-batch.json',JSON.stringify(report,null,2)+'\n');
+          console.log(JSON.stringify(report,null,2));
+          NODE
+
+      - name: Final guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum -c /tmp/mission36k-protected.sha256
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const root=JSON.parse(fs.readFileSync('public/map-data/osaka-city/buildings/manifest.json','utf8'));
+          if (!Array.isArray(root.datasets) || root.datasets.length !== 24) throw new Error(`runtime datasets=${root.datasets?.length}`);
+          if (root.coordinateConvention !== 'znorth-neg-v1' || root.layout !== 'flat' || root.tileSize !== 500) throw new Error('root runtime contract mismatch');
+          for (const d of root.datasets.filter((x)=>x.runtimeReady)) {
+            const rel=String(d.manifest||'').replace(/^\.\//,'');
+            const p=`public/map-data/osaka-city/buildings/${rel}`;
+            if (!fs.existsSync(p)) throw new Error(`runtimeReady dataset missing: ${p}`);
+          }
+          console.log(JSON.stringify({datasets:root.datasets.length,runtimeReady:root.datasets.filter((d)=>d.runtimeReady).length,buildingCount:root.buildingCount,tileCount:root.tileCount}));
+          NODE
+
+      - name: Commit rebuilt runtime ward batch
+        if: steps.select.outputs.wards != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f public/map-data/osaka-city/buildings/manifest.json data/reports/mission36k-citywide-runtime-batch.json
+          while IFS= read -r WARD; do
+            [ -n "$WARD" ] || continue
+            git add -f "public/map-data/osaka-city/buildings/osaka-${WARD}"
+            git add -f "data/reports/mission36k-citygml-range-${WARD}.json"
+          done < /tmp/mission36k-selected-wards.txt
+          if git diff --cached --quiet; then
+            echo 'No citywide runtime building changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data(mission36k): rebuild next Osaka runtime building wards'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
