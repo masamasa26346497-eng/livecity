@@ -441,14 +441,354 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標は近い(26m)が名前が一致しない: \"LE CROISSANT(ﾙ･ｸﾛﾜｯｻﾝ)天神橋店\"",
       "attemptedAt": "2026-10-02T12:30:27.867Z"
+    },
+    {
+      "facilityId": "osm-node-10773514697",
+      "name": "鶏玉",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"鶏玉 天五店\"",
+      "attemptedAt": "2026-10-02T12:31:32.703Z"
+    },
+    {
+      "facilityId": "osm-node-10774916516",
+      "name": "西洋菓子シェール Chere",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"西洋菓子処 シェール\"",
+      "attemptedAt": "2026-10-02T12:31:33.888Z"
+    },
+    {
+      "facilityId": "osm-node-10774916517",
+      "name": "ボンボミー",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2249m）",
+      "attemptedAt": "2026-10-02T12:31:34.057Z"
+    },
+    {
+      "facilityId": "osm-node-10774916525",
+      "name": "煮穴子と白ぎも",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2677m）",
+      "attemptedAt": "2026-10-02T12:32:36.604Z"
+    },
+    {
+      "facilityId": "osm-node-10774916526",
+      "name": "松崎屋",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T12:32:36.987Z"
+    },
+    {
+      "facilityId": "osm-node-10774916528",
+      "name": "風月",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 194m）",
+      "attemptedAt": "2026-10-02T12:33:38.460Z"
+    },
+    {
+      "facilityId": "osm-node-10774916530",
+      "name": "ソフトバンクショップ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"ソフトバンク扇町［ワイモバイル取扱店］\"",
+      "attemptedAt": "2026-10-02T12:33:38.675Z"
+    },
+    {
+      "facilityId": "osm-node-10774916533",
+      "name": "勝男",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"大分からあげと鉄板焼 扇町応援団 勝男\"",
+      "attemptedAt": "2026-10-02T12:34:40.321Z"
+    },
+    {
+      "facilityId": "osm-node-10774916536",
+      "name": "おしゃれ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 443m）",
+      "attemptedAt": "2026-10-02T12:34:41.000Z"
+    },
+    {
+      "facilityId": "osm-node-10774916539",
+      "name": "男流",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"男流CUTCLUB天神橋４丁目店\"",
+      "attemptedAt": "2026-10-02T12:34:41.670Z"
+    },
+    {
+      "facilityId": "osm-node-10774916540",
+      "name": "しろくま調剤薬局",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"柿の木薬局 天満店\"",
+      "attemptedAt": "2026-10-02T12:34:41.901Z"
+    },
+    {
+      "facilityId": "osm-node-10774916541",
+      "name": "キャンドゥ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"Can★Do 天神橋四丁目店\"",
+      "attemptedAt": "2026-10-02T12:34:42.119Z"
+    },
+    {
+      "facilityId": "osm-node-10774916548",
+      "name": "丸万酒蔵",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"丸力酒蔵 天神橋筋四丁目店\"",
+      "attemptedAt": "2026-10-02T12:35:43.589Z"
+    },
+    {
+      "facilityId": "osm-node-10775710939",
+      "name": "市",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T12:35:44.462Z"
+    },
+    {
+      "facilityId": "osm-node-10775710940",
+      "name": "やまき薬局",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2676m）",
+      "attemptedAt": "2026-10-02T12:35:44.655Z"
+    },
+    {
+      "facilityId": "osm-node-10775710943",
+      "name": "高匠",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 778m）",
+      "attemptedAt": "2026-10-02T12:35:44.863Z"
+    },
+    {
+      "facilityId": "osm-node-10775710945",
+      "name": "歩らり",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1155m）",
+      "attemptedAt": "2026-10-02T12:36:46.325Z"
+    },
+    {
+      "facilityId": "osm-node-10775710947",
+      "name": "兎",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 434m）",
+      "attemptedAt": "2026-10-02T12:37:47.832Z"
+    },
+    {
+      "facilityId": "osm-node-10775710952",
+      "name": "結び。",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 627m）",
+      "attemptedAt": "2026-10-02T12:37:48.063Z"
+    },
+    {
+      "facilityId": "osm-node-10779104343",
+      "name": "中も津屋",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1420m）",
+      "attemptedAt": "2026-10-02T12:37:49.423Z"
+    },
+    {
+      "facilityId": "osm-node-10781203422",
+      "name": "フレンチ食堂パ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 808m）",
+      "attemptedAt": "2026-10-02T12:38:51.897Z"
+    },
+    {
+      "facilityId": "osm-node-10781203432",
+      "name": "てんじん整形外科リウマチ科",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "healthcare_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8450m）",
+      "attemptedAt": "2026-10-02T12:38:52.126Z"
+    },
+    {
+      "facilityId": "osm-node-10781203435",
+      "name": "ぶらんにゅう亭",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 362449m）",
+      "attemptedAt": "2026-10-02T12:38:52.723Z"
+    },
+    {
+      "facilityId": "osm-node-10781203437",
+      "name": "コロッケのころっ家",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 187m）",
+      "attemptedAt": "2026-10-02T12:38:52.944Z"
+    },
+    {
+      "facilityId": "osm-node-10781203441",
+      "name": "ドリームスクエア天二",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"天神橋筋商店街（１丁目商店街）\"",
+      "attemptedAt": "2026-10-02T12:39:54.499Z"
+    },
+    {
+      "facilityId": "osm-node-10781203445",
+      "name": "天鳳",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 724m）",
+      "attemptedAt": "2026-10-02T12:39:55.086Z"
+    },
+    {
+      "facilityId": "osm-node-10926361571",
+      "name": "Go Bar",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"剛BAR\"",
+      "attemptedAt": "2026-10-02T12:40:58.448Z"
+    },
+    {
+      "facilityId": "osm-node-10976497206",
+      "name": "東京ガパオ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 152m）",
+      "attemptedAt": "2026-10-02T12:40:59.083Z"
+    },
+    {
+      "facilityId": "osm-node-10976497207",
+      "name": "香港茶龍",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"香港蒸籠 ヨドバシ梅田店\"",
+      "attemptedAt": "2026-10-02T12:40:59.293Z"
+    },
+    {
+      "facilityId": "osm-node-11002742060",
+      "name": "Cafe Blue NYC",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 11097767m）",
+      "attemptedAt": "2026-10-02T12:42:01.685Z"
+    },
+    {
+      "facilityId": "osm-node-11005365766",
+      "name": "エコル",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"EKOLU 北梅田店\"",
+      "attemptedAt": "2026-10-02T12:42:02.088Z"
+    },
+    {
+      "facilityId": "osm-node-11005365769",
+      "name": "アイスは別腹",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "ice_cream",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 736m）",
+      "attemptedAt": "2026-10-02T12:42:02.762Z"
+    },
+    {
+      "facilityId": "osm-node-11005696789",
+      "name": "クレマ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"DOLCE & ESPRESSO CREMA\"",
+      "attemptedAt": "2026-10-02T12:43:05.124Z"
+    },
+    {
+      "facilityId": "osm-node-11005710811",
+      "name": "Cafe Fu plus",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"Café FU-plus 中崎町\"",
+      "attemptedAt": "2026-10-02T12:43:05.921Z"
     }
   ],
-  "generatedAt": "2026-10-02T12:30:28.476Z",
+  "generatedAt": "2026-10-02T12:43:05.944Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 152,
-    "unresolved": 44,
-    "unattempted": 40389,
+    "verified": 218,
+    "unresolved": 78,
+    "unattempted": 40289,
     "total": 40585
   },
   "wardCounts": {
@@ -514,9 +854,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 56,
-      "unresolvedOrAmbiguous": 44,
-      "unattempted": 5555
+      "verified": 122,
+      "unresolvedOrAmbiguous": 78,
+      "unattempted": 5455
     },
     "konohana": {
       "total": 1309,
