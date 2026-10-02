@@ -1,0 +1,600 @@
+{
+  "version": 1,
+  "mission": "36J",
+  "attempts": [
+    {
+      "facilityId": "osm-node-10031129617",
+      "name": "路上喫煙禁止地区案内図",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 788m）",
+      "attemptedAt": "2026-10-02T12:17:53.003Z"
+    },
+    {
+      "facilityId": "osm-node-10088259217",
+      "name": "Le progrès",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"ル・プログレ\"",
+      "attemptedAt": "2026-10-02T12:17:53.213Z"
+    },
+    {
+      "facilityId": "osm-node-10089124133",
+      "name": "迂回路",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 17619m）",
+      "attemptedAt": "2026-10-02T12:17:53.441Z"
+    },
+    {
+      "facilityId": "osm-node-10089124135",
+      "name": "迂回路",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 17595m）",
+      "attemptedAt": "2026-10-02T12:17:53.626Z"
+    },
+    {
+      "facilityId": "osm-node-10089124139",
+      "name": "迂回路",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 9159m）",
+      "attemptedAt": "2026-10-02T12:17:53.821Z"
+    },
+    {
+      "facilityId": "osm-node-10091579984",
+      "name": "ウィゴー",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(14m)が名前が一致しない: \"WEGO HEP FIVE店\"",
+      "attemptedAt": "2026-10-02T12:17:54.069Z"
+    },
+    {
+      "facilityId": "osm-node-10130256088",
+      "name": "旧町名継承碑「豊宮町」",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(18m)が名前が一致しない: \"旧町名継承碑「浜崎町」\"",
+      "attemptedAt": "2026-10-02T12:18:56.530Z"
+    },
+    {
+      "facilityId": "osm-node-10244339911",
+      "name": "スミス",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 180m）",
+      "attemptedAt": "2026-10-02T12:18:56.767Z"
+    },
+    {
+      "facilityId": "osm-node-10301978266",
+      "name": "花門",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1258m）",
+      "attemptedAt": "2026-10-02T12:18:58.250Z"
+    },
+    {
+      "facilityId": "osm-node-10301978267",
+      "name": "ラージャスターン",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5823850m）",
+      "attemptedAt": "2026-10-02T12:18:58.448Z"
+    },
+    {
+      "facilityId": "osm-node-10301978269",
+      "name": "Bar 月光",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(112m)が名前が一致しない: \"クーロンズ・バー\"",
+      "attemptedAt": "2026-10-02T12:19:59.901Z"
+    },
+    {
+      "facilityId": "osm-node-10301978270",
+      "name": "マラッカ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4989340m）",
+      "attemptedAt": "2026-10-02T12:20:00.143Z"
+    },
+    {
+      "facilityId": "osm-node-10301978273",
+      "name": "HOLY LAND",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 27785m）",
+      "attemptedAt": "2026-10-02T12:20:00.726Z"
+    },
+    {
+      "facilityId": "osm-node-10301978279",
+      "name": "深海Bar THE DEEP",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"BAR 近藤熱帯魚店\"",
+      "attemptedAt": "2026-10-02T12:21:03.053Z"
+    },
+    {
+      "facilityId": "osm-node-10301978280",
+      "name": "コインランドリー",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 320m）",
+      "attemptedAt": "2026-10-02T12:21:03.289Z"
+    },
+    {
+      "facilityId": "osm-node-10302062855",
+      "name": "宮田麺児",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3766m）",
+      "attemptedAt": "2026-10-02T12:21:03.485Z"
+    },
+    {
+      "facilityId": "osm-node-10302188609",
+      "name": "百番",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"海鮮居酒屋 海幸丸 百番 梅田茶屋町店\"",
+      "attemptedAt": "2026-10-02T12:21:03.733Z"
+    },
+    {
+      "facilityId": "osm-node-10302222210",
+      "name": "酉の市",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"酉乃市\"",
+      "attemptedAt": "2026-10-02T12:21:03.917Z"
+    },
+    {
+      "facilityId": "osm-node-10302715615",
+      "name": "悌梧家",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8855m）",
+      "attemptedAt": "2026-10-02T12:21:04.088Z"
+    },
+    {
+      "facilityId": "osm-node-10600405643",
+      "name": "Rock Stakk Records",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"ロックスタック・レコーズ\"",
+      "attemptedAt": "2026-10-02T12:21:04.841Z"
+    },
+    {
+      "facilityId": "osm-node-10694316432",
+      "name": "ファミリーマート",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "convenience",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 504m）",
+      "attemptedAt": "2026-10-02T12:22:06.314Z"
+    },
+    {
+      "facilityId": "osm-node-10705811363",
+      "name": "スターバックス",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 200m）",
+      "attemptedAt": "2026-10-02T12:22:06.563Z"
+    },
+    {
+      "facilityId": "osm-node-10742709905",
+      "name": "扇町公園",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 126m）",
+      "attemptedAt": "2026-10-02T12:22:06.931Z"
+    },
+    {
+      "facilityId": "osm-node-10765662164",
+      "name": "Garden Cafe",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1266m）",
+      "attemptedAt": "2026-10-02T12:22:07.628Z"
+    },
+    {
+      "facilityId": "osm-node-10765662165",
+      "name": "奴寿司",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T12:23:09.194Z"
+    },
+    {
+      "facilityId": "osm-node-10765662166",
+      "name": "山秀",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"ヤマヒデ （山秀）\"",
+      "attemptedAt": "2026-10-02T12:23:09.412Z"
+    },
+    {
+      "facilityId": "osm-node-10765662167",
+      "name": "花菊",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"花菊 商店\"",
+      "attemptedAt": "2026-10-02T12:24:10.867Z"
+    },
+    {
+      "facilityId": "osm-node-10765662168",
+      "name": "厳島",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 297769m）",
+      "attemptedAt": "2026-10-02T12:24:11.003Z"
+    },
+    {
+      "facilityId": "osm-node-10772715320",
+      "name": "アルカヤ靴店",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 245m）",
+      "attemptedAt": "2026-10-02T12:24:11.224Z"
+    },
+    {
+      "facilityId": "osm-node-10772715338",
+      "name": "街のみなと 大起水産",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"大起水産 街のみなと 天神橋六丁目店\"",
+      "attemptedAt": "2026-10-02T12:24:12.703Z"
+    },
+    {
+      "facilityId": "osm-node-10773231818",
+      "name": "もみっしゅ 天神橋店",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"ほぐし処 もみっしゅ\"",
+      "attemptedAt": "2026-10-02T12:25:14.695Z"
+    },
+    {
+      "facilityId": "osm-node-10773231821",
+      "name": "ミワ アンド コー",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 354m）",
+      "attemptedAt": "2026-10-02T12:25:15.127Z"
+    },
+    {
+      "facilityId": "osm-node-10773231822",
+      "name": "アングル",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"Coffee Space ANGLE\"",
+      "attemptedAt": "2026-10-02T12:25:15.356Z"
+    },
+    {
+      "facilityId": "osm-node-10773231823",
+      "name": "Hikari",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 590m）",
+      "attemptedAt": "2026-10-02T12:25:15.551Z"
+    },
+    {
+      "facilityId": "osm-node-10773231830",
+      "name": "ピープルズ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "supermarket",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"No Risk\"",
+      "attemptedAt": "2026-10-02T12:26:17.239Z"
+    },
+    {
+      "facilityId": "osm-node-10773231834",
+      "name": "ワウ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"Wah! - ワウ -\"",
+      "attemptedAt": "2026-10-02T12:26:17.677Z"
+    },
+    {
+      "facilityId": "osm-node-10773231835",
+      "name": "石田一龍",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T12:26:18.092Z"
+    },
+    {
+      "facilityId": "osm-node-10773514652",
+      "name": "いわはし歯科",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "dentist",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 124m）",
+      "attemptedAt": "2026-10-02T12:27:20.505Z"
+    },
+    {
+      "facilityId": "osm-node-10773514665",
+      "name": "大阪トンテキ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1007m）",
+      "attemptedAt": "2026-10-02T12:28:22.300Z"
+    },
+    {
+      "facilityId": "osm-node-10773514667",
+      "name": "リコア鍼灸整骨",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"ReCORE鍼灸接骨院 天満\"",
+      "attemptedAt": "2026-10-02T12:28:22.718Z"
+    },
+    {
+      "facilityId": "osm-node-10773514670",
+      "name": "じゃんぼ総本店",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"じゃんぼ總本店 ジャンボ酒場 天満駅前店\"",
+      "attemptedAt": "2026-10-02T12:28:22.947Z"
+    },
+    {
+      "facilityId": "osm-node-10773514675",
+      "name": "とりいし",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T12:29:24.609Z"
+    },
+    {
+      "facilityId": "osm-node-10773514679",
+      "name": "第二アイヤー本店",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"台湾酒場イェスタデイ\"",
+      "attemptedAt": "2026-10-02T12:30:26.682Z"
+    },
+    {
+      "facilityId": "osm-node-10773514690",
+      "name": "ル・クロワッサン",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(26m)が名前が一致しない: \"LE CROISSANT(ﾙ･ｸﾛﾜｯｻﾝ)天神橋店\"",
+      "attemptedAt": "2026-10-02T12:30:27.867Z"
+    }
+  ],
+  "generatedAt": "2026-10-02T12:30:28.476Z",
+  "sourceRecordCount": 40585,
+  "counts": {
+    "verified": 152,
+    "unresolved": 44,
+    "unattempted": 40389,
+    "total": 40585
+  },
+  "wardCounts": {
+    "abeno": {
+      "total": 851,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 851
+    },
+    "asahi": {
+      "total": 1097,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1097
+    },
+    "chuo": {
+      "total": 5084,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 5084
+    },
+    "fukushima": {
+      "total": 967,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 967
+    },
+    "higashinari": {
+      "total": 918,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 918
+    },
+    "higashisumiyoshi": {
+      "total": 1025,
+      "verified": 40,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 985
+    },
+    "higashiyodogawa": {
+      "total": 2922,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 2922
+    },
+    "hirano": {
+      "total": 1116,
+      "verified": 5,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1111
+    },
+    "ikuno": {
+      "total": 3325,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 3325
+    },
+    "joto": {
+      "total": 1051,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1051
+    },
+    "kita": {
+      "total": 5655,
+      "verified": 56,
+      "unresolvedOrAmbiguous": 44,
+      "unattempted": 5555
+    },
+    "konohana": {
+      "total": 1309,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1309
+    },
+    "minato": {
+      "total": 612,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 612
+    },
+    "miyakojima": {
+      "total": 1444,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1444
+    },
+    "naniwa": {
+      "total": 1363,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1363
+    },
+    "nishi": {
+      "total": 2071,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 2071
+    },
+    "nishinari": {
+      "total": 854,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 854
+    },
+    "nishiyodogawa": {
+      "total": 880,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 880
+    },
+    "suminoe": {
+      "total": 617,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 617
+    },
+    "sumiyoshi": {
+      "total": 965,
+      "verified": 51,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 914
+    },
+    "taisho": {
+      "total": 649,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 649
+    },
+    "tennoji": {
+      "total": 1611,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 1611
+    },
+    "tsurumi": {
+      "total": 842,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 842
+    },
+    "yodogawa": {
+      "total": 3357,
+      "verified": 0,
+      "unresolvedOrAmbiguous": 0,
+      "unattempted": 3357
+    }
+  }
+}
