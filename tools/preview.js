@@ -97,7 +97,7 @@ async function main() {
 
   const server = http.createServer(async (req, res) => {
     let urlPath = req.url || '/';
-    if (urlPath === '/') urlPath = '/osaka_3d_buildings.html';
+    if (urlPath.split('?')[0] === '/') urlPath = '/' + DEV_UI_HTML;
     const abs = resolveSafe(urlPath);
     if (!abs) {
       res.writeHead(403); res.end('Forbidden'); return;
@@ -110,7 +110,10 @@ async function main() {
       const ext = path.extname(abs).toLowerCase();
       let body = await readFile(abs);
       body = injectDevUiCoordinator(abs, body);
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || 'application/octet-stream',
+        'Cache-Control': 'no-store',
+      });
       res.end(body);
     } catch {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -128,7 +131,7 @@ async function main() {
   });
 
   server.listen(args.port, () => {
-    const url = `http://localhost:${args.port}/osaka_3d_buildings.html`;
+    const url = `http://localhost:${args.port}/${DEV_UI_HTML}`;
     console.log('\n==================================================');
     console.log('Live City プレビューサーバーを起動しました。');
     console.log(`  ${url}`);
