@@ -17,8 +17,13 @@ Keep the full Osaka City facility dataset and existing exact building picking wh
 - Select facility render candidates through the spatial query rather than mapping/filtering/sorting all loaded records.
 - Keep the existing bounded facility sprite cap.
 - Keep exact legacy fallback semantics for infinite-radius nearest queries.
+- Add a click-time facility pick gate before the existing exact sprite raycast.
+- Project nearby indexed facilities into screen space and skip the exact facility raycast when no marker is within the click radius.
+- Preserve the original `FacilityLayer.pickHit()` as the exact fallback whenever a facility marker may actually have been clicked.
+- Expose `window.__MISSION36K_BUILDING_CLICK_PERF__()` for runtime diagnostics.
 
 ## Verification
-- Run the focused Mission 36K spatial-performance test.
+- Run `node --test tests/mission36k-facility-spatial-performance.test.js`.
+- Run `node --test tests/mission36k-building-click-performance.test.js`.
 - Run the existing Mission 35Y precise-building-picking test.
 - Assert protected production HTML remains untouched.
