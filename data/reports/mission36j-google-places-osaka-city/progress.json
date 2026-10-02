@@ -5451,14 +5451,364 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
       "attemptedAt": "2026-10-02T13:34:32.458Z"
+    },
+    {
+      "facilityId": "osm-node-14099164977",
+      "name": "老媽麻辣湯 上海生煎包",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"老媽・麻辣湯天神橋\"",
+      "attemptedAt": "2026-10-02T13:35:37.561Z"
+    },
+    {
+      "facilityId": "osm-node-14099164992",
+      "name": "m coin's OSAKA",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3665m）",
+      "attemptedAt": "2026-10-02T13:35:38.586Z"
+    },
+    {
+      "facilityId": "osm-node-14099164997",
+      "name": "Ronde",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:35:41.504Z"
+    },
+    {
+      "facilityId": "osm-node-14099195403",
+      "name": "TCSコンタクトレンズ",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"ＴＣＳ高橋コンタクトショップ 天六店\"",
+      "attemptedAt": "2026-10-02T13:35:44.670Z"
+    },
+    {
+      "facilityId": "osm-node-14099836541",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1201m）",
+      "attemptedAt": "2026-10-02T13:35:45.682Z"
+    },
+    {
+      "facilityId": "osm-node-14099836542",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1201m）",
+      "attemptedAt": "2026-10-02T13:35:46.695Z"
+    },
+    {
+      "facilityId": "osm-node-14099836561",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1204m）",
+      "attemptedAt": "2026-10-02T13:35:47.734Z"
+    },
+    {
+      "facilityId": "osm-node-14099836562",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(14m)が名前が一致しない: \"鷽献灯\"",
+      "attemptedAt": "2026-10-02T13:35:48.748Z"
+    },
+    {
+      "facilityId": "osm-node-14099836569",
+      "name": "お金を投げないで下さい",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "information",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1221m）",
+      "attemptedAt": "2026-10-02T13:35:50.034Z"
+    },
+    {
+      "facilityId": "osm-node-14100779501",
+      "name": "Club Amadeus",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"北新地 キャバクラ ニュークラブ アマデウス\"",
+      "attemptedAt": "2026-10-02T13:35:55.939Z"
+    },
+    {
+      "facilityId": "osm-node-14100779504",
+      "name": "The Coffee Party",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "cafe",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(0m)が名前が一致しない: \"サクラビルヂング\"",
+      "attemptedAt": "2026-10-02T13:35:58.019Z"
+    },
+    {
+      "facilityId": "osm-node-14100779508",
+      "name": "五條",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 42293m）",
+      "attemptedAt": "2026-10-02T13:36:01.092Z"
+    },
+    {
+      "facilityId": "osm-node-14100970867",
+      "name": "筋楽本舗",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 12440m）",
+      "attemptedAt": "2026-10-02T13:36:14.427Z"
+    },
+    {
+      "facilityId": "osm-node-14100970869",
+      "name": "Hair Salon Teto",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"Te'to [テト]\"",
+      "attemptedAt": "2026-10-02T13:36:16.465Z"
+    },
+    {
+      "facilityId": "osm-node-14100970882",
+      "name": "廻る元禄寿司",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "fast_food",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"元禄寿司 天六店\"",
+      "attemptedAt": "2026-10-02T13:36:20.542Z"
+    },
+    {
+      "facilityId": "osm-node-14100992647",
+      "name": "Orancio",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "bar",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"オランチョ\"",
+      "attemptedAt": "2026-10-02T13:36:33.845Z"
+    },
+    {
+      "facilityId": "osm-node-14100992652",
+      "name": "薬局メニー",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"薬局MANY天六店\"",
+      "attemptedAt": "2026-10-02T13:36:34.864Z"
+    },
+    {
+      "facilityId": "osm-node-14107163586",
+      "name": "お好み焼三代目てんぐ",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "restaurant",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:36:40.939Z"
+    },
+    {
+      "facilityId": "osm-node-14107163590",
+      "name": "Falette Flowers",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(19m)が名前が一致しない: \"ファレットフルール KITTE大阪店\"",
+      "attemptedAt": "2026-10-02T13:36:44.116Z"
+    },
+    {
+      "facilityId": "osm-node-14107527453",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(59m)が名前が一致しない: \"鷽献灯\"",
+      "attemptedAt": "2026-10-02T13:36:45.100Z"
+    },
+    {
+      "facilityId": "osm-node-14107527454",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1231m）",
+      "attemptedAt": "2026-10-02T13:36:46.113Z"
+    },
+    {
+      "facilityId": "osm-node-14107527464",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1215m）",
+      "attemptedAt": "2026-10-02T13:36:47.150Z"
+    },
+    {
+      "facilityId": "osm-node-14107527465",
+      "name": "灯籠",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_toro",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"鷽献灯\"",
+      "attemptedAt": "2026-10-02T13:36:48.148Z"
+    },
+    {
+      "facilityId": "osm-node-14107548213",
+      "name": "天神橋",
+      "wardId": "kita",
+      "category": "tourism",
+      "subcategory": "historic_memorial",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 675m）",
+      "attemptedAt": "2026-10-02T13:36:49.189Z"
+    },
+    {
+      "facilityId": "osm-node-14109696314",
+      "name": "日本旅行",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-02T13:36:52.212Z"
+    },
+    {
+      "facilityId": "osm-node-14118804591",
+      "name": "卑弥呼",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 214m）",
+      "attemptedAt": "2026-10-02T13:36:54.395Z"
+    },
+    {
+      "facilityId": "osm-node-14118804592",
+      "name": "ITAL STYLE",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"イタルスタイルOSAKA NORTH\"",
+      "attemptedAt": "2026-10-02T13:36:55.390Z"
+    },
+    {
+      "facilityId": "osm-node-14118804593",
+      "name": "PAL'LAS PALACE",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"パラスパレス 大阪ディアモール店\"",
+      "attemptedAt": "2026-10-02T13:36:56.426Z"
+    },
+    {
+      "facilityId": "osm-node-14118804594",
+      "name": "DoCLASSE",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 302m）",
+      "attemptedAt": "2026-10-02T13:36:57.456Z"
+    },
+    {
+      "facilityId": "osm-node-14118824003",
+      "name": "サカバ第一",
+      "wardId": "kita",
+      "category": "dining",
+      "subcategory": "pub",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"サカバ第１\"",
+      "attemptedAt": "2026-10-02T13:37:04.602Z"
+    },
+    {
+      "facilityId": "osm-node-14118824009",
+      "name": "MISTER MINIT",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:37:11.675Z"
+    },
+    {
+      "facilityId": "osm-node-14118824010",
+      "name": "bourree",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"ブーレ\"",
+      "attemptedAt": "2026-10-02T13:37:12.810Z"
+    },
+    {
+      "facilityId": "osm-node-14118824013",
+      "name": "GINZA GlobalStyle",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"GINZAグローバルスタイル ディアモール大阪店\"",
+      "attemptedAt": "2026-10-02T13:37:16.019Z"
+    },
+    {
+      "facilityId": "osm-node-14118824014",
+      "name": "Desigual.",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"デシグアル ディアモール大阪（DESIGUAL DIAMOR OSAKA)\"",
+      "attemptedAt": "2026-10-02T13:37:16.945Z"
+    },
+    {
+      "facilityId": "osm-node-14118824015",
+      "name": "DIANA",
+      "wardId": "kita",
+      "category": "shopping",
+      "subcategory": "shop_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-02T13:37:19.864Z"
     }
   ],
-  "generatedAt": "2026-10-02T13:34:32.490Z",
+  "generatedAt": "2026-10-02T13:37:27.196Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 951,
-    "unresolved": 545,
-    "unattempted": 39089,
+    "verified": 1016,
+    "unresolved": 580,
+    "unattempted": 38989,
     "total": 40585
   },
   "wardCounts": {
@@ -5524,9 +5874,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 855,
-      "unresolvedOrAmbiguous": 545,
-      "unattempted": 4255
+      "verified": 920,
+      "unresolvedOrAmbiguous": 580,
+      "unattempted": 4155
     },
     "konohana": {
       "total": 1309,
