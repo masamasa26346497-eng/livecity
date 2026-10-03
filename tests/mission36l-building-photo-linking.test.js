@@ -11,6 +11,7 @@ import {
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BRIDGE_JS = path.join(ROOT, 'public', 'livecity-building-photo-bridge.js');
+const COORDINATOR = path.join(ROOT, 'public', 'livecity-dev-ui-coordinator.js');
 const PREVIEW = path.join(ROOT, 'tools', 'preview.js');
 
 test('[36L] OSM source identity -> facilityId conversion is exact', () => {
@@ -99,9 +100,11 @@ test('[36L] conflicting durable facility mappings are rejected', () => {
   assert.equal(out.counts.linkedBuildings, 0);
 });
 
-test('[36L UI] photo bridge is dev-only, on-demand, and non-persistent', () => {
+test('[36L UI] photo bridge is dev-only, gated by exact index, on-demand, and non-persistent', () => {
   const js = fs.readFileSync(BRIDGE_JS, 'utf8');
   const preview = fs.readFileSync(PREVIEW, 'utf8');
+  assert.match(preview, /BUILDING_PHOTO_INDEX/);
+  assert.match(preview, /existsSync\(BUILDING_PHOTO_INDEX\)/);
   assert.match(preview, /livecity-building-photo-bridge\.js/);
   assert.match(js, /BuildingPhoto\.fillCard/);
   assert.match(js, /placeMatchConfidence !== 'VERIFIED'/);
@@ -111,4 +114,16 @@ test('[36L UI] photo bridge is dev-only, on-demand, and non-persistent', () => {
   assert.ok(!/localStorage|sessionStorage|indexedDB/.test(js), 'Google photo data must not be persisted');
   assert.ok(!/searchText|:searchText/.test(js), 'building click must not start fuzzy Places searches');
   assert.ok(!/reviews|rating|priceLevel/.test(js), 'unneeded Places fields must not be requested');
+});
+
+test('[36L PERF] facility runtime indexes only deltas and bounds/caches render candidates', () => {
+  const js = fs.readFileSync(COORDINATOR, 'utf8');
+  assert.match(js, /function indexNewRecords\(store\)/);
+  assert.match(js, /all\.slice\(indexedRecordCount\)/);
+  assert.match(js, /MAX_RENDER_RADIUS_METERS = 3200/);
+  assert.match(js, /DEFAULT_RENDER_CAP = 450/);
+  assert.match(js, /renderQueryCacheHits/);
+  assert.match(js, /countOnly: true/);
+  assert.ok(!/const result = await originalLoadWard\(\.\.\.args\);\s*indexRecords\(store\.getAllRecords\(\)\)/s.test(js),
+    'ward loading must not rescan every already-loaded facility');
 });
