@@ -26,10 +26,25 @@ jobs:
           node-version: '22'
       - name: Mission 36L unit tests
         run: node --test tests/mission36l-building-photo-linking.test.js
-      - name: Build exact building to Google Place index
-        run: node tools/photos/build-building-google-place-index.mjs
-      - name: Validate generated durable index
+      - name: Build exact building to Google Place index when local generated input is tracked
+        shell: bash
         run: |
+          set -euo pipefail
+          INPUT='data/processed/osaka-city/derived/building-facility-index.json'
+          if [ ! -f "$INPUT" ]; then
+            echo 'Large generated building-facility index is intentionally not tracked in GitHub; unit tests cover the deterministic bridge logic.'
+            exit 0
+          fi
+          node tools/photos/build-building-google-place-index.mjs
+      - name: Validate generated durable index when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          P='public/map-data/osaka-city/derived/building-google-place-index.json'
+          if [ ! -f "$P" ]; then
+            echo 'No generated building-place index in CI checkout; skipping file-level validation.'
+            exit 0
+          fi
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const p = 'public/map-data/osaka-city/derived/building-google-place-index.json';
