@@ -73,9 +73,7 @@
 
   function conservativeNameCandidate(building) {
     if (!building?.buildingId) return null;
-    // A named building must have high geometry/source evidence.
     if (building.buildingName && building.confidence === 'high') return building.buildingName;
-    // A primary facility is only safe in the runtime index when Mission 35O recorded one facility.
     if (building.primaryFacilityName && Number(building.n) === 1) return building.primaryFacilityName;
     return null;
   }
@@ -90,7 +88,6 @@
     const verified = (Array.isArray(placesDoc?.entries) ? placesDoc.entries : [])
       .filter((e) => e?.matchConfidence === 'VERIFIED' && e?.facilityId && e?.googlePlaceId && e?.name);
 
-    // Only names unique on both sides may be used as a temporary fallback.
     const placeByName = new Map();
     const duplicatedPlaceNames = new Set();
     for (const entry of verified) {
@@ -290,7 +287,6 @@
   }
 
   function install() {
-    loadBridge();
     let tries = 0;
     const timer = setInterval(() => {
       tries++;
