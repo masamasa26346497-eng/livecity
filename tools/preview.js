@@ -30,6 +30,7 @@ const BUILDING_PHOTO_INDEX = path.join(
 );
 const CORE_DEV_UI_SCRIPTS = [
   '/livecity-dev-ui-coordinator.js',
+  '/livecity-render-performance.js',
   '/livecity-building-click-performance.js',
 ];
 
