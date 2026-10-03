@@ -1,0 +1,49 @@
+name: Mission 36L Building Photo Linking
+
+on:
+  pull_request:
+    paths:
+      - 'public/livecity-building-photo-bridge.js'
+      - 'tools/photos/build-building-google-place-index.mjs'
+      - 'tests/mission36l-building-photo-linking.test.js'
+      - 'tools/preview.js'
+      - 'public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json'
+      - 'data/processed/osaka-city/derived/building-facility-index.json'
+      - '.github/workflows/mission36l-building-photo-linking.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Mission 36L unit tests
+        run: node --test tests/mission36l-building-photo-linking.test.js
+      - name: Build exact building to Google Place index
+        run: node tools/photos/build-building-google-place-index.mjs
+      - name: Validate generated durable index
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p = 'public/map-data/osaka-city/derived/building-google-place-index.json';
+          const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+          if (!j.policy?.exactOsmSourceIdentityOnly) throw new Error('exact identity policy missing');
+          if (!j.policy?.verifiedGooglePlaceOnly) throw new Error('verified-only policy missing');
+          if (j.policy?.persistsPhotoMedia !== false) throw new Error('photo media persistence must be false');
+          if (!Number.isInteger(j.counts?.linkedBuildings)) throw new Error('linkedBuildings count missing');
+          for (const r of j.records || []) {
+            if (r.placeMatchConfidence !== 'VERIFIED') throw new Error('non-VERIFIED record persisted');
+            if (!r.buildingId || !r.facilityId || !r.googlePlaceId) throw new Error('incomplete durable record');
+            const text = JSON.stringify(r);
+            if (/photoUri|thumbnailUrl|resourceName|imageDataBase64/i.test(text)) throw new Error('photo media leaked into durable index');
+          }
+          console.log('Mission 36L linked buildings:', j.counts.linkedBuildings);
+          console.log(JSON.stringify(j.counts));
+          NODE
