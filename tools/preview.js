@@ -24,6 +24,7 @@ const DEV_UI_HTML = 'osaka_3d_buildings.ward-ux-v1.html';
 const DEV_UI_SCRIPTS = [
   '/livecity-dev-ui-coordinator.js',
   '/livecity-building-click-performance.js',
+  '/livecity-building-photo-bridge.js',
 ];
 
 function parseArgs(argv) {
@@ -59,7 +60,7 @@ function resolveSafe(urlPath) {
   return abs;
 }
 
-// Mission 36I/36K: 開発版HTMLだけにdev coordinator/performance scriptを注入する。
+// Mission 36I/36K/36L: 開発版HTMLだけにdev coordinator/performance/photo bridgeを注入する。
 // 巨大な地図HTMLそのものを書き換えず、production/protected HTMLへ一切影響させない。
 function injectDevUiCoordinator(abs, body) {
   if (path.basename(abs) !== DEV_UI_HTML) return body;
