@@ -1,6 +1,6 @@
 {
   "mission": "36L-building-source-places",
-  "generatedAt": "2026-10-04T12:12:11.261Z",
+  "generatedAt": "2026-10-04T12:24:51.031Z",
   "policy": {
     "sourceTypes": [
       "way",
@@ -14,12 +14,12 @@
   "maxPriority": 3,
   "requestedLimit": 100,
   "processed": 100,
-  "verifiedThisBatch": 51,
+  "verifiedThisBatch": 58,
   "buildingSourceCountsBefore": {
     "total": 9498,
-    "verified": 6195,
-    "unresolvedOrAmbiguous": 4501,
-    "unattempted": 1364,
+    "verified": 6436,
+    "unresolvedOrAmbiguous": 4760,
+    "unattempted": 864,
     "byWard": {
       "abeno": {
         "total": 167,
@@ -47,9 +47,9 @@
       },
       "higashinari": {
         "total": 290,
-        "verified": 118,
-        "unresolvedOrAmbiguous": 100,
-        "unattempted": 72
+        "verified": 143,
+        "unresolvedOrAmbiguous": 129,
+        "unattempted": 18
       },
       "higashisumiyoshi": {
         "total": 302,
@@ -71,9 +71,9 @@
       },
       "ikuno": {
         "total": 1701,
-        "verified": 474,
-        "unresolvedOrAmbiguous": 553,
-        "unattempted": 674
+        "verified": 690,
+        "unresolvedOrAmbiguous": 783,
+        "unattempted": 228
       },
       "joto": {
         "total": 180,
@@ -169,21 +169,21 @@
   },
   "buildingSourceCountsAfter": {
     "total": 9498,
-    "verified": 6246,
-    "unresolvedOrAmbiguous": 4550,
-    "unattempted": 1264,
+    "verified": 6494,
+    "unresolvedOrAmbiguous": 4802,
+    "unattempted": 764,
     "byWard": {
       "abeno": {
         "total": 167,
-        "verified": 95,
-        "unresolvedOrAmbiguous": 38,
-        "unattempted": 34
+        "verified": 113,
+        "unresolvedOrAmbiguous": 45,
+        "unattempted": 9
       },
       "asahi": {
         "total": 396,
-        "verified": 189,
-        "unresolvedOrAmbiguous": 198,
-        "unattempted": 9
+        "verified": 192,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 2
       },
       "chuo": {
         "total": 718,
@@ -223,15 +223,15 @@
       },
       "ikuno": {
         "total": 1701,
-        "verified": 500,
-        "unresolvedOrAmbiguous": 573,
-        "unattempted": 628
+        "verified": 697,
+        "unresolvedOrAmbiguous": 789,
+        "unattempted": 215
       },
       "joto": {
         "total": 180,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 39,
-        "unattempted": 30
+        "verified": 129,
+        "unresolvedOrAmbiguous": 46,
+        "unattempted": 5
       },
       "kita": {
         "total": 764,
@@ -283,9 +283,9 @@
       },
       "suminoe": {
         "total": 151,
-        "verified": 77,
-        "unresolvedOrAmbiguous": 32,
-        "unattempted": 42
+        "verified": 87,
+        "unresolvedOrAmbiguous": 44,
+        "unattempted": 20
       },
       "sumiyoshi": {
         "total": 235,
@@ -307,9 +307,9 @@
       },
       "tsurumi": {
         "total": 336,
-        "verified": 152,
-        "unresolvedOrAmbiguous": 165,
-        "unattempted": 19
+        "verified": 154,
+        "unresolvedOrAmbiguous": 171,
+        "unattempted": 11
       },
       "yodogawa": {
         "total": 520,
@@ -321,21 +321,21 @@
   },
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 6246,
-    "unresolvedOrAmbiguous": 4550,
-    "unattempted": 29789,
+    "verified": 6494,
+    "unresolvedOrAmbiguous": 4802,
+    "unattempted": 29289,
     "byWard": {
       "abeno": {
         "total": 851,
-        "verified": 95,
-        "unresolvedOrAmbiguous": 38,
-        "unattempted": 718
+        "verified": 113,
+        "unresolvedOrAmbiguous": 45,
+        "unattempted": 693
       },
       "asahi": {
         "total": 1097,
-        "verified": 189,
-        "unresolvedOrAmbiguous": 198,
-        "unattempted": 710
+        "verified": 192,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 703
       },
       "chuo": {
         "total": 5084,
@@ -375,15 +375,15 @@
       },
       "ikuno": {
         "total": 3325,
-        "verified": 500,
-        "unresolvedOrAmbiguous": 573,
-        "unattempted": 2252
+        "verified": 697,
+        "unresolvedOrAmbiguous": 789,
+        "unattempted": 1839
       },
       "joto": {
         "total": 1051,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 39,
-        "unattempted": 901
+        "verified": 129,
+        "unresolvedOrAmbiguous": 46,
+        "unattempted": 876
       },
       "kita": {
         "total": 5655,
@@ -435,9 +435,9 @@
       },
       "suminoe": {
         "total": 617,
-        "verified": 77,
-        "unresolvedOrAmbiguous": 32,
-        "unattempted": 508
+        "verified": 87,
+        "unresolvedOrAmbiguous": 44,
+        "unattempted": 486
       },
       "sumiyoshi": {
         "total": 965,
@@ -459,9 +459,9 @@
       },
       "tsurumi": {
         "total": 842,
-        "verified": 152,
-        "unresolvedOrAmbiguous": 165,
-        "unattempted": 525
+        "verified": 154,
+        "unresolvedOrAmbiguous": 171,
+        "unattempted": 517
       },
       "yodogawa": {
         "total": 3357,
@@ -473,914 +473,914 @@
   },
   "apiUsage": {
     "searchCalls": 100,
-    "detailsCalls": 10,
+    "detailsCalls": 30,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 110,
+    "executed": 130,
     "inFlight": 0,
-    "windowCount": 12,
-    "sessionCount": 110
+    "windowCount": 32,
+    "sessionCount": 130
   },
   "results": [
     {
-      "facilityId": "osm-way-293372586",
+      "facilityId": "osm-way-581288620",
       "osmElementType": "way",
-      "name": "ローソン",
-      "wardId": "higashinari",
+      "name": "とうふ工房・丸信",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 4206,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4206m）"
+    },
+    {
+      "facilityId": "osm-way-584369970",
+      "osmElementType": "way",
+      "name": "STEP AUTO",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 20,
-      "reason": "座標(20m以内)と名前が一致"
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293376655",
+      "facilityId": "osm-way-585583710",
       "osmElementType": "way",
-      "name": "大矢タンス店",
-      "wardId": "higashinari",
+      "name": "宏栄社",
+      "wardId": "ikuno",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 490,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 490m）"
+      "distanceMeters": 2258,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2258m）"
     },
     {
-      "facilityId": "osm-way-293376727",
+      "facilityId": "osm-way-596049374",
       "osmElementType": "way",
-      "name": "中村書店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1155,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1155m）"
+      "name": "クムガン",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293376753",
+      "facilityId": "osm-way-596049390",
       "osmElementType": "way",
-      "name": "紀乃国屋",
-      "wardId": "higashinari",
+      "name": "ウィールチェアー",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-601172775",
+      "osmElementType": "way",
+      "name": "八州自動車工業",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"八洲自動車工業所\""
+    },
+    {
+      "facilityId": "osm-way-622580864",
+      "osmElementType": "way",
+      "name": "大阪塗料商事",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 0,
       "reason": "座標(0m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293380407",
+      "facilityId": "osm-way-700611032",
       "osmElementType": "way",
-      "name": "くわむらでんき",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
+      "name": "ランドセル工房 生田",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 17,
+      "reason": "座標は近い(17m)が名前が一致しない: \"生田ランドセル\""
     },
     {
-      "facilityId": "osm-way-293380498",
+      "facilityId": "osm-way-700611033",
       "osmElementType": "way",
-      "name": "西川衣料店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1087,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1087m）"
-    },
-    {
-      "facilityId": "osm-way-293380503",
-      "osmElementType": "way",
-      "name": "靴のまるは",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 260,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 260m）"
-    },
-    {
-      "facilityId": "osm-way-293381219",
-      "osmElementType": "way",
-      "name": "のだ屋",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
+      "name": "ランドセル工房 生田",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
+      "reason": "座標は近い(8m)が名前が一致しない: \"生田ランドセル\""
     },
     {
-      "facilityId": "osm-way-293381293",
+      "facilityId": "osm-way-755762021",
       "osmElementType": "way",
-      "name": "イシイ楽器",
-      "wardId": "higashinari",
+      "name": "共立自動車",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293381313",
+      "facilityId": "osm-way-793623384",
       "osmElementType": "way",
-      "name": "理容ムラタ",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1173,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1173m）"
+      "name": "しんしん堂大井",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 9,
+      "reason": "座標は近い(9m)が名前が一致しない: \"しんしん堂/駄菓子\""
     },
     {
-      "facilityId": "osm-way-293522116",
+      "facilityId": "osm-way-796360099",
       "osmElementType": "way",
-      "name": "南海部品",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3441,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3441m）"
-    },
-    {
-      "facilityId": "osm-way-293522317",
-      "osmElementType": "way",
-      "name": "池田商店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 556,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 556m）"
-    },
-    {
-      "facilityId": "osm-way-293540290",
-      "osmElementType": "way",
-      "name": "シティホール今里",
-      "wardId": "higashinari",
+      "name": "野山商店",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 5,
       "reason": "座標(5m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293601663",
+      "facilityId": "osm-way-800676177",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1311039523",
+      "osmElementType": "way",
+      "name": "ミヅノ",
+      "wardId": "asahi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 501,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 501m）"
+    },
+    {
+      "facilityId": "osm-way-321391058",
+      "osmElementType": "way",
+      "name": "千林くらしエール館",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 18,
+      "reason": "座標(18m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-362890769",
+      "osmElementType": "way",
+      "name": "松田質舗",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-462934552",
       "osmElementType": "way",
       "name": "ファミリーマート",
-      "wardId": "higashinari",
+      "wardId": "asahi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-462934655",
+      "osmElementType": "way",
+      "name": "業務スーパー",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 10,
       "reason": "座標(10m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-293626485",
-      "osmElementType": "way",
-      "name": "ダイハツ",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1672,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1672m）"
-    },
-    {
-      "facilityId": "osm-way-293631899",
-      "osmElementType": "way",
-      "name": "HappyBridal",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-295051251",
+      "facilityId": "osm-way-607179089",
       "osmElementType": "way",
       "name": "ライフ",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-385413881",
-      "osmElementType": "way",
-      "name": "杜嶺酒店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null,
-      "reason": "Google Places 側に候補が無い"
-    },
-    {
-      "facilityId": "osm-way-387175181",
-      "osmElementType": "way",
-      "name": "スズキアリーナ内環",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-387175186",
-      "osmElementType": "way",
-      "name": "汽車ポッポ",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 24456,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 24456m）"
-    },
-    {
-      "facilityId": "osm-way-388592822",
-      "osmElementType": "way",
-      "name": "ファミリーマート",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-399455939",
-      "osmElementType": "way",
-      "name": "スズキ特販東",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 4921,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4921m）"
-    },
-    {
-      "facilityId": "osm-way-404080534",
-      "osmElementType": "way",
-      "name": "篤友葬祭",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"（有）駕友葬祭\""
-    },
-    {
-      "facilityId": "osm-way-422432243",
-      "osmElementType": "way",
-      "name": "理容 桑原",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-425345172",
-      "osmElementType": "way",
-      "name": "今里メガネ店",
-      "wardId": "higashinari",
+      "wardId": "asahi",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-way-428227257",
+      "facilityId": "osm-way-607179100",
       "osmElementType": "way",
-      "name": "理容山口",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-430370739",
-      "osmElementType": "way",
-      "name": "大阪浪速園芸(株)",
-      "wardId": "higashinari",
+      "name": "万代",
+      "wardId": "asahi",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 8,
-      "reason": "座標は近い(8m)が名前が一致しない: \"大阪浪花園芸株式会社\""
+      "distanceMeters": 22,
+      "reason": "座標は近い(22m)が名前が一致しない: \"万代 旭高殿店\""
     },
     {
-      "facilityId": "osm-way-431329800",
+      "facilityId": "osm-way-1220652144",
       "osmElementType": "way",
-      "name": "光モータース",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-434949056",
-      "osmElementType": "way",
-      "name": "井上酒店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3049,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3049m）"
-    },
-    {
-      "facilityId": "osm-way-435162776",
-      "osmElementType": "way",
-      "name": "丸三オートサービス",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-435314370",
-      "osmElementType": "way",
-      "name": "関西日仏自動車(株)",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-435483397",
-      "osmElementType": "way",
-      "name": "小沢自動車(株)",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 246747,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 246747m）"
-    },
-    {
-      "facilityId": "osm-way-435825645",
-      "osmElementType": "way",
-      "name": "IPM",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 869,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 869m）"
-    },
-    {
-      "facilityId": "osm-way-435825647",
-      "osmElementType": "way",
-      "name": "たかひ酒店",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"高樋酒店\""
-    },
-    {
-      "facilityId": "osm-way-435833794",
-      "osmElementType": "way",
-      "name": "(有)なにわや電機",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-438290763",
-      "osmElementType": "way",
-      "name": "hair salon ROOTS",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-438290764",
-      "osmElementType": "way",
-      "name": "中村釣具",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 60894,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 60894m）"
-    },
-    {
-      "facilityId": "osm-way-439014679",
-      "osmElementType": "way",
-      "name": "戎屋酒店",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"株式会社 戎屋\""
-    },
-    {
-      "facilityId": "osm-way-439014683",
-      "osmElementType": "way",
-      "name": "田所商店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 6044,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6044m）"
-    },
-    {
-      "facilityId": "osm-way-440956731",
-      "osmElementType": "way",
-      "name": "小沢自動車(株)",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 246763,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 246763m）"
-    },
-    {
-      "facilityId": "osm-way-442877504",
-      "osmElementType": "way",
-      "name": "婦人服マルエイ",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 2357,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2357m）"
-    },
-    {
-      "facilityId": "osm-way-442877508",
-      "osmElementType": "way",
-      "name": "米の山内",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-442983325",
-      "osmElementType": "way",
-      "name": "牧田商店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 4644,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4644m）"
-    },
-    {
-      "facilityId": "osm-way-442983326",
-      "osmElementType": "way",
-      "name": "美容室シバタ",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-448836423",
-      "osmElementType": "way",
-      "name": "伊達電器商会",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 18,
-      "reason": "座標(18m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-448836426",
-      "osmElementType": "way",
-      "name": "東和商事",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-452751484",
-      "osmElementType": "way",
-      "name": "G•L•A•D",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 94,
-      "reason": "座標は近い(94m)が名前が一致しない: \"IL GRANDIT イルグランディット\""
-    },
-    {
-      "facilityId": "osm-way-452751491",
-      "osmElementType": "way",
-      "name": "松井酒店",
-      "wardId": "higashinari",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 772,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 772m）"
-    },
-    {
-      "facilityId": "osm-way-455195434",
-      "osmElementType": "way",
-      "name": "ヘアーサロンきたむら",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 67,
-      "reason": "座標は近い(67m)が名前が一致しない: \"ヘアサロン タムラ\""
-    },
-    {
-      "facilityId": "osm-way-529731741",
-      "osmElementType": "way",
-      "name": "Honda Cars大阪",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-529731742",
-      "osmElementType": "way",
-      "name": "大阪トヨペット",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-591379058",
-      "osmElementType": "way",
-      "name": "フタバクリーニング",
-      "wardId": "higashinari",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-603961159",
-      "osmElementType": "way",
-      "name": "オクダビジネス",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"Okuda文具店\""
-    },
-    {
-      "facilityId": "osm-way-603965173",
-      "osmElementType": "way",
-      "name": "國枝タンス",
-      "wardId": "higashinari",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"国枝タンス\""
-    },
-    {
-      "facilityId": "osm-way-1031913878",
-      "osmElementType": "way",
-      "name": "C&Cエンド",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1031914519",
-      "osmElementType": "way",
-      "name": "セルフのフルセ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 4926,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4926m）"
-    },
-    {
-      "facilityId": "osm-way-1111680716",
-      "osmElementType": "way",
-      "name": "春日自動車(株)",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"春日自動車 新今里工場\""
-    },
-    {
-      "facilityId": "osm-way-1115699789",
-      "osmElementType": "way",
-      "name": "辻井時計店",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1187787917",
-      "osmElementType": "way",
-      "name": "セブン-イレブン",
-      "wardId": "ikuno",
+      "name": "ダイソー",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 9,
       "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1537904679",
+      "facilityId": "osm-way-1258054716",
       "osmElementType": "way",
-      "name": "煮込み　ほくほく",
-      "wardId": "ikuno",
+      "name": "ファミリーマート",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1537904918",
-      "osmElementType": "way",
-      "name": "居酒屋　みのり",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-277766061",
-      "osmElementType": "way",
-      "name": "三鶴航空",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-300728124",
-      "osmElementType": "way",
-      "name": "家具の ヤママン",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"家具の新品アウトレット digヤママン生野本店\""
-    },
-    {
-      "facilityId": "osm-way-307312200",
-      "osmElementType": "way",
-      "name": "ビックカメラ×コジマ",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-307312205",
-      "osmElementType": "way",
-      "name": "カローラ 浪速 生野店",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"大阪トヨペット 生野巽店\""
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-307400001",
+      "facilityId": "osm-way-1274625206",
       "osmElementType": "way",
-      "name": "タイヤガーデン勝山",
-      "wardId": "ikuno",
+      "name": "ローソン",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-310498973",
+      "facilityId": "osm-way-1286745960",
       "osmElementType": "way",
-      "name": "センナリスポーツ",
-      "wardId": "ikuno",
+      "name": "ローソン",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-353864627",
+      "facilityId": "osm-way-148711205",
       "osmElementType": "way",
-      "name": "ユニクロ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-355248223",
-      "osmElementType": "way",
-      "name": "クスリのキリン堂",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 10,
-      "reason": "座標は近い(10m)が名前が一致しない: \"キリン堂 たつみ店\""
-    },
-    {
-      "facilityId": "osm-way-355252250",
-      "osmElementType": "way",
-      "name": "セカンドストリート",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 17,
-      "reason": "座標(17m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-355279305",
-      "osmElementType": "way",
-      "name": "万代",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 12,
-      "reason": "座標は近い(12m)が名前が一致しない: \"万代 巽北店\""
-    },
-    {
-      "facilityId": "osm-way-356591464",
-      "osmElementType": "way",
-      "name": "北巽ラッキーステーション",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"宝くじ\""
-    },
-    {
-      "facilityId": "osm-way-357417226",
-      "osmElementType": "way",
-      "name": "三晃自動車",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1535,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1535m）"
-    },
-    {
-      "facilityId": "osm-way-357417234",
-      "osmElementType": "way",
-      "name": "井狼自動車",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"井浪自動車\""
-    },
-    {
-      "facilityId": "osm-way-357505673",
-      "osmElementType": "way",
-      "name": "アプロ",
-      "wardId": "ikuno",
+      "name": "おおさかパルコープ",
+      "wardId": "joto",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
       "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-way-358191928",
+      "facilityId": "osm-way-247778793",
       "osmElementType": "way",
-      "name": "にしぐち",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
+      "name": "オリジン弁当",
+      "wardId": "joto",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 594,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 594m）"
     },
     {
-      "facilityId": "osm-way-358504200",
+      "facilityId": "osm-way-260555129",
       "osmElementType": "way",
-      "name": "生野ジャパン",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"ジャパン 生野店\""
-    },
-    {
-      "facilityId": "osm-way-358600521",
-      "osmElementType": "way",
-      "name": "髪工房Kuu",
-      "wardId": "ikuno",
+      "name": "山本商店",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 7,
       "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-358601581",
+      "facilityId": "osm-way-260693341",
       "osmElementType": "way",
-      "name": "いぬい鍼灸整骨院",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-359177849",
-      "osmElementType": "way",
-      "name": "眼鏡市場",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-359371215",
-      "osmElementType": "way",
-      "name": "パン工房ケルン",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"ケルン Handmade Bakery\""
-    },
-    {
-      "facilityId": "osm-way-359602552",
-      "osmElementType": "way",
-      "name": "はるやま",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-359602553",
-      "osmElementType": "way",
-      "name": "ワッツ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 18,
-      "reason": "座標(18m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-359834688",
-      "osmElementType": "way",
-      "name": "山水花",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-360342795",
-      "osmElementType": "way",
-      "name": "MOTOR WORKS",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 0,
-      "reason": "座標は近い(0m)が名前が一致しない: \"モーターワークス\""
-    },
-    {
-      "facilityId": "osm-way-360726012",
-      "osmElementType": "way",
-      "name": "アルファ",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-361100253",
-      "osmElementType": "way",
-      "name": "宮崎電気商会",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-361123547",
-      "osmElementType": "way",
-      "name": "JACK",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3551,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3551m）"
-    },
-    {
-      "facilityId": "osm-way-361123548",
-      "osmElementType": "way",
-      "name": "ヤラカスモータース",
-      "wardId": "ikuno",
+      "name": "エース",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2,
       "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-361138563",
+      "facilityId": "osm-way-260740957",
+      "osmElementType": "way",
+      "name": "MAEDA",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"前田美容室\""
+    },
+    {
+      "facilityId": "osm-way-262975400",
+      "osmElementType": "way",
+      "name": "ファミリーマート",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-294947442",
+      "osmElementType": "way",
+      "name": "ファミリーマート",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-384463061",
+      "osmElementType": "way",
+      "name": "ローソン",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-384994945",
+      "osmElementType": "way",
+      "name": "メルセデス・ベンツ 森ノ宮",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-387734623",
+      "osmElementType": "way",
+      "name": "コーナンPRO関目店",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388839487",
       "osmElementType": "way",
       "name": "セブン-イレブン",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 23,
-      "reason": "座標(23m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-361138568",
-      "osmElementType": "way",
-      "name": "ガップン",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-361354843",
-      "osmElementType": "way",
-      "name": "生野大阪祭典",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 7,
-      "reason": "座標は近い(7m)が名前が一致しない: \"大阪祭典 生野ファミリーホール\""
-    },
-    {
-      "facilityId": "osm-way-361369620",
-      "osmElementType": "way",
-      "name": "ひか製菓",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"ひかり製菓\""
-    },
-    {
-      "facilityId": "osm-way-362193712",
-      "osmElementType": "way",
-      "name": "DOG SALON guu",
-      "wardId": "ikuno",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-362208633",
+      "facilityId": "osm-way-389115343",
       "osmElementType": "way",
-      "name": "アトム電気",
-      "wardId": "ikuno",
+      "name": "ヤマダ電機",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 10,
+      "reason": "座標は近い(10m)が名前が一致しない: \"ヤマダデンキ テックランド今福東店\""
+    },
+    {
+      "facilityId": "osm-way-477080545",
+      "osmElementType": "way",
+      "name": "アプロ",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-477121231",
+      "osmElementType": "way",
+      "name": "ローソン 関目四丁目店",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-478266801",
+      "osmElementType": "way",
+      "name": "オリジン弁当",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 7,
+      "reason": "座標は近い(7m)が名前が一致しない: \"キッチンオリジン 関目店\""
+    },
+    {
+      "facilityId": "osm-way-482818203",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-484155830",
+      "osmElementType": "way",
+      "name": "サンクス",
+      "wardId": "joto",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 523,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 523m）"
+    },
+    {
+      "facilityId": "osm-way-484157195",
+      "osmElementType": "way",
+      "name": "スギドラッグ",
+      "wardId": "joto",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"アトム電器 たつみ店\""
+      "reason": "座標は近い(2m)が名前が一致しない: \"スギ薬局 城東古市店\""
     },
     {
-      "facilityId": "osm-way-362361999",
+      "facilityId": "osm-way-484157199",
       "osmElementType": "way",
-      "name": "電材本舗テック",
-      "wardId": "ikuno",
+      "name": "セブン-イレブン",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-637109015",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-781480517",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 3,
       "reason": "座標(3m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-362362539",
+      "facilityId": "osm-way-1131868398",
       "osmElementType": "way",
-      "name": "フタバクリーニング巽東店",
-      "wardId": "ikuno",
+      "name": "エンディングハウス 大阪鶴見",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-362362747",
-      "osmElementType": "way",
-      "name": "双葉電器ショップ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 19,
-      "reason": "座標(19m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-362363353",
-      "osmElementType": "way",
-      "name": "Yellow Hat",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"イエローハット 生野巽中店\""
+      "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-363456614",
+      "facilityId": "osm-way-1132102986",
       "osmElementType": "way",
-      "name": "ますや",
-      "wardId": "ikuno",
+      "name": "セブン-イレブン",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1338784737",
+      "osmElementType": "way",
+      "name": "アルペン アウトドアーズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-325678569",
+      "osmElementType": "way",
+      "name": "よしや放出店",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 295,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 295m）"
+    },
+    {
+      "facilityId": "osm-way-333934409",
+      "osmElementType": "way",
+      "name": "ジョーシン",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-425249466",
+      "osmElementType": "way",
+      "name": "スーパーサンコー",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 31,
+      "reason": "座標(31m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-478532182",
+      "osmElementType": "way",
+      "name": "ローソン",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-99976462",
+      "osmElementType": "way",
+      "name": "三井 アウトレット パーク 大阪鶴見",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1078938295",
+      "osmElementType": "way",
+      "name": "ローソン",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172358726",
+      "osmElementType": "way",
+      "name": "ニトリ",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-232504678",
+      "osmElementType": "way",
+      "name": "あべのキューズタウン",
+      "wardId": "abeno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 128,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 128m）"
+    },
+    {
+      "facilityId": "osm-way-255791159",
+      "osmElementType": "way",
+      "name": "洋服の青山",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-290276961",
+      "osmElementType": "way",
+      "name": "万代",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-317135622",
+      "osmElementType": "way",
+      "name": "ライフ",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317135929",
+      "osmElementType": "way",
+      "name": "スギ薬局",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 24,
+      "reason": "座標(24m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317137588",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317296622",
+      "osmElementType": "way",
+      "name": "サンディ",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-388412457",
+      "osmElementType": "way",
+      "name": "ビアンシュール",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388877193",
+      "osmElementType": "way",
+      "name": "かめいでんき",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-389119443",
+      "osmElementType": "way",
+      "name": "ネッツトヨタ大阪",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-400378680",
+      "osmElementType": "way",
+      "name": "大阪スバル帝塚山",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 17,
+      "reason": "座標は近い(17m)が名前が一致しない: \"スバル近畿 帝塚山店\""
+    },
+    {
+      "facilityId": "osm-way-421414557",
+      "osmElementType": "way",
+      "name": "梶谷商店",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-455198655",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-491892333",
+      "osmElementType": "way",
+      "name": "寺田屋酒店",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"寺田屋商店\""
+    },
+    {
+      "facilityId": "osm-way-493919031",
+      "osmElementType": "way",
+      "name": "中山家具",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-568023510",
+      "osmElementType": "way",
+      "name": "セントラルスクエア",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-580695417",
+      "osmElementType": "way",
+      "name": "米田酒本店",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-581751720",
+      "osmElementType": "way",
+      "name": "Liberte",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-583901592",
+      "osmElementType": "way",
+      "name": "阪田鮮魚店",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-648148143",
+      "osmElementType": "way",
+      "name": "スギ薬局",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-654472974",
+      "osmElementType": "way",
+      "name": "チケットスーパー",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-739738008",
+      "osmElementType": "way",
+      "name": "デイリーカナート",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-951906230",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1029554610",
+      "osmElementType": "way",
+      "name": "アジア太平洋トレードセンター",
+      "wardId": "suminoe",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 181,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 181m）"
+    },
+    {
+      "facilityId": "osm-way-1255477305",
+      "osmElementType": "way",
+      "name": "ダイワサイクル",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 27,
+      "reason": "座標(27m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1255901988",
+      "osmElementType": "way",
+      "name": "株式会社ニシキ商会",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"（株）ニシキ商会\""
+    },
+    {
+      "facilityId": "osm-way-1255902063",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-1362542551",
+      "osmElementType": "way",
+      "name": "ライフ",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1362794340",
+      "osmElementType": "way",
+      "name": "YMS",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1362794356",
+      "osmElementType": "way",
+      "name": "Honda Cars 大阪南",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 20,
+      "reason": "座標(20m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-298298015",
+      "osmElementType": "way",
+      "name": "ローソン",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-298298031",
+      "osmElementType": "way",
+      "name": "ロイヤルプロ",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-377576012",
+      "osmElementType": "way",
+      "name": "ロピア",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-461656227",
+      "osmElementType": "way",
+      "name": "マグスミノエ",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-461656241",
+      "osmElementType": "way",
+      "name": "ヤマダ電機テックランド",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"ヤマダデンキ テックランド大阪住之江店\""
+    },
+    {
+      "facilityId": "osm-way-462709367",
+      "osmElementType": "way",
+      "name": "ダイエー",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-462709408",
+      "osmElementType": "way",
+      "name": "アップガレージ",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-490705406",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"セブンイレブン 大阪南港中８丁目店\""
+    },
+    {
+      "facilityId": "osm-way-624907244",
+      "osmElementType": "way",
+      "name": "ファミリーマート",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-630068724",
+      "osmElementType": "way",
+      "name": "ファミリーマート",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-630383185",
+      "osmElementType": "way",
+      "name": "ローソン",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
+    },
+    {
+      "facilityId": "osm-way-632677856",
+      "osmElementType": "way",
+      "name": "中央卸売市場南港市場",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 33,
+      "reason": "座標は近い(33m)が名前が一致しない: \"大阪市食肉市場株式会社\""
+    },
+    {
+      "facilityId": "osm-way-869097277",
+      "osmElementType": "way",
+      "name": "シャトレーゼ",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-891438092",
+      "osmElementType": "way",
+      "name": "岩崎自動車工業株式会社",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-891438179",
+      "osmElementType": "way",
+      "name": "セブン-イレブン",
+      "wardId": "suminoe",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2,
       "reason": "座標(2m以内)と名前が一致"
