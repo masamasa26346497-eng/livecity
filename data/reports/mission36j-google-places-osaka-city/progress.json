@@ -15241,22 +15241,1842 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
       "attemptedAt": "2026-10-04T09:13:49.449Z"
+    },
+    {
+      "facilityId": "osm-way-172362054",
+      "name": "桃山学院中学校・桃山学院高等学校",
+      "wardId": "abeno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(73m)が名前が一致しない: \"桃山学院中学校高等学校\"",
+      "attemptedAt": "2026-10-04T09:14:29.430Z"
+    },
+    {
+      "facilityId": "osm-way-371506662",
+      "name": "三井住友銀行",
+      "wardId": "abeno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:14:46.413Z"
+    },
+    {
+      "facilityId": "osm-way-388412368",
+      "name": "日本政策金融公庫",
+      "wardId": "abeno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:14:51.324Z"
+    },
+    {
+      "facilityId": "osm-way-388882837",
+      "name": "三井住友銀行",
+      "wardId": "abeno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:14:56.222Z"
+    },
+    {
+      "facilityId": "osm-way-1030556021",
+      "name": "大阪神愛館グレース保育園",
+      "wardId": "suminoe",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"グレースこども園\"",
+      "attemptedAt": "2026-10-04T09:15:08.597Z"
+    },
+    {
+      "facilityId": "osm-way-172710594",
+      "name": "住之江養護学校",
+      "wardId": "suminoe",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"大阪府立住之江支援学校\"",
+      "attemptedAt": "2026-10-04T09:15:26.986Z"
+    },
+    {
+      "facilityId": "osm-way-493545023",
+      "name": "南港ポートタウン西警察官立寄署",
+      "wardId": "suminoe",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 159m）",
+      "attemptedAt": "2026-10-04T09:15:49.089Z"
+    },
+    {
+      "facilityId": "osm-relation-9730850",
+      "name": "大阪公立大学 杉本キャンパス",
+      "wardId": "sumiyoshi",
+      "category": "education",
+      "subcategory": "university",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 200m）",
+      "attemptedAt": "2026-10-04T09:16:01.300Z"
+    },
+    {
+      "facilityId": "osm-way-109650028",
+      "name": "帝塚山学院",
+      "wardId": "sumiyoshi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:16:08.524Z"
+    },
+    {
+      "facilityId": "osm-way-1109020271",
+      "name": "遠里小野老人憩の家",
+      "wardId": "sumiyoshi",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"遠里小野老人憩いの家\"",
+      "attemptedAt": "2026-10-04T09:16:13.566Z"
+    },
+    {
+      "facilityId": "osm-way-389000731",
+      "name": "大阪府主要警察署　我孫子交番",
+      "wardId": "sumiyoshi",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:16:52.687Z"
+    },
+    {
+      "facilityId": "osm-relation-17480035",
+      "name": "大阪城南女子短期大学",
+      "wardId": "higashisumiyoshi",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 202m）",
+      "attemptedAt": "2026-10-04T09:16:57.710Z"
+    },
+    {
+      "facilityId": "osm-relation-17480761",
+      "name": "大阪芸術大学短期大学部(大阪キャンパス)",
+      "wardId": "higashisumiyoshi",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(23m)が名前が一致しない: \"2号館\"",
+      "attemptedAt": "2026-10-04T09:16:58.893Z"
+    },
+    {
+      "facilityId": "osm-way-1187621774",
+      "name": "のぞみ信用組合",
+      "wardId": "higashisumiyoshi",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2290m）",
+      "attemptedAt": "2026-10-04T09:17:02.601Z"
+    },
+    {
+      "facilityId": "osm-way-160552850",
+      "name": "城南学院幼稚園・小学校",
+      "wardId": "higashisumiyoshi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:17:24.544Z"
+    },
+    {
+      "facilityId": "osm-way-160553311",
+      "name": "市立やたなか小中一貫校",
+      "wardId": "higashisumiyoshi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(81m)が名前が一致しない: \"やたなか小中一貫校（大阪市立矢田小学校、大阪市立矢田南中学校）\"",
+      "attemptedAt": "2026-10-04T09:17:27.152Z"
+    },
+    {
+      "facilityId": "osm-way-317307833",
+      "name": "近畿大阪銀行",
+      "wardId": "higashisumiyoshi",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:17:35.565Z"
+    },
+    {
+      "facilityId": "osm-way-317308040",
+      "name": "東京三菱UFJ銀行",
+      "wardId": "higashisumiyoshi",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:17:40.466Z"
+    },
+    {
+      "facilityId": "osm-relation-17480036",
+      "name": "常磐会学園大学",
+      "wardId": "hirano",
+      "category": "education",
+      "subcategory": "university",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(24m)が名前が一致しない: \"大阪常磐会大学\"",
+      "attemptedAt": "2026-10-04T09:17:44.263Z"
+    },
+    {
+      "facilityId": "osm-way-1137518850",
+      "name": "平野警察署瓜破警ら連絡所",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(0m)が名前が一致しない: \"平野警察署 瓜破交番\"",
+      "attemptedAt": "2026-10-04T09:17:46.786Z"
+    },
+    {
+      "facilityId": "osm-way-1196357780",
+      "name": "三井住友銀行平野店",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 640m）",
+      "attemptedAt": "2026-10-04T09:17:47.973Z"
+    },
+    {
+      "facilityId": "osm-way-1196357781",
+      "name": "みずほ銀行平野店",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"みずほ銀行 平野支店\"",
+      "attemptedAt": "2026-10-04T09:17:49.185Z"
+    },
+    {
+      "facilityId": "osm-way-1266654429",
+      "name": "平野加美北郵便局",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "post_office",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 171m）",
+      "attemptedAt": "2026-10-04T09:17:55.329Z"
+    },
+    {
+      "facilityId": "osm-way-1351539583",
+      "name": "大阪信用金庫平野本町支店",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 531m）",
+      "attemptedAt": "2026-10-04T09:18:18.616Z"
+    },
+    {
+      "facilityId": "osm-way-160455933",
+      "name": "大阪市平野下水処理場",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"大阪市建設局 平野下水処理場\"",
+      "attemptedAt": "2026-10-04T09:18:23.505Z"
+    },
+    {
+      "facilityId": "osm-way-388997503",
+      "name": "関西みらい銀行",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:19:19.661Z"
+    },
+    {
+      "facilityId": "osm-way-413161097",
+      "name": "大阪府警察平野警察署",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"大阪府 平野警察署\"",
+      "attemptedAt": "2026-10-04T09:19:23.495Z"
+    },
+    {
+      "facilityId": "osm-way-525663042",
+      "name": "近畿産業信用組合",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2326m）",
+      "attemptedAt": "2026-10-04T09:19:25.913Z"
+    },
+    {
+      "facilityId": "osm-way-742092533",
+      "name": "三菱UFJ銀行",
+      "wardId": "hirano",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:19:31.917Z"
+    },
+    {
+      "facilityId": "osm-way-1422595431",
+      "name": "大阪市立松通保育所",
+      "wardId": "nishinari",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 450m）",
+      "attemptedAt": "2026-10-04T09:19:38.199Z"
+    },
+    {
+      "facilityId": "osm-way-462897489",
+      "name": "市立松之宮小学校",
+      "wardId": "nishinari",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 267m）",
+      "attemptedAt": "2026-10-04T09:20:07.643Z"
+    },
+    {
+      "facilityId": "osm-way-780927051",
+      "name": "三菱UFJ銀行",
+      "wardId": "nishinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:20:12.352Z"
+    },
+    {
+      "facilityId": "osm-relation-21081818",
+      "name": "堂島エリア【西3】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:20:19.695Z"
+    },
+    {
+      "facilityId": "osm-relation-21081819",
+      "name": "堂島エリア【東3B】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(84m)が名前が一致しない: \"ダイソー ドーチカ店\"",
+      "attemptedAt": "2026-10-04T09:20:21.079Z"
+    },
+    {
+      "facilityId": "osm-relation-21081820",
+      "name": "堂島エリア【東3A】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(116m)が名前が一致しない: \"堂島アバンザ\"",
+      "attemptedAt": "2026-10-04T09:20:22.290Z"
+    },
+    {
+      "facilityId": "osm-relation-21081821",
+      "name": "堂島エリア【東2】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:20:27.051Z"
+    },
+    {
+      "facilityId": "osm-relation-21081822",
+      "name": "堂島エリア【東1】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:20:31.960Z"
+    },
+    {
+      "facilityId": "osm-way-1038591916",
+      "name": "こどもの森 利用者専用駐輪場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(32m)が名前が一致しない: \"こども本の森 中之島\"",
+      "attemptedAt": "2026-10-04T09:20:34.536Z"
+    },
+    {
+      "facilityId": "osm-way-1041575002",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:20:38.069Z"
+    },
+    {
+      "facilityId": "osm-way-1041591752",
+      "name": "バス専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(80m)が名前が一致しない: \"WILLERバスターミナル大阪梅田\"",
+      "attemptedAt": "2026-10-04T09:20:39.552Z"
+    },
+    {
+      "facilityId": "osm-way-1184587399",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:20:44.200Z"
+    },
+    {
+      "facilityId": "osm-way-1184784240",
+      "name": "ワールドパーク中崎西",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 217m）",
+      "attemptedAt": "2026-10-04T09:20:46.765Z"
+    },
+    {
+      "facilityId": "osm-way-1184784249",
+      "name": "鶴野町パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:20:50.331Z"
+    },
+    {
+      "facilityId": "osm-way-1184823691",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 151m）",
+      "attemptedAt": "2026-10-04T09:20:51.685Z"
+    },
+    {
+      "facilityId": "osm-way-1184832080",
+      "name": "パーククイーン",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"中崎町駅前パーキング\"",
+      "attemptedAt": "2026-10-04T09:20:54.131Z"
+    },
+    {
+      "facilityId": "osm-way-1184948990",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:20:57.681Z"
+    },
+    {
+      "facilityId": "osm-way-1185037835",
+      "name": "金森モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 554m）",
+      "attemptedAt": "2026-10-04T09:20:59.134Z"
+    },
+    {
+      "facilityId": "osm-way-1214816170",
+      "name": "タイムパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 378m）",
+      "attemptedAt": "2026-10-04T09:21:01.491Z"
+    },
+    {
+      "facilityId": "osm-way-1262580353",
+      "name": "ECOPOOL OAPタワー定期駐輪場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:21:14.838Z"
+    },
+    {
+      "facilityId": "osm-way-1314644478",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:21:18.511Z"
+    },
+    {
+      "facilityId": "osm-way-1314660472",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:22.189Z"
+    },
+    {
+      "facilityId": "osm-way-1314660478",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:23.502Z"
+    },
+    {
+      "facilityId": "osm-way-1319231166",
+      "name": "堂島エリア【渡辺橋南詰交差点南東】24H自転車専用駐輪場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:24.809Z"
+    },
+    {
+      "facilityId": "osm-way-1347368429",
+      "name": "BooBooPARK",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ブーブーパーク 中津5丁目第2\"",
+      "attemptedAt": "2026-10-04T09:21:27.337Z"
+    },
+    {
+      "facilityId": "osm-way-1349182681",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:29.672Z"
+    },
+    {
+      "facilityId": "osm-way-1368706371",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 145m）",
+      "attemptedAt": "2026-10-04T09:21:30.887Z"
+    },
+    {
+      "facilityId": "osm-way-1375609835",
+      "name": "タクシー待機場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(26m)が名前が一致しない: \"JR大阪駅タクシー乗り場\"",
+      "attemptedAt": "2026-10-04T09:21:32.114Z"
+    },
+    {
+      "facilityId": "osm-way-1383491790",
+      "name": "天神橋筋六丁目駅自転車駐車場 定期利用V1ブロック",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 155m）",
+      "attemptedAt": "2026-10-04T09:21:33.363Z"
+    },
+    {
+      "facilityId": "osm-way-1383491791",
+      "name": "天神橋筋六丁目駅自転車駐車場 定期利用V2ブロック",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T09:21:34.585Z"
+    },
+    {
+      "facilityId": "osm-way-1383491792",
+      "name": "天神橋筋六丁目駅自転車駐車場 定期利用V3ブロック",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 135m）",
+      "attemptedAt": "2026-10-04T09:21:35.783Z"
+    },
+    {
+      "facilityId": "osm-way-1414249333",
+      "name": "エコロパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:39.454Z"
+    },
+    {
+      "facilityId": "osm-way-1437155827",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:21:44.363Z"
+    },
+    {
+      "facilityId": "osm-way-1452795149",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:03.761Z"
+    },
+    {
+      "facilityId": "osm-way-1452795151",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:07.433Z"
+    },
+    {
+      "facilityId": "osm-way-1485372962",
+      "name": "井上パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(33m)が名前が一致しない: \"井上モータープール\"",
+      "attemptedAt": "2026-10-04T09:22:11.493Z"
+    },
+    {
+      "facilityId": "osm-way-1498787709",
+      "name": "COIN PARK",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 359m）",
+      "attemptedAt": "2026-10-04T09:22:12.497Z"
+    },
+    {
+      "facilityId": "osm-way-1536854455",
+      "name": "桜橋エリア【南1】24時間自転車専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(99m)が名前が一致しない: \"くるっとパークキタエリア１１A\"",
+      "attemptedAt": "2026-10-04T09:22:14.956Z"
+    },
+    {
+      "facilityId": "osm-way-1556400892",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:25.846Z"
+    },
+    {
+      "facilityId": "osm-way-1557634742",
+      "name": "コインパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"COIN PARK 堂島3丁目\"",
+      "attemptedAt": "2026-10-04T09:22:27.182Z"
+    },
+    {
+      "facilityId": "osm-way-1563196861",
+      "name": "STAR PARK",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6407m）",
+      "attemptedAt": "2026-10-04T09:22:28.420Z"
+    },
+    {
+      "facilityId": "osm-way-161549563",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:31.964Z"
+    },
+    {
+      "facilityId": "osm-way-162158416",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:38.093Z"
+    },
+    {
+      "facilityId": "osm-way-162181473",
+      "name": "中津モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:22:41.778Z"
+    },
+    {
+      "facilityId": "osm-way-174574468",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:22:49.119Z"
+    },
+    {
+      "facilityId": "osm-way-174574506",
+      "name": "協立モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 146m）",
+      "attemptedAt": "2026-10-04T09:22:50.476Z"
+    },
+    {
+      "facilityId": "osm-way-174616878",
+      "name": "ワンパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:22:55.243Z"
+    },
+    {
+      "facilityId": "osm-way-174638629",
+      "name": "パークネット",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:23:03.822Z"
+    },
+    {
+      "facilityId": "osm-way-175438322",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:23:09.948Z"
+    },
+    {
+      "facilityId": "osm-way-175449258",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:23:14.843Z"
+    },
+    {
+      "facilityId": "osm-way-175522558",
+      "name": "コインパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:23:20.968Z"
+    },
+    {
+      "facilityId": "osm-way-175679070",
+      "name": "パーククイーン",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"中崎町駅前パーキング\"",
+      "attemptedAt": "2026-10-04T09:23:23.495Z"
+    },
+    {
+      "facilityId": "osm-way-175681198",
+      "name": "柳生モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 462m）",
+      "attemptedAt": "2026-10-04T09:23:24.797Z"
+    },
+    {
+      "facilityId": "osm-way-175684235",
+      "name": "モータープール天ろくロッチ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 320m）",
+      "attemptedAt": "2026-10-04T09:23:25.986Z"
+    },
+    {
+      "facilityId": "osm-way-175698909",
+      "name": "システムパーク本庄東",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:27.240Z"
+    },
+    {
+      "facilityId": "osm-way-175698910",
+      "name": "モータープール首藤",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 258m）",
+      "attemptedAt": "2026-10-04T09:23:28.466Z"
+    },
+    {
+      "facilityId": "osm-way-175698911",
+      "name": "三井のリパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:29.696Z"
+    },
+    {
+      "facilityId": "osm-way-176156645",
+      "name": "大阪黒崎町 No6162",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:35.801Z"
+    },
+    {
+      "facilityId": "osm-way-178917954",
+      "name": "TYパーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 438m）",
+      "attemptedAt": "2026-10-04T09:23:37.031Z"
+    },
+    {
+      "facilityId": "osm-way-178924527",
+      "name": "スペース24",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"スペース 大阪浪花町第１\"",
+      "attemptedAt": "2026-10-04T09:23:39.482Z"
+    },
+    {
+      "facilityId": "osm-way-178938130",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:40.693Z"
+    },
+    {
+      "facilityId": "osm-way-178942530",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:41.871Z"
+    },
+    {
+      "facilityId": "osm-way-179071386",
+      "name": "KTVパーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:45.615Z"
+    },
+    {
+      "facilityId": "osm-way-179071468",
+      "name": "Times",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:46.863Z"
+    },
+    {
+      "facilityId": "osm-way-179074627",
+      "name": "綿笠モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"絹笠モータープール\"",
+      "attemptedAt": "2026-10-04T09:23:51.740Z"
+    },
+    {
+      "facilityId": "osm-way-180190451",
+      "name": "モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 7247m）",
+      "attemptedAt": "2026-10-04T09:23:56.650Z"
+    },
+    {
+      "facilityId": "osm-way-180203191",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:23:57.992Z"
+    },
+    {
+      "facilityId": "osm-way-181395055",
+      "name": "パークファースト天七",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:01.634Z"
+    },
+    {
+      "facilityId": "osm-way-185278088",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:02.723Z"
+    },
+    {
+      "facilityId": "osm-way-185278105",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:03.972Z"
+    },
+    {
+      "facilityId": "osm-way-185278150",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:06.381Z"
+    },
+    {
+      "facilityId": "osm-way-192185070",
+      "name": "テクニカルパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3201m）",
+      "attemptedAt": "2026-10-04T09:24:07.644Z"
+    },
+    {
+      "facilityId": "osm-way-193640317",
+      "name": "片山ガレージ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 40026m）",
+      "attemptedAt": "2026-10-04T09:24:10.084Z"
+    },
+    {
+      "facilityId": "osm-way-194739447",
+      "name": "タイムパーク紅梅町",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"タイムパーク紅梅 駐車場\"",
+      "attemptedAt": "2026-10-04T09:24:13.767Z"
+    },
+    {
+      "facilityId": "osm-way-195056474",
+      "name": "GSパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 176m）",
+      "attemptedAt": "2026-10-04T09:24:14.984Z"
+    },
+    {
+      "facilityId": "osm-way-198410756",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:17.451Z"
+    },
+    {
+      "facilityId": "osm-way-214145105",
+      "name": "西光モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4189m）",
+      "attemptedAt": "2026-10-04T09:24:18.701Z"
+    },
+    {
+      "facilityId": "osm-way-219481973",
+      "name": "ワンパーク本庄東",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 130m）",
+      "attemptedAt": "2026-10-04T09:24:20.035Z"
+    },
+    {
+      "facilityId": "osm-way-219864853",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 181m）",
+      "attemptedAt": "2026-10-04T09:24:21.127Z"
+    },
+    {
+      "facilityId": "osm-way-219881480",
+      "name": "タイムズ天六第七",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:22.397Z"
+    },
+    {
+      "facilityId": "osm-way-219894949",
+      "name": "ワンパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ONE PARK天神橋5丁目\"",
+      "attemptedAt": "2026-10-04T09:24:26.022Z"
+    },
+    {
+      "facilityId": "osm-way-220229612",
+      "name": "オリックスカーシェアリング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"オリックスカーシェア 阪急梅田駅前\"",
+      "attemptedAt": "2026-10-04T09:24:27.269Z"
+    },
+    {
+      "facilityId": "osm-way-220966461",
+      "name": "NPC",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 752m）",
+      "attemptedAt": "2026-10-04T09:24:28.487Z"
+    },
+    {
+      "facilityId": "osm-way-221064087",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:29.696Z"
+    },
+    {
+      "facilityId": "osm-way-221354480",
+      "name": "豊崎モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(109m)が名前が一致しない: \"永野モータープール\"",
+      "attemptedAt": "2026-10-04T09:24:30.964Z"
+    },
+    {
+      "facilityId": "osm-way-221998334",
+      "name": "松永パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 16696m）",
+      "attemptedAt": "2026-10-04T09:24:33.391Z"
+    },
+    {
+      "facilityId": "osm-way-221998335",
+      "name": "TOMO パーキング 天神橋",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"トモパーキング 天神橋\"",
+      "attemptedAt": "2026-10-04T09:24:34.565Z"
+    },
+    {
+      "facilityId": "osm-way-222064910",
+      "name": "相互タクシー北新地のりば",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "taxi",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"相互タクシー 北新地乗り場\"",
+      "attemptedAt": "2026-10-04T09:24:35.848Z"
+    },
+    {
+      "facilityId": "osm-way-222074913",
+      "name": "同心町駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:37.096Z"
+    },
+    {
+      "facilityId": "osm-way-222711594",
+      "name": "中津 駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:24:38.287Z"
+    },
+    {
+      "facilityId": "osm-way-222719733",
+      "name": "辻モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 124m）",
+      "attemptedAt": "2026-10-04T09:24:55.435Z"
+    },
+    {
+      "facilityId": "osm-way-222719734",
+      "name": "旭モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1275m）",
+      "attemptedAt": "2026-10-04T09:24:56.627Z"
+    },
+    {
+      "facilityId": "osm-way-223077208",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:25:03.853Z"
+    },
+    {
+      "facilityId": "osm-way-223088977",
+      "name": "三井のリパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:25:08.749Z"
+    },
+    {
+      "facilityId": "osm-way-225431290",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 125m）",
+      "attemptedAt": "2026-10-04T09:25:17.528Z"
+    },
+    {
+      "facilityId": "osm-way-225572389",
+      "name": "サ・パーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 554m）",
+      "attemptedAt": "2026-10-04T09:25:18.707Z"
+    },
+    {
+      "facilityId": "osm-way-225873486",
+      "name": "三井のリパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 241m）",
+      "attemptedAt": "2026-10-04T09:25:21.106Z"
+    },
+    {
+      "facilityId": "osm-way-226005164",
+      "name": "江上歯科専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:25:30.805Z"
+    },
+    {
+      "facilityId": "osm-way-226005172",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:25:35.710Z"
+    },
+    {
+      "facilityId": "osm-way-226318122",
+      "name": "パークジャパン",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:25:40.610Z"
+    },
+    {
+      "facilityId": "osm-way-226442905",
+      "name": "BooBooPARK 松ヶ枝町第２駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"ブーブーパーク 松ヶ枝町２\"",
+      "attemptedAt": "2026-10-04T09:25:44.408Z"
+    },
+    {
+      "facilityId": "osm-way-226641558",
+      "name": "Paraca",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"パラカ 西天満第7\"",
+      "attemptedAt": "2026-10-04T09:25:46.868Z"
+    },
+    {
+      "facilityId": "osm-way-226783232",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:25:55.307Z"
+    },
+    {
+      "facilityId": "osm-way-226997127",
+      "name": "エコロパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 134m）",
+      "attemptedAt": "2026-10-04T09:25:56.649Z"
+    },
+    {
+      "facilityId": "osm-way-227144358",
+      "name": "中津共栄パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 170m）",
+      "attemptedAt": "2026-10-04T09:25:57.892Z"
+    },
+    {
+      "facilityId": "osm-way-228077189",
+      "name": "浜四モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(72m)が名前が一致しない: \"沼澤モータープール\"",
+      "attemptedAt": "2026-10-04T09:26:01.598Z"
+    },
+    {
+      "facilityId": "osm-way-228515570",
+      "name": "GS Park",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 221m）",
+      "attemptedAt": "2026-10-04T09:26:02.797Z"
+    },
+    {
+      "facilityId": "osm-way-228515578",
+      "name": "TOYO CAR MAX",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"東洋カーマックス 大淀中駐車場\"",
+      "attemptedAt": "2026-10-04T09:26:04.040Z"
+    },
+    {
+      "facilityId": "osm-way-229031874",
+      "name": "Times",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:26:08.788Z"
+    },
+    {
+      "facilityId": "osm-way-229031878",
+      "name": "三井のリパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 155m）",
+      "attemptedAt": "2026-10-04T09:26:10.126Z"
+    },
+    {
+      "facilityId": "osm-way-229297819",
+      "name": "BePark",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3942m）",
+      "attemptedAt": "2026-10-04T09:26:11.338Z"
+    },
+    {
+      "facilityId": "osm-way-229735632",
+      "name": "CENTURY PARK",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8757m）",
+      "attemptedAt": "2026-10-04T09:26:12.613Z"
+    },
+    {
+      "facilityId": "osm-way-231224877",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:26:18.587Z"
+    },
+    {
+      "facilityId": "osm-way-231431570",
+      "name": "エコロパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:26:23.489Z"
+    },
+    {
+      "facilityId": "osm-way-231431571",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:26:24.822Z"
+    },
+    {
+      "facilityId": "osm-way-231431572",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 121m）",
+      "attemptedAt": "2026-10-04T09:26:26.057Z"
+    },
+    {
+      "facilityId": "osm-way-231431573",
+      "name": "三井のリパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 269m）",
+      "attemptedAt": "2026-10-04T09:26:27.270Z"
+    },
+    {
+      "facilityId": "osm-way-231449218",
+      "name": "GSパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:26:29.747Z"
+    },
+    {
+      "facilityId": "osm-way-231514769",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 152m）",
+      "attemptedAt": "2026-10-04T09:26:30.956Z"
+    },
+    {
+      "facilityId": "osm-way-231529694",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:26:32.172Z"
+    },
+    {
+      "facilityId": "osm-way-231828897",
+      "name": "滝川モータープール",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(104m)が名前が一致しない: \"滝川公園\"",
+      "attemptedAt": "2026-10-04T09:26:33.415Z"
+    },
+    {
+      "facilityId": "osm-way-232596534",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:26:34.612Z"
+    },
+    {
+      "facilityId": "osm-way-232596624",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 230m）",
+      "attemptedAt": "2026-10-04T09:26:35.853Z"
+    },
+    {
+      "facilityId": "osm-way-232596644",
+      "name": "ワンパーク 天満1丁目第3",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"ONE PARK天満1丁目第3\"",
+      "attemptedAt": "2026-10-04T09:26:37.143Z"
+    },
+    {
+      "facilityId": "osm-way-232596648",
+      "name": "ワンパーク 天満1丁目第2",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:26:38.361Z"
+    },
+    {
+      "facilityId": "osm-way-236943610",
+      "name": "AZpark24 中津3丁目",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"AZパーク24 中津3丁目\"",
+      "attemptedAt": "2026-10-04T09:26:40.766Z"
+    },
+    {
+      "facilityId": "osm-way-236947317",
+      "name": "三井のリパーク 中津4丁目第3",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 200m）",
+      "attemptedAt": "2026-10-04T09:26:42.069Z"
+    },
+    {
+      "facilityId": "osm-way-237003647",
+      "name": "MAX PARKING 24 中津駅前",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(54m)が名前が一致しない: \"パークステーション24 中津4丁目\"",
+      "attemptedAt": "2026-10-04T09:26:43.219Z"
+    },
+    {
+      "facilityId": "osm-way-237003659",
+      "name": "阪急中津駅自転車駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"阪急中津駅 自転車駐輪場\"",
+      "attemptedAt": "2026-10-04T09:26:44.452Z"
+    },
+    {
+      "facilityId": "osm-way-237063987",
+      "name": "TOMOパーキング豊崎",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(23m)が名前が一致しない: \"トモパーキング\"",
+      "attemptedAt": "2026-10-04T09:26:45.674Z"
+    },
+    {
+      "facilityId": "osm-way-237063991",
+      "name": "三井のリパーク 豊崎7丁目",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 358m）",
+      "attemptedAt": "2026-10-04T09:26:46.884Z"
+    },
+    {
+      "facilityId": "osm-way-237063993",
+      "name": "三井のリパーク 豊崎7丁目第2",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 323m）",
+      "attemptedAt": "2026-10-04T09:26:48.157Z"
+    },
+    {
+      "facilityId": "osm-way-237063996",
+      "name": "宅都パーキング 豊崎7丁目第1",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"宅都パーキング豊橋7丁目第１\"",
+      "attemptedAt": "2026-10-04T09:26:50.615Z"
+    },
+    {
+      "facilityId": "osm-way-237064002",
+      "name": "豊崎西第1駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 355m）",
+      "attemptedAt": "2026-10-04T09:26:51.950Z"
+    },
+    {
+      "facilityId": "osm-way-237064004",
+      "name": "豊崎西第2駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 416m）",
+      "attemptedAt": "2026-10-04T09:26:53.078Z"
+    },
+    {
+      "facilityId": "osm-way-237064006",
+      "name": "豊崎西第3駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 496m）",
+      "attemptedAt": "2026-10-04T09:26:54.291Z"
+    },
+    {
+      "facilityId": "osm-way-237064008",
+      "name": "豊崎西第4駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 870m）",
+      "attemptedAt": "2026-10-04T09:26:55.526Z"
+    },
+    {
+      "facilityId": "osm-way-278763427",
+      "name": "ジーエスパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 385856m）",
+      "attemptedAt": "2026-10-04T09:26:57.932Z"
+    },
+    {
+      "facilityId": "osm-way-385292814",
+      "name": "信和パーキング",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:01.562Z"
+    },
+    {
+      "facilityId": "osm-way-387789362",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:04.037Z"
+    },
+    {
+      "facilityId": "osm-way-390417724",
+      "name": "P",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 148m）",
+      "attemptedAt": "2026-10-04T09:27:05.278Z"
+    },
+    {
+      "facilityId": "osm-way-393422470",
+      "name": "Times",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:06.511Z"
+    },
+    {
+      "facilityId": "osm-way-452960109",
+      "name": "葉村ガレージ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"葉村温泉\"",
+      "attemptedAt": "2026-10-04T09:27:08.944Z"
+    },
+    {
+      "facilityId": "osm-way-466091081",
+      "name": "中崎西Parking",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:10.212Z"
+    },
+    {
+      "facilityId": "osm-way-475426159",
+      "name": "駐輪場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(7m)が名前が一致しない: \"中崎町駅自転車駐車場E\"",
+      "attemptedAt": "2026-10-04T09:27:12.628Z"
+    },
+    {
+      "facilityId": "osm-way-611346552",
+      "name": "タイムズ",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:16.283Z"
+    },
+    {
+      "facilityId": "osm-way-611406811",
+      "name": "リパーク",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:17.503Z"
+    },
+    {
+      "facilityId": "osm-way-612020090",
+      "name": "NPC24H",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:27:21.202Z"
+    },
+    {
+      "facilityId": "osm-way-659281364",
+      "name": "中津駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"中津三丁目駐車場\"",
+      "attemptedAt": "2026-10-04T09:27:27.326Z"
+    },
+    {
+      "facilityId": "osm-way-676609219",
+      "name": "阪神梅田駅1番線降車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:28.543Z"
+    },
+    {
+      "facilityId": "osm-way-676609220",
+      "name": "阪神梅田駅1番線乗車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:29.752Z"
+    },
+    {
+      "facilityId": "osm-way-676609221",
+      "name": "阪神梅田駅2番線乗車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:30.980Z"
+    },
+    {
+      "facilityId": "osm-way-676609222",
+      "name": "阪神梅田駅2番線降車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:32.207Z"
     }
   ],
-  "generatedAt": "2026-10-04T09:13:49.508Z",
+  "generatedAt": "2026-10-04T09:27:32.291Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 2772,
-    "unresolved": 1524,
-    "unattempted": 36289,
+    "verified": 3090,
+    "unresolved": 1706,
+    "unattempted": 35789,
     "total": 40585
   },
   "wardCounts": {
     "abeno": {
       "total": 851,
-      "verified": 18,
-      "unresolvedOrAmbiguous": 6,
-      "unattempted": 827
+      "verified": 55,
+      "unresolvedOrAmbiguous": 10,
+      "unattempted": 786
     },
     "asahi": {
       "total": 1097,
@@ -15284,9 +17104,9 @@
     },
     "higashisumiyoshi": {
       "total": 1025,
-      "verified": 48,
-      "unresolvedOrAmbiguous": 1,
-      "unattempted": 976
+      "verified": 73,
+      "unresolvedOrAmbiguous": 8,
+      "unattempted": 944
     },
     "higashiyodogawa": {
       "total": 2922,
@@ -15296,9 +17116,9 @@
     },
     "hirano": {
       "total": 1116,
-      "verified": 11,
-      "unresolvedOrAmbiguous": 3,
-      "unattempted": 1102
+      "verified": 74,
+      "unresolvedOrAmbiguous": 14,
+      "unattempted": 1028
     },
     "ikuno": {
       "total": 3325,
@@ -15314,9 +17134,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 1541,
-      "unresolvedOrAmbiguous": 1119,
-      "unattempted": 2995
+      "verified": 1641,
+      "unresolvedOrAmbiguous": 1269,
+      "unattempted": 2745
     },
     "konohana": {
       "total": 1309,
@@ -15350,9 +17170,9 @@
     },
     "nishinari": {
       "total": 854,
-      "verified": 10,
-      "unresolvedOrAmbiguous": 10,
-      "unattempted": 834
+      "verified": 38,
+      "unresolvedOrAmbiguous": 13,
+      "unattempted": 803
     },
     "nishiyodogawa": {
       "total": 880,
@@ -15362,15 +17182,15 @@
     },
     "suminoe": {
       "total": 617,
-      "verified": 6,
-      "unresolvedOrAmbiguous": 1,
-      "unattempted": 610
+      "verified": 48,
+      "unresolvedOrAmbiguous": 4,
+      "unattempted": 565
     },
     "sumiyoshi": {
       "total": 965,
-      "verified": 56,
-      "unresolvedOrAmbiguous": 7,
-      "unattempted": 902
+      "verified": 79,
+      "unresolvedOrAmbiguous": 11,
+      "unattempted": 875
     },
     "taisho": {
       "total": 649,
