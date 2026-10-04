@@ -10821,14 +10821,364 @@
       "matchConfidence": "UNRESOLVED",
       "reason": "閾値(120m)内に候補が無い（最も近い候補: 1354m）",
       "attemptedAt": "2026-10-04T07:52:14.078Z"
+    },
+    {
+      "facilityId": "osm-relation-9189913",
+      "name": "リーガロイヤルホテル（大阪）",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(27m)が名前が一致しない: \"RIHGA Royal Hotel Osaka, Vignette Collection by IHG\"",
+      "attemptedAt": "2026-10-04T07:58:59.444Z"
+    },
+    {
+      "facilityId": "osm-way-1067614204",
+      "name": "北野病院",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "hospital",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T07:59:05.432Z"
+    },
+    {
+      "facilityId": "osm-way-1369864013",
+      "name": "Nest Hotel",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5695m）",
+      "attemptedAt": "2026-10-04T07:59:09.727Z"
+    },
+    {
+      "facilityId": "osm-way-161646316",
+      "name": "北大阪クリニック",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "clinic",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"加納総合病院透析センター\"",
+      "attemptedAt": "2026-10-04T07:59:12.765Z"
+    },
+    {
+      "facilityId": "osm-way-162158414",
+      "name": "桜橋渡辺病院",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "hospital",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"桜橋渡辺リハビリテーション病院\"",
+      "attemptedAt": "2026-10-04T07:59:14.781Z"
+    },
+    {
+      "facilityId": "osm-way-164039557",
+      "name": "プレミアホテル-CABIN-大阪",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"プレミアホテル-CABIN PRESIDENT-大阪\"",
+      "attemptedAt": "2026-10-04T07:59:22.990Z"
+    },
+    {
+      "facilityId": "osm-way-164041055",
+      "name": "ホテルブイアールオオサカ",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"ホテルリブマックス梅田セントラル\"",
+      "attemptedAt": "2026-10-04T07:59:24.297Z"
+    },
+    {
+      "facilityId": "osm-way-164041058",
+      "name": "R&B ホテル 東大阪",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"ワシントンR&Bホテル梅田東\"",
+      "attemptedAt": "2026-10-04T07:59:25.187Z"
+    },
+    {
+      "facilityId": "osm-way-174643579",
+      "name": "東横イン梅田中津",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"東横ＩＮＮ梅田中津１\"",
+      "attemptedAt": "2026-10-04T07:59:28.036Z"
+    },
+    {
+      "facilityId": "osm-way-175519055",
+      "name": "AManTo guest house",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "guest_house",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(61m)が名前が一致しない: \"Salon de AManTo 天人\"",
+      "attemptedAt": "2026-10-04T07:59:31.205Z"
+    },
+    {
+      "facilityId": "osm-way-175878801",
+      "name": "Hotels Inn Osaka KitaUmeda",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"北梅田ダイヤビル\"",
+      "attemptedAt": "2026-10-04T07:59:34.542Z"
+    },
+    {
+      "facilityId": "osm-way-176100063",
+      "name": "原田鍼灸整骨院",
+      "wardId": "kita",
+      "category": "medical",
+      "subcategory": "clinic",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"西田鍼灸整骨院\"",
+      "attemptedAt": "2026-10-04T07:59:35.275Z"
+    },
+    {
+      "facilityId": "osm-way-178958637",
+      "name": "堂島ホテル",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T07:59:41.301Z"
+    },
+    {
+      "facilityId": "osm-way-180187105",
+      "name": "LIVEMAX PREMIUM梅田EAST",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"天然温泉ホテルリブマックスPREMIUM梅田EAST\"",
+      "attemptedAt": "2026-10-04T07:59:45.514Z"
+    },
+    {
+      "facilityId": "osm-way-180240848",
+      "name": "ホテル 近畿",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ホテル ロータス 梅田店\"",
+      "attemptedAt": "2026-10-04T07:59:48.313Z"
+    },
+    {
+      "facilityId": "osm-way-180400842",
+      "name": "ニュージャパン梅田店",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hostel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(15m)が名前が一致しない: \"NEW JAPAN / CAPSULE INN OSAKA\"",
+      "attemptedAt": "2026-10-04T07:59:48.568Z"
+    },
+    {
+      "facilityId": "osm-way-181037065",
+      "name": "HOTEL WING International",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"KOKO HOTEL 大阪梅田\"",
+      "attemptedAt": "2026-10-04T07:59:50.733Z"
+    },
+    {
+      "facilityId": "osm-way-221266095",
+      "name": "HOTEL NEXT",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 207m）",
+      "attemptedAt": "2026-10-04T07:59:59.971Z"
+    },
+    {
+      "facilityId": "osm-way-221354451",
+      "name": "東横イン",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"東横INN梅田中津2\"",
+      "attemptedAt": "2026-10-04T08:00:01.255Z"
+    },
+    {
+      "facilityId": "osm-way-221998224",
+      "name": "LAVIE EN ROSE",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"ラ・ヴィアンローズ\"",
+      "attemptedAt": "2026-10-04T08:00:01.924Z"
+    },
+    {
+      "facilityId": "osm-way-226069631",
+      "name": "初心之屋 拾弐号館",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "guest_house",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1361m）",
+      "attemptedAt": "2026-10-04T08:00:06.012Z"
+    },
+    {
+      "facilityId": "osm-way-702106187",
+      "name": "フォーシーズンズホテル大阪",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(27m)が名前が一致しない: \"Four Seasons Hotel Osaka\"",
+      "attemptedAt": "2026-10-04T08:00:13.208Z"
+    },
+    {
+      "facilityId": "osm-way-968643529",
+      "name": "アパホテル&リゾート 大阪梅田駅タワー",
+      "wardId": "kita",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"アパホテル＆リゾート〈大阪梅田駅タワー〉\"",
+      "attemptedAt": "2026-10-04T08:00:17.280Z"
+    },
+    {
+      "facilityId": "osm-way-1250611174",
+      "name": "東横イン",
+      "wardId": "miyakojima",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"東横INN京橋桜ノ宮\"",
+      "attemptedAt": "2026-10-04T08:00:19.610Z"
+    },
+    {
+      "facilityId": "osm-way-184602064",
+      "name": "キリン堂",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:00:23.342Z"
+    },
+    {
+      "facilityId": "osm-way-246424492",
+      "name": "ヴィアイン大阪京橋",
+      "wardId": "miyakojima",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"ヴィアインプライム大阪京橋＜水城の湯＞\"",
+      "attemptedAt": "2026-10-04T08:00:25.544Z"
+    },
+    {
+      "facilityId": "osm-way-246710095",
+      "name": "沢田 内科",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "healthcare_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1432m）",
+      "attemptedAt": "2026-10-04T08:00:30.649Z"
+    },
+    {
+      "facilityId": "osm-way-249189018",
+      "name": "マルゼン薬局",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1068m）",
+      "attemptedAt": "2026-10-04T08:00:35.766Z"
+    },
+    {
+      "facilityId": "osm-way-249555680",
+      "name": "スギ薬局",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:00:40.769Z"
+    },
+    {
+      "facilityId": "osm-way-250065921",
+      "name": "Hotel TREND",
+      "wardId": "miyakojima",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"ホテルトレンド京橋駅前\"",
+      "attemptedAt": "2026-10-04T08:00:44.038Z"
+    },
+    {
+      "facilityId": "osm-way-250115959",
+      "name": "協和病院",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "hospital",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:00:46.917Z"
+    },
+    {
+      "facilityId": "osm-way-250249435",
+      "name": "小西耳鼻科",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "clinic",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2083m）",
+      "attemptedAt": "2026-10-04T08:00:48.081Z"
+    },
+    {
+      "facilityId": "osm-way-250315475",
+      "name": "分野病院",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "hospital",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"分野（わけの）病院\"",
+      "attemptedAt": "2026-10-04T08:00:49.064Z"
+    },
+    {
+      "facilityId": "osm-way-251578968",
+      "name": "スギ薬局",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(19m)が名前が一致しない: \"スギドラッグ 都島中通店\"",
+      "attemptedAt": "2026-10-04T08:00:51.142Z"
+    },
+    {
+      "facilityId": "osm-way-251585263",
+      "name": "GOEMON",
+      "wardId": "miyakojima",
+      "category": "lodging",
+      "subcategory": "guest_house",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:00:54.088Z"
     }
   ],
-  "generatedAt": "2026-10-04T07:52:14.120Z",
+  "generatedAt": "2026-10-04T08:00:57.301Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 1514,
-    "unresolved": 1082,
-    "unattempted": 37989,
+    "verified": 1579,
+    "unresolved": 1117,
+    "unattempted": 37889,
     "total": 40585
   },
   "wardCounts": {
@@ -10894,9 +11244,9 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 1418,
-      "unresolvedOrAmbiguous": 1082,
-      "unattempted": 3155
+      "verified": 1465,
+      "unresolvedOrAmbiguous": 1105,
+      "unattempted": 3085
     },
     "konohana": {
       "total": 1309,
@@ -10912,9 +11262,9 @@
     },
     "miyakojima": {
       "total": 1444,
-      "verified": 0,
-      "unresolvedOrAmbiguous": 0,
-      "unattempted": 1444
+      "verified": 18,
+      "unresolvedOrAmbiguous": 12,
+      "unattempted": 1414
     },
     "naniwa": {
       "total": 1363,
