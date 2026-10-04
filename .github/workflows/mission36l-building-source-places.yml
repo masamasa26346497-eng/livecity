@@ -19,7 +19,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36l-building-sources]'))
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 350
     env:
       GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
       MISSION_BRANCH: feature/mission-36l-building-photo-linking
@@ -54,11 +54,107 @@ jobs:
       - name: Run building-source safety tests
         run: node --test tests/mission36l-building-source-places.test.js tests/mission36l-building-photo-linking.test.js
 
-      - name: Match one bounded building-source batch
+      - name: Drain all remaining building-source candidates safely
         shell: bash
         run: |
           set -euo pipefail
-          node tools/google-places/match-building-source-places.mjs --priority high --limit 100 --requests-per-minute 60
+
+          REPORT='data/reports/mission36l-building-source-places/last-batch.json'
+          COMPLETE='data/reports/mission36l-building-source-places/drain-complete.json'
+          MAX_BATCHES=120
+          CHECKPOINT_EVERY_BATCHES=5
+          PAUSE_SECONDS=15
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          checkpoint() {
+            git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
+            git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+            git add -f data/reports/mission36j-google-places-osaka-city/progress.json
+            git add -f data/reports/mission36l-building-source-places/last-batch.json
+            if [ -f "$COMPLETE" ]; then
+              git add -f "$COMPLETE"
+            fi
+            if git diff --cached --quiet; then
+              echo 'No checkpoint changes to commit.'
+              return 0
+            fi
+            git commit -m "data(mission36l): checkpoint building-source drain batch ${batch}"
+            git fetch origin "${MISSION_BRANCH}"
+            git rebase "origin/${MISSION_BRANCH}"
+            git push origin "HEAD:${MISSION_BRANCH}"
+          }
+
+          if [ -f "$REPORT" ]; then
+            initial_remaining=$(node -e "const d=require('./${REPORT}'); console.log(d.buildingSourceCountsAfter?.unattempted ?? d.buildingSourceCountsBefore?.unattempted ?? 0)")
+          else
+            initial_remaining=999999
+          fi
+          previous_remaining="$initial_remaining"
+          echo "Initial unattempted building-source candidates: ${initial_remaining}"
+
+          batch=0
+          while true; do
+            batch=$((batch + 1))
+            if [ "$batch" -gt "$MAX_BATCHES" ]; then
+              echo "Safety stop: exceeded ${MAX_BATCHES} batches before reaching zero."
+              exit 3
+            fi
+
+            echo "===== Mission 36L drain batch ${batch} ====="
+            node tools/google-places/match-building-source-places.mjs \
+              --priority all \
+              --limit 100 \
+              --requests-per-minute 50
+
+            if [ ! -f "$REPORT" ]; then
+              echo "Expected report not found: ${REPORT}"
+              exit 4
+            fi
+
+            remaining=$(node -e "const d=require('./${REPORT}'); console.log(d.buildingSourceCountsAfter.unattempted)")
+            verified=$(node -e "const d=require('./${REPORT}'); console.log(d.buildingSourceCountsAfter.verified)")
+            unresolved=$(node -e "const d=require('./${REPORT}'); console.log(d.buildingSourceCountsAfter.unresolvedOrAmbiguous)")
+            echo "After batch ${batch}: remaining=${remaining}, verified=${verified}, unresolved=${unresolved}"
+
+            if [ "$remaining" -ge "$previous_remaining" ] && [ "$previous_remaining" -ne 999999 ]; then
+              echo "No forward progress detected (${previous_remaining} -> ${remaining}); stopping safely."
+              exit 5
+            fi
+            previous_remaining="$remaining"
+
+            if [ $((batch % CHECKPOINT_EVERY_BATCHES)) -eq 0 ]; then
+              checkpoint
+            fi
+
+            if [ "$remaining" -eq 0 ]; then
+              echo 'All unattempted OSM way/relation building-source candidates have been processed.'
+              break
+            fi
+
+            sleep "$PAUSE_SECONDS"
+          done
+
+          BATCHES="$batch" INITIAL_REMAINING="$initial_remaining" node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const reportPath='data/reports/mission36l-building-source-places/last-batch.json';
+          const completePath='data/reports/mission36l-building-source-places/drain-complete.json';
+          const d=JSON.parse(fs.readFileSync(reportPath,'utf8'));
+          const final=d.buildingSourceCountsAfter;
+          if(final.unattempted!==0) throw new Error(`drain incomplete: ${final.unattempted} unattempted remain`);
+          fs.writeFileSync(completePath, JSON.stringify({
+            mission:'36L-building-source-places-drain',
+            completedAt:new Date().toISOString(),
+            batches:Number(process.env.BATCHES),
+            initialUnattempted:Number(process.env.INITIAL_REMAINING),
+            finalBuildingSourceCounts:final,
+            policy:d.policy,
+            finalApiUsageLastBatch:d.apiUsage,
+          }, null, 2));
+          NODE
+
+          checkpoint
 
       - name: Validate durable mapping policy
         shell: bash
@@ -75,30 +171,13 @@ jobs:
           for(const banned of ['photoname','photouri','mediaurl','base64']) {
             if(raw.includes(banned)) throw new Error(`forbidden persisted photo/media field: ${banned}`);
           }
-          console.log(JSON.stringify(d.counts));
+          const complete=JSON.parse(fs.readFileSync('data/reports/mission36l-building-source-places/drain-complete.json','utf8'));
+          if(complete.finalBuildingSourceCounts?.unattempted!==0) throw new Error('building-source drain did not reach zero');
+          console.log(JSON.stringify({mapping:d.counts, buildingSources:complete.finalBuildingSourceCounts}));
           NODE
 
-      - name: Commit building-source checkpoint
+      - name: Print final building-source result
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
-          git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
-          git add -f data/reports/mission36j-google-places-osaka-city/progress.json
-          git add -f data/reports/mission36l-building-source-places/last-batch.json
-          if git diff --cached --quiet; then
-            echo 'No building-source matching changes; nothing to commit.'
-            exit 0
-          fi
-          git commit -m 'data(mission36l): match building-source Google Places batch'
-          git fetch origin "${MISSION_BRANCH}"
-          git rebase "origin/${MISSION_BRANCH}"
-          git push origin "HEAD:${MISSION_BRANCH}"
-
-      - name: Print building-source result
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat data/reports/mission36l-building-source-places/last-batch.json
+          cat data/reports/mission36l-building-source-places/drain-complete.json
