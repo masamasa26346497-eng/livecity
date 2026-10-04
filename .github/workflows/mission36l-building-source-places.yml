@@ -1,0 +1,104 @@
+name: Mission 36L - Building Source Places Matching
+
+on:
+  push:
+    branches:
+      - feature/mission-36l-building-photo-linking
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mission36l-google-places-resume
+  cancel-in-progress: false
+
+jobs:
+  building-source-safe-batch:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36l-building-sources]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+      MISSION_BRANCH: feature/mission-36l-building-photo-linking
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.MISSION_BRANCH }}
+          fetch-depth: 0
+
+      - name: Sync latest mission branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${MISSION_BRANCH}"
+          git reset --hard "origin/${MISSION_BRANCH}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify Google Places API key without printing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${GOOGLE_PLACES_API_KEY:-}" ]; then
+            echo 'GOOGLE_PLACES_API_KEY GitHub Secret is not configured.'
+            exit 2
+          fi
+          echo 'Google Places API key is configured.'
+
+      - name: Run building-source safety tests
+        run: node --test tests/mission36l-building-source-places.test.js tests/mission36l-building-photo-linking.test.js
+
+      - name: Match one bounded building-source batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/google-places/match-building-source-places.mjs --priority high --limit 100 --requests-per-minute 60
+
+      - name: Validate durable mapping policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json';
+          const d=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(d.maxDistanceMeters!==120) throw new Error(`maxDistanceMeters changed: ${d.maxDistanceMeters}`);
+          if(!d.policy?.persistsOnlyVerifiedLinkage) throw new Error('VERIFIED-only policy missing');
+          if((d.entries||[]).some((e)=>e.matchConfidence!=='VERIFIED')) throw new Error('non-VERIFIED entry persisted');
+          const raw=JSON.stringify(d).toLowerCase();
+          for(const banned of ['photoname','photouri','mediaurl','base64']) {
+            if(raw.includes(banned)) throw new Error(`forbidden persisted photo/media field: ${banned}`);
+          }
+          console.log(JSON.stringify(d.counts));
+          NODE
+
+      - name: Commit building-source checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
+          git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+          git add -f data/reports/mission36j-google-places-osaka-city/progress.json
+          git add -f data/reports/mission36l-building-source-places/last-batch.json
+          if git diff --cached --quiet; then
+            echo 'No building-source matching changes; nothing to commit.'
+            exit 0
+          fi
+          git commit -m 'data(mission36l): match building-source Google Places batch'
+          git fetch origin "${MISSION_BRANCH}"
+          git rebase "origin/${MISSION_BRANCH}"
+          git push origin "HEAD:${MISSION_BRANCH}"
+
+      - name: Print building-source result
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat data/reports/mission36l-building-source-places/last-batch.json
