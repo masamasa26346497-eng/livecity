@@ -6,10 +6,14 @@
 
   const MARKER = '[Mission 36L PERF] runtime budget';
   const MAX_PIXEL_RATIO = 1.0;
-  const LAYER_UPDATE_INTERVAL_MS = 125;   // 8 Hz is enough for label/facility scaling while navigating.
+  const MIN_RENDER_FRAME_MS = 33;          // ~30 fps GPU cap; UI/input can still run at native rate.
+  const LAYER_UPDATE_INTERVAL_MS = 125;   // ~8 Hz for label/facility scaling.
   const HOVER_PICK_INTERVAL_MS = 100;     // building hover raycast <= 10 Hz; click raycast stays immediate.
   const MATERIAL_UPDATE_INTERVAL_MS = 250;
   const TILE_UPDATE_INTERVAL_MS = 150;
+  const MID_RING_TILES = 3;                // 5x5 -> 3x3 active building tiles in dev preview.
+  const PREFETCH_RING_TILES = 0;
+  const MAX_HIDDEN_TILE_CACHE = 96;
   const SHADOW_UPDATE_EVERY_FRAMES = 8;
 
   const stats = {
@@ -17,6 +21,8 @@
     pixelRatioApplied: false,
     beforePixelRatio: null,
     afterPixelRatio: null,
+    renderCalls: 0,
+    renderSkipped: 0,
     labelUpdateCalls: 0,
     labelUpdateSkipped: 0,
     facilityUpdateCalls: 0,
@@ -28,6 +34,12 @@
     materialUpdateSkipped: 0,
     tileIntervalBefore: null,
     tileIntervalAfter: null,
+    midRingBefore: null,
+    midRingAfter: null,
+    prefetchRingBefore: null,
+    prefetchRingAfter: null,
+    hiddenTileCacheBefore: null,
+    hiddenTileCacheAfter: null,
     shadowEveryBefore: null,
     shadowEveryAfter: null,
     errors: 0,
@@ -57,6 +69,26 @@
       stats.pixelRatioApplied = true;
     }
     stats.afterPixelRatio = Number(r.getPixelRatio()) || target;
+    return true;
+  }
+
+  function patchRendererFrameBudget() {
+    const r = getRendererBinding();
+    if (!r || typeof r.render !== 'function') return false;
+    if (r.__mission36lRenderBudgetPatched) return true;
+    const originalRender = r.render.bind(r);
+    let lastRenderAt = -1e12;
+    r.render = (...args) => {
+      stats.renderCalls++;
+      const now = nowMs();
+      if (now - lastRenderAt < MIN_RENDER_FRAME_MS) {
+        stats.renderSkipped++;
+        return;
+      }
+      lastRenderAt = now;
+      return originalRender(...args);
+    };
+    r.__mission36lRenderBudgetPatched = true;
     return true;
   }
 
@@ -173,15 +205,29 @@
     try {
       if (typeof BUILDING_TILE_CONFIG !== 'undefined' && BUILDING_TILE_CONFIG) {
         if (stats.tileIntervalBefore == null) stats.tileIntervalBefore = Number(BUILDING_TILE_CONFIG.updateIntervalMs);
+        if (stats.midRingBefore == null) stats.midRingBefore = Number(BUILDING_TILE_CONFIG.midRing);
+        if (stats.prefetchRingBefore == null) stats.prefetchRingBefore = Number(BUILDING_TILE_CONFIG.prefetchRing);
+        if (stats.hiddenTileCacheBefore == null) stats.hiddenTileCacheBefore = Number(BUILDING_TILE_CONFIG.maxCachedHiddenTiles);
+
         BUILDING_TILE_CONFIG.updateIntervalMs = Math.max(
           Number(BUILDING_TILE_CONFIG.updateIntervalMs) || 0,
           TILE_UPDATE_INTERVAL_MS,
+        );
+        BUILDING_TILE_CONFIG.midRing = Math.min(Number(BUILDING_TILE_CONFIG.midRing) || MID_RING_TILES, MID_RING_TILES);
+        BUILDING_TILE_CONFIG.prefetchRing = PREFETCH_RING_TILES;
+        BUILDING_TILE_CONFIG.maxCachedHiddenTiles = Math.min(
+          Number(BUILDING_TILE_CONFIG.maxCachedHiddenTiles) || MAX_HIDDEN_TILE_CACHE,
+          MAX_HIDDEN_TILE_CACHE,
         );
         // Keep production-style visibility optimizations on even in dev preview.
         BUILDING_TILE_CONFIG.enableTileCulling = true;
         BUILDING_TILE_CONFIG.enableFrustumCulling = true;
         BUILDING_TILE_CONFIG.devLoadAllTiles = false;
+
         stats.tileIntervalAfter = Number(BUILDING_TILE_CONFIG.updateIntervalMs);
+        stats.midRingAfter = Number(BUILDING_TILE_CONFIG.midRing);
+        stats.prefetchRingAfter = Number(BUILDING_TILE_CONFIG.prefetchRing);
+        stats.hiddenTileCacheAfter = Number(BUILDING_TILE_CONFIG.maxCachedHiddenTiles);
         touched = true;
       }
     } catch (err) { stats.errors++; }
@@ -202,11 +248,12 @@
     const timer = setInterval(() => {
       tries++;
       const pixelReady = applyPixelBudget();
+      const renderReady = patchRendererFrameBudget();
       const layersReady = patchLayerUpdates();
       const hoverReady = patchHoverPicking();
       const materialReady = patchMaterialUpdates();
       const runtimeReady = tuneBuildingRuntime();
-      if ((pixelReady && layersReady && hoverReady && materialReady && runtimeReady) || tries >= 120) {
+      if ((pixelReady && renderReady && layersReady && hoverReady && materialReady && runtimeReady) || tries >= 120) {
         clearInterval(timer);
         stats.installed = true;
         console.info(MARKER, window.__MISSION36L_RENDER_PERF__());
@@ -217,10 +264,14 @@
   window.__MISSION36L_RENDER_PERF__ = () => ({
     marker: MARKER,
     maxPixelRatio: MAX_PIXEL_RATIO,
+    minRenderFrameMs: MIN_RENDER_FRAME_MS,
     layerUpdateIntervalMs: LAYER_UPDATE_INTERVAL_MS,
     hoverPickIntervalMs: HOVER_PICK_INTERVAL_MS,
     materialUpdateIntervalMs: MATERIAL_UPDATE_INTERVAL_MS,
     tileUpdateIntervalMs: TILE_UPDATE_INTERVAL_MS,
+    midRingTiles: MID_RING_TILES,
+    prefetchRingTiles: PREFETCH_RING_TILES,
+    maxHiddenTileCache: MAX_HIDDEN_TILE_CACHE,
     shadowUpdateEveryFrames: SHADOW_UPDATE_EVERY_FRAMES,
     ...stats,
   });
