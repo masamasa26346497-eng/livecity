@@ -53,13 +53,19 @@ test('Mission 36L building pick reliability loads after the existing click perfo
 test('Mission 36L runtime guard throttles continuous work but keeps exact clicks unthrottled', async () => {
   const source = await readFile(renderPerfPath, 'utf8');
   assert.match(source, /MAX_PIXEL_RATIO = 1\.0/);
+  assert.match(source, /MIN_RENDER_FRAME_MS = 33/);
   assert.match(source, /LAYER_UPDATE_INTERVAL_MS = 125/);
   assert.match(source, /HOVER_PICK_INTERVAL_MS = 100/);
   assert.match(source, /TILE_UPDATE_INTERVAL_MS = 150/);
+  assert.match(source, /MID_RING_TILES = 3/);
+  assert.match(source, /PREFETCH_RING_TILES = 0/);
+  assert.match(source, /MAX_HIDDEN_TILE_CACHE = 96/);
   assert.match(source, /SHADOW_UPDATE_EVERY_FRAMES = 8/);
   assert.match(source, /event\.type !== 'mousemove'\) return original\(event\)/);
+  assert.match(source, /BUILDING_TILE_CONFIG\.midRing = Math\.min/);
   assert.match(source, /BUILDING_TILE_CONFIG\.enableTileCulling = true/);
   assert.match(source, /BUILDING_TILE_CONFIG\.enableFrustumCulling = true/);
+  assert.match(source, /__mission36lRenderBudgetPatched/);
   assert.match(source, /__MISSION36L_RENDER_PERF__/);
 });
 
