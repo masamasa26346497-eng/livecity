@@ -13301,14 +13301,824 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
       "attemptedAt": "2026-10-04T08:47:58.875Z"
+    },
+    {
+      "facilityId": "osm-way-404540950",
+      "name": "DOYANEN HOTELS 2Z",
+      "wardId": "nishinari",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:48:25.407Z"
+    },
+    {
+      "facilityId": "osm-way-461683767",
+      "name": "DOYANEN HOTELS BAKURO2",
+      "wardId": "nishinari",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"BAKURO - DOYANEN HOTELS\"",
+      "attemptedAt": "2026-10-04T08:48:28.082Z"
+    },
+    {
+      "facilityId": "osm-way-461683790",
+      "name": "DOYANEN HOTELS BAKURO3",
+      "wardId": "nishinari",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:48:32.754Z"
+    },
+    {
+      "facilityId": "osm-way-461683831",
+      "name": "DOYANEN HOTELS BAKURO",
+      "wardId": "nishinari",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"BAKURO - DOYANEN HOTELS\"",
+      "attemptedAt": "2026-10-04T08:48:34.163Z"
+    },
+    {
+      "facilityId": "osm-way-607705491",
+      "name": "竹宿",
+      "wardId": "nishinari",
+      "category": "lodging",
+      "subcategory": "hostel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"ホステル竹宿\"",
+      "attemptedAt": "2026-10-04T08:48:35.440Z"
+    },
+    {
+      "facilityId": "osm-relation-17915329",
+      "name": "大阪駅",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:48:42.563Z"
+    },
+    {
+      "facilityId": "osm-relation-18027995",
+      "name": "大阪保健医療大学",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:48:46.235Z"
+    },
+    {
+      "facilityId": "osm-way-139168082",
+      "name": "大阪梅田",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 573m）",
+      "attemptedAt": "2026-10-04T08:48:52.464Z"
+    },
+    {
+      "facilityId": "osm-way-161447520",
+      "name": "宝塚大学大阪 梅田キャンパス",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"宝塚大学 看護学部 大阪梅田キャンパス\"",
+      "attemptedAt": "2026-10-04T08:49:04.752Z"
+    },
+    {
+      "facilityId": "osm-way-161501410",
+      "name": "三菱UFJ銀行",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:49:08.293Z"
+    },
+    {
+      "facilityId": "osm-way-162381901",
+      "name": "日本銀行",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:49:23.005Z"
+    },
+    {
+      "facilityId": "osm-way-173269155",
+      "name": "上海中医薬大学日本校",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(21m)が名前が一致しない: \"上海中医薬大学 附属日本校\"",
+      "attemptedAt": "2026-10-04T08:49:28.016Z"
+    },
+    {
+      "facilityId": "osm-way-174616917",
+      "name": "クラーク記念国際高等学校",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1725m）",
+      "attemptedAt": "2026-10-04T08:49:31.738Z"
+    },
+    {
+      "facilityId": "osm-way-174794852",
+      "name": "北おおさか信用金庫",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:49:36.482Z"
+    },
+    {
+      "facilityId": "osm-way-179111679",
+      "name": "平成医療学園",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 384m）",
+      "attemptedAt": "2026-10-04T08:49:52.557Z"
+    },
+    {
+      "facilityId": "osm-way-192185026",
+      "name": "大阪厚生信用金庫",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:50:10.795Z"
+    },
+    {
+      "facilityId": "osm-way-220002953",
+      "name": "集会所",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8293m）",
+      "attemptedAt": "2026-10-04T08:50:13.402Z"
+    },
+    {
+      "facilityId": "osm-way-232436067",
+      "name": "天満橋警ら巡回所",
+      "wardId": "kita",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"天満警察署 天満橋北警ら連絡所\"",
+      "attemptedAt": "2026-10-04T08:50:25.616Z"
+    },
+    {
+      "facilityId": "osm-way-352255055",
+      "name": "太成学院大学天満幼稚園",
+      "wardId": "kita",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"太成学院天満幼稚園\"",
+      "attemptedAt": "2026-10-04T08:50:29.302Z"
+    },
+    {
+      "facilityId": "osm-way-184602054",
+      "name": "りそな銀行",
+      "wardId": "miyakojima",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:51:29.060Z"
+    },
+    {
+      "facilityId": "osm-way-169931612",
+      "name": "三井住友銀行",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:52:00.921Z"
+    },
+    {
+      "facilityId": "osm-way-169931616",
+      "name": "みずほ銀行",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 148m）",
+      "attemptedAt": "2026-10-04T08:52:02.286Z"
+    },
+    {
+      "facilityId": "osm-way-169941202",
+      "name": "大阪市立福島区民センター",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"NORBDENCE福島区民センター\"",
+      "attemptedAt": "2026-10-04T08:52:03.501Z"
+    },
+    {
+      "facilityId": "osm-way-220750501",
+      "name": "福島社会保険事務所",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"福島年金事務所\"",
+      "attemptedAt": "2026-10-04T08:52:08.436Z"
+    },
+    {
+      "facilityId": "osm-way-220868148",
+      "name": "大阪厚生信用金庫",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:52:11.960Z"
+    },
+    {
+      "facilityId": "osm-way-248315207",
+      "name": "福島コミュニティーセンター",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"福島コミュニティセンター\"",
+      "attemptedAt": "2026-10-04T08:52:14.496Z"
+    },
+    {
+      "facilityId": "osm-way-295447569",
+      "name": "ひばりほいくえん",
+      "wardId": "fukushima",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"玉川ひばりこども園\"",
+      "attemptedAt": "2026-10-04T08:52:21.898Z"
+    },
+    {
+      "facilityId": "osm-way-296784389",
+      "name": "大阪シティ信用金庫",
+      "wardId": "fukushima",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 231m）",
+      "attemptedAt": "2026-10-04T08:52:24.358Z"
+    },
+    {
+      "facilityId": "osm-way-45050226",
+      "name": "昇陽高等学校・中学校",
+      "wardId": "konohana",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(48m)が名前が一致しない: \"昇陽中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T08:52:52.536Z"
+    },
+    {
+      "facilityId": "osm-way-567235975",
+      "name": "市営桜島住宅集会所",
+      "wardId": "konohana",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(98m)が名前が一致しない: \"桜島ビル\"",
+      "attemptedAt": "2026-10-04T08:52:54.997Z"
+    },
+    {
+      "facilityId": "osm-way-745153555",
+      "name": "関西みらい銀行",
+      "wardId": "konohana",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 177m）",
+      "attemptedAt": "2026-10-04T08:53:31.626Z"
+    },
+    {
+      "facilityId": "osm-relation-3252574",
+      "name": "大阪府警察本部",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:53:41.254Z"
+    },
+    {
+      "facilityId": "osm-way-161621544",
+      "name": "追手門学院大手前中学校・高等学校",
+      "wardId": "chuo",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(77m)が名前が一致しない: \"追手門学院大手前中・高等学校\"",
+      "attemptedAt": "2026-10-04T08:53:48.723Z"
+    },
+    {
+      "facilityId": "osm-way-172029198",
+      "name": "大阪商工会議所",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:54:06.984Z"
+    },
+    {
+      "facilityId": "osm-way-173037552",
+      "name": "大阪市立南高等学校",
+      "wardId": "chuo",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 367m）",
+      "attemptedAt": "2026-10-04T08:54:10.802Z"
+    },
+    {
+      "facilityId": "osm-way-173041228",
+      "name": "大阪市立聴覚特別支援学校",
+      "wardId": "chuo",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(58m)が名前が一致しない: \"大阪府立中央聴覚支援学校\"",
+      "attemptedAt": "2026-10-04T08:54:13.265Z"
+    },
+    {
+      "facilityId": "osm-way-173041438",
+      "name": "城星学園",
+      "wardId": "chuo",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:54:21.701Z"
+    },
+    {
+      "facilityId": "osm-way-176311041",
+      "name": "大阪城公園管理事務所",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"大阪城公園事務所\"",
+      "attemptedAt": "2026-10-04T08:54:24.355Z"
+    },
+    {
+      "facilityId": "osm-way-219904194",
+      "name": "三菱UFJ信託銀行",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:54:33.952Z"
+    },
+    {
+      "facilityId": "osm-way-220296076",
+      "name": "大阪協栄信用組合",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:54:42.534Z"
+    },
+    {
+      "facilityId": "osm-way-241732624",
+      "name": "大阪医療センター付属看護学校",
+      "wardId": "chuo",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"国立大阪医療センター 附属看護学校\"",
+      "attemptedAt": "2026-10-04T08:54:58.625Z"
+    },
+    {
+      "facilityId": "osm-way-243278343",
+      "name": "三井住友銀行",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T08:55:01.034Z"
+    },
+    {
+      "facilityId": "osm-way-243518577",
+      "name": "三菱UFJ銀行",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:55:07.039Z"
+    },
+    {
+      "facilityId": "osm-way-41865537",
+      "name": "三井住友銀行",
+      "wardId": "chuo",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:55:20.538Z"
+    },
+    {
+      "facilityId": "osm-way-127816692",
+      "name": "大阪市立靭幼稚園",
+      "wardId": "nishi",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"大阪市立靱幼稚園\"",
+      "attemptedAt": "2026-10-04T08:55:32.897Z"
+    },
+    {
+      "facilityId": "osm-way-149824428",
+      "name": "九条北老人憩の家",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"九条北連合会館\"",
+      "attemptedAt": "2026-10-04T08:55:43.964Z"
+    },
+    {
+      "facilityId": "osm-way-161620226",
+      "name": "大阪市立西保育所",
+      "wardId": "nishi",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"大阪市西保育所\"",
+      "attemptedAt": "2026-10-04T08:55:51.232Z"
+    },
+    {
+      "facilityId": "osm-way-161620240",
+      "name": "近畿産業信用組合",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1060m）",
+      "attemptedAt": "2026-10-04T08:55:52.534Z"
+    },
+    {
+      "facilityId": "osm-way-161625001",
+      "name": "千代崎警ら連絡所",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"西警察署 千代崎橋警ら連絡所\"",
+      "attemptedAt": "2026-10-04T08:55:53.741Z"
+    },
+    {
+      "facilityId": "osm-way-257833850",
+      "name": "靭公園交番",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:56:04.632Z"
+    },
+    {
+      "facilityId": "osm-way-292354019",
+      "name": "三井住友銀行",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:56:27.795Z"
+    },
+    {
+      "facilityId": "osm-way-293255671",
+      "name": "靭本町交番",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 392m）",
+      "attemptedAt": "2026-10-04T08:56:30.393Z"
+    },
+    {
+      "facilityId": "osm-way-293408514",
+      "name": "堀江社会保険事務所",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"堀江年金事務所\"",
+      "attemptedAt": "2026-10-04T08:56:35.279Z"
+    },
+    {
+      "facilityId": "osm-way-293408515",
+      "name": "堀江社会保険事務所",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(40m)が名前が一致しない: \"堀江年金事務所\"",
+      "attemptedAt": "2026-10-04T08:56:36.455Z"
+    },
+    {
+      "facilityId": "osm-way-293408665",
+      "name": "大阪市西区民センター",
+      "wardId": "nishi",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"大阪市立西区民センター\"",
+      "attemptedAt": "2026-10-04T08:56:37.750Z"
+    },
+    {
+      "facilityId": "osm-way-293413941",
+      "name": "大阪キャナリー製菓調理専門学校",
+      "wardId": "nishi",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"大阪ホテル・ウェディング&製菓調理専門学校\"",
+      "attemptedAt": "2026-10-04T08:56:38.946Z"
+    },
+    {
+      "facilityId": "osm-way-588535874",
+      "name": "八幡屋公園前交番",
+      "wardId": "minato",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:57:30.284Z"
+    },
+    {
+      "facilityId": "osm-way-153343710",
+      "name": "近畿信用金庫",
+      "wardId": "taisho",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"近畿労働金庫 大正支店\"",
+      "attemptedAt": "2026-10-04T08:57:46.332Z"
+    },
+    {
+      "facilityId": "osm-way-173328203",
+      "name": "大阪府立大正高等学校",
+      "wardId": "taisho",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 481m）",
+      "attemptedAt": "2026-10-04T08:58:01.044Z"
+    },
+    {
+      "facilityId": "osm-way-197109899",
+      "name": "三菱東京UFJ銀行",
+      "wardId": "taisho",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"三菱UFJ銀行 大正橋支店\"",
+      "attemptedAt": "2026-10-04T08:58:07.202Z"
+    },
+    {
+      "facilityId": "osm-way-465834817",
+      "name": "大正コミュニティーセンター",
+      "wardId": "taisho",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:58:15.630Z"
+    },
+    {
+      "facilityId": "osm-way-666546098",
+      "name": "大阪市立鶴町保育所",
+      "wardId": "taisho",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 181m）",
+      "attemptedAt": "2026-10-04T08:58:16.950Z"
+    },
+    {
+      "facilityId": "osm-relation-12593003",
+      "name": "清風中学校・清風高等学校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(41m)が名前が一致しない: \"清風中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T08:58:20.673Z"
+    },
+    {
+      "facilityId": "osm-way-102845816",
+      "name": "四天王寺高等学校・中学校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(49m)が名前が一致しない: \"四天王寺中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T08:58:24.372Z"
+    },
+    {
+      "facilityId": "osm-way-170697301",
+      "name": "大阪星光学院中学・高等学校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(86m)が名前が一致しない: \"大阪星光学院中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T08:58:48.737Z"
+    },
+    {
+      "facilityId": "osm-way-172088539",
+      "name": "大阪府立夕陽ヶ丘高校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(34m)が名前が一致しない: \"大阪府立夕陽丘高等学校\"",
+      "attemptedAt": "2026-10-04T08:58:54.864Z"
+    },
+    {
+      "facilityId": "osm-way-172205602",
+      "name": "YMCA学院高等学校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1712m）",
+      "attemptedAt": "2026-10-04T08:59:02.211Z"
+    },
+    {
+      "facilityId": "osm-way-219848393",
+      "name": "天王寺動物公園事務所",
+      "wardId": "tennoji",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"天王寺動物園事務所\"",
+      "attemptedAt": "2026-10-04T08:59:14.456Z"
+    },
+    {
+      "facilityId": "osm-way-244879643",
+      "name": "三井住友銀行",
+      "wardId": "tennoji",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:59:21.692Z"
+    },
+    {
+      "facilityId": "osm-way-257202295",
+      "name": "三菱東京 UFJ 銀行",
+      "wardId": "tennoji",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:59:27.816Z"
+    },
+    {
+      "facilityId": "osm-way-257761653",
+      "name": "大阪IT会計専門学校",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"大阪ITプログラミング＆会計専門学校天王寺校\"",
+      "attemptedAt": "2026-10-04T08:59:30.394Z"
+    },
+    {
+      "facilityId": "osm-way-258581889",
+      "name": "興国学園",
+      "wardId": "tennoji",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 250m）",
+      "attemptedAt": "2026-10-04T08:59:31.557Z"
+    },
+    {
+      "facilityId": "osm-way-447051867",
+      "name": "天王寺公園南側バス駐車場",
+      "wardId": "tennoji",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:59:51.083Z"
+    },
+    {
+      "facilityId": "osm-way-1058545206",
+      "name": "大阪府浪波警察署 通天閣下警ら連絡所",
+      "wardId": "naniwa",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"浪速警察署通天閣下警ら連絡所\"",
+      "attemptedAt": "2026-10-04T08:59:57.361Z"
+    },
+    {
+      "facilityId": "osm-way-172379815",
+      "name": "日東小学校",
+      "wardId": "naniwa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(60m)が名前が一致しない: \"大阪市立日東幼稚園\"",
+      "attemptedAt": "2026-10-04T09:00:02.216Z"
+    },
+    {
+      "facilityId": "osm-way-247146807",
+      "name": "大阪中華学校",
+      "wardId": "naniwa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"大阪中華學校\"",
+      "attemptedAt": "2026-10-04T09:00:21.832Z"
+    },
+    {
+      "facilityId": "osm-way-247980971",
+      "name": "永和信用金庫",
+      "wardId": "naniwa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:00:26.610Z"
+    },
+    {
+      "facilityId": "osm-way-249307804",
+      "name": "日本橋五丁目東振興町会 集会所",
+      "wardId": "naniwa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(68m)が名前が一致しない: \"日本橋五丁目集会所\"",
+      "attemptedAt": "2026-10-04T09:00:30.436Z"
+    },
+    {
+      "facilityId": "osm-way-249307809",
+      "name": "大阪市営日東住宅第1集会所",
+      "wardId": "naniwa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(74m)が名前が一致しない: \"大阪市営日東住宅1号棟\"",
+      "attemptedAt": "2026-10-04T09:00:31.671Z"
+    },
+    {
+      "facilityId": "osm-way-254452809",
+      "name": "恵美老人憩の家",
+      "wardId": "naniwa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 257m）",
+      "attemptedAt": "2026-10-04T09:00:34.109Z"
+    },
+    {
+      "facilityId": "osm-way-87365334",
+      "name": "湊町(OCAT)バスターミナル",
+      "wardId": "naniwa",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"OCAT(湊町バスターミナル）\"",
+      "attemptedAt": "2026-10-04T09:00:41.443Z"
     }
   ],
-  "generatedAt": "2026-10-04T08:48:01.534Z",
+  "generatedAt": "2026-10-04T09:01:02.299Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 1966,
-    "unresolved": 1330,
-    "unattempted": 37289,
+    "verified": 2385,
+    "unresolved": 1411,
+    "unattempted": 36789,
     "total": 40585
   },
   "wardCounts": {
@@ -13326,15 +14136,15 @@
     },
     "chuo": {
       "total": 5084,
-      "verified": 64,
-      "unresolvedOrAmbiguous": 38,
-      "unattempted": 4982
+      "verified": 113,
+      "unresolvedOrAmbiguous": 51,
+      "unattempted": 4920
     },
     "fukushima": {
       "total": 967,
-      "verified": 7,
-      "unresolvedOrAmbiguous": 2,
-      "unattempted": 958
+      "verified": 33,
+      "unresolvedOrAmbiguous": 10,
+      "unattempted": 924
     },
     "higashinari": {
       "total": 918,
@@ -13374,51 +14184,51 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 1465,
-      "unresolvedOrAmbiguous": 1105,
-      "unattempted": 3085
+      "verified": 1541,
+      "unresolvedOrAmbiguous": 1119,
+      "unattempted": 2995
     },
     "konohana": {
       "total": 1309,
-      "verified": 19,
-      "unresolvedOrAmbiguous": 5,
-      "unattempted": 1285
+      "verified": 50,
+      "unresolvedOrAmbiguous": 8,
+      "unattempted": 1251
     },
     "minato": {
       "total": 612,
-      "verified": 8,
-      "unresolvedOrAmbiguous": 9,
-      "unattempted": 595
+      "verified": 53,
+      "unresolvedOrAmbiguous": 10,
+      "unattempted": 549
     },
     "miyakojima": {
       "total": 1444,
-      "verified": 20,
-      "unresolvedOrAmbiguous": 13,
-      "unattempted": 1411
+      "verified": 59,
+      "unresolvedOrAmbiguous": 14,
+      "unattempted": 1371
     },
     "naniwa": {
       "total": 1363,
-      "verified": 21,
-      "unresolvedOrAmbiguous": 21,
-      "unattempted": 1321
+      "verified": 49,
+      "unresolvedOrAmbiguous": 29,
+      "unattempted": 1285
     },
     "nishi": {
       "total": 2071,
-      "verified": 20,
-      "unresolvedOrAmbiguous": 6,
-      "unattempted": 2045
+      "verified": 55,
+      "unresolvedOrAmbiguous": 18,
+      "unattempted": 1998
     },
     "nishinari": {
       "total": 854,
-      "verified": 8,
-      "unresolvedOrAmbiguous": 5,
-      "unattempted": 841
+      "verified": 10,
+      "unresolvedOrAmbiguous": 10,
+      "unattempted": 834
     },
     "nishiyodogawa": {
       "total": 880,
-      "verified": 9,
+      "verified": 26,
       "unresolvedOrAmbiguous": 2,
-      "unattempted": 869
+      "unattempted": 852
     },
     "suminoe": {
       "total": 617,
@@ -13434,15 +14244,15 @@
     },
     "taisho": {
       "total": 649,
-      "verified": 4,
-      "unresolvedOrAmbiguous": 1,
-      "unattempted": 644
+      "verified": 29,
+      "unresolvedOrAmbiguous": 6,
+      "unattempted": 614
     },
     "tennoji": {
       "total": 1611,
-      "verified": 14,
-      "unresolvedOrAmbiguous": 14,
-      "unattempted": 1583
+      "verified": 60,
+      "unresolvedOrAmbiguous": 25,
+      "unattempted": 1526
     },
     "tsurumi": {
       "total": 842,
