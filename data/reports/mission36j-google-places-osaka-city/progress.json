@@ -14111,28 +14111,1158 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標は近い(12m)が名前が一致しない: \"OCAT(湊町バスターミナル）\"",
       "attemptedAt": "2026-10-04T09:00:41.443Z"
+    },
+    {
+      "facilityId": "osm-way-283551473",
+      "name": "淀川商業",
+      "wardId": "nishiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(79m)が名前が一致しない: \"大阪府立淀商業高等学校\"",
+      "attemptedAt": "2026-10-04T09:01:21.155Z"
+    },
+    {
+      "facilityId": "osm-way-283742698",
+      "name": "御幣島警ら所",
+      "wardId": "nishiyodogawa",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 502m）",
+      "attemptedAt": "2026-10-04T09:01:26.130Z"
+    },
+    {
+      "facilityId": "osm-way-284961134",
+      "name": "香蓑会館",
+      "wardId": "nishiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"かみの会館\"",
+      "attemptedAt": "2026-10-04T09:01:27.321Z"
+    },
+    {
+      "facilityId": "osm-way-349192307",
+      "name": "千船",
+      "wardId": "nishiyodogawa",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:01:41.915Z"
+    },
+    {
+      "facilityId": "osm-way-417164681",
+      "name": "西淀川養護学校",
+      "wardId": "nishiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"大阪府立西淀川支援学校\"",
+      "attemptedAt": "2026-10-04T09:01:54.298Z"
+    },
+    {
+      "facilityId": "osm-way-444357642",
+      "name": "西淀川警察 竹島交番",
+      "wardId": "nishiyodogawa",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"西淀川警察署竹島交番\"",
+      "attemptedAt": "2026-10-04T09:01:55.536Z"
+    },
+    {
+      "facilityId": "osm-way-654675759",
+      "name": "府立西淀川高等学校",
+      "wardId": "nishiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 774m）",
+      "attemptedAt": "2026-10-04T09:01:56.745Z"
+    },
+    {
+      "facilityId": "osm-relation-11855491",
+      "name": "東淀川",
+      "wardId": "yodogawa",
+      "category": "transport",
+      "subcategory": "station",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2535m）",
+      "attemptedAt": "2026-10-04T09:02:02.809Z"
+    },
+    {
+      "facilityId": "osm-way-1210476196",
+      "name": "大阪市営木川第2住宅集会所",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:02:14.992Z"
+    },
+    {
+      "facilityId": "osm-way-1394580075",
+      "name": "大阪市淡路・三国東土地区画整理事務所",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:02:21.112Z"
+    },
+    {
+      "facilityId": "osm-way-169220370",
+      "name": "三井住友銀行",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:02:32.157Z"
+    },
+    {
+      "facilityId": "osm-way-201865095",
+      "name": "三菱UFJ銀行",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:02:38.272Z"
+    },
+    {
+      "facilityId": "osm-way-271542770",
+      "name": "木川南老人憩の家",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 629m）",
+      "attemptedAt": "2026-10-04T09:03:01.701Z"
+    },
+    {
+      "facilityId": "osm-way-272227738",
+      "name": "大阪滋慶学園",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:03:12.582Z"
+    },
+    {
+      "facilityId": "osm-way-273949381",
+      "name": "大阪ハイテクノロジー専門学校 第3校舎",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(107m)が名前が一致しない: \"大阪ハイテクノロジー専門学校 本館\"",
+      "attemptedAt": "2026-10-04T09:03:20.081Z"
+    },
+    {
+      "facilityId": "osm-way-275649449",
+      "name": "塚本幼稚園（高等森友学園保育園）",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 199m）",
+      "attemptedAt": "2026-10-04T09:03:26.188Z"
+    },
+    {
+      "facilityId": "osm-way-275698174",
+      "name": "大原法律公務員専門学校",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:03:34.633Z"
+    },
+    {
+      "facilityId": "osm-way-276671128",
+      "name": "大阪こども専門学校",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 151m）",
+      "attemptedAt": "2026-10-04T09:03:37.171Z"
+    },
+    {
+      "facilityId": "osm-way-276671129",
+      "name": "大阪医療秘書福祉専門学校",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"大阪医療秘書福祉＆IT専門学校\"",
+      "attemptedAt": "2026-10-04T09:03:38.442Z"
+    },
+    {
+      "facilityId": "osm-way-276674005",
+      "name": "飛鳥未来高等学校",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 700m）",
+      "attemptedAt": "2026-10-04T09:03:40.904Z"
+    },
+    {
+      "facilityId": "osm-way-276674006",
+      "name": "大阪リゾート＆スポーツ専門学校",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:03:46.898Z"
+    },
+    {
+      "facilityId": "osm-way-276674007",
+      "name": "アミューズメントメディア総合学院",
+      "wardId": "yodogawa",
+      "category": "education",
+      "subcategory": "college",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"大阪アミューズメントメディア専門学校\"",
+      "attemptedAt": "2026-10-04T09:03:48.212Z"
+    },
+    {
+      "facilityId": "osm-way-286565742",
+      "name": "大阪シティー信用金庫",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"大阪シティ信用金庫 加島支店\"",
+      "attemptedAt": "2026-10-04T09:04:12.698Z"
+    },
+    {
+      "facilityId": "osm-way-289673284",
+      "name": "共同利用施設 北中島センター",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"共同施設利用北中島センター\"",
+      "attemptedAt": "2026-10-04T09:04:17.599Z"
+    },
+    {
+      "facilityId": "osm-way-291460858",
+      "name": "北おおさか信用金庫",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:04:21.138Z"
+    },
+    {
+      "facilityId": "osm-way-297002214",
+      "name": "共同利用施設 西中島センター",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"大阪市立西中島センター(共同利用施設)\"",
+      "attemptedAt": "2026-10-04T09:04:24.940Z"
+    },
+    {
+      "facilityId": "osm-way-306331696",
+      "name": "西中島6丁目振興会館",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"西中島六丁目振興会館\"",
+      "attemptedAt": "2026-10-04T09:04:27.386Z"
+    },
+    {
+      "facilityId": "osm-way-830027379",
+      "name": "北おおさか信用金庫",
+      "wardId": "yodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:04:49.311Z"
+    },
+    {
+      "facilityId": "osm-way-1062395232",
+      "name": "集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 11741m）",
+      "attemptedAt": "2026-10-04T09:04:53.111Z"
+    },
+    {
+      "facilityId": "osm-way-1097681099",
+      "name": "豊新第七町会集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(112m)が名前が一致しない: \"あす～る豊新\"",
+      "attemptedAt": "2026-10-04T09:04:54.369Z"
+    },
+    {
+      "facilityId": "osm-way-1117596820",
+      "name": "大阪市淡路福祉会館",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 346m）",
+      "attemptedAt": "2026-10-04T09:05:01.645Z"
+    },
+    {
+      "facilityId": "osm-way-1290523221",
+      "name": "南方本町会館",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 126m）",
+      "attemptedAt": "2026-10-04T09:05:09.035Z"
+    },
+    {
+      "facilityId": "osm-way-1486888326",
+      "name": "大阪市立西淡路第2保育所",
+      "wardId": "higashiyodogawa",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 216m）",
+      "attemptedAt": "2026-10-04T09:05:13.911Z"
+    },
+    {
+      "facilityId": "osm-way-278689803",
+      "name": "むくのき学園",
+      "wardId": "higashiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 216m）",
+      "attemptedAt": "2026-10-04T09:05:22.498Z"
+    },
+    {
+      "facilityId": "osm-way-302428113",
+      "name": "東淡路第2住宅第2集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T09:05:25.023Z"
+    },
+    {
+      "facilityId": "osm-way-302428131",
+      "name": "大阪市営東淡路第2住宅第4集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(49m)が名前が一致しない: \"大阪市営東淡路第2住宅 1号棟\"",
+      "attemptedAt": "2026-10-04T09:05:26.284Z"
+    },
+    {
+      "facilityId": "osm-way-302532310",
+      "name": "東淡路第2住宅第3集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 763m）",
+      "attemptedAt": "2026-10-04T09:05:31.134Z"
+    },
+    {
+      "facilityId": "osm-way-320588870",
+      "name": "大阪市営飛鳥住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 159m）",
+      "attemptedAt": "2026-10-04T09:05:39.687Z"
+    },
+    {
+      "facilityId": "osm-way-323901046",
+      "name": "小中一貫校むくのき学園　大阪市立啓発小学校・大阪市立中島中学校",
+      "wardId": "higashiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(62m)が名前が一致しない: \"むくのき学園 大阪市立中島中学校\"",
+      "attemptedAt": "2026-10-04T09:05:43.493Z"
+    },
+    {
+      "facilityId": "osm-way-326992952",
+      "name": "共同利用施設啓発センター",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"大阪市立啓発センター\"",
+      "attemptedAt": "2026-10-04T09:05:45.795Z"
+    },
+    {
+      "facilityId": "osm-way-329322214",
+      "name": "7号館 崇禅寺住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(80m)が名前が一致しない: \"崇禅寺住宅12号棟\"",
+      "attemptedAt": "2026-10-04T09:05:47.024Z"
+    },
+    {
+      "facilityId": "osm-way-330602231",
+      "name": "大阪市営日之出第4住宅1号館集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"日之出第4住宅 1号棟\"",
+      "attemptedAt": "2026-10-04T09:05:49.542Z"
+    },
+    {
+      "facilityId": "osm-way-330738328",
+      "name": "大阪市営日之出住宅11号館集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(26m)が名前が一致しない: \"日之出住宅11号棟\"",
+      "attemptedAt": "2026-10-04T09:05:50.711Z"
+    },
+    {
+      "facilityId": "osm-way-330742831",
+      "name": "もと西淡路小学校跡地",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 378m）",
+      "attemptedAt": "2026-10-04T09:05:51.939Z"
+    },
+    {
+      "facilityId": "osm-way-331079200",
+      "name": "関西みらい銀行",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:05:55.473Z"
+    },
+    {
+      "facilityId": "osm-way-331079284",
+      "name": "淡路本八会館",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 732m）",
+      "attemptedAt": "2026-10-04T09:05:56.857Z"
+    },
+    {
+      "facilityId": "osm-way-331753205",
+      "name": "淡路本七町会集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 277m）",
+      "attemptedAt": "2026-10-04T09:05:58.175Z"
+    },
+    {
+      "facilityId": "osm-way-333930941",
+      "name": "淡路本町第三振興町会集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 294m）",
+      "attemptedAt": "2026-10-04T09:06:00.514Z"
+    },
+    {
+      "facilityId": "osm-way-334185183",
+      "name": "北陽住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(67m)が名前が一致しない: \"大阪市立北陽住宅\"",
+      "attemptedAt": "2026-10-04T09:06:01.726Z"
+    },
+    {
+      "facilityId": "osm-way-334185222",
+      "name": "北陽第2住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 169m）",
+      "attemptedAt": "2026-10-04T09:06:02.991Z"
+    },
+    {
+      "facilityId": "osm-way-334605681",
+      "name": "東淡路集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 180m）",
+      "attemptedAt": "2026-10-04T09:06:04.214Z"
+    },
+    {
+      "facilityId": "osm-way-335034995",
+      "name": "市営淡路第1住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(37m)が名前が一致しない: \"淡路第1住宅 1号棟\"",
+      "attemptedAt": "2026-10-04T09:06:05.415Z"
+    },
+    {
+      "facilityId": "osm-way-371665181",
+      "name": "菅原第3住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 178m）",
+      "attemptedAt": "2026-10-04T09:06:20.125Z"
+    },
+    {
+      "facilityId": "osm-way-371975041",
+      "name": "淡路住宅集会室",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 313m）",
+      "attemptedAt": "2026-10-04T09:06:21.376Z"
+    },
+    {
+      "facilityId": "osm-way-654880467",
+      "name": "大阪成蹊学園",
+      "wardId": "higashiyodogawa",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(40m)が名前が一致しない: \"大阪成蹊大学 相川キャンパス\"",
+      "attemptedAt": "2026-10-04T09:06:49.405Z"
+    },
+    {
+      "facilityId": "osm-way-797506904",
+      "name": "東淡路住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(58m)が名前が一致しない: \"大阪市営東淡路住宅\"",
+      "attemptedAt": "2026-10-04T09:07:04.153Z"
+    },
+    {
+      "facilityId": "osm-way-798245523",
+      "name": "菅原北集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(23m)が名前が一致しない: \"菅原北公園\"",
+      "attemptedAt": "2026-10-04T09:07:05.376Z"
+    },
+    {
+      "facilityId": "osm-way-800375265",
+      "name": "大阪市営菅原第2住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(68m)が名前が一致しない: \"菅原公園\"",
+      "attemptedAt": "2026-10-04T09:07:09.128Z"
+    },
+    {
+      "facilityId": "osm-way-93225549",
+      "name": "菅原交番",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:07:23.638Z"
+    },
+    {
+      "facilityId": "osm-way-992265626",
+      "name": "市営西淡路住宅集会所",
+      "wardId": "higashiyodogawa",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(58m)が名前が一致しない: \"ライフ西淡路店\"",
+      "attemptedAt": "2026-10-04T09:07:25.005Z"
+    },
+    {
+      "facilityId": "osm-way-149843816",
+      "name": "中大阪朝鮮初級学校",
+      "wardId": "higashinari",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(42m)が名前が一致しない: \"学校法人大阪朝鮮学園 大阪朝鮮中高級学校\"",
+      "attemptedAt": "2026-10-04T09:07:34.767Z"
+    },
+    {
+      "facilityId": "osm-way-162080894",
+      "name": "三井住友銀行",
+      "wardId": "higashinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 861m）",
+      "attemptedAt": "2026-10-04T09:07:55.606Z"
+    },
+    {
+      "facilityId": "osm-way-290521012",
+      "name": "永和信用金庫",
+      "wardId": "higashinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:08:01.597Z"
+    },
+    {
+      "facilityId": "osm-way-290521170",
+      "name": "三菱東京UFJ銀行",
+      "wardId": "higashinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 804m）",
+      "attemptedAt": "2026-10-04T09:08:02.994Z"
+    },
+    {
+      "facilityId": "osm-way-292120838",
+      "name": "森ノ宮医療学園 アネックス校舎",
+      "wardId": "higashinari",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"森ノ宮医療学園専門学校 アネックス校舎\"",
+      "attemptedAt": "2026-10-04T09:08:04.184Z"
+    },
+    {
+      "facilityId": "osm-way-293384485",
+      "name": "北陸銀行",
+      "wardId": "higashinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:08:10.159Z"
+    },
+    {
+      "facilityId": "osm-way-293522110",
+      "name": "大西緑バレエスクール",
+      "wardId": "higashinari",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"北山大西バレエ団大西縁バレエスクール\"",
+      "attemptedAt": "2026-10-04T09:08:11.618Z"
+    },
+    {
+      "facilityId": "osm-way-377704819",
+      "name": "今里保育園",
+      "wardId": "higashinari",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:08:18.734Z"
+    },
+    {
+      "facilityId": "osm-way-435825661",
+      "name": "永和信用金庫",
+      "wardId": "higashinari",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 625m）",
+      "attemptedAt": "2026-10-04T09:08:23.876Z"
+    },
+    {
+      "facilityId": "osm-way-655664770",
+      "name": "maia club",
+      "wardId": "higashinari",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:08:26.168Z"
+    },
+    {
+      "facilityId": "osm-relation-20041876",
+      "name": "学校法人プール学院",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(57m)が名前が一致しない: \"プール学院中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T09:08:28.702Z"
+    },
+    {
+      "facilityId": "osm-way-1265729111",
+      "name": "生野警察署巽西交番",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 233m）",
+      "attemptedAt": "2026-10-04T09:08:29.891Z"
+    },
+    {
+      "facilityId": "osm-way-172235900",
+      "name": "旧大阪市立林寺小学校",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:08:45.697Z"
+    },
+    {
+      "facilityId": "osm-way-172236398",
+      "name": "勝山愛和幼稚園",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(15m)が名前が一致しない: \"勝山愛和第一幼稚園\"",
+      "attemptedAt": "2026-10-04T09:08:48.273Z"
+    },
+    {
+      "facilityId": "osm-way-172237478",
+      "name": "大阪市立東桃谷小学校",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(35m)が名前が一致しない: \"大阪市立東勝山小学校\"",
+      "attemptedAt": "2026-10-04T09:09:10.256Z"
+    },
+    {
+      "facilityId": "osm-way-172244388",
+      "name": "桃谷中学校第2グラウンド(鶴橋中学校跡)",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(64m)が名前が一致しない: \"もと鶴橋中学校\"",
+      "attemptedAt": "2026-10-04T09:09:15.188Z"
+    },
+    {
+      "facilityId": "osm-way-172244851",
+      "name": "いくのコーライブズパーク",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(23m)が名前が一致しない: \"いくのパーク\"",
+      "attemptedAt": "2026-10-04T09:09:16.373Z"
+    },
+    {
+      "facilityId": "osm-way-357806435",
+      "name": "清進塾",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"清進\"",
+      "attemptedAt": "2026-10-04T09:09:20.063Z"
+    },
+    {
+      "facilityId": "osm-way-369266533",
+      "name": "日生日本語学院",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"日生日本語学園\"",
+      "attemptedAt": "2026-10-04T09:09:27.521Z"
+    },
+    {
+      "facilityId": "osm-way-371672463",
+      "name": "生野商工会館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 435m）",
+      "attemptedAt": "2026-10-04T09:09:32.375Z"
+    },
+    {
+      "facilityId": "osm-way-372605607",
+      "name": "JAバンク",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 781m）",
+      "attemptedAt": "2026-10-04T09:09:40.932Z"
+    },
+    {
+      "facilityId": "osm-way-380675453",
+      "name": "円現塾",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 962m）",
+      "attemptedAt": "2026-10-04T09:09:50.704Z"
+    },
+    {
+      "facilityId": "osm-way-383200568",
+      "name": "永和信用金庫",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:09:55.511Z"
+    },
+    {
+      "facilityId": "osm-way-383459418",
+      "name": "四条青年会館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1188m）",
+      "attemptedAt": "2026-10-04T09:09:56.858Z"
+    },
+    {
+      "facilityId": "osm-way-385256132",
+      "name": "大阪府生野めん食会館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"大阪府生野めん食事業協同組合\"",
+      "attemptedAt": "2026-10-04T09:09:58.100Z"
+    },
+    {
+      "facilityId": "osm-way-385676622",
+      "name": "近畿大阪銀行",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 567m）",
+      "attemptedAt": "2026-10-04T09:09:59.314Z"
+    },
+    {
+      "facilityId": "osm-way-389071662",
+      "name": "腹見町公民館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"腹見公民館\"",
+      "attemptedAt": "2026-10-04T09:10:09.104Z"
+    },
+    {
+      "facilityId": "osm-way-390807112",
+      "name": "生野朝鮮初級学校",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(44m)が名前が一致しない: \"大阪朝鮮学園 大阪朝鮮初級学校\"",
+      "attemptedAt": "2026-10-04T09:10:17.629Z"
+    },
+    {
+      "facilityId": "osm-way-393221818",
+      "name": "井口久美子ピアノ教室",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"井口ピアノ教室\"",
+      "attemptedAt": "2026-10-04T09:10:18.880Z"
+    },
+    {
+      "facilityId": "osm-way-395048821",
+      "name": "正覚書道教室",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 339m）",
+      "attemptedAt": "2026-10-04T09:10:21.464Z"
+    },
+    {
+      "facilityId": "osm-way-396493717",
+      "name": "らんすい書院",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 11714m）",
+      "attemptedAt": "2026-10-04T09:10:22.565Z"
+    },
+    {
+      "facilityId": "osm-way-416450718",
+      "name": "三井住友銀行",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1326m）",
+      "attemptedAt": "2026-10-04T09:10:26.280Z"
+    },
+    {
+      "facilityId": "osm-way-427311380",
+      "name": "暁会館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 413357m）",
+      "attemptedAt": "2026-10-04T09:10:27.469Z"
+    },
+    {
+      "facilityId": "osm-way-436714181",
+      "name": "中西朝鮮会館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:10:33.474Z"
+    },
+    {
+      "facilityId": "osm-way-436815578",
+      "name": "洋裁教室フクミ",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1013m）",
+      "attemptedAt": "2026-10-04T09:10:38.598Z"
+    },
+    {
+      "facilityId": "osm-way-436878510",
+      "name": "生野南いちょう保育園",
+      "wardId": "ikuno",
+      "category": "education",
+      "subcategory": "childcare",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"南生野いちょう保育園\"",
+      "attemptedAt": "2026-10-04T09:10:39.714Z"
+    },
+    {
+      "facilityId": "osm-way-437453787",
+      "name": "韓国民団",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"在日本大韓民国民団生野南支部\"",
+      "attemptedAt": "2026-10-04T09:10:42.290Z"
+    },
+    {
+      "facilityId": "osm-way-437583942",
+      "name": "大阪貯蓄信用組合",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "bank",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 903m）",
+      "attemptedAt": "2026-10-04T09:10:43.390Z"
+    },
+    {
+      "facilityId": "osm-way-463417671",
+      "name": "大阪中小企業事業協同組合",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1084m）",
+      "attemptedAt": "2026-10-04T09:10:47.165Z"
+    },
+    {
+      "facilityId": "osm-way-525590093",
+      "name": "伊賀ケ會館",
+      "wardId": "ikuno",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 54158m）",
+      "attemptedAt": "2026-10-04T09:10:48.303Z"
+    },
+    {
+      "facilityId": "osm-way-1017316379",
+      "name": "常翔学園",
+      "wardId": "asahi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:10:56.762Z"
+    },
+    {
+      "facilityId": "osm-way-1017316382",
+      "name": "常翔学園",
+      "wardId": "asahi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:11:00.438Z"
+    },
+    {
+      "facilityId": "osm-way-1293006769",
+      "name": "武道場",
+      "wardId": "asahi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1014m）",
+      "attemptedAt": "2026-10-04T09:11:12.831Z"
+    },
+    {
+      "facilityId": "osm-relation-13943071",
+      "name": "大阪信愛学院",
+      "wardId": "joto",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:11:59.172Z"
+    },
+    {
+      "facilityId": "osm-way-318080616",
+      "name": "城東社会保険事務所",
+      "wardId": "joto",
+      "category": "public",
+      "subcategory": "government",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:12:35.934Z"
+    },
+    {
+      "facilityId": "osm-way-388839482",
+      "name": "ノア深江橋",
+      "wardId": "joto",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"テニス＆バドミントンスクール・ノア 大阪深江橋校\"",
+      "attemptedAt": "2026-10-04T09:12:42.250Z"
+    },
+    {
+      "facilityId": "osm-way-478394194",
+      "name": "鯰江老人憩の家",
+      "wardId": "joto",
+      "category": "public",
+      "subcategory": "community_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 579m）",
+      "attemptedAt": "2026-10-04T09:12:44.643Z"
+    },
+    {
+      "facilityId": "osm-way-156000363",
+      "name": "大阪市立横堤小学校",
+      "wardId": "tsurumi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"大阪市立横堤小學校\"",
+      "attemptedAt": "2026-10-04T09:13:05.466Z"
+    },
+    {
+      "facilityId": "osm-way-325132591",
+      "name": "大阪市立鶴見商業高等学校",
+      "wardId": "tsurumi",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(100m)が名前が一致しない: \"大阪府立鶴見商業高等学校\"",
+      "attemptedAt": "2026-10-04T09:13:16.512Z"
+    },
+    {
+      "facilityId": "osm-way-598442338",
+      "name": "のぎく 保育園",
+      "wardId": "tsurumi",
+      "category": "education",
+      "subcategory": "kindergarten",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:13:28.639Z"
+    },
+    {
+      "facilityId": "osm-relation-19031953",
+      "name": "大阪公立大学 阿倍野キャンパス",
+      "wardId": "abeno",
+      "category": "education",
+      "subcategory": "university",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1098m）",
+      "attemptedAt": "2026-10-04T09:13:36.114Z"
+    },
+    {
+      "facilityId": "osm-relation-20138514",
+      "name": "私立大谷中学校・私立大谷高等学校",
+      "wardId": "abeno",
+      "category": "education",
+      "subcategory": "school",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(50m)が名前が一致しない: \"大谷中学校・高等学校\"",
+      "attemptedAt": "2026-10-04T09:13:38.574Z"
+    },
+    {
+      "facilityId": "osm-way-172223915",
+      "name": "阿倍野警察署高松交番",
+      "wardId": "abeno",
+      "category": "public",
+      "subcategory": "police",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:13:49.449Z"
     }
   ],
-  "generatedAt": "2026-10-04T09:01:02.299Z",
+  "generatedAt": "2026-10-04T09:13:49.508Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 2385,
-    "unresolved": 1411,
-    "unattempted": 36789,
+    "verified": 2772,
+    "unresolved": 1524,
+    "unattempted": 36289,
     "total": 40585
   },
   "wardCounts": {
     "abeno": {
       "total": 851,
-      "verified": 7,
-      "unresolvedOrAmbiguous": 3,
-      "unattempted": 841
+      "verified": 18,
+      "unresolvedOrAmbiguous": 6,
+      "unattempted": 827
     },
     "asahi": {
       "total": 1097,
-      "verified": 2,
-      "unresolvedOrAmbiguous": 1,
-      "unattempted": 1094
+      "verified": 33,
+      "unresolvedOrAmbiguous": 4,
+      "unattempted": 1060
     },
     "chuo": {
       "total": 5084,
@@ -14148,9 +15278,9 @@
     },
     "higashinari": {
       "total": 918,
-      "verified": 17,
-      "unresolvedOrAmbiguous": 8,
-      "unattempted": 893
+      "verified": 46,
+      "unresolvedOrAmbiguous": 18,
+      "unattempted": 854
     },
     "higashisumiyoshi": {
       "total": 1025,
@@ -14160,9 +15290,9 @@
     },
     "higashiyodogawa": {
       "total": 2922,
-      "verified": 21,
-      "unresolvedOrAmbiguous": 6,
-      "unattempted": 2895
+      "verified": 104,
+      "unresolvedOrAmbiguous": 38,
+      "unattempted": 2780
     },
     "hirano": {
       "total": 1116,
@@ -14172,15 +15302,15 @@
     },
     "ikuno": {
       "total": 3325,
-      "verified": 102,
-      "unresolvedOrAmbiguous": 59,
-      "unattempted": 3164
+      "verified": 173,
+      "unresolvedOrAmbiguous": 89,
+      "unattempted": 3063
     },
     "joto": {
       "total": 1051,
-      "verified": 5,
-      "unresolvedOrAmbiguous": 3,
-      "unattempted": 1043
+      "verified": 38,
+      "unresolvedOrAmbiguous": 7,
+      "unattempted": 1006
     },
     "kita": {
       "total": 5655,
@@ -14226,9 +15356,9 @@
     },
     "nishiyodogawa": {
       "total": 880,
-      "verified": 26,
-      "unresolvedOrAmbiguous": 2,
-      "unattempted": 852
+      "verified": 49,
+      "unresolvedOrAmbiguous": 9,
+      "unattempted": 822
     },
     "suminoe": {
       "total": 617,
@@ -14256,15 +15386,15 @@
     },
     "tsurumi": {
       "total": 842,
-      "verified": 3,
-      "unresolvedOrAmbiguous": 1,
-      "unattempted": 838
+      "verified": 34,
+      "unresolvedOrAmbiguous": 4,
+      "unattempted": 804
     },
     "yodogawa": {
       "total": 3357,
-      "verified": 29,
-      "unresolvedOrAmbiguous": 16,
-      "unattempted": 3312
+      "verified": 104,
+      "unresolvedOrAmbiguous": 37,
+      "unattempted": 3216
     }
   }
 }

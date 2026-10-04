@@ -1,6 +1,6 @@
 {
   "mission": "36L-building-source-places",
-  "generatedAt": "2026-10-04T09:01:02.298Z",
+  "generatedAt": "2026-10-04T09:13:49.508Z",
   "policy": {
     "sourceTypes": [
       "way",
@@ -14,12 +14,12 @@
   "maxPriority": 3,
   "requestedLimit": 100,
   "processed": 100,
-  "verifiedThisBatch": 83,
+  "verifiedThisBatch": 90,
   "buildingSourceCountsBefore": {
     "total": 9498,
-    "verified": 2302,
-    "unresolvedOrAmbiguous": 1394,
-    "unattempted": 8364,
+    "verified": 2682,
+    "unresolvedOrAmbiguous": 1514,
+    "unattempted": 7864,
     "byWard": {
       "abeno": {
         "total": 167,
@@ -29,9 +29,9 @@
       },
       "asahi": {
         "total": 396,
-        "verified": 2,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 393
+        "verified": 18,
+        "unresolvedOrAmbiguous": 4,
+        "unattempted": 374
       },
       "chuo": {
         "total": 718,
@@ -47,161 +47,9 @@
       },
       "higashinari": {
         "total": 290,
-        "verified": 17,
-        "unresolvedOrAmbiguous": 8,
-        "unattempted": 265
-      },
-      "higashisumiyoshi": {
-        "total": 302,
-        "verified": 23,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 278
-      },
-      "higashiyodogawa": {
-        "total": 1014,
-        "verified": 21,
-        "unresolvedOrAmbiguous": 6,
-        "unattempted": 987
-      },
-      "hirano": {
-        "total": 241,
-        "verified": 9,
-        "unresolvedOrAmbiguous": 3,
-        "unattempted": 229
-      },
-      "ikuno": {
-        "total": 1701,
-        "verified": 102,
-        "unresolvedOrAmbiguous": 59,
-        "unattempted": 1540
-      },
-      "joto": {
-        "total": 180,
-        "verified": 5,
-        "unresolvedOrAmbiguous": 3,
-        "unattempted": 172
-      },
-      "kita": {
-        "total": 764,
-        "verified": 123,
-        "unresolvedOrAmbiguous": 37,
-        "unattempted": 604
-      },
-      "konohana": {
-        "total": 279,
-        "verified": 50,
-        "unresolvedOrAmbiguous": 8,
-        "unattempted": 221
-      },
-      "minato": {
-        "total": 211,
-        "verified": 53,
-        "unresolvedOrAmbiguous": 10,
-        "unattempted": 148
-      },
-      "miyakojima": {
-        "total": 283,
-        "verified": 59,
-        "unresolvedOrAmbiguous": 14,
-        "unattempted": 210
-      },
-      "naniwa": {
-        "total": 265,
-        "verified": 21,
-        "unresolvedOrAmbiguous": 21,
-        "unattempted": 223
-      },
-      "nishi": {
-        "total": 356,
-        "verified": 55,
+        "verified": 46,
         "unresolvedOrAmbiguous": 18,
-        "unattempted": 283
-      },
-      "nishinari": {
-        "total": 162,
-        "verified": 10,
-        "unresolvedOrAmbiguous": 10,
-        "unattempted": 142
-      },
-      "nishiyodogawa": {
-        "total": 210,
-        "verified": 9,
-        "unresolvedOrAmbiguous": 2,
-        "unattempted": 199
-      },
-      "suminoe": {
-        "total": 151,
-        "verified": 6,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 144
-      },
-      "sumiyoshi": {
-        "total": 235,
-        "verified": 21,
-        "unresolvedOrAmbiguous": 7,
-        "unattempted": 207
-      },
-      "taisho": {
-        "total": 190,
-        "verified": 29,
-        "unresolvedOrAmbiguous": 6,
-        "unattempted": 155
-      },
-      "tennoji": {
-        "total": 343,
-        "verified": 22,
-        "unresolvedOrAmbiguous": 16,
-        "unattempted": 305
-      },
-      "tsurumi": {
-        "total": 336,
-        "verified": 3,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 332
-      },
-      "yodogawa": {
-        "total": 520,
-        "verified": 29,
-        "unresolvedOrAmbiguous": 16,
-        "unattempted": 475
-      }
-    }
-  },
-  "buildingSourceCountsAfter": {
-    "total": 9498,
-    "verified": 2385,
-    "unresolvedOrAmbiguous": 1411,
-    "unattempted": 8264,
-    "byWard": {
-      "abeno": {
-        "total": 167,
-        "verified": 7,
-        "unresolvedOrAmbiguous": 3,
-        "unattempted": 157
-      },
-      "asahi": {
-        "total": 396,
-        "verified": 2,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 393
-      },
-      "chuo": {
-        "total": 718,
-        "verified": 113,
-        "unresolvedOrAmbiguous": 51,
-        "unattempted": 554
-      },
-      "fukushima": {
-        "total": 184,
-        "verified": 33,
-        "unresolvedOrAmbiguous": 10,
-        "unattempted": 141
-      },
-      "higashinari": {
-        "total": 290,
-        "verified": 17,
-        "unresolvedOrAmbiguous": 8,
-        "unattempted": 265
+        "unattempted": 226
       },
       "higashisumiyoshi": {
         "total": 302,
@@ -211,9 +59,9 @@
       },
       "higashiyodogawa": {
         "total": 1014,
-        "verified": 21,
-        "unresolvedOrAmbiguous": 6,
-        "unattempted": 987
+        "verified": 104,
+        "unresolvedOrAmbiguous": 38,
+        "unattempted": 872
       },
       "hirano": {
         "total": 241,
@@ -223,9 +71,9 @@
       },
       "ikuno": {
         "total": 1701,
-        "verified": 102,
-        "unresolvedOrAmbiguous": 59,
-        "unattempted": 1540
+        "verified": 173,
+        "unresolvedOrAmbiguous": 89,
+        "unattempted": 1439
       },
       "joto": {
         "total": 180,
@@ -277,9 +125,9 @@
       },
       "nishiyodogawa": {
         "total": 210,
-        "verified": 26,
-        "unresolvedOrAmbiguous": 2,
-        "unattempted": 182
+        "verified": 49,
+        "unresolvedOrAmbiguous": 9,
+        "unattempted": 152
       },
       "suminoe": {
         "total": 151,
@@ -313,29 +161,181 @@
       },
       "yodogawa": {
         "total": 520,
+        "verified": 104,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 379
+      }
+    }
+  },
+  "buildingSourceCountsAfter": {
+    "total": 9498,
+    "verified": 2772,
+    "unresolvedOrAmbiguous": 1524,
+    "unattempted": 7764,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 18,
+        "unresolvedOrAmbiguous": 6,
+        "unattempted": 143
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 33,
+        "unresolvedOrAmbiguous": 4,
+        "unattempted": 359
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 113,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 554
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 33,
+        "unresolvedOrAmbiguous": 10,
+        "unattempted": 141
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 46,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 226
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 23,
+        "unresolvedOrAmbiguous": 1,
+        "unattempted": 278
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 104,
+        "unresolvedOrAmbiguous": 38,
+        "unattempted": 872
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 9,
+        "unresolvedOrAmbiguous": 3,
+        "unattempted": 229
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 173,
+        "unresolvedOrAmbiguous": 89,
+        "unattempted": 1439
+      },
+      "joto": {
+        "total": 180,
+        "verified": 38,
+        "unresolvedOrAmbiguous": 7,
+        "unattempted": 135
+      },
+      "kita": {
+        "total": 764,
+        "verified": 123,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 604
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 50,
+        "unresolvedOrAmbiguous": 8,
+        "unattempted": 221
+      },
+      "minato": {
+        "total": 211,
+        "verified": 53,
+        "unresolvedOrAmbiguous": 10,
+        "unattempted": 148
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 59,
+        "unresolvedOrAmbiguous": 14,
+        "unattempted": 210
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 49,
+        "unresolvedOrAmbiguous": 29,
+        "unattempted": 187
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 55,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 283
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 10,
+        "unresolvedOrAmbiguous": 10,
+        "unattempted": 142
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 49,
+        "unresolvedOrAmbiguous": 9,
+        "unattempted": 152
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 6,
+        "unresolvedOrAmbiguous": 1,
+        "unattempted": 144
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 21,
+        "unresolvedOrAmbiguous": 7,
+        "unattempted": 207
+      },
+      "taisho": {
+        "total": 190,
         "verified": 29,
-        "unresolvedOrAmbiguous": 16,
-        "unattempted": 475
+        "unresolvedOrAmbiguous": 6,
+        "unattempted": 155
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 60,
+        "unresolvedOrAmbiguous": 25,
+        "unattempted": 258
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 34,
+        "unresolvedOrAmbiguous": 4,
+        "unattempted": 298
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 104,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 379
       }
     }
   },
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 2385,
-    "unresolvedOrAmbiguous": 1411,
-    "unattempted": 36789,
+    "verified": 2772,
+    "unresolvedOrAmbiguous": 1524,
+    "unattempted": 36289,
     "byWard": {
       "abeno": {
         "total": 851,
-        "verified": 7,
-        "unresolvedOrAmbiguous": 3,
-        "unattempted": 841
+        "verified": 18,
+        "unresolvedOrAmbiguous": 6,
+        "unattempted": 827
       },
       "asahi": {
         "total": 1097,
-        "verified": 2,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 1094
+        "verified": 33,
+        "unresolvedOrAmbiguous": 4,
+        "unattempted": 1060
       },
       "chuo": {
         "total": 5084,
@@ -351,9 +351,9 @@
       },
       "higashinari": {
         "total": 918,
-        "verified": 17,
-        "unresolvedOrAmbiguous": 8,
-        "unattempted": 893
+        "verified": 46,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 854
       },
       "higashisumiyoshi": {
         "total": 1025,
@@ -363,9 +363,9 @@
       },
       "higashiyodogawa": {
         "total": 2922,
-        "verified": 21,
-        "unresolvedOrAmbiguous": 6,
-        "unattempted": 2895
+        "verified": 104,
+        "unresolvedOrAmbiguous": 38,
+        "unattempted": 2780
       },
       "hirano": {
         "total": 1116,
@@ -375,15 +375,15 @@
       },
       "ikuno": {
         "total": 3325,
-        "verified": 102,
-        "unresolvedOrAmbiguous": 59,
-        "unattempted": 3164
+        "verified": 173,
+        "unresolvedOrAmbiguous": 89,
+        "unattempted": 3063
       },
       "joto": {
         "total": 1051,
-        "verified": 5,
-        "unresolvedOrAmbiguous": 3,
-        "unattempted": 1043
+        "verified": 38,
+        "unresolvedOrAmbiguous": 7,
+        "unattempted": 1006
       },
       "kita": {
         "total": 5655,
@@ -429,9 +429,9 @@
       },
       "nishiyodogawa": {
         "total": 880,
-        "verified": 26,
-        "unresolvedOrAmbiguous": 2,
-        "unattempted": 852
+        "verified": 49,
+        "unresolvedOrAmbiguous": 9,
+        "unattempted": 822
       },
       "suminoe": {
         "total": 617,
@@ -459,931 +459,931 @@
       },
       "tsurumi": {
         "total": 842,
-        "verified": 3,
-        "unresolvedOrAmbiguous": 1,
-        "unattempted": 838
+        "verified": 34,
+        "unresolvedOrAmbiguous": 4,
+        "unattempted": 804
       },
       "yodogawa": {
         "total": 3357,
-        "verified": 29,
-        "unresolvedOrAmbiguous": 16,
-        "unattempted": 3312
+        "verified": 104,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 3216
       }
     }
   },
   "apiUsage": {
     "searchCalls": 100,
-    "detailsCalls": 11,
+    "detailsCalls": 10,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 111,
+    "executed": 110,
     "inFlight": 0,
-    "windowCount": 13,
-    "sessionCount": 111
+    "windowCount": 12,
+    "sessionCount": 110
   },
   "results": [
     {
-      "facilityId": "osm-way-170696299",
+      "facilityId": "osm-way-161969646",
       "osmElementType": "way",
-      "name": "大阪市立大江小学校",
-      "wardId": "tennoji",
+      "name": "大阪市立生江小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 22,
-      "reason": "座標(22m以内)と名前が一致"
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-170697301",
+      "facilityId": "osm-way-161970698",
       "osmElementType": "way",
-      "name": "大阪星光学院中学・高等学校",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 86,
-      "reason": "座標は近い(86m)が名前が一致しない: \"大阪星光学院中学校・高等学校\""
-    },
-    {
-      "facilityId": "osm-way-170769797",
-      "osmElementType": "way",
-      "name": "天王寺警察署",
-      "wardId": "tennoji",
+      "name": "大阪市立城北小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
+      "distanceMeters": 48,
+      "reason": "座標(48m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-170776285",
+      "facilityId": "osm-way-254988971",
       "osmElementType": "way",
-      "name": "大阪市立天王寺中学校",
-      "wardId": "tennoji",
+      "name": "大阪市立高殿南小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 56,
-      "reason": "座標(56m以内)と名前が一致"
+      "distanceMeters": 32,
+      "reason": "座標(32m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-171460224",
+      "facilityId": "osm-way-271460790",
       "osmElementType": "way",
-      "name": "天王寺幼稚園",
-      "wardId": "tennoji",
+      "name": "旭区民センター",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 14,
       "reason": "座標(14m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-171998693",
+      "facilityId": "osm-way-271460792",
       "osmElementType": "way",
-      "name": "大阪市立生魂小学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 31,
-      "reason": "座標(31m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-172088539",
-      "osmElementType": "way",
-      "name": "大阪府立夕陽ヶ丘高校",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 34,
-      "reason": "座標は近い(34m)が名前が一致しない: \"大阪府立夕陽丘高等学校\""
-    },
-    {
-      "facilityId": "osm-way-172088542",
-      "osmElementType": "way",
-      "name": "大阪市立夕陽丘中学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 21,
-      "reason": "座標(21m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-172088547",
-      "osmElementType": "way",
-      "name": "大阪市消防局天王寺消防署",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-172090069",
-      "osmElementType": "way",
-      "name": "大阪府立大阪ビジネスフロンティア高等学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 62,
-      "reason": "座標(62m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-172098166",
-      "osmElementType": "way",
-      "name": "大阪市立桃陽小学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 37,
-      "reason": "座標(37m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-172098386",
-      "osmElementType": "way",
-      "name": "大阪市立聖和小学校",
-      "wardId": "tennoji",
+      "name": "旭区民センター",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 33,
       "reason": "座標(33m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172205602",
+      "facilityId": "osm-way-319207133",
       "osmElementType": "way",
-      "name": "YMCA学院高等学校",
-      "wardId": "tennoji",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1712,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1712m）"
-    },
-    {
-      "facilityId": "osm-way-172207630",
-      "osmElementType": "way",
-      "name": "大阪教育大学 天王寺キャンパス",
-      "wardId": "tennoji",
+      "name": "大阪府立思斉支援学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 99,
-      "reason": "座標(99m以内)と名前が一致"
+      "distanceMeters": 34,
+      "reason": "第二段階: 名前(exact)・タイプ(school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
     },
     {
-      "facilityId": "osm-way-172207633",
+      "facilityId": "osm-way-321223652",
       "osmElementType": "way",
-      "name": "大阪府医師会 看護専門学校",
-      "wardId": "tennoji",
+      "name": "大阪市立大宮中学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 29,
-      "reason": "座標(29m以内)と名前が一致"
+      "distanceMeters": 36,
+      "reason": "座標(36m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172214875",
+      "facilityId": "osm-way-389002222",
       "osmElementType": "way",
-      "name": "興國高等学校",
-      "wardId": "tennoji",
+      "name": "大阪市立新森小路小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 39,
-      "reason": "座標(39m以内)と名前が一致"
+      "distanceMeters": 54,
+      "reason": "座標(54m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-173040025",
+      "facilityId": "osm-way-389003890",
       "osmElementType": "way",
-      "name": "大阪市立高津中学校",
-      "wardId": "tennoji",
+      "name": "大阪市立清水小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 35,
-      "reason": "座標(35m以内)と名前が一致"
+      "distanceMeters": 36,
+      "reason": "座標(36m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-173040249",
+      "facilityId": "osm-way-480407107",
       "osmElementType": "way",
-      "name": "大阪府立高津高等学校",
-      "wardId": "tennoji",
+      "name": "大阪市立旭東中学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 77,
-      "reason": "座標(77m以内)と名前が一致"
+      "distanceMeters": 83,
+      "reason": "座標(83m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-173040479",
+      "facilityId": "osm-way-480425608",
       "osmElementType": "way",
-      "name": "明星中学校・高等学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 50,
-      "reason": "座標(50m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-173045011",
-      "osmElementType": "way",
-      "name": "大阪市立味原小学校",
-      "wardId": "tennoji",
+      "name": "大阪市立高殿小学校",
+      "wardId": "asahi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2,
       "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-173045506",
+      "facilityId": "osm-way-480426250",
       "osmElementType": "way",
-      "name": "大阪夕陽丘学園高等学校",
-      "wardId": "tennoji",
+      "name": "大阪府立旭高等学校",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 66,
+      "reason": "座標(66m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-480426251",
+      "osmElementType": "way",
+      "name": "大阪市立旭陽中学校",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 35,
+      "reason": "第二段階: 名前(exact)・タイプ(school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-481993686",
+      "osmElementType": "way",
+      "name": "大阪市立古市小学校",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-481997417",
+      "osmElementType": "way",
+      "name": "旭警察署新森交番",
+      "wardId": "asahi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-13943071",
+      "osmElementType": "relation",
+      "name": "大阪信愛学院",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1356684848",
+      "osmElementType": "way",
+      "name": "森之宮保育園",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1459436002",
+      "osmElementType": "way",
+      "name": "大阪公立大学 森之宮キャンパス",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 20,
       "reason": "座標(20m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-175994729",
+      "facilityId": "osm-way-148210542",
       "osmElementType": "way",
-      "name": "大阪信用金庫本店",
-      "wardId": "tennoji",
+      "name": "市立城東中学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 43,
-      "reason": "座標(43m以内)と名前が一致"
+      "distanceMeters": 54,
+      "reason": "座標(54m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-219848393",
+      "facilityId": "osm-way-148645649",
       "osmElementType": "way",
-      "name": "天王寺動物公園事務所",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"天王寺動物園事務所\""
-    },
-    {
-      "facilityId": "osm-way-244879643",
-      "osmElementType": "way",
-      "name": "三井住友銀行",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-255789113",
-      "osmElementType": "way",
-      "name": "天王寺警察署天王寺駅前交番",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-257200400",
-      "osmElementType": "way",
-      "name": "大阪信用金庫",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 23,
-      "reason": "座標(23m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-257202295",
-      "osmElementType": "way",
-      "name": "三菱東京 UFJ 銀行",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-257258338",
-      "osmElementType": "way",
-      "name": "日本年金機構",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-257761653",
-      "osmElementType": "way",
-      "name": "大阪IT会計専門学校",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"大阪ITプログラミング＆会計専門学校天王寺校\""
-    },
-    {
-      "facilityId": "osm-way-258581889",
-      "osmElementType": "way",
-      "name": "興国学園",
-      "wardId": "tennoji",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 250,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 250m）"
-    },
-    {
-      "facilityId": "osm-way-258630273",
-      "osmElementType": "way",
-      "name": "天王寺消防署元町出張所",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 59,
-      "reason": "座標(59m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-259246125",
-      "osmElementType": "way",
-      "name": "聖和かいせい保育園",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-259335171",
-      "osmElementType": "way",
-      "name": "大阪府警天王寺警察署勝山交番",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-260575659",
-      "osmElementType": "way",
-      "name": "YMCA学院高等学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-260689875",
-      "osmElementType": "way",
-      "name": "大阪府立夕陽丘高等職業技術専門校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-261672826",
-      "osmElementType": "way",
-      "name": "大阪市立天王寺図書館",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-264858436",
-      "osmElementType": "way",
-      "name": "大阪市立五条小学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 22,
-      "reason": "座標(22m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-264865440",
-      "osmElementType": "way",
-      "name": "大阪市立五条幼稚園",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 17,
-      "reason": "座標(17m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-279299972",
-      "osmElementType": "way",
-      "name": "大阪赤十字看護専門学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-285153046",
-      "osmElementType": "way",
-      "name": "大阪府堺支援学校大手前分校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(7m)が一意 [conservative-variant]"
-    },
-    {
-      "facilityId": "osm-way-285202005",
-      "osmElementType": "way",
-      "name": "天王寺警察署 舟橋町交番",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-286829486",
-      "osmElementType": "way",
-      "name": "ルトーア東亜美容専門学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 43,
-      "reason": "座標(43m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-287994009",
-      "osmElementType": "way",
-      "name": "ルトーア東亜美容専門学校",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-447051867",
-      "osmElementType": "way",
-      "name": "天王寺公園南側バス駐車場",
-      "wardId": "tennoji",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-491028154",
-      "osmElementType": "way",
-      "name": "大阪市立大江幼稚園",
-      "wardId": "tennoji",
+      "name": "大阪市立森之宮小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 9,
       "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-492946478",
+      "facilityId": "osm-way-148653463",
       "osmElementType": "way",
-      "name": "大阪夕陽丘学園短期大学",
-      "wardId": "tennoji",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "座標(14m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-664083781",
-      "osmElementType": "way",
-      "name": "天王寺公園東バス駐車場",
-      "wardId": "tennoji",
+      "name": "中浜幼稚園",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 15,
       "reason": "座標(15m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-relation-13157620",
-      "osmElementType": "relation",
-      "name": "大阪市立大国小学校",
-      "wardId": "naniwa",
+      "facilityId": "osm-way-148653465",
+      "osmElementType": "way",
+      "name": "市立中浜小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
+      "distanceMeters": 36,
+      "reason": "第二段階: 名前(exact)・タイプ(primary_school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
     },
     {
-      "facilityId": "osm-way-1058545206",
+      "facilityId": "osm-way-148655607",
       "osmElementType": "way",
-      "name": "大阪府浪波警察署 通天閣下警ら連絡所",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 3,
-      "reason": "座標は近い(3m)が名前が一致しない: \"浪速警察署通天閣下警ら連絡所\""
-    },
-    {
-      "facilityId": "osm-way-120267912",
-      "osmElementType": "way",
-      "name": "エール学園日本語教育科",
-      "wardId": "naniwa",
+      "name": "市立東中浜小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 26,
-      "reason": "座標(26m以内)と名前が一致"
+      "distanceMeters": 34,
+      "reason": "座標(34m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-171972364",
+      "facilityId": "osm-way-149841572",
       "osmElementType": "way",
-      "name": "大阪市消防局浪速消防署恵美須出張所",
-      "wardId": "naniwa",
+      "name": "大阪市立諏訪小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-171972365",
+      "facilityId": "osm-way-149913859",
       "osmElementType": "way",
-      "name": "浪速警察署",
-      "wardId": "naniwa",
+      "name": "大阪市立鴫野小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
+      "distanceMeters": 25,
+      "reason": "座標(25m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172379815",
+      "facilityId": "osm-way-149986637",
       "osmElementType": "way",
-      "name": "日東小学校",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 60,
-      "reason": "座標は近い(60m)が名前が一致しない: \"大阪市立日東幼稚園\""
-    },
-    {
-      "facilityId": "osm-way-172780657",
-      "osmElementType": "way",
-      "name": "大阪市立木津中学校",
-      "wardId": "naniwa",
+      "name": "大阪府立成城高等学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 39,
-      "reason": "座標(39m以内)と名前が一致"
+      "distanceMeters": 32,
+      "reason": "座標(32m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172780660",
+      "facilityId": "osm-way-150518450",
       "osmElementType": "way",
-      "name": "大阪府立今宮高等学校",
-      "wardId": "naniwa",
+      "name": "大阪市立放出中学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 46,
-      "reason": "座標(46m以内)と名前が一致"
+      "distanceMeters": 73,
+      "reason": "座標(73m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172846355",
+      "facilityId": "osm-way-150615385",
       "osmElementType": "way",
-      "name": "大阪市立敷津小学校",
-      "wardId": "naniwa",
+      "name": "大阪市立城東小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 39,
-      "reason": "座標(39m以内)と名前が一致"
+      "distanceMeters": 54,
+      "reason": "座標(54m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172955143",
+      "facilityId": "osm-way-150616241",
       "osmElementType": "way",
-      "name": "大阪市立難波元町小学校",
-      "wardId": "naniwa",
+      "name": "大阪市立城陽中学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 30,
-      "reason": "座標(30m以内)と名前が一致"
+      "distanceMeters": 101,
+      "reason": "座標(101m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172983850",
+      "facilityId": "osm-way-150757763",
       "osmElementType": "way",
-      "name": "大阪市立難波中学校",
-      "wardId": "naniwa",
+      "name": "大阪市立聖賢小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
+      "distanceMeters": 43,
+      "reason": "座標(43m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-172985487",
+      "facilityId": "osm-way-150765145",
       "osmElementType": "way",
-      "name": "大阪市立塩草立葉小学校",
-      "wardId": "naniwa",
+      "name": "大阪市立蒲生中学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 28,
-      "reason": "座標(28m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-173045960",
-      "osmElementType": "way",
-      "name": "日本橋小中一貫校",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 60,
-      "reason": "座標(60m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-173046951",
-      "osmElementType": "way",
-      "name": "大阪府立難波支援学校",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 28,
-      "reason": "座標(28m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-173210806",
-      "osmElementType": "way",
-      "name": "大阪市消防局浪速消防署浪速出張所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-176876132",
-      "osmElementType": "way",
-      "name": "新世界交番",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-220335505",
-      "osmElementType": "way",
-      "name": "大阪国税局浪速税務署",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "座標(14m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-220335506",
-      "osmElementType": "way",
-      "name": "大阪市消防局浪速消防署",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-220335564",
-      "osmElementType": "way",
-      "name": "浪速警察署体育会館前交番",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-225033148",
-      "osmElementType": "way",
-      "name": "大阪市浪速区役所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-226143690",
-      "osmElementType": "way",
-      "name": "難波年金事務所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-247146807",
-      "osmElementType": "way",
-      "name": "大阪中華学校",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 11,
-      "reason": "座標は近い(11m)が名前が一致しない: \"大阪中華學校\""
-    },
-    {
-      "facilityId": "osm-way-247980814",
-      "osmElementType": "way",
-      "name": "愛染橋保育園",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-247980971",
-      "osmElementType": "way",
-      "name": "永和信用金庫",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-248231302",
-      "osmElementType": "way",
-      "name": "大阪市立広田保育所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-249307794",
-      "osmElementType": "way",
-      "name": "日本橋東交番",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-249307804",
-      "osmElementType": "way",
-      "name": "日本橋五丁目東振興町会 集会所",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 68,
-      "reason": "座標は近い(68m)が名前が一致しない: \"日本橋五丁目集会所\""
+      "reason": "座標(68m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-249307809",
+      "facilityId": "osm-way-150766189",
       "osmElementType": "way",
-      "name": "大阪市営日東住宅第1集会所",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 74,
-      "reason": "座標は近い(74m)が名前が一致しない: \"大阪市営日東住宅1号棟\""
-    },
-    {
-      "facilityId": "osm-way-254426947",
-      "osmElementType": "way",
-      "name": "浪速区民センター",
-      "wardId": "naniwa",
+      "name": "開明中学校・高等学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-254452809",
+      "facilityId": "osm-way-150868634",
       "osmElementType": "way",
-      "name": "恵美老人憩の家",
-      "wardId": "naniwa",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 257,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 257m）"
-    },
-    {
-      "facilityId": "osm-way-255495748",
-      "osmElementType": "way",
-      "name": "大阪市立小田町保育所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-256795968",
-      "osmElementType": "way",
-      "name": "浪速警察署浪速町交番",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-591178761",
-      "osmElementType": "way",
-      "name": "日東幼稚園",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-609628764",
-      "osmElementType": "way",
-      "name": "大阪市立栄小学校",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 57,
-      "reason": "座標(57m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-699388742",
-      "osmElementType": "way",
-      "name": "大阪市立浪速第５保育所",
-      "wardId": "naniwa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 9,
-      "reason": "座標(9m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-87365334",
-      "osmElementType": "way",
-      "name": "湊町(OCAT)バスターミナル",
-      "wardId": "naniwa",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 12,
-      "reason": "座標は近い(12m)が名前が一致しない: \"OCAT(湊町バスターミナル）\""
-    },
-    {
-      "facilityId": "osm-relation-17062899",
-      "osmElementType": "relation",
-      "name": "西淀川区役所",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1073078538",
-      "osmElementType": "way",
-      "name": "西淀川消防署",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1117018509",
-      "osmElementType": "way",
-      "name": "大阪市立福小学校",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 38,
-      "reason": "座標(38m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1117527877",
-      "osmElementType": "way",
-      "name": "大阪市立大和田小学校",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1117527880",
-      "osmElementType": "way",
-      "name": "大阪市立大和田幼稚園",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 17,
-      "reason": "座標(17m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1118796400",
-      "osmElementType": "way",
-      "name": "大阪福島朝鮮初級学校",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 9,
-      "reason": "座標(9m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1119802986",
-      "osmElementType": "way",
-      "name": "大阪市立姫島小学校",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1358280733",
-      "osmElementType": "way",
-      "name": "西淀川警察署",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 18,
-      "reason": "座標(18m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1363104526",
-      "osmElementType": "way",
-      "name": "佃幼稚園",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-161846658",
-      "osmElementType": "way",
-      "name": "市立香簑小学校",
-      "wardId": "nishiyodogawa",
+      "name": "大阪市立放出小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 29,
       "reason": "座標(29m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-161852534",
+      "facilityId": "osm-way-150868635",
       "osmElementType": "way",
-      "name": "大阪市立歌島中学校",
-      "wardId": "nishiyodogawa",
+      "name": "大阪市立今福小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 46,
-      "reason": "座標(46m以内)と名前が一致"
+      "distanceMeters": 19,
+      "reason": "座標(19m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-161852535",
+      "facilityId": "osm-way-150868638",
       "osmElementType": "way",
-      "name": "御幣島幼稚園",
-      "wardId": "nishiyodogawa",
+      "name": "市立鯰江東小学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 43,
+      "reason": "座標(43m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-151002509",
+      "osmElementType": "way",
+      "name": "市立鯰江中学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 52,
+      "reason": "座標(52m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-155945250",
+      "osmElementType": "way",
+      "name": "大阪市立成育小学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 35,
+      "reason": "座標(35m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-157701858",
+      "osmElementType": "way",
+      "name": "大阪市立関目小学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 49,
+      "reason": "座標(49m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-157706437",
+      "osmElementType": "way",
+      "name": "大阪市立関目東小学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-160103738",
+      "osmElementType": "way",
+      "name": "大阪市立榎並小学校",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 27,
       "reason": "座標(27m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-162654680",
-      "osmElementType": "way",
-      "name": "大阪市立淀商業高等学校",
-      "wardId": "nishiyodogawa",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 49,
-      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(49m)が一意 [conservative-variant]"
-    },
-    {
-      "facilityId": "osm-way-164436475",
+      "facilityId": "osm-way-253933270",
       "osmElementType": "way",
       "name": "りそな銀行",
-      "wardId": "nishiyodogawa",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-164436483",
+      "facilityId": "osm-way-290085460",
       "osmElementType": "way",
-      "name": "西淀川警察署",
-      "wardId": "nishiyodogawa",
+      "name": "大阪市営中浜住宅集会所",
+      "wardId": "joto",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
+      "distanceMeters": 33,
+      "reason": "座標(33m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-164438329",
+      "facilityId": "osm-way-294841453",
       "osmElementType": "way",
-      "name": "大阪市立歌島小学校",
-      "wardId": "nishiyodogawa",
+      "name": "城東警察署鴫野西交番",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 0,
+      "reason": "第二段階: 名前(exact)・タイプ(neighborhood_police_station)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-318080616",
+      "osmElementType": "way",
+      "name": "城東社会保険事務所",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-319805235",
+      "osmElementType": "way",
+      "name": "城東税務署",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-387312609",
+      "osmElementType": "way",
+      "name": "大阪市消防局城東消防署関目出張所",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388611227",
+      "osmElementType": "way",
+      "name": "大阪市立菫中学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 106,
+      "reason": "座標(106m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388611397",
+      "osmElementType": "way",
+      "name": "鯰江幼稚園",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388839482",
+      "osmElementType": "way",
+      "name": "ノア深江橋",
+      "wardId": "joto",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 17,
+      "reason": "座標は近い(17m)が名前が一致しない: \"テニス＆バドミントンスクール・ノア 大阪深江橋校\""
+    },
+    {
+      "facilityId": "osm-way-478394188",
+      "osmElementType": "way",
+      "name": "城東警察署 関目南交番",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-478394194",
+      "osmElementType": "way",
+      "name": "鯰江老人憩の家",
+      "wardId": "joto",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 579,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 579m）"
+    },
+    {
+      "facilityId": "osm-way-478861379",
+      "osmElementType": "way",
+      "name": "大阪市立すみれ小学校",
+      "wardId": "joto",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 54,
+      "reason": "第二段階: 名前(exact)・タイプ(primary_school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-1124726745",
+      "osmElementType": "way",
+      "name": "茨田東保育所",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1124745558",
+      "osmElementType": "way",
+      "name": "大阪市立茨田東小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 74,
+      "reason": "座標(74m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1124745589",
+      "osmElementType": "way",
+      "name": "茨田大宮こども園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1127954915",
+      "osmElementType": "way",
+      "name": "鶴見みどり第二保育園",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-164438330",
+      "facilityId": "osm-way-1128099593",
       "osmElementType": "way",
-      "name": "御幣島小学校",
-      "wardId": "nishiyodogawa",
+      "name": "鶴見ぴよぴよ保育園",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 49,
-      "reason": "座標(49m以内)と名前が一致"
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1128099594",
+      "osmElementType": "way",
+      "name": "鶴見幼稚園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1128353992",
+      "osmElementType": "way",
+      "name": "トレジャーキッズよこづつみ保育園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1131084397",
+      "osmElementType": "way",
+      "name": "横堤みのり保育園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133382028",
+      "osmElementType": "way",
+      "name": "いずみの保育園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134175515",
+      "osmElementType": "way",
+      "name": "うれしい保育園放出",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134395528",
+      "osmElementType": "way",
+      "name": "えがおの森保育園いまづ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-150612680",
+      "osmElementType": "way",
+      "name": "大阪市立今津中学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 26,
+      "reason": "座標(26m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-150868287",
+      "osmElementType": "way",
+      "name": "大阪府立汎愛高等学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 51,
+      "reason": "座標(51m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-150868289",
+      "osmElementType": "way",
+      "name": "大阪市立榎本小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 77,
+      "reason": "座標(77m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-151041886",
+      "osmElementType": "way",
+      "name": "大阪市立今津小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "第二段階: 名前(exact)・タイプ(primary_school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-156000363",
+      "osmElementType": "way",
+      "name": "大阪市立横堤小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 12,
+      "reason": "座標は近い(12m)が名前が一致しない: \"大阪市立横堤小學校\""
+    },
+    {
+      "facilityId": "osm-way-156000365",
+      "osmElementType": "way",
+      "name": "大阪市立横堤中学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 40,
+      "reason": "座標(40m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-157632845",
+      "osmElementType": "way",
+      "name": "大阪市立鶴見南小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 29,
+      "reason": "座標(29m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-158461893",
+      "osmElementType": "way",
+      "name": "大阪市立茨田南小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 59,
+      "reason": "座標(59m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-158463425",
+      "osmElementType": "way",
+      "name": "大阪市立茨田中学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 81,
+      "reason": "座標(81m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-158528149",
+      "osmElementType": "way",
+      "name": "大阪市立鶴見小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 60,
+      "reason": "座標(60m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-159245982",
+      "osmElementType": "way",
+      "name": "大阪市立緑中学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 41,
+      "reason": "座標(41m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-159509854",
+      "osmElementType": "way",
+      "name": "大阪市立茨田小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 27,
+      "reason": "座標(27m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-299532211",
+      "osmElementType": "way",
+      "name": "大阪市立みどり小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 26,
+      "reason": "座標(26m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-325132591",
+      "osmElementType": "way",
+      "name": "大阪市立鶴見商業高等学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 100,
+      "reason": "座標は近い(100m)が名前が一致しない: \"大阪府立鶴見商業高等学校\""
+    },
+    {
+      "facilityId": "osm-way-327962082",
+      "osmElementType": "way",
+      "name": "鶴見みどり保育園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388611226",
+      "osmElementType": "way",
+      "name": "大阪市立茨田西小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 71,
+      "reason": "座標(71m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-388804019",
+      "osmElementType": "way",
+      "name": "大阪市立焼野小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 70,
+      "reason": "座標(70m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-389040818",
+      "osmElementType": "way",
+      "name": "大阪市立茨田北中学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 44,
+      "reason": "座標(44m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-389048133",
+      "osmElementType": "way",
+      "name": "大阪市立茨田北小学校",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 100,
+      "reason": "座標(100m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-389305408",
+      "osmElementType": "way",
+      "name": "鶴見警察署放出駅前交番",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-481224937",
+      "osmElementType": "way",
+      "name": "念法幼稚園",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 18,
+      "reason": "座標(18m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-598442338",
+      "osmElementType": "way",
+      "name": "のぎく 保育園",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-608464858",
+      "osmElementType": "way",
+      "name": "鶴見警察署放出大橋交番",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-13569986",
+      "osmElementType": "relation",
+      "name": "大阪市立常盤小学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 30,
+      "reason": "第二段階: 名前(exact)・タイプ(primary_school)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-relation-17477357",
+      "osmElementType": "relation",
+      "name": "府立住吉高等学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 59,
+      "reason": "座標(59m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-17477358",
+      "osmElementType": "relation",
+      "name": "市立晴明丘小学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 42,
+      "reason": "座標(42m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-17477359",
+      "osmElementType": "relation",
+      "name": "大阪市立昭和中学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 91,
+      "reason": "座標(91m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-19031953",
+      "osmElementType": "relation",
+      "name": "大阪公立大学 阿倍野キャンパス",
+      "wardId": "abeno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1098,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1098m）"
+    },
+    {
+      "facilityId": "osm-relation-19970022",
+      "osmElementType": "relation",
+      "name": "大阪府立阿倍野高等学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 22,
+      "reason": "座標(22m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-20138514",
+      "osmElementType": "relation",
+      "name": "私立大谷中学校・私立大谷高等学校",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 50,
+      "reason": "座標は近い(50m)が名前が一致しない: \"大谷中学校・高等学校\""
+    },
+    {
+      "facilityId": "osm-way-1086058856",
+      "osmElementType": "way",
+      "name": "阿倍野警察署聖天山公園交番",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1422089192",
+      "osmElementType": "way",
+      "name": "阿倍野保育園",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-171472996",
+      "osmElementType": "way",
+      "name": "大阪市立金塚小学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 44,
+      "reason": "座標(44m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172223126",
+      "osmElementType": "way",
+      "name": "あべの翔学高等学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 35,
+      "reason": "座標(35m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172223128",
+      "osmElementType": "way",
+      "name": "あべの翔学高等学校附属朝陽幼稚園",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172223914",
+      "osmElementType": "way",
+      "name": "大阪市立高松小学校",
+      "wardId": "abeno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172223915",
+      "osmElementType": "way",
+      "name": "阿倍野警察署高松交番",
+      "wardId": "abeno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     }
   ]
 }
