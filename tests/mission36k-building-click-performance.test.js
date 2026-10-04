@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const clickGatePath = new URL('../public/livecity-building-click-performance.js', import.meta.url);
 const reliabilityPath = new URL('../public/livecity-building-pick-reliability.js', import.meta.url);
+const renderPerfPath = new URL('../public/livecity-render-performance.js', import.meta.url);
 const previewPath = new URL('../tools/preview.js', import.meta.url);
 
 test('Mission 36K facility pick gate preserves exact pick fallback and exposes diagnostics', async () => {
@@ -47,4 +48,25 @@ test('Mission 36L building pick reliability loads after the existing click perfo
   const reliability = source.indexOf('/livecity-building-pick-reliability.js');
   assert.ok(clickGate >= 0, 'existing click performance gate must be injected');
   assert.ok(reliability > clickGate, 'pick reliability guard must load after click performance gate');
+});
+
+test('Mission 36L runtime guard throttles continuous work but keeps exact clicks unthrottled', async () => {
+  const source = await readFile(renderPerfPath, 'utf8');
+  assert.match(source, /MAX_PIXEL_RATIO = 1\.0/);
+  assert.match(source, /LAYER_UPDATE_INTERVAL_MS = 125/);
+  assert.match(source, /HOVER_PICK_INTERVAL_MS = 100/);
+  assert.match(source, /TILE_UPDATE_INTERVAL_MS = 150/);
+  assert.match(source, /SHADOW_UPDATE_EVERY_FRAMES = 8/);
+  assert.match(source, /event\.type !== 'mousemove'\) return original\(event\)/);
+  assert.match(source, /BUILDING_TILE_CONFIG\.enableTileCulling = true/);
+  assert.match(source, /BUILDING_TILE_CONFIG\.enableFrustumCulling = true/);
+  assert.match(source, /__MISSION36L_RENDER_PERF__/);
+});
+
+test('Mission 36L runtime guard is injected before click reliability logic', async () => {
+  const source = await readFile(previewPath, 'utf8');
+  const renderPerf = source.indexOf('/livecity-render-performance.js');
+  const clickGate = source.indexOf('/livecity-building-click-performance.js');
+  assert.ok(renderPerf >= 0, 'runtime performance guard must be injected');
+  assert.ok(clickGate > renderPerf, 'runtime guard must load before click-specific patches');
 });
