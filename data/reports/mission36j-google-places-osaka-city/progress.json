@@ -41551,14 +41551,704 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標は近い(17m)が名前が一致しない: \"第1・第2突堤北臨港緑地\"",
       "attemptedAt": "2026-10-04T11:32:51.594Z"
+    },
+    {
+      "facilityId": "osm-way-151871203",
+      "name": "ミナトバッティングドーム",
+      "wardId": "minato",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2306m）",
+      "attemptedAt": "2026-10-04T11:33:32.867Z"
+    },
+    {
+      "facilityId": "osm-way-151871305",
+      "name": "杉村ゴルフセンター",
+      "wardId": "minato",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:33:41.310Z"
+    },
+    {
+      "facilityId": "osm-way-1120719404",
+      "name": "大正区老人クラブ 専用ゲートボール場",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1288m）",
+      "attemptedAt": "2026-10-04T11:33:50.035Z"
+    },
+    {
+      "facilityId": "osm-way-1123286071",
+      "name": "南恩加島小学校 第二運動場",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(83m)が名前が一致しない: \"大阪市立南恩加島小学校\"",
+      "attemptedAt": "2026-10-04T11:33:52.508Z"
+    },
+    {
+      "facilityId": "osm-way-465847340",
+      "name": "北村西児童公園",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"北村西児童遊園\"",
+      "attemptedAt": "2026-10-04T11:34:27.968Z"
+    },
+    {
+      "facilityId": "osm-way-484896821",
+      "name": "平尾亥開公園",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:34:35.217Z"
+    },
+    {
+      "facilityId": "osm-way-484896822",
+      "name": "平尾亥開公園",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:34:38.870Z"
+    },
+    {
+      "facilityId": "osm-way-619597814",
+      "name": "鶴浜コミュニティ広場",
+      "wardId": "taisho",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 264m）",
+      "attemptedAt": "2026-10-04T11:34:46.397Z"
+    },
+    {
+      "facilityId": "osm-way-174506572",
+      "name": "上汐町公園",
+      "wardId": "tennoji",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"上汐公園\"",
+      "attemptedAt": "2026-10-04T11:35:04.776Z"
+    },
+    {
+      "facilityId": "osm-way-977755842",
+      "name": "PANZA(noborun!)",
+      "wardId": "tennoji",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"PANZAてんしばイーナ\"",
+      "attemptedAt": "2026-10-04T11:35:47.647Z"
+    },
+    {
+      "facilityId": "osm-way-978693035",
+      "name": "PANZA(sorarun!)",
+      "wardId": "tennoji",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(27m)が名前が一致しない: \"PANZAてんしばイーナ\"",
+      "attemptedAt": "2026-10-04T11:35:48.807Z"
+    },
+    {
+      "facilityId": "osm-way-1049165417",
+      "name": "テニススクール・ノア",
+      "wardId": "naniwa",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T11:35:52.427Z"
+    },
+    {
+      "facilityId": "osm-way-220482031",
+      "name": "なんば温泉",
+      "wardId": "naniwa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 289m）",
+      "attemptedAt": "2026-10-04T11:36:09.688Z"
+    },
+    {
+      "facilityId": "osm-way-256142939",
+      "name": "浪速東３公園",
+      "wardId": "naniwa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"浪速東第３公園\"",
+      "attemptedAt": "2026-10-04T11:36:18.267Z"
+    },
+    {
+      "facilityId": "osm-way-484912781",
+      "name": "今宮駅前第２公園",
+      "wardId": "naniwa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"今宮駅前２号公園\"",
+      "attemptedAt": "2026-10-04T11:36:31.760Z"
+    },
+    {
+      "facilityId": "osm-way-495770430",
+      "name": "日本橋西公園",
+      "wardId": "naniwa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"広田・関谷公園\"",
+      "attemptedAt": "2026-10-04T11:36:39.114Z"
+    },
+    {
+      "facilityId": "osm-way-1111246801",
+      "name": "開発公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T11:36:49.994Z"
+    },
+    {
+      "facilityId": "osm-way-1117714090",
+      "name": "大野一丁目児童遊園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"大野1丁目児童遊園\"",
+      "attemptedAt": "2026-10-04T11:36:58.688Z"
+    },
+    {
+      "facilityId": "osm-way-1118276082",
+      "name": "上町公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"さくら公園\"",
+      "attemptedAt": "2026-10-04T11:37:01.162Z"
+    },
+    {
+      "facilityId": "osm-way-1355197117",
+      "name": "野里北公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 283m）",
+      "attemptedAt": "2026-10-04T11:37:15.838Z"
+    },
+    {
+      "facilityId": "osm-way-1359594429",
+      "name": "柏里保育所",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:37:21.852Z"
+    },
+    {
+      "facilityId": "osm-way-161843137",
+      "name": "西淀川中央コミュニティ広場",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(70m)が名前が一致しない: \"西淀川中央コミュニティー広場\"",
+      "attemptedAt": "2026-10-04T11:37:32.969Z"
+    },
+    {
+      "facilityId": "osm-way-161846412",
+      "name": "竹島南公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 130m）",
+      "attemptedAt": "2026-10-04T11:37:34.170Z"
+    },
+    {
+      "facilityId": "osm-way-282854591",
+      "name": "御幣島六丁目公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"御幣六公園\"",
+      "attemptedAt": "2026-10-04T11:37:36.728Z"
+    },
+    {
+      "facilityId": "osm-way-283551476",
+      "name": "野里公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(0m)が名前が一致しない: \"野里西公園\"",
+      "attemptedAt": "2026-10-04T11:37:39.154Z"
+    },
+    {
+      "facilityId": "osm-way-289005904",
+      "name": "歌島中学運動場",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 149m）",
+      "attemptedAt": "2026-10-04T11:37:40.350Z"
+    },
+    {
+      "facilityId": "osm-way-349151568",
+      "name": "佃コーポ第６号棟公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(27m)が名前が一致しない: \"佃第３コーポ６号棟\"",
+      "attemptedAt": "2026-10-04T11:37:42.823Z"
+    },
+    {
+      "facilityId": "osm-way-387979819",
+      "name": "開発公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 539m）",
+      "attemptedAt": "2026-10-04T11:37:45.243Z"
+    },
+    {
+      "facilityId": "osm-way-408650573",
+      "name": "中島第一野球場",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"中島公園 中島野球場\"",
+      "attemptedAt": "2026-10-04T11:37:48.917Z"
+    },
+    {
+      "facilityId": "osm-way-417164664",
+      "name": "福東公園",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 372506m）",
+      "attemptedAt": "2026-10-04T11:37:50.164Z"
+    },
+    {
+      "facilityId": "osm-way-417164679",
+      "name": "エルモ西淀川プール",
+      "wardId": "nishiyodogawa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(39m)が名前が一致しない: \"大阪市立西淀川屋内プール\"",
+      "attemptedAt": "2026-10-04T11:38:07.497Z"
+    },
+    {
+      "facilityId": "osm-way-1191971512",
+      "name": "ベラジオ",
+      "wardId": "yodogawa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 7287m）",
+      "attemptedAt": "2026-10-04T11:38:26.871Z"
+    },
+    {
+      "facilityId": "osm-way-271810665",
+      "name": "J-STORY",
+      "wardId": "yodogawa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"Ｊ‐ＳＴＯＲＹ\"",
+      "attemptedAt": "2026-10-04T11:38:52.601Z"
+    },
+    {
+      "facilityId": "osm-way-314206495",
+      "name": "淀川河川公園 十三野草地区",
+      "wardId": "yodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 146m）",
+      "attemptedAt": "2026-10-04T11:39:01.210Z"
+    },
+    {
+      "facilityId": "osm-way-713822585",
+      "name": "加島南第二住宅付属公園",
+      "wardId": "yodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 293m）",
+      "attemptedAt": "2026-10-04T11:39:12.255Z"
+    },
+    {
+      "facilityId": "osm-way-1112806683",
+      "name": "瑞光四丁目公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"瑞光4公園\"",
+      "attemptedAt": "2026-10-04T11:39:26.988Z"
+    },
+    {
+      "facilityId": "osm-way-1155043149",
+      "name": "児童公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(69m)が名前が一致しない: \"下新庄小公園\"",
+      "attemptedAt": "2026-10-04T11:39:34.313Z"
+    },
+    {
+      "facilityId": "osm-way-1180751008",
+      "name": "大阪市立新庄小学校 第2運動場",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(31m)が名前が一致しない: \"新庄小学校第二グランド\"",
+      "attemptedAt": "2026-10-04T11:39:38.010Z"
+    },
+    {
+      "facilityId": "osm-way-142669489",
+      "name": "東淡路南公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:39:48.869Z"
+    },
+    {
+      "facilityId": "osm-way-273308144",
+      "name": "柴島浄水場グランド",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"柴島浄水場 グラウンド\"",
+      "attemptedAt": "2026-10-04T11:39:57.537Z"
+    },
+    {
+      "facilityId": "osm-way-360342750",
+      "name": "能條東公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"能条東公園\"",
+      "attemptedAt": "2026-10-04T11:40:47.836Z"
+    },
+    {
+      "facilityId": "osm-way-549132328",
+      "name": "相川南児童公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(15m)が名前が一致しない: \"相川南児童遊園（キャベツ公園）\"",
+      "attemptedAt": "2026-10-04T11:41:01.298Z"
+    },
+    {
+      "facilityId": "osm-way-549132329",
+      "name": "南江口公園",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 372m）",
+      "attemptedAt": "2026-10-04T11:41:02.560Z"
+    },
+    {
+      "facilityId": "osm-way-654991217",
+      "name": "第2グラウンド",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 10138m）",
+      "attemptedAt": "2026-10-04T11:41:16.048Z"
+    },
+    {
+      "facilityId": "osm-way-656619844",
+      "name": "井高野ゴルフセンター",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:41:23.264Z"
+    },
+    {
+      "facilityId": "osm-way-795315791",
+      "name": "スロットラボ淡路西店",
+      "wardId": "higashiyodogawa",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(21m)が名前が一致しない: \"プレミアSLOT LAB淡路西店\"",
+      "attemptedAt": "2026-10-04T11:41:30.809Z"
+    },
+    {
+      "facilityId": "osm-way-484518001",
+      "name": "千間川みどり公園",
+      "wardId": "higashinari",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 152m）",
+      "attemptedAt": "2026-10-04T11:42:05.019Z"
+    },
+    {
+      "facilityId": "osm-way-1021565819",
+      "name": "いくたのにわ",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"生田ランドセル\"",
+      "attemptedAt": "2026-10-04T11:42:07.518Z"
+    },
+    {
+      "facilityId": "osm-way-353603947",
+      "name": "伊賀ケ西公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"伊賀ヶ西公園\"",
+      "attemptedAt": "2026-10-04T11:42:19.796Z"
+    },
+    {
+      "facilityId": "osm-way-355243919",
+      "name": "テニススクール梅塾",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"TENNIS SUPPORT“梅塾”\"",
+      "attemptedAt": "2026-10-04T11:42:24.615Z"
+    },
+    {
+      "facilityId": "osm-way-355246153",
+      "name": "フットメッセ",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(25m)が名前が一致しない: \"キャプテン翼スタジアム生野\"",
+      "attemptedAt": "2026-10-04T11:42:25.868Z"
+    },
+    {
+      "facilityId": "osm-way-358603515",
+      "name": "トミオカ体操スクール",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5519m）",
+      "attemptedAt": "2026-10-04T11:42:33.181Z"
+    },
+    {
+      "facilityId": "osm-way-362364454",
+      "name": "金沢トレーニングセンター＆ボクシングジム",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1569m）",
+      "attemptedAt": "2026-10-04T11:42:52.846Z"
+    },
+    {
+      "facilityId": "osm-way-378667650",
+      "name": "空手道 魁塾",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "sports_centre",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 887m）",
+      "attemptedAt": "2026-10-04T11:43:13.656Z"
+    },
+    {
+      "facilityId": "osm-way-380981670",
+      "name": "長細公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 265m）",
+      "attemptedAt": "2026-10-04T11:43:16.122Z"
+    },
+    {
+      "facilityId": "osm-way-380981671",
+      "name": "長細公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 227m）",
+      "attemptedAt": "2026-10-04T11:43:17.296Z"
+    },
+    {
+      "facilityId": "osm-way-381670454",
+      "name": "長細公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T11:43:18.576Z"
+    },
+    {
+      "facilityId": "osm-way-381670455",
+      "name": "長細公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 181m）",
+      "attemptedAt": "2026-10-04T11:43:19.730Z"
+    },
+    {
+      "facilityId": "osm-way-403116437",
+      "name": "巽伊賀ケ公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"巽伊賀ヶ公園\"",
+      "attemptedAt": "2026-10-04T11:43:27.139Z"
+    },
+    {
+      "facilityId": "osm-way-408631085",
+      "name": "長細公園",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "playground",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 361m）",
+      "attemptedAt": "2026-10-04T11:43:30.842Z"
+    },
+    {
+      "facilityId": "osm-way-409182621",
+      "name": "アミスター",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T11:43:35.598Z"
+    },
+    {
+      "facilityId": "osm-way-418084568",
+      "name": "生野区花づくり広場",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "garden",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(13m)が名前が一致しない: \"生野区緑花友の会 花づくり広場\"",
+      "attemptedAt": "2026-10-04T11:43:36.967Z"
+    },
+    {
+      "facilityId": "osm-way-793633723",
+      "name": "ZERO腕⁼-大阪",
+      "wardId": "ikuno",
+      "category": "park",
+      "subcategory": "leisure_other",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"ZERO-腕 大阪\"",
+      "attemptedAt": "2026-10-04T11:43:56.554Z"
+    },
+    {
+      "facilityId": "osm-way-1117049605",
+      "name": "さくら児童公園",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"さくら児童遊園\"",
+      "attemptedAt": "2026-10-04T11:43:59.056Z"
+    },
+    {
+      "facilityId": "osm-way-1120260587",
+      "name": "高殿コミュニティ広場",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(40m)が名前が一致しない: \"高殿会館\"",
+      "attemptedAt": "2026-10-04T11:44:01.480Z"
+    },
+    {
+      "facilityId": "osm-way-161946858",
+      "name": "大宮中グラウンド",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"大宮中学校第二グラウンド\"",
+      "attemptedAt": "2026-10-04T11:44:06.354Z"
+    },
+    {
+      "facilityId": "osm-way-188618033",
+      "name": "淀川河川公園 赤川地区",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "park",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 233m）",
+      "attemptedAt": "2026-10-04T11:44:07.625Z"
+    },
+    {
+      "facilityId": "osm-way-477263615",
+      "name": "旭運動場",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "pitch",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(82m)が名前が一致しない: \"旭公園\"",
+      "attemptedAt": "2026-10-04T11:44:34.522Z"
+    },
+    {
+      "facilityId": "osm-way-609348634",
+      "name": "城北菖蒲園",
+      "wardId": "asahi",
+      "category": "park",
+      "subcategory": "garden",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 186m）",
+      "attemptedAt": "2026-10-04T11:44:54.138Z"
     }
   ],
-  "generatedAt": "2026-10-04T11:32:54.152Z",
+  "generatedAt": "2026-10-04T11:44:55.478Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 5141,
-    "unresolved": 4155,
-    "unattempted": 31289,
+    "verified": 5572,
+    "unresolved": 4224,
+    "unattempted": 30789,
     "total": 40585
   },
   "wardCounts": {
@@ -41570,9 +42260,9 @@
     },
     "asahi": {
       "total": 1097,
-      "verified": 148,
-      "unresolvedOrAmbiguous": 192,
-      "unattempted": 757
+      "verified": 189,
+      "unresolvedOrAmbiguous": 198,
+      "unattempted": 710
     },
     "chuo": {
       "total": 5084,
@@ -41588,9 +42278,9 @@
     },
     "higashinari": {
       "total": 918,
-      "verified": 94,
-      "unresolvedOrAmbiguous": 92,
-      "unattempted": 732
+      "verified": 109,
+      "unresolvedOrAmbiguous": 93,
+      "unattempted": 716
     },
     "higashisumiyoshi": {
       "total": 1025,
@@ -41600,9 +42290,9 @@
     },
     "higashiyodogawa": {
       "total": 2922,
-      "verified": 397,
-      "unresolvedOrAmbiguous": 460,
-      "unattempted": 2065
+      "verified": 491,
+      "unresolvedOrAmbiguous": 471,
+      "unattempted": 1960
     },
     "hirano": {
       "total": 1116,
@@ -41612,15 +42302,15 @@
     },
     "ikuno": {
       "total": 3325,
-      "verified": 414,
-      "unresolvedOrAmbiguous": 537,
-      "unattempted": 2374
+      "verified": 474,
+      "unresolvedOrAmbiguous": 553,
+      "unattempted": 2298
     },
     "joto": {
       "total": 1051,
-      "verified": 58,
+      "verified": 59,
       "unresolvedOrAmbiguous": 37,
-      "unattempted": 956
+      "unattempted": 955
     },
     "kita": {
       "total": 5655,
@@ -41636,9 +42326,9 @@
     },
     "minato": {
       "total": 612,
-      "verified": 104,
-      "unresolvedOrAmbiguous": 38,
-      "unattempted": 470
+      "verified": 128,
+      "unresolvedOrAmbiguous": 40,
+      "unattempted": 444
     },
     "miyakojima": {
       "total": 1444,
@@ -41648,9 +42338,9 @@
     },
     "naniwa": {
       "total": 1363,
-      "verified": 93,
-      "unresolvedOrAmbiguous": 74,
-      "unattempted": 1196
+      "verified": 128,
+      "unresolvedOrAmbiguous": 79,
+      "unattempted": 1156
     },
     "nishi": {
       "total": 2071,
@@ -41666,9 +42356,9 @@
     },
     "nishiyodogawa": {
       "total": 880,
-      "verified": 72,
-      "unresolvedOrAmbiguous": 33,
-      "unattempted": 775
+      "verified": 123,
+      "unresolvedOrAmbiguous": 48,
+      "unattempted": 709
     },
     "suminoe": {
       "total": 617,
@@ -41684,15 +42374,15 @@
     },
     "taisho": {
       "total": 649,
-      "verified": 58,
-      "unresolvedOrAmbiguous": 49,
-      "unattempted": 542
+      "verified": 96,
+      "unresolvedOrAmbiguous": 55,
+      "unattempted": 498
     },
     "tennoji": {
       "total": 1611,
-      "verified": 149,
-      "unresolvedOrAmbiguous": 99,
-      "unattempted": 1363
+      "verified": 184,
+      "unresolvedOrAmbiguous": 102,
+      "unattempted": 1325
     },
     "tsurumi": {
       "total": 842,
@@ -41702,9 +42392,9 @@
     },
     "yodogawa": {
       "total": 3357,
-      "verified": 242,
-      "unresolvedOrAmbiguous": 181,
-      "unattempted": 2934
+      "verified": 279,
+      "unresolvedOrAmbiguous": 185,
+      "unattempted": 2893
     }
   }
 }
