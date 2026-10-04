@@ -1,6 +1,6 @@
 {
   "mission": "36L-building-source-places",
-  "generatedAt": "2026-10-04T08:00:57.301Z",
+  "generatedAt": "2026-10-04T08:05:34.763Z",
   "policy": {
     "sourceTypes": [
       "way",
@@ -14,160 +14,8 @@
   "maxPriority": 0,
   "requestedLimit": 100,
   "processed": 100,
-  "verifiedThisBatch": 65,
+  "verifiedThisBatch": 74,
   "buildingSourceCountsBefore": {
-    "total": 9498,
-    "verified": 1514,
-    "unresolvedOrAmbiguous": 1082,
-    "unattempted": 9464,
-    "byWard": {
-      "abeno": {
-        "total": 167,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 167
-      },
-      "asahi": {
-        "total": 396,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 396
-      },
-      "chuo": {
-        "total": 718,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 718
-      },
-      "fukushima": {
-        "total": 184,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 184
-      },
-      "higashinari": {
-        "total": 290,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 290
-      },
-      "higashisumiyoshi": {
-        "total": 302,
-        "verified": 15,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 287
-      },
-      "higashiyodogawa": {
-        "total": 1014,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 1014
-      },
-      "hirano": {
-        "total": 241,
-        "verified": 3,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 238
-      },
-      "ikuno": {
-        "total": 1701,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 1701
-      },
-      "joto": {
-        "total": 180,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 180
-      },
-      "kita": {
-        "total": 764,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 764
-      },
-      "konohana": {
-        "total": 279,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 279
-      },
-      "minato": {
-        "total": 211,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 211
-      },
-      "miyakojima": {
-        "total": 283,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 283
-      },
-      "naniwa": {
-        "total": 265,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 265
-      },
-      "nishi": {
-        "total": 356,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 356
-      },
-      "nishinari": {
-        "total": 162,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 162
-      },
-      "nishiyodogawa": {
-        "total": 210,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 210
-      },
-      "suminoe": {
-        "total": 151,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 151
-      },
-      "sumiyoshi": {
-        "total": 235,
-        "verified": 16,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 219
-      },
-      "taisho": {
-        "total": 190,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 190
-      },
-      "tennoji": {
-        "total": 343,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 343
-      },
-      "tsurumi": {
-        "total": 336,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 336
-      },
-      "yodogawa": {
-        "total": 520,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 520
-      }
-    }
-  },
-  "buildingSourceCountsAfter": {
     "total": 9498,
     "verified": 1579,
     "unresolvedOrAmbiguous": 1117,
@@ -319,11 +167,163 @@
       }
     }
   },
+  "buildingSourceCountsAfter": {
+    "total": 9498,
+    "verified": 1653,
+    "unresolvedOrAmbiguous": 1143,
+    "unattempted": 9264,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 167
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 396
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 46,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 654
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 7,
+        "unresolvedOrAmbiguous": 2,
+        "unattempted": 175
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 290
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 15,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 287
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 1014
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 3,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 238
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 1701
+      },
+      "joto": {
+        "total": 180,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 180
+      },
+      "kita": {
+        "total": 764,
+        "verified": 47,
+        "unresolvedOrAmbiguous": 23,
+        "unattempted": 694
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 19,
+        "unresolvedOrAmbiguous": 5,
+        "unattempted": 255
+      },
+      "minato": {
+        "total": 211,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 211
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 20,
+        "unresolvedOrAmbiguous": 13,
+        "unattempted": 250
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 265
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 356
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 162
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 210
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 151
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 16,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 219
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 190
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 343
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 336
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 0,
+        "unresolvedOrAmbiguous": 0,
+        "unattempted": 520
+      }
+    }
+  },
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 1579,
-    "unresolvedOrAmbiguous": 1117,
-    "unattempted": 37889,
+    "verified": 1653,
+    "unresolvedOrAmbiguous": 1143,
+    "unattempted": 37789,
     "byWard": {
       "abeno": {
         "total": 851,
@@ -339,15 +339,15 @@
       },
       "chuo": {
         "total": 5084,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 5084
+        "verified": 46,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 5020
       },
       "fukushima": {
         "total": 967,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 967
+        "verified": 7,
+        "unresolvedOrAmbiguous": 2,
+        "unattempted": 958
       },
       "higashinari": {
         "total": 918,
@@ -393,9 +393,9 @@
       },
       "konohana": {
         "total": 1309,
-        "verified": 0,
-        "unresolvedOrAmbiguous": 0,
-        "unattempted": 1309
+        "verified": 19,
+        "unresolvedOrAmbiguous": 5,
+        "unattempted": 1285
       },
       "minato": {
         "total": 612,
@@ -405,9 +405,9 @@
       },
       "miyakojima": {
         "total": 1444,
-        "verified": 18,
-        "unresolvedOrAmbiguous": 12,
-        "unattempted": 1414
+        "verified": 20,
+        "unresolvedOrAmbiguous": 13,
+        "unattempted": 1411
       },
       "naniwa": {
         "total": 1363,
@@ -486,904 +486,904 @@
   },
   "results": [
     {
-      "facilityId": "osm-relation-13166722",
-      "osmElementType": "relation",
-      "name": "大阪府済生会中津病院",
-      "wardId": "kita",
+      "facilityId": "osm-way-254474755",
+      "osmElementType": "way",
+      "name": "キリン堂",
+      "wardId": "miyakojima",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 22,
-      "reason": "座標(22m以内)と名前が一致"
+      "distanceMeters": 18,
+      "reason": "座標(18m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-relation-16417304",
-      "osmElementType": "relation",
-      "name": "医誠会国際総合病院 i-Mall",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 33,
-      "reason": "座標(33m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-relation-17062956",
-      "osmElementType": "relation",
-      "name": "ホテルヴィスキオ大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-relation-9189913",
-      "osmElementType": "relation",
-      "name": "リーガロイヤルホテル（大阪）",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 27,
-      "reason": "座標は近い(27m)が名前が一致しない: \"RIHGA Royal Hotel Osaka, Vignette Collection by IHG\""
-    },
-    {
-      "facilityId": "osm-way-1067614204",
+      "facilityId": "osm-way-254750262",
       "osmElementType": "way",
-      "name": "北野病院",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-1071278816",
-      "osmElementType": "way",
-      "name": "帝国ホテル大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1072655563",
-      "osmElementType": "way",
-      "name": "フォーポイント フレックス by シェラトン 大阪梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1205137946",
-      "osmElementType": "way",
-      "name": "行岡病院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 35,
-      "reason": "第二段階: 名前(exact)・タイプ(hospital)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-1369864013",
-      "osmElementType": "way",
-      "name": "Nest Hotel",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 5695,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5695m）"
-    },
-    {
-      "facilityId": "osm-way-1459472425",
-      "osmElementType": "way",
-      "name": "梅田ホリックホテル",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1512303899",
-      "osmElementType": "way",
-      "name": "ホテルモントレ ル・フレール大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-161646316",
-      "osmElementType": "way",
-      "name": "北大阪クリニック",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"加納総合病院透析センター\""
-    },
-    {
-      "facilityId": "osm-way-162158341",
-      "osmElementType": "way",
-      "name": "大阪中央病院",
-      "wardId": "kita",
+      "name": "ニシワキ診療所",
+      "wardId": "miyakojima",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 4,
       "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-162158414",
+      "facilityId": "osm-way-254752284",
       "osmElementType": "way",
-      "name": "桜橋渡辺病院",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 10,
-      "reason": "座標は近い(10m)が名前が一致しない: \"桜橋渡辺リハビリテーション病院\""
-    },
-    {
-      "facilityId": "osm-way-162158415",
-      "osmElementType": "way",
-      "name": "ハートンホテル西梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162181354",
-      "osmElementType": "way",
-      "name": "京医院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162181358",
-      "osmElementType": "way",
-      "name": "ホテルビナリオ梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162184899",
-      "osmElementType": "way",
-      "name": "大阪東急REIホテル",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162185075",
-      "osmElementType": "way",
-      "name": "ホテル法華クラブ大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162185344",
-      "osmElementType": "way",
-      "name": "ホテルマイステイズプレミア堂島",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-162217900",
-      "osmElementType": "way",
-      "name": "田上医院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-164039557",
-      "osmElementType": "way",
-      "name": "プレミアホテル-CABIN-大阪",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 8,
-      "reason": "座標は近い(8m)が名前が一致しない: \"プレミアホテル-CABIN PRESIDENT-大阪\""
-    },
-    {
-      "facilityId": "osm-way-164041055",
-      "osmElementType": "way",
-      "name": "ホテルブイアールオオサカ",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"ホテルリブマックス梅田セントラル\""
-    },
-    {
-      "facilityId": "osm-way-164041058",
-      "osmElementType": "way",
-      "name": "R&B ホテル 東大阪",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 8,
-      "reason": "座標は近い(8m)が名前が一致しない: \"ワシントンR&Bホテル梅田東\""
-    },
-    {
-      "facilityId": "osm-way-174576758",
-      "osmElementType": "way",
-      "name": "イークリニック",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-174591842",
-      "osmElementType": "way",
-      "name": "ホテルリブマックスBudget梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-174643579",
-      "osmElementType": "way",
-      "name": "東横イン梅田中津",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"東横ＩＮＮ梅田中津１\""
-    },
-    {
-      "facilityId": "osm-way-174643588",
-      "osmElementType": "way",
-      "name": "ハートンホテル北梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-175517982",
-      "osmElementType": "way",
-      "name": "人見歯科医院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-175519055",
-      "osmElementType": "way",
-      "name": "AManTo guest house",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 61,
-      "reason": "座標は近い(61m)が名前が一致しない: \"Salon de AManTo 天人\""
-    },
-    {
-      "facilityId": "osm-way-175711212",
-      "osmElementType": "way",
-      "name": "本庄東整骨院・鍼灸院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-175766522",
-      "osmElementType": "way",
-      "name": "なかつ薬局",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-175878801",
-      "osmElementType": "way",
-      "name": "Hotels Inn Osaka KitaUmeda",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"北梅田ダイヤビル\""
-    },
-    {
-      "facilityId": "osm-way-176100063",
-      "osmElementType": "way",
-      "name": "原田鍼灸整骨院",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"西田鍼灸整骨院\""
-    },
-    {
-      "facilityId": "osm-way-178938115",
-      "osmElementType": "way",
-      "name": "川島産婦人科",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-178942577",
-      "osmElementType": "way",
-      "name": "ホテルランドマーク",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 20,
-      "reason": "座標(20m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-178958637",
-      "osmElementType": "way",
-      "name": "堂島ホテル",
-      "wardId": "kita",
+      "name": "ウエルシア薬局",
+      "wardId": "miyakojima",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-178996353",
+      "facilityId": "osm-way-1354339488",
       "osmElementType": "way",
-      "name": "ホテルエルセラーン大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-178996358",
-      "osmElementType": "way",
-      "name": "ヴィアイン梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-179076136",
-      "osmElementType": "way",
-      "name": "TONES OSAKA",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-180187105",
-      "osmElementType": "way",
-      "name": "LIVEMAX PREMIUM梅田EAST",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"天然温泉ホテルリブマックスPREMIUM梅田EAST\""
-    },
-    {
-      "facilityId": "osm-way-180203203",
-      "osmElementType": "way",
-      "name": "北野病院西館",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-180240848",
-      "osmElementType": "way",
-      "name": "ホテル 近畿",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"ホテル ロータス 梅田店\""
-    },
-    {
-      "facilityId": "osm-way-180400842",
-      "osmElementType": "way",
-      "name": "ニュージャパン梅田店",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 15,
-      "reason": "座標は近い(15m)が名前が一致しない: \"NEW JAPAN / CAPSULE INN OSAKA\""
-    },
-    {
-      "facilityId": "osm-way-180581972",
-      "osmElementType": "way",
-      "name": "ホテル喜多八",
-      "wardId": "kita",
+      "name": "薬局ファルシオ大開店",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-181037065",
+      "facilityId": "osm-way-1549867676",
       "osmElementType": "way",
-      "name": "HOTEL WING International",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 6,
-      "reason": "座標は近い(6m)が名前が一致しない: \"KOKO HOTEL 大阪梅田\""
-    },
-    {
-      "facilityId": "osm-way-181048584",
-      "osmElementType": "way",
-      "name": "HOTEL CEEDS",
-      "wardId": "kita",
+      "name": "首藤病院",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-181048633",
+      "facilityId": "osm-way-194051691",
       "osmElementType": "way",
-      "name": "丸一ホテル",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-181068660",
-      "osmElementType": "way",
-      "name": "Premias Umeda",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-181072245",
-      "osmElementType": "way",
-      "name": "ホテル関西",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 21,
-      "reason": "座標(21m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-194059962",
-      "osmElementType": "way",
-      "name": "ホテルNCB",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 15,
-      "reason": "座標(15m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-214145098",
-      "osmElementType": "way",
-      "name": "太田診療所",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-220077676",
-      "osmElementType": "way",
-      "name": "篠原医院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-221035589",
-      "osmElementType": "way",
-      "name": "キリン堂",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 37,
-      "reason": "座標(37m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-221266095",
-      "osmElementType": "way",
-      "name": "HOTEL NEXT",
-      "wardId": "kita",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 207,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 207m）"
-    },
-    {
-      "facilityId": "osm-way-221354451",
-      "osmElementType": "way",
-      "name": "東横イン",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"東横INN梅田中津2\""
-    },
-    {
-      "facilityId": "osm-way-221998224",
-      "osmElementType": "way",
-      "name": "LAVIE EN ROSE",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"ラ・ヴィアンローズ\""
-    },
-    {
-      "facilityId": "osm-way-222072570",
-      "osmElementType": "way",
-      "name": "増原クリニック",
-      "wardId": "kita",
+      "name": "関西電力病院",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 19,
       "reason": "座標(19m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-222074847",
+      "facilityId": "osm-way-220747839",
       "osmElementType": "way",
-      "name": "アパホテル",
-      "wardId": "kita",
+      "name": "ホテル阪神",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
+      "distanceMeters": 19,
+      "reason": "座標(19m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-223085614",
+      "facilityId": "osm-way-220810109",
       "osmElementType": "way",
-      "name": "辰巳 診療所",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-226069631",
-      "osmElementType": "way",
-      "name": "初心之屋 拾弐号館",
-      "wardId": "kita",
+      "name": "カワイ薬局",
+      "wardId": "fukushima",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1361,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1361m）"
+      "distanceMeters": 3653,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3653m）"
     },
     {
-      "facilityId": "osm-way-231449108",
+      "facilityId": "osm-way-248660453",
       "osmElementType": "way",
-      "name": "三井ガーデンホテル大阪プレミア",
-      "wardId": "kita",
+      "name": "フロンティア 薬局",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
+      "distanceMeters": 0,
+      "reason": "座標(0m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-231449170",
+      "facilityId": "osm-way-292192358",
       "osmElementType": "way",
-      "name": "住友病院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-237063998",
-      "osmElementType": "way",
-      "name": "江上歯科",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(2m)が一意 [conservative-variant]"
-    },
-    {
-      "facilityId": "osm-way-460927270",
-      "osmElementType": "way",
-      "name": "ヒルトン大阪",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "座標(14m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-702106187",
-      "osmElementType": "way",
-      "name": "フォーシーズンズホテル大阪",
-      "wardId": "kita",
+      "name": "東横イン",
+      "wardId": "fukushima",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 27,
-      "reason": "座標は近い(27m)が名前が一致しない: \"Four Seasons Hotel Osaka\""
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"東横INN大阪JR野田駅前\""
     },
     {
-      "facilityId": "osm-way-716611435",
+      "facilityId": "osm-way-305353224",
       "osmElementType": "way",
-      "name": "ホテルリブマックス梅田堂山",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-793802293",
-      "osmElementType": "way",
-      "name": "イビスバジェット大阪梅田",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-960078119",
-      "osmElementType": "way",
-      "name": "ホテル イビス 大阪 梅田",
-      "wardId": "kita",
+      "name": "大阪整形外科病院",
+      "wardId": "fukushima",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 10,
       "reason": "座標(10m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-968643529",
+      "facilityId": "osm-way-689116631",
       "osmElementType": "way",
-      "name": "アパホテル&リゾート 大阪梅田駅タワー",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 16,
-      "reason": "座標は近い(16m)が名前が一致しない: \"アパホテル＆リゾート〈大阪梅田駅タワー〉\""
+      "name": "JCHO大阪病院",
+      "wardId": "fukushima",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 60,
+      "reason": "座標(60m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1150937517",
+      "facilityId": "osm-way-1109194445",
       "osmElementType": "way",
-      "name": "大阪市立総合医療センター",
-      "wardId": "miyakojima",
+      "name": "此花ダイイチ薬局",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1110460442",
+      "osmElementType": "way",
+      "name": "ふかき歯科",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1534983157",
+      "osmElementType": "way",
+      "name": "大阪暁明館病院",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 27,
+      "reason": "座標(27m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1537631985",
+      "osmElementType": "way",
+      "name": "JAPAVISTA ひなた",
+      "wardId": "konohana",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3,
+      "reason": "座標は近い(3m)が名前が一致しない: \"JAPAVISTA Hinata ジャパビスタ ひなた\""
+    },
+    {
+      "facilityId": "osm-way-257458123",
+      "osmElementType": "way",
+      "name": "ホテル ユニバーサル ポート",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 35,
+      "reason": "第二段階: 名前(exact)・タイプ(hotel)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-257458153",
+      "osmElementType": "way",
+      "name": "ホテル京阪ユニバーサル・タワー",
+      "wardId": "konohana",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 19,
       "reason": "座標(19m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1250611174",
+      "facilityId": "osm-way-318638644",
       "osmElementType": "way",
-      "name": "東横イン",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"東横INN京橋桜ノ宮\""
-    },
-    {
-      "facilityId": "osm-way-1368091798",
-      "osmElementType": "way",
-      "name": "nanacara薬局",
-      "wardId": "miyakojima",
+      "name": "ビジネスホテル アーバンティ西九条",
+      "wardId": "konohana",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-184602064",
+      "facilityId": "osm-way-413103436",
       "osmElementType": "way",
-      "name": "キリン堂",
-      "wardId": "miyakojima",
+      "name": "köti söpö Universal Bay",
+      "wardId": "konohana",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-246416006",
+      "facilityId": "osm-way-497899205",
       "osmElementType": "way",
-      "name": "都島放射線科クリニック",
-      "wardId": "miyakojima",
+      "name": "ラ・ジェント・ホテル大阪ベイ",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "第二段階: 名前(exact)・タイプ(hotel)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-567963070",
+      "osmElementType": "way",
+      "name": "ホテル ユニバーサル ポート ヴィータ",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 52,
+      "reason": "座標(52m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-588084068",
+      "osmElementType": "way",
+      "name": "シンプルハートホテル大阪",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-588916352",
+      "osmElementType": "way",
+      "name": "矢守眼科クリニック",
+      "wardId": "konohana",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-246424492",
+      "facilityId": "osm-way-589549540",
       "osmElementType": "way",
-      "name": "ヴィアイン大阪京橋",
-      "wardId": "miyakojima",
+      "name": "オリエンタルホテル ユニバーサル・シティ",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 22,
+      "reason": "座標(22m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-655573716",
+      "osmElementType": "way",
+      "name": "暁明館 西九条クリニック",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-674795958",
+      "osmElementType": "way",
+      "name": "大場内科病院",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-674891066",
+      "osmElementType": "way",
+      "name": "大阪陽子線クリニック",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-674891078",
+      "osmElementType": "way",
+      "name": "此花診療所",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-675063647",
+      "osmElementType": "way",
+      "name": "北星会鎌田病院",
+      "wardId": "konohana",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 12484,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 12484m）"
+    },
+    {
+      "facilityId": "osm-way-675063673",
+      "osmElementType": "way",
+      "name": "板東医院",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-678333486",
+      "osmElementType": "way",
+      "name": "小山医院",
+      "wardId": "konohana",
       "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-678333488",
+      "osmElementType": "way",
+      "name": "幸生堂薬局",
+      "wardId": "konohana",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 681,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 681m）"
+    },
+    {
+      "facilityId": "osm-way-682318413",
+      "osmElementType": "way",
+      "name": "谷本医院",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-726021619",
+      "osmElementType": "way",
+      "name": "リーベルホテル大阪",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 16,
+      "reason": "座標(16m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-776357020",
+      "osmElementType": "way",
+      "name": "島村診療所",
+      "wardId": "konohana",
+      "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
-      "reason": "座標は近い(8m)が名前が一致しない: \"ヴィアインプライム大阪京橋＜水城の湯＞\""
+      "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-246432283",
-      "osmElementType": "way",
-      "name": "さくら大阪城北ホテル",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-246557610",
-      "osmElementType": "way",
-      "name": "のぞみ薬局",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-246557634",
-      "osmElementType": "way",
-      "name": "都島休日急病診療所",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-246557643",
-      "osmElementType": "way",
-      "name": "竹谷クリニック",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "第二段階: 名前(exact)・タイプ(medical_clinic)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-246710095",
-      "osmElementType": "way",
-      "name": "沢田 内科",
-      "wardId": "miyakojima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1432,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1432m）"
-    },
-    {
-      "facilityId": "osm-way-247815823",
-      "osmElementType": "way",
-      "name": "尽生会聖和病院",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-247818014",
-      "osmElementType": "way",
-      "name": "村上歯科医院",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248140181",
-      "osmElementType": "way",
-      "name": "玉城クリニック",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248309280",
-      "osmElementType": "way",
-      "name": "Sakura Garden Hotel",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-249189018",
-      "osmElementType": "way",
-      "name": "マルゼン薬局",
-      "wardId": "miyakojima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1068,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1068m）"
-    },
-    {
-      "facilityId": "osm-way-249192084",
-      "osmElementType": "way",
-      "name": "小林産婦人科",
-      "wardId": "miyakojima",
+      "facilityId": "osm-relation-14324739",
+      "osmElementType": "relation",
+      "name": "アパホテル〈なんば駅東〉",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 21,
       "reason": "座標(21m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-249555680",
-      "osmElementType": "way",
-      "name": "スギ薬局",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+      "facilityId": "osm-relation-2904758",
+      "osmElementType": "relation",
+      "name": "なんばオリエンタルホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-249710665",
+      "facilityId": "osm-way-1024782159",
       "osmElementType": "way",
-      "name": "明生記念病院",
-      "wardId": "miyakojima",
+      "name": "WOsaka",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 19,
+      "reason": "座標(19m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1077002113",
+      "osmElementType": "way",
+      "name": "The Bridge Hotel",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6,
+      "reason": "座標は近い(6m)が名前が一致しない: \"ブリッジホテル 心斎橋\""
+    },
+    {
+      "facilityId": "osm-way-109949444",
+      "osmElementType": "way",
+      "name": "ホテル日航大阪",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 5,
       "reason": "座標(5m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-249710767",
+      "facilityId": "osm-way-109949445",
       "osmElementType": "way",
-      "name": "明生病院",
-      "wardId": "miyakojima",
+      "name": "ドーミーイン心斎橋",
+      "wardId": "chuo",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 788,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 788m）"
+    },
+    {
+      "facilityId": "osm-way-1251982686",
+      "osmElementType": "way",
+      "name": "花築・堺筋本町ホテル",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-250065921",
+      "facilityId": "osm-way-1337979040",
       "osmElementType": "way",
-      "name": "Hotel TREND",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"ホテルトレンド京橋駅前\""
+      "name": "ホテルブライトンシティ大阪北浜",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-250115959",
+      "facilityId": "osm-way-1355681254",
       "osmElementType": "way",
-      "name": "協和病院",
-      "wardId": "miyakojima",
+      "name": "ホテルK6 大阪なんば店",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1383420643",
+      "osmElementType": "way",
+      "name": "Welina Hotel Nagomi",
+      "wardId": "chuo",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-250249435",
+      "facilityId": "osm-way-1462759232",
       "osmElementType": "way",
-      "name": "小西耳鼻科",
-      "wardId": "miyakojima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 2083,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2083m）"
+      "name": "&Here OSAKA NAMBA",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 42,
+      "reason": "座標(42m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-250315475",
+      "facilityId": "osm-way-1562251058",
       "osmElementType": "way",
-      "name": "分野病院",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 17,
-      "reason": "座標は近い(17m)が名前が一致しない: \"分野（わけの）病院\""
+      "name": "大阪国際がんセンター",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-251578904",
+      "facilityId": "osm-way-1562251062",
       "osmElementType": "way",
-      "name": "東朋病院",
-      "wardId": "miyakojima",
+      "name": "大阪重粒子線センター",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 16,
+      "reason": "座標(16m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-161622038",
+      "osmElementType": "way",
+      "name": "ホテル京阪天満橋",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 6,
       "reason": "座標(6m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-251578968",
+      "facilityId": "osm-way-161623050",
       "osmElementType": "way",
-      "name": "スギ薬局",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 19,
-      "reason": "座標は近い(19m)が名前が一致しない: \"スギドラッグ 都島中通店\""
+      "name": "ホテル ザ ルーテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-251585263",
+      "facilityId": "osm-way-161623692",
       "osmElementType": "way",
-      "name": "GOEMON",
-      "wardId": "miyakojima",
+      "name": "KKRホテル大阪",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-161623964",
+      "osmElementType": "way",
+      "name": "シティプラザ大阪",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-161835214",
+      "osmElementType": "way",
+      "name": "ホテルロイヤルクラシック大阪",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-161870806",
+      "osmElementType": "way",
+      "name": "ネストホテル大阪心斎橋",
+      "wardId": "chuo",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-252066610",
+      "facilityId": "osm-way-161875235",
       "osmElementType": "way",
-      "name": "原医院",
-      "wardId": "miyakojima",
+      "name": "ハートンホテル心斎橋",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "第二段階: 名前(exact)・タイプ(hotel)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-161875238",
+      "osmElementType": "way",
+      "name": "ハートンホテル心斎橋別館",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-161879622",
+      "osmElementType": "way",
+      "name": "クロスホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-170087125",
+      "osmElementType": "way",
+      "name": "飯島会産科婦人科飯島病院",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-170147862",
+      "osmElementType": "way",
+      "name": "Wayfarer Shinsaibashi",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"ウェイフェア心斎橋\""
+    },
+    {
+      "facilityId": "osm-way-170147912",
+      "osmElementType": "way",
+      "name": "ドーミーインPREMIUMなんば",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "第二段階: 名前(exact)・タイプ(hotel)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-171997916",
+      "osmElementType": "way",
+      "name": "The Lively",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172336207",
+      "osmElementType": "way",
+      "name": "アークホテル大阪心斎橋",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-172378783",
+      "osmElementType": "way",
+      "name": "スイスホテル南海大阪",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 17,
+      "reason": "座標(17m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-173042473",
+      "osmElementType": "way",
+      "name": "国立病院機構 大阪医療センター",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 29,
+      "reason": "第二段階: 名前(exact)・タイプ(government_office)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-176301507",
+      "osmElementType": "way",
+      "name": "大阪迎賓館",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-176306968",
+      "osmElementType": "way",
+      "name": "ホテルニューオータニ",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 62,
+      "reason": "座標(62m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-178481590",
+      "osmElementType": "way",
+      "name": "HOTEL TRAD Replay",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-178481635",
+      "osmElementType": "way",
+      "name": "スーパーホテルなんば・日本橋",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-179076111",
+      "osmElementType": "way",
+      "name": "ホテルユニゾ",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-180245012",
+      "osmElementType": "way",
+      "name": "ビジネスホテルニッセイ",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-219616677",
+      "osmElementType": "way",
+      "name": "ホテルWBFなんば黒門",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 9,
+      "reason": "座標は近い(9m)が名前が一致しない: \"ザ・ワンファイブ大阪なんば黒門\""
+    },
+    {
+      "facilityId": "osm-way-219616710",
+      "osmElementType": "way",
+      "name": "ル ・ポテジュール",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"ホテル ル・ボテジュール ナンバ\""
+    },
+    {
+      "facilityId": "osm-way-219904154",
+      "osmElementType": "way",
+      "name": "御堂筋ホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-219913046",
+      "osmElementType": "way",
+      "name": "ホテルアルプス",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-219913077",
+      "osmElementType": "way",
+      "name": "ナンバプラザホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-220687500",
+      "osmElementType": "way",
+      "name": "Business Inn Sennichimae Hoteleed",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-222580126",
+      "osmElementType": "way",
+      "name": "相鉄グランドフレッサ大阪なんば",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 22,
+      "reason": "座標(22m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-222588129",
+      "osmElementType": "way",
+      "name": "高橋歯科",
+      "wardId": "chuo",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 349,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 349m）"
+    },
+    {
+      "facilityId": "osm-way-223292242",
+      "osmElementType": "way",
+      "name": "The OneFive Osaka Namba Dotonbori",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 10,
+      "reason": "座標は近い(10m)が名前が一致しない: \"ザ・ワンファイブ大阪なんば道頓堀\""
+    },
+    {
+      "facilityId": "osm-way-223355694",
+      "osmElementType": "way",
+      "name": "東急ステイメルキュール大阪なんば",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 20,
+      "reason": "座標(20m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-223355695",
+      "osmElementType": "way",
+      "name": "ホリデイ・イン大阪難波",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"Holiday Inn Osaka Namba by IHG\""
+    },
+    {
+      "facilityId": "osm-way-223477574",
+      "osmElementType": "way",
+      "name": "グランドサウナ心斎橋",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-223477634",
+      "osmElementType": "way",
+      "name": "Bali An RESORT",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 21,
+      "reason": "座標は近い(21m)が名前が一致しない: \"ホテルバリアンリゾートなんば心斎橋店\""
+    },
+    {
+      "facilityId": "osm-way-223783804",
+      "osmElementType": "way",
+      "name": "ホテルアズガーデン",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 16,
+      "reason": "座標は近い(16m)が名前が一致しない: \"アズガーデン日本橋\""
+    },
+    {
+      "facilityId": "osm-way-223889948",
+      "osmElementType": "way",
+      "name": "東横inn 大阪なんば",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 0,
       "reason": "座標(0m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-253347737",
+      "facilityId": "osm-way-223889989",
       "osmElementType": "way",
-      "name": "たかはし皮膚科クリニック",
-      "wardId": "miyakojima",
+      "name": "道頓堀ホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-223928620",
+      "osmElementType": "way",
+      "name": "Hotel 88 Shinsaibashi",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 11,
+      "reason": "座標は近い(11m)が名前が一致しない: \"ホテル８８心斎橋\""
+    },
+    {
+      "facilityId": "osm-way-224034973",
+      "osmElementType": "way",
+      "name": "ホテルビスタ大阪",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 9,
       "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-253347806",
+      "facilityId": "osm-way-224444016",
       "osmElementType": "way",
-      "name": "泉野医院",
-      "wardId": "miyakojima",
+      "name": "Welina Hotel 道頓堀",
+      "wardId": "chuo",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-225239208",
+      "osmElementType": "way",
+      "name": "大阪富士屋ホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-225782612",
+      "osmElementType": "way",
+      "name": "変なホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-232787028",
+      "osmElementType": "way",
+      "name": "HOTEL KEIHAN",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-233086698",
+      "osmElementType": "way",
+      "name": "アパホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-233086720",
+      "osmElementType": "way",
+      "name": "天然温泉 水都の湯 dormy inn Premium 大阪北浜",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3,
+      "reason": "座標は近い(3m)が名前が一致しない: \"ドーミーインPREMIUM大阪北浜\""
+    },
+    {
+      "facilityId": "osm-way-233321101",
+      "osmElementType": "way",
+      "name": "アパホテル",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 12,
+      "reason": "座標(12m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-234992589",
+      "osmElementType": "way",
+      "name": "Sarasa Hotel",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-235840432",
+      "osmElementType": "way",
+      "name": "ホテルマイステイズ堺筋本町",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-235911645",
+      "osmElementType": "way",
+      "name": "ホテル ザ グランデ心斎橋なんば",
+      "wardId": "chuo",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-236984224",
+      "osmElementType": "way",
+      "name": "東横イン",
+      "wardId": "chuo",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 16,
+      "reason": "座標は近い(16m)が名前が一致しない: \"東横INN淀屋橋駅南\""
     }
   ]
 }

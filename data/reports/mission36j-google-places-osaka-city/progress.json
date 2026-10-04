@@ -11171,14 +11171,274 @@
       "matchConfidence": "AMBIGUOUS",
       "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
       "attemptedAt": "2026-10-04T08:00:54.088Z"
+    },
+    {
+      "facilityId": "osm-way-254752284",
+      "name": "ウエルシア薬局",
+      "wardId": "miyakojima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:03:37.508Z"
+    },
+    {
+      "facilityId": "osm-way-220810109",
+      "name": "カワイ薬局",
+      "wardId": "fukushima",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3653m）",
+      "attemptedAt": "2026-10-04T08:03:42.746Z"
+    },
+    {
+      "facilityId": "osm-way-292192358",
+      "name": "東横イン",
+      "wardId": "fukushima",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"東横INN大阪JR野田駅前\"",
+      "attemptedAt": "2026-10-04T08:03:45.117Z"
+    },
+    {
+      "facilityId": "osm-way-1537631985",
+      "name": "JAPAVISTA ひなた",
+      "wardId": "konohana",
+      "category": "lodging",
+      "subcategory": "guest_house",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"JAPAVISTA Hinata ジャパビスタ ひなた\"",
+      "attemptedAt": "2026-10-04T08:03:50.918Z"
+    },
+    {
+      "facilityId": "osm-way-413103436",
+      "name": "köti söpö Universal Bay",
+      "wardId": "konohana",
+      "category": "lodging",
+      "subcategory": "guest_house",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:03:57.994Z"
+    },
+    {
+      "facilityId": "osm-way-675063647",
+      "name": "北星会鎌田病院",
+      "wardId": "konohana",
+      "category": "medical",
+      "subcategory": "hospital",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 12484m）",
+      "attemptedAt": "2026-10-04T08:04:08.372Z"
+    },
+    {
+      "facilityId": "osm-way-678333486",
+      "name": "小山医院",
+      "wardId": "konohana",
+      "category": "medical",
+      "subcategory": "clinic",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T08:04:12.348Z"
+    },
+    {
+      "facilityId": "osm-way-678333488",
+      "name": "幸生堂薬局",
+      "wardId": "konohana",
+      "category": "medical",
+      "subcategory": "pharmacy",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 681m）",
+      "attemptedAt": "2026-10-04T08:04:13.533Z"
+    },
+    {
+      "facilityId": "osm-way-1077002113",
+      "name": "The Bridge Hotel",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"ブリッジホテル 心斎橋\"",
+      "attemptedAt": "2026-10-04T08:04:20.741Z"
+    },
+    {
+      "facilityId": "osm-way-109949445",
+      "name": "ドーミーイン心斎橋",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 788m）",
+      "attemptedAt": "2026-10-04T08:04:22.974Z"
+    },
+    {
+      "facilityId": "osm-way-1383420643",
+      "name": "Welina Hotel Nagomi",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:04:28.742Z"
+    },
+    {
+      "facilityId": "osm-way-161870806",
+      "name": "ネストホテル大阪心斎橋",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:04:41.040Z"
+    },
+    {
+      "facilityId": "osm-way-170147862",
+      "name": "Wayfarer Shinsaibashi",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"ウェイフェア心斎橋\"",
+      "attemptedAt": "2026-10-04T08:04:46.270Z"
+    },
+    {
+      "facilityId": "osm-way-179076111",
+      "name": "ホテルユニゾ",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:04:59.496Z"
+    },
+    {
+      "facilityId": "osm-way-219616677",
+      "name": "ホテルWBFなんば黒門",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"ザ・ワンファイブ大阪なんば黒門\"",
+      "attemptedAt": "2026-10-04T08:05:01.771Z"
+    },
+    {
+      "facilityId": "osm-way-219616710",
+      "name": "ル ・ポテジュール",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"ホテル ル・ボテジュール ナンバ\"",
+      "attemptedAt": "2026-10-04T08:05:02.687Z"
+    },
+    {
+      "facilityId": "osm-way-220687500",
+      "name": "Business Inn Sennichimae Hoteleed",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:05:08.717Z"
+    },
+    {
+      "facilityId": "osm-way-222588129",
+      "name": "高橋歯科",
+      "wardId": "chuo",
+      "category": "medical",
+      "subcategory": "dentist",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 349m）",
+      "attemptedAt": "2026-10-04T08:05:10.913Z"
+    },
+    {
+      "facilityId": "osm-way-223292242",
+      "name": "The OneFive Osaka Namba Dotonbori",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"ザ・ワンファイブ大阪なんば道頓堀\"",
+      "attemptedAt": "2026-10-04T08:05:11.890Z"
+    },
+    {
+      "facilityId": "osm-way-223355695",
+      "name": "ホリデイ・イン大阪難波",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"Holiday Inn Osaka Namba by IHG\"",
+      "attemptedAt": "2026-10-04T08:05:14.292Z"
+    },
+    {
+      "facilityId": "osm-way-223477634",
+      "name": "Bali An RESORT",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(21m)が名前が一致しない: \"ホテルバリアンリゾートなんば心斎橋店\"",
+      "attemptedAt": "2026-10-04T08:05:16.088Z"
+    },
+    {
+      "facilityId": "osm-way-223783804",
+      "name": "ホテルアズガーデン",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"アズガーデン日本橋\"",
+      "attemptedAt": "2026-10-04T08:05:17.065Z"
+    },
+    {
+      "facilityId": "osm-way-223928620",
+      "name": "Hotel 88 Shinsaibashi",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"ホテル８８心斎橋\"",
+      "attemptedAt": "2026-10-04T08:05:20.106Z"
+    },
+    {
+      "facilityId": "osm-way-232787028",
+      "name": "HOTEL KEIHAN",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T08:05:27.175Z"
+    },
+    {
+      "facilityId": "osm-way-233086720",
+      "name": "天然温泉 水都の湯 dormy inn Premium 大阪北浜",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"ドーミーインPREMIUM大阪北浜\"",
+      "attemptedAt": "2026-10-04T08:05:29.415Z"
+    },
+    {
+      "facilityId": "osm-way-236984224",
+      "name": "東横イン",
+      "wardId": "chuo",
+      "category": "lodging",
+      "subcategory": "hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(16m)が名前が一致しない: \"東横INN淀屋橋駅南\"",
+      "attemptedAt": "2026-10-04T08:05:34.717Z"
     }
   ],
-  "generatedAt": "2026-10-04T08:00:57.301Z",
+  "generatedAt": "2026-10-04T08:05:34.763Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 1579,
-    "unresolved": 1117,
-    "unattempted": 37889,
+    "verified": 1653,
+    "unresolved": 1143,
+    "unattempted": 37789,
     "total": 40585
   },
   "wardCounts": {
@@ -11196,15 +11456,15 @@
     },
     "chuo": {
       "total": 5084,
-      "verified": 0,
-      "unresolvedOrAmbiguous": 0,
-      "unattempted": 5084
+      "verified": 46,
+      "unresolvedOrAmbiguous": 18,
+      "unattempted": 5020
     },
     "fukushima": {
       "total": 967,
-      "verified": 0,
-      "unresolvedOrAmbiguous": 0,
-      "unattempted": 967
+      "verified": 7,
+      "unresolvedOrAmbiguous": 2,
+      "unattempted": 958
     },
     "higashinari": {
       "total": 918,
@@ -11250,9 +11510,9 @@
     },
     "konohana": {
       "total": 1309,
-      "verified": 0,
-      "unresolvedOrAmbiguous": 0,
-      "unattempted": 1309
+      "verified": 19,
+      "unresolvedOrAmbiguous": 5,
+      "unattempted": 1285
     },
     "minato": {
       "total": 612,
@@ -11262,9 +11522,9 @@
     },
     "miyakojima": {
       "total": 1444,
-      "verified": 18,
-      "unresolvedOrAmbiguous": 12,
-      "unattempted": 1414
+      "verified": 20,
+      "unresolvedOrAmbiguous": 13,
+      "unattempted": 1411
     },
     "naniwa": {
       "total": 1363,
