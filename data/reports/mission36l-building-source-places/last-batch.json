@@ -1,6 +1,6 @@
 {
   "mission": "36L-building-source-places",
-  "generatedAt": "2026-10-04T10:37:38.936Z",
+  "generatedAt": "2026-10-04T10:52:07.410Z",
   "policy": {
     "sourceTypes": [
       "way",
@@ -14,12 +14,12 @@
   "maxPriority": 3,
   "requestedLimit": 100,
   "processed": 100,
-  "verifiedThisBatch": 35,
+  "verifiedThisBatch": 28,
   "buildingSourceCountsBefore": {
     "total": 9498,
-    "verified": 3981,
-    "unresolvedOrAmbiguous": 3215,
-    "unattempted": 4864,
+    "verified": 4162,
+    "unresolvedOrAmbiguous": 3534,
+    "unattempted": 4364,
     "byWard": {
       "abeno": {
         "total": 167,
@@ -29,161 +29,9 @@
       },
       "asahi": {
         "total": 396,
-        "verified": 33,
-        "unresolvedOrAmbiguous": 4,
-        "unattempted": 359
-      },
-      "chuo": {
-        "total": 718,
-        "verified": 203,
-        "unresolvedOrAmbiguous": 194,
-        "unattempted": 321
-      },
-      "fukushima": {
-        "total": 184,
-        "verified": 50,
-        "unresolvedOrAmbiguous": 38,
-        "unattempted": 96
-      },
-      "higashinari": {
-        "total": 290,
-        "verified": 84,
-        "unresolvedOrAmbiguous": 91,
-        "unattempted": 115
-      },
-      "higashisumiyoshi": {
-        "total": 302,
-        "verified": 48,
-        "unresolvedOrAmbiguous": 8,
-        "unattempted": 246
-      },
-      "higashiyodogawa": {
-        "total": 1014,
-        "verified": 366,
-        "unresolvedOrAmbiguous": 446,
-        "unattempted": 202
-      },
-      "hirano": {
-        "total": 241,
-        "verified": 72,
-        "unresolvedOrAmbiguous": 14,
-        "unattempted": 155
-      },
-      "ikuno": {
-        "total": 1701,
-        "verified": 330,
-        "unresolvedOrAmbiguous": 457,
-        "unattempted": 914
-      },
-      "joto": {
-        "total": 180,
-        "verified": 38,
-        "unresolvedOrAmbiguous": 7,
-        "unattempted": 135
-      },
-      "kita": {
-        "total": 764,
-        "verified": 225,
-        "unresolvedOrAmbiguous": 195,
-        "unattempted": 344
-      },
-      "konohana": {
-        "total": 279,
-        "verified": 84,
-        "unresolvedOrAmbiguous": 62,
-        "unattempted": 133
-      },
-      "minato": {
-        "total": 211,
-        "verified": 70,
-        "unresolvedOrAmbiguous": 33,
-        "unattempted": 108
-      },
-      "miyakojima": {
-        "total": 283,
-        "verified": 85,
-        "unresolvedOrAmbiguous": 47,
-        "unattempted": 151
-      },
-      "naniwa": {
-        "total": 265,
-        "verified": 78,
-        "unresolvedOrAmbiguous": 66,
-        "unattempted": 121
-      },
-      "nishi": {
-        "total": 356,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 121,
-        "unattempted": 124
-      },
-      "nishinari": {
-        "total": 162,
-        "verified": 38,
-        "unresolvedOrAmbiguous": 13,
-        "unattempted": 111
-      },
-      "nishiyodogawa": {
-        "total": 210,
-        "verified": 58,
-        "unresolvedOrAmbiguous": 31,
-        "unattempted": 121
-      },
-      "suminoe": {
-        "total": 151,
-        "verified": 48,
-        "unresolvedOrAmbiguous": 4,
-        "unattempted": 99
-      },
-      "sumiyoshi": {
-        "total": 235,
-        "verified": 44,
-        "unresolvedOrAmbiguous": 11,
-        "unattempted": 180
-      },
-      "taisho": {
-        "total": 190,
-        "verified": 55,
-        "unresolvedOrAmbiguous": 46,
-        "unattempted": 89
-      },
-      "tennoji": {
-        "total": 343,
-        "verified": 80,
-        "unresolvedOrAmbiguous": 65,
-        "unattempted": 198
-      },
-      "tsurumi": {
-        "total": 336,
-        "verified": 34,
-        "unresolvedOrAmbiguous": 4,
-        "unattempted": 298
-      },
-      "yodogawa": {
-        "total": 520,
-        "verified": 212,
-        "unresolvedOrAmbiguous": 166,
-        "unattempted": 142
-      }
-    }
-  },
-  "buildingSourceCountsAfter": {
-    "total": 9498,
-    "verified": 4016,
-    "unresolvedOrAmbiguous": 3280,
-    "unattempted": 4764,
-    "byWard": {
-      "abeno": {
-        "total": 167,
-        "verified": 55,
-        "unresolvedOrAmbiguous": 10,
-        "unattempted": 102
-      },
-      "asahi": {
-        "total": 396,
-        "verified": 46,
-        "unresolvedOrAmbiguous": 29,
-        "unattempted": 321
+        "verified": 135,
+        "unresolvedOrAmbiguous": 184,
+        "unattempted": 77
       },
       "chuo": {
         "total": 718,
@@ -229,9 +77,9 @@
       },
       "joto": {
         "total": 180,
-        "verified": 38,
-        "unresolvedOrAmbiguous": 7,
-        "unattempted": 135
+        "verified": 51,
+        "unresolvedOrAmbiguous": 32,
+        "unattempted": 97
       },
       "kita": {
         "total": 764,
@@ -307,9 +155,161 @@
       },
       "tsurumi": {
         "total": 336,
-        "verified": 34,
+        "verified": 78,
+        "unresolvedOrAmbiguous": 78,
+        "unattempted": 180
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 212,
+        "unresolvedOrAmbiguous": 166,
+        "unattempted": 142
+      }
+    }
+  },
+  "buildingSourceCountsAfter": {
+    "total": 9498,
+    "verified": 4190,
+    "unresolvedOrAmbiguous": 3606,
+    "unattempted": 4264,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 55,
+        "unresolvedOrAmbiguous": 10,
+        "unattempted": 102
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 135,
+        "unresolvedOrAmbiguous": 184,
+        "unattempted": 77
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 203,
+        "unresolvedOrAmbiguous": 194,
+        "unattempted": 321
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 50,
+        "unresolvedOrAmbiguous": 38,
+        "unattempted": 96
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 84,
+        "unresolvedOrAmbiguous": 91,
+        "unattempted": 115
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 48,
+        "unresolvedOrAmbiguous": 8,
+        "unattempted": 246
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 366,
+        "unresolvedOrAmbiguous": 446,
+        "unattempted": 202
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 72,
+        "unresolvedOrAmbiguous": 14,
+        "unattempted": 155
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 352,
+        "unresolvedOrAmbiguous": 497,
+        "unattempted": 852
+      },
+      "joto": {
+        "total": 180,
+        "verified": 51,
+        "unresolvedOrAmbiguous": 32,
+        "unattempted": 97
+      },
+      "kita": {
+        "total": 764,
+        "verified": 225,
+        "unresolvedOrAmbiguous": 195,
+        "unattempted": 344
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 84,
+        "unresolvedOrAmbiguous": 62,
+        "unattempted": 133
+      },
+      "minato": {
+        "total": 211,
+        "verified": 70,
+        "unresolvedOrAmbiguous": 33,
+        "unattempted": 108
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 85,
+        "unresolvedOrAmbiguous": 47,
+        "unattempted": 151
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 78,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 121
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 111,
+        "unresolvedOrAmbiguous": 121,
+        "unattempted": 124
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 38,
+        "unresolvedOrAmbiguous": 13,
+        "unattempted": 111
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 58,
+        "unresolvedOrAmbiguous": 31,
+        "unattempted": 121
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 48,
         "unresolvedOrAmbiguous": 4,
-        "unattempted": 298
+        "unattempted": 99
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 44,
+        "unresolvedOrAmbiguous": 11,
+        "unattempted": 180
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 55,
+        "unresolvedOrAmbiguous": 46,
+        "unattempted": 89
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 80,
+        "unresolvedOrAmbiguous": 65,
+        "unattempted": 198
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 106,
+        "unresolvedOrAmbiguous": 150,
+        "unattempted": 80
       },
       "yodogawa": {
         "total": 520,
@@ -321,9 +321,9 @@
   },
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 4016,
-    "unresolvedOrAmbiguous": 3280,
-    "unattempted": 33289,
+    "verified": 4190,
+    "unresolvedOrAmbiguous": 3606,
+    "unattempted": 32789,
     "byWard": {
       "abeno": {
         "total": 851,
@@ -333,9 +333,9 @@
       },
       "asahi": {
         "total": 1097,
-        "verified": 46,
-        "unresolvedOrAmbiguous": 29,
-        "unattempted": 1022
+        "verified": 135,
+        "unresolvedOrAmbiguous": 184,
+        "unattempted": 778
       },
       "chuo": {
         "total": 5084,
@@ -381,9 +381,9 @@
       },
       "joto": {
         "total": 1051,
-        "verified": 38,
-        "unresolvedOrAmbiguous": 7,
-        "unattempted": 1006
+        "verified": 51,
+        "unresolvedOrAmbiguous": 32,
+        "unattempted": 968
       },
       "kita": {
         "total": 5655,
@@ -459,9 +459,9 @@
       },
       "tsurumi": {
         "total": 842,
-        "verified": 34,
-        "unresolvedOrAmbiguous": 4,
-        "unattempted": 804
+        "verified": 106,
+        "unresolvedOrAmbiguous": 150,
+        "unattempted": 586
       },
       "yodogawa": {
         "total": 3357,
@@ -473,917 +473,917 @@
   },
   "apiUsage": {
     "searchCalls": 100,
-    "detailsCalls": 26,
+    "detailsCalls": 27,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 126,
+    "executed": 127,
     "inFlight": 0,
-    "windowCount": 28,
-    "sessionCount": 126
+    "windowCount": 29,
+    "sessionCount": 127
   },
   "results": [
     {
-      "facilityId": "osm-way-525209502",
+      "facilityId": "osm-way-1132670150",
       "osmElementType": "way",
-      "name": "真光寺参詣者用",
-      "wardId": "ikuno",
+      "name": "システムパーク",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 154,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 154m）"
+      "distanceMeters": 733,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 733m）"
     },
     {
-      "facilityId": "osm-way-525917532",
+      "facilityId": "osm-way-1133017151",
       "osmElementType": "way",
-      "name": "キョウテク",
-      "wardId": "ikuno",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1133017195",
+      "osmElementType": "way",
+      "name": "セイワパーキング 今津中4丁目第1",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133020653",
+      "osmElementType": "way",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133020663",
+      "osmElementType": "way",
+      "name": "東洋カーマックス 今津北第2",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2,
       "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-525917533",
+      "facilityId": "osm-way-1133020703",
       "osmElementType": "way",
-      "name": "巽南モータープール",
-      "wardId": "ikuno",
+      "name": "橋詰モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 834,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 834m）"
+    },
+    {
+      "facilityId": "osm-way-1133020719",
+      "osmElementType": "way",
+      "name": "タイムパーク 今津中3丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 194,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 194m）"
+    },
+    {
+      "facilityId": "osm-way-1133020725",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 20,
-      "reason": "座標は近い(20m)が名前が一致しない: \"キョウテク巽南５丁目２パーキング\""
+      "distanceMeters": 58,
+      "reason": "座標は近い(58m)が名前が一致しない: \"アンプルールフェール今津｜パークダイレクト\""
     },
     {
-      "facilityId": "osm-way-525917539",
+      "facilityId": "osm-way-1133046376",
       "osmElementType": "way",
-      "name": "Dパーキング",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 422,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 422m）"
-    },
-    {
-      "facilityId": "osm-way-527239214",
-      "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 17,
-      "reason": "座標(17m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-527296361",
-      "osmElementType": "way",
-      "name": "東研サーモテックお客様専用駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 18,
-      "reason": "座標は近い(18m)が名前が一致しない: \"東研サーモテック 駐車場\""
-    },
-    {
-      "facilityId": "osm-way-532689015",
-      "osmElementType": "way",
-      "name": "P.ゾーン",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 12,
-      "reason": "座標は近い(12m)が名前が一致しない: \"P.ZONE 勝山南\""
-    },
-    {
-      "facilityId": "osm-way-532689022",
-      "osmElementType": "way",
-      "name": "エス駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-538771322",
-      "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-540415426",
-      "osmElementType": "way",
-      "name": "川端モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 16261,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 16261m）"
-    },
-    {
-      "facilityId": "osm-way-543117185",
-      "osmElementType": "way",
-      "name": "エコロパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-547424364",
-      "osmElementType": "way",
-      "name": "増田青空ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1367,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1367m）"
-    },
-    {
-      "facilityId": "osm-way-549913724",
-      "osmElementType": "way",
-      "name": "FRパーキング",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 112,
-      "reason": "座標は近い(112m)が名前が一致しない: \"ミスターP巽中4丁目\""
-    },
-    {
-      "facilityId": "osm-way-549916784",
-      "osmElementType": "way",
-      "name": "村上ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 310,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 310m）"
-    },
-    {
-      "facilityId": "osm-way-549917556",
-      "osmElementType": "way",
-      "name": "貸ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 270,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 270m）"
-    },
-    {
-      "facilityId": "osm-way-550188737",
-      "osmElementType": "way",
-      "name": "ママパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-550188748",
-      "osmElementType": "way",
-      "name": "MMパーキング",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 142828,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 142828m）"
-    },
-    {
-      "facilityId": "osm-way-550188750",
-      "osmElementType": "way",
-      "name": "奥村モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3509,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3509m）"
-    },
-    {
-      "facilityId": "osm-way-550190050",
-      "osmElementType": "way",
-      "name": "野村モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 879,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 879m）"
-    },
-    {
-      "facilityId": "osm-way-550190865",
-      "osmElementType": "way",
-      "name": "東洋カーマックス",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 506,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 506m）"
-    },
-    {
-      "facilityId": "osm-way-550399771",
-      "osmElementType": "way",
-      "name": "田中モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 891,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 891m）"
-    },
-    {
-      "facilityId": "osm-way-550403219",
-      "osmElementType": "way",
-      "name": "本覚寺檀家駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 229,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 229m）"
-    },
-    {
-      "facilityId": "osm-way-551254849",
-      "osmElementType": "way",
-      "name": "フクタニ第３モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1956,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1956m）"
-    },
-    {
-      "facilityId": "osm-way-553781519",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-554304705",
-      "osmElementType": "way",
-      "name": "マルトモータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-554587959",
-      "osmElementType": "way",
-      "name": "ショウワパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-554662631",
-      "osmElementType": "way",
-      "name": "イナダモータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-554667544",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "ikuno",
+      "name": "今津北2丁目 月極駐車場",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-554667549",
+      "facilityId": "osm-way-1133046377",
       "osmElementType": "way",
-      "name": "長栄パーキング",
-      "wardId": "ikuno",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
+      "distanceMeters": 92,
+      "reason": "座標(92m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-556387777",
+      "facilityId": "osm-way-1133051200",
       "osmElementType": "way",
-      "name": "飯田モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 53,
-      "reason": "座標は近い(53m)が名前が一致しない: \"（株）飯田興産\""
-    },
-    {
-      "facilityId": "osm-way-556387780",
-      "osmElementType": "way",
-      "name": "長谷川ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-558368756",
-      "osmElementType": "way",
-      "name": "小路モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 120,
-      "reason": "座標は近い(120m)が名前が一致しない: \"ナニワモータープール\""
-    },
-    {
-      "facilityId": "osm-way-571031737",
-      "osmElementType": "way",
-      "name": "伊勢本モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 355,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 355m）"
-    },
-    {
-      "facilityId": "osm-way-578574533",
-      "osmElementType": "way",
-      "name": "MUSCLE",
-      "wardId": "ikuno",
+      "name": "Dパーキング 鶴見区今津北2丁目第2",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 30,
-      "reason": "座標は近い(30m)が名前が一致しない: \"BIGBANGZYM\""
+      "reason": "座標は近い(30m)が名前が一致しない: \"タイムズ今津北２丁目\""
     },
     {
-      "facilityId": "osm-way-581288617",
-      "osmElementType": "way",
-      "name": "パラカ",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-585576530",
-      "osmElementType": "way",
-      "name": "パラカ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 214,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 214m）"
-    },
-    {
-      "facilityId": "osm-way-585579654",
-      "osmElementType": "way",
-      "name": "村上ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 580,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 580m）"
-    },
-    {
-      "facilityId": "osm-way-585590889",
-      "osmElementType": "way",
-      "name": "大阪シティ信用金庫 たつみ支店 駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 42,
-      "reason": "座標(42m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-589547955",
-      "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-589550329",
-      "osmElementType": "way",
-      "name": "パラカ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1140,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1140m）"
-    },
-    {
-      "facilityId": "osm-way-593448382",
-      "osmElementType": "way",
-      "name": "みゆきモータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-593766535",
-      "osmElementType": "way",
-      "name": "河合駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 843,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 843m）"
-    },
-    {
-      "facilityId": "osm-way-598549833",
-      "osmElementType": "way",
-      "name": "三晁モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 313,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 313m）"
-    },
-    {
-      "facilityId": "osm-way-607837382",
-      "osmElementType": "way",
-      "name": "GSパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 69,
-      "reason": "座標(69m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-609979022",
-      "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "ikuno",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-617806332",
+      "facilityId": "osm-way-1133051204",
       "osmElementType": "way",
       "name": "三井のリパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-617806614",
-      "osmElementType": "way",
-      "name": "ブレイク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 20,
-      "reason": "座標(20m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-619818147",
-      "osmElementType": "way",
-      "name": "アイワパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-648127298",
-      "osmElementType": "way",
-      "name": "松木モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-648127301",
-      "osmElementType": "way",
-      "name": "西川モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 7720,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 7720m）"
-    },
-    {
-      "facilityId": "osm-way-650600445",
-      "osmElementType": "way",
-      "name": "イングP",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 126,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 126m）"
-    },
-    {
-      "facilityId": "osm-way-655189026",
-      "osmElementType": "way",
-      "name": "まじま歯科クリニック 第2駐車場",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 52,
-      "reason": "座標(52m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-655189028",
-      "osmElementType": "way",
-      "name": "パークンパーク",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-680641548",
-      "osmElementType": "way",
-      "name": "親和ガレージ",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 9,
-      "reason": "座標(9m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-680641552",
-      "osmElementType": "way",
-      "name": "舎利寺エコキューブ",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 535,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 535m）"
-    },
-    {
-      "facilityId": "osm-way-682076818",
-      "osmElementType": "way",
-      "name": "日版プリント専用駐車場",
-      "wardId": "ikuno",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 33,
-      "reason": "座標は近い(33m)が名前が一致しない: \"（株）日版プリント\""
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-way-687415148",
+      "facilityId": "osm-way-1133056213",
       "osmElementType": "way",
-      "name": "スエヒロモータープール",
-      "wardId": "ikuno",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1133059529",
+      "osmElementType": "way",
+      "name": "志方モータープール",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1339,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1339m）"
+      "distanceMeters": 581,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 581m）"
     },
     {
-      "facilityId": "osm-way-690971227",
+      "facilityId": "osm-way-1133369385",
       "osmElementType": "way",
-      "name": "田中モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 856,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 856m）"
-    },
-    {
-      "facilityId": "osm-way-697506616",
-      "osmElementType": "way",
-      "name": "名鉄協商パーキング",
-      "wardId": "ikuno",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-697506655",
-      "osmElementType": "way",
-      "name": "松井モータープール",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 6061,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6061m）"
-    },
-    {
-      "facilityId": "osm-way-706083373",
-      "osmElementType": "way",
-      "name": "パークス",
-      "wardId": "ikuno",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 2645,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2645m）"
-    },
-    {
-      "facilityId": "osm-way-706083374",
-      "osmElementType": "way",
-      "name": "NPC",
-      "wardId": "ikuno",
+      "name": "ハローパーク 今津北",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
       "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1115918769",
+      "facilityId": "osm-way-1133372883",
       "osmElementType": "way",
-      "name": "OnePark 大工大前",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
+      "name": "竹中駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 95184,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 95184m）"
     },
     {
-      "facilityId": "osm-way-1115926243",
+      "facilityId": "osm-way-1133372895",
+      "osmElementType": "way",
+      "name": "森田住宅モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3308,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3308m）"
+    },
+    {
+      "facilityId": "osm-way-1133372896",
       "osmElementType": "way",
       "name": "三井のリパーク",
-      "wardId": "asahi",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1115926323",
+      "facilityId": "osm-way-1133372907",
       "osmElementType": "way",
-      "name": "細見モータープール",
-      "wardId": "asahi",
+      "name": "森田パーキング",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 544,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 544m）"
+      "distanceMeters": 3782,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3782m）"
     },
     {
-      "facilityId": "osm-way-1115926326",
+      "facilityId": "osm-way-1133377628",
       "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 165,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 165m）"
+      "name": "放出東1丁目 月極モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1116125657",
+      "facilityId": "osm-way-1133382035",
       "osmElementType": "way",
-      "name": "コミュニティパーク 中宮3丁目",
-      "wardId": "asahi",
+      "name": "来客用駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 264,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 264m）"
+    },
+    {
+      "facilityId": "osm-way-1133382055",
+      "osmElementType": "way",
+      "name": "榎本モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 418,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 418m）"
+    },
+    {
+      "facilityId": "osm-way-1133594784",
+      "osmElementType": "way",
+      "name": "GSパーク 今津南1丁目",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-1116131996",
+      "facilityId": "osm-way-1133674906",
       "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
+      "name": "ヒットメゾン放出東",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+      "distanceMeters": 13,
+      "reason": "座標は近い(13m)が名前が一致しない: \"ヒットメゾン大智\""
     },
     {
-      "facilityId": "osm-way-1116132038",
+      "facilityId": "osm-way-1133674909",
       "osmElementType": "way",
-      "name": "橘第三モータープール",
-      "wardId": "asahi",
+      "name": "アキラ・モータープール",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 539,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 539m）"
+      "distanceMeters": 1620,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1620m）"
     },
     {
-      "facilityId": "osm-way-1116132049",
+      "facilityId": "osm-way-1133680002",
       "osmElementType": "way",
-      "name": "林電気工事 専用駐車場",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 83,
-      "reason": "座標は近い(83m)が名前が一致しない: \"株式会社林電気工事\""
-    },
-    {
-      "facilityId": "osm-way-1116176510",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 120,
-      "reason": "座標(120m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116176513",
-      "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 23,
-      "reason": "座標(23m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116176518",
-      "osmElementType": "way",
-      "name": "橘第二モータープール",
-      "wardId": "asahi",
+      "name": "第2西田モータープール",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 588,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 588m）"
+      "distanceMeters": 742,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 742m）"
     },
     {
-      "facilityId": "osm-way-1116176595",
+      "facilityId": "osm-way-1133680043",
       "osmElementType": "way",
-      "name": "タイムズ",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116176596",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
+      "name": "フクイモータープール",
+      "wardId": "tsurumi",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 146,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 146m）"
+      "distanceMeters": 1566,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1566m）"
     },
     {
-      "facilityId": "osm-way-1116181763",
+      "facilityId": "osm-way-1133680056",
       "osmElementType": "way",
-      "name": "中三モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1968,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1968m）"
-    },
-    {
-      "facilityId": "osm-way-1116181774",
-      "osmElementType": "way",
-      "name": "中三モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1965,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1965m）"
-    },
-    {
-      "facilityId": "osm-way-1116195218",
-      "osmElementType": "way",
-      "name": "一富士ガレージ",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 837,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 837m）"
-    },
-    {
-      "facilityId": "osm-way-1116398104",
-      "osmElementType": "way",
-      "name": "中宮3丁目駐車場",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 31,
-      "reason": "座標は近い(31m)が名前が一致しない: \"三井のリパーク 中宮３丁目第２ 駐車場\""
-    },
-    {
-      "facilityId": "osm-way-1116403470",
-      "osmElementType": "way",
-      "name": "フルーツパーク 中宮2丁目",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1126,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1126m）"
-    },
-    {
-      "facilityId": "osm-way-1116403481",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-1116403538",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-1116441507",
-      "osmElementType": "way",
-      "name": "OnePark 中宮2丁目",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116736855",
-      "osmElementType": "way",
-      "name": "エコロパーク 中宮第1",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116736857",
-      "osmElementType": "way",
-      "name": "三井のリパーク",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 16,
-      "reason": "座標(16m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116736941",
-      "osmElementType": "way",
-      "name": "中宮モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116749291",
-      "osmElementType": "way",
-      "name": "Super jpm",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116749333",
-      "osmElementType": "way",
-      "name": "中宮1丁目パーキング",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 162,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 162m）"
-    },
-    {
-      "facilityId": "osm-way-1116762592",
-      "osmElementType": "way",
-      "name": "旭豊モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 10032,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 10032m）"
-    },
-    {
-      "facilityId": "osm-way-1116762594",
-      "osmElementType": "way",
-      "name": "トウメイ洗車駐車場",
-      "wardId": "asahi",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1116762604",
-      "osmElementType": "way",
-      "name": "AnyPark",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 8454561,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 8454561m）"
-    },
-    {
-      "facilityId": "osm-way-1116762608",
-      "osmElementType": "way",
-      "name": "AnyPark 生江4",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null,
-      "reason": "Google Places 側に候補が無い"
-    },
-    {
-      "facilityId": "osm-way-1116762633",
-      "osmElementType": "way",
-      "name": "グリーンハイツ駐車場",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"グリーンハイツたちばな\""
-    },
-    {
-      "facilityId": "osm-way-1116762634",
-      "osmElementType": "way",
-      "name": "AnyPark 生江2",
-      "wardId": "asahi",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-1117010487",
-      "osmElementType": "way",
-      "name": "生江3丁目第5駐車場",
-      "wardId": "asahi",
+      "name": "高山モータープール",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 6,
       "reason": "座標(6m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1117010542",
+      "facilityId": "osm-way-1133680060",
       "osmElementType": "way",
-      "name": "橘第六モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 142,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 142m）"
-    },
-    {
-      "facilityId": "osm-way-1117010549",
-      "osmElementType": "way",
-      "name": "岸本ビル来客用駐車場",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 398453,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 398453m）"
-    },
-    {
-      "facilityId": "osm-way-1117010551",
-      "osmElementType": "way",
-      "name": "矢尾前田モータープール",
-      "wardId": "asahi",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1568,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1568m）"
-    },
-    {
-      "facilityId": "osm-way-1117010555",
-      "osmElementType": "way",
-      "name": "松岡駐車場",
-      "wardId": "asahi",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 4,
       "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1117010560",
+      "facilityId": "osm-way-1133684703",
       "osmElementType": "way",
-      "name": "橘第一モータープール",
-      "wardId": "asahi",
+      "name": "タニグチモータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133684724",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 141,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 141m）"
+    },
+    {
+      "facilityId": "osm-way-1133940136",
+      "osmElementType": "way",
+      "name": "SPARK 今津中",
+      "wardId": "tsurumi",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 115,
-      "reason": "座標は近い(115m)が名前が一致しない: \"岡崎モータープール\""
+      "distanceMeters": 3,
+      "reason": "座標は近い(3m)が名前が一致しない: \"SPARK(スパーク) 今津中\""
+    },
+    {
+      "facilityId": "osm-way-1133974278",
+      "osmElementType": "way",
+      "name": "M&Kモータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 529,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 529m）"
+    },
+    {
+      "facilityId": "osm-way-1133974305",
+      "osmElementType": "way",
+      "name": "ニッケンパーク 今津中3丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 67,
+      "reason": "座標は近い(67m)が名前が一致しない: \"タイムズ今津中３丁目\""
+    },
+    {
+      "facilityId": "osm-way-1133977714",
+      "osmElementType": "way",
+      "name": "放出モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 639,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 639m）"
+    },
+    {
+      "facilityId": "osm-way-1133977774",
+      "osmElementType": "way",
+      "name": "名鉄協商パーク 大阪今津南3丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 54,
+      "reason": "座標は近い(54m)が名前が一致しない: \"名鉄協商パーキング 大阪今津南３丁目\""
+    },
+    {
+      "facilityId": "osm-way-1133977775",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 164,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 164m）"
+    },
+    {
+      "facilityId": "osm-way-1133981464",
+      "osmElementType": "way",
+      "name": "今津ガレージ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133981470",
+      "osmElementType": "way",
+      "name": "南4 月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 160,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 160m）"
+    },
+    {
+      "facilityId": "osm-way-1133981471",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1133981559",
+      "osmElementType": "way",
+      "name": "下農モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 498,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 498m）"
+    },
+    {
+      "facilityId": "osm-way-1134175463",
+      "osmElementType": "way",
+      "name": "グリーンモータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 5458,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5458m）"
+    },
+    {
+      "facilityId": "osm-way-1134196578",
+      "osmElementType": "way",
+      "name": "TS高翔産業 専用駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 13,
+      "reason": "座標は近い(13m)が名前が一致しない: \"TS高翔産業株式会社 専用駐車場\""
+    },
+    {
+      "facilityId": "osm-way-1134196616",
+      "osmElementType": "way",
+      "name": "下農モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 252,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 252m）"
+    },
+    {
+      "facilityId": "osm-way-1134200092",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134206196",
+      "osmElementType": "way",
+      "name": "名鉄協商パーキング",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 29,
+      "reason": "座標(29m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134206204",
+      "osmElementType": "way",
+      "name": "美田モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6,
+      "reason": "座標は近い(6m)が名前が一致しない: \"美田モーターブール\""
+    },
+    {
+      "facilityId": "osm-way-1134391432",
+      "osmElementType": "way",
+      "name": "パーキング012",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 46,
+      "reason": "座標は近い(46m)が名前が一致しない: \"ピコパーキング 今津南2丁目\""
+    },
+    {
+      "facilityId": "osm-way-1134391451",
+      "osmElementType": "way",
+      "name": "ピコパーキング 今津南2丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134391474",
+      "osmElementType": "way",
+      "name": "パーキングΩ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134395474",
+      "osmElementType": "way",
+      "name": "中峰モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 12,
+      "reason": "座標(12m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134395522",
+      "osmElementType": "way",
+      "name": "青空駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1378,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1378m）"
+    },
+    {
+      "facilityId": "osm-way-1134425459",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1134425466",
+      "osmElementType": "way",
+      "name": "南2-2 月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1770,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1770m）"
+    },
+    {
+      "facilityId": "osm-way-1134425469",
+      "osmElementType": "way",
+      "name": "タイムパーキング 今津南2丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-1134425489",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1134425490",
+      "osmElementType": "way",
+      "name": "南2-1 月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 137,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 137m）"
+    },
+    {
+      "facilityId": "osm-way-1134430854",
+      "osmElementType": "way",
+      "name": "タイムパーキング 今津中1丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134430859",
+      "osmElementType": "way",
+      "name": "NBパーキング 今津中",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134430866",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 12,
+      "reason": "座標(12m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134430879",
+      "osmElementType": "way",
+      "name": "アサダモータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 9406,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 9406m）"
+    },
+    {
+      "facilityId": "osm-way-1134430883",
+      "osmElementType": "way",
+      "name": "くるっとパーク 今津中1丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134430937",
+      "osmElementType": "way",
+      "name": "パラカ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"Paraca\""
+    },
+    {
+      "facilityId": "osm-way-1134440575",
+      "osmElementType": "way",
+      "name": "セリイモータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 398,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 398m）"
+    },
+    {
+      "facilityId": "osm-way-1134447308",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 241,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 241m）"
+    },
+    {
+      "facilityId": "osm-way-1134670583",
+      "osmElementType": "way",
+      "name": "OnePark 藍の都脳神経外科病院第2",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 48,
+      "reason": "座標は近い(48m)が名前が一致しない: \"社会医療法人ささき会 藍の都脳神経外科病院\""
+    },
+    {
+      "facilityId": "osm-way-1134670596",
+      "osmElementType": "way",
+      "name": "ランドパーキング 放出東",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 74,
+      "reason": "座標は近い(74m)が名前が一致しない: \"三井のリパーク 放出東２丁目第４ 駐車場\""
+    },
+    {
+      "facilityId": "osm-way-1134670603",
+      "osmElementType": "way",
+      "name": "OnePark 藍の都脳神経外科病院第1",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 27,
+      "reason": "座標は近い(27m)が名前が一致しない: \"社会医療法人ささき会 藍の都脳神経外科病院\""
+    },
+    {
+      "facilityId": "osm-way-1134670619",
+      "osmElementType": "way",
+      "name": "大橋駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 5095,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5095m）"
+    },
+    {
+      "facilityId": "osm-way-1134677423",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 16,
+      "reason": "座標(16m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1134677444",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 101,
+      "reason": "座標は近い(101m)が名前が一致しない: \"La Douceur放出｜パークダイレクト\""
+    },
+    {
+      "facilityId": "osm-way-1134699636",
+      "osmElementType": "way",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 201,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 201m）"
+    },
+    {
+      "facilityId": "osm-way-1134699671",
+      "osmElementType": "way",
+      "name": "D-パーキング 放出駅前第1",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"Dパーキング 放出駅前第1\""
+    },
+    {
+      "facilityId": "osm-way-1134703397",
+      "osmElementType": "way",
+      "name": "野村モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2680,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2680m）"
+    },
+    {
+      "facilityId": "osm-way-1134710668",
+      "osmElementType": "way",
+      "name": "放出駅自転車駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 56,
+      "reason": "座標は近い(56m)が名前が一致しない: \"放出駅自転車駐輪場\""
+    },
+    {
+      "facilityId": "osm-way-1134710673",
+      "osmElementType": "way",
+      "name": "センターパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2768,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2768m）"
+    },
+    {
+      "facilityId": "osm-way-1134715838",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1134715842",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1134715876",
+      "osmElementType": "way",
+      "name": "システムパーク 放出3丁目",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"システムパーク 放出東3丁目\""
+    },
+    {
+      "facilityId": "osm-way-1135034951",
+      "osmElementType": "way",
+      "name": "ファミリア放出東3一 月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 218,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 218m）"
+    },
+    {
+      "facilityId": "osm-way-1135034963",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 146,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 146m）"
+    },
+    {
+      "facilityId": "osm-way-1135052563",
+      "osmElementType": "way",
+      "name": "NPC24H 放出東パーキング",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 19,
+      "reason": "座標(19m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1135052587",
+      "osmElementType": "way",
+      "name": "鳥芳モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 6698,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6698m）"
+    },
+    {
+      "facilityId": "osm-way-1135344458",
+      "osmElementType": "way",
+      "name": "エコロパーク 放出東第2",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1135344507",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 291,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 291m）"
+    },
+    {
+      "facilityId": "osm-way-1135349189",
+      "osmElementType": "way",
+      "name": "タイムズ",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1135349231",
+      "osmElementType": "way",
+      "name": "ファミリア放出東2-2 月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 267,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 267m）"
+    },
+    {
+      "facilityId": "osm-way-1135359682",
+      "osmElementType": "way",
+      "name": "放出東モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 173,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 173m）"
+    },
+    {
+      "facilityId": "osm-way-1135571377",
+      "osmElementType": "way",
+      "name": "モータープール ファミリア放出東1",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 323,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 323m）"
+    },
+    {
+      "facilityId": "osm-way-1135574707",
+      "osmElementType": "way",
+      "name": "阪口第一モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1907,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1907m）"
+    },
+    {
+      "facilityId": "osm-way-1135577730",
+      "osmElementType": "way",
+      "name": "月極駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-1135606773",
+      "osmElementType": "way",
+      "name": "エコロパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 292,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 292m）"
+    },
+    {
+      "facilityId": "osm-way-1135606799",
+      "osmElementType": "way",
+      "name": "アルファパーキング",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2557,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2557m）"
+    },
+    {
+      "facilityId": "osm-way-1135606814",
+      "osmElementType": "way",
+      "name": "711モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 9101,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 9101m）"
+    },
+    {
+      "facilityId": "osm-way-1135606817",
+      "osmElementType": "way",
+      "name": "センカパーキング",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 5531,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5531m）"
+    },
+    {
+      "facilityId": "osm-way-1135606831",
+      "osmElementType": "way",
+      "name": "工藤モータープール",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 6719,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6719m）"
+    },
+    {
+      "facilityId": "osm-way-1135606842",
+      "osmElementType": "way",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "座標(13m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1135606857",
+      "osmElementType": "way",
+      "name": "奥野製薬工業 放出駐車場",
+      "wardId": "tsurumi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 187,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 187m）"
+    },
+    {
+      "facilityId": "osm-way-329803726",
+      "osmElementType": "way",
+      "name": "KTF鶴見パーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-387316351",
+      "osmElementType": "way",
+      "name": "三井のリパーク",
+      "wardId": "tsurumi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14,
+      "reason": "座標(14m以内)と名前が一致"
     }
   ]
 }
