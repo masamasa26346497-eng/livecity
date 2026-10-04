@@ -1,6 +1,6 @@
 {
   "mission": "36L-building-source-places",
-  "generatedAt": "2026-10-04T11:06:09.009Z",
+  "generatedAt": "2026-10-04T11:20:03.652Z",
   "policy": {
     "sourceTypes": [
       "way",
@@ -14,12 +14,12 @@
   "maxPriority": 3,
   "requestedLimit": 100,
   "processed": 100,
-  "verifiedThisBatch": 74,
+  "verifiedThisBatch": 67,
   "buildingSourceCountsBefore": {
     "total": 9498,
-    "verified": 4347,
-    "unresolvedOrAmbiguous": 3849,
-    "unattempted": 3864,
+    "verified": 4691,
+    "unresolvedOrAmbiguous": 4005,
+    "unattempted": 3364,
     "byWard": {
       "abeno": {
         "total": 167,
@@ -35,161 +35,9 @@
       },
       "chuo": {
         "total": 718,
-        "verified": 203,
-        "unresolvedOrAmbiguous": 194,
-        "unattempted": 321
-      },
-      "fukushima": {
-        "total": 184,
-        "verified": 50,
-        "unresolvedOrAmbiguous": 38,
-        "unattempted": 96
-      },
-      "higashinari": {
-        "total": 290,
-        "verified": 84,
-        "unresolvedOrAmbiguous": 91,
-        "unattempted": 115
-      },
-      "higashisumiyoshi": {
-        "total": 302,
-        "verified": 90,
-        "unresolvedOrAmbiguous": 117,
-        "unattempted": 95
-      },
-      "higashiyodogawa": {
-        "total": 1014,
-        "verified": 366,
-        "unresolvedOrAmbiguous": 446,
-        "unattempted": 202
-      },
-      "hirano": {
-        "total": 241,
-        "verified": 87,
-        "unresolvedOrAmbiguous": 33,
-        "unattempted": 121
-      },
-      "ikuno": {
-        "total": 1701,
-        "verified": 352,
-        "unresolvedOrAmbiguous": 497,
-        "unattempted": 852
-      },
-      "joto": {
-        "total": 180,
-        "verified": 51,
-        "unresolvedOrAmbiguous": 32,
-        "unattempted": 97
-      },
-      "kita": {
-        "total": 764,
-        "verified": 288,
-        "unresolvedOrAmbiguous": 212,
-        "unattempted": 264
-      },
-      "konohana": {
-        "total": 279,
-        "verified": 84,
-        "unresolvedOrAmbiguous": 62,
-        "unattempted": 133
-      },
-      "minato": {
-        "total": 211,
-        "verified": 70,
-        "unresolvedOrAmbiguous": 33,
-        "unattempted": 108
-      },
-      "miyakojima": {
-        "total": 283,
-        "verified": 85,
-        "unresolvedOrAmbiguous": 47,
-        "unattempted": 151
-      },
-      "naniwa": {
-        "total": 265,
-        "verified": 78,
-        "unresolvedOrAmbiguous": 66,
-        "unattempted": 121
-      },
-      "nishi": {
-        "total": 356,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 121,
-        "unattempted": 124
-      },
-      "nishinari": {
-        "total": 162,
-        "verified": 54,
-        "unresolvedOrAmbiguous": 35,
-        "unattempted": 73
-      },
-      "nishiyodogawa": {
-        "total": 210,
-        "verified": 58,
-        "unresolvedOrAmbiguous": 31,
-        "unattempted": 121
-      },
-      "suminoe": {
-        "total": 151,
-        "verified": 50,
-        "unresolvedOrAmbiguous": 18,
-        "unattempted": 83
-      },
-      "sumiyoshi": {
-        "total": 235,
-        "verified": 53,
-        "unresolvedOrAmbiguous": 56,
-        "unattempted": 126
-      },
-      "taisho": {
-        "total": 190,
-        "verified": 55,
-        "unresolvedOrAmbiguous": 46,
-        "unattempted": 89
-      },
-      "tennoji": {
-        "total": 343,
-        "verified": 80,
-        "unresolvedOrAmbiguous": 65,
-        "unattempted": 198
-      },
-      "tsurumi": {
-        "total": 336,
-        "verified": 106,
-        "unresolvedOrAmbiguous": 151,
-        "unattempted": 79
-      },
-      "yodogawa": {
-        "total": 520,
-        "verified": 212,
-        "unresolvedOrAmbiguous": 166,
-        "unattempted": 142
-      }
-    }
-  },
-  "buildingSourceCountsAfter": {
-    "total": 9498,
-    "verified": 4421,
-    "unresolvedOrAmbiguous": 3875,
-    "unattempted": 3764,
-    "byWard": {
-      "abeno": {
-        "total": 167,
-        "verified": 65,
-        "unresolvedOrAmbiguous": 26,
-        "unattempted": 76
-      },
-      "asahi": {
-        "total": 396,
-        "verified": 135,
-        "unresolvedOrAmbiguous": 184,
-        "unattempted": 77
-      },
-      "chuo": {
-        "total": 718,
-        "verified": 204,
-        "unresolvedOrAmbiguous": 196,
-        "unattempted": 318
+        "verified": 284,
+        "unresolvedOrAmbiguous": 251,
+        "unattempted": 183
       },
       "fukushima": {
         "total": 184,
@@ -211,9 +59,9 @@
       },
       "higashiyodogawa": {
         "total": 1014,
-        "verified": 366,
-        "unresolvedOrAmbiguous": 446,
-        "unattempted": 202
+        "verified": 385,
+        "unresolvedOrAmbiguous": 453,
+        "unattempted": 176
       },
       "hirano": {
         "total": 241,
@@ -247,9 +95,9 @@
       },
       "minato": {
         "total": 211,
-        "verified": 70,
-        "unresolvedOrAmbiguous": 33,
-        "unattempted": 108
+        "verified": 86,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 88
       },
       "miyakojima": {
         "total": 283,
@@ -259,15 +107,15 @@
       },
       "naniwa": {
         "total": 265,
-        "verified": 78,
-        "unresolvedOrAmbiguous": 66,
-        "unattempted": 121
+        "verified": 93,
+        "unresolvedOrAmbiguous": 74,
+        "unattempted": 98
       },
       "nishi": {
         "total": 356,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 121,
-        "unattempted": 124
+        "verified": 135,
+        "unresolvedOrAmbiguous": 123,
+        "unattempted": 98
       },
       "nishinari": {
         "total": 162,
@@ -277,9 +125,9 @@
       },
       "nishiyodogawa": {
         "total": 210,
-        "verified": 58,
-        "unresolvedOrAmbiguous": 31,
-        "unattempted": 121
+        "verified": 72,
+        "unresolvedOrAmbiguous": 33,
+        "unattempted": 105
       },
       "suminoe": {
         "total": 151,
@@ -295,15 +143,15 @@
       },
       "taisho": {
         "total": 190,
-        "verified": 55,
-        "unresolvedOrAmbiguous": 46,
-        "unattempted": 89
+        "verified": 58,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 83
       },
       "tennoji": {
         "total": 343,
-        "verified": 80,
-        "unresolvedOrAmbiguous": 65,
-        "unattempted": 198
+        "verified": 149,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 95
       },
       "tsurumi": {
         "total": 336,
@@ -313,17 +161,169 @@
       },
       "yodogawa": {
         "total": 520,
-        "verified": 212,
-        "unresolvedOrAmbiguous": 166,
-        "unattempted": 142
+        "verified": 242,
+        "unresolvedOrAmbiguous": 181,
+        "unattempted": 97
+      }
+    }
+  },
+  "buildingSourceCountsAfter": {
+    "total": 9498,
+    "verified": 4758,
+    "unresolvedOrAmbiguous": 4038,
+    "unattempted": 3264,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 65,
+        "unresolvedOrAmbiguous": 26,
+        "unattempted": 76
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 135,
+        "unresolvedOrAmbiguous": 184,
+        "unattempted": 77
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 284,
+        "unresolvedOrAmbiguous": 251,
+        "unattempted": 183
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 68,
+        "unresolvedOrAmbiguous": 44,
+        "unattempted": 72
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 94,
+        "unresolvedOrAmbiguous": 92,
+        "unattempted": 104
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 90,
+        "unresolvedOrAmbiguous": 117,
+        "unattempted": 95
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 397,
+        "unresolvedOrAmbiguous": 460,
+        "unattempted": 157
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 87,
+        "unresolvedOrAmbiguous": 33,
+        "unattempted": 121
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 397,
+        "unresolvedOrAmbiguous": 522,
+        "unattempted": 782
+      },
+      "joto": {
+        "total": 180,
+        "verified": 51,
+        "unresolvedOrAmbiguous": 32,
+        "unattempted": 97
+      },
+      "kita": {
+        "total": 764,
+        "verified": 306,
+        "unresolvedOrAmbiguous": 217,
+        "unattempted": 241
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 102,
+        "unresolvedOrAmbiguous": 69,
+        "unattempted": 108
+      },
+      "minato": {
+        "total": 211,
+        "verified": 86,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 88
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 104,
+        "unresolvedOrAmbiguous": 53,
+        "unattempted": 126
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 93,
+        "unresolvedOrAmbiguous": 74,
+        "unattempted": 98
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 135,
+        "unresolvedOrAmbiguous": 123,
+        "unattempted": 98
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 54,
+        "unresolvedOrAmbiguous": 35,
+        "unattempted": 73
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 72,
+        "unresolvedOrAmbiguous": 33,
+        "unattempted": 105
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 50,
+        "unresolvedOrAmbiguous": 18,
+        "unattempted": 83
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 53,
+        "unresolvedOrAmbiguous": 56,
+        "unattempted": 126
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 58,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 83
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 149,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 95
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 106,
+        "unresolvedOrAmbiguous": 151,
+        "unattempted": 79
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 242,
+        "unresolvedOrAmbiguous": 181,
+        "unattempted": 97
       }
     }
   },
   "countsAfterBatch": {
     "total": 40585,
-    "verified": 4421,
-    "unresolvedOrAmbiguous": 3875,
-    "unattempted": 32289,
+    "verified": 4758,
+    "unresolvedOrAmbiguous": 4038,
+    "unattempted": 31789,
     "byWard": {
       "abeno": {
         "total": 851,
@@ -339,9 +339,9 @@
       },
       "chuo": {
         "total": 5084,
-        "verified": 204,
-        "unresolvedOrAmbiguous": 196,
-        "unattempted": 4684
+        "verified": 284,
+        "unresolvedOrAmbiguous": 251,
+        "unattempted": 4549
       },
       "fukushima": {
         "total": 967,
@@ -351,9 +351,9 @@
       },
       "higashinari": {
         "total": 918,
-        "verified": 84,
-        "unresolvedOrAmbiguous": 91,
-        "unattempted": 743
+        "verified": 94,
+        "unresolvedOrAmbiguous": 92,
+        "unattempted": 732
       },
       "higashisumiyoshi": {
         "total": 1025,
@@ -363,9 +363,9 @@
       },
       "higashiyodogawa": {
         "total": 2922,
-        "verified": 366,
-        "unresolvedOrAmbiguous": 446,
-        "unattempted": 2110
+        "verified": 397,
+        "unresolvedOrAmbiguous": 460,
+        "unattempted": 2065
       },
       "hirano": {
         "total": 1116,
@@ -375,9 +375,9 @@
       },
       "ikuno": {
         "total": 3325,
-        "verified": 352,
-        "unresolvedOrAmbiguous": 497,
-        "unattempted": 2476
+        "verified": 397,
+        "unresolvedOrAmbiguous": 522,
+        "unattempted": 2406
       },
       "joto": {
         "total": 1051,
@@ -399,9 +399,9 @@
       },
       "minato": {
         "total": 612,
-        "verified": 70,
-        "unresolvedOrAmbiguous": 33,
-        "unattempted": 509
+        "verified": 86,
+        "unresolvedOrAmbiguous": 37,
+        "unattempted": 489
       },
       "miyakojima": {
         "total": 1444,
@@ -411,15 +411,15 @@
       },
       "naniwa": {
         "total": 1363,
-        "verified": 78,
-        "unresolvedOrAmbiguous": 66,
-        "unattempted": 1219
+        "verified": 93,
+        "unresolvedOrAmbiguous": 74,
+        "unattempted": 1196
       },
       "nishi": {
         "total": 2071,
-        "verified": 111,
-        "unresolvedOrAmbiguous": 121,
-        "unattempted": 1839
+        "verified": 135,
+        "unresolvedOrAmbiguous": 123,
+        "unattempted": 1813
       },
       "nishinari": {
         "total": 854,
@@ -429,9 +429,9 @@
       },
       "nishiyodogawa": {
         "total": 880,
-        "verified": 58,
-        "unresolvedOrAmbiguous": 31,
-        "unattempted": 791
+        "verified": 72,
+        "unresolvedOrAmbiguous": 33,
+        "unattempted": 775
       },
       "suminoe": {
         "total": 617,
@@ -447,15 +447,15 @@
       },
       "taisho": {
         "total": 649,
-        "verified": 55,
-        "unresolvedOrAmbiguous": 46,
-        "unattempted": 548
+        "verified": 58,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 542
       },
       "tennoji": {
         "total": 1611,
-        "verified": 80,
-        "unresolvedOrAmbiguous": 65,
-        "unattempted": 1466
+        "verified": 149,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 1363
       },
       "tsurumi": {
         "total": 842,
@@ -465,925 +465,925 @@
       },
       "yodogawa": {
         "total": 3357,
-        "verified": 212,
-        "unresolvedOrAmbiguous": 166,
-        "unattempted": 2979
+        "verified": 242,
+        "unresolvedOrAmbiguous": 181,
+        "unattempted": 2934
       }
     }
   },
   "apiUsage": {
     "searchCalls": 100,
-    "detailsCalls": 30,
+    "detailsCalls": 18,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 130,
+    "executed": 118,
     "inFlight": 0,
-    "windowCount": 32,
-    "sessionCount": 130
+    "windowCount": 20,
+    "sessionCount": 118
   },
   "results": [
     {
-      "facilityId": "osm-way-399112063",
+      "facilityId": "osm-way-273398526",
       "osmElementType": "way",
-      "name": "日本キリスト教会 大阪北教会",
-      "wardId": "kita",
+      "name": "正徳寺",
+      "wardId": "higashiyodogawa",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-445480957",
+      "facilityId": "osm-way-273399728",
       "osmElementType": "way",
-      "name": "堂島薬師堂",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
+      "name": "源光寺",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-way-463452876",
+      "facilityId": "osm-way-273399729",
       "osmElementType": "way",
-      "name": "網敷天満宮御旅所",
-      "wardId": "kita",
+      "name": "正福寺",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-330602207",
+      "osmElementType": "way",
+      "name": "大將軍社",
+      "wardId": "higashiyodogawa",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
       "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
     },
     {
-      "facilityId": "osm-way-464117222",
+      "facilityId": "osm-way-487127518",
       "osmElementType": "way",
-      "name": "歯神社",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-464256652",
-      "osmElementType": "way",
-      "name": "網敷天神社",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-464256666",
-      "osmElementType": "way",
-      "name": "喜多埜稲荷神社",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-482761129",
-      "osmElementType": "way",
-      "name": "露 天神社",
-      "wardId": "kita",
+      "name": "瑞光寺",
+      "wardId": "higashiyodogawa",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 20,
       "reason": "座標(20m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-504335749",
+      "facilityId": "osm-way-487547242",
       "osmElementType": "way",
-      "name": "彫刻の小径",
-      "wardId": "kita",
+      "name": "大隅神社御旅所",
+      "wardId": "higashiyodogawa",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 52,
-      "reason": "座標(52m以内)と名前が一致"
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-541582128",
+      "facilityId": "osm-way-575940098",
       "osmElementType": "way",
-      "name": "HANKYU BRICK MUSEUM",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 10,
-      "reason": "座標(10m以内)と名前が一致"
+      "name": "社務所",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 25,
+      "reason": "座標は近い(25m)が名前が一致しない: \"中島惣社\""
     },
     {
-      "facilityId": "osm-way-564995042",
+      "facilityId": "osm-way-678061260",
       "osmElementType": "way",
-      "name": "白龍大神",
-      "wardId": "kita",
+      "name": "明教寺",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 16,
+      "reason": "座標(16m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-690892067",
+      "osmElementType": "way",
+      "name": "摂社 仲哀天皇社",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-690892068",
+      "osmElementType": "way",
+      "name": "末社 住吉神社",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-692738685",
+      "osmElementType": "way",
+      "name": "寂光寺",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-714979512",
+      "osmElementType": "way",
+      "name": "菅原天満宮",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-784715876",
+      "osmElementType": "way",
+      "name": "大隅神社",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-795981393",
+      "osmElementType": "way",
+      "name": "淡路に在る キリスト教の集会所",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"淡路に在るキリストの集会\""
+    },
+    {
+      "facilityId": "osm-way-800107791",
+      "osmElementType": "way",
+      "name": "松山神社",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-94199525",
+      "osmElementType": "way",
+      "name": "水道記念館",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-965601258",
+      "osmElementType": "way",
+      "name": "日本基督教改革派大阪教会",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"日本キリスト改革派大阪教会\""
+    },
+    {
+      "facilityId": "osm-way-965601260",
+      "osmElementType": "way",
+      "name": "歓喜地蔵尊",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-995850485",
+      "osmElementType": "way",
+      "name": "大阪相川教会",
+      "wardId": "higashiyodogawa",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1363620714",
+      "osmElementType": "way",
+      "name": "正一位 稲荷大神",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-258336907",
+      "osmElementType": "way",
+      "name": "創価学会",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-290768577",
+      "osmElementType": "way",
+      "name": "光栄寺",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-293372667",
+      "osmElementType": "way",
+      "name": "天理教",
+      "wardId": "higashinari",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 365,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 365m）"
+    },
+    {
+      "facilityId": "osm-way-377704861",
+      "osmElementType": "way",
+      "name": "教秀寺",
+      "wardId": "higashinari",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 11,
       "reason": "座標(11m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-579515525",
+      "facilityId": "osm-way-384163783",
       "osmElementType": "way",
-      "name": "淀川旧分流施設 毛馬第一閘門",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-611406810",
-      "osmElementType": "way",
-      "name": "太融寺",
-      "wardId": "kita",
+      "name": "洗心寺",
+      "wardId": "higashinari",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 20,
+      "distanceMeters": 3,
       "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
     },
     {
-      "facilityId": "osm-way-615519171",
+      "facilityId": "osm-way-439019448",
       "osmElementType": "way",
-      "name": "梅田芸術劇場",
-      "wardId": "kita",
+      "name": "遍照山専光寺",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-439363160",
+      "osmElementType": "way",
+      "name": "金光教片江教会",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-439887824",
+      "osmElementType": "way",
+      "name": "熊野大神宮",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-443030938",
+      "osmElementType": "way",
+      "name": "金光教",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-607836113",
+      "osmElementType": "way",
+      "name": "観光寺",
+      "wardId": "higashinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-5470400",
+      "osmElementType": "relation",
+      "name": "(宗)真イエス教会",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"真イエス教会 大阪生野教会\""
+    },
+    {
+      "facilityId": "osm-way-1148448649",
+      "osmElementType": "way",
+      "name": "彌榮神社",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-1148448658",
+      "osmElementType": "way",
+      "name": "櫛名毘売大神",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1148448660",
+      "osmElementType": "way",
+      "name": "福徳大明神",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1162946440",
+      "osmElementType": "way",
+      "name": "石切劔大明神",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3164,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3164m）"
+    },
+    {
+      "facilityId": "osm-way-1272926487",
+      "osmElementType": "way",
+      "name": "天理教 北大教会",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 38,
       "reason": "座標(38m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-695766275",
+      "facilityId": "osm-way-206198101",
       "osmElementType": "way",
-      "name": "専念寺",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-695766290",
-      "osmElementType": "way",
-      "name": "堀川戎神社",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-695766291",
-      "osmElementType": "way",
-      "name": "冷雲院",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-695774097",
-      "osmElementType": "way",
-      "name": "蓮華寺",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-695774099",
-      "osmElementType": "way",
-      "name": "西福寺",
-      "wardId": "kita",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-695774100",
-      "osmElementType": "way",
-      "name": "龍渕寺",
-      "wardId": "kita",
+      "name": "御幸森天神宮",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 9,
       "reason": "座標(9m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-695774101",
+      "facilityId": "osm-way-268098880",
       "osmElementType": "way",
-      "name": "本傳寺",
-      "wardId": "kita",
+      "name": "源ケ橋温泉(廃業)",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 4,
       "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-743325646",
+      "facilityId": "osm-way-355249890",
       "osmElementType": "way",
-      "name": "大信寺",
-      "wardId": "kita",
+      "name": "矢柄地蔵尊",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 6,
-      "reason": "座標(6m以内)と名前が一致"
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-764461695",
+      "facilityId": "osm-way-359834687",
       "osmElementType": "way",
-      "name": "鶴満寺",
-      "wardId": "kita",
+      "name": "光徳寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-361371196",
+      "osmElementType": "way",
+      "name": "コヤマ",
+      "wardId": "ikuno",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null,
       "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
     },
     {
-      "facilityId": "osm-way-887380875",
+      "facilityId": "osm-way-362220225",
       "osmElementType": "way",
-      "name": "淀川旧分流施設 毛馬洗堰",
-      "wardId": "kita",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"旧毛馬洗堰\""
+      "name": "薬泉寺",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 853641,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 853641m）"
     },
     {
-      "facilityId": "osm-way-1292764422",
+      "facilityId": "osm-way-364867868",
       "osmElementType": "way",
-      "name": "大長寺",
-      "wardId": "miyakojima",
+      "name": "大阪教会",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 45,
+      "reason": "座標は近い(45m)が名前が一致しない: \"在日韓国基督教会館\""
+    },
+    {
+      "facilityId": "osm-way-365048725",
+      "osmElementType": "way",
+      "name": "御幸森天神宮御旅所",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-366315230",
+      "osmElementType": "way",
+      "name": "小路キリスト教会",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-366921109",
+      "osmElementType": "way",
+      "name": "念佛堂",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 7,
+      "reason": "座標は近い(7m)が名前が一致しない: \"念仏堂\""
+    },
+    {
+      "facilityId": "osm-way-368117190",
+      "osmElementType": "way",
+      "name": "法泉寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-368765740",
+      "osmElementType": "way",
+      "name": "松尾神社址",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"松尾神社跡\""
+    },
+    {
+      "facilityId": "osm-way-371736123",
+      "osmElementType": "way",
+      "name": "偏増寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-371875046",
+      "osmElementType": "way",
+      "name": "光泉寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 36,
+      "reason": "座標(36m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-372192891",
+      "osmElementType": "way",
+      "name": "圓龍寺",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 32,
+      "reason": "座標は近い(32m)が名前が一致しない: \"円龍寺\""
+    },
+    {
+      "facilityId": "osm-way-372192892",
+      "osmElementType": "way",
+      "name": "西俊徳地蔵尊",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-372597847",
+      "osmElementType": "way",
+      "name": "巽神社鳥居",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-374283826",
+      "osmElementType": "way",
+      "name": "永照寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-377811621",
+      "osmElementType": "way",
+      "name": "大悲山法蔵寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-378112682",
+      "osmElementType": "way",
+      "name": "妙信寺",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 716,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 716m）"
+    },
+    {
+      "facilityId": "osm-way-378112692",
+      "osmElementType": "way",
+      "name": "教願寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-378895713",
+      "osmElementType": "way",
+      "name": "宮趾紀念",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 8,
+      "reason": "座標は近い(8m)が名前が一致しない: \"宮址紀念\""
+    },
+    {
+      "facilityId": "osm-way-378972213",
+      "osmElementType": "way",
+      "name": "宗玄寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
       "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
     },
     {
-      "facilityId": "osm-way-1301242841",
+      "facilityId": "osm-way-380342034",
       "osmElementType": "way",
-      "name": "藤田邸跡公園",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
-    },
-    {
-      "facilityId": "osm-way-1325556403",
-      "osmElementType": "way",
-      "name": "母恩寺",
-      "wardId": "miyakojima",
+      "name": "榎白上大神",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1395276109",
+      "facilityId": "osm-way-380343151",
       "osmElementType": "way",
-      "name": "櫻宮",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(14m)が一意 [conservative-variant]"
-    },
-    {
-      "facilityId": "osm-way-1450758359",
-      "osmElementType": "way",
-      "name": "奥之坊",
-      "wardId": "miyakojima",
+      "name": "生野神社",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 10,
       "reason": "座標(10m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-246432311",
+      "facilityId": "osm-way-383085077",
       "osmElementType": "way",
-      "name": "旧川崎家住宅主屋",
-      "wardId": "miyakojima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 40810,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 40810m）"
-    },
-    {
-      "facilityId": "osm-way-246452597",
-      "osmElementType": "way",
-      "name": "浄行寺",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-247778837",
-      "osmElementType": "way",
-      "name": "狹間ハウス",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"狭間ハウス\""
-    },
-    {
-      "facilityId": "osm-way-247780550",
-      "osmElementType": "way",
-      "name": "浄妙寺",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-247956658",
-      "osmElementType": "way",
-      "name": "桜宮神社御旅所",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"桜宮（櫻宮神社）御旅所\""
-    },
-    {
-      "facilityId": "osm-way-248448145",
-      "osmElementType": "way",
-      "name": "八柱神社",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248448228",
-      "osmElementType": "way",
-      "name": "早馬稲荷神社",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248662051",
-      "osmElementType": "way",
-      "name": "心宗寺",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248730808",
-      "osmElementType": "way",
-      "name": "本法寺 大阪別院",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-248749183",
-      "osmElementType": "way",
-      "name": "創価学会",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-250249452",
-      "osmElementType": "way",
-      "name": "金光教",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-250699076",
-      "osmElementType": "way",
-      "name": "妙法寺",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-250790565",
-      "osmElementType": "way",
-      "name": "天理教",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 14,
-      "reason": "座標(14m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-251159164",
-      "osmElementType": "way",
-      "name": "主聖霊教会",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-251504269",
-      "osmElementType": "way",
-      "name": "辯天宗",
-      "wardId": "miyakojima",
+      "name": "大阪ベテル教会",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 8,
       "reason": "座標(8m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-254297631",
+      "facilityId": "osm-way-383223915",
       "osmElementType": "way",
-      "name": "友渕阿弥陀堂",
-      "wardId": "miyakojima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 981,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 981m）"
-    },
-    {
-      "facilityId": "osm-way-254752415",
-      "osmElementType": "way",
-      "name": "淀川神社",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "座標(4m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-609486327",
-      "osmElementType": "way",
-      "name": "楠玉神社",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-933383872",
-      "osmElementType": "way",
-      "name": "櫻宮大神 楠龍王大神",
-      "wardId": "miyakojima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-947112669",
-      "osmElementType": "way",
-      "name": "藤田美術館",
-      "wardId": "miyakojima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 29,
-      "reason": "第二段階: 名前(exact)・タイプ(art_museum)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-1413467694",
-      "osmElementType": "way",
-      "name": "高野寺",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7,
-      "reason": "座標(7m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-160892792",
-      "osmElementType": "way",
-      "name": "八坂神社",
-      "wardId": "fukushima",
+      "name": "浄円寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 5,
       "reason": "座標(5m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-162639737",
+      "facilityId": "osm-way-383235330",
       "osmElementType": "way",
-      "name": "聖天了徳院",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 30,
-      "reason": "座標(30m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-194059983",
-      "osmElementType": "way",
-      "name": "本遇寺",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-246417710",
-      "osmElementType": "way",
-      "name": "福島天満宮",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-252138695",
-      "osmElementType": "way",
-      "name": "天理教分教会",
-      "wardId": "fukushima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4,
-      "reason": "座標は近い(4m)が名前が一致しない: \"天理教 理誠分教会\""
-    },
-    {
-      "facilityId": "osm-way-294368105",
-      "osmElementType": "way",
-      "name": "豊光神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-296359493",
-      "osmElementType": "way",
-      "name": "金光教 野田教会",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-296675429",
-      "osmElementType": "way",
-      "name": "金刀比羅神社",
-      "wardId": "fukushima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 8,
-      "reason": "座標は近い(8m)が名前が一致しない: \"金刀比羅社(金刀比羅宮)\""
-    },
-    {
-      "facilityId": "osm-way-296675481",
-      "osmElementType": "way",
-      "name": "稲荷神社",
-      "wardId": "fukushima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 2,
-      "reason": "座標は近い(2m)が名前が一致しない: \"稲荷社（豊受稲荷宮）\""
-    },
-    {
-      "facilityId": "osm-way-296784247",
-      "osmElementType": "way",
-      "name": "弘法寺",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-296802577",
-      "osmElementType": "way",
-      "name": "天理教 福花分教会",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1,
-      "reason": "座標(1m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-310065186",
-      "osmElementType": "way",
-      "name": "蓮光寺",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-310743266",
-      "osmElementType": "way",
-      "name": "稲荷神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-504502252",
-      "osmElementType": "way",
-      "name": "吉高稲荷神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3,
-      "reason": "座標(3m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-528760679",
-      "osmElementType": "way",
-      "name": "弁才天",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-531750144",
-      "osmElementType": "way",
-      "name": "えびす神社",
-      "wardId": "fukushima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1390,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1390m）"
-    },
-    {
-      "facilityId": "osm-way-531996291",
-      "osmElementType": "way",
-      "name": "淡 嶋大神 八大龍王",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 9,
-      "reason": "座標(9m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-533600358",
-      "osmElementType": "way",
-      "name": "春日神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-533811828",
-      "osmElementType": "way",
-      "name": "野田恵美須神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "座標(5m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-534252872",
-      "osmElementType": "way",
-      "name": "熊野神社",
-      "wardId": "fukushima",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-way-534259787",
-      "osmElementType": "way",
-      "name": "圓満寺",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 5,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-534277082",
-      "osmElementType": "way",
-      "name": "極楽寺",
-      "wardId": "fukushima",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 375142,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 375142m）"
-    },
-    {
-      "facilityId": "osm-way-680376474",
-      "osmElementType": "way",
-      "name": "天神社",
-      "wardId": "fukushima",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-relation-21230390",
-      "osmElementType": "relation",
-      "name": "スーパー・ニンテンドー・ワールド",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 53,
-      "reason": "座標(53m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-relation-21230391",
-      "osmElementType": "relation",
-      "name": "スーパードンキーコング",
-      "wardId": "konohana",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
-    },
-    {
-      "facilityId": "osm-relation-5695002",
-      "osmElementType": "relation",
-      "name": "ユニバーサル・スタジオ・ジャパン",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 26,
-      "reason": "座標(26m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1191573524",
-      "osmElementType": "way",
-      "name": "住吉神社",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1227340378",
-      "osmElementType": "way",
-      "name": "西九條神社",
-      "wardId": "konohana",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 5,
-      "reason": "座標は近い(5m)が名前が一致しない: \"西九条神社\""
-    },
-    {
-      "facilityId": "osm-way-1227351318",
-      "osmElementType": "way",
-      "name": "西念寺",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 4,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
-    },
-    {
-      "facilityId": "osm-way-1227351328",
-      "osmElementType": "way",
-      "name": "淨泉寺",
-      "wardId": "konohana",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 9,
-      "reason": "座標は近い(9m)が名前が一致しない: \"浄泉寺\""
-    },
-    {
-      "facilityId": "osm-way-1227351345",
-      "osmElementType": "way",
-      "name": "鴉宮",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-1302390506",
-      "osmElementType": "way",
-      "name": "ホグワーツ城",
-      "wardId": "konohana",
+      "name": "南岳山 舎利尊勝寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 13,
       "reason": "座標(13m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-147105958",
+      "facilityId": "osm-way-383445302",
       "osmElementType": "way",
-      "name": "正蓮寺",
-      "wardId": "konohana",
+      "name": "難波寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 10,
-      "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+      "reason": "座標(10m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1534983152",
+      "facilityId": "osm-way-384838194",
       "osmElementType": "way",
-      "name": "西法寺",
-      "wardId": "konohana",
+      "name": "三吉大明神",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-386186751",
+      "osmElementType": "way",
+      "name": "大阪善光寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 21,
+      "reason": "座標(21m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-386732038",
+      "osmElementType": "way",
+      "name": "故石川弘先生銅像趾",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 43569,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 43569m）"
+    },
+    {
+      "facilityId": "osm-way-388870849",
+      "osmElementType": "way",
+      "name": "瑞光寺",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 11042,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 11042m）"
+    },
+    {
+      "facilityId": "osm-way-389095685",
+      "osmElementType": "way",
+      "name": "巽神社",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 13,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-389710478",
+      "osmElementType": "way",
+      "name": "清見原神社",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-390067121",
+      "osmElementType": "way",
+      "name": "子育地蔵尊",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"育子地蔵尊\""
+    },
+    {
+      "facilityId": "osm-way-390067150",
+      "osmElementType": "way",
+      "name": "道明寺",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 11710,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 11710m）"
+    },
+    {
+      "facilityId": "osm-way-390604284",
+      "osmElementType": "way",
+      "name": "妙法寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 16,
+      "reason": "座標(16m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-390797207",
+      "osmElementType": "way",
+      "name": "妙蓮寺",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-391734825",
+      "osmElementType": "way",
+      "name": "獅子吼山 教恩寺",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 7,
+      "reason": "座標は近い(7m)が名前が一致しない: \"教恩寺（獅子吼山）\""
+    },
+    {
+      "facilityId": "osm-way-391905565",
+      "osmElementType": "way",
+      "name": "田島神社",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 27,
+      "reason": "第二段階: 名前(exact)・タイプ(shinto_shrine)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
+    },
+    {
+      "facilityId": "osm-way-391905566",
+      "osmElementType": "way",
+      "name": "眼鏡レンズ発祥之地",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6,
+      "reason": "座標は近い(6m)が名前が一致しない: \"眼鏡レンズ発祥の地\""
+    },
+    {
+      "facilityId": "osm-way-393198783",
+      "osmElementType": "way",
+      "name": "アガペ宣教教会",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1108,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1108m）"
+    },
+    {
+      "facilityId": "osm-way-393221823",
+      "osmElementType": "way",
+      "name": "延命地蔵尊",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 309,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 309m）"
+    },
+    {
+      "facilityId": "osm-way-394390570",
+      "osmElementType": "way",
+      "name": "大光寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-394920057",
+      "osmElementType": "way",
+      "name": "天理教眞洋分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"天理教 眞洋分教會\""
+    },
+    {
+      "facilityId": "osm-way-396715751",
+      "osmElementType": "way",
+      "name": "天理教葛上分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-398748194",
+      "osmElementType": "way",
+      "name": "古本市場 生野店",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 17,
+      "reason": "座標(17m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-401218746",
+      "osmElementType": "way",
+      "name": "光西寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2,
       "reason": "座標(2m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1549909364",
+      "facilityId": "osm-way-403203641",
       "osmElementType": "way",
-      "name": "ウォーターワールド",
-      "wardId": "konohana",
+      "name": "清瀧稲荷大明神",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 35,
-      "reason": "座標(35m以内)と名前が一致"
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-1549994522",
+      "facilityId": "osm-way-403880785",
       "osmElementType": "way",
-      "name": "ジュラシッ ク パーク",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 53,
-      "reason": "座標(53m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-341987328",
-      "osmElementType": "way",
-      "name": "観音寺",
-      "wardId": "konohana",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 176154,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 176154m）"
-    },
-    {
-      "facilityId": "osm-way-447424409",
-      "osmElementType": "way",
-      "name": "創価学会 此花文化会館",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2,
-      "reason": "座標(2m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-497899204",
-      "osmElementType": "way",
-      "name": "Zepp OsakaBayside",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 29,
-      "reason": "座標(29m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-565649913",
-      "osmElementType": "way",
-      "name": "白浪大神鴉宮神社御旅所北港桜島神社",
-      "wardId": "konohana",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 15,
-      "reason": "座標は近い(15m)が名前が一致しない: \"白浪龍神大神\""
-    },
-    {
-      "facilityId": "osm-way-590297592",
-      "osmElementType": "way",
-      "name": "産土神社",
-      "wardId": "konohana",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 8,
-      "reason": "座標(8m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-way-661938345",
-      "osmElementType": "way",
-      "name": "信光寺",
-      "wardId": "konohana",
+      "name": "金光教大友教会",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-405999093",
+      "osmElementType": "way",
+      "name": "慶長山 光明寺",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2694,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2694m）"
+    },
+    {
+      "facilityId": "osm-way-407019565",
+      "osmElementType": "way",
+      "name": "末廣稲荷神社",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-414745352",
+      "osmElementType": "way",
+      "name": "浄恩寺",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
       "reason": "第二段階: 名前(exact)・タイプ(buddhist_temple)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]"
     },
     {
-      "facilityId": "osm-way-675063662",
+      "facilityId": "osm-way-414789150",
       "osmElementType": "way",
-      "name": "PL教団",
-      "wardId": "konohana",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 1,
-      "reason": "座標は近い(1m)が名前が一致しない: \"パーフェクトリバティー教団此花教会\""
-    },
-    {
-      "facilityId": "osm-way-691543442",
-      "osmElementType": "way",
-      "name": "酉島神社",
-      "wardId": "konohana",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1222,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1222m）"
-    },
-    {
-      "facilityId": "osm-way-706520675",
-      "osmElementType": "way",
-      "name": "朝日神明社",
-      "wardId": "konohana",
+      "name": "出世不動寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 12,
-      "reason": "座標(12m以内)と名前が一致"
+      "distanceMeters": 11,
+      "reason": "座標(11m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-720979052",
+      "facilityId": "osm-way-415397649",
       "osmElementType": "way",
-      "name": "ピーコック・シアター",
-      "wardId": "konohana",
+      "name": "天理教島里分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-415780685",
+      "osmElementType": "way",
+      "name": "天理教本樂分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5,
+      "reason": "座標は近い(5m)が名前が一致しない: \"天理教本楽分教会\""
+    },
+    {
+      "facilityId": "osm-way-416549794",
+      "osmElementType": "way",
+      "name": "天理教北華分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-417315776",
+      "osmElementType": "way",
+      "name": "尚容院",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 125,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 125m）"
+    },
+    {
+      "facilityId": "osm-way-418101729",
+      "osmElementType": "way",
+      "name": "金光教 東田島分教会",
+      "wardId": "ikuno",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 471,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 471m）"
+    },
+    {
+      "facilityId": "osm-way-418610967",
+      "osmElementType": "way",
+      "name": "円徳寺",
+      "wardId": "ikuno",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 21,
+      "reason": "座標は近い(21m)が名前が一致しない: \"真宗大谷派 圓徳寺\""
+    },
+    {
+      "facilityId": "osm-way-422859438",
+      "osmElementType": "way",
+      "name": "超善寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 7,
       "reason": "座標(7m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-907903555",
+      "facilityId": "osm-way-422871369",
       "osmElementType": "way",
-      "name": "文徳延命地蔵尊",
-      "wardId": "konohana",
+      "name": "小丘山 定願寺",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
     },
     {
-      "facilityId": "osm-way-909438321",
+      "facilityId": "osm-way-422903576",
       "osmElementType": "way",
-      "name": "浄興寺",
-      "wardId": "konohana",
+      "name": "天理教",
+      "wardId": "ikuno",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 0,
-      "reason": "座標(0m以内)と名前が一致"
-    },
-    {
-      "facilityId": "osm-relation-3304310",
-      "osmElementType": "relation",
-      "name": "薬王寺",
-      "wardId": "chuo",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null,
-      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）"
-    },
-    {
-      "facilityId": "osm-relation-6123047",
-      "osmElementType": "relation",
-      "name": "御堂筋",
-      "wardId": "chuo",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1263,
-      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1263m）"
-    },
-    {
-      "facilityId": "osm-way-1026627621",
-      "osmElementType": "way",
-      "name": "五幸稲荷",
-      "wardId": "chuo",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11,
-      "reason": "座標(11m以内)と名前が一致"
+      "distanceMeters": 12,
+      "reason": "座標(12m以内)と名前が一致"
     }
   ]
 }
