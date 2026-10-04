@@ -1,0 +1,180 @@
+{
+  "mission": "36L-building-source-places-drain",
+  "completedAt": "2026-10-04T12:45:33.927Z",
+  "batches": 93,
+  "initialUnattempted": 9264,
+  "finalBuildingSourceCounts": {
+    "total": 9498,
+    "verified": 6908,
+    "unresolvedOrAmbiguous": 5152,
+    "unattempted": 0,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 117,
+        "unresolvedOrAmbiguous": 50,
+        "unattempted": 0
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 194,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 0
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 388,
+        "unresolvedOrAmbiguous": 330,
+        "unattempted": 0
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 122,
+        "unresolvedOrAmbiguous": 62,
+        "unattempted": 0
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 154,
+        "unresolvedOrAmbiguous": 136,
+        "unattempted": 0
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 147,
+        "unresolvedOrAmbiguous": 155,
+        "unattempted": 0
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 526,
+        "unresolvedOrAmbiguous": 488,
+        "unattempted": 0
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 172,
+        "unresolvedOrAmbiguous": 69,
+        "unattempted": 0
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 787,
+        "unresolvedOrAmbiguous": 914,
+        "unattempted": 0
+      },
+      "joto": {
+        "total": 180,
+        "verified": 131,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 0
+      },
+      "kita": {
+        "total": 764,
+        "verified": 470,
+        "unresolvedOrAmbiguous": 294,
+        "unattempted": 0
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 180,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 0
+      },
+      "minato": {
+        "total": 211,
+        "verified": 160,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 0
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 204,
+        "unresolvedOrAmbiguous": 79,
+        "unattempted": 0
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 159,
+        "unresolvedOrAmbiguous": 106,
+        "unattempted": 0
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 200,
+        "unresolvedOrAmbiguous": 156,
+        "unattempted": 0
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 111,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 0
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 144,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 102,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 0
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 132,
+        "unresolvedOrAmbiguous": 103,
+        "unattempted": 0
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 124,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 226,
+        "unresolvedOrAmbiguous": 117,
+        "unattempted": 0
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 164,
+        "unresolvedOrAmbiguous": 172,
+        "unattempted": 0
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 314,
+        "unresolvedOrAmbiguous": 206,
+        "unattempted": 0
+      }
+    }
+  },
+  "policy": {
+    "sourceTypes": [
+      "way",
+      "relation"
+    ],
+    "exactBuildingSourceIdentityGoal": true,
+    "maxDistanceMeters": 120,
+    "verifiedOnlyPersistence": true
+  },
+  "finalApiUsageLastBatch": {
+    "searchCalls": 64,
+    "detailsCalls": 24,
+    "photoMediaCalls": 0,
+    "disabledCalls": 0,
+    "deduped": 0,
+    "rateLimited": 0,
+    "sessionLimited": 0,
+    "executed": 88,
+    "inFlight": 0,
+    "windowCount": 39,
+    "sessionCount": 88
+  }
+}

@@ -3,7 +3,7 @@
   "mission": "36J",
   "areaId": "osaka-city",
   "sourceDataset": "public/map-data/osaka-city/facilities/facilities.json",
-  "generatedAt": "2026-10-04T12:38:44.258Z",
+  "generatedAt": "2026-10-04T12:45:33.676Z",
   "maxDistanceMeters": 120,
   "policy": {
     "persistsOnlyVerifiedLinkage": true,
@@ -18,23 +18,23 @@
     "buildingSourceFocusedBatches": true
   },
   "counts": {
-    "verified": 6790,
-    "unresolved": 5006,
-    "unattempted": 28789,
+    "verified": 6908,
+    "unresolved": 5152,
+    "unattempted": 28525,
     "total": 40585
   },
   "wardCounts": {
     "abeno": {
       "total": 851,
-      "verified": 113,
-      "unresolvedOrAmbiguous": 45,
-      "unattempted": 693
+      "verified": 117,
+      "unresolvedOrAmbiguous": 50,
+      "unattempted": 684
     },
     "asahi": {
       "total": 1097,
-      "verified": 192,
+      "verified": 194,
       "unresolvedOrAmbiguous": 202,
-      "unattempted": 703
+      "unattempted": 701
     },
     "chuo": {
       "total": 5084,
@@ -56,9 +56,9 @@
     },
     "higashisumiyoshi": {
       "total": 1025,
-      "verified": 162,
-      "unresolvedOrAmbiguous": 146,
-      "unattempted": 717
+      "verified": 172,
+      "unresolvedOrAmbiguous": 155,
+      "unattempted": 698
     },
     "higashiyodogawa": {
       "total": 2922,
@@ -68,21 +68,21 @@
     },
     "hirano": {
       "total": 1116,
-      "verified": 171,
-      "unresolvedOrAmbiguous": 60,
-      "unattempted": 885
+      "verified": 174,
+      "unresolvedOrAmbiguous": 69,
+      "unattempted": 873
     },
     "ikuno": {
       "total": 3325,
-      "verified": 721,
-      "unresolvedOrAmbiguous": 815,
-      "unattempted": 1789
+      "verified": 787,
+      "unresolvedOrAmbiguous": 914,
+      "unattempted": 1624
     },
     "joto": {
       "total": 1051,
-      "verified": 129,
-      "unresolvedOrAmbiguous": 46,
-      "unattempted": 876
+      "verified": 131,
+      "unresolvedOrAmbiguous": 49,
+      "unattempted": 871
     },
     "kita": {
       "total": 5655,
@@ -122,9 +122,9 @@
     },
     "nishinari": {
       "total": 854,
-      "verified": 106,
-      "unresolvedOrAmbiguous": 47,
-      "unattempted": 701
+      "verified": 111,
+      "unresolvedOrAmbiguous": 51,
+      "unattempted": 692
     },
     "nishiyodogawa": {
       "total": 880,
@@ -134,15 +134,15 @@
     },
     "suminoe": {
       "total": 617,
-      "verified": 93,
-      "unresolvedOrAmbiguous": 47,
-      "unattempted": 477
+      "verified": 102,
+      "unresolvedOrAmbiguous": 49,
+      "unattempted": 466
     },
     "sumiyoshi": {
       "total": 965,
-      "verified": 160,
-      "unresolvedOrAmbiguous": 89,
-      "unattempted": 716
+      "verified": 167,
+      "unresolvedOrAmbiguous": 103,
+      "unattempted": 695
     },
     "taisho": {
       "total": 649,
@@ -158,9 +158,9 @@
     },
     "tsurumi": {
       "total": 842,
-      "verified": 154,
-      "unresolvedOrAmbiguous": 171,
-      "unattempted": 517
+      "verified": 164,
+      "unresolvedOrAmbiguous": 172,
+      "unattempted": 506
     },
     "yodogawa": {
       "total": 3357,
@@ -74858,6 +74858,1304 @@
       "matchReason": "座標(6m以内)と名前が一致",
       "distanceMeters": 6,
       "verifiedAt": "2026-10-04T12:38:35.512Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-370572333",
+      "googlePlaceId": "ChIJX4PpXV_fAGARI5CbKXvC0VU",
+      "name": "喫茶よりみち",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:39:02.745Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-370729898",
+      "googlePlaceId": "ChIJaz9mYTbeAGAR2qw1IClnKt4",
+      "name": "丸太屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:39:05.013Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-370878382",
+      "googlePlaceId": "ChIJbVBr7DbeAGARsWPVXsxrMe8",
+      "name": "スナックおむすび",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(18m以内)と名前が一致",
+      "distanceMeters": 18,
+      "verifiedAt": "2026-10-04T12:39:06.239Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-371704765",
+      "googlePlaceId": "ChIJTRUsPdPfAGART34fTwdt_MI",
+      "name": "味納賛",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:39:08.650Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-371737604",
+      "googlePlaceId": "ChIJP92uljreAGARrSLadxhy6kI",
+      "name": "焼肉だるま園",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:39:11.099Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-374928502",
+      "googlePlaceId": "ChIJkfu11DzeAGARxBDvQ-YS8kk",
+      "name": "大丸亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:39:19.706Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-376248525",
+      "googlePlaceId": "ChIJQaHBRSPeAGAR0o_PvkxHkD4",
+      "name": "焼肉のごろはち",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:39:22.148Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-378112630",
+      "googlePlaceId": "ChIJwxGhTwDhAGARWIZ_TlMzb4A",
+      "name": "居酒屋とって",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:39:24.588Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-380365048",
+      "googlePlaceId": "ChIJkzzsa7jhAGARhjPYfXcpBeY",
+      "name": "K-POP　cafe 1004",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:39:29.491Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-380365145",
+      "googlePlaceId": "ChIJY2DykTDfAGARkjPM1-KIaRc",
+      "name": "天使のシフォンgo-on",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(15m以内)と名前が一致",
+      "distanceMeters": 15,
+      "verifiedAt": "2026-10-04T12:39:30.718Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-381471858",
+      "googlePlaceId": "ChIJDYq6W73hAGARlKhPUQREDYw",
+      "name": "しっぽ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:39:31.980Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-381647776",
+      "googlePlaceId": "ChIJE2q4DzHeAGARxy9ZF6kLCGI",
+      "name": "焼肉ひふみ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(yakiniku_restaurant)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:39:33.197Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-381934359",
+      "googlePlaceId": "ChIJa7H8cgHeAGAResieRz3S5ok",
+      "name": "葉菜茶",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:39:34.397Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-383200541",
+      "googlePlaceId": "ChIJ1ZqcHR3eAGARoPBrwt0o66E",
+      "name": "ゆびきりげんまん",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:39:45.406Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-387325826",
+      "googlePlaceId": "ChIJB__9CzTeAGARSAC2gRGRU6Q",
+      "name": "喫茶オランダ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:39:52.801Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-387951986",
+      "googlePlaceId": "ChIJ1cur4kjeAGARpcOPP9MPV58",
+      "name": "丸亀製麺",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(22m以内)と名前が一致",
+      "distanceMeters": 22,
+      "verifiedAt": "2026-10-04T12:39:56.489Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-389295887",
+      "googlePlaceId": "ChIJASN6skTeAGAR0_4drTvMiOk",
+      "name": "ソナム",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:40:01.374Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-389295918",
+      "googlePlaceId": "ChIJ-e-SrUTeAGARHMRIjatam9g",
+      "name": "松寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(0m以内)と名前が一致",
+      "distanceMeters": 0,
+      "verifiedAt": "2026-10-04T12:40:02.733Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-391909883",
+      "googlePlaceId": "ChIJgcY868_fAGARoY0NRVy8N80",
+      "name": "ちゃが家",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:40:09.950Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-392095909",
+      "googlePlaceId": "ChIJVVWR5xXeAGARbRVWvXXFVBk",
+      "name": "揚子江ラーメン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(12m以内)と名前が一致",
+      "distanceMeters": 12,
+      "verifiedAt": "2026-10-04T12:40:13.637Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-392467023",
+      "googlePlaceId": "ChIJm_8qajfeAGARnFhp3MxmLLE",
+      "name": "喫茶スター",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:40:14.860Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-393198786",
+      "googlePlaceId": "ChIJiWaa-TbeAGARCnOGMM63x3k",
+      "name": "三国屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:40:16.068Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-394390567",
+      "googlePlaceId": "ChIJOydFFDHeAGAR9kY9_3Lw3w8",
+      "name": "COFFEE KOMATSU",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:40:20.970Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-394671478",
+      "googlePlaceId": "ChIJZeACEbvfAGARxGvID96M_R4",
+      "name": "ぽんと",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:40:22.193Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-396488038",
+      "googlePlaceId": "ChIJ7zF0OjveAGAR7o-u2mRcpac",
+      "name": "居酒屋あぜみち",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:40:25.883Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-401010982",
+      "googlePlaceId": "ChIJVVWBFVjeAGARJq99xqg6y-Q",
+      "name": "軽食喫茶タツミ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:40:27.114Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-401010983",
+      "googlePlaceId": "ChIJi6WqFVjeAGARzVgTTbXPE5Y",
+      "name": "道",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(25m以内)と名前が一致",
+      "distanceMeters": 25,
+      "verifiedAt": "2026-10-04T12:40:28.351Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-405322726",
+      "googlePlaceId": "ChIJXfof_zPeAGAR7ZmAxr4d96s",
+      "name": "お好み焼き 笑福亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:40:30.758Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-409828800",
+      "googlePlaceId": "ChIJlR3UD_7fAGARBDHW9N5gqxU",
+      "name": "つくし",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:40:39.347Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-409828804",
+      "googlePlaceId": "ChIJmwFSD3XfAGARYBsvw_tXOuE",
+      "name": "みなみ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:40:40.688Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-412462649",
+      "googlePlaceId": "ChIJ8Z0qC7PfAGARmf464H5M_f4",
+      "name": "富久鮓",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:40:41.771Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-413653171",
+      "googlePlaceId": "ChIJJ1lkniTeAGARP3-MEjurQ0E",
+      "name": "割烹 本郷",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:40:43.004Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-414747651",
+      "googlePlaceId": "ChIJp0u4zHPfAGARth1aOQ_RdCE",
+      "name": "カフェ シーガル",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:40:47.922Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-415818728",
+      "googlePlaceId": "ChIJk8pClPfeAGARo_GIwB8Rv_8",
+      "name": "藤屋食堂",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(japanese_restaurant)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:40:52.840Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-416450727",
+      "googlePlaceId": "ChIJvwceeGveAGAROwXk525ZyAg",
+      "name": "TAJIMA COFFEE",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:40:58.907Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-416450797",
+      "googlePlaceId": "ChIJSQFuj2veAGARvRuMrcxhM3k",
+      "name": "田島屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:41:00.145Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-422027831",
+      "googlePlaceId": "ChIJq37l3TreAGAR9HO7oxdQMTo",
+      "name": "ホルモン焼 えびす商店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:41:30.972Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-422903552",
+      "googlePlaceId": "ChIJS2dmeG7eAGARiUzfHg8DIjM",
+      "name": "お好み焼き 庄兵衛",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:41:37.051Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-426832092",
+      "googlePlaceId": "ChIJ2wsFn1rfAGARDhlaDYUv2mU",
+      "name": "居酒屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(74m以内)と名前が一致",
+      "distanceMeters": 74,
+      "verifiedAt": "2026-10-04T12:41:43.191Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-427363590",
+      "googlePlaceId": "ChIJiUkT5vPfAGARjnaCWRDbsiM",
+      "name": "ビビアン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:41:44.404Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-427462137",
+      "googlePlaceId": "ChIJVVXoU2veAGARw_8m1j2QZIU",
+      "name": "いさ美",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:41:46.828Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-427462140",
+      "googlePlaceId": "ChIJEyB9S2veAGARGduHq4bAGQg",
+      "name": "ちょこっとCHINA てんしとあくま",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:41:48.037Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-431571374",
+      "googlePlaceId": "ChIJn5RBNwDfAGARQIy4CsMHToc",
+      "name": "居酒屋すもも",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:41:54.198Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-431571430",
+      "googlePlaceId": "ChIJIdWIBBreAGARHSwqAIvoSvU",
+      "name": "焼肉ホルモン かわはら",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:41:55.399Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-431695251",
+      "googlePlaceId": "ChIJ04-iHUPeAGARYO7PJ3lJEnQ",
+      "name": "ラーメンまるまさ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:41:56.685Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-436099970",
+      "googlePlaceId": "ChIJrWxpCRfeAGARQc56AsaxuOg",
+      "name": "かんぱち寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:41:57.892Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-436099995",
+      "googlePlaceId": "ChIJT0Up8RbeAGAROVegz34xIM4",
+      "name": "魚福",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:41:59.132Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-436389808",
+      "googlePlaceId": "ChIJp5WB-z7eAGARp-fm-TMXFXc",
+      "name": "お好み焼き とよかわ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:42:00.352Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-436815572",
+      "googlePlaceId": "ChIJKXnxHRPeAGARXYgGCDQhCPU",
+      "name": "富士好",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(12m以内)と名前が一致",
+      "distanceMeters": 12,
+      "verifiedAt": "2026-10-04T12:42:06.447Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-436874677",
+      "googlePlaceId": "ChIJHSr10mreAGARriikpqY-t60",
+      "name": "大衆酒場 寅さん",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(21m以内)と名前が一致",
+      "distanceMeters": 21,
+      "verifiedAt": "2026-10-04T12:42:08.925Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-441755620",
+      "googlePlaceId": "ChIJOaTB0GreAGAR8lIWX3dNFUU",
+      "name": "喫茶モモコ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:42:12.592Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-443042809",
+      "googlePlaceId": "ChIJu9VAEBreAGAR-fQWJR4DSaI",
+      "name": "お食事処 まるはん",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(14m以内)と名前が一致",
+      "distanceMeters": 14,
+      "verifiedAt": "2026-10-04T12:42:15.101Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-443044794",
+      "googlePlaceId": "ChIJwR2AZVHfAGARrEmTBkc8WHU",
+      "name": "はま寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(53m以内)と名前が一致",
+      "distanceMeters": 53,
+      "verifiedAt": "2026-10-04T12:42:16.259Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-443770261",
+      "googlePlaceId": "ChIJcQkYuzjeAGARFJvj5w9kAso",
+      "name": "ワンカルビ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(12m以内)と名前が一致",
+      "distanceMeters": 12,
+      "verifiedAt": "2026-10-04T12:42:17.505Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-452427833",
+      "googlePlaceId": "ChIJl2xBYDfeAGARpTtEyEl6IKc",
+      "name": "きんちゃい",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:42:19.926Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-530733185",
+      "googlePlaceId": "ChIJSYIJcSTeAGARhQ_V9EPva3U",
+      "name": "キッチンオリジン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(34m以内)と名前が一致",
+      "distanceMeters": 34,
+      "verifiedAt": "2026-10-04T12:42:24.875Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-596049294",
+      "googlePlaceId": "ChIJx7WRjRveAGARpZJgWnZTYww",
+      "name": "百済離宮",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:42:29.712Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-674047744",
+      "googlePlaceId": "ChIJK18FqyTeAGARl92wzVIFIjw",
+      "name": "力餅",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(10m以内)と名前が一致",
+      "distanceMeters": 10,
+      "verifiedAt": "2026-10-04T12:42:30.978Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-674049810",
+      "googlePlaceId": "ChIJaxf_qiTeAGAR9nxlE2evY1E",
+      "name": "麺や 福はら",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:42:33.405Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-793637300",
+      "googlePlaceId": "ChIJ45o8wgPeAGARq1XqS-XSw8w",
+      "name": "和ヌードル鈴七",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:42:37.062Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-793640968",
+      "googlePlaceId": "ChIJib44XajgAGARPwuUmbkjjkY",
+      "name": "風月　市場店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(0m以内)と名前が一致",
+      "distanceMeters": 0,
+      "verifiedAt": "2026-10-04T12:42:38.513Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-794151837",
+      "googlePlaceId": "ChIJlR6jFm3eAGARpsUomZTLeN8",
+      "name": "笑福亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "第二段階: 名前(exact)・タイプ(chinese_restaurant)互換・所在地(大阪)・座標が揃う候補が唯一 [disambiguated]",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:42:40.759Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-794158822",
+      "googlePlaceId": "ChIJP8WP4hzeAGARctW1yHFX7KQ",
+      "name": "アポロ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:42:42.015Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-794427573",
+      "googlePlaceId": "ChIJISRCLz7fAGARcHxQw8rlPTc",
+      "name": "お好み焼き　じゅん",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(9m以内)と名前が一致",
+      "distanceMeters": 9,
+      "verifiedAt": "2026-10-04T12:42:43.341Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-794446353",
+      "googlePlaceId": "ChIJ1zWrsgXeAGARqgXkWEDvaDw",
+      "name": "cafe Tea Time",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:42:44.438Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-804845591",
+      "googlePlaceId": "ChIJ6VL6lxTeAGAR3NP4kJzr9Cg",
+      "name": "きずな",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:42:45.811Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1120266183",
+      "googlePlaceId": "ChIJu8c7eLDhAGAR--IAjt27wGo",
+      "name": "Yoko Coffee Osaka",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:42:46.891Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-362890765",
+      "googlePlaceId": "ChIJlSGcfA3hAGAR9bgiKc4nsZ0",
+      "name": "風月・風の街千林本店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:42:48.142Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-247778858",
+      "googlePlaceId": "ChIJv9os8NngAGAR2AIEG_pEkRY",
+      "name": "喜六",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:42:51.805Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-260719394",
+      "googlePlaceId": "ChIJi9u1NuvgAGARIccjzI7hHpo",
+      "name": "かんなべ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:42:54.246Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1134710734",
+      "googlePlaceId": "ChIJ3yLADWLgAGARFZmDObRD9_4",
+      "name": "かかし亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:42:55.427Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1391178226",
+      "googlePlaceId": "ChIJQeXkPmvhAGAR9HPwoeXLKX8",
+      "name": "コメダ珈琲店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:42:56.738Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-176321497",
+      "googlePlaceId": "ChIJY1O7b1LhAGARTiuqFD-dYZA",
+      "name": "レストハウスつるみ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:42:57.903Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-325678549",
+      "googlePlaceId": "ChIJe3Eu5GLgAGARpuPJEblk4Ks",
+      "name": "餃子の王将",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:42:59.148Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-389002386",
+      "googlePlaceId": "ChIJNV1YUQDhAGARwddvIMoTU0o",
+      "name": "マクドナルド",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:43:00.377Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-389048162",
+      "googlePlaceId": "ChIJRyrZBL7hAGARq2rkhQFKZsA",
+      "name": "茶室 むらさき亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:43:01.584Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-425276011",
+      "googlePlaceId": "ChIJJ84Z14ngAGAR0WAdNivlK5E",
+      "name": "じゃんぼ總本店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(9m以内)と名前が一致",
+      "distanceMeters": 9,
+      "verifiedAt": "2026-10-04T12:43:02.823Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-519608165",
+      "googlePlaceId": "ChIJB_mOdNHhAGARvvJNsNbU0KI",
+      "name": "スターバックス",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(19m以内)と名前が一致",
+      "distanceMeters": 19,
+      "verifiedAt": "2026-10-04T12:43:07.833Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-860028470",
+      "googlePlaceId": "ChIJtX0HAz7gAGARQi4020FIGzQ",
+      "name": "吉野家",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:43:08.933Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-860028477",
+      "googlePlaceId": "ChIJtwqaPhbgAGARytVC2K-u7oY",
+      "name": "久太郎",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(10m以内)と名前が一致",
+      "distanceMeters": 10,
+      "verifiedAt": "2026-10-04T12:43:10.284Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-369778224",
+      "googlePlaceId": "ChIJExwlKVndAGARTK2de547gbc",
+      "name": "HAMONCafe",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(9m以内)と名前が一致",
+      "distanceMeters": 9,
+      "verifiedAt": "2026-10-04T12:43:15.033Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-493708222",
+      "googlePlaceId": "ChIJ_461Y-LdAGARj5iD6VpOrgE",
+      "name": "すき家",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:43:18.744Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-553403777",
+      "googlePlaceId": "ChIJwephkTLcAGARqTkLISMO8uc",
+      "name": "うのう",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(12m以内)と名前が一致",
+      "distanceMeters": 12,
+      "verifiedAt": "2026-10-04T12:43:20.003Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-758315715",
+      "googlePlaceId": "ChIJh1EWW9vdAGARJPAd04PWG08",
+      "name": "ハンバーグレストランBOSTON昭和町本店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:43:21.193Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1255901115",
+      "googlePlaceId": "ChIJXTiigSDdAGAROLM15G6oh_w",
+      "name": "千鳥文化",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:43:22.412Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-462705427",
+      "googlePlaceId": "ChIJFyD2aRzdAGARFCZUQeKKrBE",
+      "name": "大阪ふくちぁんラーメン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:43:24.940Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-629666787",
+      "googlePlaceId": "ChIJI1GawE3oAGART9N-kgATQXs",
+      "name": "大阪南港港湾労働者福祉センター",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(15m以内)と名前が一致",
+      "distanceMeters": 15,
+      "verifiedAt": "2026-10-04T12:43:26.059Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-632077955",
+      "googlePlaceId": "ChIJHYQ6cqbpAGAR5Op_onU4Gsk",
+      "name": "ウイング南港",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(22m以内)と名前が一致",
+      "distanceMeters": 22,
+      "verifiedAt": "2026-10-04T12:43:27.300Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-869097296",
+      "googlePlaceId": "ChIJb8ckMj3dAGARMxWQYnUct98",
+      "name": "マクドナルド",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:43:28.543Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-891438093",
+      "googlePlaceId": "ChIJRdLLLBPdAGARANSpaKYUjyw",
+      "name": "丸源ラーメン",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:43:29.803Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-891438094",
+      "googlePlaceId": "ChIJm_jLLRPdAGARzYA9pxaS80I",
+      "name": "鎌倉パスタ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(0m以内)と名前が一致",
+      "distanceMeters": 0,
+      "verifiedAt": "2026-10-04T12:43:31.048Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-893687926",
+      "googlePlaceId": "ChIJ2Tljo9HdAGARG-Ve0bXIiTc",
+      "name": "solege",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(6m以内)と名前が一致",
+      "distanceMeters": 6,
+      "verifiedAt": "2026-10-04T12:43:48.235Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-899183703",
+      "googlePlaceId": "ChIJP1uqBXLdAGAR3uv8c_oGTnQ",
+      "name": "にぎり長次郎",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(0m以内)と名前が一致",
+      "distanceMeters": 0,
+      "verifiedAt": "2026-10-04T12:43:49.485Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-relation-6015248",
+      "googlePlaceId": "ChIJTUfs6rfdAGARZQH18WZzSMo",
+      "name": "ロイヤルホスト",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(9m以内)と名前が一致",
+      "distanceMeters": 9,
+      "verifiedAt": "2026-10-04T12:43:50.689Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-317312115",
+      "googlePlaceId": "ChIJn3j-RDLcAGAR-nxcrP4yZBw",
+      "name": "くら寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:43:56.822Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-317312625",
+      "googlePlaceId": "ChIJ5yGBFiTcAGARfu7OH59FMdM",
+      "name": "マクドナルド",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:43:58.056Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-340400575",
+      "googlePlaceId": "ChIJ1yfh5WvcAGARCE8hg7EOe_g",
+      "name": "Shot Bar Shanty",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:43:59.218Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-355598533",
+      "googlePlaceId": "ChIJzcOgx7ndAGARkG9Cmyy-gzc",
+      "name": "ポアール帝塚山本店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:44:07.848Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-400760485",
+      "googlePlaceId": "ChIJD1fT77XdAGARoBaDTrFwS1w",
+      "name": "たこ焼き正ちゃん",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:44:10.285Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-547820243",
+      "googlePlaceId": "ChIJ9ZtHfzrcAGARrVyrQwny0p0",
+      "name": "浪花屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(8m)が一意 [conservative-variant]",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-04T12:44:22.441Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1102812904",
+      "googlePlaceId": "ChIJ2x0WdmXeAGARsa2alLjRxAk",
+      "name": "さんきゅう",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:44:29.943Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1102812908",
+      "googlePlaceId": "ChIJnYZAyXPfAGAR7X2d0dlZflw",
+      "name": "からやま",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:44:33.587Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1102857025",
+      "googlePlaceId": "ChIJO5BQUAPfAGARyMxJ4xlz6EE",
+      "name": "たこよし",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:44:34.848Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-300729815",
+      "googlePlaceId": "ChIJZ8VhxYHeAGAR9jSHdgqfZc0",
+      "name": "ロイヤルホスト",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:44:36.028Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-317310037",
+      "googlePlaceId": "ChIJZwSn2rjeAGARx7FprD3wU-I",
+      "name": "びっくりドンキー",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:44:37.288Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-317310577",
+      "googlePlaceId": "ChIJ-SsUrJ_eAGARJVNf4I6PEG4",
+      "name": "来来亭",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(1m以内)と名前が一致",
+      "distanceMeters": 1,
+      "verifiedAt": "2026-10-04T12:44:42.175Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-462707984",
+      "googlePlaceId": "ChIJTcdbmoHeAGARuQQlSCpzB6g",
+      "name": "ジョリーパスタ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(44m以内)と名前が一致",
+      "distanceMeters": 44,
+      "verifiedAt": "2026-10-04T12:44:48.300Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-582497063",
+      "googlePlaceId": "ChIJ05XBQXPeAGARFV_fwpOJins",
+      "name": "街かど屋",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(15m以内)と名前が一致",
+      "distanceMeters": 15,
+      "verifiedAt": "2026-10-04T12:44:54.444Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-742092530",
+      "googlePlaceId": "ChIJ_9pE1rjeAGARG4hlaM3YwVo",
+      "name": "焼肉 五苑 湯里店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:44:55.624Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-951906667",
+      "googlePlaceId": "ChIJtd_--5HeAGARHfc4RqUtnWU",
+      "name": "ザ・めしや",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(7m以内)と名前が一致",
+      "distanceMeters": 7,
+      "verifiedAt": "2026-10-04T12:44:56.859Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1007573169",
+      "googlePlaceId": "ChIJqYhAL0ffAGARX5Hn2NcGOAo",
+      "name": "はま寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:44:58.122Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1279562292",
+      "googlePlaceId": "ChIJ4ZQfYQDfAGARp8Xzanp1-dw",
+      "name": "餃子の王将 喜連瓜破店",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:45:00.599Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-993857871",
+      "googlePlaceId": "ChIJyRcg_iDfAGAROlUeFBK62Yc",
+      "name": "マクドナルド",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:45:21.392Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-relation-17719145",
+      "googlePlaceId": "ChIJpV1uN43dAGARzDD8V2Te5XU",
+      "name": "あっちち本舗",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-04T12:45:23.833Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1086058858",
+      "googlePlaceId": "ChIJ2Xk_JubdAGARZJDP1Gw4uYc",
+      "name": "マロニエ",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(10m以内)と名前が一致",
+      "distanceMeters": 10,
+      "verifiedAt": "2026-10-04T12:45:25.077Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-390552470",
+      "googlePlaceId": "ChIJbY011JznAGAR3GDSBAKUTKw",
+      "name": "くら寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(3m以内)と名前が一致",
+      "distanceMeters": 3,
+      "verifiedAt": "2026-10-04T12:45:27.518Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-463304829",
+      "googlePlaceId": "ChIJY4V5zY3dAGARuGnljJTCCek",
+      "name": "板前焼肉一斗",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-04T12:45:28.761Z",
+      "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-686244221",
+      "googlePlaceId": "ChIJVbMRODbgjl8RngBEdI5S-7g",
+      "name": "かっぱ寿司",
+      "relevanceClass": "dining",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-04T12:45:31.193Z",
       "verifiedBy": "automated-building-source-batch"
     }
   ]
