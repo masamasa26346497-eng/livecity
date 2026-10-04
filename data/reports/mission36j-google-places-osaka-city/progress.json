@@ -17061,14 +17061,3074 @@
       "matchConfidence": "UNRESOLVED",
       "reason": "Google Places 側に候補が無い",
       "attemptedAt": "2026-10-04T09:27:32.207Z"
+    },
+    {
+      "facilityId": "osm-way-676609223",
+      "name": "阪神梅田駅3番線降車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:50.297Z"
+    },
+    {
+      "facilityId": "osm-way-676609224",
+      "name": "阪神梅田駅3番線乗車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"大阪梅田駅\"",
+      "attemptedAt": "2026-10-04T09:27:51.351Z"
+    },
+    {
+      "facilityId": "osm-way-676609225",
+      "name": "阪神梅田駅4番線乗車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:52.532Z"
+    },
+    {
+      "facilityId": "osm-way-676609230",
+      "name": "阪神梅田駅4番線降車ホーム",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:27:53.753Z"
+    },
+    {
+      "facilityId": "osm-way-766805616",
+      "name": "Times",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:27:58.558Z"
+    },
+    {
+      "facilityId": "osm-way-777499466",
+      "name": "光輪会専用駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(30m)が名前が一致しない: \"医療法人光輪会 法人本部\"",
+      "attemptedAt": "2026-10-04T09:27:59.908Z"
+    },
+    {
+      "facilityId": "osm-way-819268281",
+      "name": "西田工業月極駐車場",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:28:04.698Z"
+    },
+    {
+      "facilityId": "osm-way-830027371",
+      "name": "SHINWA Parking 中津第2",
+      "wardId": "kita",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(8m)が名前が一致しない: \"信和パーキング 中津第２\"",
+      "attemptedAt": "2026-10-04T09:28:07.259Z"
+    },
+    {
+      "facilityId": "osm-way-1205370258",
+      "name": "ショウワパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:13.254Z"
+    },
+    {
+      "facilityId": "osm-way-1205370261",
+      "name": "三井のリパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 122m）",
+      "attemptedAt": "2026-10-04T09:28:14.603Z"
+    },
+    {
+      "facilityId": "osm-way-1222881562",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:21.836Z"
+    },
+    {
+      "facilityId": "osm-way-1257478606",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:29.186Z"
+    },
+    {
+      "facilityId": "osm-way-1270635751",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:34.081Z"
+    },
+    {
+      "facilityId": "osm-way-1388815693",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:40.206Z"
+    },
+    {
+      "facilityId": "osm-way-1388815695",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:47.556Z"
+    },
+    {
+      "facilityId": "osm-way-1388815696",
+      "name": "One Park",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:51.229Z"
+    },
+    {
+      "facilityId": "osm-way-1448588376",
+      "name": "くるっとパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:28:58.585Z"
+    },
+    {
+      "facilityId": "osm-way-1448588392",
+      "name": "One Park",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 441m）",
+      "attemptedAt": "2026-10-04T09:28:59.953Z"
+    },
+    {
+      "facilityId": "osm-way-1448588393",
+      "name": "One Park",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 455m）",
+      "attemptedAt": "2026-10-04T09:29:01.130Z"
+    },
+    {
+      "facilityId": "osm-way-1448663096",
+      "name": "グッドパーキング",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:29:04.703Z"
+    },
+    {
+      "facilityId": "osm-way-1449400999",
+      "name": "くるっとパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:29:08.383Z"
+    },
+    {
+      "facilityId": "osm-way-1449401000",
+      "name": "くるっとパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:09.683Z"
+    },
+    {
+      "facilityId": "osm-way-1449401001",
+      "name": "くるっとパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:10.900Z"
+    },
+    {
+      "facilityId": "osm-way-1452476259",
+      "name": "上田モータープール",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 10711m）",
+      "attemptedAt": "2026-10-04T09:29:12.209Z"
+    },
+    {
+      "facilityId": "osm-way-1560153098",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 127m）",
+      "attemptedAt": "2026-10-04T09:29:13.403Z"
+    },
+    {
+      "facilityId": "osm-way-246432324",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:15.828Z"
+    },
+    {
+      "facilityId": "osm-way-246432325",
+      "name": "Pゾーン",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(100m)が名前が一致しない: \"P.ZONE 大阪城北\"",
+      "attemptedAt": "2026-10-04T09:29:17.078Z"
+    },
+    {
+      "facilityId": "osm-way-246432328",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:18.301Z"
+    },
+    {
+      "facilityId": "osm-way-246452610",
+      "name": "三井のリパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:19.510Z"
+    },
+    {
+      "facilityId": "osm-way-247094183",
+      "name": "GS Park",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"セレパーク 京阪京橋駅前\"",
+      "attemptedAt": "2026-10-04T09:29:23.219Z"
+    },
+    {
+      "facilityId": "osm-way-247634491",
+      "name": "DParking",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"Ｄパーキング 毛馬町1丁目第1\"",
+      "attemptedAt": "2026-10-04T09:29:25.647Z"
+    },
+    {
+      "facilityId": "osm-way-247818075",
+      "name": "ショウワパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:28.076Z"
+    },
+    {
+      "facilityId": "osm-way-248730864",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 243m）",
+      "attemptedAt": "2026-10-04T09:29:31.767Z"
+    },
+    {
+      "facilityId": "osm-way-250065855",
+      "name": "RESIOS PARK",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 940m）",
+      "attemptedAt": "2026-10-04T09:29:34.226Z"
+    },
+    {
+      "facilityId": "osm-way-251257364",
+      "name": "PARK ZEUS",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"パークゼウス 中野町\"",
+      "attemptedAt": "2026-10-04T09:29:35.468Z"
+    },
+    {
+      "facilityId": "osm-way-252843369",
+      "name": "三井のリパーク",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 184m）",
+      "attemptedAt": "2026-10-04T09:29:37.919Z"
+    },
+    {
+      "facilityId": "osm-way-252893994",
+      "name": "東洋カーマックス",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 432m）",
+      "attemptedAt": "2026-10-04T09:29:39.201Z"
+    },
+    {
+      "facilityId": "osm-way-253124468",
+      "name": "大栄モータープール",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 477m）",
+      "attemptedAt": "2026-10-04T09:29:40.358Z"
+    },
+    {
+      "facilityId": "osm-way-253142398",
+      "name": "タイムズ",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:41.579Z"
+    },
+    {
+      "facilityId": "osm-way-254419412",
+      "name": "古本市場 コレクターズ 都島店",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"古本市場都島店\"",
+      "attemptedAt": "2026-10-04T09:29:44.049Z"
+    },
+    {
+      "facilityId": "osm-way-674914961",
+      "name": "Dパーキング",
+      "wardId": "miyakojima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"D-Parking片町PS第1\"",
+      "attemptedAt": "2026-10-04T09:29:50.156Z"
+    },
+    {
+      "facilityId": "osm-way-1413467674",
+      "name": "Superjpm",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1149m）",
+      "attemptedAt": "2026-10-04T09:29:51.383Z"
+    },
+    {
+      "facilityId": "osm-way-1414438796",
+      "name": "リパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:55.056Z"
+    },
+    {
+      "facilityId": "osm-way-1414438797",
+      "name": "リパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:56.300Z"
+    },
+    {
+      "facilityId": "osm-way-1466025974",
+      "name": "Times",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:29:58.767Z"
+    },
+    {
+      "facilityId": "osm-way-1492946943",
+      "name": "コインパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 256m）",
+      "attemptedAt": "2026-10-04T09:29:59.971Z"
+    },
+    {
+      "facilityId": "osm-way-1561312422",
+      "name": "タイムズ",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:30:04.859Z"
+    },
+    {
+      "facilityId": "osm-way-179111736",
+      "name": "タイムズ",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:30:07.307Z"
+    },
+    {
+      "facilityId": "osm-way-194051677",
+      "name": "三井のリパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 141m）",
+      "attemptedAt": "2026-10-04T09:30:08.541Z"
+    },
+    {
+      "facilityId": "osm-way-194059960",
+      "name": "スペース",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 651m）",
+      "attemptedAt": "2026-10-04T09:30:09.794Z"
+    },
+    {
+      "facilityId": "osm-way-220810123",
+      "name": "三井のリパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:30:10.979Z"
+    },
+    {
+      "facilityId": "osm-way-220868225",
+      "name": "聖天モータープール",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 580m）",
+      "attemptedAt": "2026-10-04T09:30:12.262Z"
+    },
+    {
+      "facilityId": "osm-way-228458270",
+      "name": "GSパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 129m）",
+      "attemptedAt": "2026-10-04T09:30:13.461Z"
+    },
+    {
+      "facilityId": "osm-way-243365308",
+      "name": "ParaCa",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 149m）",
+      "attemptedAt": "2026-10-04T09:30:15.874Z"
+    },
+    {
+      "facilityId": "osm-way-246587853",
+      "name": "TIMES",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 197m）",
+      "attemptedAt": "2026-10-04T09:30:17.138Z"
+    },
+    {
+      "facilityId": "osm-way-248018696",
+      "name": "パーク NET",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:30:19.601Z"
+    },
+    {
+      "facilityId": "osm-way-303261797",
+      "name": "Times",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(118m)が名前が一致しない: \"タイムズＪＲ野田駅前第５\"",
+      "attemptedAt": "2026-10-04T09:30:23.266Z"
+    },
+    {
+      "facilityId": "osm-way-303265763",
+      "name": "リパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:30:24.460Z"
+    },
+    {
+      "facilityId": "osm-way-303298745",
+      "name": "Park Station",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"プラスパークス吉野第3\"",
+      "attemptedAt": "2026-10-04T09:30:25.719Z"
+    },
+    {
+      "facilityId": "osm-way-304461441",
+      "name": "セブン-イレブン駐車場",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(14m)が名前が一致しない: \"セブン-イレブン 野田阪神駅北店\"",
+      "attemptedAt": "2026-10-04T09:30:26.963Z"
+    },
+    {
+      "facilityId": "osm-way-308316881",
+      "name": "コインパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(116m)が名前が一致しない: \"エコロパーク大開第２\"",
+      "attemptedAt": "2026-10-04T09:30:28.129Z"
+    },
+    {
+      "facilityId": "osm-way-309715787",
+      "name": "コインパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 370m）",
+      "attemptedAt": "2026-10-04T09:30:45.250Z"
+    },
+    {
+      "facilityId": "osm-way-310065193",
+      "name": "Parks Park",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1503m）",
+      "attemptedAt": "2026-10-04T09:30:46.491Z"
+    },
+    {
+      "facilityId": "osm-way-387939363",
+      "name": "コインパーク",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 269m）",
+      "attemptedAt": "2026-10-04T09:30:47.687Z"
+    },
+    {
+      "facilityId": "osm-way-436013607",
+      "name": "Times",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T09:30:50.178Z"
+    },
+    {
+      "facilityId": "osm-way-450211219",
+      "name": "Times",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:30:53.730Z"
+    },
+    {
+      "facilityId": "osm-way-450211220",
+      "name": "TOMO",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(14m)が名前が一致しない: \"トモパーキング 福島第２\"",
+      "attemptedAt": "2026-10-04T09:30:55.065Z"
+    },
+    {
+      "facilityId": "osm-way-685874050",
+      "name": "サイクルプラザ",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4195m）",
+      "attemptedAt": "2026-10-04T09:31:01.205Z"
+    },
+    {
+      "facilityId": "osm-way-694291407",
+      "name": "PARK HONGO",
+      "wardId": "fukushima",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 10610m）",
+      "attemptedAt": "2026-10-04T09:31:02.412Z"
+    },
+    {
+      "facilityId": "osm-relation-11806160",
+      "name": "西島屋",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bus_stop",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:05.981Z"
+    },
+    {
+      "facilityId": "osm-relation-11806172",
+      "name": "三本松",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bus_stop",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:09.658Z"
+    },
+    {
+      "facilityId": "osm-way-1191573529",
+      "name": "リパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:14.559Z"
+    },
+    {
+      "facilityId": "osm-way-1191578845",
+      "name": "エコステーション21",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 569m）",
+      "attemptedAt": "2026-10-04T09:31:15.935Z"
+    },
+    {
+      "facilityId": "osm-way-129192741",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:20.687Z"
+    },
+    {
+      "facilityId": "osm-way-1354666320",
+      "name": "Dパーキング",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(103m)が名前が一致しない: \"D-Parking セレッソスポーツパーク 舞洲東駐車場\"",
+      "attemptedAt": "2026-10-04T09:31:23.292Z"
+    },
+    {
+      "facilityId": "osm-way-1374634894",
+      "name": "普通車駐車場",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1262m）",
+      "attemptedAt": "2026-10-04T09:31:24.531Z"
+    },
+    {
+      "facilityId": "osm-way-1377166079",
+      "name": "舞洲万博P&R駐車場AB",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 512m）",
+      "attemptedAt": "2026-10-04T09:31:25.745Z"
+    },
+    {
+      "facilityId": "osm-way-1377166118",
+      "name": "舞洲万博P&R駐車場D",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(104m)が名前が一致しない: \"The Day Osaka 第1駐車場\"",
+      "attemptedAt": "2026-10-04T09:31:28.212Z"
+    },
+    {
+      "facilityId": "osm-way-1423050705",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:32.942Z"
+    },
+    {
+      "facilityId": "osm-way-1423051860",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:36.611Z"
+    },
+    {
+      "facilityId": "osm-way-1513099353",
+      "name": "タイムスペース",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 373m）",
+      "attemptedAt": "2026-10-04T09:31:40.430Z"
+    },
+    {
+      "facilityId": "osm-way-1513099393",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:47.640Z"
+    },
+    {
+      "facilityId": "osm-way-1513583217",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:52.552Z"
+    },
+    {
+      "facilityId": "osm-way-1513583218",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:31:56.193Z"
+    },
+    {
+      "facilityId": "osm-way-1514024279",
+      "name": "ザ・パーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1398m）",
+      "attemptedAt": "2026-10-04T09:32:00.007Z"
+    },
+    {
+      "facilityId": "osm-way-1514024283",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:32:07.227Z"
+    },
+    {
+      "facilityId": "osm-way-151500390",
+      "name": "第2安治川モータープール",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 170m）",
+      "attemptedAt": "2026-10-04T09:32:09.854Z"
+    },
+    {
+      "facilityId": "osm-way-151586326",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:12.265Z"
+    },
+    {
+      "facilityId": "osm-way-151586329",
+      "name": "阪神西九条パーキング第1駐車場",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:14.750Z"
+    },
+    {
+      "facilityId": "osm-way-1520718351",
+      "name": "西九条駅自転車駐車場",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:16.004Z"
+    },
+    {
+      "facilityId": "osm-way-1520718355",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:17.156Z"
+    },
+    {
+      "facilityId": "osm-way-1526422200",
+      "name": "駐車場のパラカ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"パラカ 大阪市梅香第2\"",
+      "attemptedAt": "2026-10-04T09:32:18.415Z"
+    },
+    {
+      "facilityId": "osm-way-1526756459",
+      "name": "OnePark",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:20.836Z"
+    },
+    {
+      "facilityId": "osm-way-1526756460",
+      "name": "サイクルスペース西九条駅前24時間駐輪場",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:22.171Z"
+    },
+    {
+      "facilityId": "osm-way-1527882198",
+      "name": "Park 1st",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1655m）",
+      "attemptedAt": "2026-10-04T09:32:23.306Z"
+    },
+    {
+      "facilityId": "osm-way-1528795811",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:24.522Z"
+    },
+    {
+      "facilityId": "osm-way-1528795812",
+      "name": "Pork西九条",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(77m)が名前が一致しない: \"うたげ商店 カンパイ屋\"",
+      "attemptedAt": "2026-10-04T09:32:25.790Z"
+    },
+    {
+      "facilityId": "osm-way-1530619875",
+      "name": "城山モータープール",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 13548m）",
+      "attemptedAt": "2026-10-04T09:32:28.208Z"
+    },
+    {
+      "facilityId": "osm-way-1530989362",
+      "name": "フジムラ第2モータープール",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(99m)が名前が一致しない: \"タイムズカー フジムラ第１モータープール\"",
+      "attemptedAt": "2026-10-04T09:32:30.639Z"
+    },
+    {
+      "facilityId": "osm-way-1530989376",
+      "name": "パークステーション",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 726m）",
+      "attemptedAt": "2026-10-04T09:32:33.085Z"
+    },
+    {
+      "facilityId": "osm-way-1531653302",
+      "name": "エコステーション21",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 519m）",
+      "attemptedAt": "2026-10-04T09:32:34.293Z"
+    },
+    {
+      "facilityId": "osm-way-1531653311",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 125m）",
+      "attemptedAt": "2026-10-04T09:32:36.749Z"
+    },
+    {
+      "facilityId": "osm-way-1532305468",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 195m）",
+      "attemptedAt": "2026-10-04T09:32:37.967Z"
+    },
+    {
+      "facilityId": "osm-way-1546509659",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:39.199Z"
+    },
+    {
+      "facilityId": "osm-way-1547245710",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 156m）",
+      "attemptedAt": "2026-10-04T09:32:40.408Z"
+    },
+    {
+      "facilityId": "osm-way-1548787503",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:41.642Z"
+    },
+    {
+      "facilityId": "osm-way-1548787504",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:42.852Z"
+    },
+    {
+      "facilityId": "osm-way-1561665148",
+      "name": "パークフィールド",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2656m）",
+      "attemptedAt": "2026-10-04T09:32:44.119Z"
+    },
+    {
+      "facilityId": "osm-way-318558177",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:47.752Z"
+    },
+    {
+      "facilityId": "osm-way-318638518",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:49.006Z"
+    },
+    {
+      "facilityId": "osm-way-319048722",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:32:50.305Z"
+    },
+    {
+      "facilityId": "osm-way-574902205",
+      "name": "大型車駐車場",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1008m）",
+      "attemptedAt": "2026-10-04T09:32:57.620Z"
+    },
+    {
+      "facilityId": "osm-way-740880927",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 122m）",
+      "attemptedAt": "2026-10-04T09:33:07.392Z"
+    },
+    {
+      "facilityId": "osm-way-836270676",
+      "name": "タイムズ",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:33:09.841Z"
+    },
+    {
+      "facilityId": "osm-way-863987685",
+      "name": "舞洲スポーツアイランド",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 414m）",
+      "attemptedAt": "2026-10-04T09:33:11.071Z"
+    },
+    {
+      "facilityId": "osm-way-864503458",
+      "name": "舞洲東",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "platform",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:33:12.305Z"
+    },
+    {
+      "facilityId": "osm-way-868885722",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:33:13.495Z"
+    },
+    {
+      "facilityId": "osm-way-868885736",
+      "name": "セントビルコインパーキング",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2382m）",
+      "attemptedAt": "2026-10-04T09:33:14.793Z"
+    },
+    {
+      "facilityId": "osm-way-902568516",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 159m）",
+      "attemptedAt": "2026-10-04T09:33:15.941Z"
+    },
+    {
+      "facilityId": "osm-way-909438304",
+      "name": "TOYOCARMAX",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:33:20.856Z"
+    },
+    {
+      "facilityId": "osm-way-909438305",
+      "name": "TOYOCARMAX",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(42m)が名前が一致しない: \"東洋カーマックス 四貫島第２駐車場\"",
+      "attemptedAt": "2026-10-04T09:33:22.047Z"
+    },
+    {
+      "facilityId": "osm-way-926066478",
+      "name": "三井のリパーク",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 125m）",
+      "attemptedAt": "2026-10-04T09:33:37.985Z"
+    },
+    {
+      "facilityId": "osm-way-940408175",
+      "name": "エコステーション21",
+      "wardId": "konohana",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:33:43.935Z"
+    },
+    {
+      "facilityId": "osm-relation-17232368",
+      "name": "エコロパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:33:47.613Z"
+    },
+    {
+      "facilityId": "osm-relation-17233042",
+      "name": "エコロパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:33:51.267Z"
+    },
+    {
+      "facilityId": "osm-relation-6122822",
+      "name": "長堀地下駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(32m)が名前が一致しない: \"長堀駐車場\"",
+      "attemptedAt": "2026-10-04T09:33:52.660Z"
+    },
+    {
+      "facilityId": "osm-way-1012639463",
+      "name": "Space Zero",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 623730m）",
+      "attemptedAt": "2026-10-04T09:33:53.864Z"
+    },
+    {
+      "facilityId": "osm-way-1039759700",
+      "name": "TOYO CARMAX",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 709m）",
+      "attemptedAt": "2026-10-04T09:33:55.106Z"
+    },
+    {
+      "facilityId": "osm-way-1106093523",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:33:58.648Z"
+    },
+    {
+      "facilityId": "osm-way-1106093525",
+      "name": "Ecolo Park",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:34:03.550Z"
+    },
+    {
+      "facilityId": "osm-way-1110175832",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 141m）",
+      "attemptedAt": "2026-10-04T09:34:04.886Z"
+    },
+    {
+      "facilityId": "osm-way-1118225258",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:34:10.905Z"
+    },
+    {
+      "facilityId": "osm-way-1202532674",
+      "name": "BooBooPARK",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"ブーブーパーク博労町\"",
+      "attemptedAt": "2026-10-04T09:34:15.910Z"
+    },
+    {
+      "facilityId": "osm-way-1217742586",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 134m）",
+      "attemptedAt": "2026-10-04T09:34:18.376Z"
+    },
+    {
+      "facilityId": "osm-way-1247643931",
+      "name": "ミナミエリア 長堀通(H) 24時間自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(47m)が名前が一致しない: \"ミナミエリア 長堀通【G】 24時間自転車専用駐車場\"",
+      "attemptedAt": "2026-10-04T09:34:28.190Z"
+    },
+    {
+      "facilityId": "osm-way-1247643932",
+      "name": "ミナミエリア 長堀通(H) 24時間自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(41m)が名前が一致しない: \"ミナミエリア 長堀通【G】 24時間自転車専用駐車場\"",
+      "attemptedAt": "2026-10-04T09:34:29.374Z"
+    },
+    {
+      "facilityId": "osm-way-1247643933",
+      "name": "ミナミエリア 長堀通(I) 24時間自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:34:34.174Z"
+    },
+    {
+      "facilityId": "osm-way-1247643934",
+      "name": "ミナミエリア 長堀通(I) 24時間自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:34:37.831Z"
+    },
+    {
+      "facilityId": "osm-way-1251982675",
+      "name": "A+Qtower",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "Google Places 側に候補が無い",
+      "attemptedAt": "2026-10-04T09:34:39.129Z"
+    },
+    {
+      "facilityId": "osm-way-1252042690",
+      "name": "TOMOパーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 527m）",
+      "attemptedAt": "2026-10-04T09:34:44.112Z"
+    },
+    {
+      "facilityId": "osm-way-1252042691",
+      "name": "P.ゾーン",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"P.ZONE 博労町\"",
+      "attemptedAt": "2026-10-04T09:34:45.327Z"
+    },
+    {
+      "facilityId": "osm-way-1252042701",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:34:51.324Z"
+    },
+    {
+      "facilityId": "osm-way-1252042704",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:34:54.984Z"
+    },
+    {
+      "facilityId": "osm-way-1252050683",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 194m）",
+      "attemptedAt": "2026-10-04T09:34:56.344Z"
+    },
+    {
+      "facilityId": "osm-way-1252085390",
+      "name": "タニガワ パーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(29m)が名前が一致しない: \"FUKU BLD.南久宝寺パーキング\"",
+      "attemptedAt": "2026-10-04T09:35:00.050Z"
+    },
+    {
+      "facilityId": "osm-way-1252353207",
+      "name": "ブレイクパーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(78m)が名前が一致しない: \"ブレイク南船場第２\"",
+      "attemptedAt": "2026-10-04T09:35:01.258Z"
+    },
+    {
+      "facilityId": "osm-way-1252353209",
+      "name": "エムテック",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:02.485Z"
+    },
+    {
+      "facilityId": "osm-way-1252840886",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 229m）",
+      "attemptedAt": "2026-10-04T09:35:03.687Z"
+    },
+    {
+      "facilityId": "osm-way-1252840887",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:04.915Z"
+    },
+    {
+      "facilityId": "osm-way-1252923922",
+      "name": "P.ゾーン",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(9m)が名前が一致しない: \"P.ZONE 南船場\"",
+      "attemptedAt": "2026-10-04T09:35:07.370Z"
+    },
+    {
+      "facilityId": "osm-way-1252943207",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:08.584Z"
+    },
+    {
+      "facilityId": "osm-way-1319367618",
+      "name": "エコステーション21 トレードピア淀屋橋駐輪場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 215m）",
+      "attemptedAt": "2026-10-04T09:35:09.859Z"
+    },
+    {
+      "facilityId": "osm-way-1319367620",
+      "name": "エコステーション21 淀屋橋駐輪場C",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:11.058Z"
+    },
+    {
+      "facilityId": "osm-way-1319367621",
+      "name": "エコステーション21 淀屋橋駐輪場D",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:12.278Z"
+    },
+    {
+      "facilityId": "osm-way-1319367622",
+      "name": "エコステーション21 淀屋橋駐輪場E",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"ES21 淀屋橋駐輪場 E\"",
+      "attemptedAt": "2026-10-04T09:35:13.447Z"
+    },
+    {
+      "facilityId": "osm-way-1319367623",
+      "name": "エコステーション21 淀屋橋駐輪場F",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(62m)が名前が一致しない: \"ES21 淀屋橋駐輪場 E\"",
+      "attemptedAt": "2026-10-04T09:35:14.743Z"
+    },
+    {
+      "facilityId": "osm-way-1337979028",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:18.396Z"
+    },
+    {
+      "facilityId": "osm-way-1338312177",
+      "name": "コインパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:22.049Z"
+    },
+    {
+      "facilityId": "osm-way-1338312186",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:23.292Z"
+    },
+    {
+      "facilityId": "osm-way-1355681255",
+      "name": "ミナミエリア駐輪場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 121m）",
+      "attemptedAt": "2026-10-04T09:35:24.527Z"
+    },
+    {
+      "facilityId": "osm-way-1368752208",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:25.740Z"
+    },
+    {
+      "facilityId": "osm-way-1381029168",
+      "name": "D-Parking",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(17m)が名前が一致しない: \"Ｄパーキング難波宮跡公園駐車場\"",
+      "attemptedAt": "2026-10-04T09:35:27.012Z"
+    },
+    {
+      "facilityId": "osm-way-1408593806",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:28.185Z"
+    },
+    {
+      "facilityId": "osm-way-164668950",
+      "name": "大阪城公園城南バス駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 124m）",
+      "attemptedAt": "2026-10-04T09:35:33.172Z"
+    },
+    {
+      "facilityId": "osm-way-164668961",
+      "name": "大阪城公園城南第二バス駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(25m)が名前が一致しない: \"城南バス専用駐車場\"",
+      "attemptedAt": "2026-10-04T09:35:34.346Z"
+    },
+    {
+      "facilityId": "osm-way-171997909",
+      "name": "パラカ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:36.761Z"
+    },
+    {
+      "facilityId": "osm-way-172382512",
+      "name": "Superjpm",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 667m）",
+      "attemptedAt": "2026-10-04T09:35:40.456Z"
+    },
+    {
+      "facilityId": "osm-way-176302489",
+      "name": "TWIN21",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(94m)が名前が一致しない: \"ツイン21\"",
+      "attemptedAt": "2026-10-04T09:35:42.881Z"
+    },
+    {
+      "facilityId": "osm-way-203485709",
+      "name": "ワールド パーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1108m）",
+      "attemptedAt": "2026-10-04T09:35:44.180Z"
+    },
+    {
+      "facilityId": "osm-way-219616467",
+      "name": "ツインタワー",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:45.369Z"
+    },
+    {
+      "facilityId": "osm-way-219616675",
+      "name": "DAISHO",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:46.602Z"
+    },
+    {
+      "facilityId": "osm-way-219616715",
+      "name": "GSパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 237m）",
+      "attemptedAt": "2026-10-04T09:35:47.823Z"
+    },
+    {
+      "facilityId": "osm-way-220079188",
+      "name": "GS Park",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(14m)が名前が一致しない: \"GSパーク 日本橋第二\"",
+      "attemptedAt": "2026-10-04T09:35:50.260Z"
+    },
+    {
+      "facilityId": "osm-way-220079245",
+      "name": "まいどパーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:51.492Z"
+    },
+    {
+      "facilityId": "osm-way-220104095",
+      "name": "リップル日本橋モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"リップル［🅿日本橋ﾓｰﾀｰﾌﾟｰﾙ］\"",
+      "attemptedAt": "2026-10-04T09:35:53.910Z"
+    },
+    {
+      "facilityId": "osm-way-220104096",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:55.162Z"
+    },
+    {
+      "facilityId": "osm-way-220287450",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:35:56.366Z"
+    },
+    {
+      "facilityId": "osm-way-223228508",
+      "name": "GSパーク 日本橋第3",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 143m）",
+      "attemptedAt": "2026-10-04T09:36:02.518Z"
+    },
+    {
+      "facilityId": "osm-way-223279613",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:36:04.956Z"
+    },
+    {
+      "facilityId": "osm-way-223477663",
+      "name": "アメ村駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:36:08.658Z"
+    },
+    {
+      "facilityId": "osm-way-223889990",
+      "name": "信和パーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:36:11.075Z"
+    },
+    {
+      "facilityId": "osm-way-225782626",
+      "name": "GS Park",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"GSパーク 南船場三丁目\"",
+      "attemptedAt": "2026-10-04T09:36:12.332Z"
+    },
+    {
+      "facilityId": "osm-way-225782641",
+      "name": "パークNET 心斎橋駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(12m)が名前が一致しない: \"パークネット 心斎橋\"",
+      "attemptedAt": "2026-10-04T09:36:13.544Z"
+    },
+    {
+      "facilityId": "osm-way-228010113",
+      "name": "Times",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 138m）",
+      "attemptedAt": "2026-10-04T09:36:14.791Z"
+    },
+    {
+      "facilityId": "osm-way-232786863",
+      "name": "GSパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:36:35.439Z"
+    },
+    {
+      "facilityId": "osm-way-233086657",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:36:46.454Z"
+    },
+    {
+      "facilityId": "osm-way-233321090",
+      "name": "ヤマトコインパーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:36:51.362Z"
+    },
+    {
+      "facilityId": "osm-way-233321141",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:36:56.259Z"
+    },
+    {
+      "facilityId": "osm-way-233321182",
+      "name": "D-Parking",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:36:59.935Z"
+    },
+    {
+      "facilityId": "osm-way-233321183",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:37:06.046Z"
+    },
+    {
+      "facilityId": "osm-way-233321184",
+      "name": "セレパーク平野町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:37:09.721Z"
+    },
+    {
+      "facilityId": "osm-way-233450418",
+      "name": "大宝モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:37:15.863Z"
+    },
+    {
+      "facilityId": "osm-way-236984143",
+      "name": "ふくろうPARKING淡路町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(47m)が名前が一致しない: \"ふくろうパーキング淡路町\"",
+      "attemptedAt": "2026-10-04T09:37:18.472Z"
+    },
+    {
+      "facilityId": "osm-way-236984144",
+      "name": "ジーエスパーク 岸本・瓦町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(11m)が名前が一致しない: \"GSパーク 岸本瓦町\"",
+      "attemptedAt": "2026-10-04T09:37:19.648Z"
+    },
+    {
+      "facilityId": "osm-way-238069536",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:37:25.662Z"
+    },
+    {
+      "facilityId": "osm-way-238069578",
+      "name": "エコロパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:37:30.569Z"
+    },
+    {
+      "facilityId": "osm-way-238069583",
+      "name": "リパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:33.016Z"
+    },
+    {
+      "facilityId": "osm-way-238182355",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:35.560Z"
+    },
+    {
+      "facilityId": "osm-way-238320393",
+      "name": "D-Parking",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:38.045Z"
+    },
+    {
+      "facilityId": "osm-way-238762735",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:41.702Z"
+    },
+    {
+      "facilityId": "osm-way-238842529",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:45.365Z"
+    },
+    {
+      "facilityId": "osm-way-238843153",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:47.831Z"
+    },
+    {
+      "facilityId": "osm-way-238944319",
+      "name": "Superjpm",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 536m）",
+      "attemptedAt": "2026-10-04T09:37:49.043Z"
+    },
+    {
+      "facilityId": "osm-way-239444292",
+      "name": "東長堀地下駐車場出口",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 317m）",
+      "attemptedAt": "2026-10-04T09:37:50.278Z"
+    },
+    {
+      "facilityId": "osm-way-239444347",
+      "name": "エコロパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 187m）",
+      "attemptedAt": "2026-10-04T09:37:51.505Z"
+    },
+    {
+      "facilityId": "osm-way-239450008",
+      "name": "パラカ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:53.919Z"
+    },
+    {
+      "facilityId": "osm-way-239507382",
+      "name": "ジーエスパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 384684m）",
+      "attemptedAt": "2026-10-04T09:37:55.186Z"
+    },
+    {
+      "facilityId": "osm-way-239593725",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:56.399Z"
+    },
+    {
+      "facilityId": "osm-way-239692550",
+      "name": "ナビパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:37:58.814Z"
+    },
+    {
+      "facilityId": "osm-way-239692638",
+      "name": "リパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 160m）",
+      "attemptedAt": "2026-10-04T09:38:00.093Z"
+    },
+    {
+      "facilityId": "osm-way-239699825",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:02.522Z"
+    },
+    {
+      "facilityId": "osm-way-239699882",
+      "name": "Parking U",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"パーキングＵ 月極駐車場\"",
+      "attemptedAt": "2026-10-04T09:38:03.791Z"
+    },
+    {
+      "facilityId": "osm-way-239699974",
+      "name": "ダイヤパーク徳井町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(6m)が名前が一致しない: \"ﾀﾞｲﾔﾊﾟｰｸ\"",
+      "attemptedAt": "2026-10-04T09:38:06.213Z"
+    },
+    {
+      "facilityId": "osm-way-239733137",
+      "name": "Times",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:07.474Z"
+    },
+    {
+      "facilityId": "osm-way-239733448",
+      "name": "Times",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:08.678Z"
+    },
+    {
+      "facilityId": "osm-way-239863632",
+      "name": "ワンパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ONE PARK谷町３丁目\"",
+      "attemptedAt": "2026-10-04T09:38:09.871Z"
+    },
+    {
+      "facilityId": "osm-way-239863755",
+      "name": "Times",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:13.556Z"
+    },
+    {
+      "facilityId": "osm-way-240012392",
+      "name": "魚留モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3754m）",
+      "attemptedAt": "2026-10-04T09:38:17.265Z"
+    },
+    {
+      "facilityId": "osm-way-241552313",
+      "name": "ジーエスパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 386196m）",
+      "attemptedAt": "2026-10-04T09:38:19.662Z"
+    },
+    {
+      "facilityId": "osm-way-241552412",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:20.905Z"
+    },
+    {
+      "facilityId": "osm-way-241555315",
+      "name": "パラカ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 144m）",
+      "attemptedAt": "2026-10-04T09:38:23.344Z"
+    },
+    {
+      "facilityId": "osm-way-241555317",
+      "name": "三泉タワーパーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:24.608Z"
+    },
+    {
+      "facilityId": "osm-way-241555348",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:25.810Z"
+    },
+    {
+      "facilityId": "osm-way-241555442",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 147m）",
+      "attemptedAt": "2026-10-04T09:38:28.260Z"
+    },
+    {
+      "facilityId": "osm-way-241731629",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:30.722Z"
+    },
+    {
+      "facilityId": "osm-way-241731654",
+      "name": "備後町四丁目パーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:31.951Z"
+    },
+    {
+      "facilityId": "osm-way-241732689",
+      "name": "ジーエスパーク 谷町4丁目",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 126m）",
+      "attemptedAt": "2026-10-04T09:38:33.172Z"
+    },
+    {
+      "facilityId": "osm-way-241995181",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:34.391Z"
+    },
+    {
+      "facilityId": "osm-way-242793054",
+      "name": "パークNET松屋町駅前駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:36.894Z"
+    },
+    {
+      "facilityId": "osm-way-243182153",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:40.505Z"
+    },
+    {
+      "facilityId": "osm-way-243182156",
+      "name": "タイムズ黒門東",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:41.705Z"
+    },
+    {
+      "facilityId": "osm-way-243230063",
+      "name": "タイムズ安堂寺町第4",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(72m)が名前が一致しない: \"タイムズカー 安堂寺町２丁目\"",
+      "attemptedAt": "2026-10-04T09:38:43.001Z"
+    },
+    {
+      "facilityId": "osm-way-243278339",
+      "name": "ジャストパーク龍造寺町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(22m)が名前が一致しない: \"ジャストインパーク 龍造寺町\"",
+      "attemptedAt": "2026-10-04T09:38:44.217Z"
+    },
+    {
+      "facilityId": "osm-way-243278340",
+      "name": "ジーエスパーク上町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 207m）",
+      "attemptedAt": "2026-10-04T09:38:45.442Z"
+    },
+    {
+      "facilityId": "osm-way-243505036",
+      "name": "植野モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 142m）",
+      "attemptedAt": "2026-10-04T09:38:49.132Z"
+    },
+    {
+      "facilityId": "osm-way-243876417",
+      "name": "三和パーキング",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 357m）",
+      "attemptedAt": "2026-10-04T09:38:51.607Z"
+    },
+    {
+      "facilityId": "osm-way-243966138",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:52.763Z"
+    },
+    {
+      "facilityId": "osm-way-244251908",
+      "name": "リパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:53.993Z"
+    },
+    {
+      "facilityId": "osm-way-244406048",
+      "name": "中央南モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(28m)が名前が一致しない: \"瓦屋町モータープール 駐車場\"",
+      "attemptedAt": "2026-10-04T09:38:55.265Z"
+    },
+    {
+      "facilityId": "osm-way-244406098",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:38:57.662Z"
+    },
+    {
+      "facilityId": "osm-way-244645911",
+      "name": "モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4257m）",
+      "attemptedAt": "2026-10-04T09:38:58.885Z"
+    },
+    {
+      "facilityId": "osm-way-245987185",
+      "name": "モータープール",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4707m）",
+      "attemptedAt": "2026-10-04T09:39:00.082Z"
+    },
+    {
+      "facilityId": "osm-way-246384415",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 236m）",
+      "attemptedAt": "2026-10-04T09:39:01.348Z"
+    },
+    {
+      "facilityId": "osm-way-397120989",
+      "name": "谷町六丁目駅自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(63m)が名前が一致しない: \"谷町六丁目駅有料自転車駐車場\"",
+      "attemptedAt": "2026-10-04T09:39:07.521Z"
+    },
+    {
+      "facilityId": "osm-way-397120992",
+      "name": "谷町六丁目駅自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(5m)が名前が一致しない: \"谷町六丁目駅有料自転車駐車場\"",
+      "attemptedAt": "2026-10-04T09:39:08.699Z"
+    },
+    {
+      "facilityId": "osm-way-406467613",
+      "name": "東長堀バス駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(37m)が名前が一致しない: \"大阪市東長堀バスＢブロック\"",
+      "attemptedAt": "2026-10-04T09:39:26.010Z"
+    },
+    {
+      "facilityId": "osm-way-457930766",
+      "name": "江戸堀駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:39:33.097Z"
+    },
+    {
+      "facilityId": "osm-way-457930767",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:39:40.430Z"
+    },
+    {
+      "facilityId": "osm-way-458972537",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 164m）",
+      "attemptedAt": "2026-10-04T09:39:43.021Z"
+    },
+    {
+      "facilityId": "osm-way-458972538",
+      "name": "ジーエスパーク横堀",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:39:46.582Z"
+    },
+    {
+      "facilityId": "osm-way-465688753",
+      "name": "GSパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:39:50.258Z"
+    },
+    {
+      "facilityId": "osm-way-500984247",
+      "name": "駐車場EAST",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 125m）",
+      "attemptedAt": "2026-10-04T09:39:55.304Z"
+    },
+    {
+      "facilityId": "osm-way-581282445",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:40:06.191Z"
+    },
+    {
+      "facilityId": "osm-way-585828636",
+      "name": "サイカパーク 大阪ビジネスパークOBP北駐車場第2",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(78m)が名前が一致しない: \"大阪ビジネスパークKDDI大阪第2ビル南 2輪等駐車場\"",
+      "attemptedAt": "2026-10-04T09:40:08.828Z"
+    },
+    {
+      "facilityId": "osm-way-617163821",
+      "name": "上本町駅・谷町九丁目駅自転車駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(87m)が名前が一致しない: \"谷町九丁目駅 有料自転車駐車場\"",
+      "attemptedAt": "2026-10-04T09:40:10.043Z"
+    },
+    {
+      "facilityId": "osm-way-634833700",
+      "name": "ジーエスパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 386200m）",
+      "attemptedAt": "2026-10-04T09:40:12.408Z"
+    },
+    {
+      "facilityId": "osm-way-635299767",
+      "name": "セレパーク平野町",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:40:17.212Z"
+    },
+    {
+      "facilityId": "osm-way-659804931",
+      "name": "OnePark",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 394m）",
+      "attemptedAt": "2026-10-04T09:40:18.550Z"
+    },
+    {
+      "facilityId": "osm-way-673095663",
+      "name": "スパーク難波千日前3",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:40:24.572Z"
+    },
+    {
+      "facilityId": "osm-way-814999263",
+      "name": "三井のリパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:40:30.682Z"
+    },
+    {
+      "facilityId": "osm-way-835700629",
+      "name": "坐摩神社 大阪府神社庁 専用駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-04T09:40:34.367Z"
+    },
+    {
+      "facilityId": "osm-way-871031916",
+      "name": "GSパーク",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-04T09:40:38.049Z"
+    },
+    {
+      "facilityId": "osm-way-898497069",
+      "name": "東長堀バス駐車場",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:39.398Z"
+    },
+    {
+      "facilityId": "osm-way-913219604",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 133m）",
+      "attemptedAt": "2026-10-04T09:40:40.607Z"
+    },
+    {
+      "facilityId": "osm-way-929655167",
+      "name": "駐車場WEST",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:43.125Z"
+    },
+    {
+      "facilityId": "osm-way-929655179",
+      "name": "タイムズ",
+      "wardId": "chuo",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:44.278Z"
+    },
+    {
+      "facilityId": "osm-way-1202786057",
+      "name": "三井のリパーク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 228m）",
+      "attemptedAt": "2026-10-04T09:40:45.510Z"
+    },
+    {
+      "facilityId": "osm-way-1231373882",
+      "name": "KF-Park",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:46.736Z"
+    },
+    {
+      "facilityId": "osm-way-1246004583",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:49.178Z"
+    },
+    {
+      "facilityId": "osm-way-1246056655",
+      "name": "リパーク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:50.406Z"
+    },
+    {
+      "facilityId": "osm-way-128057038",
+      "name": "西長堀駅自転車駐輪場",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 263m）",
+      "attemptedAt": "2026-10-04T09:40:55.332Z"
+    },
+    {
+      "facilityId": "osm-way-128057043",
+      "name": "西長堀駅自転車駐輪場",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:56.519Z"
+    },
+    {
+      "facilityId": "osm-way-128057044",
+      "name": "西長堀駅自転車駐輪場",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 245m）",
+      "attemptedAt": "2026-10-04T09:40:57.740Z"
+    },
+    {
+      "facilityId": "osm-way-151230969",
+      "name": "九条南3丁目パーキング",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:40:59.055Z"
+    },
+    {
+      "facilityId": "osm-way-151230985",
+      "name": "東洋カーマックス",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 387m）",
+      "attemptedAt": "2026-10-04T09:41:00.243Z"
+    },
+    {
+      "facilityId": "osm-way-158508813",
+      "name": "アルファパーク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2395m）",
+      "attemptedAt": "2026-10-04T09:41:05.108Z"
+    },
+    {
+      "facilityId": "osm-way-159339420",
+      "name": "OnePark",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 175m）",
+      "attemptedAt": "2026-10-04T09:41:07.546Z"
+    },
+    {
+      "facilityId": "osm-way-159339423",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 150m）",
+      "attemptedAt": "2026-10-04T09:41:08.783Z"
+    },
+    {
+      "facilityId": "osm-way-160574938",
+      "name": "阪口モータープール",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 4793m）",
+      "attemptedAt": "2026-10-04T09:41:10.016Z"
+    },
+    {
+      "facilityId": "osm-way-160601513",
+      "name": "安積モータープール",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 486m）",
+      "attemptedAt": "2026-10-04T09:41:11.240Z"
+    },
+    {
+      "facilityId": "osm-way-161505883",
+      "name": "P・パーク南海",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2688m）",
+      "attemptedAt": "2026-10-04T09:41:13.689Z"
+    },
+    {
+      "facilityId": "osm-way-161574142",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 156m）",
+      "attemptedAt": "2026-10-04T09:41:14.913Z"
+    },
+    {
+      "facilityId": "osm-way-161620206",
+      "name": "DEPO",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2494m）",
+      "attemptedAt": "2026-10-04T09:41:17.399Z"
+    },
+    {
+      "facilityId": "osm-way-161620209",
+      "name": "parkstation",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(1m)が名前が一致しない: \"パークステーション千代崎第2\"",
+      "attemptedAt": "2026-10-04T09:41:18.593Z"
+    },
+    {
+      "facilityId": "osm-way-161620224",
+      "name": "大洋製器工業",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:21.053Z"
+    },
+    {
+      "facilityId": "osm-way-161620227",
+      "name": "太平モータープール",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6273m）",
+      "attemptedAt": "2026-10-04T09:41:22.274Z"
+    },
+    {
+      "facilityId": "osm-way-161683813",
+      "name": "P.ZONE",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 482m）",
+      "attemptedAt": "2026-10-04T09:41:23.538Z"
+    },
+    {
+      "facilityId": "osm-way-246617757",
+      "name": "パラカ土佐堀第1",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"エコロパーク 土佐堀1丁目第1駐車場\"",
+      "attemptedAt": "2026-10-04T09:41:24.730Z"
+    },
+    {
+      "facilityId": "osm-way-246617807",
+      "name": "ブレイク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 516m）",
+      "attemptedAt": "2026-10-04T09:41:29.629Z"
+    },
+    {
+      "facilityId": "osm-way-246617820",
+      "name": "トラストパーク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 897m）",
+      "attemptedAt": "2026-10-04T09:41:30.870Z"
+    },
+    {
+      "facilityId": "osm-way-247828335",
+      "name": "ODD江戸堀PARKING",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(10m)が名前が一致しない: \"ODD江戸堀パーキング\"",
+      "attemptedAt": "2026-10-04T09:41:32.067Z"
+    },
+    {
+      "facilityId": "osm-way-247828383",
+      "name": "パラカ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 136m）",
+      "attemptedAt": "2026-10-04T09:41:33.242Z"
+    },
+    {
+      "facilityId": "osm-way-247828390",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:34.519Z"
+    },
+    {
+      "facilityId": "osm-way-247828429",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:36.957Z"
+    },
+    {
+      "facilityId": "osm-way-248656944",
+      "name": "富士ビル月極駐輪場",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "bicycle_parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 983m）",
+      "attemptedAt": "2026-10-04T09:41:40.676Z"
+    },
+    {
+      "facilityId": "osm-way-248657035",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:41.857Z"
+    },
+    {
+      "facilityId": "osm-way-249113120",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:45.528Z"
+    },
+    {
+      "facilityId": "osm-way-254340597",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:49.204Z"
+    },
+    {
+      "facilityId": "osm-way-254340660",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:50.431Z"
+    },
+    {
+      "facilityId": "osm-way-254340683",
+      "name": "BePark",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 5427m）",
+      "attemptedAt": "2026-10-04T09:41:51.642Z"
+    },
+    {
+      "facilityId": "osm-way-254415145",
+      "name": "京町堀1丁目コインパーキング",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:52.951Z"
+    },
+    {
+      "facilityId": "osm-way-254415218",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:54.104Z"
+    },
+    {
+      "facilityId": "osm-way-257833888",
+      "name": "パラカ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 437m）",
+      "attemptedAt": "2026-10-04T09:41:56.554Z"
+    },
+    {
+      "facilityId": "osm-way-257833890",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:41:57.791Z"
+    },
+    {
+      "facilityId": "osm-way-273208603",
+      "name": "三井のリパーク",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 230m）",
+      "attemptedAt": "2026-10-04T09:41:59.009Z"
+    },
+    {
+      "facilityId": "osm-way-290277620",
+      "name": "タイムズ",
+      "wardId": "nishi",
+      "category": "transport",
+      "subcategory": "parking",
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）（Details: Details全体上限に到達）",
+      "attemptedAt": "2026-10-04T09:42:03.907Z"
     }
   ],
-  "generatedAt": "2026-10-04T09:27:32.291Z",
+  "generatedAt": "2026-10-04T09:42:04.023Z",
   "sourceRecordCount": 40585,
   "counts": {
-    "verified": 3090,
-    "unresolved": 1706,
-    "unattempted": 35789,
+    "verified": 3284,
+    "unresolved": 2012,
+    "unattempted": 35289,
     "total": 40585
   },
   "wardCounts": {
@@ -17086,15 +20146,15 @@
     },
     "chuo": {
       "total": 5084,
-      "verified": 113,
-      "unresolvedOrAmbiguous": 51,
-      "unattempted": 4920
+      "verified": 203,
+      "unresolvedOrAmbiguous": 194,
+      "unattempted": 4687
     },
     "fukushima": {
       "total": 967,
-      "verified": 33,
-      "unresolvedOrAmbiguous": 10,
-      "unattempted": 924
+      "verified": 50,
+      "unresolvedOrAmbiguous": 38,
+      "unattempted": 879
     },
     "higashinari": {
       "total": 918,
@@ -17134,15 +20194,15 @@
     },
     "kita": {
       "total": 5655,
-      "verified": 1641,
-      "unresolvedOrAmbiguous": 1269,
-      "unattempted": 2745
+      "verified": 1643,
+      "unresolvedOrAmbiguous": 1277,
+      "unattempted": 2735
     },
     "konohana": {
       "total": 1309,
-      "verified": 50,
-      "unresolvedOrAmbiguous": 8,
-      "unattempted": 1251
+      "verified": 84,
+      "unresolvedOrAmbiguous": 62,
+      "unattempted": 1163
     },
     "minato": {
       "total": 612,
@@ -17152,9 +20212,9 @@
     },
     "miyakojima": {
       "total": 1444,
-      "verified": 59,
-      "unresolvedOrAmbiguous": 14,
-      "unattempted": 1371
+      "verified": 85,
+      "unresolvedOrAmbiguous": 47,
+      "unattempted": 1312
     },
     "naniwa": {
       "total": 1363,
@@ -17164,9 +20224,9 @@
     },
     "nishi": {
       "total": 2071,
-      "verified": 55,
-      "unresolvedOrAmbiguous": 18,
-      "unattempted": 1998
+      "verified": 80,
+      "unresolvedOrAmbiguous": 58,
+      "unattempted": 1933
     },
     "nishinari": {
       "total": 854,
