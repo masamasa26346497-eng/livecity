@@ -1,0 +1,83 @@
+name: Mission 36L - Missing Facility Rescue
+
+on:
+  push:
+    branches:
+      - feature/mission-36l-building-photo-linking
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mission36l-missing-facility-rescue
+  cancel-in-progress: false
+
+jobs:
+  missing-facility-rescue:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36l-missing-rescue]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+      MISSION_BRANCH: feature/mission-36l-building-photo-linking
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.MISSION_BRANCH }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify API key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${GOOGLE_PLACES_API_KEY:-}" || { echo 'GOOGLE_PLACES_API_KEY missing'; exit 2; }
+
+      - name: Rescue first 100 missing-facility exact-source gaps
+        run: node tools/google-places/rescue-mission36l-missing-facility-records.mjs --limit 100 --requests-per-minute 40
+
+      - name: Validate safe durable output
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json';
+          const d=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(d.maxDistanceMeters!==120) throw new Error('120m hard ceiling changed');
+          if(!d.policy?.persistsOnlyVerifiedLinkage) throw new Error('VERIFIED-only policy missing');
+          if((d.entries||[]).some((e)=>e.matchConfidence!=='VERIFIED')) throw new Error('non-VERIFIED durable entry');
+          const raw=JSON.stringify(d).toLowerCase();
+          for(const banned of ['photouri','photoname','mediaurl','resourcename','base64']) {
+            if(raw.includes(banned)) throw new Error(`forbidden durable media token: ${banned}`);
+          }
+          const r=JSON.parse(fs.readFileSync('data/reports/mission36l-missing-facility-rescue/last-batch.json','utf8'));
+          if(!r.policy?.exactOsmSourceOnly) throw new Error('exact OSM source policy missing');
+          console.log(JSON.stringify({processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved}));
+          NODE
+
+      - name: Commit rescue batch result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
+          git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+          git add -f data/reports/mission36l-missing-facility-rescue/progress.json
+          git add -f data/reports/mission36l-missing-facility-rescue/last-batch.json
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data(mission36l): missing-facility rescue batch 1'
+          git fetch origin "${MISSION_BRANCH}"
+          git rebase "origin/${MISSION_BRANCH}"
+          git push origin "HEAD:${MISSION_BRANCH}"
