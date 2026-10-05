@@ -3,7 +3,7 @@
   "mission": "36J",
   "areaId": "osaka-city",
   "sourceDataset": "public/map-data/osaka-city/facilities/facilities.json",
-  "generatedAt": "2026-10-04T12:45:33.676Z",
+  "generatedAt": "2026-10-05T11:43:03.412Z",
   "maxDistanceMeters": 120,
   "policy": {
     "persistsOnlyVerifiedLinkage": true,
@@ -15,10 +15,11 @@
     "resolvesPhotosAtDisplayTime": true,
     "ambiguousMatchesAreNotPersisted": true,
     "resumableBatches": true,
-    "buildingSourceFocusedBatches": true
+    "buildingSourceFocusedBatches": true,
+    "exactSourceGapExpansion": true
   },
   "counts": {
-    "verified": 6908,
+    "verified": 6910,
     "unresolved": 5152,
     "unattempted": 28525,
     "total": 40585
@@ -76157,6 +76158,28 @@
       "distanceMeters": 4,
       "verifiedAt": "2026-10-04T12:45:31.193Z",
       "verifiedBy": "automated-building-source-batch"
+    },
+    {
+      "facilityId": "osm-way-1086688882",
+      "googlePlaceId": "ChIJVyR_RSHeAGARhnmM68tDudw",
+      "name": "ライゼボックス",
+      "relevanceClass": "shopping",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-05T11:41:14.609Z",
+      "verifiedBy": "automated-exact-source-gap-batch"
+    },
+    {
+      "facilityId": "osm-way-1115666706",
+      "googlePlaceId": "ChIJy65RIkLlAGAR3JAGH3ZIMhM",
+      "name": "Superjpm",
+      "relevanceClass": "transport",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "座標(90m以内)と名前が一致",
+      "distanceMeters": 90,
+      "verifiedAt": "2026-10-05T11:43:00.616Z",
+      "verifiedBy": "automated-exact-source-gap-batch"
     }
   ]
 }
