@@ -3,7 +3,7 @@
   "mission": "36J",
   "areaId": "osaka-city",
   "sourceDataset": "public/map-data/osaka-city/facilities/facilities.json",
-  "generatedAt": "2026-10-05T11:43:03.412Z",
+  "generatedAt": "2026-10-05T13:48:05.827Z",
   "maxDistanceMeters": 120,
   "policy": {
     "persistsOnlyVerifiedLinkage": true,
@@ -16,10 +16,11 @@
     "ambiguousMatchesAreNotPersisted": true,
     "resumableBatches": true,
     "buildingSourceFocusedBatches": true,
-    "exactSourceGapExpansion": true
+    "exactSourceGapExpansion": true,
+    "missingFacilityRescueUsesExactOsmSource": true
   },
   "counts": {
-    "verified": 6910,
+    "verified": 6923,
     "unresolved": 5152,
     "unattempted": 28525,
     "total": 40585
@@ -76180,6 +76181,149 @@
       "distanceMeters": 90,
       "verifiedAt": "2026-10-05T11:43:00.616Z",
       "verifiedBy": "automated-exact-source-gap-batch"
+    },
+    {
+      "facilityId": "osm-way-38939491",
+      "googlePlaceId": "ChIJ118SMlTmAGARMjYgGnwCwrU",
+      "name": "新藤村ビルディング",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-05T13:47:34.786Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-39662867",
+      "googlePlaceId": "ChIJFfAgt6rnAGARAjMqaBLLhck",
+      "name": "NTT西日本新町ビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-05T13:47:41.762Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031164",
+      "googlePlaceId": "ChIJDclroWnhAGARER1KUT422bA",
+      "name": "松下IMPビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(11m以内)と名前が一致",
+      "distanceMeters": 11,
+      "verifiedAt": "2026-10-05T13:47:45.215Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031352",
+      "googlePlaceId": "ChIJmWzTANTgAGARoa4LA9QRGJE",
+      "name": "オプテージビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-05T13:47:46.956Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031357",
+      "googlePlaceId": "ChIJqSa539DgAGAR-85O-qioIYI",
+      "name": "富士通 関西システムラボラトリ",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-05T13:47:48.594Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031361",
+      "googlePlaceId": "ChIJ53SSu5DhAGARZ-TC0HkmZrk",
+      "name": "OBPビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-05T13:47:50.252Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031362",
+      "googlePlaceId": "ChIJq6rqgdDgAGARq0kPxisccqQ",
+      "name": "KDDI 大阪ビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(4m以内)と名前が一致",
+      "distanceMeters": 4,
+      "verifiedAt": "2026-10-05T13:47:52.012Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031364",
+      "googlePlaceId": "ChIJq6rqmNDgAGAR6-S7YkHshe0",
+      "name": "大阪東京海上日動ビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(2m以内)と名前が一致",
+      "distanceMeters": 2,
+      "verifiedAt": "2026-10-05T13:47:53.742Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-42031369",
+      "googlePlaceId": "ChIJuQajttDgAGAReLe5jJxstv8",
+      "name": "ytv京橋ビル",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(31m以内)と名前が一致",
+      "distanceMeters": 31,
+      "verifiedAt": "2026-10-05T13:47:55.463Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-43979655",
+      "googlePlaceId": "ChIJ29qDqVPoAGARiM-JUhh1Ca8",
+      "name": "大阪府咲洲庁舎",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(8m以内)と名前が一致",
+      "distanceMeters": 8,
+      "verifiedAt": "2026-10-05T13:47:57.094Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-48123160",
+      "googlePlaceId": "ChIJB0010jLnAGARwtewXYzhnYU",
+      "name": "修道館",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(10m以内)と名前が一致",
+      "distanceMeters": 10,
+      "verifiedAt": "2026-10-05T13:47:58.798Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-48123161",
+      "googlePlaceId": "ChIJB0010jLnAGARwtewXYzhnYU",
+      "name": "修道館事務所",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(37m以内)と名前が一致",
+      "distanceMeters": 37,
+      "verifiedAt": "2026-10-05T13:48:00.507Z",
+      "verifiedBy": "automated-missing-facility-rescue"
+    },
+    {
+      "facilityId": "osm-way-48229768",
+      "googlePlaceId": "ChIJfyDviArhAGARl_8whYnxj5c",
+      "name": "一番櫓",
+      "relevanceClass": "other",
+      "matchConfidence": "VERIFIED",
+      "matchReason": "missing-facility-rescue: 座標(5m以内)と名前が一致",
+      "distanceMeters": 5,
+      "verifiedAt": "2026-10-05T13:48:05.639Z",
+      "verifiedBy": "automated-missing-facility-rescue"
     }
   ]
 }

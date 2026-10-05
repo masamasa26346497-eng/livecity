@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "mission": "36L-missing-facility-rescue",
+  "attempts": [
+    {
+      "facilityId": "osm-way-34619004",
+      "sourceId": "way/34619004",
+      "queryName": "旧大阪砲兵工廠 守衛詰所",
+      "lat": 34.6900464,
+      "lon": 135.5231176,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(60m)が名前が一致しない: \"大阪砲兵工廠工場\"",
+      "attemptedAt": "2026-10-05T13:47:33.005Z"
+    },
+    {
+      "facilityId": "osm-way-38939491",
+      "sourceId": "way/38939491",
+      "queryName": "新藤村ビルディング",
+      "lat": 34.6805276,
+      "lon": 135.4848711,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(2m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:34.786Z"
+    },
+    {
+      "facilityId": "osm-way-39011879",
+      "sourceId": "way/39011879",
+      "queryName": "ヨコハマタイヤ大阪中央営業所",
+      "lat": 34.6804745,
+      "lon": 135.4854615,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(2m)が名前が一致しない: \"ヨコハマタイヤジャパン 近畿四国営業本部\"",
+      "attemptedAt": "2026-10-05T13:47:36.503Z"
+    },
+    {
+      "facilityId": "osm-way-39011880",
+      "sourceId": "way/39011880",
+      "queryName": "ステンレス管機株式会社",
+      "lat": 34.6805449,
+      "lon": 135.4851282,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(3m)が名前が一致しない: \"ステンレス管機（株）商品センター\"",
+      "attemptedAt": "2026-10-05T13:47:38.296Z"
+    },
+    {
+      "facilityId": "osm-way-39074613",
+      "sourceId": "way/39074613",
+      "queryName": "株式会社金剛組",
+      "lat": 34.6547008,
+      "lon": 135.5139899,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標は近い(4m)が名前が一致しない: \"㈱金剛組［本社/大阪支店］\"",
+      "attemptedAt": "2026-10-05T13:47:40.024Z"
+    },
+    {
+      "facilityId": "osm-way-39662867",
+      "sourceId": "way/39662867",
+      "queryName": "NTT西日本新町ビル",
+      "lat": 34.677014,
+      "lon": 135.48651,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(4m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:41.762Z"
+    },
+    {
+      "facilityId": "osm-way-41758955",
+      "sourceId": "way/41758955",
+      "queryName": "クリスタル タワー",
+      "lat": 34.6921318,
+      "lon": 135.5285348,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）",
+      "attemptedAt": "2026-10-05T13:47:43.496Z"
+    },
+    {
+      "facilityId": "osm-way-42031164",
+      "sourceId": "way/42031164",
+      "queryName": "松下IMPビル",
+      "lat": 34.6917185,
+      "lon": 135.5306853,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(11m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:45.215Z"
+    },
+    {
+      "facilityId": "osm-way-42031352",
+      "sourceId": "way/42031352",
+      "queryName": "オプテージビル",
+      "lat": 34.6929119,
+      "lon": 135.5296472,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(5m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:46.956Z"
+    },
+    {
+      "facilityId": "osm-way-42031357",
+      "sourceId": "way/42031357",
+      "queryName": "富士通 関西システムラボラトリ",
+      "lat": 34.6929781,
+      "lon": 135.5323861,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(2m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:48.594Z"
+    },
+    {
+      "facilityId": "osm-way-42031361",
+      "sourceId": "way/42031361",
+      "queryName": "OBPビル",
+      "lat": 34.6938606,
+      "lon": 135.532605,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(4m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:50.252Z"
+    },
+    {
+      "facilityId": "osm-way-42031362",
+      "sourceId": "way/42031362",
+      "queryName": "KDDI 大阪ビル",
+      "lat": 34.693043,
+      "lon": 135.5345117,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(4m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:52.012Z"
+    },
+    {
+      "facilityId": "osm-way-42031364",
+      "sourceId": "way/42031364",
+      "queryName": "大阪東京海上日動ビル",
+      "lat": 34.6937861,
+      "lon": 135.5341199,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(2m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:53.742Z"
+    },
+    {
+      "facilityId": "osm-way-42031369",
+      "sourceId": "way/42031369",
+      "queryName": "ytv京橋ビル",
+      "lat": 34.6943217,
+      "lon": 135.5340713,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(31m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:55.463Z"
+    },
+    {
+      "facilityId": "osm-way-43979655",
+      "sourceId": "way/43979655",
+      "queryName": "大阪府咲洲庁舎",
+      "lat": 34.6380874,
+      "lon": 135.4147302,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(8m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:57.094Z"
+    },
+    {
+      "facilityId": "osm-way-48123160",
+      "sourceId": "way/48123160",
+      "queryName": "修道館",
+      "lat": 34.6843934,
+      "lon": 135.5249793,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(10m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:47:58.798Z"
+    },
+    {
+      "facilityId": "osm-way-48123161",
+      "sourceId": "way/48123161",
+      "queryName": "修道館事務所",
+      "lat": 34.6841566,
+      "lon": 135.5249514,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(37m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:48:00.507Z"
+    },
+    {
+      "facilityId": "osm-way-48229761",
+      "sourceId": "way/48229761",
+      "queryName": "結婚式場",
+      "lat": 34.6841126,
+      "lon": 135.5260923,
+      "matchConfidence": "UNRESOLVED",
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 200m）",
+      "attemptedAt": "2026-10-05T13:48:02.177Z"
+    },
+    {
+      "facilityId": "osm-way-48229767",
+      "sourceId": "way/48229767",
+      "queryName": "豊国神社",
+      "lat": 34.6842862,
+      "lon": 135.5269113,
+      "matchConfidence": "AMBIGUOUS",
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）",
+      "attemptedAt": "2026-10-05T13:48:03.893Z"
+    },
+    {
+      "facilityId": "osm-way-48229768",
+      "sourceId": "way/48229768",
+      "queryName": "一番櫓",
+      "lat": 34.6843389,
+      "lon": 135.5279989,
+      "matchConfidence": "VERIFIED",
+      "reason": "座標(5m以内)と名前が一致",
+      "attemptedAt": "2026-10-05T13:48:05.639Z"
+    }
+  ],
+  "generatedAt": "2026-10-05T13:48:05.827Z"
+}
