@@ -48,7 +48,7 @@ export function buildMissingFacilityCandidates(gapsDoc, facilitiesDoc, mappingDo
   return out;
 }
 
-async function fetchOverpassCenters(items, fetchImpl = fetch) {
+async function fetchOverpassCentersOnce(items, fetchImpl = fetch) {
   const nodes = items.filter((x) => x.src.type === 'node').map((x) => x.src.id);
   const ways = items.filter((x) => x.src.type === 'way').map((x) => x.src.id);
   const parts = [];
@@ -56,8 +56,7 @@ async function fetchOverpassCenters(items, fetchImpl = fetch) {
   if (ways.length) parts.push(`way(id:${ways.join(',')});`);
   if (!parts.length) return new Map();
   const q = `[out:json][timeout:60];(${parts.join('')});out center tags;`;
-  const url = 'https://overpass-api.de/api/interpreter';
-  const res = await fetchImpl(url, {
+  const res = await fetchImpl('https://overpass-api.de/api/interpreter', {
     method: 'POST',
     headers: { 'content-type': 'application/x-www-form-urlencoded', 'user-agent': 'LiveCity-Mission36L/1.0' },
     body: new URLSearchParams({ data: q }).toString(),
@@ -74,15 +73,32 @@ async function fetchOverpassCenters(items, fetchImpl = fetch) {
   return map;
 }
 
-export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(), fetchImpl = fetch, limit = 100, requestsPerMinute = 40, now = () => new Date() } = {}) {
+async function fetchOverpassCenters(items, fetchImpl = fetch, retries = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fetchOverpassCentersOnce(items, fetchImpl);
+    } catch (e) {
+      lastError = e;
+      const retryable = /Overpass HTTP (429|502|503|504)/.test(String(e?.message || e));
+      if (!retryable || attempt === retries) throw e;
+      await sleep(3000 * attempt);
+    }
+  }
+  throw lastError;
+}
+
+export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(), fetchImpl = fetch, limit = 20, requestsPerMinute = 40, now = () => new Date() } = {}) {
   for (const p of [GAP_PATH, FACILITIES_PATH, MAPPING_PATH]) if (!fs.existsSync(p)) throw new Error(`required input missing: ${p}`);
   const gaps = readJson(GAP_PATH);
   const facilities = readJson(FACILITIES_PATH);
   const mapping = readJson(MAPPING_PATH);
   const progress = readJsonIfExists(PROGRESS_PATH) || { version: 1, mission: '36L-missing-facility-rescue', attempts: [] };
   const all = buildMissingFacilityCandidates(gaps, facilities, mapping, progress);
-  const selected = all.slice(0, Math.max(1, Math.min(100, Number(limit) || 100)));
-  const centers = await fetchOverpassCenters(selected, fetchImpl);
+  const selected = all.slice(0, Math.max(1, Math.min(20, Number(limit) || 20)));
+  if (!selected.length) return { mission: '36L-missing-facility-rescue', processed: 0, verifiedThisBatch: 0, remainingMissingActionable: 0, osmCentersResolved: 0, results: [] };
+
+  const centers = await fetchOverpassCenters(selected, fetchImpl, 3);
   const client = createPlacesClient({ apiKey, fetchImpl, requestGuard: createPacedCityGuard({ requestsPerMinute }) });
   if (!client.isEnabled()) throw new Error('GOOGLE_PLACES_API_KEY is not configured');
   const entries = [...(mapping.entries || [])].map(assertDurableRecordSafe);
@@ -97,6 +113,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
       results.push({ facilityId: gap.facilityId, sourceId: gap.sourceId, queryName, matchConfidence: 'UNRESOLVED', reason: 'No OSM center from Overpass' });
       continue;
     }
+
     const search = await client.searchText({ textQuery: queryName, lat: c.lat, lon: c.lon });
     let match = search.ok ? classifyPilotMatch({
       facilityId: gap.facilityId,
@@ -119,6 +136,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
       const idx = entries.findIndex((e) => e.facilityId === gap.facilityId);
       if (idx >= 0) entries[idx] = entry; else entries.push(entry);
     }
+
     progress.attempts.push({ facilityId: gap.facilityId, sourceId: gap.sourceId, queryName, lat: c.lat, lon: c.lon, matchConfidence: match.matchConfidence, reason: match.reason, attemptedAt });
     results.push({ facilityId: gap.facilityId, sourceId: gap.sourceId, queryName, matchConfidence: match.matchConfidence, distanceMeters: match.distanceMeters ?? null });
     if (i + 1 < selected.length) await sleep(Math.ceil(60000 / Math.max(1, requestsPerMinute)));
@@ -130,6 +148,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   await fsp.writeFile(UI_MAPPING_PATH, JSON.stringify(updatedMapping, null, 2));
   await fsp.mkdir(REPORT_DIR, { recursive: true });
   await fsp.writeFile(PROGRESS_PATH, JSON.stringify({ ...progress, generatedAt }, null, 2));
+
   const verifiedThisBatch = results.filter((r) => r.matchConfidence === 'VERIFIED').length;
   const remaining = buildMissingFacilityCandidates(gaps, facilities, updatedMapping, progress).length;
   const report = { mission: '36L-missing-facility-rescue', generatedAt, policy: { exactOsmSourceOnly: true, maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS, verifiedOnlyPersistence: true }, selected: selected.length, processed: results.length, verifiedThisBatch, remainingMissingActionable: remaining, osmCentersResolved: centers.size, apiUsage: client.getDebugCounters(), results };
@@ -138,14 +157,31 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
 }
 
 function parseCli(argv) {
-  const out = { limit: 100, requestsPerMinute: 40 };
+  const out = { limit: 20, requestsPerMinute: 40, chunks: 10 };
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--limit') out.limit = Math.min(100, Math.max(1, Number(argv[++i]) || 100));
+    if (argv[i] === '--limit') out.limit = Math.min(20, Math.max(1, Number(argv[++i]) || 20));
     else if (argv[i] === '--requests-per-minute') out.requestsPerMinute = Math.max(1, Number(argv[++i]) || 40);
+    else if (argv[i] === '--chunks') out.chunks = Math.min(25, Math.max(1, Number(argv[++i]) || 10));
   }
   return out;
 }
 
+async function runCli(opts) {
+  let processed = 0;
+  let verified = 0;
+  let remaining = null;
+  for (let chunk = 1; chunk <= opts.chunks; chunk++) {
+    const r = await runRescueBatch(opts);
+    processed += r.processed;
+    verified += r.verifiedThisBatch;
+    remaining = r.remainingMissingActionable;
+    console.log(`[36L missing-facility rescue] chunk ${chunk}/${opts.chunks}`, JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }));
+    if (!r.processed || !r.remainingMissingActionable) break;
+    await sleep(3000);
+  }
+  console.log('[36L missing-facility rescue] total', JSON.stringify({ processed, verifiedThisRun: verified, remainingMissingActionable: remaining }));
+}
+
 if (isMainModule(import.meta.url)) {
-  runRescueBatch(parseCli(process.argv.slice(2))).then((r) => console.log('[36L missing-facility rescue]', JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }))).catch((e) => { console.error(e?.stack || e); process.exitCode = 1; });
+  runCli(parseCli(process.argv.slice(2))).catch((e) => { console.error(e?.stack || e); process.exitCode = 1; });
 }
