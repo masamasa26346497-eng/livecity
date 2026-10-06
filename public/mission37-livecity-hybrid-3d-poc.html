@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Live City | Hybrid 3D Engine POC</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Cesium.js"></script>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Widgets/widgets.css" />
+  <style>
+    html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:#07111f; }
+    #hud {
+      position:fixed; top:12px; left:12px; z-index:10; width:min(360px,calc(100vw - 24px));
+      box-sizing:border-box; padding:12px 14px; border-radius:12px;
+      background:rgba(8,18,32,.86); color:#f4f7fb; font:13px/1.5 system-ui,-apple-system,sans-serif;
+      backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12);
+    }
+    #hud h1 { font-size:15px; margin:0 0 6px; }
+    #status { color:#9bd7ff; }
+    #metrics { margin-top:8px; opacity:.9; white-space:pre-line; }
+    #error { margin-top:8px; color:#ffb4b4; display:none; }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <aside id="hud">
+    <h1>Live City | Hybrid 3D Engine POC</h1>
+    <div id="status">設定を確認中…</div>
+    <div id="metrics"></div>
+    <div id="error"></div>
+  </aside>
+
+  <script src="./local-config.js"></script>
+  <script>
+    (async function () {
+      const status = document.getElementById('status');
+      const metrics = document.getElementById('metrics');
+      const error = document.getElementById('error');
+      const apiKey = window.LIVECITY_CONFIG && window.LIVECITY_CONFIG.googleMapTilesApiKey;
+
+      if (!apiKey) {
+        status.textContent = 'Map Tiles APIキー未設定';
+        error.style.display = 'block';
+        error.textContent = 'public/local-config.js に googleMapTilesApiKey を設定してください。';
+        return;
+      }
+
+      const t0 = performance.now();
+      Cesium.RequestScheduler.requestsByServer["tile.googleapis.com:443"] = 18;
+
+      const viewer = new Cesium.Viewer('cesiumContainer', {
+        imageryProvider: false,
+        baseLayerPicker: false,
+        geocoder: false,
+        homeButton: false,
+        sceneModePicker: false,
+        navigationHelpButton: false,
+        animation: false,
+        timeline: false,
+        fullscreenButton: false,
+        requestRenderMode: true
+      });
+
+      viewer.scene.globe.show = false;
+      viewer.scene.fog.enabled = true;
+
+      const tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+        url: 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + encodeURIComponent(apiKey),
+        showCreditsOnScreen: true,
+        maximumScreenSpaceError: 16,
+        skipLevelOfDetail: true,
+        baseScreenSpaceError: 1024,
+        skipScreenSpaceErrorFactor: 16,
+        skipLevels: 1,
+        immediatelyLoadDesiredLevelOfDetail: false,
+        loadSiblings: false
+      }));
+
+      // Umeda / Osaka Station area
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(135.49595, 34.70385, 950),
+        orientation: {
+          heading: Cesium.Math.toRadians(165),
+          pitch: Cesium.Math.toRadians(-32),
+          roll: 0
+        }
+      });
+
+      let frames = 0;
+      let fps = 0;
+      let lastFpsAt = performance.now();
+
+      viewer.scene.postRender.addEventListener(function () {
+        frames += 1;
+        const now = performance.now();
+        if (now - lastFpsAt >= 1000) {
+          fps = Math.round(frames * 1000 / (now - lastFpsAt));
+          frames = 0;
+          lastFpsAt = now;
+        }
+        metrics.textContent =
+          'FPS: ' + fps +
+          '\n画質閾値(SSE): ' + tileset.maximumScreenSpaceError +
+          '\n読込経過: ' + ((now - t0) / 1000).toFixed(1) + '秒';
+      });
+
+      try {
+        await tileset.readyPromise;
+        status.textContent = 'Photorealistic 3D Tiles 接続成功（梅田）';
+        window.__MISSION37_HYBRID_3D_POC__ = function () {
+          return {
+            ready: !!tileset.ready,
+            maximumScreenSpaceError: tileset.maximumScreenSpaceError,
+            totalMemoryUsageInBytes: tileset.totalMemoryUsageInBytes || null,
+            camera: {
+              lon: 135.49595,
+              lat: 34.70385
+            }
+          };
+        };
+      } catch (e) {
+        status.textContent = '3D Tiles接続失敗';
+        error.style.display = 'block';
+        error.textContent = String(e && e.message || e);
+        console.error('[Mission37] tileset load failed', e);
+      }
+    })();
+  </script>
+</body>
+</html>
