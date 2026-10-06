@@ -21,3 +21,20 @@ test('[Mission37] production pages are not patched by launcher source', () => {
   assert.ok(!toggle.includes('osaka_3d_buildings.html'));
   assert.ok(!toggle.includes('osaka_3d_buildings.fullward-v3.html'));
 });
+
+
+test('[Mission37] Cesium click is bridged to existing Live City photo index', () => {
+  const html = fs.readFileSync('public/mission37-livecity-hybrid-3d-poc.html', 'utf8');
+  assert.ok(html.includes('/map-data/osaka-city/derived/building-photo-index.json'));
+  assert.ok(html.includes('ScreenSpaceEventType.LEFT_CLICK'));
+  assert.ok(html.includes('pickPosition'));
+  assert.ok(html.includes('nearestPhotoBuilding'));
+  assert.ok(html.includes('canonicalId'));
+});
+
+test('[Mission37] photo index stays lazy until building interaction', () => {
+  const html = fs.readFileSync('public/mission37-livecity-hybrid-3d-poc.html', 'utf8');
+  assert.ok(html.includes('let photoIndexPromise = null'));
+  assert.ok(html.includes('async function loadPhotoSpatialIndex'));
+  assert.ok(!html.includes('<script src="/map-data/osaka-city/derived/building-photo-index.json'));
+});
