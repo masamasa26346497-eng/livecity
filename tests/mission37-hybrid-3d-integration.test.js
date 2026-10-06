@@ -38,3 +38,16 @@ test('[Mission37] photo index stays lazy until building interaction', () => {
   assert.ok(html.includes('async function loadPhotoSpatialIndex'));
   assert.ok(!html.includes('<script src="/map-data/osaka-city/derived/building-photo-index.json'));
 });
+
+
+test('[Mission37] exact canonical footprint lookup is preferred', () => {
+  const html = fs.readFileSync('public/mission37-livecity-hybrid-3d-poc.html','utf8');
+  const lookup = fs.readFileSync('public/livecity-cesium-building-lookup.js','utf8');
+  assert.ok(html.includes('livecity-cesium-building-lookup.js'));
+  assert.ok(html.includes('exactCanonicalBuilding'));
+  assert.ok(html.includes('photoRecordForCanonicalId'));
+  assert.ok(lookup.includes('pointInFeature'));
+  assert.ok(lookup.includes('buildingsAtLatLon'));
+  assert.ok(lookup.includes('derived-v4-final/near/buildings'));
+  assert.ok(lookup.includes('for (let dx=-1; dx<=1; dx++)'));
+});
