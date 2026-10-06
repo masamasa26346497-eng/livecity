@@ -43,6 +43,7 @@
   <aside id="buildingCard"></aside>
 
   <script src="./local-config.js"></script>
+  <script src="./livecity-cesium-building-lookup.js"></script>
   <script>
     (async function () {
       const status = document.getElementById('status');
@@ -89,6 +90,27 @@
         return photoIndexPromise;
       }
 
+      async function exactCanonicalBuilding(lat, lon) {
+        const lookup = window.LiveCityCesiumBuildingLookup;
+        if (!lookup?.buildingsAtLatLon) return null;
+        const result = await lookup.buildingsAtLatLon(lat, lon);
+        return result?.best ? { feature: result.best, lookup: result } : null;
+      }
+
+      async function photoRecordForCanonicalId(canonicalId) {
+        if (!canonicalId) return null;
+        const idx = await loadPhotoSpatialIndex();
+        // The existing photo index exposes byCanonicalId in its source document, but the
+        // browser spatial cache is record based. Build a tiny map lazily once exact picking is used.
+        if (!idx.byCanonical) {
+          idx.byCanonical = new Map();
+          for (const arr of idx.grid.values()) {
+            for (const rec of arr) if (rec?.canonicalId && !idx.byCanonical.has(rec.canonicalId)) idx.byCanonical.set(rec.canonicalId, rec);
+          }
+        }
+        return idx.byCanonical.get(canonicalId) || null;
+      }
+
       async function nearestPhotoBuilding(lat, lon, maxM) {
         const idx = await loadPhotoSpatialIndex();
         const gy = Math.floor(lat * 1000), gx = Math.floor(lon * 1000);
@@ -109,16 +131,18 @@
 
       function showBuildingCard(match, lat, lon) {
         const rec = match && match.rec;
+        const exact = match && match.exact;
+        const canonicalId = exact?.feature?.canonicalId || rec?.canonicalId || null;
         const photo = rec && Array.isArray(rec.photos) ? rec.photos[0] : null;
         buildingCard.style.display = 'block';
         buildingCard.innerHTML = rec ? `
           <button class="close" aria-label="閉じる">×</button>
           <div class="title">${esc(rec.buildingName || rec.curatedName || '建物候補')}</div>
-          <div class="muted">${esc(rec.canonicalId)}</div>
-          <div style="margin:5px 0 9px">クリック地点から約 ${match.distanceM.toFixed(1)}m</div>
+          <div class="muted">${esc(canonicalId)}</div>
+          <div style="margin:5px 0 9px">${exact ? 'canonical footprint 内判定で特定' : ('クリック地点から約 ' + match.distanceM.toFixed(1) + 'm')}</div>
           ${photo?.imageUrl ? `<img src="${esc(photo.imageUrl)}" alt="${esc(rec.buildingName || '建物写真')}" loading="lazy">` : ''}
           ${photo?.sourcePageUrl ? `<div style="margin-top:5px"><a style="color:#9bd7ff" href="${esc(photo.sourcePageUrl)}" target="_blank" rel="noopener noreferrer">写真の出典を確認</a></div>` : ''}
-          <div class="muted" style="margin-top:9px">Mission 37 POC: 現段階は近傍照合。正式導入ではcanonical footprintのpoint-in-polygon判定へ置換します。</div>
+          <div class="muted" style="margin-top:9px">Mission 37 POC: ${exact ? 'canonical footprint の point-in-polygon 判定を使用。' : 'footprint生成タイル未配置時のみ近傍照合へフォールバック。'}</div>
         ` : `
           <button class="close" aria-label="閉じる">×</button>
           <div class="title">Live City建物候補なし</div>
@@ -213,8 +237,14 @@
           buildingCard.style.display = 'block';
           buildingCard.innerHTML = '<div class="title">Live City建物を照合中…</div>';
           try {
-            const match = await nearestPhotoBuilding(lat, lon, 45);
-            showBuildingCard(match, lat, lon);
+            const exact = await exactCanonicalBuilding(lat, lon);
+            if (exact?.feature?.canonicalId) {
+              const rec = await photoRecordForCanonicalId(exact.feature.canonicalId);
+              showBuildingCard({ exact, rec, distanceM:0 }, lat, lon);
+            } else {
+              const match = await nearestPhotoBuilding(lat, lon, 45);
+              showBuildingCard(match, lat, lon);
+            }
           } catch (e) {
             buildingCard.innerHTML = '<div class="title">写真索引を読み込めません</div><div class="muted">' + esc(e.message || e) + '</div>';
           }
@@ -226,6 +256,7 @@
             totalMemoryUsageInBytes: tileset.totalMemoryUsageInBytes || null,
             photoIndexLoaded: !!photoSpatial,
             photoIndexRecordCount: photoSpatial?.count || null,
+            canonicalLookup: window.LiveCityCesiumBuildingLookup?.stats?.() || null,
             camera: {
               lon: 135.49595,
               lat: 34.70385
