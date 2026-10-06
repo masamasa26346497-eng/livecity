@@ -1,6 +1,6 @@
 {
   "mission": "36L-missing-facility-rescue",
-  "generatedAt": "2026-10-06T11:06:37.925Z",
+  "generatedAt": "2026-10-06T12:07:11.971Z",
   "policy": {
     "exactOsmSourceOnly": true,
     "maxDistanceMeters": 120,
@@ -9,7 +9,7 @@
   "selected": 20,
   "processed": 20,
   "verifiedThisBatch": 10,
-  "remainingMissingActionable": 11344,
+  "remainingMissingActionable": 11144,
   "osmCentersResolved": 20,
   "apiUsage": {
     "searchCalls": 20,
@@ -26,144 +26,144 @@
   },
   "results": [
     {
-      "facilityId": "osm-way-224053571",
-      "sourceId": "way/224053571",
-      "queryName": "川村 同心 ビル",
+      "facilityId": "osm-way-225752783",
+      "sourceId": "way/225752783",
+      "queryName": "シティーテラス",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5
+    },
+    {
+      "facilityId": "osm-way-225752785",
+      "sourceId": "way/225752785",
+      "queryName": "ジオシティーハウス",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 11
+    },
+    {
+      "facilityId": "osm-way-225752829",
+      "sourceId": "way/225752829",
+      "queryName": "第二 東寺町 ビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6
+    },
+    {
+      "facilityId": "osm-way-225752830",
+      "sourceId": "way/225752830",
+      "queryName": "千趣会",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 159
+    },
+    {
+      "facilityId": "osm-way-225782515",
+      "sourceId": "way/225782515",
+      "queryName": "心斎橋東急ビル",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null
     },
     {
-      "facilityId": "osm-way-224053580",
-      "sourceId": "way/224053580",
-      "queryName": "アンビアン",
+      "facilityId": "osm-way-225782538",
+      "sourceId": "way/225782538",
+      "queryName": "科野ビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 12
+    },
+    {
+      "facilityId": "osm-way-225782539",
+      "sourceId": "way/225782539",
+      "queryName": "KOKUMIN BLD.",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3
+    },
+    {
+      "facilityId": "osm-way-225782540",
+      "sourceId": "way/225782540",
+      "queryName": "Sakura Shinsaibashi Building",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-225782548",
+      "sourceId": "way/225782548",
+      "queryName": "辰野本町ビル",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 1
     },
     {
-      "facilityId": "osm-way-224053581",
-      "sourceId": "way/224053581",
-      "queryName": "末広センタービル",
+      "facilityId": "osm-way-225782568",
+      "sourceId": "way/225782568",
+      "queryName": "loire南船場",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2
+      "distanceMeters": 13
     },
     {
-      "facilityId": "osm-way-224053585",
-      "sourceId": "way/224053585",
-      "queryName": "森下ビル",
+      "facilityId": "osm-way-225782601",
+      "sourceId": "way/225782601",
+      "queryName": "上田ビル",
       "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 577
+      "distanceMeters": 3052
     },
     {
-      "facilityId": "osm-way-224065549",
-      "sourceId": "way/224065549",
-      "queryName": "ユニオンマーク株式会社",
+      "facilityId": "osm-way-225782604",
+      "sourceId": "way/225782604",
+      "queryName": "イトゥビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8
+    },
+    {
+      "facilityId": "osm-way-225782608",
+      "sourceId": "way/225782608",
+      "queryName": "キュープラザ心斎橋",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4
+    },
+    {
+      "facilityId": "osm-way-225782614",
+      "sourceId": "way/225782614",
+      "queryName": "アルファ心斎橋",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-225782616",
+      "sourceId": "way/225782616",
+      "queryName": "東和ビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 14
+    },
+    {
+      "facilityId": "osm-way-225782617",
+      "sourceId": "way/225782617",
+      "queryName": "もみぢ屋ビル",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-225782632",
+      "sourceId": "way/225782632",
+      "queryName": "御堂筋MIDビル",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 394
+    },
+    {
+      "facilityId": "osm-way-225880570",
+      "sourceId": "way/225880570",
+      "queryName": "中津セントポリア",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 5
     },
     {
-      "facilityId": "osm-way-224065552",
-      "sourceId": "way/224065552",
-      "queryName": "株式会社衛藤",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7
-    },
-    {
-      "facilityId": "osm-way-224065553",
-      "sourceId": "way/224065553",
-      "queryName": "永和マンション",
+      "facilityId": "osm-way-225880571",
+      "sourceId": "way/225880571",
+      "queryName": "パークプラザ北梅田",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 4
+      "distanceMeters": null
     },
     {
-      "facilityId": "osm-way-224065558",
-      "sourceId": "way/224065558",
-      "queryName": "互光建物管理株式会社",
+      "facilityId": "osm-way-225880644",
+      "sourceId": "way/225880644",
+      "queryName": "プレサンス梅田北デイズ",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 2
-    },
-    {
-      "facilityId": "osm-way-224065580",
-      "sourceId": "way/224065580",
-      "queryName": "豊崎薬品商会",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 11
-    },
-    {
-      "facilityId": "osm-way-224065587",
-      "sourceId": "way/224065587",
-      "queryName": "ビルサービス株式会社",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2
-    },
-    {
-      "facilityId": "osm-way-224065589",
-      "sourceId": "way/224065589",
-      "queryName": "かみふうせん",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 786
-    },
-    {
-      "facilityId": "osm-way-224065603",
-      "sourceId": "way/224065603",
-      "queryName": "有限会社オオヨド自工和光建装",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 11
-    },
-    {
-      "facilityId": "osm-way-224065612",
-      "sourceId": "way/224065612",
-      "queryName": "ドルフ豊崎",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 38
-    },
-    {
-      "facilityId": "osm-way-224065620",
-      "sourceId": "way/224065620",
-      "queryName": "ラッパヤ",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3017
-    },
-    {
-      "facilityId": "osm-way-224065625",
-      "sourceId": "way/224065625",
-      "queryName": "シャトー高橋",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 383257
-    },
-    {
-      "facilityId": "osm-way-224065628",
-      "sourceId": "way/224065628",
-      "queryName": "日本氷業有限会社 アイスセンター",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 2972
-    },
-    {
-      "facilityId": "osm-way-224065639",
-      "sourceId": "way/224065639",
-      "queryName": "豊栄印刷株式会社",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": 27
-    },
-    {
-      "facilityId": "osm-way-224065641",
-      "sourceId": "way/224065641",
-      "queryName": "コーポ豊崎",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 7
-    },
-    {
-      "facilityId": "osm-way-224075212",
-      "sourceId": "way/224075212",
-      "queryName": "ノバカネイチ中津",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 3
-    },
-    {
-      "facilityId": "osm-way-224075213",
-      "sourceId": "way/224075213",
-      "queryName": "中津グランドハイツ",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1
     }
   ]
 }
