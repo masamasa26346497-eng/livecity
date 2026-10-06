@@ -1,6 +1,6 @@
 {
   "mission": "36L-missing-facility-rescue",
-  "generatedAt": "2026-10-06T05:43:37.811Z",
+  "generatedAt": "2026-10-06T08:09:36.512Z",
   "policy": {
     "exactOsmSourceOnly": true,
     "maxDistanceMeters": 120,
@@ -8,8 +8,8 @@
   },
   "selected": 20,
   "processed": 20,
-  "verifiedThisBatch": 10,
-  "remainingMissingActionable": 11944,
+  "verifiedThisBatch": 11,
+  "remainingMissingActionable": 11744,
   "osmCentersResolved": 20,
   "apiUsage": {
     "searchCalls": 20,
@@ -26,144 +26,144 @@
   },
   "results": [
     {
-      "facilityId": "osm-way-194588332",
-      "sourceId": "way/194588332",
-      "queryName": "東西線アクセスビル",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1
+      "facilityId": "osm-way-219989829",
+      "sourceId": "way/219989829",
+      "queryName": "テンポス",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
     },
     {
-      "facilityId": "osm-way-194588335",
-      "sourceId": "way/194588335",
-      "queryName": "栗山ビル",
+      "facilityId": "osm-way-219989851",
+      "sourceId": "way/219989851",
+      "queryName": "日本橋 ビル",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 0
+    },
+    {
+      "facilityId": "osm-way-220002947",
+      "sourceId": "way/220002947",
+      "queryName": "ジーニス大阪",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 24
+    },
+    {
+      "facilityId": "osm-way-220002948",
+      "sourceId": "way/220002948",
+      "queryName": "日本生命本店東館",
       "matchConfidence": "VERIFIED",
       "distanceMeters": 0
     },
     {
-      "facilityId": "osm-way-194588337",
-      "sourceId": "way/194588337",
-      "queryName": "盛田ビル",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 3192
-    },
-    {
-      "facilityId": "osm-way-194588338",
-      "sourceId": "way/194588338",
-      "queryName": "西川ビル",
+      "facilityId": "osm-way-220002957",
+      "sourceId": "way/220002957",
+      "queryName": "MID今橋ビル",
       "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-194588341",
-      "sourceId": "way/194588341",
-      "queryName": "辰巳ビル",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 1688
-    },
-    {
-      "facilityId": "osm-way-194700555",
-      "sourceId": "way/194700555",
-      "queryName": "サンライト九条",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 302
-    },
-    {
-      "facilityId": "osm-way-194700556",
-      "sourceId": "way/194700556",
-      "queryName": "シティマインド",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 1
-    },
-    {
-      "facilityId": "osm-way-194700557",
-      "sourceId": "way/194700557",
-      "queryName": "プラス九条",
-      "matchConfidence": "AMBIGUOUS",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-194700558",
-      "sourceId": "way/194700558",
-      "queryName": "メゾン鍛冶",
-      "matchConfidence": "VERIFIED",
       "distanceMeters": 2
     },
     {
-      "facilityId": "osm-way-194700559",
-      "sourceId": "way/194700559",
-      "queryName": "リバーサイド紀の国",
+      "facilityId": "osm-way-220011087",
+      "sourceId": "way/220011087",
+      "queryName": "井筒ビル",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 1
-    },
-    {
-      "facilityId": "osm-way-194700562",
-      "sourceId": "way/194700562",
-      "queryName": "山脇",
-      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 3
     },
     {
-      "facilityId": "osm-way-194700586",
-      "sourceId": "way/194700586",
-      "queryName": "新川口ビル",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 966
-    },
-    {
-      "facilityId": "osm-way-194700588",
-      "sourceId": "way/194700588",
-      "queryName": "竹内鉄工所",
+      "facilityId": "osm-way-220011111",
+      "sourceId": "way/220011111",
+      "queryName": "グランフォースビル",
       "matchConfidence": "VERIFIED",
-      "distanceMeters": 2
-    },
-    {
-      "facilityId": "osm-way-194720122",
-      "sourceId": "way/194720122",
-      "queryName": "グレース九条",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0
-    },
-    {
-      "facilityId": "osm-way-194720123",
-      "sourceId": "way/194720123",
-      "queryName": "メロディーハイム九条",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2
-    },
-    {
-      "facilityId": "osm-way-194739404",
-      "sourceId": "way/194739404",
-      "queryName": "グランビラ",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": 4242
-    },
-    {
-      "facilityId": "osm-way-194739406",
-      "sourceId": "way/194739406",
-      "queryName": "ビギンビル",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 2
-    },
-    {
-      "facilityId": "osm-way-194739407",
-      "sourceId": "way/194739407",
-      "queryName": "ヤマヤビル",
-      "matchConfidence": "VERIFIED",
-      "distanceMeters": 0
-    },
-    {
-      "facilityId": "osm-way-194739408",
-      "sourceId": "way/194739408",
-      "queryName": "ヴィヴィンテ南森町",
-      "matchConfidence": "AMBIGUOUS",
       "distanceMeters": 1
     },
     {
-      "facilityId": "osm-way-194739409",
-      "sourceId": "way/194739409",
-      "queryName": "与力町パークビル",
+      "facilityId": "osm-way-220011687",
+      "sourceId": "way/220011687",
+      "queryName": "龍王 ビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15
+    },
+    {
+      "facilityId": "osm-way-220011695",
+      "sourceId": "way/220011695",
+      "queryName": "IBC",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4
+    },
+    {
+      "facilityId": "osm-way-220077695",
+      "sourceId": "way/220077695",
+      "queryName": "レジーナ天神橋",
       "matchConfidence": "AMBIGUOUS",
       "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-220077852",
+      "sourceId": "way/220077852",
+      "queryName": "マンション戸田",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-220077863",
+      "sourceId": "way/220077863",
+      "queryName": "フラットプラム",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-220079192",
+      "sourceId": "way/220079192",
+      "queryName": "坂井 ビルディング 日本橋",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3
+    },
+    {
+      "facilityId": "osm-way-220079254",
+      "sourceId": "way/220079254",
+      "queryName": "銀泉日本一ビル",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 963
+    },
+    {
+      "facilityId": "osm-way-220079255",
+      "sourceId": "way/220079255",
+      "queryName": "ジョリー・プレリー日本橋ビル",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-220079257",
+      "sourceId": "way/220079257",
+      "queryName": "ハリマヤビル",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 218479
+    },
+    {
+      "facilityId": "osm-way-220079717",
+      "sourceId": "way/220079717",
+      "queryName": "ナンバヒップス",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2
+    },
+    {
+      "facilityId": "osm-way-220082234",
+      "sourceId": "way/220082234",
+      "queryName": "ホープ・アベニュー",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-220090033",
+      "sourceId": "way/220090033",
+      "queryName": "メディアカフェポパイ",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 9
+    },
+    {
+      "facilityId": "osm-way-220090041",
+      "sourceId": "way/220090041",
+      "queryName": "難波バレビル",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2
     }
   ]
 }
