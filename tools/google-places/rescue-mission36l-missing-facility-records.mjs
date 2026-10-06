@@ -73,16 +73,33 @@ async function fetchOverpassCentersOnce(items, fetchImpl = fetch) {
   return map;
 }
 
-async function fetchOverpassCenters(items, fetchImpl = fetch, retries = 3) {
+export const OVERPASS_MAX_ATTEMPTS = 5;
+export const OVERPASS_BASE_BACKOFF_MS = 5000;
+export const OVERPASS_MAX_BACKOFF_MS = 60000;
+
+export function isTransientOverpassError(e) {
+  const msg = String(e?.message || e);
+  return /Overpass HTTP (429|500|502|503|504)/.test(msg) || /fetch failed|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|UND_ERR|socket hang up|aborted/i.test(msg) || e?.name === 'SyntaxError';
+}
+
+export function overpassBackoffMs(attempt, random = Math.random) {
+  const exp = Math.min(OVERPASS_MAX_BACKOFF_MS, OVERPASS_BASE_BACKOFF_MS * 2 ** (attempt - 1));
+  return Math.round(exp * (0.75 + random() * 0.5));
+}
+
+export async function fetchOverpassCenters(items, fetchImpl = fetch, retries = OVERPASS_MAX_ATTEMPTS, sleepImpl = sleep) {
   let lastError;
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fetchOverpassCentersOnce(items, fetchImpl);
     } catch (e) {
       lastError = e;
-      const retryable = /Overpass HTTP (429|502|503|504)/.test(String(e?.message || e));
-      if (!retryable || attempt === retries) throw e;
-      await sleep(3000 * attempt);
+      const transient = isTransientOverpassError(e);
+      if (!transient || attempt === retries) {
+        if (transient) e.transientOverpass = true;
+        throw e;
+      }
+      await sleepImpl(overpassBackoffMs(attempt));
     }
   }
   throw lastError;
@@ -98,7 +115,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   const selected = all.slice(0, Math.max(1, Math.min(20, Number(limit) || 20)));
   if (!selected.length) return { mission: '36L-missing-facility-rescue', processed: 0, verifiedThisBatch: 0, remainingMissingActionable: 0, osmCentersResolved: 0, results: [] };
 
-  const centers = await fetchOverpassCenters(selected, fetchImpl, 3);
+  const centers = await fetchOverpassCenters(selected, fetchImpl, OVERPASS_MAX_ATTEMPTS);
   const client = createPlacesClient({ apiKey, fetchImpl, requestGuard: createPacedCityGuard({ requestsPerMinute }) });
   if (!client.isEnabled()) throw new Error('GOOGLE_PLACES_API_KEY is not configured');
   const entries = [...(mapping.entries || [])].map(assertDurableRecordSafe);
@@ -166,20 +183,39 @@ function parseCli(argv) {
   return out;
 }
 
-async function runCli(opts) {
+// Each runRescueBatch call persists mapping/progress/last-batch to disk before returning, so every completed
+// chunk is already a checkpoint. A transient Overpass failure (after retries) stops the run gracefully (exit 0)
+// so the workflow's Validate/Commit steps still persist completed chunks; the next run resumes from progress.json.
+// Non-transient errors (including safety violations) still fail the run.
+export async function runChunks(opts, { runBatch = runRescueBatch, sleepImpl = sleep, log = console.log } = {}) {
   let processed = 0;
   let verified = 0;
   let remaining = null;
+  let stoppedEarly = null;
   for (let chunk = 1; chunk <= opts.chunks; chunk++) {
-    const r = await runRescueBatch(opts);
+    let r;
+    try {
+      r = await runBatch(opts);
+    } catch (e) {
+      if (!(e?.transientOverpass || isTransientOverpassError(e))) throw e;
+      stoppedEarly = `chunk ${chunk}: ${e?.message || e}`;
+      log(`[36L missing-facility rescue] transient Overpass failure; keeping ${chunk - 1} completed chunk(s), stopping gracefully: ${stoppedEarly}`);
+      break;
+    }
     processed += r.processed;
     verified += r.verifiedThisBatch;
     remaining = r.remainingMissingActionable;
-    console.log(`[36L missing-facility rescue] chunk ${chunk}/${opts.chunks}`, JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }));
+    log(`[36L missing-facility rescue] chunk ${chunk}/${opts.chunks}`, JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }));
     if (!r.processed || !r.remainingMissingActionable) break;
-    await sleep(3000);
+    await sleepImpl(3000);
   }
-  console.log('[36L missing-facility rescue] total', JSON.stringify({ processed, verifiedThisRun: verified, remainingMissingActionable: remaining }));
+  const summary = { processed, verifiedThisRun: verified, remainingMissingActionable: remaining, stoppedEarly };
+  log('[36L missing-facility rescue] total', JSON.stringify(summary));
+  return summary;
+}
+
+async function runCli(opts) {
+  await runChunks(opts);
 }
 
 if (isMainModule(import.meta.url)) {
