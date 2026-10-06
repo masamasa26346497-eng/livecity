@@ -18,6 +18,17 @@
     #status { color:#9bd7ff; }
     #metrics { margin-top:8px; opacity:.9; white-space:pre-line; }
     #error { margin-top:8px; color:#ffb4b4; display:none; }
+    #buildingCard {
+      position:fixed; right:14px; top:14px; z-index:11; width:min(340px,calc(100vw - 28px));
+      max-height:calc(100vh - 28px); overflow:auto; display:none; box-sizing:border-box;
+      padding:12px; border-radius:12px; background:rgba(8,18,32,.92); color:#f4f7fb;
+      border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(10px);
+      font:12px/1.5 system-ui,-apple-system,sans-serif;
+    }
+    #buildingCard img { width:100%; max-height:210px; object-fit:contain; border-radius:8px; background:#111827; }
+    #buildingCard .muted { opacity:.7; }
+    #buildingCard .title { font-size:15px; font-weight:700; margin-bottom:4px; }
+    #buildingCard .close { float:right; border:0; background:transparent; color:white; font-size:18px; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -27,7 +38,9 @@
     <div id="status">設定を確認中…</div>
     <div id="metrics"></div>
     <div id="error"></div>
+    <div class="muted" style="margin-top:8px;opacity:.72">建物をクリックすると、既存のLive City写真索引から近傍候補を照合します。</div>
   </aside>
+  <aside id="buildingCard"></aside>
 
   <script src="./local-config.js"></script>
   <script>
@@ -35,7 +48,85 @@
       const status = document.getElementById('status');
       const metrics = document.getElementById('metrics');
       const error = document.getElementById('error');
+      const buildingCard = document.getElementById('buildingCard');
       const apiKey = window.LIVECITY_CONFIG && window.LIVECITY_CONFIG.googleMapTilesApiKey;
+      const PHOTO_INDEX_URL = '/map-data/osaka-city/derived/building-photo-index.json';
+      let photoIndexPromise = null;
+      let photoSpatial = null;
+
+      function haversineM(aLat, aLon, bLat, bLon) {
+        const R = 6371008.8;
+        const toR = Math.PI / 180;
+        const p1 = aLat * toR, p2 = bLat * toR;
+        const dP = (bLat - aLat) * toR;
+        const dL = (bLon - aLon) * toR;
+        const q = Math.sin(dP/2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dL/2) ** 2;
+        return 2 * R * Math.asin(Math.sqrt(q));
+      }
+
+      function gridKey(lat, lon) {
+        return Math.floor(lat * 1000) + ':' + Math.floor(lon * 1000);
+      }
+
+      async function loadPhotoSpatialIndex() {
+        if (photoSpatial) return photoSpatial;
+        if (!photoIndexPromise) {
+          photoIndexPromise = fetch(PHOTO_INDEX_URL, { cache:'no-store' })
+            .then(r => { if (!r.ok) throw new Error('photo index ' + r.status); return r.json(); })
+            .then(doc => {
+              const grid = new Map();
+              const recs = Array.isArray(doc.records) ? doc.records : Object.values(doc.byCanonicalId || {});
+              for (const rec of recs) {
+                if (!rec || !rec.canonicalId || !Number.isFinite(Number(rec.lat)) || !Number.isFinite(Number(rec.lon))) continue;
+                const key = gridKey(Number(rec.lat), Number(rec.lon));
+                if (!grid.has(key)) grid.set(key, []);
+                grid.get(key).push(rec);
+              }
+              photoSpatial = { grid, count: recs.length };
+              return photoSpatial;
+            });
+        }
+        return photoIndexPromise;
+      }
+
+      async function nearestPhotoBuilding(lat, lon, maxM) {
+        const idx = await loadPhotoSpatialIndex();
+        const gy = Math.floor(lat * 1000), gx = Math.floor(lon * 1000);
+        let best = null, bestD = Infinity;
+        for (let dy=-1; dy<=1; dy++) for (let dx=-1; dx<=1; dx++) {
+          const arr = idx.grid.get((gy+dy) + ':' + (gx+dx)) || [];
+          for (const rec of arr) {
+            const d = haversineM(lat, lon, Number(rec.lat), Number(rec.lon));
+            if (d < bestD) { bestD = d; best = rec; }
+          }
+        }
+        return best && bestD <= maxM ? { rec:best, distanceM:bestD } : null;
+      }
+
+      function esc(v) {
+        return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+
+      function showBuildingCard(match, lat, lon) {
+        const rec = match && match.rec;
+        const photo = rec && Array.isArray(rec.photos) ? rec.photos[0] : null;
+        buildingCard.style.display = 'block';
+        buildingCard.innerHTML = rec ? `
+          <button class="close" aria-label="閉じる">×</button>
+          <div class="title">${esc(rec.buildingName || rec.curatedName || '建物候補')}</div>
+          <div class="muted">${esc(rec.canonicalId)}</div>
+          <div style="margin:5px 0 9px">クリック地点から約 ${match.distanceM.toFixed(1)}m</div>
+          ${photo?.imageUrl ? `<img src="${esc(photo.imageUrl)}" alt="${esc(rec.buildingName || '建物写真')}" loading="lazy">` : ''}
+          ${photo?.sourcePageUrl ? `<div style="margin-top:5px"><a style="color:#9bd7ff" href="${esc(photo.sourcePageUrl)}" target="_blank" rel="noopener noreferrer">写真の出典を確認</a></div>` : ''}
+          <div class="muted" style="margin-top:9px">Mission 37 POC: 現段階は近傍照合。正式導入ではcanonical footprintのpoint-in-polygon判定へ置換します。</div>
+        ` : `
+          <button class="close" aria-label="閉じる">×</button>
+          <div class="title">Live City建物候補なし</div>
+          <div>緯度 ${lat.toFixed(6)} / 経度 ${lon.toFixed(6)}</div>
+          <div class="muted" style="margin-top:8px">写真索引に近傍候補がない地点です。Photorealistic 3D自体のクリック取得は成功しています。</div>
+        `;
+        buildingCard.querySelector('.close')?.addEventListener('click', () => buildingCard.style.display = 'none');
+      }
 
       if (!apiKey) {
         status.textContent = 'Map Tiles APIキー未設定';
@@ -106,11 +197,35 @@
       try {
         await tileset.readyPromise;
         status.textContent = 'Photorealistic 3D Tiles 接続成功（梅田）';
+
+        const clickHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        clickHandler.setInputAction(async function (movement) {
+          let cartesian = null;
+          if (viewer.scene.pickPositionSupported) cartesian = viewer.scene.pickPosition(movement.position);
+          if (!Cesium.defined(cartesian)) {
+            const ray = viewer.camera.getPickRay(movement.position);
+            cartesian = ray ? viewer.scene.globe.pick(ray, viewer.scene) : null;
+          }
+          if (!Cesium.defined(cartesian)) return;
+          const c = Cesium.Cartographic.fromCartesian(cartesian);
+          const lat = Cesium.Math.toDegrees(c.latitude);
+          const lon = Cesium.Math.toDegrees(c.longitude);
+          buildingCard.style.display = 'block';
+          buildingCard.innerHTML = '<div class="title">Live City建物を照合中…</div>';
+          try {
+            const match = await nearestPhotoBuilding(lat, lon, 45);
+            showBuildingCard(match, lat, lon);
+          } catch (e) {
+            buildingCard.innerHTML = '<div class="title">写真索引を読み込めません</div><div class="muted">' + esc(e.message || e) + '</div>';
+          }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
         window.__MISSION37_HYBRID_3D_POC__ = function () {
           return {
             ready: !!tileset.ready,
             maximumScreenSpaceError: tileset.maximumScreenSpaceError,
             totalMemoryUsageInBytes: tileset.totalMemoryUsageInBytes || null,
+            photoIndexLoaded: !!photoSpatial,
+            photoIndexRecordCount: photoSpatial?.count || null,
             camera: {
               lon: 135.49595,
               lat: 34.70385
