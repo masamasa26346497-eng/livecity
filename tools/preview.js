@@ -24,6 +24,7 @@ const DEV_UI_HTML = 'osaka_3d_buildings.ward-ux-v1.html';
 const DEV_UI_SCRIPTS = [
   '/livecity-dev-ui-coordinator.js',
   '/livecity-building-click-performance.js',
+  '/livecity-hybrid-3d-toggle.js',
 ];
 
 function parseArgs(argv) {
@@ -138,9 +139,15 @@ async function main() {
 
   server.listen(args.port, () => {
     const url = `http://localhost:${args.port}/${DEV_UI_HTML}`;
+    const hybridUrl = `http://localhost:${args.port}/mission37-livecity-hybrid-3d-poc.html`;
+    const compareUrl = `http://localhost:${args.port}/mission37-livecity-hybrid-3d-compare.html`;
     console.log('\n==================================================');
     console.log('Live City プレビューサーバーを起動しました。');
     console.log(`  ${url}`);
+    console.log('\nMission 37 Hybrid 3D POC:');
+    console.log(`  ${hybridUrl}`);
+    console.log('Three.js / Cesium 比較:');
+    console.log(`  ${compareUrl}`);
     console.log('\n確認用（統計JSONのHTTP取得チェック）:');
     const base = `http://localhost:${args.port}/map-data/${args.area}`;
     console.log(`  ${base}/demographics/summary.json`);
