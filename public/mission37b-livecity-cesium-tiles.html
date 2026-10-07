@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Mission 37B — CesiumJS × Live City 既存建物タイル POC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Mission 37B POC（本番HTMLとは独立。osaka_3d_buildings*.html は一切変更しない）
+  - Google Map Tiles API / Photorealistic 3D Tiles / Cesium ion は不使用（APIキー不要）
+  - 既存 public/map-data/osaka-city/buildings/{dataset}/ の tile JSON をそのまま fetch（コピー・再生成なし）
+  - 座標: znorth-neg-v1 (meters-local) → WGS84。geoToThree() (osaka_3d_buildings.html) の厳密な逆変換
+      x = (lon - CLON) * cos(CLAT) * MPD ,  z = -((lat - CLAT) * MPD)
+  - canonicalId = tile JSON の building.id（"bldg_<uuid>"）をそのまま GeometryInstance.id に保持（新体系なし）
+  - 方式: 1 tile = 1 Cesium Primitive（全 GeometryInstance をバッチ）。後で 3D Tiles(b3dm/glTF) 化する際も
+          「tile 単位 = tileset の 1 content」としてそのまま対応づけられる。
+  URL params: ?dataset=osaka-sumiyoshi&tx0=-6&tx1=-4&tz0=-3&tz1=-1&imagery=0|1
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>
+  html, body, #cesiumContainer { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0b1220; }
+  #hud { position: absolute; top: 8px; left: 8px; z-index: 10; padding: 8px 10px; background: rgba(8,12,20,.82);
+         color: #dfe8f5; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; border-radius: 6px; min-width: 270px; pointer-events: auto; }
+  #hud h1 { font-size: 12px; margin: 0 0 4px; color: #8fd0ff; }
+  #hud .k { color: #8aa0b8; display: inline-block; min-width: 130px; }
+  #hud button { margin-top: 6px; font: inherit; cursor: pointer; }
+  #picked { margin-top: 6px; padding-top: 6px; border-top: 1px solid #2a3a50; word-break: break-all; color: #ffd37a; }
+</style>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id="hud">
+  <h1>Mission 37B · Cesium × Live City tiles</h1>
+  <div><span class="k">状態</span><span id="h-status">loading…</span></div>
+  <div><span class="k">FPS (1s平均)</span><span id="h-fps">-</span></div>
+  <div><span class="k">FPS (最小/最大)</span><span id="h-fps-mm">-</span></div>
+  <div><span class="k">描画建物数</span><span id="h-bldg">0</span></div>
+  <div><span class="k">読込タイル数</span><span id="h-tiles">0</span></div>
+  <div><span class="k">Primitive数</span><span id="h-prims">0</span></div>
+  <div><span class="k">footprint頂点数</span><span id="h-verts">0</span></div>
+  <div><span class="k">初期ロード時間</span><span id="h-load">-</span></div>
+  <div><span class="k">　fetch/parse</span><span id="h-fetch">-</span></div>
+  <div><span class="k">　Primitive ready</span><span id="h-ready">-</span></div>
+  <div><span class="k">JS heap</span><span id="h-heap">n/a</span></div>
+  <div><span class="k">スキップ(不正fp)</span><span id="h-skip">0</span></div>
+  <button id="btn-reset">カメラ初期位置に戻す</button>
+  <div id="picked">建物をクリック → canonicalId</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script>
+(function () {
+  'use strict';
+  const T0 = performance.now();
+
+  // ── 既存 geoToThree()（osaka_3d_buildings.html）と同一定数。変更禁止 ──
+  const SEARCH_CLAT = 34.604208, SEARCH_CLON = 135.525020, SEARCH_MPD = 111320;
+  const COS_CLAT = Math.cos(SEARCH_CLAT * Math.PI / 180);
+  const localToLon = (x) => SEARCH_CLON + x / (COS_CLAT * SEARCH_MPD);
+  const localToLat = (z) => SEARCH_CLAT - z / SEARCH_MPD; // znorth-neg-v1: 北 = -Z
+
+  const q = new URLSearchParams(location.search);
+  const DATASET = q.get('dataset') || 'osaka-sumiyoshi';
+  // 既定: 住吉区の最密 3×3 tile ブロック（x:-3000..-1500m, z:-1500..0m, 約10.5k棟, 9 tile）
+  const BLOCK = {
+    tx0: +(q.get('tx0') ?? -6), tx1: +(q.get('tx1') ?? -4),
+    tz0: +(q.get('tz0') ?? -3), tz1: +(q.get('tz1') ?? -1),
+  };
+  const BASE = 'map-data/osaka-city/buildings/' + DATASET + '/';
+
+  // ── Cesium viewer（ion / Google 不使用）──
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false,
+    sceneModePicker: false, navigationHelpButton: false, animation: false, timeline: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false, requestRenderMode: false,
+  });
+  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#1c2733');
+  viewer.scene.globe.depthTestAgainstTerrain = false;
+  if (q.get('imagery') !== '0') {
+    // キー不要の OSM ラスタ（比較時の位置確認用。?imagery=0 で無効化）
+    viewer.imageryLayers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' }));
+  }
+  viewer.scene.debugShowFramesPerSecond = false;
+
+  // ── カメラ初期位置（固定。Three.js 版比較用）──
+  // ブロック中心を注視、heading=0(北上) / pitch=-45° / range=1500m
+  const cx = ((BLOCK.tx0 + BLOCK.tx1 + 1) / 2) * 500;
+  const cz = ((BLOCK.tz0 + BLOCK.tz1 + 1) / 2) * 500;
+  const CENTER = Cesium.Cartesian3.fromDegrees(localToLon(cx), localToLat(cz), 0);
+  const CAM = { heading: 0, pitch: Cesium.Math.toRadians(-45), range: 1500 };
+  function resetCamera() {
+    viewer.camera.lookAt(CENTER, new Cesium.HeadingPitchRange(CAM.heading, CAM.pitch, CAM.range));
+    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); // 解除して自由操作可能にする
+  }
+  resetCamera();
+  document.getElementById('btn-reset').onclick = resetCamera;
+
+  // ── stats / HUD ──
+  const stats = {
+    dataset: DATASET, block: BLOCK, tiles: 0, buildings: 0, primitives: 0, vertices: 0, skipped: 0,
+    fetchParseMs: null, primitivesReadyMs: null, initialLoadMs: null, fps: 0, fpsMin: null, fpsMax: null,
+    lastPickedCanonicalId: null, status: 'loading',
+  };
+  window.__mission37b = stats;
+  const $ = (id) => document.getElementById(id);
+  function renderHud() {
+    $('h-status').textContent = stats.status;
+    $('h-bldg').textContent = stats.buildings;
+    $('h-tiles').textContent = stats.tiles;
+    $('h-prims').textContent = stats.primitives;
+    $('h-verts').textContent = stats.vertices;
+    $('h-skip').textContent = stats.skipped;
+    if (stats.fetchParseMs != null) $('h-fetch').textContent = stats.fetchParseMs.toFixed(0) + ' ms';
+    if (stats.primitivesReadyMs != null) $('h-ready').textContent = stats.primitivesReadyMs.toFixed(0) + ' ms';
+    if (stats.initialLoadMs != null) $('h-load').textContent = stats.initialLoadMs.toFixed(0) + ' ms';
+    if (performance.memory) $('h-heap').textContent = (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB';
+  }
+
+  // FPS: postRender 間隔から 1 秒窓の平均 / 最小 / 最大を算出
+  let frames = 0, winStart = performance.now(), mn = Infinity, mx = 0;
+  viewer.scene.postRender.addEventListener(() => {
+    frames++;
+    const now = performance.now();
+    if (now - winStart >= 1000) {
+      const fps = frames * 1000 / (now - winStart);
+      stats.fps = +fps.toFixed(1);
+      mn = Math.min(mn, fps); mx = Math.max(mx, fps);
+      stats.fpsMin = +mn.toFixed(1); stats.fpsMax = +mx.toFixed(1);
+      $('h-fps').textContent = stats.fps.toFixed(1);
+      $('h-fps-mm').textContent = stats.fpsMin + ' / ' + stats.fpsMax;
+      frames = 0; winStart = now;
+      renderHud();
+    }
+  });
+
+  // ── 建物色（高さ帯。見た目比較用の簡易スタイル）──
+  function colorFor(h) {
+    const t = Math.min(h / 60, 1);
+    return Cesium.Color.fromBytes(Math.round(190 - 70 * t), Math.round(200 - 50 * t), Math.round(215 - 20 * t), 255);
+  }
+  const HILITE = Cesium.Color.fromCssColorString('#ff9f1c');
+
+  // footprint(ローカル m) → Cartesian3 flat degrees。連続重複点・閉じ点を除去
+  function footprintToDegrees(fp) {
+    const out = [];
+    let px = null, pz = null;
+    for (const p of fp) {
+      if (p[0] === px && p[1] === pz) continue;
+      out.push(localToLon(p[0]), localToLat(p[1]));
+      px = p[0]; pz = p[1];
+    }
+    const n = out.length;
+    if (n >= 6 && out[0] === out[n - 2] && out[1] === out[n - 1]) { out.pop(); out.pop(); }
+    return out.length >= 6 ? out : null;
+  }
+
+  function buildTilePrimitive(tile) {
+    const instances = [];
+    for (const b of tile.buildings) {
+      const deg = footprintToDegrees(b.fp);
+      if (!deg) { stats.skipped++; continue; }
+      const z0 = b.z0 || 0;
+      const top = z0 + (b.dz || b.h || 3);
+      instances.push(new Cesium.GeometryInstance({
+        id: b.id, // canonicalId をそのまま保持
+        geometry: new Cesium.PolygonGeometry({
+          polygonHierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(deg)),
+          height: z0, extrudedHeight: top,
+          vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+        }),
+        attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(colorFor(b.h || top - z0)) },
+      }));
+      stats.vertices += b.fp.length;
+    }
+    return new Cesium.Primitive({
+      geometryInstances: instances,
+      appearance: new Cesium.PerInstanceColorAppearance({ translucent: false, closed: true }),
+      allowPicking: true, asynchronous: true, releaseGeometryInstances: false, // 色変更(ハイライト)に属性参照が必要
+    });
+  }
+
+  async function load() {
+    const manifest = await (await fetch(BASE + 'manifest.json')).json();
+    if (manifest.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinateConvention=' + manifest.coordinateConvention);
+    const want = manifest.tiles.filter(t => t.tx >= BLOCK.tx0 && t.tx <= BLOCK.tx1 && t.tz >= BLOCK.tz0 && t.tz <= BLOCK.tz1);
+    const tiles = await Promise.all(want.map(t => fetch(BASE + t.file).then(r => r.json())));
+    stats.fetchParseMs = performance.now() - T0;
+
+    const prims = [];
+    for (const tile of tiles) {
+      const p = buildTilePrimitive(tile);
+      viewer.scene.primitives.add(p);
+      prims.push(p);
+      stats.tiles++; stats.primitives++; stats.buildings += tile.buildings.length;
+    }
+    // 全 Primitive の async ジオメトリ生成(WebWorker)完了待ち
+    const tReady0 = performance.now();
+    await new Promise((resolve) => {
+      const rm = viewer.scene.postRender.addEventListener(() => {
+        if (prims.every(p => p.ready)) { rm(); resolve(); }
+      });
+    });
+    stats.primitivesReadyMs = performance.now() - tReady0;
+    stats.initialLoadMs = performance.now() - T0;
+    stats.status = 'ready';
+    renderHud();
+    console.log('[Mission37B] ready', JSON.stringify(stats));
+  }
+  load().catch((e) => { stats.status = 'error: ' + e.message; renderHud(); console.error(e); });
+
+  // ── canonicalId クリック取得 + ハイライト ──
+  let lastPrim = null, lastId = null, lastColor = null;
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction((click) => {
+    if (lastPrim && lastId) {
+      const a = lastPrim.getGeometryInstanceAttributes(lastId);
+      if (a) a.color = lastColor;
+      lastPrim = lastId = lastColor = null;
+    }
+    const picked = viewer.scene.pick(click.position);
+    if (Cesium.defined(picked) && typeof picked.id === 'string') {
+      const a = picked.primitive.getGeometryInstanceAttributes(picked.id);
+      if (a) { lastColor = a.color.slice(); a.color = Cesium.ColorGeometryInstanceAttribute.toValue(HILITE); lastPrim = picked.primitive; lastId = picked.id; }
+      stats.lastPickedCanonicalId = picked.id;
+      $('picked').textContent = 'canonicalId: ' + picked.id;
+      console.log('[Mission37B] picked canonicalId =', picked.id);
+    } else {
+      stats.lastPickedCanonicalId = null;
+      $('picked').textContent = '(建物なし)';
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+})();
+</script>
+</body>
+</html>
