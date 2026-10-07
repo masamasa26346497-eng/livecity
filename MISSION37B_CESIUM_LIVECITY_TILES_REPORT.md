@@ -173,6 +173,57 @@
 - **計測**: 既存 HUD / 「10秒FPS計測」を流用し、同一端末・同一視点で fixed / all / 3D Tiles を比較。
 - **リスク**: 不正 footprint での三角形分割失敗、出力ファイルサイズ（未見積もり）、GPU 側が主因なら FPS が改善しない可能性。
 
+## 3D Tiles PoC 実装（9 tile 段階）— 未実行・未実測
+
+**この節の実装は、作成環境でコマンド実行が承認されず、変換ツールもテストも一度も実行していません。** 生成物（tileset/GLB）も未生成で、ビューアのブラウザ動作も未確認です。以下は設計と手順で、数値はまだありません。
+
+### 構成
+| 項目 | 内容 |
+|---|---|
+| 変換ツール | `tools/mission37b-build-3dtiles.cjs`（Node のみ・依存追加なし・ネットワーク不要） |
+| ビューア | `public/mission37b-3dtiles-poc.html`（Primitive 版 `mission37b-livecity-cesium-tiles.html` は無変更） |
+| テスト | `tests/mission37b-3dtiles.test.cjs`（`npm test` 未登録。`node --test tests/mission37b-3dtiles.test.cjs`） |
+| tileset | root（content なし）→ group（4×4 tile ごと、簡略 LOD の GLB）→ leaf（既存 500 m tile 1 つ = 1 GLB）の 3 階層 |
+| 座標 | `geoToThree()` の厳密な逆変換（CLAT/CLON/MPD 同一）→ WGS84 → ECEF → tile 中心の ENU。leaf/group の `transform` は ENU フレーム、`boundingVolume` は実頂点から算出した `region` |
+| 形状 | 屋根を ear clipping で三角形分割、側面は押し出し。`KHR_materials_unlit`＋頂点色（Primitive 版と同じ高さ帯。側面は 0.78 倍の暗色）。照明に依存しない |
+| canonicalId | 既存 `building.id`（`bldg_<uuid>`）をそのまま保持。`EXT_mesh_features`（`_FEATURE_ID_0`）＋`EXT_structural_metadata` の文字列プロパティ `canonicalId`。さらに featureId 順の sidecar `ids/*.json` を併置（照合・フォールバック用）。新規採番なし |
+| 簡略 LOD | group content は footprint の軸平行 bbox 押し出し。bbox 面積 100 m² 未満は除外。`geometricError` は group 40、leaf 0（`--coarse-error`、`--coarse-min-area` で変更可） |
+| クリック | `scene.pick` → `feature.getProperty('canonicalId')`、sidecar と突き合わせて一致を表示 |
+| SSE | HUD のセレクタで `maximumScreenSpaceError` 8 / 16 / 32 を切替（`?sse=` で初期値） |
+| HUD | FPS（1 s 平均）、p95 frame（直近 300 フレーム）、初回表示時間（`allTilesLoaded` 初回）、表示 tile 数/読込済、表示建物数、heap、10 秒計測 |
+
+### 生成手順
+```bash
+node tools/mission37b-build-3dtiles.cjs          # 9 tile（tx -6..-4, tz -3..-1）→ public/mission37b-3dtiles/osaka-sumiyoshi-9tile/
+node tools/mission37b-build-3dtiles.cjs --all    # 52 tile → public/mission37b-3dtiles/osaka-sumiyoshi-all/（.gitignore 済み）
+node --test tests/mission37b-3dtiles.test.cjs
+```
+確認 URL: `/mission37b-3dtiles-poc.html`（9 tile）、`?set=osaka-sumiyoshi-all&sse=16`（52 tile）。
+
+### 52 tile への拡張
+変換ツールは `--all` で manifest の全 tile を同じ処理で変換します。ビューアは `?set=` を切り替えるだけです。コード上の変更は不要な構造にしています。
+
+### Primitive 版との比較表（記入用。9 tile / 52 tile とも未計測）
+| 指標 | Primitive fixed(9) | 3D Tiles 9 tile | Primitive all(52) | 3D Tiles 52 tile | 合格目標(52) |
+|---|---|---|---|---|---|
+| 10 秒平均 FPS | 約 31.3（計測法不明） | 未計測 | 8.3 | 未計測 | ≥ 30 |
+| p95 frame | 未計測 | 未計測 | 93.3 ms | 未計測 | ≤ 50 ms |
+| 初回表示 | 約 10.0 s | 未計測 | 14,013 ms | 未計測 | < 14 s |
+| canonicalId 一致 | 取得確認済み | 未確認 | 取得確認済み | 未確認 | 一致 |
+SSE 8 / 16 / 32 それぞれで記入してください。
+
+### 既知のリスク・未確認事項
+- 作成環境では変換・テストを実行できておらず、GLB が Cesium 1.121.1 で正しく読めるかは未確認です。特に `EXT_structural_metadata` 経由の `getProperty` と、tile transform の合成が要確認です。
+- 生成物は未コミットです。9 tile の GLB は概算で十数 MB と見込まれ（未測定）、コミットするかは生成後のサイズを見て判断してください。52 tile 版は `.gitignore` 済みです。
+- 生成物がなければ、Vercel Preview ではビューアが読み込みエラーを表示します（`tileset.json` の場所と生成コマンドを画面に表示）。
+- leaf は子を持たないため、SSE の影響を受けるのは group の簡略 LOD の切替だけです。8 / 16 / 32 の差は視点距離に依存し、`geometricError` 40 が妥当かは未検証です。
+- bbox による簡略は L 字等の建物を過大に描きます。FPS が改善するかも未検証です。
+
+## 変更ファイル（3D Tiles PoC 追加分）
+- 追加: `tools/mission37b-build-3dtiles.cjs`、`public/mission37b-3dtiles-poc.html`、`tests/mission37b-3dtiles.test.cjs`
+- 変更: `.gitignore`（`public/mission37b-3dtiles/*-all/` を除外）、本レポート
+- 変更なし: 本番 HTML 2 ファイル、Mission 36L 写真データ、canonicalId 体系、Primitive 版 POC
+
 ## 変更ファイル
 - 追加: `public/mission37b-livecity-cesium-tiles.html`
 - 追加: `tools/mission37b-poc-stats.js`（読み取り専用の静的集計ツール。未実行）
