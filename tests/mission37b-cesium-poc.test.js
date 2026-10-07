@@ -25,6 +25,17 @@ test('geoToThree と同一の投影定数を使う', () => {
   assert.match(html, /SEARCH_MPD = 111320/);
 });
 
+test('動的ロード/破棄・全域モード・計測ボタンが実装されている', () => {
+  assert.match(html, /\['fixed', 'all', 'dynamic'\]/);
+  assert.match(html, /unloadTile/);
+  assert.match(html, /primitives\.remove/);
+  assert.match(html, /btn-measure/);
+});
+
+test('ピッキングは bldg_ 接頭辞の canonicalId のみ受理する', () => {
+  assert.match(html, /\/\^bldg_\/\.test\(picked\.id\)/);
+});
+
 test('既定ブロックのタイルが既存 manifest に存在する', () => {
   const m = JSON.parse(fs.readFileSync(path.join(pub, 'map-data/osaka-city/buildings/osaka-sumiyoshi/manifest.json'), 'utf8'));
   const n = m.tiles.filter(t => t.tx >= -6 && t.tx <= -4 && t.tz >= -3 && t.tz <= -1);

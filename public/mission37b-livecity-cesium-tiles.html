@@ -42,6 +42,9 @@
   <div><span class="k">　Primitive ready</span><span id="h-ready">-</span></div>
   <div><span class="k">JS heap</span><span id="h-heap">n/a</span></div>
   <div><span class="k">スキップ(不正fp)</span><span id="h-skip">0</span></div>
+  <div><span class="k">モード</span><span id="h-mode">-</span></div>
+  <div><span class="k">10秒計測</span><span id="h-measure">-</span></div>
+  <button id="btn-measure">10秒FPS計測</button>
   <button id="btn-reset">カメラ初期位置に戻す</button>
   <div id="picked">建物をクリック → canonicalId</div>
 </div>
@@ -65,6 +68,8 @@
     tx0: +(q.get('tx0') ?? -6), tx1: +(q.get('tx1') ?? -4),
     tz0: +(q.get('tz0') ?? -3), tz1: +(q.get('tz1') ?? -1),
   };
+  const MODE = ['fixed', 'all', 'dynamic'].includes(q.get('mode')) ? q.get('mode') : 'fixed';
+  const DYN_R = +(q.get('r') ?? 1); // dynamic: 注視 tile からの Chebyshev 半径（1 → 最大 3×3 tile）
   const BASE = 'map-data/osaka-city/buildings/' + DATASET + '/';
 
   // ── Cesium viewer（ion / Google 不使用）──
@@ -98,7 +103,7 @@
 
   // ── stats / HUD ──
   const stats = {
-    dataset: DATASET, block: BLOCK, tiles: 0, buildings: 0, primitives: 0, vertices: 0, skipped: 0,
+    dataset: DATASET, block: BLOCK, mode: MODE, dynR: DYN_R, tilesLoadedTotal: 0, tilesUnloadedTotal: 0, dynLog: [], measure: null, tiles: 0, buildings: 0, primitives: 0, vertices: 0, skipped: 0,
     fetchParseMs: null, primitivesReadyMs: null, initialLoadMs: null, fps: 0, fpsMin: null, fpsMax: null,
     lastPickedCanonicalId: null, status: 'loading',
   };
@@ -106,6 +111,7 @@
   const $ = (id) => document.getElementById(id);
   function renderHud() {
     $('h-status').textContent = stats.status;
+    $('h-mode').textContent = MODE + (MODE === 'dynamic' ? ' r=' + DYN_R + ' (+' + stats.tilesLoadedTotal + '/-' + stats.tilesUnloadedTotal + ')' : '');
     $('h-bldg').textContent = stats.buildings;
     $('h-tiles').textContent = stats.tiles;
     $('h-prims').textContent = stats.primitives;
@@ -157,11 +163,11 @@
 
   const ext = { w: Infinity, e: -Infinity, s: Infinity, n: -Infinity }; // 実読込 footprint の WGS84 範囲
 
-  function buildTilePrimitive(tile) {
+  function buildTilePrimitive(tile, info) {
     const instances = [];
     for (const b of tile.buildings) {
       const deg = footprintToDegrees(b.fp);
-      if (!deg) { stats.skipped++; continue; }
+      if (!deg) { info.skipped++; continue; }
       const z0 = b.z0 || 0;
       const top = z0 + (b.dz || b.h || 3);
       instances.push(new Cesium.GeometryInstance({
@@ -173,7 +179,7 @@
         }),
         attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(colorFor(b.h || top - z0)) },
       }));
-      stats.vertices += b.fp.length;
+      info.verts += b.fp.length;
       for (let i = 0; i < deg.length; i += 2) {
         if (deg[i] < ext.w) ext.w = deg[i];
         if (deg[i] > ext.e) ext.e = deg[i];
@@ -189,31 +195,100 @@
     });
   }
 
+  // ── タイル管理（key "tx_tz" → {prim, count, verts, skipped}）──
+  // mode=fixed(既定): BLOCK の固定タイル / all: manifest 全タイル / dynamic: カメラ注視点周辺のみ動的ロード・破棄
+  const tileState = new Map();
+  const pending = new Set();
+  let manifestTiles = [];
+  const TILE = 500;
+  function recount() {
+    let tiles = 0, bl = 0, v = 0, sk = 0;
+    for (const s of tileState.values()) { tiles++; bl += s.count; v += s.verts; sk += s.skipped; }
+    stats.tiles = tiles; stats.primitives = tiles; stats.buildings = bl; stats.vertices = v; stats.skipped = sk;
+  }
+  async function loadTile(t) {
+    const key = t.tx + '_' + t.tz;
+    if (tileState.has(key) || pending.has(key)) return null;
+    pending.add(key);
+    try {
+      const t0 = performance.now();
+      const tile = await (await fetch(BASE + t.file)).json();
+      const info = { count: tile.buildings.length, verts: 0, skipped: 0, prim: null, loadedAt: t0 };
+      info.prim = buildTilePrimitive(tile, info);
+      viewer.scene.primitives.add(info.prim);
+      tileState.set(key, info);
+      stats.tilesLoadedTotal++;
+      recount();
+      return info;
+    } finally { pending.delete(key); }
+  }
+  function unloadTile(key) {
+    const s = tileState.get(key);
+    if (!s) return;
+    if (lastPrim === s.prim) { lastPrim = lastId = lastColor = null; }
+    viewer.scene.primitives.remove(s.prim); // remove は destroy も行う（GPU 解放）
+    tileState.delete(key);
+    stats.tilesUnloadedTotal++;
+    recount();
+  }
+  const whenReady = (prims) => new Promise((resolve) => {
+    const rm = viewer.scene.postRender.addEventListener(() => {
+      if (prims.every(p => p.ready)) { rm(); resolve(); }
+    });
+  });
+
+  // カメラ注視点（画面中心の地表点。取れなければカメラ直下）→ ローカル m → tile index
+  function focusTile() {
+    const c = viewer.scene.canvas;
+    let pos = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(c.clientWidth / 2, c.clientHeight / 2), viewer.scene.globe.ellipsoid);
+    const carto = Cesium.Cartographic.fromCartesian(pos || viewer.camera.positionWC);
+    const lon = Cesium.Math.toDegrees(carto.longitude), lat = Cesium.Math.toDegrees(carto.latitude);
+    const x = (lon - SEARCH_CLON) * COS_CLAT * SEARCH_MPD, z = -((lat - SEARCH_CLAT) * SEARCH_MPD);
+    return { tx: Math.floor(x / TILE), tz: Math.floor(z / TILE) };
+  }
+  // 動的: 注視 tile から Chebyshev 距離 R 以内をロード、R+1 超を破棄（ヒステリシス 1）
+  let dynBusy = false;
+  async function updateDynamic() {
+    if (dynBusy || stats.status !== 'ready') return;
+    dynBusy = true;
+    try {
+      const f = focusTile(); stats.focusTile = f.tx + '_' + f.tz;
+      const R = DYN_R;
+      for (const key of [...tileState.keys()]) {
+        const [tx, tz] = key.split('_').map(Number);
+        if (Math.max(Math.abs(tx - f.tx), Math.abs(tz - f.tz)) > R + 1) unloadTile(key);
+      }
+      const want = manifestTiles.filter(t => Math.max(Math.abs(t.tx - f.tx), Math.abs(t.tz - f.tz)) <= R);
+      const t0 = performance.now();
+      const loaded = (await Promise.all(want.map(loadTile))).filter(Boolean);
+      if (loaded.length) {
+        await whenReady(loaded.map(s => s.prim));
+        const ms = performance.now() - t0;
+        stats.dynLog.push({ focus: stats.focusTile, loaded: loaded.length, ms: Math.round(ms), tilesNow: stats.tiles, buildingsNow: stats.buildings });
+        if (stats.dynLog.length > 50) stats.dynLog.shift();
+      }
+    } catch (e) { console.error(e); } finally { dynBusy = false; renderHud(); }
+  }
+
   async function load() {
     const manifest = await (await fetch(BASE + 'manifest.json')).json();
     if (manifest.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinateConvention=' + manifest.coordinateConvention);
-    const want = manifest.tiles.filter(t => t.tx >= BLOCK.tx0 && t.tx <= BLOCK.tx1 && t.tz >= BLOCK.tz0 && t.tz <= BLOCK.tz1);
-    const tiles = await Promise.all(want.map(t => fetch(BASE + t.file).then(r => r.json())));
+    manifestTiles = manifest.tiles;
+    stats.manifestTiles = manifestTiles.length; stats.manifestBuildings = manifest.totalBuildings;
+    let want;
+    if (MODE === 'all') want = manifestTiles;
+    else if (MODE === 'dynamic') { const f = focusTile(); want = manifestTiles.filter(t => Math.max(Math.abs(t.tx - f.tx), Math.abs(t.tz - f.tz)) <= DYN_R); }
+    else want = manifestTiles.filter(t => t.tx >= BLOCK.tx0 && t.tx <= BLOCK.tx1 && t.tz >= BLOCK.tz0 && t.tz <= BLOCK.tz1);
+    const loaded = (await Promise.all(want.map(loadTile))).filter(Boolean);
     stats.fetchParseMs = performance.now() - T0;
-
-    const prims = [];
-    for (const tile of tiles) {
-      const p = buildTilePrimitive(tile);
-      viewer.scene.primitives.add(p);
-      prims.push(p);
-      stats.tiles++; stats.primitives++; stats.buildings += tile.buildings.length;
-    }
     // 全 Primitive の async ジオメトリ生成(WebWorker)完了待ち
     const tReady0 = performance.now();
-    await new Promise((resolve) => {
-      const rm = viewer.scene.postRender.addEventListener(() => {
-        if (prims.every(p => p.ready)) { rm(); resolve(); }
-      });
-    });
+    const prims = loaded.map(s => s.prim);
+    await whenReady(prims);
     stats.primitivesReadyMs = performance.now() - tReady0;
     stats.initialLoadMs = performance.now() - T0;
     // 実データ範囲からカメラを再設定。赤枠は建物範囲の診断用輪郭（建物が描画されなくても位置整合を目視できる）
-    if (isFinite(ext.w)) {
+    if (isFinite(ext.w) && MODE !== 'dynamic') {
       CENTER = Cesium.Cartesian3.fromDegrees((ext.w + ext.e) / 2, (ext.s + ext.n) / 2, 0);
       RANGE = Math.max(600, Math.hypot((ext.e - ext.w) * COS_CLAT * SEARCH_MPD, (ext.n - ext.s) * SEARCH_MPD) * 1.1);
       stats.extentDeg = ext; stats.cameraRange = Math.round(RANGE);
@@ -225,22 +300,50 @@
     stats.primitiveShown = prims.every(p => p.show);
     stats.boundingSphereRadii = prims.map(p => p.boundingSphere ? Math.round(p.boundingSphere.radius) : null);
     stats.status = 'ready';
+    if (typeof performance.memory !== 'undefined') stats.heapMBAfterLoad = +(performance.memory.usedJSHeapSize / 1048576).toFixed(1);
+    if (MODE === 'dynamic') {
+      // カメラ操作終了時 + 2 秒周期（ズーム/慣性移動の取りこぼし対策）で更新
+      viewer.camera.moveEnd.addEventListener(updateDynamic);
+      setInterval(updateDynamic, 2000);
+    }
     renderHud();
     console.log('[Mission37B] ready', JSON.stringify(stats));
   }
+  // FPS 計測: 10 秒間の postRender 間隔から平均/最小/最大(フレーム間隔ベース)/p95 frame ms を算出 → stats.measure
+  $('btn-measure').onclick = () => {
+    const ts = []; let last = performance.now(); const t0 = last;
+    $('h-measure').textContent = '計測中 10s…';
+    const rm = viewer.scene.postRender.addEventListener(() => {
+      const n = performance.now(); ts.push(n - last); last = n;
+      if (n - t0 >= 10000) {
+        rm();
+        const sorted = ts.slice().sort((a, b) => a - b);
+        const avgMs = ts.reduce((a, b) => a + b, 0) / ts.length;
+        stats.measure = {
+          durationMs: Math.round(n - t0), frames: ts.length, avgFps: +(1000 / avgMs).toFixed(1),
+          p95FrameMs: +sorted[Math.floor(sorted.length * 0.95)].toFixed(1), maxFrameMs: +sorted[sorted.length - 1].toFixed(1),
+          mode: MODE, tiles: stats.tiles, buildings: stats.buildings, primitives: stats.primitives,
+          heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null,
+        };
+        $('h-measure').textContent = stats.measure.avgFps + ' fps / p95 ' + stats.measure.p95FrameMs + ' ms';
+        console.log('[Mission37B] measure', JSON.stringify(stats.measure));
+      }
+    });
+  };
   load().catch((e) => { stats.status = 'error: ' + e.message; renderHud(); console.error(e); });
 
   // ── canonicalId クリック取得 + ハイライト ──
   let lastPrim = null, lastId = null, lastColor = null;
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
   handler.setInputAction((click) => {
-    if (lastPrim && lastId) {
+    if (lastPrim && lastId && !lastPrim.isDestroyed()) {
       const a = lastPrim.getGeometryInstanceAttributes(lastId);
       if (a) a.color = lastColor;
       lastPrim = lastId = lastColor = null;
     }
     const picked = viewer.scene.pick(click.position);
-    if (Cesium.defined(picked) && typeof picked.id === 'string') {
+    // canonicalId = "bldg_<uuid>"（GeometryInstance.id）。赤枠 Entity 等は id が Entity なので除外される
+    if (Cesium.defined(picked) && typeof picked.id === 'string' && /^bldg_/.test(picked.id)) {
       const a = picked.primitive.getGeometryInstanceAttributes(picked.id);
       if (a) { lastColor = a.color.slice(); a.color = Cesium.ColorGeometryInstanceAttribute.toValue(HILITE); lastPrim = picked.primitive; lastId = picked.id; }
       stats.lastPickedCanonicalId = picked.id;

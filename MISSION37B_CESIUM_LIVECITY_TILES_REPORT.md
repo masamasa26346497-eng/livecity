@@ -66,6 +66,47 @@
 3D Tiles（タイル単位、`canonicalId` を feature table/batch table に格納）への事前変換が妥当と考える。
 ただし最終判断は、本 POC の実測（ロード時間・FPS・heap）を踏まえて行うこと。
 
+## 次段階（PR #24 追加分）— 比較・拡張検証
+
+> 事実区分: 追加実装は静的記述のみで、この環境ではブラウザ実行・計測ができていません。**以下の実測欄は未記入**です。
+
+### (1) canonicalId クリック
+- `scene.pick` → `picked.id`（`GeometryInstance.id` = tile JSON の `building.id`、実データで `bldg_<uuid>` 形式を確認）。
+- 受理条件を `typeof string` かつ `/^bldg_/` に限定（診断用の赤枠 Entity 等を誤認しない）。
+- 動的破棄で Primitive が destroy 済みの場合にハイライト復元が例外を出さないようガード追加。
+- 実機クリック結果: 利用者報告「表示は確認済み」。クリックの canonicalId 取得は **要確認**（HUD 下部 / `__mission37b.lastPickedCanonicalId`）。
+
+### (2) 計測（HUD）
+- HUD に「10秒FPS計測」ボタンを追加。10 秒間の平均 FPS・p95/最大フレーム時間・heap を `__mission37b.measure` に保存。
+- 既存の初期ロード（fetch/parse と Primitive ready の内訳）、建物数、Primitive 数、タイル数は HUD に表示。
+- 参考: Vercel 実機の前回報告値 = 建物 10,546 / 9 tile / Primitive 9 / 初期ロード約 10.0 s / FPS 平均約 31.3（ユーザー提供値）。
+
+### (3) 動的タイルロード/破棄（最小 POC）
+- `?mode=dynamic&r=1`: 画面中心の地表点（取れなければカメラ直下）→ ローカル m → `floor(x/500), floor(z/500)` で注視 tile を決定。
+  Chebyshev 距離 `r` 以内をロード、`r+1` 超を `primitives.remove`（destroy）で破棄（ヒステリシス 1）。
+- 更新契機: `camera.moveEnd` と 2 秒周期。重複ロード防止（`pending` セット）、実行中は再入しない。
+- ログ: `__mission37b.dynLog`（ロード tile 数・所要 ms・現在 tile/建物数）、`tilesLoadedTotal / tilesUnloadedTotal`。
+- 制約: 破棄済み tile の JSON は再取得（HTTP キャッシュ依存）。空・水域などで注視点が地表に当たらない場合はカメラ直下を使う。
+
+### (4) 住吉区全域
+- `?mode=all`: manifest の全 52 tile / 35,031 棟を一括ロード。カメラは読込範囲から自動フィット。
+- 計測手順: `?mode=all` を開く → ready 後に HUD の初期ロード時間、「10秒FPS計測」、`__mission37b` を記録。
+
+### 実測記入欄（要ブラウザ。同一端末・同一カメラで）
+| 構成 | 建物 | tile | 初期ロード | 平均FPS | p95 frame | heap |
+|---|---|---|---|---|---|---|
+| fixed 3×3（既定） | 10,546 | 9 | 約10.0 s（ユーザー報告） | 約31.3（同） | 未計測 | 未計測 |
+| dynamic r=1 | 要実測 | 最大9 | 要実測 | 要実測 | 要実測 | 要実測 |
+| all（住吉区全域） | 35,031 | 52 | 要実測 | 要実測 | 要実測 | 要実測 |
+| Three.js 版（同中心） | 要実測 | - | 要実測 | 要実測 | - | 要実測 |
+
+### (5) 3D Tiles 事前変換の結論（暫定・実測前）
+- 実測が無いため**最終結論は出せません**。根拠のある範囲での見立て:
+  - fixed 3×3（1万棟）で初期ロード約 10 s・約 31 FPS という報告値は、すでに JSON→Primitive 変換が主因で重い可能性を示す（変換時間と描画時間の内訳は `primitivesReadyMs` で分離可能）。
+  - 住吉区全域はその約 3.3 倍の棟数。`mode=all` で線形以上に悪化するなら、事前変換が必要。
+- 判断基準案: `mode=all` の初期ロード > 数十秒、または平均 FPS が 30 未満なら 3D Tiles（tile 単位 content、canonicalId を batch table）へ進む。
+  dynamic が許容範囲（ロード各回数秒、FPS 維持）なら、まず動的ロード + 簡素化で足りる。上記基準値は提案であり、合意が必要。
+
 ## 変更ファイル
 - 追加: `public/mission37b-livecity-cesium-tiles.html`
 - 追加: `tools/mission37b-poc-stats.js`（読み取り専用の静的集計ツール。未実行）
