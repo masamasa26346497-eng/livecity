@@ -203,6 +203,7 @@
       let frames = 0;
       let fps = 0;
       let lastFpsAt = performance.now();
+      let selectedFootprintEntities = [];
 
       viewer.scene.postRender.addEventListener(function () {
         frames += 1;
@@ -217,6 +218,52 @@
           '\n画質閾値(SSE): ' + tileset.maximumScreenSpaceError +
           '\n読込経過: ' + ((now - t0) / 1000).toFixed(1) + '秒';
       });
+
+      function clearSelectedFootprint() {
+        for (const e of selectedFootprintEntities) viewer.entities.remove(e);
+        selectedFootprintEntities = [];
+      }
+
+      function localToLatLon(x, z) {
+        const CLAT = 34.604208, CLON = 135.52502, MPD = 111320;
+        return {
+          lat: CLAT - (z / MPD),
+          lon: CLON + (x / (Math.cos(CLAT * Math.PI / 180) * MPD)),
+        };
+      }
+
+      function addRingEntity(ring, height, kind) {
+        if (!Array.isArray(ring) || ring.length < 3) return;
+        const positions = [];
+        for (const p of ring) {
+          const ll = localToLatLon(Number(p[0]), Number(p[1]));
+          positions.push(Cesium.Cartesian3.fromDegrees(ll.lon, ll.lat, height));
+        }
+        const isOuter = kind === 'outer';
+        const entity = viewer.entities.add({
+          polyline: {
+            positions,
+            width: isOuter ? 4 : 2,
+            clampToGround: false,
+            material: isOuter ? Cesium.Color.fromCssColorString('#19a7ff') : Cesium.Color.fromCssColorString('#83d7ff'),
+            depthFailMaterial: Cesium.Color.fromCssColorString('#19a7ff').withAlpha(0.45)
+          }
+        });
+        selectedFootprintEntities.push(entity);
+      }
+
+      function highlightCanonicalFeature(feature, clickHeight) {
+        clearSelectedFootprint();
+        if (!feature) return;
+        const polys = feature.geometryType === 'MultiPolygon' ? feature.coordinates : [feature.coordinates];
+        const baseHeight = Number.isFinite(clickHeight) ? clickHeight + 1.2 : 12;
+        for (const poly of polys || []) {
+          if (!poly || !poly.length) continue;
+          addRingEntity(poly[0], baseHeight, 'outer');
+          for (let i = 1; i < poly.length; i++) addRingEntity(poly[i], baseHeight, 'hole');
+        }
+        viewer.scene.requestRender();
+      }
 
       try {
         await tileset.readyPromise;
@@ -234,14 +281,17 @@
           const c = Cesium.Cartographic.fromCartesian(cartesian);
           const lat = Cesium.Math.toDegrees(c.latitude);
           const lon = Cesium.Math.toDegrees(c.longitude);
+          const clickHeight = Number(c.height) || 0;
           buildingCard.style.display = 'block';
           buildingCard.innerHTML = '<div class="title">Live City建物を照合中…</div>';
           try {
             const exact = await exactCanonicalBuilding(lat, lon);
             if (exact?.feature?.canonicalId) {
+              highlightCanonicalFeature(exact.feature, clickHeight);
               const rec = await photoRecordForCanonicalId(exact.feature.canonicalId);
               showBuildingCard({ exact, rec, distanceM:0 }, lat, lon);
             } else {
+              clearSelectedFootprint();
               const match = await nearestPhotoBuilding(lat, lon, 45);
               showBuildingCard(match, lat, lon);
             }
@@ -257,6 +307,7 @@
             photoIndexLoaded: !!photoSpatial,
             photoIndexRecordCount: photoSpatial?.count || null,
             canonicalLookup: window.LiveCityCesiumBuildingLookup?.stats?.() || null,
+            selectedFootprintEntityCount: selectedFootprintEntities.length,
             camera: {
               lon: 135.49595,
               lat: 34.70385
