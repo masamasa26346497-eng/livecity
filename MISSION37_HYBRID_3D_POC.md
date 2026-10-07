@@ -35,3 +35,6 @@ The POC deliberately tests:
    - transferred bytes,
    - interaction latency.
 4. Only after measurement, decide whether to migrate more rendering responsibility from Three.js.
+
+
+<!-- Vercel preview trigger: 2026-10-07 -->
