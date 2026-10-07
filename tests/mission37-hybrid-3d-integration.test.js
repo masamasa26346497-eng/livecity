@@ -51,3 +51,13 @@ test('[Mission37] exact canonical footprint lookup is preferred', () => {
   assert.ok(lookup.includes('derived-v4-final/near/buildings'));
   assert.ok(lookup.includes('for (let dx=-1; dx<=1; dx++)'));
 });
+
+
+test('[Mission37] exact canonical footprint is highlighted in Cesium', () => {
+  const html = fs.readFileSync('public/mission37-livecity-hybrid-3d-poc.html','utf8');
+  assert.ok(html.includes('highlightCanonicalFeature'));
+  assert.ok(html.includes('clearSelectedFootprint'));
+  assert.ok(html.includes('viewer.entities.add'));
+  assert.ok(html.includes("#19a7ff"));
+  assert.ok(html.includes('selectedFootprintEntityCount'));
+});
