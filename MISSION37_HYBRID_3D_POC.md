@@ -38,3 +38,5 @@ The POC deliberately tests:
 
 
 <!-- Vercel preview trigger: 2026-10-07 -->
+
+<!-- Vercel preview retrigger after rootDirectory=public: 2026-10-07 -->
