@@ -50,7 +50,7 @@
       const metrics = document.getElementById('metrics');
       const error = document.getElementById('error');
       const buildingCard = document.getElementById('buildingCard');
-      const apiKey = window.LIVECITY_CONFIG && window.LIVECITY_CONFIG.googleMapTilesApiKey;
+      let apiKey = String((window.LIVECITY_CONFIG && window.LIVECITY_CONFIG.googleMapTilesApiKey) || sessionStorage.getItem('livecity.mapTilesApiKey') || '').trim();
       const PHOTO_INDEX_URL = '/map-data/osaka-city/derived/building-photo-index.json';
       let photoIndexPromise = null;
       let photoSpatial = null;
@@ -153,9 +153,22 @@
       }
 
       if (!apiKey) {
-        status.textContent = 'Map Tiles APIキー未設定';
+        status.textContent = 'Google Map Tiles APIキーを入力してください';
         error.style.display = 'block';
-        error.textContent = 'public/local-config.js に googleMapTilesApiKey を設定してください。';
+        error.innerHTML = [
+          '<div style="margin-bottom:8px">Photorealistic 3D Tiles表示にはGoogle Map Tiles APIキーが必要です。</div>',
+          '<div style="display:flex;gap:6px">',
+          '<input id="mission37ApiKey" type="password" autocomplete="off" placeholder="Map Tiles API key" style="min-width:0;flex:1;padding:8px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:#0b1728;color:white">',
+          '<button id="mission37ApiKeyApply" type="button" style="padding:8px 10px;border-radius:7px;border:0;cursor:pointer">表示</button>',
+          '</div>',
+          '<div style="margin-top:7px;font-size:10px;opacity:.7">キーはこのブラウザのsessionStorageだけに保存し、GitHubには保存しません。</div>'
+        ].join('');
+        document.getElementById('mission37ApiKeyApply')?.addEventListener('click', function () {
+          const value = String(document.getElementById('mission37ApiKey')?.value || '').trim();
+          if (!value) return;
+          sessionStorage.setItem('livecity.mapTilesApiKey', value);
+          location.reload();
+        });
         return;
       }
 
