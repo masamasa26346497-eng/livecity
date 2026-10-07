@@ -1,0 +1,121 @@
+{
+ "dataset": "osaka-sumiyoshi",
+ "selectedTiles": 9,
+ "groups": 2,
+ "leaf": [
+  {
+   "name": "t_-4_-1",
+   "buildings": 855,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 24205,
+   "triangles": 12813,
+   "bytes": 678232
+  },
+  {
+   "name": "t_-4_-2",
+   "buildings": 1149,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 31035,
+   "triangles": 16323,
+   "bytes": 870192
+  },
+  {
+   "name": "t_-4_-3",
+   "buildings": 908,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 24995,
+   "triangles": 13181,
+   "bytes": 700836
+  },
+  {
+   "name": "t_-5_-1",
+   "buildings": 874,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 25125,
+   "triangles": 13327,
+   "bytes": 703660
+  },
+  {
+   "name": "t_-5_-2",
+   "buildings": 1054,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 30095,
+   "triangles": 15949,
+   "bytes": 842624
+  },
+  {
+   "name": "t_-5_-3",
+   "buildings": 1432,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 39630,
+   "triangles": 20914,
+   "bytes": 1109916
+  },
+  {
+   "name": "t_-6_-1",
+   "buildings": 1449,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 39600,
+   "triangles": 20862,
+   "bytes": 1109456
+  },
+  {
+   "name": "t_-6_-2",
+   "buildings": 1329,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 37445,
+   "triangles": 19809,
+   "bytes": 1048320
+  },
+  {
+   "name": "t_-6_-3",
+   "buildings": 1496,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 42385,
+   "triangles": 22439,
+   "bytes": 1186196
+  }
+ ],
+ "coarse": [
+  {
+   "name": "g_-1_-1",
+   "buildings": 1200,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 24000,
+   "triangles": 12000,
+   "bytes": 679900
+  },
+  {
+   "name": "g_-2_-1",
+   "buildings": 2673,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 53460,
+   "triangles": 26730,
+   "bytes": 1512156
+  }
+ ],
+ "totals": {
+  "buildings": 10546,
+  "sourceBuildings": 10546,
+  "skipped": 0,
+  "fallbacks": 0,
+  "glbBytes": 10441488,
+  "uniqueCanonicalIds": 10546
+ },
+ "options": {
+  "group": 4,
+  "coarseError": 40,
+  "coarseMinArea": 100
+ }
+}
