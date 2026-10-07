@@ -85,10 +85,12 @@
   // ブロック中心を注視、heading=0(北上) / pitch=-45° / range=1500m
   const cx = ((BLOCK.tx0 + BLOCK.tx1 + 1) / 2) * 500;
   const cz = ((BLOCK.tz0 + BLOCK.tz1 + 1) / 2) * 500;
-  const CENTER = Cesium.Cartesian3.fromDegrees(localToLon(cx), localToLat(cz), 0);
-  const CAM = { heading: 0, pitch: Cesium.Math.toRadians(-45), range: 1500 };
+  // ロード完了後は、実際に読み込んだ footprint の WGS84 範囲(ext)から中心/距離を再計算する
+  let CENTER = Cesium.Cartesian3.fromDegrees(localToLon(cx), localToLat(cz), 0);
+  let RANGE = 1500;
+  const CAM = { heading: 0, pitch: Cesium.Math.toRadians(-45) };
   function resetCamera() {
-    viewer.camera.lookAt(CENTER, new Cesium.HeadingPitchRange(CAM.heading, CAM.pitch, CAM.range));
+    viewer.camera.lookAt(CENTER, new Cesium.HeadingPitchRange(CAM.heading, CAM.pitch, RANGE));
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); // 解除して自由操作可能にする
   }
   resetCamera();
@@ -153,6 +155,8 @@
     return out.length >= 6 ? out : null;
   }
 
+  const ext = { w: Infinity, e: -Infinity, s: Infinity, n: -Infinity }; // 実読込 footprint の WGS84 範囲
+
   function buildTilePrimitive(tile) {
     const instances = [];
     for (const b of tile.buildings) {
@@ -165,15 +169,22 @@
         geometry: new Cesium.PolygonGeometry({
           polygonHierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(deg)),
           height: z0, extrudedHeight: top,
-          vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+          vertexFormat: Cesium.PerInstanceColorAppearance.FLAT_VERTEX_FORMAT,
         }),
         attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(colorFor(b.h || top - z0)) },
       }));
       stats.vertices += b.fp.length;
+      for (let i = 0; i < deg.length; i += 2) {
+        if (deg[i] < ext.w) ext.w = deg[i];
+        if (deg[i] > ext.e) ext.e = deg[i];
+        if (deg[i + 1] < ext.s) ext.s = deg[i + 1];
+        if (deg[i + 1] > ext.n) ext.n = deg[i + 1];
+      }
     }
     return new Cesium.Primitive({
       geometryInstances: instances,
-      appearance: new Cesium.PerInstanceColorAppearance({ translucent: false, closed: true }),
+      // flat: 太陽光(夜間は暗転)に依存せず色を出す。closed:false で面の向きによるカリングを避ける
+      appearance: new Cesium.PerInstanceColorAppearance({ flat: true, translucent: false, closed: false, faceForward: true }),
       allowPicking: true, asynchronous: true, releaseGeometryInstances: false, // 色変更(ハイライト)に属性参照が必要
     });
   }
@@ -201,6 +212,18 @@
     });
     stats.primitivesReadyMs = performance.now() - tReady0;
     stats.initialLoadMs = performance.now() - T0;
+    // 実データ範囲からカメラを再設定。赤枠は建物範囲の診断用輪郭（建物が描画されなくても位置整合を目視できる）
+    if (isFinite(ext.w)) {
+      CENTER = Cesium.Cartesian3.fromDegrees((ext.w + ext.e) / 2, (ext.s + ext.n) / 2, 0);
+      RANGE = Math.max(600, Math.hypot((ext.e - ext.w) * COS_CLAT * SEARCH_MPD, (ext.n - ext.s) * SEARCH_MPD) * 1.1);
+      stats.extentDeg = ext; stats.cameraRange = Math.round(RANGE);
+      viewer.entities.add({ polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([ext.w, ext.s, ext.e, ext.s, ext.e, ext.n, ext.w, ext.n, ext.w, ext.s]),
+        width: 3, material: Cesium.Color.RED } });
+      resetCamera();
+    }
+    stats.primitiveShown = prims.every(p => p.show);
+    stats.boundingSphereRadii = prims.map(p => p.boundingSphere ? Math.round(p.boundingSphere.radius) : null);
     stats.status = 'ready';
     renderHud();
     console.log('[Mission37B] ready', JSON.stringify(stats));
