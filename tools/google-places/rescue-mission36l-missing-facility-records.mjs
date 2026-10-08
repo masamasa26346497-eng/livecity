@@ -12,6 +12,7 @@ import { classifyPilotMatch, DEFAULT_MAX_DISTANCE_METERS } from './lib/pilot-mat
 import { classifyConservativeJapaneseVariant } from './retry-sumiyoshi-unresolved.mjs';
 import { assertDurableRecordSafe } from './lib/persistence-guard.mjs';
 import { loadGooglePlacesApiKeyFromEnv } from './load-api-key.mjs';
+import { reservePlacesRequest } from './lib/monthly-cost-guard.mjs';
 
 const GAP_PATH = resolveProjectPath('data/reports/mission36l-building-photo-linking/exact-source-gaps.json');
 const FACILITIES_PATH = resolveProjectPath('public/map-data/osaka-city/facilities/facilities.json');
@@ -145,6 +146,13 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
       continue;
     }
 
+    // Reserve estimated spend before every paid search, including unsuccessful HTTP responses.
+    // This ledger is local to the runner; cross-run persistence must be proven before unlocking.
+    await fsp.mkdir(REPORT_DIR, { recursive: true });
+    await reservePlacesRequest({
+      ledgerPath: path.join(REPORT_DIR, 'places-cost-ledger.json'),
+      runId: process.env.GITHUB_RUN_ID || 'local-manual',
+    });
     const search = await client.searchText({ textQuery: queryName, lat: c.lat, lon: c.lon });
     if (!search.ok) {
       // Not evaluated: leave the candidate unattempted and stop the batch (retrying more only burns quota).
