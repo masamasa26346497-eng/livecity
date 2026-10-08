@@ -24,8 +24,10 @@ export function checkReservation({ ledger, month, day, runId, config }) {
   if (![monthlyBudgetYen, estimatedYenPerRequest, dailyRequestCap, runRequestCap].every((v) => Number.isSafeInteger(v) && v > 0)) throw new Error('invalid cost guard settings');
   if (typeof runId !== 'string' || !/^[A-Za-z0-9_.-]{1,120}$/.test(runId)) throw new Error('invalid runId');
   if (ledger && (ledger.version !== 1 || typeof ledger.month !== 'string' || !Array.isArray(ledger.reservations))) throw new Error('invalid ledger');
-  const rows = ledger?.month === month ? ledger.reservations : [];
-  if (rows.some((r) => !r || r.day > day || !Number.isSafeInteger(r.estimatedYen) || r.estimatedYen <= 0 || !r.runId || !r.day)) throw new Error('invalid ledger reservations');
+  if (!ledger) throw new Error('MISSING_LEDGER: initialize only after confirming existing monthly usage');
+  if (ledger.month > month) throw new Error('FUTURE_LEDGER_PERIOD');
+  const rows = ledger.month === month ? ledger.reservations : [];
+  if (rows.some((r) => !r || !/^\d{4}-\d{2}-\d{2}$/.test(r.day) || r.day.slice(0, 7) !== month || r.day > day || !Number.isSafeInteger(r.estimatedYen) || r.estimatedYen <= 0 || typeof r.runId !== 'string' || !/^[A-Za-z0-9_.-]{1,120}$/.test(r.runId))) throw new Error('invalid ledger reservations');
   const spent = rows.reduce((sum, r) => sum + r.estimatedYen, 0);
   const daily = rows.filter((r) => r.day === day).length;
   const perRun = rows.filter((r) => r.runId === runId).length;
