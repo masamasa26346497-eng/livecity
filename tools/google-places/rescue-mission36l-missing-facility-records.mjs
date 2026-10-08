@@ -133,6 +133,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   const entries = [...(mapping.entries || [])].map(assertDurableRecordSafe);
   const results = [];
   let apiError = null;
+  let apiErrorDiagnostics = null;
 
   for (let i = 0; i < selected.length; i++) {
     const { gap, queryName } = selected[i];
@@ -148,6 +149,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
     if (!search.ok) {
       // Not evaluated: leave the candidate unattempted and stop the batch (retrying more only burns quota).
       apiError = `${API_ERROR_REASON_PREFIX} ${search.reason}`;
+      apiErrorDiagnostics = search.diagnostics || null;
       results.push({ facilityId: gap.facilityId, sourceId: gap.sourceId, queryName, matchConfidence: 'NOT_EVALUATED', reason: apiError });
       break;
     }
@@ -188,16 +190,21 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   const evaluated = results.filter((r) => r.matchConfidence !== 'NOT_EVALUATED');
   const verifiedThisBatch = results.filter((r) => r.matchConfidence === 'VERIFIED').length;
   const remaining = buildMissingFacilityCandidates(gaps, facilities, updatedMapping, progress).length;
-  const report = { mission: '36L-missing-facility-rescue', generatedAt, policy: { exactOsmSourceOnly: true, maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS, verifiedOnlyPersistence: true }, selected: selected.length, processed: evaluated.length, notEvaluated: results.length - evaluated.length, apiError, prunedApiErrorAttempts, verifiedThisBatch, remainingMissingActionable: remaining, osmCentersResolved: centers.size, apiUsage: client.getDebugCounters(), results };
+  const report = { mission: '36L-missing-facility-rescue', generatedAt, policy: { exactOsmSourceOnly: true, maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS, verifiedOnlyPersistence: true }, selected: selected.length, processed: evaluated.length, notEvaluated: results.length - evaluated.length, apiError, apiErrorDiagnostics, prunedApiErrorAttempts, verifiedThisBatch, remainingMissingActionable: remaining, osmCentersResolved: centers.size, apiUsage: client.getDebugCounters(), results };
   await fsp.writeFile(LAST_BATCH_PATH, JSON.stringify(report, null, 2));
   return report;
 }
 
-function parseCli(argv) {
-  const out = { limit: 20, requestsPerMinute: 40, chunks: 10 };
+export const DEFAULT_REQUESTS_PER_MINUTE = 20;
+
+export function parseCli(argv) {
+  const out = { limit: 20, requestsPerMinute: DEFAULT_REQUESTS_PER_MINUTE, chunks: 10 };
   for (let i = 0; i < argv.length; i++) {
+    // Bounded diagnostic: 1 chunk x 3 candidates at 10 req/min (<=3 Places searches; stops at the first API error).
+    if (argv[i] === '--diagnostic') { out.limit = 3; out.chunks = 1; out.requestsPerMinute = 10; }
+    else
     if (argv[i] === '--limit') out.limit = Math.min(20, Math.max(1, Number(argv[++i]) || 20));
-    else if (argv[i] === '--requests-per-minute') out.requestsPerMinute = Math.max(1, Number(argv[++i]) || 40);
+    else if (argv[i] === '--requests-per-minute') out.requestsPerMinute = Math.max(1, Number(argv[++i]) || DEFAULT_REQUESTS_PER_MINUTE);
     else if (argv[i] === '--chunks') out.chunks = Math.min(25, Math.max(1, Number(argv[++i]) || 10));
   }
   return out;
@@ -212,6 +219,7 @@ export async function runChunks(opts, { runBatch = runRescueBatch, sleepImpl = s
   let verified = 0;
   let remaining = null;
   let stoppedEarly = null;
+  let summaryDiagnostics = null;
   for (let chunk = 1; chunk <= opts.chunks; chunk++) {
     let r;
     try {
@@ -228,13 +236,16 @@ export async function runChunks(opts, { runBatch = runRescueBatch, sleepImpl = s
     log(`[36L missing-facility rescue] chunk ${chunk}/${opts.chunks}`, JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }));
     if (r.apiError) {
       stoppedEarly = `chunk ${chunk}: ${r.apiError}`;
-      log(`::warning::[36L missing-facility rescue] Places API error; candidates left unattempted, stopping: ${r.apiError}`);
+      const d = r.apiErrorDiagnostics;
+      const diag = d ? ` (httpStatus=${d.httpStatus ?? 'n/a'} retryAfter=${d.retryAfter ?? 'none'} errorCode=${d.errorCode ?? 'n/a'} errorStatus=${d.errorStatus ?? 'n/a'})` : '';
+      log(`::warning::[36L missing-facility rescue] Places API error; candidates left unattempted, stopping: ${r.apiError}${diag}`);
+      if (d) summaryDiagnostics = d;
       break;
     }
     if (!r.processed || !r.remainingMissingActionable) break;
     await sleepImpl(3000);
   }
-  const summary = { processed, verifiedThisRun: verified, remainingMissingActionable: remaining, stoppedEarly };
+  const summary = { processed, verifiedThisRun: verified, remainingMissingActionable: remaining, stoppedEarly, apiErrorDiagnostics: summaryDiagnostics };
   log('[36L missing-facility rescue] total', JSON.stringify(summary));
   return summary;
 }
