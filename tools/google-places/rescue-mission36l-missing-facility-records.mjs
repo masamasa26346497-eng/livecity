@@ -30,6 +30,17 @@ function parseSourceId(sourceId) {
   return m ? { type: m[1], id: Number(m[2]) } : null;
 }
 
+// A Places API failure (429 quota/rate, 403 key/billing, 5xx...) says nothing about the candidate, so it must never be
+// recorded as a consumed "UNRESOLVED" attempt. Attempts written by older versions with this reason are re-evaluable.
+export const API_ERROR_REASON_PREFIX = 'Places API:';
+export const isApiErrorAttempt = (a) => String(a?.reason || '').startsWith(API_ERROR_REASON_PREFIX);
+
+export function pruneApiErrorAttempts(progress) {
+  const before = progress.attempts.length;
+  progress.attempts = progress.attempts.filter((a) => !isApiErrorAttempt(a));
+  return before - progress.attempts.length;
+}
+
 export function buildMissingFacilityCandidates(gapsDoc, facilitiesDoc, mappingDoc, progressDoc = null) {
   const facilities = new Set((facilitiesDoc?.records || []).map((r) => String(r.id || '')));
   const verifiedIds = new Set((mappingDoc?.entries || []).filter((e) => e?.matchConfidence === 'VERIFIED').map((e) => String(e.facilityId || '')));
@@ -111,6 +122,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   const facilities = readJson(FACILITIES_PATH);
   const mapping = readJson(MAPPING_PATH);
   const progress = readJsonIfExists(PROGRESS_PATH) || { version: 1, mission: '36L-missing-facility-rescue', attempts: [] };
+  const prunedApiErrorAttempts = pruneApiErrorAttempts(progress);
   const all = buildMissingFacilityCandidates(gaps, facilities, mapping, progress);
   const selected = all.slice(0, Math.max(1, Math.min(20, Number(limit) || 20)));
   if (!selected.length) return { mission: '36L-missing-facility-rescue', processed: 0, verifiedThisBatch: 0, remainingMissingActionable: 0, osmCentersResolved: 0, results: [] };
@@ -120,6 +132,7 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   if (!client.isEnabled()) throw new Error('GOOGLE_PLACES_API_KEY is not configured');
   const entries = [...(mapping.entries || [])].map(assertDurableRecordSafe);
   const results = [];
+  let apiError = null;
 
   for (let i = 0; i < selected.length; i++) {
     const { gap, queryName } = selected[i];
@@ -132,7 +145,13 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
     }
 
     const search = await client.searchText({ textQuery: queryName, lat: c.lat, lon: c.lon });
-    let match = search.ok ? classifyPilotMatch({
+    if (!search.ok) {
+      // Not evaluated: leave the candidate unattempted and stop the batch (retrying more only burns quota).
+      apiError = `${API_ERROR_REASON_PREFIX} ${search.reason}`;
+      results.push({ facilityId: gap.facilityId, sourceId: gap.sourceId, queryName, matchConfidence: 'NOT_EVALUATED', reason: apiError });
+      break;
+    }
+    let match = classifyPilotMatch({
       facilityId: gap.facilityId,
       name: queryName,
       wardId: (gap.wardIds || [])[0] || null,
@@ -141,9 +160,9 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
       osmSubcategory: null,
       expectLat: c.lat,
       expectLon: c.lon,
-    }, search.places, { maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS }) : { matchConfidence: 'UNRESOLVED', googlePlaceId: null, distanceMeters: null, reason: `Places API: ${search.reason}` };
+    }, search.places, { maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS });
 
-    if (search.ok && match.matchConfidence !== 'VERIFIED') {
+    if (match.matchConfidence !== 'VERIFIED') {
       const variant = classifyConservativeJapaneseVariant({ facilityId: gap.facilityId, name: queryName, expectLat: c.lat, expectLon: c.lon }, search.places, DEFAULT_MAX_DISTANCE_METERS);
       if (variant.ok) match = { matchConfidence: 'VERIFIED', googlePlaceId: variant.googlePlaceId, distanceMeters: variant.distanceMeters, reason: variant.reason };
     }
@@ -166,9 +185,10 @@ export async function runRescueBatch({ apiKey = loadGooglePlacesApiKeyFromEnv(),
   await fsp.mkdir(REPORT_DIR, { recursive: true });
   await fsp.writeFile(PROGRESS_PATH, JSON.stringify({ ...progress, generatedAt }, null, 2));
 
+  const evaluated = results.filter((r) => r.matchConfidence !== 'NOT_EVALUATED');
   const verifiedThisBatch = results.filter((r) => r.matchConfidence === 'VERIFIED').length;
   const remaining = buildMissingFacilityCandidates(gaps, facilities, updatedMapping, progress).length;
-  const report = { mission: '36L-missing-facility-rescue', generatedAt, policy: { exactOsmSourceOnly: true, maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS, verifiedOnlyPersistence: true }, selected: selected.length, processed: results.length, verifiedThisBatch, remainingMissingActionable: remaining, osmCentersResolved: centers.size, apiUsage: client.getDebugCounters(), results };
+  const report = { mission: '36L-missing-facility-rescue', generatedAt, policy: { exactOsmSourceOnly: true, maxDistanceMeters: DEFAULT_MAX_DISTANCE_METERS, verifiedOnlyPersistence: true }, selected: selected.length, processed: evaluated.length, notEvaluated: results.length - evaluated.length, apiError, prunedApiErrorAttempts, verifiedThisBatch, remainingMissingActionable: remaining, osmCentersResolved: centers.size, apiUsage: client.getDebugCounters(), results };
   await fsp.writeFile(LAST_BATCH_PATH, JSON.stringify(report, null, 2));
   return report;
 }
@@ -206,6 +226,11 @@ export async function runChunks(opts, { runBatch = runRescueBatch, sleepImpl = s
     verified += r.verifiedThisBatch;
     remaining = r.remainingMissingActionable;
     log(`[36L missing-facility rescue] chunk ${chunk}/${opts.chunks}`, JSON.stringify({ processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingMissingActionable:r.remainingMissingActionable, osmCentersResolved:r.osmCentersResolved }));
+    if (r.apiError) {
+      stoppedEarly = `chunk ${chunk}: ${r.apiError}`;
+      log(`::warning::[36L missing-facility rescue] Places API error; candidates left unattempted, stopping: ${r.apiError}`);
+      break;
+    }
     if (!r.processed || !r.remainingMissingActionable) break;
     await sleepImpl(3000);
   }
