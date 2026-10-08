@@ -1,169 +1,45 @@
 {
   "mission": "36L-missing-facility-rescue",
-  "generatedAt": "2026-10-08T06:08:02.582Z",
+  "generatedAt": "2026-10-08T22:19:27.087Z",
   "policy": {
     "exactOsmSourceOnly": true,
     "maxDistanceMeters": 120,
     "verifiedOnlyPersistence": true
   },
-  "selected": 20,
-  "processed": 20,
+  "selected": 3,
+  "processed": 0,
+  "notEvaluated": 1,
+  "apiError": "Places API: http-403",
+  "apiErrorDiagnostics": {
+    "httpStatus": 403,
+    "retryAfter": null,
+    "errorCode": 403,
+    "errorStatus": "PERMISSION_DENIED"
+  },
+  "prunedApiErrorAttempts": 4919,
   "verifiedThisBatch": 0,
-  "remainingMissingActionable": 6224,
-  "osmCentersResolved": 20,
+  "remainingMissingActionable": 11143,
+  "osmCentersResolved": 3,
   "apiUsage": {
-    "searchCalls": 20,
+    "searchCalls": 1,
     "detailsCalls": 0,
     "photoMediaCalls": 0,
     "disabledCalls": 0,
     "deduped": 0,
     "rateLimited": 0,
     "sessionLimited": 0,
-    "executed": 20,
+    "executed": 1,
     "inFlight": 0,
-    "windowCount": 20,
-    "sessionCount": 20
+    "windowCount": 1,
+    "sessionCount": 1
   },
   "results": [
     {
-      "facilityId": "osm-way-313031173",
-      "sourceId": "way/313031173",
-      "queryName": "Luxe 十三本町",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031218",
-      "sourceId": "way/313031218",
-      "queryName": "ウイング新北野",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031226",
-      "sourceId": "way/313031226",
-      "queryName": "東洋プラザ新北野",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031241",
-      "sourceId": "way/313031241",
-      "queryName": "ホテルファインガーデン",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031242",
-      "sourceId": "way/313031242",
-      "queryName": "プリムローズ吉村",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031826",
-      "sourceId": "way/313031826",
-      "queryName": "十三西口浜ビル",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031856",
-      "sourceId": "way/313031856",
-      "queryName": "まるたけ",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031899",
-      "sourceId": "way/313031899",
-      "queryName": "十三本町町ウインズマンションII",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031952",
-      "sourceId": "way/313031952",
-      "queryName": "十三エステートハイツ",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313031960",
-      "sourceId": "way/313031960",
-      "queryName": "エビービューハイツ十三",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313308265",
-      "sourceId": "way/313308265",
-      "queryName": "ルーミハイツ",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313308268",
-      "sourceId": "way/313308268",
-      "queryName": "三国プラウ21",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313387084",
-      "sourceId": "way/313387084",
-      "queryName": "新大阪ファイナンス",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313387249",
-      "sourceId": "way/313387249",
-      "queryName": "カンフリエ三国",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313858709",
-      "sourceId": "way/313858709",
-      "queryName": "新大阪OMパレス",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313858747",
-      "sourceId": "way/313858747",
-      "queryName": "飛鳥弐番館",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313907103",
-      "sourceId": "way/313907103",
-      "queryName": "若松冷蔵（株）",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313907123",
-      "sourceId": "way/313907123",
-      "queryName": "上進ビル",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313907156",
-      "sourceId": "way/313907156",
-      "queryName": "能登第二マンション",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
-    },
-    {
-      "facilityId": "osm-way-313907202",
-      "sourceId": "way/313907202",
-      "queryName": "藤井三国マンション",
-      "matchConfidence": "UNRESOLVED",
-      "distanceMeters": null
+      "facilityId": "osm-way-225880645",
+      "sourceId": "way/225880645",
+      "queryName": "サーベント中津",
+      "matchConfidence": "NOT_EVALUATED",
+      "reason": "Places API: http-403"
     }
   ]
 }
