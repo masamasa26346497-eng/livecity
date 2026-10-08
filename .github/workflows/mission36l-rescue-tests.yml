@@ -9,6 +9,7 @@ on:
       - 'tools/google-places/**'
       - 'tests/mission36l-missing-facility-rescue-*.test.js'
       - 'tests/mission36l-places-error-diagnostics.test.js'
+      - 'tests/mission36l-monthly-cost-guard.test.mjs'
       - '.github/workflows/mission36l-rescue-tests.yml'
   workflow_dispatch:
 
@@ -34,3 +35,4 @@ jobs:
           tests/mission36l-missing-facility-rescue-api-errors.test.js
           tests/mission36l-missing-facility-rescue-resilience.test.js
           tests/mission36l-places-error-diagnostics.test.js
+          tests/mission36l-monthly-cost-guard.test.mjs
