@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Live City — 住吉区 3Dビュー（Mission 37C）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Mission 37C — Cesium の地理エンジンを使いつつ、見た目は Live City オリジナルにしたページ。
+
+  独立したページで、次のファイルは一切変更していない:
+    - public/osaka_3d_buildings.html / osaka_3d_buildings.fullward-v3.html（本番 2 ファイル）
+    - public/mission37b-livecity-cesium-tiles.html / mission37b-3dtiles-poc.html（37B の POC）
+    - Mission 36L 写真データ / canonicalId 体系
+
+  データ:
+    - 建物  : Mission 37B が生成した 3D Tiles をそのまま参照（mission37b-3dtiles/<set>/tileset.json）。
+              canonicalId = building.id（bldg_<uuid>）。採番・GLB・sidecar は変更しない。
+    - 道路 / 鉄道 / 水路 / 公園 / ラベル:
+              tools/mission37c-build-theme-layers.cjs が POC 範囲だけ切り出した
+              mission37c-layers/<set>/*.json（public/map-data は .gitignore で配信されないため）。
+    - 建物属性（高さ・用途）: mission37c-layers/<set>/attrs/t_<tx>_<tz>.json をクリック時に遅延取得。
+
+  座標: znorth-neg-v1。投影は下の PROJ 1 箇所だけで行い、定数は Mission 37B / geoToThree() と同一。
+  Cesium ion / Google Map Tiles API は不使用（API キー不要）。
+
+  URL params: ?set=osaka-sumiyoshi-9tile  &sse=8|16|32  &basemap=gsi-pale|gsi-blank|osm|none  &imagery=0|1  &panel=0
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>
+  /* ── Live City テーマトークン（public/osaka_3d_buildings.ward-ux-v1.html の UI 配色から採った実値）── */
+  :root {
+    --lc-navy-0: #050a18;
+    --lc-panel:   rgba(5, 10, 24, 0.88);
+    --lc-panel-2: rgba(8, 14, 26, 0.95);
+    --lc-line:    #334d68;
+    --lc-accent:  #50a0ff;
+    --lc-accent-soft: rgba(80, 160, 255, 0.16);
+    --lc-accent-mid:  rgba(80, 160, 255, 0.30);
+    --lc-text:      #eef1f3;
+    --lc-text-dim:  #9cb8d8;
+    --lc-text-mute: #5a7aa0;
+    --lc-hi:    #8fc0ff;
+    --lc-amber: #d8a868;
+    --lc-header-h: 52px;
+    --lc-radius: 8px;
+    --lc-font: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    --lc-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; overflow: hidden;
+               background: var(--lc-navy-0); color: var(--lc-text); font-family: var(--lc-font); }
+  #cesiumContainer { position: absolute; inset: var(--lc-header-h) 0 0 0; }
+
+  /* ── Cesium 標準 UI を消す（要件1）。クレジットだけは OSM / Cesium のライセンス表示なので
+        消さずにテーマへ寄せる。 ── */
+  .cesium-viewer-toolbar, .cesium-viewer-animationContainer, .cesium-viewer-timelineContainer,
+  .cesium-viewer-fullscreenContainer, .cesium-viewer-vrContainer, .cesium-infoBox,
+  .cesium-selection-wrapper, .cesium-navigation-help, .cesium-viewer-geocoderContainer { display: none !important; }
+  .cesium-widget-credits {
+    font: 10px/1.5 var(--lc-font) !important; color: var(--lc-text-mute) !important;
+    background: rgba(5, 10, 24, 0.55); padding: 2px 8px; border-radius: 6px 0 0 0;
+  }
+  .cesium-widget-credits a { color: var(--lc-text-mute) !important; text-decoration: none; }
+  /* Cesium ion は使っていない（ion のサービスを一切呼んでいない）ので ion ロゴだけ外す。
+     地図データの帰属表示（OpenStreetMap / CARTO）はライセンス上必要なので残す。 */
+  .cesium-credit-logoContainer { display: none !important; }
+  .cesium-widget canvas { outline: none; }
+
+  /* ── ヘッダー（要件2）── */
+  #lc-header {
+    position: absolute; top: 0; left: 0; right: 0; height: var(--lc-header-h); z-index: 20;
+    display: flex; align-items: center; gap: 16px; padding: 0 14px;
+    background: linear-gradient(180deg, #0a1326 0%, #070e1d 100%);
+    border-bottom: 1px solid var(--lc-line);
+  }
+  #lc-brand { display: flex; align-items: baseline; gap: 9px; }
+  #lc-mark { width: 10px; height: 10px; border-radius: 2px; background: var(--lc-accent);
+             box-shadow: 0 0 10px var(--lc-accent-mid); flex: 0 0 auto; align-self: center; }
+  #lc-title { font-size: 15px; font-weight: 700; letter-spacing: .14em; color: var(--lc-text); }
+  #lc-sub { font-size: 11px; color: var(--lc-text-mute); letter-spacing: .04em; }
+  #lc-head-stats { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .lc-stat { display: flex; flex-direction: column; line-height: 1.25; min-width: 58px; }
+  .lc-stat b { font: 600 13px/1 var(--lc-mono); color: var(--lc-hi); }
+  .lc-stat span { font-size: 10px; color: var(--lc-text-mute); }
+  .lc-btn {
+    font: 500 12px var(--lc-font); color: var(--lc-text); cursor: pointer;
+    background: var(--lc-accent-soft); border: 1px solid var(--lc-accent-mid);
+    border-radius: 6px; padding: 6px 11px;
+  }
+  .lc-btn:hover { background: var(--lc-accent-mid); }
+  .lc-btn:active { transform: translateY(1px); }
+
+  /* ── パネル共通 ── */
+  .lc-panel {
+    position: absolute; z-index: 15; width: 252px; max-height: calc(100% - 28px); overflow-y: auto;
+    background: var(--lc-panel); border: 1px solid var(--lc-line); border-radius: var(--lc-radius);
+    backdrop-filter: blur(6px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  #lc-left  { left: 14px;  top: calc(var(--lc-header-h) + 14px); }
+  #lc-right { right: 14px; top: calc(var(--lc-header-h) + 14px); width: 274px; }
+  .lc-sec { border-bottom: 1px solid rgba(51, 77, 104, 0.6); padding: 10px 12px; }
+  .lc-sec:last-child { border-bottom: 0; }
+  .lc-sec > h2 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 700; letter-spacing: .16em;
+    color: var(--lc-text-mute); text-transform: uppercase;
+  }
+  .lc-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; padding: 2px 0; }
+  .lc-row .k { color: var(--lc-text-dim); }
+  .lc-row .v { font-family: var(--lc-mono); font-size: 11px; color: var(--lc-text); text-align: right; }
+
+  /* ── レイヤー行（要件3・要件8）── */
+  .lc-layer { display: flex; align-items: center; gap: 9px; padding: 5px 0; cursor: pointer; user-select: none; }
+  .lc-layer input { display: none; }
+  .lc-sw { width: 30px; height: 17px; border-radius: 9px; background: #1b2740; border: 1px solid var(--lc-line);
+           position: relative; flex: 0 0 auto; transition: background .15s, border-color .15s; }
+  .lc-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%;
+                  background: var(--lc-text-mute); transition: transform .15s, background .15s; }
+  .lc-layer input:checked + .lc-sw { background: var(--lc-accent-soft); border-color: var(--lc-accent-mid); }
+  .lc-layer input:checked + .lc-sw::after { transform: translateX(13px); background: var(--lc-accent); }
+  .lc-layer .nm { font-size: 12px; color: var(--lc-text); flex: 1 1 auto; }
+  .lc-layer .ct { font: 10px var(--lc-mono); color: var(--lc-text-mute); }
+  .lc-layer[data-state="error"] .nm { color: var(--lc-amber); }
+  .lc-layer[data-state="loading"] .ct::after { content: '…'; }
+  .lc-swatch { width: 9px; height: 9px; border-radius: 2px; flex: 0 0 auto; border: 1px solid rgba(255,255,255,.18); }
+
+  /* ── スライダー（背景地図調整・要件5）── */
+  .lc-slider { display: grid; grid-template-columns: 1fr 42px; gap: 6px; align-items: center; padding: 3px 0; }
+  .lc-slider label { font-size: 11px; color: var(--lc-text-dim); grid-column: 1 / -1; display: flex; justify-content: space-between; }
+  .lc-slider label i { font-family: var(--lc-mono); font-style: normal; color: var(--lc-text-mute); }
+  .lc-slider input[type=range] { grid-column: 1 / -1; width: 100%; height: 3px; -webkit-appearance: none;
+                                 background: #1b2740; border-radius: 2px; outline: none; }
+  .lc-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--lc-accent); border: 0; cursor: pointer; }
+  .lc-slider input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%;
+    background: var(--lc-accent); border: 0; cursor: pointer; }
+  select.lc-select {
+    font: 11px var(--lc-mono); color: var(--lc-text); background: #101a2e;
+    border: 1px solid var(--lc-line); border-radius: 5px; padding: 3px 6px;
+  }
+
+  /* ── 建物情報パネル（要件4）── */
+  #lc-bldg-empty { font-size: 12px; color: var(--lc-text-mute); line-height: 1.7; }
+  #lc-bldg-body { display: none; }
+  #lc-bldg-body.on { display: block; }
+  #lc-cid {
+    font: 10px/1.5 var(--lc-mono); color: var(--lc-hi); word-break: break-all; user-select: all;
+    background: rgba(80, 160, 255, 0.08); border: 1px solid var(--lc-accent-soft);
+    border-radius: 5px; padding: 5px 6px; margin-bottom: 8px;
+  }
+  #lc-usage { display: inline-block; font-size: 11px; color: var(--lc-text); background: var(--lc-accent-soft);
+              border: 1px solid var(--lc-accent-mid); border-radius: 999px; padding: 2px 9px; margin-bottom: 8px; }
+  .lc-note { font-size: 10px; color: var(--lc-text-mute); line-height: 1.6; margin-top: 8px; }
+  #lc-err { color: var(--lc-amber); font-size: 11px; white-space: pre-wrap; line-height: 1.6; }
+  #lc-left::-webkit-scrollbar, #lc-right::-webkit-scrollbar { width: 6px; }
+  #lc-left::-webkit-scrollbar-thumb, #lc-right::-webkit-scrollbar-thumb { background: #22314c; border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .lc-panel { width: 208px; }
+    #lc-right { width: 224px; }
+    #lc-sub { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header id="lc-header">
+  <div id="lc-mark"></div>
+  <div id="lc-brand">
+    <div id="lc-title">LIVE CITY</div>
+    <div id="lc-sub">大阪市住吉区 · 3D都市ビュー</div>
+  </div>
+  <div id="lc-head-stats">
+    <div class="lc-stat"><b id="hs-bldg">—</b><span>建物</span></div>
+    <div class="lc-stat"><b id="hs-tiles">—</b><span>表示タイル</span></div>
+    <div class="lc-stat"><b id="hs-fps">—</b><span>FPS</span></div>
+    <button class="lc-btn" id="btn-home">初期視点</button>
+  </div>
+</header>
+
+<div id="cesiumContainer"></div>
+
+<!-- 左: レイヤーパネル -->
+<aside class="lc-panel" id="lc-left">
+  <div class="lc-sec">
+    <h2>レイヤー</h2>
+    <div id="lc-layers"></div>
+  </div>
+  <div class="lc-sec">
+    <h2>背景地図</h2>
+    <div class="lc-row" style="margin-bottom:6px"><span class="k">種類</span>
+      <select class="lc-select" id="sel-basemap">
+        <option value="gsi-blank" selected>地理院 白地図（最小）</option>
+        <option value="gsi-pale">地理院 淡色地図</option>
+        <option value="osm">OpenStreetMap</option>
+        <option value="none">なし（下地色のみ）</option>
+      </select></div>
+    <div id="bg-sliders"></div>
+    <div class="lc-note">既定は地理院の白地図。道路・鉄道・河川・公園・ラベルは Live City 側で描くので、背景は下地に徹します。地名まで出したいときは淡色地図へ。</div>
+  </div>
+  <div class="lc-sec">
+    <h2>表示</h2>
+    <div class="lc-row"><span class="k">建物トーン</span>
+      <select class="lc-select" id="sel-tone">
+        <option value="pale" selected>淡色</option>
+        <option value="mid">標準</option>
+        <option value="deep">濃色</option>
+      </select></div>
+    <div class="lc-row"><span class="k">タイル精度 (SSE)</span>
+      <select class="lc-select" id="sel-sse"><option>8</option><option selected>16</option><option>32</option></select></div>
+  </div>
+  <div class="lc-sec">
+    <h2>計測</h2>
+    <div class="lc-row"><span class="k">FPS (1s平均)</span><span class="v" id="m-fps">—</span></div>
+    <div class="lc-row"><span class="k">p95 frame</span><span class="v" id="m-p95">—</span></div>
+    <div class="lc-row"><span class="k">初回表示</span><span class="v" id="m-first">—</span></div>
+    <div class="lc-row"><span class="k">表示建物</span><span class="v" id="m-bldg">—</span></div>
+    <div class="lc-row"><span class="k">JS heap</span><span class="v" id="m-heap">—</span></div>
+    <div class="lc-row"><span class="k">10秒計測</span><span class="v" id="m-measure">—</span></div>
+    <button class="lc-btn" id="btn-measure" style="margin-top:8px;width:100%">10秒FPS計測</button>
+  </div>
+  <div class="lc-sec"><div id="lc-err"></div></div>
+</aside>
+
+<!-- 右: 建物情報パネル -->
+<aside class="lc-panel" id="lc-right">
+  <div class="lc-sec">
+    <h2>建物情報</h2>
+    <div id="lc-bldg-empty">建物をクリックすると、canonicalId と属性を表示します。</div>
+    <div id="lc-bldg-body">
+      <div id="lc-usage">—</div>
+      <div id="lc-cid">—</div>
+      <div class="lc-row"><span class="k">高さ</span><span class="v" id="lb-h">—</span></div>
+      <div class="lc-row"><span class="k">用途コード</span><span class="v" id="lb-usage">—</span></div>
+      <div class="lc-row"><span class="k">行政区</span><span class="v" id="lb-ward">—</span></div>
+      <div class="lc-row"><span class="k">タイル</span><span class="v" id="lb-tile">—</span></div>
+      <div class="lc-row"><span class="k">緯度 / 経度</span><span class="v" id="lb-ll">—</span></div>
+      <div class="lc-row"><span class="k">ローカル x / z</span><span class="v" id="lb-xz">—</span></div>
+      <div class="lc-row"><span class="k">sidecar 照合</span><span class="v" id="lb-side">—</span></div>
+      <button class="lc-btn" id="btn-fly" style="margin-top:10px;width:100%">この建物に寄る</button>
+      <div class="lc-note" id="lb-note"></div>
+    </div>
+  </div>
+  <div class="lc-sec">
+    <h2>出典</h2>
+    <div class="lc-note" id="lc-src">—</div>
+  </div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script>
+(function () {
+  'use strict';
+  const T0 = performance.now();
+  const q = new URLSearchParams(location.search);
+  const SET = q.get('set') || 'osaka-sumiyoshi-9tile';
+  const SSE0 = [8, 16, 32].includes(+q.get('sse')) ? +q.get('sse') : 16;
+  const TILES_BASE = 'mission37b-3dtiles/' + SET + '/';   // Mission 37B の生成物（読むだけ）
+  const LAYER_BASE = 'mission37c-layers/' + SET + '/';    // Mission 37C のレイヤー束
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n == null ? '—' : n.toLocaleString('ja-JP');
+
+  // ══════════════════════════════════════════════════════════════
+  // 座標: znorth-neg-v1 の逆変換。ここが投影の唯一の場所。
+  //   x = (lon - clon) * cos(clat) * mpd ,  z = -((lat - clat) * mpd)
+  // 定数は Mission 37B / geoToThree() と同一。変更しない。
+  // ══════════════════════════════════════════════════════════════
+  const PROJ = { clat: 34.604208, clon: 135.525020, mpd: 111320 };
+  const COS_CLAT = Math.cos(PROJ.clat * Math.PI / 180);
+  const toLon = (x) => PROJ.clon + x / (COS_CLAT * PROJ.mpd);
+  const toLat = (z) => PROJ.clat - z / PROJ.mpd;
+  const toCart = (x, z, h) => Cesium.Cartesian3.fromDegrees(toLon(x), toLat(z), h || 0);
+
+  // 面レイヤーの重なり順。Three.js 版の Y スタック（water < park < road < rail）と同じ考え方で、
+  // Cesium では高さそのもので順序を決める（z-fighting を避けるため等間隔に離す）。
+  const LAYER_H = { waterways: 0.5, parks: 0.9, roadsCasing: 1.3, roads: 1.4, railways: 2.0 };
+
+  // Live City の配色（CSS トークンと同じ実値）
+  const C = {
+    accent: '#50a0ff', hi: '#8fc0ff', text: '#eef1f3', dim: '#9cb8d8', mute: '#5a7aa0',
+    navy: '#050a18', amber: '#d8a868',
+    roadMajor: '#9fb4c9', roadMid: '#aabdce', roadLocal: '#bac8d7', roadCasing: '#7d93ab',
+    rail: '#8396aa', waterLine: '#9ec6e0', waterArea: '#b4d4ea', park: '#bcd3b4',
+  };
+  // 建物トーン（3D Tiles の頂点色に掛ける係数。淡色＝ほぼ素の淡い青灰のまま）
+  const TONE = { pale: '#f4f8fd', mid: '#dbe6f2', deep: '#b9c9dd' };
+
+  const stats = {
+    mission: '37C', set: SET, sse: SSE0, status: 'loading', fps: 0, p95FrameMs: null,
+    firstDisplayMs: null, visibleTiles: 0, visibleBuildings: 0, loadedTilesTotal: 0,
+    layers: {}, measure: null, lastPicked: null, errors: [],
+  };
+  window.__mission37c = stats;
+  function fail(where, e) {
+    const msg = where + ': ' + (e && e.message ? e.message : String(e));
+    stats.errors.push(msg);
+    $('lc-err').textContent = stats.errors.join('\n');
+    console.error('[37C]', where, e);
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // Cesium: 標準 UI は全部オフ（要件1）
+  // ══════════════════════════════════════════════════════════════
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false,
+    sceneModePicker: false, navigationHelpButton: false, animation: false, timeline: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false, requestRenderMode: false,
+    scene3DOnly: true, shouldAnimate: false,
+  });
+  const scene = viewer.scene;
+  scene.skyAtmosphere.show = false;
+  scene.sun.show = false;
+  scene.moon.show = false;
+  if (scene.skyBox) scene.skyBox.show = false;
+  scene.backgroundColor = Cesium.Color.fromCssColorString('#0a1220');
+  scene.globe.baseColor = Cesium.Color.fromCssColorString('#e9eef4'); // 明るい下地（要件5）
+  scene.globe.showGroundAtmosphere = false;
+  scene.globe.depthTestAgainstTerrain = false;
+  scene.globe.enableLighting = false;
+  scene.fog.enabled = false;
+  scene.highDynamicRange = false;
+  scene.screenSpaceCameraController.enableCollisionDetection = false;
+
+  // ── 背景地図: 明るく・彩度低め・情報量控えめ（要件5）──
+  // 既定は文字・記号の入らない淡色ラスタ（CARTO Positron no-labels）。OSM 標準タイルは
+  // 地図側に地名・店名・建物が全部描かれていて、Live City のラベルと二重になるため既定にしない。
+  // どちらも ImageryLayer の brightness/contrast/saturation/gamma/alpha でさらに寝かせる。
+  // Credit の第2引数 true = 常時表示。既定だと「Data attribution」の折りたたみに入り、
+  // 帰属表示がクリックしないと見えないため明示的に出す。
+  const BASEMAPS = {
+    'gsi-pale': {
+      label: '地理院 淡色地図',
+      bg: { brightness: 1.10, contrast: 0.92, saturation: 0.30, gamma: 1.05, alpha: 0.80 },
+      make: () => new Cesium.UrlTemplateImageryProvider({
+        url: 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', maximumLevel: 18,
+        credit: new Cesium.Credit('<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（淡色地図）</a>', true),
+      }),
+    },
+    'gsi-blank': {
+      label: '地理院 白地図',
+      bg: { brightness: 1.05, contrast: 0.95, saturation: 0.25, gamma: 1.0, alpha: 0.85 },
+      make: () => new Cesium.UrlTemplateImageryProvider({
+        url: 'https://cyberjapandata.gsi.go.jp/xyz/blank/{z}/{x}/{y}.png', maximumLevel: 14,
+        credit: new Cesium.Credit('<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（白地図）</a>', true),
+      }),
+    },
+    osm: {
+      label: 'OpenStreetMap',
+      bg: { brightness: 1.30, contrast: 0.88, saturation: 0.22, gamma: 1.15, alpha: 0.72 },
+      make: () => new Cesium.OpenStreetMapImageryProvider({
+        url: 'https://tile.openstreetmap.org/',
+        credit: new Cesium.Credit('© OpenStreetMap contributors', true),
+      }),
+    },
+    none: { label: 'なし', bg: null, make: null },
+  };
+  const DEFAULT_BASEMAP = 'gsi-blank';
+  let bgKind = BASEMAPS[q.get('basemap')] ? q.get('basemap') : (q.get('imagery') === '0' ? 'none' : DEFAULT_BASEMAP);
+  const BG0 = Object.assign({}, BASEMAPS[DEFAULT_BASEMAP].bg);
+  let bgLayer = null;
+
+  function setBasemap(kind) {
+    bgKind = BASEMAPS[kind] ? kind : 'none';
+    stats.basemap = bgKind;
+    if (bgLayer) { viewer.imageryLayers.remove(bgLayer, true); bgLayer = null; }
+    const def = BASEMAPS[bgKind];
+    if (!def.make) { syncBgSliders(); return; }
+    Object.assign(BG0, def.bg);
+    bgLayer = viewer.imageryLayers.addImageryProvider(def.make());
+    applyBg();
+    syncBgSliders();
+  }
+  function applyBg() {
+    if (!bgLayer) return;
+    for (const k of Object.keys(BG0)) bgLayer[k] = BG0[k];
+  }
+
+  const BG_META = [
+    ['brightness', '明るさ', 0.5, 2.0, 0.01],
+    ['contrast', 'コントラスト', 0.3, 1.8, 0.01],
+    ['saturation', '彩度', 0, 1.5, 0.01],
+    ['gamma', 'ガンマ', 0.4, 2.2, 0.01],
+    ['alpha', '不透明度', 0.1, 1.0, 0.01],
+  ];
+  for (const [key, label, min, max, step] of BG_META) {
+    const wrap = document.createElement('div');
+    wrap.className = 'lc-slider';
+    wrap.innerHTML = '<label>' + label + '<i id="bgv-' + key + '">' + BG0[key].toFixed(2) + '</i></label>'
+      + '<input type="range" id="bg-' + key + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + BG0[key] + '">';
+    $('bg-sliders').appendChild(wrap);
+    wrap.querySelector('input').addEventListener('input', (ev) => {
+      BG0[key] = +ev.target.value;
+      $('bgv-' + key).textContent = BG0[key].toFixed(2);
+      applyBg();
+      scene.requestRender();
+    });
+  }
+  function syncBgSliders() {
+    const on = !!bgLayer;
+    for (const [key] of BG_META) {
+      const el = $('bg-' + key);
+      if (!el) continue;
+      el.value = BG0[key];
+      el.disabled = !on;
+      $('bgv-' + key).textContent = on ? BG0[key].toFixed(2) : '—';
+    }
+  }
+  function updateSources() {
+    const bm = { 'gsi-pale': '地理院タイル（淡色地図） / 国土地理院',
+                 'gsi-blank': '地理院タイル（白地図） / 国土地理院',
+                 osm: '© OpenStreetMap contributors', none: '（なし）' }[bgKind];
+    $('lc-src').innerHTML = [
+      '建物: PLATEAU / Mission 37B 3D Tiles（' + SET + '）',
+      '道路・鉄道・水路・公園: OpenStreetMap（ODbL）',
+      'ラベル: Live City 派生データ',
+      '背景地図: ' + bm,
+    ].join('<br>');
+  }
+  $('sel-basemap').value = bgKind;
+  $('sel-basemap').addEventListener('change', (ev) => { setBasemap(ev.target.value); updateSources(); scene.requestRender(); });
+  setBasemap(bgKind);
+
+  // ══════════════════════════════════════════════════════════════
+  // LayerRegistry — レイヤーを 1 つずつ独立して足せる形にする（要件9）
+  //   各レイヤーは mount()/applyVisible() だけを実装する。データの出どころ（ローカル JSON か
+  //   将来のライブタイルか）は mount() の中に閉じ込めるので、差し替えはここだけで済む。
+  // ══════════════════════════════════════════════════════════════
+  const LayerRegistry = (function () {
+    const defs = new Map();
+    const order = [];
+    function register(def) {
+      const rec = Object.assign({ visible: def.defaultOn !== false, state: 'idle', count: 0, error: null }, def);
+      defs.set(def.id, rec); order.push(def.id);
+      stats.layers[def.id] = { state: 'idle', count: 0, visible: rec.visible };
+      return rec;
+    }
+    function sync(rec) {
+      stats.layers[rec.id] = { state: rec.state, count: rec.count, visible: rec.visible, error: rec.error };
+      const row = document.querySelector('[data-layer="' + rec.id + '"]');
+      if (!row) return;
+      row.dataset.state = rec.state;
+      row.querySelector('.ct').textContent = rec.state === 'error' ? '取得失敗'
+        : rec.state === 'loading' ? '読込中'
+        : rec.count ? fmt(rec.count) : '0';
+      row.title = rec.error || (rec.hint || '');
+    }
+    async function mount(rec) {
+      if (rec.state === 'ready' || rec.state === 'loading') return;
+      rec.state = 'loading'; sync(rec);
+      try {
+        const r = await rec.mount();
+        rec.count = (r && r.count) || 0;
+        rec.state = 'ready';
+        rec.applyVisible(rec.visible);
+      } catch (e) {
+        rec.state = 'error'; rec.error = e && e.message ? e.message : String(e);
+        fail('layer:' + rec.id, e);
+      }
+      sync(rec);
+    }
+    return {
+      register,
+      all: () => order.map((id) => defs.get(id)),
+      get: (id) => defs.get(id),
+      mountAll: () => Promise.all(order.map((id) => mount(defs.get(id)))),
+      setVisible(id, on) {
+        const rec = defs.get(id); if (!rec) return;
+        rec.visible = !!on;
+        if (rec.state === 'ready') rec.applyVisible(rec.visible);
+        sync(rec);
+        scene.requestRender();
+      },
+      sync,
+    };
+  })();
+
+  // ── レイヤー束 manifest / 取得ヘルパ ──
+  let bundleManifest = null;
+  const jsonCache = new Map();
+  function fetchLayerJson(name) {
+    if (!jsonCache.has(name)) {
+      jsonCache.set(name, fetch(LAYER_BASE + name).then((r) => {
+        if (!r.ok) throw new Error(LAYER_BASE + name + ' → HTTP ' + r.status);
+        return r.json();
+      }));
+    }
+    return jsonCache.get(name);
+  }
+
+  // ── 線レイヤー: PolylineCollection（material を共有してバッチさせる）──
+  const matCache = new Map();
+  function solidMat(css) {
+    if (!matCache.has('s:' + css)) {
+      matCache.set('s:' + css, Cesium.Material.fromType('Color', { color: Cesium.Color.fromCssColorString(css) }));
+    }
+    return matCache.get('s:' + css);
+  }
+  function dashMat(css, dashLength) {
+    const key = 'd:' + css + ':' + dashLength;
+    if (!matCache.has(key)) {
+      matCache.set(key, Cesium.Material.fromType('PolylineDash', {
+        color: Cesium.Color.fromCssColorString(css), dashLength,
+      }));
+    }
+    return matCache.get(key);
+  }
+  function makeLineLayer(file, styleOf) {
+    let coll = null;
+    return {
+      async mount() {
+        const data = await fetchLayerJson(file);
+        coll = scene.primitives.add(new Cesium.PolylineCollection());
+        let n = 0;
+        for (const f of data.features || []) {
+          const st = styleOf(f);
+          if (!st || !Array.isArray(f.p) || f.p.length < 2) continue;
+          const positions = f.p.map((pt) => toCart(pt[0], pt[1], st.height));
+          // 太い道路は外側に暗い線を重ねて、地図らしい縁取りにする（major/mid のみ）
+          if (st.casing) {
+            coll.add({ positions, width: st.width + st.casing, material: solidMat(C.roadCasing),
+                       id: { layer: file, casing: true } });
+          }
+          coll.add({ positions, width: st.width, material: st.material, id: { layer: file, featureId: f.id, name: f.name || null } });
+          n++;
+        }
+        return { count: n };
+      },
+      applyVisible(on) { if (coll) coll.show = on; },
+    };
+  }
+
+  // ── 面レイヤー: 1 レイヤー = 1 Primitive（37B の建物 Primitive と同じ作り）──
+  function makeAreaLayer(file, opts) {
+    let prim = null;
+    return {
+      async mount() {
+        const data = await fetchLayerJson(file);
+        const instances = [];
+        for (const f of data.features || []) {
+          if (f.kind !== 'area' || !Array.isArray(f.p) || f.p.length < 3) continue;
+          const color = Cesium.Color.fromCssColorString(opts.colorOf ? opts.colorOf(f) : opts.color)
+            .withAlpha(opts.alpha != null ? opts.alpha : 0.85);
+          instances.push(new Cesium.GeometryInstance({
+            geometry: new Cesium.PolygonGeometry({
+              polygonHierarchy: new Cesium.PolygonHierarchy(f.p.map((pt) => toCart(pt[0], pt[1], 0))),
+              height: opts.height, perPositionHeight: false,
+              vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+            }),
+            attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(color) },
+            id: { layer: file, featureId: f.id, name: f.name || null },
+          }));
+        }
+        if (!instances.length) return { count: 0 };
+        prim = scene.primitives.add(new Cesium.Primitive({
+          geometryInstances: instances,
+          appearance: new Cesium.PerInstanceColorAppearance({ flat: true, translucent: true }),
+          releaseGeometryInstances: true, asynchronous: true,
+        }));
+        return { count: instances.length };
+      },
+      applyVisible(on) { if (prim) prim.show = on; },
+    };
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // 建物レイヤー（Mission 37B の 3D Tiles をそのまま使う）
+  // ══════════════════════════════════════════════════════════════
+  let tileset = null, silhouette = null;
+  const visTiles = new Set();
+  let curTiles = 0, curBldg = 0;
+  let homeCenter = null, homeRange = 1500;
+  const CAM_PITCH = Cesium.Math.toRadians(-45);
+
+  function applyTone(name) {
+    if (!tileset) return;
+    const css = TONE[name] || TONE.pale;
+    // 頂点色（高さで淡い青灰→やや濃い青）に掛ける。淡色はほぼ素のまま＝薄い青灰（要件6）。
+    tileset.style = new Cesium.Cesium3DTileStyle({ color: "color('" + css + "')" });
+    stats.tone = name;
+  }
+
+  const buildingLayer = {
+    id: 'buildings', label: '建物', swatch: TONE.pale, defaultOn: true,
+    hint: 'Mission 37B 生成の 3D Tiles（canonicalId 保持）',
+    async mount() {
+      tileset = await Cesium.Cesium3DTileset.fromUrl(TILES_BASE + 'tileset.json', { maximumScreenSpaceError: SSE0 });
+      scene.primitives.add(tileset);
+      applyTone($('sel-tone').value);
+      homeCenter = tileset.boundingSphere.center;
+      homeRange = Math.max(600, tileset.boundingSphere.radius * 2.2);
+      resetCamera();
+      tileset.tileLoad.addEventListener(() => { stats.loadedTilesTotal++; });
+      tileset.tileUnload.addEventListener(() => { stats.loadedTilesTotal--; });
+      tileset.tileVisible.addEventListener((tile) => { if (tile.hasRenderableContent !== false) visTiles.add(tile); });
+      let first = true;
+      tileset.allTilesLoaded.addEventListener(() => {
+        if (!first) return; first = false;
+        stats.firstDisplayMs = performance.now() - T0;
+        stats.status = 'ready';
+        $('m-first').textContent = stats.firstDisplayMs.toFixed(0) + ' ms';
+        console.log('[37C] first display', JSON.stringify({ firstDisplayMs: Math.round(stats.firstDisplayMs), set: SET }));
+      });
+      const total = (tileset.extras && tileset.extras.buildings) || null;
+      stats.tilesetBuildings = total;
+      $('hs-bldg').textContent = fmt(total);
+      return { count: total || 0 };
+    },
+    applyVisible(on) { if (tileset) tileset.show = on; },
+  };
+
+  function resetCamera() {
+    if (!homeCenter) return;
+    viewer.camera.lookAt(homeCenter, new Cesium.HeadingPitchRange(0, CAM_PITCH, homeRange));
+    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+  }
+  $('btn-home').onclick = resetCamera;
+  $('sel-sse').value = String(SSE0);
+  $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; };
+  $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
+
+  // ══════════════════════════════════════════════════════════════
+  // ラベル（主要駅・主要ランドマークだけを目立たせる）
+  // ══════════════════════════════════════════════════════════════
+  const LABEL_STYLE = {
+    ward:    { font: '600 19px ' + 'sans-serif', fill: '#dceaff', bg: 'rgba(5,10,24,0.70)', near: 0, far: 40000, h: 70 },
+    station: { font: '600 13px sans-serif', fill: '#cfe6ff', bg: 'rgba(8,14,26,0.92)', near: 0, far: 14000, h: 46, prefix: '◉ ' },
+    park:    { font: '500 12px sans-serif', fill: '#cfe3c6', bg: 'rgba(8,14,26,0.70)', near: 0, far: 6000, h: 34 },
+    place:   { font: '500 13px sans-serif', fill: '#eef1f3', bg: 'rgba(8,14,26,0.74)', near: 0, far: 9000, h: 40 },
+  };
+  // importance で「主役」を絞る。local は近づいたときだけ出す。
+  const PLACE_BY_IMPORTANCE = {
+    major:  { font: '600 15px sans-serif', fill: '#ffffff', far: 16000, h: 52 },
+    medium: { font: '500 13px sans-serif', fill: '#dceaff', far: 7000, h: 42 },
+    local:  { font: '400 11px sans-serif', fill: '#9cb8d8', far: 1800, h: 32 },
+  };
+  const labelLayer = {
+    id: 'labels', label: 'ラベル', swatch: '#cfe6ff', defaultOn: true,
+    hint: '主要駅・地名・公園・区名（importance で優先度を分ける）',
+    coll: null,
+    async mount() {
+      const data = await fetchLayerJson('labels.json');
+      this.coll = scene.primitives.add(new Cesium.LabelCollection());
+      let n = 0;
+      for (const it of data.items || []) {
+        const base = LABEL_STYLE[it.kind];
+        if (!base) continue;
+        const o = Object.assign({}, base, it.kind === 'place' ? (PLACE_BY_IMPORTANCE[it.importance] || PLACE_BY_IMPORTANCE.local) : {});
+        this.coll.add({
+          position: toCart(it.x, it.z, o.h),
+          text: (base.prefix || '') + it.name,
+          font: o.font, fillColor: Cesium.Color.fromCssColorString(o.fill),
+          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          showBackground: true, backgroundColor: Cesium.Color.fromCssColorString(o.bg),
+          backgroundPadding: new Cesium.Cartesian2(7, 4),
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+          // 建物に隠れず浮く（Three.js 版のラベルと同じふるまい）
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(o.near || 0, o.far),
+          translucencyByDistance: new Cesium.NearFarScalar(o.far * 0.75, 1.0, o.far, 0.25),
+          id: { layer: 'labels', kind: it.kind, name: it.name },
+        });
+        n++;
+      }
+      return { count: n };
+    },
+    applyVisible(on) { if (this.coll) this.coll.show = on; },
+  };
+
+  // ══════════════════════════════════════════════════════════════
+  // レイヤー登録（この並びが左パネルの並びになる）
+  // ══════════════════════════════════════════════════════════════
+  LayerRegistry.register(buildingLayer);
+  LayerRegistry.register(Object.assign({
+    id: 'roads', label: '道路', swatch: C.roadMajor, defaultOn: true,
+    hint: 'OSM 由来。tier (major/mid/local) で太さと色を分ける',
+  }, makeLineLayer('roads.json', (f) => {
+    const t = f.tier || 'local';
+    if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
+    if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
+    return { width: 2.4, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
+  })));
+  LayerRegistry.register(Object.assign({
+    id: 'railways', label: '鉄道', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
+  }, makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }))));
+  LayerRegistry.register(Object.assign({
+    id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）',
+  }, (function () {
+    const lines = makeLineLayer('waterways.json', (f) => f.kind === 'line'
+      ? { width: f.waterClass === 'canal' ? 5 : 3.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways }
+      : null);
+    const areas = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.88, height: LAYER_H.waterways });
+    return {
+      async mount() { const a = await lines.mount(); const b = await areas.mount(); return { count: a.count + b.count }; },
+      applyVisible(on) { lines.applyVisible(on); areas.applyVisible(on); },
+    };
+  })()));
+  LayerRegistry.register(Object.assign({
+    id: 'parks', label: '公園・緑地', swatch: C.park, defaultOn: true, hint: 'OSM 由来の面',
+  }, makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks })));
+  LayerRegistry.register(labelLayer);
+
+  // ── 左パネルのレイヤー行を作る（要件8）──
+  for (const rec of LayerRegistry.all()) {
+    const row = document.createElement('label');
+    row.className = 'lc-layer';
+    row.dataset.layer = rec.id;
+    row.dataset.state = 'idle';
+    row.innerHTML = '<input type="checkbox"' + (rec.visible ? ' checked' : '') + '><span class="lc-sw"></span>'
+      + '<span class="lc-swatch" style="background:' + rec.swatch + '"></span>'
+      + '<span class="nm"></span><span class="ct">—</span>';
+    row.querySelector('.nm').textContent = rec.label;
+    row.querySelector('input').addEventListener('change', (ev) => LayerRegistry.setVisible(rec.id, ev.target.checked));
+    $('lc-layers').appendChild(row);
+    LayerRegistry.sync(rec);
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // 計測（37B の HUD と同じ指標を Live City パネルの中に移植）
+  // ══════════════════════════════════════════════════════════════
+  const ring = new Float32Array(300);
+  let ri = 0, rn = 0, lastT = performance.now(), frames = 0, winStart = performance.now();
+  scene.preUpdate.addEventListener(() => { visTiles.clear(); });
+  scene.postRender.addEventListener(() => {
+    const now = performance.now();
+    ring[ri] = now - lastT; ri = (ri + 1) % ring.length; rn = Math.min(rn + 1, ring.length); lastT = now;
+    let b = 0;
+    for (const t of visTiles) b += (t.extras && t.extras.buildings) || (t._header && t._header.extras && t._header.extras.buildings) || 0;
+    curTiles = visTiles.size; curBldg = b;
+    frames++;
+    if (now - winStart >= 1000) {
+      stats.fps = +(frames * 1000 / (now - winStart)).toFixed(1);
+      const s = Array.from(ring.subarray(0, rn)).sort((x, y) => x - y);
+      stats.p95FrameMs = +s[Math.floor(s.length * 0.95)].toFixed(1);
+      stats.visibleTiles = curTiles; stats.visibleBuildings = curBldg;
+      frames = 0; winStart = now;
+      $('hs-fps').textContent = stats.fps.toFixed(0);
+      $('hs-tiles').textContent = curTiles;
+      $('m-fps').textContent = stats.fps.toFixed(1);
+      $('m-p95').textContent = stats.p95FrameMs + ' ms';
+      $('m-bldg').textContent = fmt(curBldg);
+      if (performance.memory) $('m-heap').textContent = (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB';
+    }
+  });
+  $('btn-measure').onclick = () => {
+    const ts = []; let last = performance.now(); const t0 = last;
+    $('m-measure').textContent = '計測中…';
+    const off = scene.postRender.addEventListener(() => {
+      const n = performance.now(); ts.push(n - last); last = n;
+      if (n - t0 < 10000) return;
+      off();
+      const sorted = ts.slice().sort((a, b) => a - b);
+      const avgMs = ts.reduce((a, b) => a + b, 0) / ts.length;
+      stats.measure = {
+        set: SET, sse: stats.sse, durationMs: Math.round(n - t0), frames: ts.length,
+        avgFps: +(1000 / avgMs).toFixed(1), p95FrameMs: +sorted[Math.floor(sorted.length * 0.95)].toFixed(1),
+        maxFrameMs: +sorted[sorted.length - 1].toFixed(1),
+        firstDisplayMs: stats.firstDisplayMs == null ? null : Math.round(stats.firstDisplayMs),
+        visibleTiles: curTiles, visibleBuildings: curBldg,
+        layersVisible: LayerRegistry.all().filter((r) => r.visible).map((r) => r.id),
+        heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null,
+      };
+      $('m-measure').textContent = stats.measure.avgFps + ' fps / p95 ' + stats.measure.p95FrameMs + ' ms';
+      console.log('[37C] measure', JSON.stringify(stats.measure));
+    });
+  };
+
+  // ══════════════════════════════════════════════════════════════
+  // canonicalId クリック（要件10）— 37B と同じ経路を保ち、表示先を Live City パネルにする
+  // ══════════════════════════════════════════════════════════════
+  try {
+    if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(scene)) {
+      silhouette = Cesium.PostProcessStageLibrary.createSilhouetteStage();
+      silhouette.uniforms.color = Cesium.Color.fromCssColorString(C.accent);
+      silhouette.uniforms.length = 0.4;
+      silhouette.selected = [];
+      scene.postProcessStages.add(silhouette);
+    }
+  } catch (e) { fail('silhouette', e); }
+
+  const sidecarCache = new Map();
+  function sidecarIds(feature) {
+    const tile = feature.content && feature.content.tile;
+    const ex = tile && (tile.extras || (tile._header && tile._header.extras));
+    if (!ex || !ex.idsUri) return Promise.resolve(null);
+    if (!sidecarCache.has(ex.idsUri)) {
+      sidecarCache.set(ex.idsUri, fetch(TILES_BASE + ex.idsUri).then((r) => r.json()).catch(() => null));
+    }
+    return sidecarCache.get(ex.idsUri);
+  }
+  const attrCache = new Map();
+  function tileAttrs(feature) {
+    const tile = feature.content && feature.content.tile;
+    const ex = tile && (tile.extras || (tile._header && tile._header.extras));
+    if (!ex || !Number.isInteger(ex.tx) || !Number.isInteger(ex.tz)) return Promise.resolve(null);
+    const name = 'attrs/t_' + ex.tx + '_' + ex.tz + '.json';
+    if (!attrCache.has(name)) {
+      attrCache.set(name, fetch(LAYER_BASE + name).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    }
+    return attrCache.get(name).then((j) => (j ? { tx: ex.tx, tz: ex.tz, data: j } : null));
+  }
+
+  let lastFeature = null, flyTarget = null;
+  function clearSelection() {
+    if (lastFeature) { try { lastFeature.color = Cesium.Color.WHITE; } catch (e) { /* tile 破棄済み */ } }
+    lastFeature = null;
+    if (silhouette) silhouette.selected = [];
+    $('lc-bldg-body').classList.remove('on');
+    $('lc-bldg-empty').style.display = '';
+    flyTarget = null;
+  }
+  $('btn-fly').onclick = () => {
+    if (!flyTarget) return;
+    viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(flyTarget, 90), { duration: 1.0, offset: new Cesium.HeadingPitchRange(viewer.camera.heading, CAM_PITCH, 260) });
+  };
+
+  const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+  handler.setInputAction(async (click) => {
+    const picked = scene.pick(click.position);
+    // 建物以外（道路・公園ラベル等）を押したときは選択を解除するだけ。従来の建物クリックは変えない。
+    if (!Cesium.defined(picked) || typeof picked.getProperty !== 'function') { clearSelection(); return; }
+    const id = picked.getProperty('canonicalId');
+    if (typeof id !== 'string' || !/^bldg_/.test(id)) { clearSelection(); return; }
+
+    clearSelection();
+    // 選択は Live City ブルー＋シルエットで強調（要件7）
+    try { picked.color = Cesium.Color.fromCssColorString(C.accent); lastFeature = picked; } catch (e) { /* ignore */ }
+    if (silhouette) silhouette.selected = [picked];
+
+    $('lc-bldg-empty').style.display = 'none';
+    $('lc-bldg-body').classList.add('on');
+    $('lc-cid').textContent = id;
+    $('lb-ward').textContent = (bundleManifest && bundleManifest.buildings && bundleManifest.buildings.ward) || '—';
+    $('lb-side').textContent = '照合中…';
+    $('lb-note').textContent = '';
+    for (const k of ['lb-h', 'lb-usage', 'lb-tile', 'lb-ll', 'lb-xz']) $(k).textContent = '—';
+    $('lc-usage').textContent = '建物';
+
+    stats.lastPicked = { canonicalId: id, featureId: picked.featureId };
+
+    const [side, attrs] = await Promise.all([sidecarIds(picked), tileAttrs(picked)]);
+    const sideId = side ? side[picked.featureId] : null;
+    stats.lastPicked.sidecar = sideId;
+    stats.lastPicked.sidecarMatches = sideId == null ? null : sideId === id;
+    $('lb-side').textContent = sideId == null ? '未照合' : (sideId === id ? '✓ 一致' : '✗ 不一致');
+
+    if (attrs) {
+      $('lb-tile').textContent = 't_' + attrs.tx + '_' + attrs.tz;
+      const a = attrs.data.byId && attrs.data.byId[id];
+      if (a) {
+        const [h, usage, repX, repZ] = a;
+        const labels = (bundleManifest && bundleManifest.usageLabels && bundleManifest.usageLabels.labels) || {};
+        $('lb-h').textContent = h.toFixed(1) + ' m';
+        $('lb-usage').textContent = usage == null ? '—' : usage;
+        $('lc-usage').textContent = (usage != null && labels[usage]) ? labels[usage] : '用途不明';
+        $('lb-ll').textContent = toLat(repZ).toFixed(6) + ' / ' + toLon(repX).toFixed(6);
+        $('lb-xz').textContent = repX.toFixed(1) + ' / ' + repZ.toFixed(1);
+        flyTarget = toCart(repX, repZ, (h || 0) / 2);
+        stats.lastPicked.heightM = h;
+        stats.lastPicked.usage = usage;
+      } else {
+        $('lb-note').textContent = 'この canonicalId は属性サイドカーに見つかりませんでした。';
+      }
+    } else {
+      $('lb-note').textContent = '属性サイドカー（attrs/）が配信されていないため、高さ・用途は表示できません。';
+    }
+    console.log('[37C] picked', JSON.stringify(stats.lastPicked));
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  // ══════════════════════════════════════════════════════════════
+  // 起動
+  // ══════════════════════════════════════════════════════════════
+  (async function boot() {
+    try {
+      bundleManifest = await fetchLayerJson('manifest.json');
+      const b = bundleManifest.buildings || {};
+      $('lc-sub').textContent = (b.ward || '大阪市') + ' · 3D都市ビュー';
+      updateSources();
+    } catch (e) {
+      fail('manifest', e);
+      $('lc-err').textContent = LAYER_BASE + 'manifest.json を読み込めません。\n'
+        + '生成: node tools/mission37c-build-theme-layers.cjs\n' + stats.errors.join('\n');
+    }
+    await LayerRegistry.mountAll();
+    stats.status = stats.errors.length ? 'ready-with-errors' : (stats.status === 'ready' ? 'ready' : 'loading tiles…');
+    console.log('[37C] layers', JSON.stringify(stats.layers));
+  })();
+
+  if (q.get('panel') === '0') { $('lc-left').style.display = 'none'; $('lc-right').style.display = 'none'; }
+})();
+</script>
+</body>
+</html>
