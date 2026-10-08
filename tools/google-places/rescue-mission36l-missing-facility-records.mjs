@@ -251,7 +251,14 @@ export async function runChunks(opts, { runBatch = runRescueBatch, sleepImpl = s
 }
 
 async function runCli(opts) {
-  await runChunks(opts);
+  // Fail closed: activating billing in Google Cloud never authorizes paid batch execution.
+  // Explicit opt-in is required even for --diagnostic. This is an emergency cost-safety
+  // interlock; a durable monthly budget ledger must be implemented and tested separately.
+  if (process.env.LIVECITY_PLACES_RESCUE_ENABLED !== 'true') {
+    console.log('[36L missing-facility rescue] PAUSED: paid API calls disabled; no Places requests issued.');
+    return;
+  }
+  throw new Error('Paid rescue remains locked until Issue #25 monthly budget enforcement is implemented and tested.');
 }
 
 if (isMainModule(import.meta.url)) {
