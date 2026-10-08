@@ -41,8 +41,7 @@ jobs:
           test -n "${GOOGLE_PLACES_API_KEY:-}" || { echo 'GOOGLE_PLACES_API_KEY missing'; exit 2; }
 
       - name: Rescue next 200 missing-facility exact-source gaps in 20-item chunks
-        run: node tools/google-places/rescue-mission36l-missing-facility-records.mjs --diagnosticun: node tools/google-places/rescue-mission36l-missing-facility-records.mjs --limit 20 --chunks 10 --requests-per-minute 10
-
+        run: node tools/google-places/rescue-mission36l-missing-facility-records.mjs --diagnostic 
       - name: Validate safe durable output
         shell: bash
         run: |
