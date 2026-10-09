@@ -56,3 +56,31 @@ Vercel へ載せるなら、コミットせずビルド時生成にするか、�
 4. 施設の点をクリック → 詳細。
 5. DevTools で `__mission37d`（layers / selectedCanonicalId / selectedPoi / lastPicked.photo / lastSearch）。
 6. 幅 400px 程度で右パネルが下部シートになるか。
+
+## 町丁目（住吉区）追加
+
+### 監査（実ファイルの読解。スクリプトは実行できていない）
+| 項目 | 結果 |
+|---|---|
+| 名称・ID | `data/processed/osaka-sumiyoshi/boundaries/administrative-boundaries.json` に住吉区 **104 件**（東住吉区 102 件、計 206）。`compositeCode`（例 `27120:001001`）と `chochoName`（例 `南住吉一丁目`）。出典: 国勢調査町丁・字等別境界（e-Stat / CODH Geoshape、CC BY 4.0、基準日 2020-10-01） |
+| 公式の頂点座標 | **リポジトリに無い**。上記ファイルの `geometry` は全件 null。35L の元 zip と派生 `area-boundaries.json` も未コミット |
+| 形状の唯一の実在ソース | 本番 HTML の `TOWN_POLYGONS`（暫定・出典未確認）。住吉区は **101 キー**（104 件中 3 件は形状なし見込み）。キーは `住吉区我孫子4丁目` 形式（算用数字）で、`normalizedChochoName` と結合できる |
+| 統計 | `town-stats.json` から結合（人口・世帯・高齢化率。公式値 / 計算値の区別を保持）。無い町丁目は null |
+
+### 実装
+- `tools/mission37d-build-towns.cjs`: 上記 3 ソースを結合して `public/mission37d-data/sumiyoshi-towns.json` を生成（HTML は読むだけ）。形状は新規作成せず、結合できなかった町丁目は `geometryStatus: "none"`。`--check` で件数だけ表示。
+- `public/mission37d-data/town-normalize.js`: 名称正規化（ブラウザ / Node 共用）。
+- `public/mission37d-sumiyoshi-mvp.html`: レイヤー「町丁目境界」「町丁目名ラベル」、検索、クリック選択、右パネルを追加。
+  - ラベル: カメラ高度 >4500m=区名、1800–4500m=町名（重心）、≤1800m=正式な町丁目名。画面中心に近い順に重なり回避し、町名 40 / 町丁目 48 件で打ち切り。駅名など既存ラベルは別レイヤーのまま。
+  - 検索: 漢数字/算用数字/全角/空白を正規化。「長居東」のように丁目省略なら全丁目が候補。候補は「住吉区 長居東四丁目」の形で区付き表示。0 件・データ未接続は文言で明示。
+  - クリック: 建物 / POI を pick できなかったときだけ、地表座標の点内判定で町丁目を選ぶ（canonicalId の経路は不変）。輪郭と薄い塗りでハイライトし、右パネルに正式名称・ID・取得済み統計のみ表示（無い項目は「データなし」）。境界レイヤー OFF 中は選択しない。
+- `tests/mission37d-towns.test.cjs`: 正規化、104 件・ID 一意、座標範囲、ラベル段階、建物選択との両立（静的）。
+
+### 未実行・未確認
+- **データ束は未生成**です（この環境で node が実行できないため）。生成するまで Preview は町丁目レイヤーが「取得失敗」、検索は「町丁目データが未接続」と表示します。
+  ```bash
+  node tools/mission37d-build-towns.cjs
+  node --test tests/mission37d-towns.test.cjs
+  ```
+- テスト・ブラウザ表示ともに未実行。
+- 輪郭は暫定形状。公式の頂点座標を使うには 35L の zip（`tools/download/estat-town-boundaries.js`）から `tools/build-official-town-boundaries.js` を実行して差し替える必要があります。

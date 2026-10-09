@@ -222,6 +222,9 @@
   @keyframes lcbar { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
   #lc-poi-body { display: none; }
   #lc-poi-body.on { display: block; }
+  #lc-town-body { display: none; }
+  #lc-town-body.on { display: block; }
+  #lc-town-name { font-weight: 600; font-size: 15px; margin: 6px 0; }
   #lc-poi-body a { color: var(--lc-hi); word-break: break-all; }
   #lc-photo-slot img { max-width: 100%; border-radius: 6px; display: block; margin: 0 auto 6px; }
   #lc-photo-slot a { color: var(--lc-hi); }
@@ -344,6 +347,17 @@
       <div class="lc-note" id="lp-src"></div>
       <button class="lc-btn" id="btn-poi-fly" style="margin-top:10px;width:100%">ここに寄る</button>
     </div>
+    <div id="lc-town-body">
+      <div id="lc-poi-cat">町丁目</div>
+      <div id="lc-town-name">—</div>
+      <div class="lc-row"><span class="k">ID</span><span class="v" id="lt-id">—</span></div>
+      <div class="lc-row"><span class="k">区</span><span class="v" id="lt-ward">—</span></div>
+      <div class="lc-row"><span class="k">人口</span><span class="v" id="lt-pop">—</span></div>
+      <div class="lc-row"><span class="k">世帯数</span><span class="v" id="lt-hh">—</span></div>
+      <div class="lc-row"><span class="k">高齢化率</span><span class="v" id="lt-aging">—</span></div>
+      <div class="lc-note" id="lt-note"></div>
+      <button class="lc-btn" id="btn-town-fly" style="margin-top:10px;width:100%">この町丁目に寄る</button>
+    </div>
     <div id="lc-bldg-body">
       <div id="lc-usage">—</div>
       <div id="lc-cid">—</div>
@@ -383,6 +397,7 @@
 <div id="lc-minimap" title="ミニマップ（簡易）"><span class="cap">MINIMAP</span><canvas id="lc-mm" width="300" height="224"></canvas></div>
 
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script src="mission37d-data/town-normalize.js"></script>
 <script>
 (function () {
   'use strict';
@@ -901,6 +916,230 @@
   LayerRegistry.register(makePoiLayer('spots', '観光スポット', '#7fcf9a',
     'OSM の tourism タグのみ（件数が少ない。住吉大社などは施設データに無い）', (r) => r.category === 'tourism'));
 
+  // ══════════════════════════════════════════════════════════════
+  // 37D 追加: 町丁目（住吉区 104 件）— 境界・ラベル・検索・選択
+  //   名称 / ID は公式データ（e-Stat 国勢調査町丁・字等別境界の属性）、輪郭は暫定形状（legacy-unverified）。
+  //   データ束は tools/mission37d-build-towns.cjs が生成する。無ければ「未接続」と表示し、他機能は止めない。
+  //   町丁目のクリックは「建物 / POI を pick できなかったとき」だけ地表座標で判定する（canonicalId の pick と競合しない）。
+  // ══════════════════════════════════════════════════════════════
+  const TN = window.LiveCityTownNormalize;
+  const TOWNS_URL = 'mission37d-data/sumiyoshi-towns.json';
+  const TOWN_TIER = { ward: 4500, base: 1800 };   // カメラ高度 (m): これより高い→区名のみ / base 超→町名 / 以下→町丁目名
+  const TOWN_CAP = { base: 40, full: 48 };         // 同時表示ラベル数の上限（FPS 維持）
+  let townsPromise = null;
+  function loadTowns() {
+    if (!townsPromise) {
+      townsPromise = fetch(TOWNS_URL).then((r) => {
+        if (!r.ok) throw new Error(TOWNS_URL + ' → HTTP ' + r.status + '（生成: node tools/mission37d-build-towns.cjs）');
+        return r.json();
+      }).then((j) => {
+        const recs = (j.records || []).map((t) => Object.assign(t, { key: TN.normalizeTownName(t.name), wardKey: TN.normalizeTownName(t.ward) }));
+        stats.towns = { loaded: true, count: recs.length, withGeometry: recs.filter((t) => t.rings && t.rings.length).length,
+          geometryStatus: j.geometry && j.geometry.status, labelTier: null, labelsShown: 0 };
+        return { meta: j, recs };
+      });
+      townsPromise.catch((e) => { stats.towns = { loaded: false, error: String(e && e.message || e) }; });
+    }
+    return townsPromise;
+  }
+  function pointInRing(x, z, r) {
+    let inside = false;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      if (((r[i][1] > z) !== (r[j][1] > z)) && (x < (r[j][0] - r[i][0]) * (z - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0])) inside = !inside;
+    }
+    return inside;
+  }
+
+  const TownUI = (function () {
+    let recs = [];
+    let outline = null, fill = null, labelsBase = null, labelsFull = null, labelsWard = null;
+    let baseItems = [], fullItems = [];
+    let hlLine = null, hlFill = null, selected = null, pending = false;
+    const C_LINE = '#6f8fb8';
+
+    function hit(x, z) {
+      for (const t of recs) {
+        if (!t.bbox || x < t.bbox[0] || x > t.bbox[2] || z < t.bbox[1] || z > t.bbox[3]) continue;
+        for (const r of t.rings) if (pointInRing(x, z, r)) return t;
+      }
+      return null;
+    }
+    function pickAt(pos) {
+      const bl = LayerRegistry.get('towns');
+      if (!bl || bl.state !== 'ready' || !bl.visible) return null;   // 境界 OFF のときは町丁目を選ばせない
+      const c = viewer.camera.pickEllipsoid(pos, scene.globe.ellipsoid);
+      if (!c) return null;
+      const g = Cesium.Cartographic.fromCartesian(c);
+      const x = (Cesium.Math.toDegrees(g.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd;
+      const z = -(Cesium.Math.toDegrees(g.latitude) - PROJ.clat) * PROJ.mpd;
+      return hit(x, z);
+    }
+    function clearHighlight() {
+      if (hlLine) { scene.primitives.remove(hlLine); hlLine = null; }
+      if (hlFill) { scene.primitives.remove(hlFill); hlFill = null; }
+      selected = null; stats.selectedTown = null;
+    }
+    function highlight(t) {
+      hlLine = scene.primitives.add(new Cesium.PolylineCollection());
+      const insts = [];
+      for (const r of t.rings) {
+        const pts = r.map((p) => toCart(p[0], p[1], 3));
+        pts.push(pts[0]);
+        hlLine.add({ positions: pts, width: 4, material: solidMat(C.accent) });
+        insts.push(new Cesium.GeometryInstance({ geometry: new Cesium.PolygonGeometry({
+          polygonHierarchy: new Cesium.PolygonHierarchy(r.map((p) => toCart(p[0], p[1], 0))), height: 0.7,
+          vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT }),
+          attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.fromCssColorString(C.accent).withAlpha(0.18)) } }));
+      }
+      hlFill = scene.primitives.add(new Cesium.Primitive({ geometryInstances: insts, allowPicking: false,
+        appearance: new Cesium.PerInstanceColorAppearance({ flat: true, translucent: true }), asynchronous: false }));
+    }
+    function select(t, fly) {
+      clearSelection();
+      selected = t;
+      const nd = (v, f) => (v == null ? 'データなし' : f(v));
+      $('lc-bldg-empty').style.display = 'none';
+      $('lc-town-body').classList.add('on');
+      $('lc-town-name').textContent = t.name;
+      $('lt-id').textContent = t.id;
+      $('lt-ward').textContent = t.ward;
+      const s = t.stats;
+      $('lt-pop').textContent = s ? nd(s.population, (v) => fmt(v) + ' 人') : 'データなし';
+      $('lt-hh').textContent = s ? nd(s.households, (v) => fmt(v) + ' 世帯') : 'データなし';
+      $('lt-aging').textContent = s ? nd(s.agingRatio, (v) => v + ' %（Live City 計算値）') : 'データなし';
+      const notes = [];
+      if (s) notes.push('統計: ' + (s.source || '出典不明') + '（基準日 ' + (s.referenceDate || '—') + '、公式値。高齢化率のみ計算値）');
+      else notes.push('この町丁目の統計は取得済みデータにありません（人口・地価などは推計していません）。');
+      notes.push(t.rings && t.rings.length ? '輪郭は暫定形状（出典未確認）です。名称・IDは国勢調査町丁・字等別境界（e-Stat / CC BY 4.0）。'
+        : '境界データなし: 地図上の位置・輪郭は表示できません。');
+      $('lt-note').textContent = notes.join('\n');
+      $('lt-note').style.whiteSpace = 'pre-line';
+      $('btn-town-fly').style.display = t.rings && t.rings.length ? '' : 'none';
+      stats.selectedTown = { id: t.id, name: t.name, hasGeometry: !!(t.rings && t.rings.length), hasStats: !!s };
+      if (t.rings && t.rings.length) { highlight(t); if (fly) flyTown(t); }
+      scene.requestRender();
+    }
+    function flyTown(t) {
+      const radius = Math.max(60, Math.max(t.bbox[2] - t.bbox[0], t.bbox[3] - t.bbox[1]) / 2);
+      flyToLocal((t.bbox[0] + t.bbox[2]) / 2, (t.bbox[1] + t.bbox[3]) / 2, radius, Math.max(500, radius * 2.6));
+    }
+    $('btn-town-fly').onclick = () => { if (selected) flyTown(selected); };
+
+    // ── ラベルの重なり回避 + 件数制限 ──
+    //   候補を画面中心に近い順に並べ、既に置いた矩形と交差しないものだけを cap 件まで表示する。
+    function declutter(items, cap) {
+      const W = scene.canvas.clientWidth, H = scene.canvas.clientHeight, cx = W / 2, cy = H / 2;
+      const cand = [];
+      for (const it of items) {
+        const wp = Cesium.SceneTransforms.worldToWindowCoordinates(scene, it.pos);
+        it.label.show = false;
+        if (!wp || wp.x < 0 || wp.y < 0 || wp.x > W || wp.y > H) continue;
+        cand.push({ it, x: wp.x, y: wp.y, d: (wp.x - cx) * (wp.x - cx) + (wp.y - cy) * (wp.y - cy) });
+      }
+      cand.sort((a, b) => a.d - b.d);
+      const boxes = []; let shown = 0;
+      for (const c of cand) {
+        if (shown >= cap) break;
+        const w = c.it.text.length * 13 + 8, h = 20;
+        const x0 = c.x - w / 2, y0 = c.y - h, x1 = c.x + w / 2, y1 = c.y;
+        let ok = true;
+        for (const b of boxes) if (x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]) { ok = false; break; }
+        if (!ok) continue;
+        boxes.push([x0, y0, x1, y1]); c.it.label.show = true; shown++;
+      }
+      return shown;
+    }
+    function tierOf(h) { return h > TOWN_TIER.ward ? 'ward' : (h > TOWN_TIER.base ? 'base' : 'full'); }
+    function updateLabels() {
+      pending = false;
+      if (!labelsWard) return;
+      const lv = LayerRegistry.get('townlabels');
+      if (!lv || !lv.visible) return;
+      const tier = tierOf(viewer.camera.positionCartographic.height);
+      labelsWard.show = tier === 'ward';
+      labelsBase.show = tier === 'base';
+      labelsFull.show = tier === 'full';
+      let n = 1;
+      if (tier === 'base') n = declutter(baseItems, TOWN_CAP.base);
+      else if (tier === 'full') n = declutter(fullItems, TOWN_CAP.full);
+      if (stats.towns) { stats.towns.labelTier = tier; stats.towns.labelsShown = n; }
+      scene.requestRender();
+    }
+    function scheduleLabels() { if (!pending) { pending = true; requestAnimationFrame(updateLabels); } }
+    viewer.camera.percentageChanged = 0.05;
+    viewer.camera.changed.addEventListener(scheduleLabels);
+    viewer.camera.moveEnd.addEventListener(scheduleLabels);
+
+    const lblStyle = (size) => ({ font: '600 ' + size + 'px sans-serif', fillColor: Cesium.Color.fromCssColorString('#16305a'),
+      outlineColor: Cesium.Color.fromCssColorString('#f4f7fb'), outlineWidth: 3, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY });
+
+    const boundaryLayer = {
+      id: 'towns', label: '町丁目境界', swatch: C_LINE, defaultOn: true, hint: '住吉区の町丁目の輪郭（暫定形状・出典未確認）。名称とIDは公式データ',
+      async mount() {
+        const { recs: rs } = await loadTowns();
+        recs = rs;
+        outline = scene.primitives.add(new Cesium.PolylineCollection());
+        let n = 0;
+        for (const t of recs) {
+          if (!t.rings || !t.rings.length) continue;
+          for (const r of t.rings) {
+            const pts = r.map((p) => toCart(p[0], p[1], 2.5)); pts.push(pts[0]);
+            outline.add({ positions: pts, width: 1.5, material: solidMat(C_LINE) });
+          }
+          n++;
+        }
+        return { count: n };
+      },
+      applyVisible(on) { if (outline) outline.show = on; if (!on && selected) clearSelection(); },
+    };
+    const labelLayerTown = {
+      id: 'townlabels', label: '町丁目名ラベル', swatch: '#16305a', defaultOn: true,
+      hint: '広域=区名 / 中=町名 / 近づくと正式な町丁目名。重なりは自動で間引き',
+      async mount() {
+        const { recs: rs } = await loadTowns();
+        recs = rs;
+        labelsWard = scene.primitives.add(new Cesium.LabelCollection());
+        labelsBase = scene.primitives.add(new Cesium.LabelCollection());
+        labelsFull = scene.primitives.add(new Cesium.LabelCollection());
+        const geo = recs.filter((t) => t.cx != null);
+        if (geo.length) {
+          const mx = geo.reduce((a, t) => a + t.cx, 0) / geo.length, mz = geo.reduce((a, t) => a + t.cz, 0) / geo.length;
+          labelsWard.add(Object.assign({ position: toCart(mx, mz, 8), text: geo[0].ward }, lblStyle(22)));
+        }
+        const groups = new Map();
+        for (const t of geo) {
+          const g = groups.get(t.base) || { x: 0, z: 0, n: 0 };
+          g.x += t.cx; g.z += t.cz; g.n++; groups.set(t.base, g);
+          const pos = toCart(t.cx, t.cz, 8);
+          const label = labelsFull.add(Object.assign({ position: pos, text: t.name, show: false }, lblStyle(13)));
+          fullItems.push({ label, pos, text: t.name });
+        }
+        for (const [base, g] of groups) {
+          const pos = toCart(g.x / g.n, g.z / g.n, 8);
+          const label = labelsBase.add(Object.assign({ position: pos, text: base, show: false }, lblStyle(15)));
+          baseItems.push({ label, pos, text: base });
+        }
+        return { count: geo.length };
+      },
+      applyVisible(on) {
+        for (const c of [labelsWard, labelsBase, labelsFull]) if (c) c.show = on;
+        if (on) scheduleLabels();
+      },
+    };
+    // 初回表示（mount 完了後に呼ばれる applyVisible が scheduleLabels する）
+    return { boundaryLayer, labelLayerTown, pickAt, select, clearHighlight, tierOf, schedule: scheduleLabels,
+      records: () => recs };
+  })();
+  LayerRegistry.register(TownUI.boundaryLayer);
+  LayerRegistry.register(TownUI.labelLayerTown);
+  // 町丁目クリック: 建物 / POI の pick が無いとき、地表座標で判定（建物選択と競合しない）
+  function clickTown(pos) {
+    clearSelection();
+    const t = TownUI.pickAt(pos);
+    if (t) TownUI.select(t, false);
+  }
+
   // ── 左パネルのレイヤー行を作る（要件8）──
   for (const rec of LayerRegistry.all()) {
     const row = document.createElement('label');
@@ -1009,6 +1248,8 @@
     if (silhouette) silhouette.selected = [];
     $('lc-bldg-body').classList.remove('on');
     $('lc-poi-body').classList.remove('on');
+    $('lc-town-body').classList.remove('on');
+    TownUI.clearHighlight();
     $('lc-bldg-empty').style.display = '';
     flyTarget = null;
     stats.selectedCanonicalId = null;
@@ -1128,9 +1369,10 @@
     const picked = scene.pick(click.position);
     if (picked && picked.id && picked.id.poi) { selectPoi(picked.id.poi); return; }
     // 建物以外（道路・公園ラベル等）を押したときは選択を解除するだけ。従来の建物クリックは変えない。
-    if (!Cesium.defined(picked) || typeof picked.getProperty !== 'function') { clearSelection(); return; }
+    // 37D: 建物でも POI でもなければ、町丁目（境界レイヤー ON のとき）を地表座標で判定する
+    if (!Cesium.defined(picked) || typeof picked.getProperty !== 'function') { clickTown(click.position); return; }
     const id = picked.getProperty('canonicalId');
-    if (typeof id !== 'string' || !/^bldg_/.test(id)) { clearSelection(); return; }
+    if (typeof id !== 'string' || !/^bldg_/.test(id)) { clickTown(click.position); return; }
 
     clearSelection();
     // 選択は Live City ブルー＋シルエットで強調（要件7）
@@ -1277,6 +1519,7 @@
   function chooseResult(h) {
     closeResults();
     $('lc-q').value = h.name;
+    if (h.town) { TownUI.select(h.town, true); document.body.classList.remove('show-left'); return; }
     if (h.poi) selectPoi(h.poi);
     flyToLocal(h.x, h.z, h.poi ? 80 : 120, h.poi ? 500 : 700);
     document.body.classList.remove('show-left');
@@ -1288,11 +1531,23 @@
     resBox.appendChild(el('div', '検索中…', { class: 'empty' }));
     const idx = await buildSearchIndex();
     if (norm($('lc-q').value) !== term) return [];
-    const hits = idx.filter((i) => i.key.includes(term))
-      .sort((a, b) => (a.key === term ? -1 : 0) - (b.key === term ? -1 : 0) || a.rank - b.rank || a.key.length - b.key.length).slice(0, 8);
+    const others = idx.filter((i) => i.key.includes(term))
+      .sort((a, b) => (a.key === term ? -1 : 0) - (b.key === term ? -1 : 0) || a.rank - b.rank || a.key.length - b.key.length).slice(0, 6);
+    // 町丁目: 漢数字/算用数字/空白の揺れを正規化して照合。区名付きで表示して区別する
+    let townErr = null, townHits = [];
+    try {
+      const tk = TN.normalizeTownName($('lc-q').value);
+      const { recs } = await loadTowns();
+      townHits = recs.map((t) => ({ t, s: TN.matchTown(tk, t) })).filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s || a.t.key.localeCompare(b.t.key, 'ja', { numeric: true })).slice(0, 6)
+        .map((x) => ({ name: x.t.ward + ' ' + x.t.name, kind: '町丁目', town: x.t, x: x.t.cx, z: x.t.cz }));
+    } catch (e) { townErr = e; fail('search:towns', e); }
+    if (norm($('lc-q').value) !== term) return [];
+    const exactOther = others.length && others[0].key === term;
+    const hits = (exactOther ? others.concat(townHits) : townHits.concat(others)).slice(0, 10);
     resBox.textContent = '';
     if (!hits.length) {
-      resBox.appendChild(el('div', '「' + $('lc-q').value.trim() + '」に一致する駅・地名・施設はありません（住所検索は未対応）', { class: 'empty' }));
+      resBox.appendChild(el('div', '「' + $('lc-q').value.trim() + '」に一致する町丁目・駅・地名・施設はありません（住所検索は未対応）', { class: 'empty' }));
     }
     for (const h of hits) {
       const b = el('button', null, { type: 'button', role: 'option' });
@@ -1302,7 +1557,8 @@
       resBox.appendChild(b);
     }
     if (idx.partial) resBox.appendChild(el('div', idx.partial + 'データを読み込めなかったため、結果が不完全です', { class: 'empty' }));
-    stats.lastSearch = { term: $('lc-q').value.trim(), hits: hits.length };
+    if (townErr) resBox.appendChild(el('div', '町丁目データが未接続のため、町丁目は検索できません', { class: 'empty' }));
+    stats.lastSearch = { term: $('lc-q').value.trim(), hits: hits.length, townHits: townHits.length, townsConnected: !townErr };
     return hits;
   }
   $('lc-q').addEventListener('input', () => { runSearch().catch((e) => fail('search', e)); });
