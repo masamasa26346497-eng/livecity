@@ -240,3 +240,32 @@ test('[37C] localBox: 建物タイル範囲がローカル矩形になる', () =
   assert.deepEqual(b, { minX: -3000, maxX: -1500, minZ: -1500, maxZ: 0 });
   assert.equal(tool.BUILDING_TILE_SIZE, 500);
 });
+
+// ── 6. 37C 第2段: 要件の UI 構造 ─────────────────────────────────
+test('[37C] ヘッダーに検索UIと5つのモードタブがある', () => {
+  assert.match(html, /id="lc-search"/);
+  for (const m of ['tourism', 'realestate', 'stats', 'disaster', 'business']) {
+    assert.match(html, new RegExp('data-mode="' + m + '"'), m);
+  }
+});
+
+test('[37C] 要件の14レイヤーが LayerRegistry に登録されている（8つは未接続ダミー）', () => {
+  const real = ['buildings', 'roads', 'railways', 'parks', 'waterways', 'labels'];
+  const dummy = ['facilities', 'photos', 'population', 'landprice', 'realestate', 'shops', 'spots', 'hazard'];
+  for (const id of real) assert.match(html, new RegExp("id: '" + id + "'"), id);
+  for (const id of dummy) assert.match(html, new RegExp("\\['" + id + "',"), id);
+  assert.match(html, /dummy: true/);
+});
+
+test('[37C] 右パネルに写真・基本情報・周辺情報の枠があり、未実装の環境UIは disabled', () => {
+  for (const id of ['lc-basic-slot', 'lc-photo-slot', 'lc-nearby-slot']) assert.match(html, new RegExp('id="' + id + '"'));
+  assert.match(html, /id="chk-shadow" disabled/);
+  assert.match(html, /id="chk-terrain" disabled/);
+  assert.match(html, /data-v="night"[^>]*disabled/);
+});
+
+test('[37C] __mission37c に selectedCanonicalId / theme / tilesetStats がある', () => {
+  assert.match(html, /selectedCanonicalId/);
+  assert.match(html, /defineProperty\(stats, 'theme'/);
+  assert.match(html, /defineProperty\(stats, 'tilesetStats'/);
+});

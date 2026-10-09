@@ -154,6 +154,42 @@
   #lc-left::-webkit-scrollbar, #lc-right::-webkit-scrollbar { width: 6px; }
   #lc-left::-webkit-scrollbar-thumb, #lc-right::-webkit-scrollbar-thumb { background: #22314c; border-radius: 3px; }
 
+  /* ── 検索・モードタブ（ヘッダー）── */
+  #lc-search { display: flex; align-items: center; background: rgba(80,160,255,0.08); border: 1px solid var(--lc-line);
+               border-radius: 6px; padding: 0 8px; height: 30px; width: 220px; flex: 0 1 220px; }
+  #lc-search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--lc-text); font: 12px var(--lc-font); }
+  #lc-search input::placeholder { color: var(--lc-text-mute); }
+  #lc-modes { display: flex; gap: 2px; }
+  .lc-tab { font: 500 12px var(--lc-font); color: var(--lc-text-dim); background: transparent; border: 0;
+            border-bottom: 2px solid transparent; padding: 15px 10px 13px; cursor: pointer; white-space: nowrap; }
+  .lc-tab:hover { color: var(--lc-text); }
+  .lc-tab[aria-selected="true"] { color: var(--lc-hi); border-bottom-color: var(--lc-accent); }
+  .lc-tab[data-impl="0"]::after { content: '準備中'; font-size: 8px; margin-left: 4px; color: var(--lc-text-mute); }
+  #lc-modebar { position: absolute; z-index: 14; left: 50%; transform: translateX(-50%); top: calc(var(--lc-header-h) + 10px);
+                max-width: 36%; font-size: 11px; color: var(--lc-text-dim); background: var(--lc-panel); border: 1px solid var(--lc-line);
+                border-radius: 999px; padding: 5px 14px; display: none; text-align: center; }
+  #lc-modebar.on { display: block; }
+  /* ── ダミー（未接続）レイヤー ── */
+  .lc-layer[data-dummy="1"] .nm { color: var(--lc-text-dim); }
+  .lc-layer[data-dummy="1"] .ct { color: var(--lc-text-mute); font-style: italic; }
+  .lc-tag { font: 8px var(--lc-mono); color: var(--lc-amber); border: 1px solid rgba(216,168,104,.4); border-radius: 3px; padding: 0 3px; }
+  /* ── 右パネルの枠 ── */
+  .lc-frame { border: 1px dashed var(--lc-line); border-radius: 6px; padding: 10px; font-size: 11px; color: var(--lc-text-mute); line-height: 1.6; text-align: center; }
+  #lc-photo-slot { min-height: 74px; display: flex; align-items: center; justify-content: center; }
+  /* ── 環境UI枠・ミニマップ ── */
+  .lc-seg { display: flex; border: 1px solid var(--lc-line); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+  .lc-seg button { flex: 1; font: 11px var(--lc-font); color: var(--lc-text-dim); background: #101a2e; border: 0; padding: 5px 0; cursor: pointer; }
+  .lc-seg button[aria-pressed="true"] { background: var(--lc-accent-mid); color: var(--lc-text); }
+  .lc-seg button:disabled { color: var(--lc-text-mute); cursor: not-allowed; opacity: .6; }
+  .lc-chk { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--lc-text-mute); padding: 2px 0; }
+  #lc-minimap { position: absolute; z-index: 15; right: 14px; bottom: 28px; width: 150px; height: 112px; border-radius: var(--lc-radius);
+                border: 1px solid var(--lc-line); background: var(--lc-panel); overflow: hidden; }
+  #lc-minimap canvas { width: 100%; height: 100%; display: block; }
+  #lc-minimap .cap { position: absolute; left: 6px; top: 4px; font: 9px var(--lc-mono); color: var(--lc-text-mute); }
+
+  @media (max-width: 1400px) { #lc-search { width: 150px; flex-basis: 150px; } .lc-tab { padding-left: 7px; padding-right: 7px; } }
+  @media (max-width: 1280px) { #lc-head-stats .lc-stat:nth-child(2) { display: none; } #lc-sub { display: none; } #lc-modebar { display: none !important; } }
+  @media (max-height: 760px) { #lc-minimap { display: none; } }
   @media (max-width: 900px) {
     .lc-panel { width: 208px; }
     #lc-right { width: 224px; }
@@ -169,6 +205,16 @@
     <div id="lc-title">LIVE CITY</div>
     <div id="lc-sub">大阪市住吉区 · 3D都市ビュー</div>
   </div>
+  <form id="lc-search" role="search" autocomplete="off">
+    <input id="lc-q" type="search" placeholder="駅・地名を検索" aria-label="地名検索">
+  </form>
+  <nav id="lc-modes" role="tablist" aria-label="モード">
+    <button class="lc-tab" role="tab" data-mode="tourism" data-impl="1" aria-selected="false">観光</button>
+    <button class="lc-tab" role="tab" data-mode="realestate" data-impl="0" aria-selected="false">不動産</button>
+    <button class="lc-tab" role="tab" data-mode="stats" data-impl="0" aria-selected="false">人口・統計</button>
+    <button class="lc-tab" role="tab" data-mode="disaster" data-impl="0" aria-selected="false">防災</button>
+    <button class="lc-tab" role="tab" data-mode="business" data-impl="0" aria-selected="false">ビジネス</button>
+  </nav>
   <div id="lc-head-stats">
     <div class="lc-stat"><b id="hs-bldg">—</b><span>建物</span></div>
     <div class="lc-stat"><b id="hs-tiles">—</b><span>表示タイル</span></div>
@@ -178,6 +224,7 @@
 </header>
 
 <div id="cesiumContainer"></div>
+<div id="lc-modebar"></div>
 
 <!-- 左: レイヤーパネル -->
 <aside class="lc-panel" id="lc-left">
@@ -207,6 +254,16 @@
       </select></div>
     <div class="lc-row"><span class="k">タイル精度 (SSE)</span>
       <select class="lc-select" id="sel-sse"><option>8</option><option selected>16</option><option>32</option></select></div>
+  </div>
+  <div class="lc-sec">
+    <h2>環境（UI枠のみ・未実装）</h2>
+    <div class="lc-seg" id="seg-tod" role="group" aria-label="時間帯">
+      <button data-v="day" aria-pressed="true">昼</button>
+      <button data-v="dusk" aria-pressed="false" disabled title="未実装">夕</button>
+      <button data-v="night" aria-pressed="false" disabled title="未実装">夜</button>
+    </div>
+    <label class="lc-chk"><input type="checkbox" id="chk-shadow" disabled> 影表示 <span class="lc-tag">未実装</span></label>
+    <label class="lc-chk"><input type="checkbox" id="chk-terrain" disabled> 地形強調 <span class="lc-tag">未実装</span></label>
   </div>
   <div class="lc-sec">
     <h2>計測</h2>
@@ -241,10 +298,24 @@
     </div>
   </div>
   <div class="lc-sec">
+    <h2>基本情報</h2>
+    <div class="lc-frame" id="lc-basic-slot">築年・構造・階数・所有区分などは未接続（次段階）</div>
+  </div>
+  <div class="lc-sec">
+    <h2>写真</h2>
+    <div class="lc-frame" id="lc-photo-slot" data-slot="mission36l-photo">Mission 36L 写真は未接続<br>（canonicalId で引く差し込み口）</div>
+  </div>
+  <div class="lc-sec">
+    <h2>周辺情報</h2>
+    <div class="lc-frame" id="lc-nearby-slot">最寄駅・公共施設・店舗などは未接続（次段階）</div>
+  </div>
+  <div class="lc-sec">
     <h2>出典</h2>
     <div class="lc-note" id="lc-src">—</div>
   </div>
 </aside>
+
+<div id="lc-minimap" title="ミニマップ（簡易）"><span class="cap">MINIMAP</span><canvas id="lc-mm" width="300" height="224"></canvas></div>
 
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
 <script>
@@ -288,6 +359,7 @@
     mission: '37C', set: SET, sse: SSE0, status: 'loading', fps: 0, p95FrameMs: null,
     firstDisplayMs: null, visibleTiles: 0, visibleBuildings: 0, loadedTilesTotal: 0,
     layers: {}, measure: null, lastPicked: null, errors: [],
+    mode: 'tourism', selectedCanonicalId: null,
   };
   window.__mission37c = stats;
   function fail(where, e) {
@@ -430,14 +502,15 @@
     function register(def) {
       const rec = Object.assign({ visible: def.defaultOn !== false, state: 'idle', count: 0, error: null }, def);
       defs.set(def.id, rec); order.push(def.id);
-      stats.layers[def.id] = { state: 'idle', count: 0, visible: rec.visible };
+      stats.layers[def.id] = { state: 'idle', count: 0, visible: rec.visible, dummy: !!def.dummy };
       return rec;
     }
     function sync(rec) {
-      stats.layers[rec.id] = { state: rec.state, count: rec.count, visible: rec.visible, error: rec.error };
+      stats.layers[rec.id] = { state: rec.state, count: rec.count, visible: rec.visible, error: rec.error, dummy: !!rec.dummy };
       const row = document.querySelector('[data-layer="' + rec.id + '"]');
       if (!row) return;
       row.dataset.state = rec.state;
+      if (rec.dummy) { row.querySelector('.ct').textContent = '未接続'; row.title = rec.hint || ''; return; }
       row.querySelector('.ct').textContent = rec.state === 'error' ? '取得失敗'
         : rec.state === 'loading' ? '読込中'
         : rec.count ? fmt(rec.count) : '0';
@@ -633,7 +706,7 @@
     local:  { font: '400 11px sans-serif', fill: '#9cb8d8', far: 1800, h: 32 },
   };
   const labelLayer = {
-    id: 'labels', label: 'ラベル', swatch: '#cfe6ff', defaultOn: true,
+    id: 'labels', label: '地名・ラベル', swatch: '#cfe6ff', defaultOn: true,
     hint: '主要駅・地名・公園・区名（importance で優先度を分ける）',
     coll: null,
     async mount() {
@@ -681,7 +754,7 @@
     return { width: 2.4, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
   })));
   LayerRegistry.register(Object.assign({
-    id: 'railways', label: '鉄道', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
+    id: 'railways', label: '鉄道・駅', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
   }, makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }))));
   LayerRegistry.register(Object.assign({
     id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）',
@@ -700,12 +773,32 @@
   }, makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks })));
   LayerRegistry.register(labelLayer);
 
+  // ── 未接続レイヤー: UI 状態（visible）だけを持つダミー ──
+  // 接続するときは、同じ id で mount()/applyVisible() を実装した descriptor に差し替えるだけ。
+  // UI 行・トグル・診断（__mission37c.layers）はそのまま使える。
+  function makeDummyLayer(id, label, swatch, hint) {
+    return { id, label, swatch, defaultOn: false, dummy: true, hint: '未接続: ' + hint,
+      async mount() { return { count: 0 }; },
+      applyVisible() { /* 描画対象なし。visible 状態のみ保持 */ } };
+  }
+  [
+    ['facilities', '公共施設', '#8fc0ff', '学校・病院・役所など'],
+    ['photos', '写真', '#d8a868', 'Mission 36L 写真（canonicalId 経由で接続予定）'],
+    ['population', '人口・世帯', '#6fa8dc', '町丁目別の国勢調査統計'],
+    ['landprice', '地価', '#c490d1', '公示地価・路線価'],
+    ['realestate', '不動産', '#e0a458', '物件・賃料'],
+    ['shops', '店舗・飲食店', '#e07a7a', '店舗・飲食店 POI'],
+    ['spots', '観光スポット', '#7fcf9a', '観光スポット POI'],
+    ['hazard', '防災情報', '#f0b84a', 'ハザード・避難所'],
+  ].forEach(([id, label, sw, hint]) => LayerRegistry.register(makeDummyLayer(id, label, sw, hint)));
+
   // ── 左パネルのレイヤー行を作る（要件8）──
   for (const rec of LayerRegistry.all()) {
     const row = document.createElement('label');
     row.className = 'lc-layer';
     row.dataset.layer = rec.id;
     row.dataset.state = 'idle';
+    if (rec.dummy) row.dataset.dummy = '1';
     row.innerHTML = '<input type="checkbox"' + (rec.visible ? ' checked' : '') + '><span class="lc-sw"></span>'
       + '<span class="lc-swatch" style="background:' + rec.swatch + '"></span>'
       + '<span class="nm"></span><span class="ct">—</span>';
@@ -808,6 +901,7 @@
     $('lc-bldg-body').classList.remove('on');
     $('lc-bldg-empty').style.display = '';
     flyTarget = null;
+    stats.selectedCanonicalId = null;
   }
   $('btn-fly').onclick = () => {
     if (!flyTarget) return;
@@ -837,6 +931,7 @@
     $('lc-usage').textContent = '建物';
 
     stats.lastPicked = { canonicalId: id, featureId: picked.featureId };
+    stats.selectedCanonicalId = id;
 
     const [side, attrs] = await Promise.all([sidecarIds(picked), tileAttrs(picked)]);
     const sideId = side ? side[picked.featureId] : null;
@@ -885,6 +980,82 @@
     stats.status = stats.errors.length ? 'ready-with-errors' : (stats.status === 'ready' ? 'ready' : 'loading tiles…');
     console.log('[37C] layers', JSON.stringify(stats.layers));
   })();
+
+  // ══════════════════════════════════════════════════════════════
+  // モードタブ（観光/不動産/人口・統計/防災/ビジネス）— 現段階は安全なダミー表示
+  // ══════════════════════════════════════════════════════════════
+  const MODES = {
+    tourism: '観光モード: 現在の標準ビュー（観光スポットは未接続）',
+    realestate: '不動産モードは準備中です（物件・地価レイヤー接続後に有効化）',
+    stats: '人口・統計モードは準備中です（町丁目統計の接続後に有効化）',
+    disaster: '防災モードは準備中です（ハザード・避難所の接続後に有効化）',
+    business: 'ビジネスモードは準備中です（店舗・商圏データの接続後に有効化）',
+  };
+  function setMode(m) {
+    if (!MODES[m]) return;
+    stats.mode = m;
+    document.querySelectorAll('.lc-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.mode === m)));
+    $('lc-modebar').textContent = MODES[m];
+    $('lc-modebar').classList.toggle('on', m !== 'tourism');
+  }
+  document.querySelectorAll('.lc-tab').forEach((t) => t.addEventListener('click', () => setMode(t.dataset.mode)));
+  setMode('tourism');
+
+  // ── 検索: labels.json の名称で一致を探してカメラを寄せる（住所ジオコーディングは未実装）──
+  $('lc-search').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const term = $('lc-q').value.trim();
+    if (!term) return;
+    try {
+      const items = (await fetchLayerJson('labels.json')).items || [];
+      const hit = items.find((i) => i.name === term) || items.find((i) => i.name.includes(term));
+      if (!hit) { $('lc-q').setCustomValidity('見つかりません'); $('lc-q').reportValidity(); $('lc-q').setCustomValidity(''); return; }
+      viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(toCart(hit.x, hit.z, 0), 120),
+        { duration: 1.2, offset: new Cesium.HeadingPitchRange(0, CAM_PITCH, 700) });
+    } catch (e) { fail('search', e); }
+  });
+
+  // ── ミニマップ（簡易）: major/mid 道路とカメラ位置を 2D canvas に描く ──
+  const mm = $('lc-mm'), mctx = mm.getContext('2d');
+  let mmBox = null;
+  (async function mmInit() {
+    try {
+      const roads = (await fetchLayerJson('roads.json')).features || [];
+      let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+      for (const f of roads) for (const pt of f.p || []) {
+        x0 = Math.min(x0, pt[0]); x1 = Math.max(x1, pt[0]); z0 = Math.min(z0, pt[1]); z1 = Math.max(z1, pt[1]);
+      }
+      mmBox = { x0, x1, z0, z1, roads: roads.filter((f) => f.tier !== 'local') };
+    } catch (e) { fail('minimap', e); }
+  })();
+  function mmDraw() {
+    if (!mmBox) return;
+    const { x0, x1, z0, z1 } = mmBox, W = mm.width, H = mm.height, pad = 10;
+    const sc = Math.min((W - pad * 2) / (x1 - x0), (H - pad * 2) / (z1 - z0));
+    const px = (x) => pad + (x - x0) * sc, pz = (z) => pad + (z - z0) * sc;
+    mctx.clearRect(0, 0, W, H);
+    mctx.strokeStyle = '#4a6a8f'; mctx.lineWidth = 1;
+    for (const f of mmBox.roads) {
+      mctx.beginPath();
+      f.p.forEach((pt, i) => (i ? mctx.lineTo(px(pt[0]), pz(pt[1])) : mctx.moveTo(px(pt[0]), pz(pt[1]))));
+      mctx.stroke();
+    }
+    const c = viewer.camera.positionCartographic;
+    const cx = (Cesium.Math.toDegrees(c.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd;
+    const cz = -((Cesium.Math.toDegrees(c.latitude) - PROJ.clat) * PROJ.mpd);
+    mctx.fillStyle = C.accent; mctx.beginPath(); mctx.arc(px(cx), pz(cz), 4, 0, 6.283); mctx.fill();
+  }
+  setInterval(mmDraw, 500);
+
+  // ── 診断: theme 値・tileset stats（getter で常に最新値）──
+  Object.defineProperty(stats, 'theme', { enumerable: true, get() {
+    return { basemap: bgKind, background: Object.assign({}, BG0), buildingTone: stats.tone, buildingTones: TONE,
+      accent: C.accent, panel: 'rgba(5,10,24,0.88)', tod: 'day', shadow: false, terrainEmphasis: false };
+  } });
+  Object.defineProperty(stats, 'tilesetStats', { enumerable: true, get() {
+    return tileset ? { buildings: stats.tilesetBuildings, sse: tileset.maximumScreenSpaceError,
+      tilesLoaded: stats.loadedTilesTotal, visibleTiles: curTiles, visibleBuildings: curBldg, show: tileset.show } : null;
+  } });
 
   if (q.get('panel') === '0') { $('lc-left').style.display = 'none'; $('lc-right').style.display = 'none'; }
 })();
