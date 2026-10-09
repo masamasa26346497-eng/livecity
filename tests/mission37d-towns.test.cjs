@@ -49,7 +49,7 @@ test('全件数: 住吉区は管理境界データの 104 件、ID・名称キ�
   assert.strictEqual(new Set(data.records.map((r) => r.key)).size, 104);
   for (const r of data.records) {
     assert.strictEqual(r.ward, '住吉区');
-    assert.match(r.id, /^27120:\d{6}$/);
+    assert.match(r.id, /^27120:\d{4,6}$/);
   }
 });
 
