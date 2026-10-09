@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const TN = require('../public/mission37d-data/town-normalize.js');
+const TN = require('../public/mission37d-data/town-normalize.cjs');
 const { build } = require('../tools/mission37d-build-towns.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
