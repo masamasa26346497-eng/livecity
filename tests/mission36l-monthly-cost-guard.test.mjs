@@ -26,12 +26,16 @@ test('budget and caps fail closed', () => {
 test('atomic file reservation, lock rejection and corrupt ledger rejection', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'lc-cost-'));
   const ledgerPath = path.join(dir, 'ledger.json');
-  const args = { ledgerPath, runId: 'r1', config, now: () => new Date('2026-10-09T00:00:00Z') };
+  const approval = { approved: true, runId: 'r1', api: 'places.searchText', maxRequests: 2,
+    maxEstimatedYen: 20, expiresAt: '2026-10-09T01:00:00Z' };
+  const args = { ledgerPath, runId: 'r1', approval, config, now: () => new Date('2026-10-09T00:00:00Z') };
   try {
     await assert.rejects(reservePlacesRequest(args), /MISSING_LEDGER/);
     await fs.writeFile(ledgerPath, JSON.stringify({ version: 1, month: '2026-10', reservations: [] }));
     assert.equal((await reservePlacesRequest(args)).estimatedYen, 10);
     assert.equal((await reservePlacesRequest(args)).estimatedYen, 20);
+    await assert.rejects(reservePlacesRequest(args), /APPROVAL_BUDGET_EXCEEDED/);
+    await assert.rejects(reservePlacesRequest({ ...args, approval: null }), /APPROVAL_REQUIRED/);
     await fs.writeFile(ledgerPath + '.lock', 'blocked');
     await assert.rejects(reservePlacesRequest(args), { code: 'EEXIST' });
     await fs.unlink(ledgerPath + '.lock');
