@@ -9,7 +9,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { normalizeTownName, splitTown } = require('../public/mission37d-data/town-normalize.js');
+const { normalizeTownName, splitTown } = require('../public/mission37d-data/town-normalize.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const P = (...s) => path.join(ROOT, ...s);
