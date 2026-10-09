@@ -39,7 +39,7 @@ test('[37D] 写真索引のキーは cg_ + 建物 id（実データで 1 件以�
   const ids = new Set();
   for (const f of fs.readdirSync(dir)) {
     if (!/^tile_.*\.json$/.test(f)) continue;
-    for (const m of fs.readFileSync(path.join(dir, f), 'utf-8').matchAll(/"id":"(bldg_[0-9a-f-]+)"/g)) ids.add(m[1]);
+    for (const m of fs.readFileSync(path.join(dir, f), 'utf-8').matchAll(/"id"\s*:\s*"(bldg_[0-9a-f-]+)"/g)) ids.add(m[1]);
   }
   const hits = Object.keys(idx.byCanonicalId).filter((k) => k.startsWith('cg_') && ids.has(k.slice(3)));
   assert.ok(hits.length >= 1, '住吉区の建物 id と一致する索引キーが無い');
@@ -49,7 +49,7 @@ test('[37D] 写真索引のキーは cg_ + 建物 id（実データで 1 件以�
 test('[37D] 未接続レイヤーの行を出さず、空状態・エラーの文言がある', () => {
   assert.ok(!/makeDummyLayer\(id, label, sw, hint\)\)\)/.test(page), 'ダミーレイヤーを登録している');
   assert.match(page, /準備中（未接続）/);
-  assert.match(page, /に一致する駅・地名・施設はありません/);
+  assert.match(page, /に一致する町丁目・駅・地名・施設はありません/);
   assert.match(page, /建物データ（3D Tiles）を読み込めませんでした/);
   assert.match(page, /写真データなし/);
   assert.match(page, /データなし/);
