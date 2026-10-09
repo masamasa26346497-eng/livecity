@@ -3,6 +3,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { validatePaidRunApproval } from './paid-run-approval.mjs';
 
 export const DEFAULT_COST_GUARD = Object.freeze({
   monthlyBudgetYen: 3000,
@@ -39,7 +40,9 @@ export function checkReservation({ ledger, month, day, runId, config }) {
 
 // Lock acquisition uses exclusive create. An abandoned lock deliberately blocks new requests
 // until an operator investigates; never auto-break it and risk duplicate paid calls.
-export async function reservePlacesRequest({ ledgerPath, runId, now = () => new Date(), config = DEFAULT_COST_GUARD }) {
+export async function reservePlacesRequest({ ledgerPath, runId, approval, now = () => new Date(), config = DEFAULT_COST_GUARD }) {
+  // Approval is mandatory before even a local reservation can be made.
+  // Each invocation checks cumulative per-run reservations inside the ledger lock.
   if (!path.isAbsolute(ledgerPath)) throw new Error('ledgerPath must be absolute');
   const lockPath = ledgerPath + '.lock';
   const lock = await fs.open(lockPath, 'wx', 0o600);
@@ -47,7 +50,11 @@ export async function reservePlacesRequest({ ledgerPath, runId, now = () => new 
     let ledger = null;
     try { ledger = JSON.parse(await fs.readFile(ledgerPath, 'utf8')); }
     catch (e) { if (e.code !== 'ENOENT') throw e; }
-    const { month, day } = jstPeriod(now());
+    const currentTime = now();
+    const { month, day } = jstPeriod(currentTime);
+    const priorRunCalls = ledger?.month === month ? ledger.reservations.filter(r => r.runId === runId).length : 0;
+    validatePaidRunApproval({ approval, runId, now: currentTime, requestedCalls: priorRunCalls + 1,
+      estimatedYenPerCall: config.estimatedYenPerRequest });
     const next = checkReservation({ ledger, month, day, runId, config });
     const tmp = ledgerPath + '.' + randomUUID() + '.tmp';
     try {
