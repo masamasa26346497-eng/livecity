@@ -26,7 +26,12 @@
 
   async function show(event) {
     const id = event?.detail?.googlePlaceId;
-    if (typeof id !== 'string' || !/^[-_A-Za-z0-9]{8,256}$/.test(id)) return;
+    if (typeof id !== 'string' || !/^[-_A-Za-z0-9]{8,256}$/.test(id)) {
+      lastPlaceId = null;
+      const old = document.getElementById(HOST_ID);
+      if (old) { old.style.display = 'none'; old.replaceChildren(); }
+      return;
+    }
     lastPlaceId = id;
     const el = host();
     if (!el) return;
