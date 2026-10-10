@@ -15,6 +15,9 @@ on:
       - 'tools/photos/build-building-google-place-index.mjs'
       - 'public/livecity-building-photo-bridge.js'
       - 'tests/mission36l-browser-photo-cost-lock.test.mjs'
+      - 'tests/mission36l-ui-kit-staging.test.mjs'
+      - 'public/livecity-places-ui-kit.js'
+      - 'tools/preview.js'
       - '.github/workflows/mission36l-rescue-tests.yml'
   workflow_dispatch:
 
@@ -44,3 +47,4 @@ jobs:
           tests/mission36l-paid-run-approval.test.mjs
           tests/mission36l-building-google-place-index-safety.test.mjs
           tests/mission36l-browser-photo-cost-lock.test.mjs
+          tests/mission36l-ui-kit-staging.test.mjs
