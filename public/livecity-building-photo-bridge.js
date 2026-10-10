@@ -217,7 +217,11 @@
     const bridge = await loadBridge();
     if (token !== renderToken) return;
     const link = bridge.get(buildingId);
-    if (!link) { stats.noLink++; return; }
+    if (!link) {
+      stats.noLink++;
+      window.dispatchEvent(new CustomEvent('livecity:verified-google-place', { detail: {} }));
+      return;
+    }
     window.dispatchEvent(new CustomEvent('livecity:verified-google-place', {
       detail: { googlePlaceId: link.googlePlaceId, buildingId }
     }));
