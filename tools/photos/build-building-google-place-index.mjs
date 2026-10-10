@@ -56,11 +56,16 @@ export function buildBuildingGooglePlaceIndex(buildingDoc, placesDoc, { generate
     .filter((e) => e?.matchConfidence === 'VERIFIED' && e?.facilityId && e?.googlePlaceId);
 
   const placeByFacility = new Map();
+  const conflictedFacilities = new Set();
   for (const entry of verifiedEntries) {
     // A duplicate durable facilityId with conflicting Google IDs is unsafe: remove it from the usable map.
+    if (conflictedFacilities.has(entry.facilityId)) continue;
     const old = placeByFacility.get(entry.facilityId);
     if (!old) placeByFacility.set(entry.facilityId, entry);
-    else if (old.googlePlaceId !== entry.googlePlaceId) placeByFacility.set(entry.facilityId, null);
+    else if (old.googlePlaceId !== entry.googlePlaceId) {
+      conflictedFacilities.add(entry.facilityId);
+      placeByFacility.delete(entry.facilityId);
+    }
   }
 
   const records = [];
