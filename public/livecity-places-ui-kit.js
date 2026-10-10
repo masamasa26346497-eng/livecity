@@ -51,7 +51,7 @@
 
     // Reserved implementation after approval. Fail closed; never auto-enable
     // by merely setting an API key or by clicking a building.
-    // Planned: google.maps.importLibrary('places'), then append
+    // Planned: load the Google Places library after authorization, then append
     // <gmp-place-details><gmp-place-details-place-request>...</...>
     // <gmp-place-all-content></...></gmp-place-details>.
     throw new Error('UI Kit activation requires a separately reviewed billing guard');
