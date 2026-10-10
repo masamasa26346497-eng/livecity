@@ -14,6 +14,10 @@
   const HOST_ID = 'pc-google-photo-section-36l';
   const MARKER = '[Mission 36L BUILDING PHOTO]';
   const MAX_PHOTOS = 3;
+  // Paid Places requests must not be triggered by a building click.
+  // There is currently no authenticated one-time owner approval and shared budget
+  // enforcement in the browser. Keep this hard-disabled even when an API key exists.
+  const PAID_GOOGLE_PHOTOS_ENABLED = false;
   const FIELD_MASK = 'id,displayName,googleMapsUri,photos';
 
   const placeCache = new Map();
@@ -131,7 +135,7 @@
 
   function loadBridge() {
     if (bridgePromise) return bridgePromise;
-    bridgePromise = (async () => (await tryExactIndex()) || buildFallbackBridge())()
+    bridgePromise = (async () => (await tryExactIndex()) || new Map())()
       .catch((err) => {
         stats.errors++;
         stats.bridgeMode = 'failed';
@@ -215,6 +219,9 @@
     const link = bridge.get(buildingId);
     if (!link) { stats.noLink++; return; }
 
+    // The 14k+ exact links are metadata, not permission to incur per-click charges.
+    // No browser-side approval token can safely authorize or budget these calls.
+    if (!PAID_GOOGLE_PHOTOS_ENABLED) return;
     const key = apiKey();
     if (!key) { stats.noKey++; return; }
 
@@ -296,6 +303,7 @@
       ...stats,
       placeCache: placeCache.size,
       mediaCache: mediaCache.size,
+      paidPhotosEnabled: PAID_GOOGLE_PHOTOS_ENABLED,
       patched,
     });
   }
