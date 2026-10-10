@@ -218,6 +218,9 @@
     if (token !== renderToken) return;
     const link = bridge.get(buildingId);
     if (!link) { stats.noLink++; return; }
+    window.dispatchEvent(new CustomEvent('livecity:verified-google-place', {
+      detail: { googlePlaceId: link.googlePlaceId, buildingId }
+    }));
 
     // The 14k+ exact links are metadata, not permission to incur per-click charges.
     // No browser-side approval token can safely authorize or budget these calls.
