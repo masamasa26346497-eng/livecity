@@ -71,7 +71,7 @@ function getDevUiScripts() {
   const scripts = [...CORE_DEV_UI_SCRIPTS];
   // Mission 36L: never load the expensive runtime-name fallback by accident.
   // The Google photo bridge is injected only after the exact local building->Place index exists.
-  if (existsSync(BUILDING_PHOTO_INDEX)) scripts.push('/livecity-building-photo-bridge.js');
+  if (existsSync(BUILDING_PHOTO_INDEX)) scripts.push('/livecity-places-ui-kit.js', '/livecity-building-photo-bridge.js');
   return scripts;
 }
 
@@ -117,7 +117,7 @@ async function main() {
   checkMapData(args.area);
 
   if (existsSync(BUILDING_PHOTO_INDEX)) {
-    console.log('建物写真: 厳密インデックスあり（Google Places写真ブリッジを有効化）');
+    console.log('建物写真: 厳密インデックスあり（Google Place IDブリッジを読み込み（有料写真・UI Kit通信は停止））');
   } else {
     console.log('建物写真: 厳密インデックス未生成（軽量化のため写真ブリッジを無効化）');
     console.log('  → 有効化: node tools/photos/build-building-google-place-index.mjs');
