@@ -3,7 +3,7 @@
   "kind": "photo-display",
   "url": "http://localhost:8137/mission37d-sumiyoshi-mvp.html?qa=1",
   "browser": "Chrome/154.0.8037.97",
-  "generatedAt": "2026-10-11T11:46:25.028Z",
+  "generatedAt": "2026-10-11T12:30:28.782Z",
   "googleRequests": [],
   "imageRequests": [
     "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Hanwa_hospital-01.jpg/330px-Hanwa_hospital-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -36,7 +36,7 @@
         "heightFrac": 0.5
       },
       "photo": {
-        "slotText": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons",
+        "slotText": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons⚠ 2020年7月撮影（2022年6月の移転・新築前の写真）。現在の病院の外観とは異なる可能性があります。⚠ 阪和病院は2022年6月に住吉区南住吉3-5-15へ移転しました。この建物は旧所在地（移転前）の可能性があり、現在の病院の位置・外観ではない場合があります。",
         "ariaBusy": "false",
         "img": {
           "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Hanwa_hospital-01.jpg/330px-Hanwa_hospital-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -61,7 +61,7 @@
       },
       "selectedAfterClick": "bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-ec74351a.jpg",
-      "ms": 13296,
+      "ms": 15202,
       "verdict": "displayed"
     },
     {
@@ -89,7 +89,7 @@
         "bldg_ef3be94e-ff1b-4174-acd2-646dd9c4542d"
       ],
       "note": "scene.pick が目的の建物を返す画面点を見つけられなかった（別の建物/地面に遮られた可能性）",
-      "ms": 86183,
+      "ms": 86327,
       "verdict": "not-clickable"
     },
     {
@@ -110,7 +110,7 @@
       "realClick": true,
       "pick": {
         "x": 750,
-        "y": 495.9999999976734,
+        "y": 496,
         "tried": 1,
         "heightFrac": 0.5
       },
@@ -136,7 +136,7 @@
       },
       "selectedAfterClick": "bldg_867c2448-0dcd-4a35-bfa6-3d7b7b93c1d8",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-867c2448.jpg",
-      "ms": 12930,
+      "ms": 12524,
       "verdict": "displayed"
     },
     {
@@ -183,7 +183,7 @@
       },
       "selectedAfterClick": "bldg_1a63a520-ada1-45fe-96dd-e45b7c7cbceb",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-1a63a520.jpg",
-      "ms": 12067,
+      "ms": 12242,
       "verdict": "displayed"
     },
     {
@@ -230,7 +230,7 @@
       },
       "selectedAfterClick": "bldg_43fb9581-ca25-402e-a552-2953d62e210a",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-43fb9581.jpg",
-      "ms": 12510,
+      "ms": 12882,
       "verdict": "displayed"
     }
   ],
@@ -285,6 +285,6 @@
     },
     "displayed": 4,
     "total": 5,
-    "totalMs": 175221
+    "totalMs": 189787
   }
 }

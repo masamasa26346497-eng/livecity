@@ -1325,16 +1325,26 @@
     const m = String((p && p.sourcePageUrl) || '').match(/File:([^?#]+)$/);
     return m ? PHOTO_CAVEATS[decodeURIComponent(m[1])] || null : null;
   };
+  // 移転済み施設の旧所在地 footprint: 現在の施設の位置・外観として案内しない。新病棟の写真（2023年撮影）は旧 footprint に紐付けない。
+  // 根拠(tools/mission37e-audit-hanwa.cjs): 公式の現所在地は南住吉3-5-15（2022-06-01 集約・新築移転）。Wikidata 2022年以降の座標 34.6038056,135.5036944 は
+  // Live City の footprint の外（最寄りは高さ3m級の低層棟）で、阪和病院 footprint(34.4m) の Wikidata 座標とは約145m離れている。新病棟に対応する建物IDは見つからないため保留。
+  const RELOCATED = {
+    'bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0': { exclude: ['Hanwa_memorial_hospital_2023-12_2.jpg'], notice: '阪和病院は2022年6月に住吉区南住吉3-5-15へ移転しました。この建物は旧所在地（移転前）の可能性があり、現在の病院の位置・外観ではない場合があります。' },
+    'bldg_fae25b63-cddc-4545-8004-c41620676308': { exclude: ['Hanwa_memorial_hospital_2023-12_1.jpg'], notice: '阪和記念病院は2022年6月に住吉区南住吉3-5-15（阪和病院と同じ新病棟）へ移転しました。この建物は旧所在地（移転前）の可能性があり、現在の病院の位置・外観ではない場合があります。' }
+  };
+  const photoFile = (p) => { const m = String((p && p.sourcePageUrl) || '').match(/File:([^?#]+)$/); return m ? decodeURIComponent(m[1]) : ''; };
   function renderPhoto(id, idx) {
     const slot = $('lc-photo-slot');
     slot.textContent = '';
     slot.setAttribute('aria-busy', 'false');
     const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_bldg_' + id];
     const okConf = (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'];
-    const photos = entry && entry.photos ? entry.photos.filter((p) => safeUrl(p.thumbnailUrl) && p.license) : [];
+    const reloc = RELOCATED[id] || null;
+    const photos = entry && entry.photos ? entry.photos.filter((p) => safeUrl(p.thumbnailUrl) && p.license && !(reloc && reloc.exclude.includes(photoFile(p)))) : [];
     stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0 };
     if (!entry || !okConf.includes(entry.matchConfidence) || !photos.length) {
       slot.textContent = '写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）';
+      if (reloc) slot.appendChild(el('div', '⚠ ' + reloc.notice, { class: 'cap', 'data-photo-relocated': '1' }));
       return entry;
     }
     const p = photos[0];
@@ -1356,6 +1366,7 @@
     slot.appendChild(cap);
     const cv = photoCaveat(p);
     if (cv) slot.appendChild(el('div', '⚠ ' + cv, { class: 'cap', 'data-photo-caveat': '1' }));
+    if (reloc) slot.appendChild(el('div', '⚠ ' + reloc.notice, { class: 'cap', 'data-photo-relocated': '1' }));
     stats.lastPicked.photo.shown = 1;
     return entry;
   }

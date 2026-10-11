@@ -79,3 +79,12 @@ test('37E: 移転前(2020年)の阪和病院写真には鮮度注意が付き、
   assert.match(html, /data-photo-caveat/);
   assert.match(html, /const p = photos\[0\]/);
 });
+
+test('37E: 移転済み病院の旧所在地 footprint には移転注記が付き、2023年の新病棟写真は紐付けない', () => {
+  const html = require('fs').readFileSync(require('path').join(__dirname, '..', 'public', 'mission37d-sumiyoshi-mvp.html'), 'utf8');
+  assert.match(html, /const RELOCATED = /);
+  assert.match(html, /data-photo-relocated/);
+  assert.match(html, /bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0'.*Hanwa_memorial_hospital_2023-12_2\.jpg/);
+  assert.match(html, /bldg_fae25b63-cddc-4545-8004-c41620676308'.*Hanwa_memorial_hospital_2023-12_1\.jpg/);
+  assert.match(html, /南住吉3-5-15/);
+});
