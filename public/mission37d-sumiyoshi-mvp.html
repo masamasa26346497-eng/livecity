@@ -383,6 +383,7 @@
   <div class="lc-sec">
     <h2>写真</h2>
     <div class="lc-frame" id="lc-photo-slot" data-slot="mission36l-photo">建物をクリックすると、Mission 36L の写真索引に該当があれば表示します。</div>
+    <div class="lc-frame" id="lc-google-place-staging" style="margin-top:8px;font-size:11px;text-align:left;line-height:1.6">Google施設情報は建物選択時に照合します（有料API通信なし）。</div>
   </div>
   <div class="lc-sec">
     <h2>周辺（500m以内・直線距離）</h2>
@@ -1266,8 +1267,9 @@
   // 索引のキーは 'cg_' + 建物 id（'cg_bldg_bldg_<uuid>'）。ID 体系は変更せず、キーを組み立てるだけ。
   // Google Places UI Kit staging for Mission 37D. No paid Google requests.
   // Existing Wikimedia photo behavior remains unchanged.
-  const GOOGLE_PLACE_INDEX_URL = 'map-data/osaka-city/derived/building-google-place-index.json';
+  const GOOGLE_PLACE_INDEX_URL = 'mission37d-data/verified-google-place-ids.json';
   let googlePlaceIndexPromise = null;
+  let googlePlaceLookupSeq = 0;
   function loadGooglePlaceIndex() {
     if (!googlePlaceIndexPromise) {
       googlePlaceIndexPromise = fetch(GOOGLE_PLACE_INDEX_URL).then(r => {
@@ -1278,12 +1280,42 @@
     }
     return googlePlaceIndexPromise;
   }
-  // This hook is intentionally non-billable and does not load Google JS.
+  function updateGooglePlaceStaging(canonicalId) {
+    const sequence = ++googlePlaceLookupSeq;
+    const slot = $('lc-google-place-staging');
+    if (!slot) return;
+    slot.replaceChildren();
+    if (!canonicalId) return;
+    slot.textContent = 'Google施設情報との照合中…';
+    loadGooglePlaceIndex().then(index => {
+      if (sequence !== googlePlaceLookupSeq) return;
+      const key = 'cg_' + canonicalId;
+      const placeId = index?.byBuildingId?.[key];
+      slot.replaceChildren();
+      if (typeof placeId !== 'string' || !/^ChIJ[-_A-Za-z0-9]+$/.test(placeId)) {
+        slot.textContent = 'Google施設情報：確認済みの対応データなし';
+        return;
+      }
+      const label = document.createElement('div');
+      label.textContent = 'Google施設情報：建物との照合済み';
+      slot.appendChild(label);
+      const note = document.createElement('div');
+      note.textContent = '写真表示は準備中です。課金制御が完了するまでGoogleへの通信は行いません。';
+      slot.appendChild(note);
+      slot.dataset.googlePlaceId = placeId;
+    }).catch(() => {
+      if (sequence !== googlePlaceLookupSeq) return;
+      slot.textContent = 'Google施設情報の照合データを読み込めませんでした。';
+    });
+  }
+  window.addEventListener('livecity:37d-building-selected', event => {
+    updateGooglePlaceStaging(event.detail?.canonicalId || null);
+  });
   window.__mission37dGooglePlacesStaging = Object.freeze({
     enabled: false,
     indexUrl: GOOGLE_PLACE_INDEX_URL,
     loadIndex: loadGooglePlaceIndex,
-    reason: 'Server-enforced billing guard and reviewed UI Kit wiring required before activation'
+    reason: 'No Google network requests until an enforced budget guard is implemented'
   });
   const PHOTO_INDEX_URL = 'map-data/osaka-city/derived/building-photo-index.json';
   let photoIdxPromise = null;
