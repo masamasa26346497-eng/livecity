@@ -71,3 +71,11 @@ test('[37E] 作者が定型句のときは作者名を作らず、名称は Wiki
   for (const a of ['Own work', 'I, KENPEI', 'Self-photographed']) assert.ok(g.test(a), a);
   for (const a of ['Gohachiyasu1214', 'Saigen Jiro', '岩佐 栄三']) assert.ok(!g.test(a), a);
 });
+
+test('37E: 移転前(2020年)の阪和病院写真には鮮度注意が付き、写真は入れ替えない', () => {
+  const html = require('fs').readFileSync(require('path').join(__dirname, '..', 'public', 'mission37d-sumiyoshi-mvp.html'), 'utf8');
+  assert.match(html, /PHOTO_CAVEATS/);
+  assert.match(html, /Hanwa_hospital-01\.jpg/);
+  assert.match(html, /data-photo-caveat/);
+  assert.match(html, /const p = photos\[0\]/);
+});

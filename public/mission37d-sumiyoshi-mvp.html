@@ -1316,6 +1316,15 @@
   const authorLabel = (a) => (!a || GENERIC_AUTHOR.test(String(a).trim()) ? '索引に作者名の記載なし（Wikimedia Commons のファイルページを参照）' : a);
   // curatedName が Wikidata 名の先頭部分だけ（例: 細井川 ← 細井川停留場）のときは、種別が分かる Wikidata 名を表示する
   const displayName = (e) => (e && e.wikidataLabel && e.buildingName && e.wikidataLabel.length > e.buildingName.length && e.wikidataLabel.startsWith(e.buildingName) ? e.wikidataLabel : (e && e.buildingName) || null);
+  // 写真の鮮度注意（撮影日・移転情報が確認できた写真だけを手動登録）。写真の入れ替えはせず、現況と誤解されないよう注記する
+  // 根拠: Commons ファイルページの撮影日 / 錦秀会の公式案内（2022-06-01 阪和病院・阪和記念病院が集約・新築移転、現住所 住吉区南住吉3-5-15）
+  const PHOTO_CAVEATS = {
+    'Hanwa_hospital-01.jpg': '2020年7月撮影（2022年6月の移転・新築前の写真）。現在の病院の外観とは異なる可能性があります。'
+  };
+  const photoCaveat = (p) => {
+    const m = String((p && p.sourcePageUrl) || '').match(/File:([^?#]+)$/);
+    return m ? PHOTO_CAVEATS[decodeURIComponent(m[1])] || null : null;
+  };
   function renderPhoto(id, idx) {
     const slot = $('lc-photo-slot');
     slot.textContent = '';
@@ -1345,6 +1354,8 @@
     if (src) { cap.appendChild(document.createTextNode(' / ')); cap.appendChild(el('a', 'Wikimedia Commons', { href: src, target: '_blank', rel: 'noopener' })); }
     if (entry.matchConfidence !== 'VERY_HIGH' && entry.matchConfidence !== 'HIGH') cap.appendChild(document.createTextNode(' / 対応づけ信頼度: ' + entry.matchConfidence));
     slot.appendChild(cap);
+    const cv = photoCaveat(p);
+    if (cv) slot.appendChild(el('div', '⚠ ' + cv, { class: 'cap', 'data-photo-caveat': '1' }));
     stats.lastPicked.photo.shown = 1;
     return entry;
   }
