@@ -1265,7 +1265,7 @@
   let selSeq = 0;
 
   // ── 36L 写真索引: 初回クリック時に 1 回だけ遅延取得（約 6MB）。ネットへの問い合わせは索引の読込のみ ──
-  // 索引のキーは 'cg_' + 建物 id（'cg_bldg_bldg_<uuid>'）。ID 体系は変更せず、キーを組み立てるだけ。
+  // 索引のキーは 'cg_bldg_' + 建物 id（'cg_bldg_bldg_<uuid>'）。37E で 'cg_' から修正。ID 体系は変更せず、キーを組み立てるだけ。
   // ── Mission 37E: Google Places UI Kit の照合（共通モジュールへ委譲）──
   //   照合・競合制御・表示は mission37e-places-ui-kit.js が持つ。ここは配線だけ。
   //   区ごとの差分は索引 URL だけなので、24 区展開でこのページの改修は要らない。
@@ -1311,7 +1311,7 @@
   function renderPhoto(id, idx) {
     const slot = $('lc-photo-slot');
     slot.textContent = '';
-    const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_' + id];
+    const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_bldg_' + id];
     const okConf = (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'];
     const photos = entry && entry.photos ? entry.photos.filter((p) => safeUrl(p.thumbnailUrl) && p.license) : [];
     stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0 };

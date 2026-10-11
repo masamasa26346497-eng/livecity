@@ -33,7 +33,7 @@ test('[37D] 施設データは元データの複製で、件数と座標が揃�
   }
 });
 
-test('[37D] 写真索引のキーは cg_ + 建物 id（実データで 1 件以上、住吉区の建物 tile に存在）', () => {
+test('[37D] 写真索引のキーは cg_bldg_ + 建物 id（実データで 1 件以上、住吉区の建物 tile に存在）', () => {
   const idx = JSON.parse(read('public/map-data/osaka-city/derived/building-photo-index.json'));
   const dir = path.join(ROOT, 'public/map-data/osaka-city/buildings/osaka-sumiyoshi');
   const ids = new Set();
@@ -41,9 +41,10 @@ test('[37D] 写真索引のキーは cg_ + 建物 id（実データで 1 件以�
     if (!/^tile_.*\.json$/.test(f)) continue;
     for (const m of fs.readFileSync(path.join(dir, f), 'utf-8').matchAll(/"id"\s*:\s*"(bldg_[0-9a-f-]+)"/g)) ids.add(m[1]);
   }
-  const hits = Object.keys(idx.byCanonicalId).filter((k) => k.startsWith('cg_') && ids.has(k.slice(3)));
+  const hits = Object.keys(idx.byCanonicalId).filter((k) => k.startsWith('cg_bldg_') && ids.has(k.slice(8)));
   assert.ok(hits.length >= 1, '住吉区の建物 id と一致する索引キーが無い');
   assert.ok(idx.policy.clickShows.includes('HIGH'));
+  assert.ok(page.includes("byCanonicalId['cg_bldg_' + id]"), 'HTML が cg_bldg_ を使っていない');
 });
 
 test('[37D] 未接続レイヤーの行を出さず、空状態・エラーの文言がある', () => {
