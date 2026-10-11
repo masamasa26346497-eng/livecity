@@ -1,0 +1,39 @@
+# Mission 36L: CI for the missing-facility rescue tests.
+# Claude's GitHub App cannot create files under .github/workflows, so this is provided for a maintainer to copy to
+#   .github/workflows/mission36l-rescue-tests.yml
+# (no secrets, no network calls: all tests use injected fetch stubs)
+name: Mission 36L Rescue Tests
+
+on:
+  push:
+    branches:
+      - feature/mission-36l-building-photo-linking
+    paths:
+      - 'tools/google-places/**'
+      - 'tests/mission36l-missing-facility-rescue-*.test.js'
+      - 'tests/mission36l-places-error-diagnostics.test.js'
+      - '.github/workflows/mission36l-rescue-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mission36l-rescue-tests
+  cancel-in-progress: true
+
+jobs:
+  rescue-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run rescue unit tests (offline)
+        run: >
+          node --test
+          tests/mission36l-missing-facility-rescue-api-errors.test.js
+          tests/mission36l-missing-facility-rescue-resilience.test.js
+          tests/mission36l-places-error-diagnostics.test.js
