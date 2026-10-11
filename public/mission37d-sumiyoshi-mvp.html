@@ -1311,6 +1311,11 @@
     for (const k in (attrs || {})) e.setAttribute(k, attrs[k]);
     return e;
   }
+  // 索引の作者欄が「Own work」等の定型句だけのとき、それは作者名ではない。名前を作らず Commons のページを案内する
+  const GENERIC_AUTHOR = /^(own work|self[- ]?photographed|i, .+|photo taken by .+|taken by .+)$/i;
+  const authorLabel = (a) => (!a || GENERIC_AUTHOR.test(String(a).trim()) ? '索引に作者名の記載なし（Wikimedia Commons のファイルページを参照）' : a);
+  // curatedName が Wikidata 名の先頭部分だけ（例: 細井川 ← 細井川停留場）のときは、種別が分かる Wikidata 名を表示する
+  const displayName = (e) => (e && e.wikidataLabel && e.buildingName && e.wikidataLabel.length > e.buildingName.length && e.wikidataLabel.startsWith(e.buildingName) ? e.wikidataLabel : (e && e.buildingName) || null);
   function renderPhoto(id, idx) {
     const slot = $('lc-photo-slot');
     slot.textContent = '';
@@ -1324,7 +1329,7 @@
       return entry;
     }
     const p = photos[0];
-    const img = el('img', null, { src: p.thumbnailUrl, alt: (entry.buildingName || '建物') + 'の写真', loading: 'lazy', referrerpolicy: 'no-referrer' });
+    const img = el('img', null, { src: p.thumbnailUrl, alt: (displayName(entry) || '建物') + 'の写真', loading: 'lazy', referrerpolicy: 'no-referrer' });
     img.addEventListener('error', () => {
       if (!img.isConnected) return; // 別の建物に切り替わった後の遅延エラーは無視
       slot.textContent = '写真を読み込めませんでした（画像の取得に失敗）。出典: ';
@@ -1333,7 +1338,7 @@
     });
     slot.appendChild(img);
     const cap = el('div', null, { class: 'cap' });
-    cap.appendChild(document.createTextNode('作者: ' + (p.author || '不明') + ' / ライセンス: '));
+    cap.appendChild(document.createTextNode('作者: ' + authorLabel(p.author) + ' / ライセンス: '));
     const lic = safeUrl(p.licenseUrl);
     if (lic) cap.appendChild(el('a', p.license, { href: lic, target: '_blank', rel: 'noopener' })); else cap.appendChild(document.createTextNode(p.license));
     const src = safeUrl(p.sourcePageUrl);
@@ -1398,6 +1403,34 @@
     if (!flyTarget) return;
     viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(flyTarget, 90), { duration: 1.0, offset: new Cesium.HeadingPitchRange(viewer.camera.heading, CAM_PITCH, 260) });
   };
+
+  // QA 専用フック: localhost / 127.0.0.1 かつ ?qa=1 のときだけ公開（本番ホストでは定義されない）。
+  // 実クリック(CDP Input)の座標を Cesium の投影 API で求めるためのもので、選択処理そのものは呼ばない。
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('qa') === '1') {
+    const rect = () => scene.canvas.getBoundingClientRect();
+    window.__mission37dQA = {
+      lookAtLocal(x, z, h, range, pitchDeg, headingDeg) {
+        viewer.camera.lookAt(toCart(x, z, h), new Cesium.HeadingPitchRange(Cesium.Math.toRadians(headingDeg || 0), Cesium.Math.toRadians(pitchDeg), range));
+        viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+      },
+      tilesReady: () => !!tileset && tileset.tilesLoaded,
+      project(x, z, h) {
+        const p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(x, z, h));
+        if (!p) return null;
+        const r = rect();
+        return { x: p.x + r.left, y: p.y + r.top, inCanvas: p.x >= 0 && p.y >= 0 && p.x < r.width && p.y < r.height };
+      },
+      drillIds(px, py) { // 同じ画面点に重なる全建物（診断用）
+        const r = rect();
+        return scene.drillPick(new Cesium.Cartesian2(px - r.left, py - r.top), 8).map((f) => (f && typeof f.getProperty === 'function' ? f.getProperty('canonicalId') : null));
+      },
+      pickId(px, py) {
+        const r = rect();
+        const f = scene.pick(new Cesium.Cartesian2(px - r.left, py - r.top));
+        return f && typeof f.getProperty === 'function' ? f.getProperty('canonicalId') : null;
+      },
+    };
+  }
 
   const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction(async (click) => {
@@ -1468,7 +1501,7 @@
     loadPhotoIndex().then((idx) => {
       if (seq !== selSeq) return;
       const entry = renderPhoto(id, idx);
-      if (entry && entry.buildingName && ['VERY_HIGH', 'HIGH', 'AMBIGUOUS'].includes(entry.matchConfidence)) $('bs-name').textContent = entry.buildingName;
+      if (entry && entry.buildingName && ['VERY_HIGH', 'HIGH', 'AMBIGUOUS'].includes(entry.matchConfidence)) $('bs-name').textContent = displayName(entry);
     }).catch((e) => {
       if (seq !== selSeq) return;
       fail('photo-index', e);

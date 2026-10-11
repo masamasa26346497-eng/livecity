@@ -61,3 +61,13 @@ test('[37D] 外部リンクは https のみ・DOM は textContent 経由', () =>
   assert.match(page, /\/\^https:\\\/\\\//);
   assert.ok(!/photo[^\n]*innerHTML/.test(page));
 });
+
+test('[37E] 作者が定型句のときは作者名を作らず、名称は Wikidata 名で補う。QA フックは localhost+?qa=1 限定', () => {
+  assert.ok(/GENERIC_AUTHOR/.test(page) && /authorLabel\(p\.author\)/.test(page));
+  assert.ok(/displayName\(entry\)/.test(page));
+  assert.ok(/location\.hostname\) && new URLSearchParams\(location\.search\)\.get\('qa'\) === '1'/.test(page));
+  assert.equal((page.match(/window\.__mission37dQA\s*=/g) || []).length, 1);
+  const g = new RegExp(page.match(/const GENERIC_AUTHOR = \/(.*)\/i;/)[1], 'i');
+  for (const a of ['Own work', 'I, KENPEI', 'Self-photographed']) assert.ok(g.test(a), a);
+  for (const a of ['Gohachiyasu1214', 'Saigen Jiro', '岩佐 栄三']) assert.ok(!g.test(a), a);
+});
