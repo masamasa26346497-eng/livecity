@@ -3,14 +3,13 @@
   "kind": "photo-display",
   "url": "http://localhost:8137/mission37d-sumiyoshi-mvp.html?qa=1",
   "browser": "Chrome/154.0.8037.97",
-  "generatedAt": "2026-10-11T12:45:37.038Z",
+  "generatedAt": "2026-10-11T15:07:17.208Z",
   "googleRequests": [],
   "imageRequests": [
     "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Hanwa_hospital-01.jpg/330px-Hanwa_hospital-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
     "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Shogon-jodoji%2C_hondou.jpg/330px-Shogon-jodoji%2C_hondou.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
     "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Todorokihimenomikoto_shrine.jpg/330px-Todorokihimenomikoto_shrine.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG/330px-%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Hanwa_hospital-01.jpg/330px-Hanwa_hospital-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG/330px-%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
   ],
   "jsErrors": [],
   "targets": [
@@ -37,7 +36,7 @@
         "heightFrac": 0.5
       },
       "photo": {
-        "slotText": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons⚠ 2020年7月撮影（2022年6月の移転・新築前の写真）。現在の病院の外観とは異なる可能性があります。⚠ 阪和病院は2022年6月に住吉区南住吉3-5-15へ移転しました。この建物は旧所在地（移転前）の可能性があり、現在の病院の位置・外観ではない場合があります。",
+        "slotText": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons / 撮影: 2020年7月19日⚠ 2020年7月撮影（2022年6月の移転・新築前の写真）。現在の病院の外観とは異なる可能性があります。⚠ 阪和病院は2022年6月に住吉区南住吉3-5-15へ移転しました。この建物は旧所在地（移転前）の可能性があり、現在の病院の位置・外観ではない場合があります。",
         "ariaBusy": "false",
         "img": {
           "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Hanwa_hospital-01.jpg/330px-Hanwa_hospital-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -47,7 +46,7 @@
           "shownWidth": 220,
           "alt": "阪和病院の写真"
         },
-        "caption": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons",
+        "caption": "作者: Gohachiyasu1214 / ライセンス: CC BY-SA 4.0 / Wikimedia Commons / 撮影: 2020年7月19日",
         "links": [
           {
             "text": "CC BY-SA 4.0",
@@ -56,13 +55,17 @@
           {
             "text": "Wikimedia Commons",
             "href": "https://commons.wikimedia.org/wiki/File:Hanwa_hospital-01.jpg"
+          },
+          {
+            "text": "2020年7月19日",
+            "href": "https://commons.wikimedia.org/wiki/File:Hanwa_hospital-01.jpg"
           }
         ],
         "name": "阪和病院"
       },
       "selectedAfterClick": "bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-ec74351a.jpg",
-      "ms": 15168,
+      "ms": 13014,
       "verdict": "displayed"
     },
     {
@@ -90,7 +93,7 @@
         "bldg_ef3be94e-ff1b-4174-acd2-646dd9c4542d"
       ],
       "note": "scene.pick が目的の建物を返す画面点を見つけられなかった（別の建物/地面に遮られた可能性）",
-      "ms": 85194,
+      "ms": 85941,
       "verdict": "not-clickable"
     },
     {
@@ -116,7 +119,7 @@
         "heightFrac": 0.5
       },
       "photo": {
-        "slotText": "作者: Saigen Jiro / ライセンス: CC0 / Wikimedia Commons",
+        "slotText": "作者: Saigen Jiro / ライセンス: CC0 / Wikimedia Commons / 撮影: 2017年10月8日",
         "ariaBusy": "false",
         "img": {
           "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Shogon-jodoji%2C_hondou.jpg/330px-Shogon-jodoji%2C_hondou.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -126,18 +129,22 @@
           "shownWidth": 220,
           "alt": "荘厳浄土寺の写真"
         },
-        "caption": "作者: Saigen Jiro / ライセンス: CC0 / Wikimedia Commons",
+        "caption": "作者: Saigen Jiro / ライセンス: CC0 / Wikimedia Commons / 撮影: 2017年10月8日",
         "links": [
           {
             "text": "Wikimedia Commons",
             "href": "https://commons.wikimedia.org/wiki/File:Shogon-jodoji,_hondou.jpg"
+          },
+          {
+            "text": "2017年10月8日",
+            "href": "https://commons.wikimedia.org/wiki/File:Shogon-jodoji%2C_hondou.jpg"
           }
         ],
         "name": "荘厳浄土寺"
       },
       "selectedAfterClick": "bldg_867c2448-0dcd-4a35-bfa6-3d7b7b93c1d8",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-867c2448.jpg",
-      "ms": 13080,
+      "ms": 12251,
       "verdict": "displayed"
     },
     {
@@ -163,7 +170,7 @@
         "heightFrac": 0.5
       },
       "photo": {
-        "slotText": "作者: 岩佐 栄三 / ライセンス: CC0 / Wikimedia Commons",
+        "slotText": "作者: 岩佐 栄三 / ライセンス: CC0 / Wikimedia Commons / 撮影: 2018年3月4日",
         "ariaBusy": "false",
         "img": {
           "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Todorokihimenomikoto_shrine.jpg/330px-Todorokihimenomikoto_shrine.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -173,10 +180,14 @@
           "shownWidth": 220,
           "alt": "止止呂支比売命神社の写真"
         },
-        "caption": "作者: 岩佐 栄三 / ライセンス: CC0 / Wikimedia Commons",
+        "caption": "作者: 岩佐 栄三 / ライセンス: CC0 / Wikimedia Commons / 撮影: 2018年3月4日",
         "links": [
           {
             "text": "Wikimedia Commons",
+            "href": "https://commons.wikimedia.org/wiki/File:Todorokihimenomikoto_shrine.jpg"
+          },
+          {
+            "text": "2018年3月4日",
             "href": "https://commons.wikimedia.org/wiki/File:Todorokihimenomikoto_shrine.jpg"
           }
         ],
@@ -184,7 +195,7 @@
       },
       "selectedAfterClick": "bldg_1a63a520-ada1-45fe-96dd-e45b7c7cbceb",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-1a63a520.jpg",
-      "ms": 12462,
+      "ms": 12255,
       "verdict": "displayed"
     },
     {
@@ -210,7 +221,7 @@
         "heightFrac": 0.5
       },
       "photo": {
-        "slotText": "作者: 投稿者瑞雲 / ライセンス: CC BY-SA 3.0 / Wikimedia Commons",
+        "slotText": "作者: 投稿者瑞雲 / ライセンス: CC BY-SA 3.0 / Wikimedia Commons / 撮影: 2008年7月30日",
         "ariaBusy": "false",
         "img": {
           "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG/330px-%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -220,10 +231,14 @@
           "shownWidth": 220,
           "alt": "東福寺の写真"
         },
-        "caption": "作者: 投稿者瑞雲 / ライセンス: CC BY-SA 3.0 / Wikimedia Commons",
+        "caption": "作者: 投稿者瑞雲 / ライセンス: CC BY-SA 3.0 / Wikimedia Commons / 撮影: 2008年7月30日",
         "links": [
           {
             "text": "Wikimedia Commons",
+            "href": "https://commons.wikimedia.org/wiki/File:%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG"
+          },
+          {
+            "text": "2008年7月30日",
             "href": "https://commons.wikimedia.org/wiki/File:%E7%9C%9F%E8%A8%80%E5%AE%97%E6%9D%B1%E7%A6%8F%E5%AF%BA%EF%BC%88%E5%A4%A7%E9%98%AA%E5%BA%9C%EF%BC%89%E5%B1%B1%E9%96%80.JPG"
           }
         ],
@@ -231,7 +246,7 @@
       },
       "selectedAfterClick": "bldg_43fb9581-ca25-402e-a552-2953d62e210a",
       "screenshot": "data/reports/mission37e-places-ui-kit/photo-43fb9581.jpg",
-      "ms": 13470,
+      "ms": 12939,
       "verdict": "displayed"
     }
   ],
@@ -286,6 +301,6 @@
     },
     "displayed": 4,
     "total": 5,
-    "totalMs": 178540
+    "totalMs": 184358
   }
 }

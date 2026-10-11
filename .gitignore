@@ -135,3 +135,6 @@ public/map-data/osaka-city/gsi-building-outline/
 # [Mission 37B] 3D Tiles PoC の生成物。再生成: node tools/mission37b-build-3dtiles.cjs [--all]
 # 52 tile 版は大きいので commit しない（9 tile 版のみ最小サンプルとして commit 可）。
 public/mission37b-3dtiles/*-all/
+
+# Mission 37F Commons imageinfo cache (再生成可能)
+data/cache/mission37f-commons/

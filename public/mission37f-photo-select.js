@@ -84,9 +84,10 @@
     });
     // 並べ替えは「より新しい日付の根拠がある」ときだけ。日付が同じ/不明どうしは 36L の元の順序(score 順)を保つ。
     // 解像度は、日付が既知で同じ(同年月)の写真どうしの決め手にだけ使う。
+    // 検証済みの日付を最優先。ファイル名の年(非検証)が検証済みの日付より前に来ることはない。
     kept.sort((a, b) =>
-      (dateScore(b.date) - dateScore(a.date)) ||
       (BASIS_RANK[b.date.basis] - BASIS_RANK[a.date.basis]) ||
+      (dateScore(b.date) - dateScore(a.date)) ||
       (a.date.year != null ? pixels(b.photo) - pixels(a.photo) : 0) ||
       (a.order - b.order));
     out.photos = kept.map((k) => ({ photo: k.photo, date: k.date }));

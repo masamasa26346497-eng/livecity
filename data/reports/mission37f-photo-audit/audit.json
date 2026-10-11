@@ -15,8 +15,9 @@
     "3": 2
   },
   "dateBasis": {
-    "unknown": 552,
-    "filename": 36
+    "verified": 420,
+    "unknown": 151,
+    "filename": 17
   },
   "licenses": {
     "CC BY-SA 3.0": 246,
@@ -42,48 +43,80 @@
     "large": 150
   },
   "eligibleEntries": 574,
-  "eligiblePhotos": 588,
-  "rejectedReasons": {},
+  "eligiblePhotos": 586,
+  "rejectedReasons": {
+    "relocation-excluded": 2
+  },
   "reorderedByDate": [
+    {
+      "canonicalId": "cg_bldg_osm_161451126",
+      "name": "HEP FIVE",
+      "before": "HEP-FIVE_in_201409_001.JPG",
+      "after": "HEP_FIVE.jpg",
+      "afterDateBasis": "verified",
+      "afterYear": 2020,
+      "afterTakenAt": "2020-10-29",
+      "beforeTakenAt": null
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_8e4695fb-0c30-41d2-bd5e-37f2b10c467e",
+      "name": "大阪梅田",
+      "before": "OsakaUmeda_Twin_Towers_South.jpg",
+      "after": "Hankyu_Osaka-Umeda-STA_Premises.jpg",
+      "afterDateBasis": "verified",
+      "afterYear": 2023,
+      "afterTakenAt": "2023-12-08",
+      "beforeTakenAt": "2022-01-03"
+    },
     {
       "canonicalId": "cg_bldg_bldg_8ad5d70f-2cb7-411f-a234-299b6e6af56f",
       "name": "大阪くらしの今昔館",
       "before": "Tenjimbashi6_on_Tenjimbashisuji-Mall.JPG",
       "after": "Osaka_Museum_of_Housing_and_Living_in_2013.jpg",
-      "afterDateBasis": "filename",
-      "afterYear": 2013
+      "afterDateBasis": "verified",
+      "afterYear": 2013,
+      "afterTakenAt": "2013-01-12",
+      "beforeTakenAt": null
     },
     {
       "canonicalId": "cg_bldg_bldg_dd72626d-0999-4568-b85e-9a2d412120f9",
       "name": "なんばCITY本館",
       "before": "Namba1.jpg",
       "after": "Nanba_CITY_2019,02.jpg",
-      "afterDateBasis": "filename",
-      "afterYear": 2019
+      "afterDateBasis": "verified",
+      "afterYear": 2019,
+      "afterTakenAt": "2019-02-22",
+      "beforeTakenAt": null
     },
     {
-      "canonicalId": "cg_bldg_bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
-      "name": "大阪松竹座",
-      "before": "Osaka_Shochikuza_2010.jpg",
-      "after": "Shochikuza_2020-09.jpg",
-      "afterDateBasis": "filename",
-      "afterYear": 2020
+      "canonicalId": "cg_bldg_bldg_3967a4f3-66ba-48aa-8990-492fc89fb041",
+      "name": "大阪公立大学医学部附属病院",
+      "before": "大阪市立大学医学部.jpg",
+      "after": "Osaka_Metropolitan_University_Hospital_sign.jpg",
+      "afterDateBasis": "verified",
+      "afterYear": 2022,
+      "afterTakenAt": "2022-06-20",
+      "beforeTakenAt": null
     },
     {
-      "canonicalId": "cg_bldg_bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
-      "name": "阪和病院",
-      "before": "Hanwa_hospital-01.jpg",
-      "after": "Hanwa_memorial_hospital_2023-12_2.jpg",
-      "afterDateBasis": "filename",
-      "afterYear": 2023
+      "canonicalId": "cg_bldg_bldg_e640c127-f8f3-4def-b4e9-b65819c03033",
+      "name": "式内楯原神社",
+      "before": "Tatehara_Shrine._The_south_side_of_the_torii.jpg",
+      "after": "Tatehara_Shrine_Kire_Tomoshibi_no_Yube.png",
+      "afterDateBasis": "verified",
+      "afterYear": 2019,
+      "afterTakenAt": "2019-08-30",
+      "beforeTakenAt": "2016-11-06"
     },
     {
-      "canonicalId": "cg_bldg_bldg_fae25b63-cddc-4545-8004-c41620676308",
-      "name": "阪和記念病院",
-      "before": "Hanwa_Memorial_Hospital.JPG",
-      "after": "Hanwa_memorial_hospital_2023-12_1.jpg",
-      "afterDateBasis": "filename",
-      "afterYear": 2023
+      "canonicalId": "cg_bldg_bldg_30319fab-0161-41f2-8505-dcf6d5740994",
+      "name": "丼池繊維会館",
+      "before": "Dobuike_Hall.jpg",
+      "after": "愛國貯金銀行.png",
+      "afterDateBasis": "verified",
+      "afterYear": 2025,
+      "afterTakenAt": "2025-01-19",
+      "beforeTakenAt": "2021-09-07"
     }
   ],
   "relocationSuspects": [

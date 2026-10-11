@@ -65,6 +65,20 @@
 
 - Google Places UI Kit は `ENABLED=false` のまま。SDK、API キー、有料通信は追加していません。
 - 阪和病院の新病棟 footprint は建物データに無く、2023年写真は旧 ID に付けません（37E のロックを維持）。
-- 撮影日は 588 件すべて未検証（unknown 552 / ファイル名の年のみ 36）。
+- 撮影日は第2段階で取得済み（§7）。verified 420 / unknown 168。
 - `RELOCATED` / `PHOTO_CAVEATS` はまだ 37D ページ内（住吉区のみ）。24 区向けのデータ化は次の作業。
 - Vercel Preview の画面確認はしていません。
+
+## 7. 第2段階: Commons 撮影日の実取得（実施済み）
+
+- コマンド: `node tools/mission37f-fetch-photo-dates.cjs`（`--limit N` で小規模サンプル、`--offline` / `--fresh` あり）。Node の public GET で `commons.wikimedia.org/w/api.php` の `prop=imageinfo&iiprop=extmetadata|timestamp` のみ。50 件/リクエスト、1.5 秒間隔の直列、`maxlag=5`、429/503 と maxlag は指数バックオフ（最大 5 回）、20 秒タイムアウト、明示的 User-Agent、バッチごとにキャッシュ保存（`data/cache/mission37f-commons/`、gitignore）で中断再開。トークン不要・費用ゼロ（公開の読み取り API のみで、課金サービスは使っていない）。
+- 実行結果: 20 件のサンプル → 588 件全件。12 リクエスト、失敗 0。
+- 採用規則: `DateTimeOriginal` が ISO（YYYY[-MM[-DD]] [時刻]）のときだけ `verified:true`。アップロード timestamp、`DateTime`、ファイル名の年は使わない。未来日、1900 年未満、不正な月日時、アップロードより後の撮影日は拒否。
+- 結果（`public/map-data/osaka-city/derived/photo-dates.json`）: **verified 420 / unknown 168**。精度の内訳は day 395、month 21、year 4。unknown の理由は、非 ISO 表記 156（"Taken on 26 December 2014" 等の英文）、DateTimeOriginal なし 12。英文の日付は、指示どおり自動変換せず原文を保持している。
+- 画面: 検証済みのときだけ「撮影: YYYY年M月D日」を根拠 URL へのリンクで表示。それ以外は「撮影: 未確認」。順位は、検証済みの日付 > ファイル名の年 > 不明。ファイル名の年が、検証済みの日付に勝つことはない。
+- 同じ建物で先頭が変わる件数: **7 / 574**（第1段階はファイル名ヒントで 5 件）。住吉区の建物は **0 件**。
+  - 例: なんばCITY本館 `Namba1.jpg` → `Nanba_CITY_2019,02.jpg`（2019-02-22）、大阪くらしの今昔館 → `…_in_2013.jpg`（2013-01-12）、式内楯原神社 2016-11-06 → 2019-08-30。
+  - **要確認**: 丼池繊維会館 → `愛國貯金銀行.png`（2025-01-19）、大阪梅田 → `Hankyu_Osaka-Umeda-STA_Premises.jpg` は、日付は新しいが被写体が同じ建物かを日付だけでは判断できない。索引が同一の建物に対応づけた候補なので順位付けの対象に入れているが、別建物の可能性は未確認。
+- 住吉区の写真付き 10 建物のうち、撮影日が検証済みは 9 件（阪和記念病院のみ unknown）。阪和病院の `Hanwa_hospital-01.jpg` は 2020-07-19 で、既存の移転前注記と整合する。
+- 阪和病院・阪和記念病院の旧 footprint には 2023 年の新病棟写真を付けない（除外が必須であることをテストで固定）。
+- 実 Chrome QA（ローカル）: 5 施設中 4 件が実クリックで写真表示し、撮影日（2020/7/19、2017/10/8、2018/3/4、2008/7/30）が画面に出た。阪和住吉総合病院は前回と同じく、手前の建物に隠れてクリック不可（`not-clickable`）。Google 通信 0、JS 例外 0、連続切替で前の写真は残らない。

@@ -1293,14 +1293,17 @@
     panel: () => placePhotoPanel,
     reason: 'No Google network requests until an enforced budget guard is implemented'
   });
-  const PHOTO_INDEX_URL = 'map-data/osaka-city/derived/building-photo-index.json';
+  const PHOTO_DATES_URL = 'map-data/osaka-city/derived/photo-dates.json';
+  const PHOTO_INDEX_URL ='map-data/osaka-city/derived/building-photo-index.json';
   let photoIdxPromise = null;
   function loadPhotoIndex() {
     if (!photoIdxPromise) {
+      // 撮影日表（Mission 37F, Commons DateTimeOriginal）は任意。取得できなくても写真表示は従来どおり（日付は「未確認」扱い）
+      const datesP = fetch(PHOTO_DATES_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d && d.dates) || null).catch(() => null);
       photoIdxPromise = fetch(PHOTO_INDEX_URL).then((r) => {
         if (!r.ok) throw new Error(PHOTO_INDEX_URL + ' → HTTP ' + r.status);
         return r.json();
-      });
+      }).then(async (idx) => { idx.__dates = await datesP; return idx; });
       photoIdxPromise.catch(() => { photoIdxPromise = null; }); // 失敗時は次のクリックで再試行
     }
     return photoIdxPromise;
@@ -1343,10 +1346,11 @@
     // 共通の優先順位(mission37f-photo-select.js): 適格性(信頼度・ライセンス・https・移転除外) → 新しい日付の根拠 → 元の順序
     const ranked = LiveCityPhotoSelect.rankPhotos(entry, {
       okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
-      exclude: reloc ? reloc.exclude : []
+      exclude: reloc ? reloc.exclude : [],
+      dates: (idx && idx.__dates) || {}
     });
     const photos = ranked.photos.map((r) => r.photo);
-    stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0, dateBasis: ranked.photos[0] ? ranked.photos[0].date.basis : null, candidates: photos.length };
+    stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0, takenAt: ranked.photos[0] && ranked.photos[0].date.basis === 'verified' ? ranked.photos[0].date.takenAt : null, dateBasis: ranked.photos[0] ? ranked.photos[0].date.basis : null, candidates: photos.length };
     if (!ranked.eligibleEntry || !photos.length) {
       slot.textContent = '写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）';
       if (reloc) slot.appendChild(el('div', '⚠ ' + reloc.notice, { class: 'cap', 'data-photo-relocated': '1' }));
@@ -1367,6 +1371,13 @@
     if (lic) cap.appendChild(el('a', p.license, { href: lic, target: '_blank', rel: 'noopener' })); else cap.appendChild(document.createTextNode(p.license));
     const src = safeUrl(p.sourcePageUrl);
     if (src) { cap.appendChild(document.createTextNode(' / ')); cap.appendChild(el('a', 'Wikimedia Commons', { href: src, target: '_blank', rel: 'noopener' })); }
+    // 撮影日は検証済み(Commons DateTimeOriginal + 根拠URL)のときだけ表示。それ以外は「未確認」。アップロード日は撮影日として扱わない
+    const dinfo = ranked.photos[0].date;
+    cap.appendChild(document.createTextNode(' / 撮影: '));
+    if (dinfo.basis === 'verified' && safeUrl(dinfo.evidenceUrl)) {
+      const pr = dinfo.takenAt.split('-');
+      cap.appendChild(el('a', pr[0] + '年' + (pr[1] ? +pr[1] + '月' : '') + (pr[2] ? +pr[2] + '日' : ''), { href: dinfo.evidenceUrl, target: '_blank', rel: 'noopener', 'data-photo-taken': dinfo.takenAt }));
+    } else cap.appendChild(el('span', '未確認', { 'data-photo-taken': 'unknown' }));
     if (entry.matchConfidence !== 'VERY_HIGH' && entry.matchConfidence !== 'HIGH') cap.appendChild(document.createTextNode(' / 対応づけ信頼度: ' + entry.matchConfidence));
     slot.appendChild(cap);
     const cv = photoCaveat(p);
