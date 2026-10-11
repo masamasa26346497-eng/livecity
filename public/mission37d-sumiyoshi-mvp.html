@@ -402,6 +402,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
 <script src="mission37d-data/town-normalize.js"></script>
+<script src="mission37f-photo-select.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -1338,11 +1339,15 @@
     slot.textContent = '';
     slot.setAttribute('aria-busy', 'false');
     const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_bldg_' + id];
-    const okConf = (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'];
     const reloc = RELOCATED[id] || null;
-    const photos = entry && entry.photos ? entry.photos.filter((p) => safeUrl(p.thumbnailUrl) && p.license && !(reloc && reloc.exclude.includes(photoFile(p)))) : [];
-    stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0 };
-    if (!entry || !okConf.includes(entry.matchConfidence) || !photos.length) {
+    // 共通の優先順位(mission37f-photo-select.js): 適格性(信頼度・ライセンス・https・移転除外) → 新しい日付の根拠 → 元の順序
+    const ranked = LiveCityPhotoSelect.rankPhotos(entry, {
+      okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
+      exclude: reloc ? reloc.exclude : []
+    });
+    const photos = ranked.photos.map((r) => r.photo);
+    stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0, dateBasis: ranked.photos[0] ? ranked.photos[0].date.basis : null, candidates: photos.length };
+    if (!ranked.eligibleEntry || !photos.length) {
       slot.textContent = '写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）';
       if (reloc) slot.appendChild(el('div', '⚠ ' + reloc.notice, { class: 'cap', 'data-photo-relocated': '1' }));
       return entry;

@@ -1,0 +1,109 @@
+{
+  "generatedFrom": "public/map-data/osaka-city/derived/building-photo-index.json",
+  "indexGeneratedAt": "2026-09-28T11:46:51.769Z",
+  "entries": 574,
+  "entriesByConfidence": {
+    "VERY_HIGH": 344,
+    "HIGH": 230
+  },
+  "entriesWithPhotos": 574,
+  "photoCandidates": 588,
+  "multiPhotoEntries": 12,
+  "entriesByPhotoCount": {
+    "1": 562,
+    "2": 10,
+    "3": 2
+  },
+  "dateBasis": {
+    "unknown": 552,
+    "filename": 36
+  },
+  "licenses": {
+    "CC BY-SA 3.0": 246,
+    "CC BY 2.5": 36,
+    "CC BY-SA 4.0": 185,
+    "CC BY 4.0": 8,
+    "CC0": 57,
+    "CC BY 3.0": 18,
+    "Public domain": 31,
+    "Attribution": 1,
+    "CC BY-SA 2.0": 3,
+    "CC BY 2.0": 2,
+    "FAL": 1
+  },
+  "genericAuthor": 4,
+  "missingAuthor": 10,
+  "httpsThumbnail": 588,
+  "noHttps": 0,
+  "noLicense": 0,
+  "resolution": {
+    "under320x200": 15,
+    "mid": 423,
+    "large": 150
+  },
+  "eligibleEntries": 574,
+  "eligiblePhotos": 588,
+  "rejectedReasons": {},
+  "reorderedByDate": [
+    {
+      "canonicalId": "cg_bldg_bldg_8ad5d70f-2cb7-411f-a234-299b6e6af56f",
+      "name": "大阪くらしの今昔館",
+      "before": "Tenjimbashi6_on_Tenjimbashisuji-Mall.JPG",
+      "after": "Osaka_Museum_of_Housing_and_Living_in_2013.jpg",
+      "afterDateBasis": "filename",
+      "afterYear": 2013
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_dd72626d-0999-4568-b85e-9a2d412120f9",
+      "name": "なんばCITY本館",
+      "before": "Namba1.jpg",
+      "after": "Nanba_CITY_2019,02.jpg",
+      "afterDateBasis": "filename",
+      "afterYear": 2019
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
+      "name": "大阪松竹座",
+      "before": "Osaka_Shochikuza_2010.jpg",
+      "after": "Shochikuza_2020-09.jpg",
+      "afterDateBasis": "filename",
+      "afterYear": 2020
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
+      "name": "阪和病院",
+      "before": "Hanwa_hospital-01.jpg",
+      "after": "Hanwa_memorial_hospital_2023-12_2.jpg",
+      "afterDateBasis": "filename",
+      "afterYear": 2023
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_fae25b63-cddc-4545-8004-c41620676308",
+      "name": "阪和記念病院",
+      "before": "Hanwa_Memorial_Hospital.JPG",
+      "after": "Hanwa_memorial_hospital_2023-12_1.jpg",
+      "afterDateBasis": "filename",
+      "afterYear": 2023
+    }
+  ],
+  "relocationSuspects": [
+    {
+      "canonicalId": "cg_bldg_bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
+      "name": "阪和病院",
+      "files": [
+        "Hanwa_hospital-01.jpg",
+        "Hanwa_memorial_hospital_2023-12_2.jpg"
+      ]
+    },
+    {
+      "canonicalId": "cg_bldg_bldg_fae25b63-cddc-4545-8004-c41620676308",
+      "name": "阪和記念病院",
+      "files": [
+        "Hanwa_Memorial_Hospital.JPG",
+        "Hanwa_memorial_hospital_2023-12_1.jpg"
+      ]
+    }
+  ],
+  "sharedFileAcrossBuildings": 0,
+  "note": "索引に撮影日・アップロード日は無い。dateBasis=filename はファイル名中の年（非検証の目安）、unknown は日付不明。verified は検証済み日付表(未整備)が必要。"
+}
