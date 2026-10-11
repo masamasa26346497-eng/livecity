@@ -1263,6 +1263,27 @@
 
   // ── 36L 写真索引: 初回クリック時に 1 回だけ遅延取得（約 6MB）。ネットへの問い合わせは索引の読込のみ ──
   // 索引のキーは 'cg_' + 建物 id（'cg_bldg_bldg_<uuid>'）。ID 体系は変更せず、キーを組み立てるだけ。
+  // Google Places UI Kit staging for Mission 37D. No paid Google requests.
+  // Existing Wikimedia photo behavior remains unchanged.
+  const GOOGLE_PLACE_INDEX_URL = 'map-data/osaka-city/derived/building-google-place-index.json';
+  let googlePlaceIndexPromise = null;
+  function loadGooglePlaceIndex() {
+    if (!googlePlaceIndexPromise) {
+      googlePlaceIndexPromise = fetch(GOOGLE_PLACE_INDEX_URL).then(r => {
+        if (!r.ok) throw new Error('Google Place index unavailable: ' + r.status);
+        return r.json();
+      });
+      googlePlaceIndexPromise.catch(() => { googlePlaceIndexPromise = null; });
+    }
+    return googlePlaceIndexPromise;
+  }
+  // This hook is intentionally non-billable and does not load Google JS.
+  window.__mission37dGooglePlacesStaging = Object.freeze({
+    enabled: false,
+    indexUrl: GOOGLE_PLACE_INDEX_URL,
+    loadIndex: loadGooglePlaceIndex,
+    reason: 'Server-enforced billing guard and reviewed UI Kit wiring required before activation'
+  });
   const PHOTO_INDEX_URL = 'map-data/osaka-city/derived/building-photo-index.json';
   let photoIdxPromise = null;
   function loadPhotoIndex() {
