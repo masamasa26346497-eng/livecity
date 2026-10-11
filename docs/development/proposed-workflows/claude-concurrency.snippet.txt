@@ -1,0 +1,6 @@
+# .github/workflows/claude.yml の jobs.claude 直下に追加する提案（未適用）。
+# 同一 Issue/PR に対する Claude 実行を直列化し、実行中のものはキャンセルしない（作業の途中破棄を避ける）。
+# github.event.issue.number / pull_request.number のどちらかが入る。他イベント用に run_id へフォールバック。
+    concurrency:
+      group: claude-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: false
