@@ -1253,6 +1253,7 @@
     $('lc-bldg-empty').style.display = '';
     flyTarget = null;
     stats.selectedCanonicalId = null;
+    window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: null } }));
     stats.selectedPoi = null;
     selSeq++; // 取得中の非同期結果を捨てる
     $('bs-name').textContent = $('bs-addr').textContent = $('bs-misc').textContent = '—';
@@ -1411,6 +1412,9 @@
 
     stats.lastPicked = { canonicalId: id, featureId: picked.featureId };
     stats.selectedCanonicalId = id;
+    // Non-billable integration point: future UI Kit adapter receives exact canonical ID.
+    // Never dispatch a guessed Google Place ID or load Google JS on a map click.
+    window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: id } }));
     const seq = selSeq;
     $('bs-name').textContent = $('bs-addr').textContent = $('bs-misc').textContent = '確認中…';
     $('lc-photo-slot').textContent = '写真索引を確認中…（初回のみ約6MBを取得します）';
