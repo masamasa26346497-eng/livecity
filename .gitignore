@@ -131,3 +131,7 @@ public/map-data/osaka-city/gsi-building-outline/
 # [Mission 36H] Google Places APIキー等、ローカル専用のブラウザ側設定。コミットしない。
 # 雛形は public/local-config.example.js（これは配布物としてコミットする）。
 /public/local-config.js
+
+# [Mission 37B] 3D Tiles PoC の生成物。再生成: node tools/mission37b-build-3dtiles.cjs [--all]
+# 52 tile 版は大きいので commit しない（9 tile 版のみ最小サンプルとして commit 可）。
+public/mission37b-3dtiles/*-all/
