@@ -8,6 +8,7 @@
   const HOST_ID = 'pc-places-ui-kit-36l';
   let lastPlaceId = null;
   let calls = 0;
+  let activePlaceId = null;
 
   function host() {
     const card = document.getElementById('prop-card');
@@ -28,11 +29,13 @@
     const id = event?.detail?.googlePlaceId;
     if (typeof id !== 'string' || !/^[-_A-Za-z0-9]{8,256}$/.test(id)) {
       lastPlaceId = null;
+      activePlaceId = null;
       const old = document.getElementById(HOST_ID);
       if (old) { old.style.display = 'none'; old.replaceChildren(); }
       return;
     }
     lastPlaceId = id;
+    activePlaceId = null;
     const el = host();
     if (!el) return;
     el.replaceChildren();
@@ -49,12 +52,22 @@
       return;
     }
 
-    // Reserved implementation after approval. Fail closed; never auto-enable
-    // by merely setting an API key or by clicking a building.
-    // Planned: load the Google Places library after authorization, then append
-    // <gmp-place-details><gmp-place-details-place-request>...</...>
-    // <gmp-place-all-content></...></gmp-place-details>.
-    throw new Error('UI Kit activation requires a separately reviewed billing guard');
+    // UI Kit may only be activated after a separate audited usage gate exists.
+    // A browser counter is not a hard monetary cap; never rely on it as one.
+    const key = String(window.LIVECITY_CONFIG?.googlePlacesApiKey || '').trim();
+    if (!key || !window.LIVECITY_CONFIG?.placesUiKitServerBudgetGuardVerified) {
+      throw new Error('UI Kit requires an approved, enforced billing gate');
+    }
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Googleの写真・施設情報を表示';
+    button.addEventListener('click', async () => {
+      if (activePlaceId === id) return;
+      // Gate must be checked by a trusted server before any billable request.
+      // No implementation is supplied yet: fail closed until reviewed.
+      throw new Error('Server authorization endpoint not configured');
+    });
+    el.appendChild(button);
   }
 
   window.addEventListener('livecity:verified-google-place', (event) => {
