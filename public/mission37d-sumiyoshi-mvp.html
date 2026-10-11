@@ -226,7 +226,10 @@
   #lc-town-body.on { display: block; }
   #lc-town-name { font-weight: 600; font-size: 15px; margin: 6px 0; }
   #lc-poi-body a { color: var(--lc-hi); word-break: break-all; }
-  #lc-photo-slot img { max-width: 100%; border-radius: 6px; display: block; margin: 0 auto 6px; }
+  #lc-photo-slot[aria-busy="true"] { opacity: .7; }
+  #lc-photo-slot .retry { margin-top: 6px; font: 11px var(--lc-font); color: var(--lc-text); background: var(--lc-accent-mid); border: 1px solid var(--lc-line); border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+  #lc-photo-slot .retry:focus-visible, #lc-photo-slot a:focus-visible { outline: 2px solid var(--lc-hi); outline-offset: 2px; }
+  #lc-photo-slot img { min-height: 40px; background: rgba(80,160,255,0.08); max-width: 100%; border-radius: 6px; display: block; margin: 0 auto 6px; }
   #lc-photo-slot a { color: var(--lc-hi); }
   #lc-photo-slot .cap { font-size: 10px; line-height: 1.5; color: var(--lc-text-mute); text-align: left; word-break: break-all; }
   #lc-nearby-slot { text-align: left; padding: 6px; }
@@ -382,7 +385,7 @@
   </div>
   <div class="lc-sec">
     <h2>写真</h2>
-    <div class="lc-frame" id="lc-photo-slot" data-slot="mission36l-photo">建物をクリックすると、Mission 36L の写真索引に該当があれば表示します。</div>
+    <div class="lc-frame" id="lc-photo-slot" data-slot="mission36l-photo" role="status" aria-live="polite" aria-busy="false">建物をクリックすると、Mission 36L の写真索引に該当があれば表示します。</div>
     <div class="lc-frame" id="lc-google-place-staging" style="margin-top:8px;font-size:11px;text-align:left;line-height:1.6">Google施設情報は建物選択時に照合します（有料API通信なし）。</div>
   </div>
   <div class="lc-sec">
@@ -1311,6 +1314,7 @@
   function renderPhoto(id, idx) {
     const slot = $('lc-photo-slot');
     slot.textContent = '';
+    slot.setAttribute('aria-busy', 'false');
     const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_bldg_' + id];
     const okConf = (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'];
     const photos = entry && entry.photos ? entry.photos.filter((p) => safeUrl(p.thumbnailUrl) && p.license) : [];
@@ -1321,7 +1325,12 @@
     }
     const p = photos[0];
     const img = el('img', null, { src: p.thumbnailUrl, alt: (entry.buildingName || '建物') + 'の写真', loading: 'lazy', referrerpolicy: 'no-referrer' });
-    img.addEventListener('error', () => { slot.textContent = '写真を読み込めませんでした（通信エラー）'; });
+    img.addEventListener('error', () => {
+      if (!img.isConnected) return; // 別の建物に切り替わった後の遅延エラーは無視
+      slot.textContent = '写真を読み込めませんでした（画像の取得に失敗）。出典: ';
+      const src0 = safeUrl(p.sourcePageUrl);
+      if (src0) slot.appendChild(el('a', 'Wikimedia Commons', { href: src0, target: '_blank', rel: 'noopener' }));
+    });
     slot.appendChild(img);
     const cap = el('div', null, { class: 'cap' });
     cap.appendChild(document.createTextNode('作者: ' + (p.author || '不明') + ' / ライセンス: '));
@@ -1421,6 +1430,7 @@
     window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: id } }));
     const seq = selSeq;
     $('bs-name').textContent = $('bs-addr').textContent = $('bs-misc').textContent = '確認中…';
+    $('lc-photo-slot').setAttribute('aria-busy', 'true');
     $('lc-photo-slot').textContent = '写真索引を確認中…（初回のみ約6MBを取得します）';
 
     const [side, attrs] = await Promise.all([sidecarIds(picked), tileAttrs(picked)]);
@@ -1463,7 +1473,17 @@
       if (seq !== selSeq) return;
       fail('photo-index', e);
       stats.lastPicked.photo = { indexed: null, error: String(e && e.message || e) };
-      $('lc-photo-slot').textContent = '写真索引を取得できませんでした（通信エラー）。再度クリックすると再試行します。';
+      const slot = $('lc-photo-slot');
+      slot.setAttribute('aria-busy', 'false');
+      slot.textContent = '写真索引を取得できませんでした（通信エラー）。';
+      const rb = el('button', '再試行', { type: 'button', class: 'retry' });
+      rb.onclick = () => {
+        if (seq !== selSeq) return;
+        slot.setAttribute('aria-busy', 'true'); slot.textContent = '写真索引を確認中…';
+        loadPhotoIndex().then((idx) => { if (seq === selSeq) renderPhoto(id, idx); })
+          .catch(() => { if (seq === selSeq) { slot.setAttribute('aria-busy', 'false'); slot.textContent = '写真索引を取得できませんでした。'; slot.appendChild(rb); } });
+      };
+      slot.appendChild(rb);
     });
     console.log('[37D] picked', JSON.stringify(stats.lastPicked));
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);

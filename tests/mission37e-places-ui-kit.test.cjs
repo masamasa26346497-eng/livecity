@@ -377,3 +377,84 @@ test('[37E] 本番 HTML / 37B / 37C に 37E の記述が無い', () => {
     assert.ok(!/mission37e|Mission 37E|PlacePhotoPanel/.test(read(f)), f);
   }
 });
+
+// ══════════════════════════════════════════════════════════════════════
+// 8. 37E 続行: Google 表示分岐（モック）と Wikimedia パネルの状態
+// ══════════════════════════════════════════════════════════════════════
+function loadKitEnabledForMockOnly() {
+  // モジュールのコピーだけ ENABLED=true にして vm で評価する。配信物は変更しない。
+  const src = moduleSrc.replace('const ENABLED = false;', 'const ENABLED = true;');
+  assert.notEqual(src, moduleSrc);
+  const sandbox = {};
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox);
+  return sandbox.LiveCityPlacesUiKit37E;
+}
+const tick = () => new Promise((r) => setImmediate(r));
+
+test('[37E] 配信物の ENABLED は false のまま、ローダー注入点は呼ばれない', async () => {
+  assert.match(moduleSrc, /const ENABLED = false;/);
+  let loaderCalls = 0;
+  const dom = makeStubDom();
+  const panel = new kit.PlacePhotoPanel({
+    indexUrl: 'mission37d-data/verified-google-place-ids.json',
+    fetchImpl: okFetch(index), loadPlacesLibrary: () => { loaderCalls++; }, maxInstantiations: 5, ...dom,
+  });
+  const c = verifiedSumiyoshiCases(1)[0];
+  const st = await panel.select(c.canonicalId);
+  assert.equal(st.status, 'matched');
+  assert.equal(loaderCalls, 0);
+  assert.equal(panel.instantiations, 0);
+  assert.ok(!dom.container.children.some((x) => /^gmp-/.test(x.tagName)));
+});
+
+test('[37E] (モック) 有効時: 1 つだけ生成し、上限を守る', async () => {
+  const k = loadKitEnabledForMockOnly();
+  const c = verifiedSumiyoshiCases(2);
+  assert.equal(c.length, 2);
+  const dom = makeStubDom();
+  const panel = new k.PlacePhotoPanel({
+    indexUrl: 'x.json', fetchImpl: okFetch(index),
+    loadPlacesLibrary: () => Promise.resolve(), maxInstantiations: 1, ...dom,
+  });
+  await panel.select(c[0].canonicalId);
+  await tick();
+  assert.equal(panel.instantiations, 1);
+  const els = dom.container.children.filter((x) => x.tagName === 'gmp-place-details');
+  assert.equal(els.length, 1);
+  await panel.select(c[1].canonicalId);
+  await tick();
+  assert.equal(panel.instantiations, 1);
+  assert.ok(dom.container.children.every((x) => x.tagName !== 'gmp-place-details'));
+  assert.match(dom.container.textContent, /上限/);
+});
+
+test('[37E] (モック) 有効時: 待機中に解除された選択は生成しない / ローダー失敗はエラー表示', async () => {
+  const k = loadKitEnabledForMockOnly();
+  const c = verifiedSumiyoshiCases(1);
+  const dom = makeStubDom();
+  let release;
+  const gate = new Promise((r) => { release = r; });
+  const panel = new k.PlacePhotoPanel({
+    indexUrl: 'x.json', fetchImpl: okFetch(index), loadPlacesLibrary: () => gate, maxInstantiations: 9, ...dom,
+  });
+  await panel.select(c[0].canonicalId);
+  panel.clear();
+  release();
+  await tick();
+  assert.equal(panel.instantiations, 0);
+  const dom2 = makeStubDom();
+  const bad = new k.PlacePhotoPanel({
+    indexUrl: 'x.json', fetchImpl: okFetch(index), loadPlacesLibrary: () => Promise.reject(new Error('x')), maxInstantiations: 9, ...dom2,
+  });
+  await bad.select(c[0].canonicalId);
+  await tick();
+  assert.match(dom2.container.textContent, /読み込めませんでした/);
+});
+
+test('[37E] Wikimedia 写真スロット: aria-live・再試行・接頭辞 cg_bldg_ を維持', () => {
+  assert.match(page, /id="lc-photo-slot"[^>]*aria-live="polite"/);
+  assert.match(page, /'cg_bldg_' \+ id/);
+  assert.match(page, /class: 'retry'/);
+  assert.match(page, /img\.isConnected/);
+});

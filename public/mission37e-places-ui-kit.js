@@ -186,6 +186,8 @@
     matchedNote: '写真表示は準備中です。課金制御が完了するまでGoogleへの通信は行いません。',
     unmatched: 'Google施設情報：確認済みの対応データなし',
     indexError: 'Google施設情報の照合データを読み込めませんでした。',
+    capReached: 'Google写真の表示回数の上限に達しました。',
+    liveError: 'Google写真を読み込めませんでした。',
   });
 
   class PlacePhotoPanel {
@@ -205,7 +207,13 @@
       this._doc = o.documentImpl || (typeof document !== 'undefined' ? document : null);
       this.container = o.container || null;
       this.labels = Object.assign({}, DEFAULT_LABELS, o.labels || {});
-      this._seq = 0;             // 非同期競合: 最後の選択だけを採用する
+      // 有効化後だけ使う注入点。ホストが公式ローダーで 'places' を取り込む関数を渡す。
+      // このモジュールは Google のローダーを持たない。ENABLED=false の間は参照されない。
+      this._loadPlacesLibrary = typeof o.loadPlacesLibrary === 'function' ? o.loadPlacesLibrary : null;
+      // 同一ページ内の生成回数の上限。上限「保証」ではない（リロードで消える）。誤爆防止の安全弁。
+      this.maxInstantiations = Number.isFinite(o.maxInstantiations) ? o.maxInstantiations : 0;
+      this.instantiations = 0;
+      this._seq = 0;            // 非同期競合: 最後の選択だけを採用する
       this._indexPromise = null;
       this.state = { status: 'idle', canonicalId: null, key: null, placeId: null };
     }
@@ -279,8 +287,33 @@
           line(this.labels.matchedNote);
           // Place ID は保持するだけ。UI Kit 要素は作らない（作ると課金される）。
           c.dataset.googlePlaceId = this.state.placeId;
+          if (ENABLED) this._mountLive(this._seq, this.state.placeId);
           break;
       }
+    }
+
+    /**
+     * 有効化後のみ到達。ローダー待ち → 最新の選択か再確認 → 上限確認 → 生成して 1 つだけ載せる。
+     * Google ロゴと作者帰属は <gmp-place-attribution> と写真部品が描く。自前のロゴ画像は作らない。
+     */
+    _mountLive(seq, placeId) {
+      const c = this.container;
+      if (!this._loadPlacesLibrary || !c) return Promise.resolve('no-loader');
+      const note = (text) => { const d = this._doc.createElement('div'); d.textContent = text; c.appendChild(d); };
+      return Promise.resolve(this._loadPlacesLibrary()).then(() => {
+        if (seq !== this._seq) return 'superseded';
+        if (!this.maxInstantiations || this.instantiations >= this.maxInstantiations) {
+          note(this.labels.capReached);
+          return 'cap-reached';
+        }
+        this.instantiations++;
+        c.appendChild(createPlaceDetailsElement(this._doc, placeId, { lightbox: true }));
+        return 'mounted';
+      }).catch(() => {
+        if (seq !== this._seq) return 'superseded';
+        note(this.labels.liveError);
+        return 'live-error';
+      });
     }
   }
 
