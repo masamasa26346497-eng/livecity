@@ -24,6 +24,18 @@ test('関連不明・共通基盤は全件に切り替わる', () => {
   assert.equal(selectTests(['tools/lib/x.js'], list, read).tests.length, 2);
 });
 
+test('未登録の新規テスト・削除された未知ファイル・workflow変更は安全側で全件', () => {
+  assert.equal(selectTests(['tests/new-unregistered.test.js'], list, read).full, true);
+  assert.equal(selectTests(['tools/deleted-file.js'], list, read).full, true);
+  assert.equal(selectTests(['.github/workflows/pr-fast-tests.yml'], list, read).full, true);
+});
+
+test('本テスト自身が npm test に登録されている', async () => {
+  const { readFileSync } = await import('node:fs');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.ok(parseTestList(pkg).includes('tests/ci-select-tests.test.js'));
+});
+
 test('parseTestList は scripts.test からテストを抽出する', () => {
   assert.deepEqual(parseTestList({ scripts: { test: 'node --test tests/a.test.js tests/b.test.js' } }), list);
 });

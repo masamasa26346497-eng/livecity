@@ -36,9 +36,16 @@ async function loadPlaywright() {
 
 function serve() {
   const server = http.createServer(async (req, res) => {
-    const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    let rel;
+    try {
+      rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    } catch {
+      res.writeHead(400).end();
+      return;
+    }
     const file = path.normalize(path.join(PUBLIC_DIR, rel));
-    if (!file.startsWith(PUBLIC_DIR)) {
+    // 区切り文字付きで比較し、public-evil/ のような兄弟ディレクトリへの脱出を防ぐ
+    if (file !== PUBLIC_DIR && !file.startsWith(PUBLIC_DIR + path.sep)) {
       res.writeHead(403).end();
       return;
     }

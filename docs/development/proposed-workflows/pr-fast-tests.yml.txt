@@ -1,5 +1,8 @@
-# 提案（未適用）: .github/workflows/pr-fast-tests.yml として人間が追加する。
+# 確定版（CI未適用）: .github/workflows/pr-fast-tests.yml として人間がGitHub UIで追加する。
+# Claude Code の GitHub App には workflows への書き込み権限がないため、このブランチには配置していない。
 # 無課金: GitHub-hosted runner 上の Node 標準テストのみ。外部APIなし。シークレット不使用。
+# 注意: 全件テストは main でも赤が出る可能性がある（基準値は未取得）。全件ジョブは手動実行のみで、
+#       PR の必須チェックにしないこと。選択テストが「テスト対象なし」でも全件成功を意味しない。
 name: PR fast tests
 on:
   pull_request:
@@ -13,24 +16,45 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pr-fast-${{ github.ref }}
+  group: pr-fast-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  test:
+  related:
+    if: ${{ !inputs.full }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci --ignore-scripts || npm install --ignore-scripts
+      - name: Verify lockfile
+        run: test -f package-lock.json
+      - name: Install (no scripts)
+        run: npm ci --ignore-scripts
       - name: Related tests (PR)
-        if: ${{ !inputs.full }}
         run: node tools/ci/select-tests.js --base origin/main --run
-      - name: Full tests
-        if: ${{ inputs.full }}
+  full:
+    if: ${{ inputs.full }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: test -f package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Full tests (baseline 比較用。失敗は隠さない)
         run: npm test
-      # ブラウザスモークは Playwright 導入を別承認とした後に有効化する（Phase B）。
+# ブラウザスモークは Playwright 導入を別承認とした後に有効化する（Phase B）。
+#
+# 手動適用手順:
+#  1. GitHub > Add file > Create new file > .github/workflows/pr-fast-tests.yml に上記を貼る
+#  2. PR #29 とは別ブランチ/別承認で commit（main直pushは承認後のみ）
+#  3. Actions > PR fast tests > Run workflow で full=true を、main と本ブランチ双方で実行し基準値を比較
