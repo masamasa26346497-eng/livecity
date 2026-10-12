@@ -12,6 +12,8 @@
 import { readFileSync, existsSync } from 'fs';
 import { execFileSync, spawnSync } from 'child_process';
 import path from 'path';
+import { parseFailures } from './classify-tap-failures.js';
+import { verdict } from './baseline.js';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -76,6 +78,21 @@ function main() {
   r.reasons.forEach((x) => console.log(`  - ${x}`));
   if (!r.tests.length) console.log('テスト対象なし（文書のみの変更）。全件成功を意味しない。');
   r.tests.forEach((t) => console.log(`  ${t}`));
+  if (argv.includes('--run') && r.tests.length && opt('--baseline')) {
+    // 既知の赤（baseline）と比較。新規失敗・異常終了は失敗、既知の赤は警告として必ず表示する。
+    const names = JSON.parse(readFileSync(path.resolve(ROOT, opt('--baseline')), 'utf8')).failures.map((f) => f.name);
+    const res = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...r.tests], {
+      cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 29,
+    });
+    process.stdout.write(res.stdout || '');
+    process.stderr.write(res.stderr || '');
+    const v = verdict(res.status ?? 1, parseFailures(res.stdout || ''), names);
+    console.log(`\n[baseline] 既知の赤: ${v.knownFailures.length} / 新規失敗: ${v.newFailures.length} / baselineから解消: ${v.nowPassing.length}`);
+    v.newFailures.forEach((n) => console.log(`::error::NEW FAILURE: ${n}`));
+    if (v.crashed) console.log('::error::テストが失敗を解析できないまま異常終了した');
+    if (v.knownFailures.length) console.log(`::warning::既知の赤が${v.knownFailures.length}件残っている（成功ではない）`);
+    process.exit(v.ok ? 0 : 1);
+  }
   if (argv.includes('--run') && r.tests.length) {
     const res = spawnSync(process.execPath, ['--test', ...r.tests], { cwd: ROOT, stdio: 'inherit' });
     process.exit(res.status ?? 1);
