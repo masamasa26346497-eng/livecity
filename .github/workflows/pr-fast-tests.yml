@@ -1,0 +1,50 @@
+
+name: PR fast tests
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "全件テスト(npm test)を実行"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: pr-fast-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  related:
+    if: ${{ !inputs.full }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify lockfile
+        run: test -f package-lock.json
+      - name: Install (no scripts)
+        run: npm ci --ignore-scripts
+      - name: Related tests (PR)
+        run: node tools/ci/select-tests.js --base origin/main --run
+  full:
+    if: ${{ inputs.full }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: test -f package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Full tests (baseline 比較用。失敗は隠さない)
+        run: npm test
