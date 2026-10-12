@@ -1,0 +1,147 @@
+{
+  "mission": "37H",
+  "url": "http://localhost:8139/mission37g-osaka-24ward-mvp.html?qa=1",
+  "browser": "Chrome/154.0.8037.97",
+  "generatedAt": "2026-10-12T22:57:04.832Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8139/favicon.ico"
+  ],
+  "jsErrors": [],
+  "wards": [
+    {
+      "ward": "北区",
+      "attrCount": 2698,
+      "targets": [
+        {
+          "id": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+          "heightM": 118.1,
+          "realClick": true,
+          "selected": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+          "panel": {
+            "cid": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+            "ward": "北区",
+            "side": "✓ 一致",
+            "h": "118.1 m",
+            "usage": "403"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_f1bcc2bb-9c0b-416e-ac2f-851a4da4fca7",
+          "heightM": 114,
+          "realClick": true,
+          "selected": "bldg_f1bcc2bb-9c0b-416e-ac2f-851a4da4fca7",
+          "panel": {
+            "cid": "bldg_f1bcc2bb-9c0b-416e-ac2f-851a4da4fca7",
+            "ward": "北区",
+            "side": "✓ 一致",
+            "h": "114.0 m",
+            "usage": "461"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_f92418ca-7bcc-4b8d-b37a-c0250f9bf136",
+          "heightM": 105,
+          "realClick": true,
+          "selected": "bldg_f92418ca-7bcc-4b8d-b37a-c0250f9bf136",
+          "panel": {
+            "cid": "bldg_f92418ca-7bcc-4b8d-b37a-c0250f9bf136",
+            "ward": "北区",
+            "side": "✓ 一致",
+            "h": "105.0 m",
+            "usage": "401"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        }
+      ],
+      "screenshot": "data/reports/mission37h-wards/ward-kita-click.jpg",
+      "pass": true
+    },
+    {
+      "ward": "中央区",
+      "attrCount": 5629,
+      "targets": [
+        {
+          "id": "bldg_f01feb4f-7308-4d6e-9051-1be227f17466",
+          "heightM": 107.1,
+          "realClick": true,
+          "selected": "bldg_f01feb4f-7308-4d6e-9051-1be227f17466",
+          "panel": {
+            "cid": "bldg_f01feb4f-7308-4d6e-9051-1be227f17466",
+            "ward": "中央区",
+            "side": "✓ 一致",
+            "h": "107.1 m",
+            "usage": "461"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_8ff945fd-3c44-4cf5-b156-e0f9e7727746",
+          "heightM": 106,
+          "realClick": true,
+          "selected": "bldg_8ff945fd-3c44-4cf5-b156-e0f9e7727746",
+          "panel": {
+            "cid": "bldg_8ff945fd-3c44-4cf5-b156-e0f9e7727746",
+            "ward": "中央区",
+            "side": "✓ 一致",
+            "h": "106.0 m",
+            "usage": "412"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_d0a7b704-9185-4269-bfb8-5a7119ab5f96",
+          "heightM": 105.9,
+          "realClick": true,
+          "selected": "bldg_d0a7b704-9185-4269-bfb8-5a7119ab5f96",
+          "panel": {
+            "cid": "bldg_d0a7b704-9185-4269-bfb8-5a7119ab5f96",
+            "ward": "中央区",
+            "side": "✓ 一致",
+            "h": "105.9 m",
+            "usage": "461"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        }
+      ],
+      "screenshot": "data/reports/mission37h-wards/ward-chuo-click.jpg",
+      "pass": true
+    }
+  ],
+  "extraSets": [
+    {
+      "id": "kita-sample",
+      "wardCode": "27127",
+      "tiles": 13,
+      "buildings": 2698
+    },
+    {
+      "id": "chuo-sample",
+      "wardCode": "27128",
+      "tiles": 15,
+      "buildings": 5629
+    }
+  ],
+  "coverage": {
+    "mapWards": 24,
+    "wardsWith3d": 3,
+    "tiles3d": 37,
+    "buildings3d": 18873,
+    "sourceBuildingsTotal": 574213,
+    "sourceTilesTotal": 1097
+  },
+  "status": "loading tiles…",
+  "wardsWith3dCount": 3,
+  "fps": 1.5,
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}

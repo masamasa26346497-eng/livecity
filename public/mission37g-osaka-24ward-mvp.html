@@ -321,7 +321,7 @@
   <div class="lc-sec">
     <h2>大阪市24区 <span id="lc-ward-count" style="font-weight:400;color:var(--lc-text-mute)"></span></h2>
     <div id="lc-ward-list"><div class="lc-note">区データを読み込み中…</div></div>
-    <div class="lc-note">全24区で地図と区境界を閲覧できます。3D建物が見えるのは住吉区の一部（9タイル・10,546棟）だけで、他の区は未配信です。</div>
+    <div class="lc-note" id="ward-cov-note">全24区で地図と区境界を閲覧できます。3D建物が見えるのは住吉区の一部（9タイル・10,546棟）だけで、他の区は未配信です。</div>
   </div>
   <div class="lc-sec">
     <h2>レイヤー</h2>
@@ -763,6 +763,34 @@
   // 建物レイヤー（Mission 37B の 3D Tiles をそのまま使う）
   // ══════════════════════════════════════════════════════════════
   let tileset = null, silhouette = null;
+  // Mission 37H: 住吉区以外の区の実 PLATEAU 建物（限定メッシュ）。tileset ごとに配信ベース URL を持つ。
+  //   実際に読み込めた tileset だけが COVERAGE に入る。?extra=0 で無効化。
+  const EXTRA_SET_DEFS = [
+    { id: 'kita-sample',  base: 'mission37h-3dtiles/kita-sample/' },
+    { id: 'chuo-sample',  base: 'mission37h-3dtiles/chuo-sample/' },
+  ];
+  const extraSets = [];   // { id, base, tileset, source, report }
+  async function mountExtraSets() {
+    if (q.get('extra') === '0') return;
+    for (const def of EXTRA_SET_DEFS) {
+      try {
+        const [src, rep] = await Promise.all([
+          fetch(def.base + 'source.json').then((r) => { if (!r.ok) throw new Error('source.json HTTP ' + r.status); return r.json(); }),
+          fetch(def.base + 'build-report.json').then((r) => { if (!r.ok) throw new Error('build-report.json HTTP ' + r.status); return r.json(); }),
+        ]);
+        const ts = await Cesium.Cesium3DTileset.fromUrl(def.base + 'tileset.json', { maximumScreenSpaceError: SSE0 });
+        ts._lcBase = def.base;
+        scene.primitives.add(ts);
+        const css = (TONE[$('sel-tone').value] || TONE.pale);
+        ts.style = new Cesium.Cesium3DTileStyle({ color: "color('" + css + "')" });
+        ts.tileLoad.addEventListener(() => { stats.loadedTilesTotal++; });
+        ts.tileUnload.addEventListener(() => { stats.loadedTilesTotal--; });
+        ts.tileVisible.addEventListener((tile) => { if (tile.hasRenderableContent !== false) visTiles.add(tile); });
+        extraSets.push({ id: def.id, base: def.base, tileset: ts, source: src, report: rep });
+      } catch (e) { fail('extra-tileset ' + def.id, e); }
+    }
+    stats.extraSets = extraSets.map((e) => ({ id: e.id, wardCode: e.source.wardCode, tiles: e.report.selectedTiles, buildings: e.report.totals.buildings }));
+  }
   const visTiles = new Set();
   let curTiles = 0, curBldg = 0;
   let homeCenter = null, homeRange = 1500;
@@ -773,6 +801,7 @@
     const css = TONE[name] || TONE.pale;
     // 頂点色（高さで淡い青灰→やや濃い青）に掛ける。淡色はほぼ素のまま＝薄い青灰（要件6）。
     tileset.style = new Cesium.Cesium3DTileStyle({ color: "color('" + css + "')" });
+    for (const e of extraSets) e.tileset.style = new Cesium.Cesium3DTileStyle({ color: "color('" + css + "')" });
     stats.tone = name;
   }
 
@@ -801,15 +830,17 @@
         $('lc-loading').classList.add('done');
         console.log('[37D] first display', JSON.stringify({ firstDisplayMs: Math.round(stats.firstDisplayMs), set: SET }));
       });
+      extraReady = mountExtraSets();   // 37H: 住吉区以外の限定メッシュ（失敗しても住吉区の表示には影響しない）
+      await extraReady;
       const total = (tileset.extras && tileset.extras.buildings) || null;
       stats.tilesetBuildings = total;
-      $('hs-bldg').textContent = fmt(total);
+      $('hs-bldg').textContent = fmt((total || 0) + extraSets.reduce((a, e) => a + (e.report.totals.buildings | 0), 0));
       return { count: total || 0 };
     },
-    applyVisible(on) { if (tileset) tileset.show = on; },
+    applyVisible(on) { if (tileset) tileset.show = on; for (const e of extraSets) e.tileset.show = on; },
   };
 
-  let cityHome = null, sumiHome = null, wardsSettled = false;
+  let cityHome = null, sumiHome = null, wardsSettled = false, extraReady = Promise.resolve();
   function resetCamera() {
     const h = cityHome || sumiHome;
     if (!h) return;
@@ -820,7 +851,7 @@
   }
   $('btn-home').onclick = resetCamera;
   $('sel-sse').value = String(SSE0);
-  $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; };
+  $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; for (const x of extraSets) x.tileset.maximumScreenSpaceError = stats.sse; };
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
 
   // ══════════════════════════════════════════════════════════════
@@ -1214,6 +1245,14 @@
         text: full ? '3D建物: 配信済み（' + tiles + 'タイル・' + fmt(n) + '棟）'
           : '3D建物: 一部配信（' + tiles + 'タイル・' + fmt(n) + '棟。住吉区の元データ ' + fmt(sourceBuildings) + '棟のうち）' };
     } catch (e) { /* 未配信扱い */ }
+    // 37H: 実際に読み込めた追加区の tileset だけを COVERAGE に入れる（限定メッシュなので常に 'partial'）
+    try { await extraReady; } catch (e) { /* mount 側で fail 済み */ }
+    for (const e of extraSets) {
+      const n = e.report.totals.buildings | 0, tiles = e.report.selectedTiles | 0;
+      if (!n || !tiles) continue;
+      COVERAGE[e.source.wardCode] = { state: 'partial', tiles, buildings: n,
+        text: '3D建物: 一部のみ配信（実PLATEAU ' + e.source.sourceMeshes.length + 'メッシュ・' + tiles + 'タイル・' + fmt(n) + '棟。区全体ではありません）' };
+    }
   }
   const WardUI = (function () {
     let data = null, loading = null, lines = null, labels = null, selLines = null, selected = null;
@@ -1246,6 +1285,10 @@
         data = d;
         stats.coverage = { mapWards: d.wards.length, wardsWith3d: d.wards.filter((w) => w.cover.state !== 'none').length,
           tiles3d: Object.values(COVERAGE).reduce((a, c) => a + c.tiles, 0), buildings3d: Object.values(COVERAGE).reduce((a, c) => a + c.buildings, 0), sourceBuildingsTotal: d.sourceBuildingsTotal, sourceTilesTotal: d.sourceTilesTotal };
+        const cv = stats.coverage, nw = cv.wardsWith3d;
+        $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。3D建物が見えるのは ' + nw + ' 区（' + d.wards.filter((w) => w.cover.state !== 'none').map((w) => w.wardName).join('・')
+          + '）の一部だけ（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟）で、残り ' + (24 - nw) + ' 区は未配信です。';
+        $('hs-bldg').textContent = fmt(cv.buildings3d);
         return d;
       });
       return loading;
@@ -1451,19 +1494,27 @@
     const tile = feature.content && feature.content.tile;
     const ex = tile && (tile.extras || (tile._header && tile._header.extras));
     if (!ex || !ex.idsUri) return Promise.resolve(null);
-    if (!sidecarCache.has(ex.idsUri)) {
-      sidecarCache.set(ex.idsUri, fetch(TILES_BASE + ex.idsUri).then((r) => r.json()).catch(() => null));
+    const base = tilesBaseOf(feature);
+    const key = base + ex.idsUri;
+    if (!sidecarCache.has(key)) {
+      sidecarCache.set(key, fetch(key).then((r) => r.json()).catch(() => null));
     }
-    return sidecarCache.get(ex.idsUri);
+    return sidecarCache.get(key);
+  }
+  // 37H: 特徴が属する tileset の配信ベース（住吉区は TILES_BASE、追加区は ts._lcBase）。tile 名が区をまたいで衝突するため必須。
+  function tilesBaseOf(feature) {
+    const ts = feature.content && feature.content.tile && feature.content.tile.tileset;
+    return (ts && ts._lcBase) || TILES_BASE;
   }
   const attrCache = new Map();
   function tileAttrs(feature) {
     const tile = feature.content && feature.content.tile;
     const ex = tile && (tile.extras || (tile._header && tile._header.extras));
     if (!ex || !Number.isInteger(ex.tx) || !Number.isInteger(ex.tz)) return Promise.resolve(null);
-    const name = 'attrs/t_' + ex.tx + '_' + ex.tz + '.json';
+    const extraBase = tilesBaseOf(feature);
+    const name = (extraBase === TILES_BASE ? LAYER_BASE : extraBase) + 'attrs/t_' + ex.tx + '_' + ex.tz + '.json';
     if (!attrCache.has(name)) {
-      attrCache.set(name, fetch(LAYER_BASE + name).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+      attrCache.set(name, fetch(name).then((r) => (r.ok ? r.json() : null)).catch(() => null));
     }
     return attrCache.get(name).then((j) => (j ? { tx: ex.tx, tz: ex.tz, data: j } : null));
   }
@@ -1677,7 +1728,7 @@
         viewer.camera.lookAt(toCart(x, z, h), new Cesium.HeadingPitchRange(Cesium.Math.toRadians(headingDeg || 0), Cesium.Math.toRadians(pitchDeg), range));
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
-      tilesReady: () => !!tileset && tileset.tilesLoaded,
+      tilesReady: () => !!tileset && tileset.tilesLoaded && extraSets.every((e) => e.tileset.tilesLoaded),
       // 写真パネルだけを実コード(renderPhoto)で描く。3D 選択は経由しない＝実クリックではない（37F-4: 9 tile 外の建物の確認用）
       async renderPhotoOnly(id) { if (!stats.lastPicked) stats.lastPicked = {}; return !!renderPhoto(id, await loadPhotoIndex()); },
       project(x, z, h) {
@@ -1716,7 +1767,8 @@
     $('lc-bldg-empty').style.display = 'none';
     $('lc-bldg-body').classList.add('on');
     $('lc-cid').textContent = id;
-    $('lb-ward').textContent = (bundleManifest && bundleManifest.buildings && bundleManifest.buildings.ward) || '—';
+    const extraSrc = extraSets.find((e) => e.base === tilesBaseOf(picked));
+    $('lb-ward').textContent = extraSrc ? extraSrc.source.ward : ((bundleManifest && bundleManifest.buildings && bundleManifest.buildings.ward) || '—');
     $('lb-side').textContent = '照合中…';
     $('lb-note').textContent = '';
     for (const k of ['lb-h', 'lb-usage', 'lb-tile', 'lb-ll', 'lb-xz']) $(k).textContent = '—';

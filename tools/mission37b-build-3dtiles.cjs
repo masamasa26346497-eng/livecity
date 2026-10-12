@@ -277,7 +277,7 @@ const mergeExt = (a, b) => ({ w: Math.min(a.w, b.w), e: Math.max(a.e, b.e), s: M
   minH: Math.min(a.minH, b.minH), maxH: Math.max(a.maxH, b.maxH) });
 
 function build(opts) {
-  const dir = path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
+  const dir = opts.srcDir || path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   if (manifest.coordinateConvention !== 'znorth-neg-v1') throw new Error('coordinateConvention=' + manifest.coordinateConvention);
   const sel = manifest.tiles.filter(t => opts.all || (t.tx >= opts.tx0 && t.tx <= opts.tx1 && t.tz >= opts.tz0 && t.tz <= opts.tz1));
