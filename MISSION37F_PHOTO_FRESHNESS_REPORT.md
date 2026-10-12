@@ -82,3 +82,34 @@
 - 住吉区の写真付き 10 建物のうち、撮影日が検証済みは 9 件（阪和記念病院のみ unknown）。阪和病院の `Hanwa_hospital-01.jpg` は 2020-07-19 で、既存の移転前注記と整合する。
 - 阪和病院・阪和記念病院の旧 footprint には 2023 年の新病棟写真を付けない（除外が必須であることをテストで固定）。
 - 実 Chrome QA（ローカル）: 5 施設中 4 件が実クリックで写真表示し、撮影日（2020/7/19、2017/10/8、2018/3/4、2008/7/30）が画面に出た。阪和住吉総合病院は前回と同じく、手前の建物に隠れてクリック不可（`not-clickable`）。Google 通信 0、JS 例外 0、連続切替で前の写真は残らない。
+
+## 8. 第3段階（誤表示防止 → 日付精度 → 候補調査）
+
+### 8.1 誤表示防止
+- 前段で「被写体が未検証」とした2件を Commons の説明・カテゴリ・座標で調べた（`node tools/mission37f-inspect-commons.cjs <File...>`）。
+  - **丼池繊維会館 / `愛國貯金銀行.png`**: カテゴリは `Dobuike Hall`（同建物）だが、**1929年の書籍図版のスキャン**（`PD-Japan-oldphoto`）。`DateTimeOriginal=2025-01-19` はスキャン日で撮影日ではない。
+    → 新しい日付と誤認された原因はこれ。日付を不採用にし（`historic-scan-category`）、検証済み 2021-09-07 の `Dobuike_Hall.jpg` が先頭に戻る。
+  - **大阪梅田 / `Hankyu_Osaka-Umeda-STA_Premises.jpg`**: 被写体は阪急大阪梅田駅の**ホーム全景**。撮影座標なし。建物の Wikidata は「梅田駅」（複数駅を含む名称）で、この footprint の外観写真と確定できない。→ **保留（hold）**。
+- 同じ基準で見直した結果、**`Tenjimbashi6_on_Tenjimbashisuji-Mall.JPG`（大阪くらしの今昔館）も保留**: 被写体は商店街の通り（カテゴリ `Tenjinbashisuji Shopping Street`）。建物名カテゴリの `…in_2013.jpg` を優先する。
+- 保留は `public/map-data/osaka-city/derived/photo-review.json` の `holds`（理由・根拠 URL 付き）。36L 索引は変更せず、画像情報は残す。37D ページが任意で読み込み、`rankPhotos` の除外に渡す。
+- 汎用ガード: Commons のカテゴリが示す撮影年と `DateTimeOriginal` が食い違う、または古写真系カテゴリ（`PD-*oldphoto` 等）の場合は日付を採用しない。**この規則で新たに落ちたのは2件**（`愛國貯金銀行.png`、`BIC_CAMERA_Namba.JPG`＝カテゴリ年不一致）。
+- 阪和病院・阪和記念病院の旧 footprint への2023年新病棟写真の除外は維持（テスト済み）。阪和住吉総合病院の重なりクリック不能も未解決のまま。
+
+### 8.2 日付検証の精度改善
+- 英文表記だけを厳格変換: `[Taken on ]D Month YYYY[, HH:MM[:SS]][ (according to Exif data)]`（英語月名の完全一致のみ）。変換後は既存と同じ検証（未来日・不正日・アップロード後を拒否）を通し、`parse:"english-dmy"` と原文 `raw` を保持。
+- **拒否**: `(original upload date)` 付き（アップロード日の注記）、範囲 `(… to …)`、自由文、和文（`2024年1月19日` 等。英語以外は推測しない）、略称月名。
+- 結果（`photo-dates.json`）: **verified 565 / unknown 23**（前回 420 / 168）。内訳: ISO 418、英文変換 147。unknown 23 = DateTimeOriginal なし 12、非対応表記 9（upload date 注記 5・和文 2・自由文 1・曖昧 1）、カテゴリ不一致/古写真 2。既存 ISO の420件は、カテゴリガードで落ちた2件（`愛國貯金銀行.png`は元々ISO 2025-01-19、`BIC_CAMERA_Namba.JPG`）を除き不変。
+- **repo の不備を修正**: `public/map-data/osaka-city` は `.gitignore` 対象で、前段の `photo-dates.json` は実際には commit されていなかった（Preview では日付表が読めず「未確認」表示になる状態）。`git add -f` で追加（既存の索引と同じ扱い）。
+
+### 8.3 候補探索（調査サンプル 16 建物、住吉区周辺 8 + 区外 8）
+`node tools/mission37f-candidate-survey.cjs`（Commons `generator=search`、公開 GET のみ、1.5秒間隔、16リクエスト、画像は取得しない）。結果: `data/reports/mission37f-candidates/survey.json`。
+- 索引にない別画像の候補 **126件**。自動採用条件（座標100m以内・名称一致・オープンライセンス・検証済み日付・現先頭より新しい）を**すべて満たしたものは0件**。
+- 不採用理由（重複あり）: 座標なし 109 / 現先頭より古いか同日 51 / 名称が題名・説明にない 87 / 日付なし・非対応 38 / 座標が遠い 15 / 古写真スキャン 5。
+- 座標がないことだけが理由の「人手確認候補」が14件（例: HEP FIVE → `HEP FIVE 20260223.jpg` 2026-02-23 CC BY 4.0、イオン喜連瓜破 → 2024-01-27 の複数枚、ABC-MART梅田ビル → 2020年）。**未採用**。被写体の確認ができるまで索引に入れない。
+- 名称検索のノイズ例: 住吉警察署の検索で `Sumiyoshi PL in Osaka Prefecture.svg`（ロゴ、2026-06-01）が最新として出る。名称・日付だけでは採用できない実例。
+- 設計: (1) Commons 検索で候補 → (2) 座標・名称・ライセンス・日付ゲート → (3) 通過分だけ `photo-review.json` に `adds` として人手承認後に取り込み（今回は未実装。`holds` と対）。24区展開では Wikidata の P373（Commons カテゴリ）起点の列挙が精度面で有利だが、Wikidata は今回の許可範囲外のため未使用。
+- 現状では「新しい別画像を自動で追加」できる件数は **0**。現在の写真が古い建物（例: イオン喜連瓜破の先頭は 1997 年）は、人手確認候補から被写体確認して追加する運用になる。
+
+### 8.4 検証
+- `node --test`（37E・37D・37F の4ファイル）57件すべて pass。
+- 表示の Before→After: `node tools/mission37f-ranking-diff.cjs`（先頭写真が変わる建物 574 中 3 件）。
