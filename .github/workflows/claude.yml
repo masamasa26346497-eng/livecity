@@ -47,8 +47,8 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           # The Claude Code Action denies Bash by default. Enable only the
-          # locally required test runner and lightweight preview server.
-          # Do not enable arbitrary shell commands or paid API invocations.
+          # offline test runner, local preview server, and read-only repository inspection.
+          # No unrestricted shell, API keys, paid APIs, or production deploy commands.
           claude_args: |
-            --allowedTools "Bash(node:*),Bash(python3 -m http.server:*)"
+            --allowedTools "Bash(node:*),Bash(python3 -m http.server:*),Bash(git status:*),Bash(git rev-parse:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(du:*),Bash(ls:*),Bash(unzip -l:*)"
 
