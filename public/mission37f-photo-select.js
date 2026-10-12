@@ -69,13 +69,24 @@
   // opts: { okConfidence, exclude:[ファイル名], dates:{ファイル名:{takenAt,evidenceUrl,verified}} }
   // 戻り値: { eligibleEntry, reason, photos:[{photo,date}], rejected:[{file,reason}] }（photos は優先順）
   function rankPhotos(entry, opts) {
-    const o = opts || {};
+    let o = opts || {};
     const ok = o.okConfidence || DEFAULT_OK_CONFIDENCE;
     const out = { eligibleEntry: false, reason: null, photos: [], rejected: [] };
     if (!entry) { out.reason = 'no-entry'; return out; }
     if (ok.indexOf(entry.matchConfidence) < 0) { out.reason = 'confidence-' + entry.matchConfidence; return out; }
     out.eligibleEntry = true;
-    const list = Array.isArray(entry.photos) ? entry.photos : [];
+    const list = (Array.isArray(entry.photos) ? entry.photos : []).slice();
+    const dates = Object.assign({}, o.dates || {});
+    // 承認済みの追加写真(photo-review.json の adds)。人手で被写体確認済みのものだけ。形式を厳格に検証し、満たさないものは無視する。
+    (Array.isArray(o.adds) ? o.adds : []).forEach((a) => {
+      if (!a || a.canonicalId !== entry.canonicalId || a.status !== 'approved-manual' || !a.photo) return;
+      const f = fileName(a.photo);
+      if (!f || list.some((x) => fileName(x) === f)) return;
+      if (!/^\d{4}(-\d{2})?(-\d{2})?$/.test(String(a.takenAt || '')) || !safeHttps(a.evidenceUrl) || !safeHttps(a.photo.imageUrl) || !a.photo.author) return;
+      dates[f] = { verified: true, takenAt: a.takenAt, evidenceUrl: a.evidenceUrl };
+      list.push(a.photo);
+    });
+    o = Object.assign({}, o, { dates });
     const kept = [];
     list.forEach((p, i) => {
       const why = ineligibleReason(p, o);

@@ -113,3 +113,31 @@
 ### 8.4 検証
 - `node --test`（37E・37D・37F の4ファイル）57件すべて pass。
 - 表示の Before→After: `node tools/mission37f-ranking-diff.cjs`（先頭写真が変わる建物 574 中 3 件）。
+
+## 9. 第4段階: 人手確認候補 14 件の調査と安全な新規採用（3 件）
+
+### 9.1 取り込み経路
+- `photo-review.json` に `adds`（schema 2）を追加。`rankPhotos(entry, { adds })` が、`status:"approved-manual"`・対象 canonicalId 一致・撮影日(ISO)・https の根拠 URL/画像 URL・作者あり・ライセンスあり・保留/除外でない、を満たすものだけを候補に加える（満たさなければ無視）。区に依存しない共通処理。
+- `node tools/mission37f-build-adds.cjs`: 承認リスト（人が画像を目視し根拠を記録したもの）について、Commons 公式 API（`iiurlwidth=330`）が返す thumbnail/原本/ページ URL・作者・ライセンス・DateTimeOriginal だけを使う。URL を文字列連結で作らない。Commons カテゴリの存在・日付とカテゴリ年の整合・オープンライセンスを再検証し、満たさなければ失敗する。画像ファイルは複製しない。
+
+### 9.2 14 候補の調査（座標なしだけが不採用理由だったもの）
+| 建物 | 候補 | 結果 |
+|---|---|---|
+| イオン喜連瓜破 | `ÆON KIREURIWARI SHOPPING CENTER.jpg`（2024-01-27, CC BY-SA 4.0） | **採用**。カテゴリ=建物名、説明が建物名、画像に AEON ロゴ付きの外観。現先頭は 1997 年撮影の `DIAMOND_CITY_Higashisumiyoshi.JPG`（別名称の施設） |
+| イオン喜連瓜破 | 同日の別 2 枚(`ÆON Kireuriwari…`, `ÆON Kire-Uriwari…`)・駐車場 | 未採用(1 枚で十分。駐車場は外観でない) |
+| イオン喜連瓜破 | 2012 年の 3 枚 | 未採用(2024 年より古い。自販機写真も含む) |
+| HEP FIVE | `HEP FIVE on 26th March 2025.jpg`（2025-03-26, CC0） | **採用**。カテゴリ=HEP FIVE、説明が建物名、画像に HEP FIVE/HANKYU 看板と観覧車の外観 |
+| HEP FIVE | `HEP FIVE 20260223.jpg`（2026-02-23, CC BY 4.0） | **未採用**。より新しいが、説明「観覧車が覗くHEP FIVE」で被写体の主眼が観覧車か建物か画像確認なしに決められず、2025 年版が外観を明瞭に写すため。次回追加の候補 |
+| ABC-MART梅田ビル | `ABC-MART UMEDA Building.jpg`（2020-11-27, CC BY-SA 4.0） | **採用**。カテゴリ=建物名、説明が建物名、画像に ABC-MART 看板のある低層部とビル外観 |
+| ABC-MART梅田ビル | `PRESTIA ATM…`(2015) | 未採用(ATM の屋内写真) |
+| 住吉警察署 | `住吉警察署（旧庁舎）.jpg`(2018) | 未採用。説明は『1994年まで使用された旧庁舎』で現庁舎ではない |
+| 住吉警察署 | `Sumiyoshi PL in Osaka Prefecture.svg`(2026) | 未採用(ロゴ) |
+| 大阪松竹座 | `Osaka Shochikuza.jpg`(2021-03-18) | **未採用・要確認**。カテゴリ・説明は一致するが、画像の目視確認をしていない（残件） |
+
+採用 3 / 未採用 11（うち要確認 2: HEP FIVE 2026・松竹座 2021）。座標がないことだけを理由にはせず、カテゴリ一致・説明・画像目視で判断した。
+
+### 9.3 検証
+- `node --test`（37E・37D・37F の 5 ファイル）62 件 pass（`tests/mission37f-photo-adds.test.cjs` 5 件を追加）。
+- 実 Chrome(headless): `node tools/experiments/mission37e_run_local_qa.mjs tools/experiments/mission37f_adds_panel_qa.mjs` で、3 件とも実ページの `renderPhoto` が新写真を描画（`complete=true`, naturalWidth=330, 表示幅 220, 作者・ライセンス・Commons リンク・撮影日あり）。Google 通信 0・JS 例外 0。**これは QA フック(`?qa=1`・localhost 限定)で写真パネルだけを描いたもので、3D の実クリックではない**（3 件の建物は 9 tile の範囲外）。
+- 既存の課金ガード QA は全項目 true。写真の実クリック QA は 5 施設中 4 件 displayed（阪和住吉総合病院のみ not-clickable、従来どおり）。Google 通信 0・JS 例外 0。
+- 結果: `data/reports/mission37f-adds/adds-panel-qa.json` とスクリーンショット。

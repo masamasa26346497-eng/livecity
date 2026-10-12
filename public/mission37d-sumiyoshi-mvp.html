@@ -1302,11 +1302,11 @@
       // 撮影日表（Mission 37F, Commons DateTimeOriginal）は任意。取得できなくても写真表示は従来どおり（日付は「未確認」扱い）
       const datesP = fetch(PHOTO_DATES_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d && d.dates) || null).catch(() => null);
       // 写真レビュー(保留リスト)も任意。取得できなければ保留なし(従来動作)
-      const reviewP = fetch(PHOTO_REVIEW_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d && Array.isArray(d.holds) ? d.holds : [])).catch(() => []);
+      const reviewP = fetch(PHOTO_REVIEW_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d ? { holds: Array.isArray(d.holds) ? d.holds : [], adds: Array.isArray(d.adds) ? d.adds : [] } : { holds: [], adds: [] })).catch(() => ({ holds: [], adds: [] }));
       photoIdxPromise = fetch(PHOTO_INDEX_URL).then((r) => {
         if (!r.ok) throw new Error(PHOTO_INDEX_URL + ' → HTTP ' + r.status);
         return r.json();
-      }).then(async (idx) => { idx.__dates = await datesP; idx.__holds = await reviewP; return idx; });
+      }).then(async (idx) => { idx.__dates = await datesP; const rv = await reviewP; idx.__holds = rv.holds; idx.__adds = rv.adds; return idx; });
       photoIdxPromise.catch(() => { photoIdxPromise = null; }); // 失敗時は次のクリックで再試行
     }
     return photoIdxPromise;
@@ -1350,7 +1350,8 @@
     const ranked = LiveCityPhotoSelect.rankPhotos(entry, {
       okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
       exclude: (reloc ? reloc.exclude : []).concat(((idx && idx.__holds) || []).filter((h) => h.canonicalId === id).map((h) => h.file)),
-      dates: (idx && idx.__dates) || {}
+      dates: (idx && idx.__dates) || {},
+      adds: (idx && idx.__adds) || []
     });
     const photos = ranked.photos.map((r) => r.photo);
     stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0, takenAt: ranked.photos[0] && ranked.photos[0].date.basis === 'verified' ? ranked.photos[0].date.takenAt : null, dateBasis: ranked.photos[0] ? ranked.photos[0].date.basis : null, candidates: photos.length };
@@ -1455,6 +1456,8 @@
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
       tilesReady: () => !!tileset && tileset.tilesLoaded,
+      // 写真パネルだけを実コード(renderPhoto)で描く。3D 選択は経由しない＝実クリックではない（37F-4: 9 tile 外の建物の確認用）
+      async renderPhotoOnly(id) { if (!stats.lastPicked) stats.lastPicked = {}; return !!renderPhoto(id, await loadPhotoIndex()); },
       project(x, z, h) {
         const p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(x, z, h));
         if (!p) return null;
