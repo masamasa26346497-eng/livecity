@@ -50,7 +50,14 @@ function loadExactTriangleHelpers() {
   const extractFn = extractFunctionBody(html, 'extractExactBuildingGeometry');
   assert.ok(indicesFn, 'crExactTriangleIndices関数が見つかりません');
   assert.ok(extractFn, 'extractExactBuildingGeometry関数が見つかりません');
-  const factory = new Function(`${indicesFn}\n${extractFn}\nreturn { crExactTriangleIndices, extractExactBuildingGeometry };`);
+  // extractExactBuildingGeometry は crGetBiTriIndex(→crBuildBiTriIndex)と crApplyMatrix4 に依存する。
+  // これらを含めないと "crGetBiTriIndex is not defined" になる。
+  const depFns = ['crBuildBiTriIndex', 'crGetBiTriIndex', 'crApplyMatrix4'].map((name) => {
+    const body = extractFunctionBody(html, name);
+    assert.ok(body, `${name}関数が見つかりません`);
+    return body;
+  });
+  const factory = new Function(`${indicesFn}\n${depFns.join('\n')}\n${extractFn}\nreturn { crExactTriangleIndices, extractExactBuildingGeometry };`);
   return factory();
 }
 
