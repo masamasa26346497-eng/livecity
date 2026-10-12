@@ -1,0 +1,378 @@
+{
+ "asof": "2026-10-12",
+ "note": "先頭写真の撮影日（検証済みのみ）からの経過年数。年数は撮影日が検証済みの場合だけ計算し、未確認は推測しない。外観か・建物一致かは判定していない。",
+ "buckets": {
+  "total": 574,
+  "under5": 104,
+  "from5to10": 96,
+  "over10": 353,
+  "unknown": 21,
+  "relocationLocked": 2,
+  "holds": 2,
+  "adds": 5
+ },
+ "priorityOver10y": 353,
+ "priorityUnverified": 21,
+ "priority": [
+  {
+   "canonicalId": "cg_bldg_bldg_a7072ace-6194-4023-b252-abc384b23d4a",
+   "name": "桜島駅",
+   "ward": "konohana",
+   "file": "Sakurajima_Station.JPG",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_366ee5fa-e551-4929-8989-a483f632c6e3",
+   "name": "湯木美術館",
+   "ward": "chuo",
+   "file": "Yuki-museum.JPG",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_f859ecf5-6874-402d-b95a-29504f94d48a",
+   "name": "放出",
+   "ward": "tsurumi",
+   "file": "Hanaten-South.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_11112708-9ed5-4bea-90ea-253756fa96cb",
+   "name": "シェラトン都ホテル大阪",
+   "ward": "tennoji",
+   "file": "MIYAKO_HOTEL_OSAKA.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_d9365dfc-cb58-457d-ab72-71455b57b8d0",
+   "name": "住友ビルディング",
+   "ward": "chuo",
+   "file": "SUMITOMO_mura_01.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_2d314a2d-d8a8-4ea5-87cc-5204e5b00725",
+   "name": "エスカールなんば",
+   "ward": "chuo",
+   "file": "BIC_CAMERA_Namba.JPG",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_08430360-2157-403b-a35b-101fcfb4738c",
+   "name": "湊町リバープレイス",
+   "ward": "naniwa",
+   "file": "Minatomachi-River1.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_8fc8508b-5e0d-44c6-bb0d-1a2ebffe78d8",
+   "name": "阪急グランドビル",
+   "ward": "kita",
+   "file": "Hankyu_Grand_Bld.JPG",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_c6d40de9-644e-4fb6-9fcd-3f88a7e4d051",
+   "name": "大阪府立桃谷高等学校",
+   "ward": "ikuno",
+   "file": "Osaka_Prefectural_Momodani_High_School.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_1990f6dd-1607-4cdb-9880-a64e0771ce98",
+   "name": "大阪府立今宮高等学校",
+   "ward": "naniwa",
+   "file": "Osaka_Prefectural_Imamiya_High_School.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_e8920eb7-0581-441a-a4b9-dce511e19809",
+   "name": "ホテルニューオータニ",
+   "ward": "chuo",
+   "file": "OBP_Hotel_New_Otani_Osaka.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_osm_181072358",
+   "name": "善覚寺",
+   "ward": "kita",
+   "file": "法性山_善覚寺.jpeg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_3d4e164a-b500-4c82-bc8d-e944d6a2dccc",
+   "name": "高島屋東別館",
+   "ward": "naniwa",
+   "file": "Takashimaya_east_annex_-_panoramio.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_717bf7bf-d2f0-4335-adf4-0a049a9cda72",
+   "name": "大阪府立中之島図書館",
+   "ward": "kita",
+   "file": "Osaka_Nakanosima_Library.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_132ff8e7-1383-4c45-af2a-a08f6e6d542c",
+   "name": "法善寺",
+   "ward": "chuo",
+   "file": "法善寺_水掛不動.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_879818d1-78ee-4478-9602-616be114d6fd",
+   "name": "浄蓮寺",
+   "ward": "kita",
+   "file": "臥龍山_浄蓮寺.jpeg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_12f85ac6-36b3-4ceb-87f3-b61402fe51c1",
+   "name": "住之江競艇場",
+   "ward": "suminoe",
+   "file": "Suminoe_Kyotei2.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_osm_493551119",
+   "name": "インテックスプラザ",
+   "ward": "suminoe",
+   "file": "Intex_Osaka1.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_ab94bc88-0ebb-4835-819b-8094aa2b0441",
+   "name": "大阪ベイタワー",
+   "ward": "minato",
+   "file": "ORC200.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_517570fd-2f38-4f6f-8a54-244913f725cd",
+   "name": "フェスティバルゲート",
+   "ward": "naniwa",
+   "file": "FestivalGate_front.JPG",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_7d1f4d04-7881-43b9-a6a2-67249922c3d3",
+   "name": "安治川発電所",
+   "ward": "fukushima",
+   "file": "Ajigawa_east_power_station.jpg",
+   "takenAt": null,
+   "ageYears": null,
+   "why": "date-unverified"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_0899800a-0a0e-47bb-9944-8ba90b7df802",
+   "name": "大阪女学院大学",
+   "ward": "chuo",
+   "file": "Osaka_Jogakuin_College2.jpg",
+   "takenAt": "2000",
+   "ageYears": 26.8,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_b610b35e-cbc5-4ff7-a94b-284bdff2acbd",
+   "name": "了徳院",
+   "ward": "fukushima",
+   "file": "Ryotokuin01.jpg",
+   "takenAt": "2005-11-17",
+   "ageYears": 20.9,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_ae83b5e7-ed29-44c2-a683-6335bf6a879e",
+   "name": "ゲートタワービル",
+   "ward": "fukushima",
+   "file": "Building_penetrated_by_an_expressway_001_OSAKA_JPN.jpg",
+   "takenAt": "2006-03-20",
+   "ageYears": 20.6,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_1c54862e-07f1-449c-9621-43505a1bf1a1",
+   "name": "日本基督教団大阪教会",
+   "ward": "nishi",
+   "file": "Uccj_osaka_church01_2048.jpg",
+   "takenAt": "2006-03-31",
+   "ageYears": 20.5,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_0e7d56df-dba7-4a2a-bb67-42af3d49ef2b",
+   "name": "比売許曽神社",
+   "ward": "higashinari",
+   "file": "Himekoso_Shrine_torii.jpeg",
+   "takenAt": "2006-05-14",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_e8e30483-f191-4821-a42f-4d803e237680",
+   "name": "NHK大阪ホール",
+   "ward": "chuo",
+   "file": "NHK_Osaka_Broadcasting_Station_Bldg_20060604-001.jpg",
+   "takenAt": "2006-06-04",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_ccec3c6b-785f-4510-ab28-6f2ba1b35858",
+   "name": "曽根崎警察署",
+   "ward": "kita",
+   "file": "Sonezaki-Police-St-01.jpg",
+   "takenAt": "2006-06-04",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_8d84d758-6a19-47db-93ed-72120112d459",
+   "name": "大和ハウス大阪ビル",
+   "ward": "kita",
+   "file": "Daiwa-House-Osaka-Bldg-01.jpg",
+   "takenAt": "2006-06-04",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_1447091d-93e6-4de9-a145-5c22f3fcea5c",
+   "name": "北浜NEXU BUILD",
+   "ward": "chuo",
+   "file": "Osaka-Obayashi-bldg-01.jpg",
+   "takenAt": "2006-05-21",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_e95587aa-04ee-45d9-b145-5352a0bbdb77",
+   "name": "大阪証券取引所ビル",
+   "ward": "chuo",
+   "file": "Osaka-Securities-Exchange-01.jpg",
+   "takenAt": "2006-05-21",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_5d55b776-a483-41b1-a27f-e9883f3c60f4",
+   "name": "阪急電鉄本社ビル",
+   "ward": "kita",
+   "file": "Hankyu-Corp-headoffice-01.jpg",
+   "takenAt": "2006-06-04",
+   "ageYears": 20.4,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_66c2fee9-dfbb-4740-a387-7c78648f930c",
+   "name": "桑津天神社",
+   "ward": "higashisumiyoshi",
+   "file": "Kuwazu-tenjinja.jpg",
+   "takenAt": "2006-07",
+   "ageYears": 20.3,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_45d9a7c2-12af-4768-8cfd-879709662564",
+   "name": "河堀稲生神社",
+   "ward": "tennoji",
+   "file": "Kawahori-inao_jinja.jpg",
+   "takenAt": "2006-07",
+   "ageYears": 20.3,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_osm_958343155",
+   "name": "梅田センタービル",
+   "ward": "kita",
+   "file": "Umeda-Center-Bldg-01.jpg",
+   "takenAt": "2006-07-15",
+   "ageYears": 20.2,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_osm_1457156820",
+   "name": "中之島センタービル",
+   "ward": "kita",
+   "file": "Nakanoshima_center_bld01s2816.jpg",
+   "takenAt": "2006-07-26",
+   "ageYears": 20.2,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_34c98a53-557e-4c6a-b25f-45262436cf6e",
+   "name": "JR西日本本社ビル",
+   "ward": "kita",
+   "file": "West-JR-hq-01.jpg",
+   "takenAt": "2006-09-17",
+   "ageYears": 20.1,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_2661cf17-a57c-4f6b-8760-d20c372b0568",
+   "name": "大阪マルビル",
+   "ward": "kita",
+   "file": "Umeda-Dia-Bldg-01.jpg",
+   "takenAt": "2006-09-17",
+   "ageYears": 20.1,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_e217aea1-924d-4591-853a-d9688eee4203",
+   "name": "津守神社",
+   "ward": "nishinari",
+   "file": "津守神社本殿.JPG",
+   "takenAt": "2006-10-15",
+   "ageYears": 20,
+   "why": "over-10y"
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_0ecfa2c5-ba1e-4029-adb9-35896bede9ff",
+   "name": "阪急茶屋町ビルディング",
+   "ward": "kita",
+   "file": "Applause-Tower-02.jpg",
+   "takenAt": "2006-10-15",
+   "ageYears": 20,
+   "why": "over-10y"
+  }
+ ]
+}

@@ -14,6 +14,11 @@ const UA = 'LiveCityPhotoDateBot/0.1 (https://github.com/masamasa26346497-eng/li
 const args = process.argv.slice(2);
 const arg = (n, d) => (args.includes(n) ? args[args.indexOf(n) + 1] : d);
 const N = Math.min(20, +arg('--n', 16));
+// 増分モード: --incremental で ledger を読み、調査済み建物を除外して区ごとに分散した新規建物を選ぶ。--ids a,b で建物指定、--recheck-days で再調査間隔(既定 30)。
+const INCR = args.includes('--incremental');
+const IDS = arg('--ids', '') ? arg('--ids', '').split(',') : [];
+const RECHECK_DAYS = +arg('--recheck-days', 30);
+const LEDGER = path.join(root, 'data/reports/mission37f-candidates/ledger.json');
 const OUT = path.join(root, arg('--out', 'data/reports/mission37f-candidates/survey.json'));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sb = { module: { exports: {} } };
@@ -47,7 +52,19 @@ async function main() {
   const all = Object.values(idx).filter((e) => e.matchConfidence === 'VERY_HIGH' && e.buildingName && e.lat && (e.photos || []).length);
   const sumi = all.filter((e) => /sumiyoshi|hirano/i.test(e.ward || '')).sort((a, b) => a.buildingName.localeCompare(b.buildingName, 'ja')).slice(0, Math.ceil(N / 2));
   const others = all.filter((e) => !sumi.includes(e) && !/sumiyoshi|hirano/i.test(e.ward || '')).sort((a, b) => b.photos.length - a.photos.length || a.buildingName.localeCompare(b.buildingName, 'ja')).slice(0, N - sumi.length);
-  const sample = sumi.concat(others);
+  let sample = sumi.concat(others);
+  const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : { schema: 'mission37f-survey-ledger/1', buildings: {} };
+  if (INCR || IDS.length) {
+    if (IDS.length) sample = all.filter((e) => IDS.includes(e.canonicalId));
+    else {
+      const byWard = {};
+      all.filter((e) => { const L = ledger.buildings[e.canonicalId]; return !L || (Date.now() - Date.parse(L.lastSurveyedAt)) / 864e5 >= RECHECK_DAYS * 12; })
+        .sort((a, b) => b.photos.length - a.photos.length || a.buildingName.localeCompare(b.buildingName, 'ja'))
+        .forEach((e) => (byWard[e.ward || '?'] = byWard[e.ward || '?'] || []).push(e));
+      sample = [];
+      for (let i = 0; sample.length < N && Object.values(byWard).some((l) => l[i]); i++) for (const l of Object.values(byWard)) if (l[i] && sample.length < N) sample.push(l[i]);
+    }
+  }
   const now = new Date(), report = [];
   for (const e of sample) {
     const known = new Set((e.photos || []).map((p) => PS.fileName(p).replace(/_/g, ' ')));
@@ -80,6 +97,10 @@ async function main() {
     }
     rec.summary = { found: rec.candidates.length, autoAdoptable: rec.candidates.filter((c) => c.verdict === 'auto-adoptable').length };
     report.push(rec);
+    // ledger: 再調査日時・候補ごとの自動判定と理由を保持。人手の decision / decisionBasis は上書きしない。
+    const L = ledger.buildings[e.canonicalId] = ledger.buildings[e.canonicalId] || { name: e.buildingName, ward: e.ward, candidates: {} };
+    L.lastSurveyedAt = now.toISOString(); L.currentFile = rec.current && rec.current.file; L.currentTakenAt = rec.current && rec.current.takenAt;
+    for (const c of rec.candidates) L.candidates[c.file] = Object.assign(L.candidates[c.file] || {}, { takenAt: c.takenAt, license: c.license, distanceM: c.distanceM, autoVerdict: c.verdict, autoReasons: c.rejectedBecause, evidenceUrl: c.evidenceUrl });
     console.log(e.buildingName + ' [' + e.ward + '] cand=' + rec.summary.found + ' ok=' + rec.summary.autoAdoptable);
     await sleep(1500);
   }
@@ -88,6 +109,8 @@ async function main() {
   const doc = { generatedAt: now.toISOString(), note: '調査サンプル。本番の索引・日付表には反映しない。auto-adoptable も人手確認を経て photo-review/索引に取り込む前提。', sampleSize: report.length,
     totals: { candidates: report.reduce((s, r) => s + r.candidates.length, 0), autoAdoptable: report.reduce((s, r) => s + r.summary.autoAdoptable, 0), rejectedReasons: reasons }, buildings: report };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  ledger.updatedAt = now.toISOString();
+  fs.writeFileSync(LEDGER, JSON.stringify(ledger, null, 1) + '\n');
   fs.writeFileSync(OUT, JSON.stringify(doc, null, 1) + '\n');
   console.log(JSON.stringify(doc.totals));
 }

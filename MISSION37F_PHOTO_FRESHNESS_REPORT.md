@@ -141,3 +141,38 @@
 - 実 Chrome(headless): `node tools/experiments/mission37e_run_local_qa.mjs tools/experiments/mission37f_adds_panel_qa.mjs` で、3 件とも実ページの `renderPhoto` が新写真を描画（`complete=true`, naturalWidth=330, 表示幅 220, 作者・ライセンス・Commons リンク・撮影日あり）。Google 通信 0・JS 例外 0。**これは QA フック(`?qa=1`・localhost 限定)で写真パネルだけを描いたもので、3D の実クリックではない**（3 件の建物は 9 tile の範囲外）。
 - 既存の課金ガード QA は全項目 true。写真の実クリック QA は 5 施設中 4 件 displayed（阪和住吉総合病院のみ not-clickable、従来どおり）。Google 通信 0・JS 例外 0。
 - 結果: `data/reports/mission37f-adds/adds-panel-qa.json` とスクリーンショット。
+
+## 10. 第5段階: 増分更新導線・古さの監査・新規 2 件採用（2026-10-12）
+
+### 10.1 調査バッチ
+- 新規 14 建物（14 行政区に分散、ランドマーク・施設）を Commons 公式 API（読み取り専用・1.5 秒間隔）で調査。候補 130 件、自動採用条件を全て満たしたもの 6 件（アゼリア大正 4・海遊館 2）。結果は `data/reports/mission37f-candidates/survey-2026-10-12.json`。
+- 前回未採用の松竹座 2021・HEP FIVE 2026 を再点検し、画像を目視した（640px サムネイルを gitignore 済みキャッシュに一時保存。commit・配信はしない）。
+- **採用 2 件**（人手で目視し、説明・カテゴリ・撮影日・ライセンスが一致したものだけ）:
+  - 大阪松竹座: `Osaka Shochikuza.jpg`（2021-03-18、Tokumeigakarinoaoshima、CC BY-SA 4.0）。正面ファサードの外観。Before `Shochikuza_2020-09.jpg`（2020-09-18）。
+  - 海遊館: `Osaka Aquarium "Kaiyukan" 20190201-2.jpg`（2019-02-01、そらみみ、CC BY-SA 4.0）。ジンベエザメ壁画のある本館外観。Before `Osaka_Kaiyukan01s3872.jpg`（2007-09-26）。撮影座標は建物 Wikidata 点から 93m（広場側からの撮影）。
+- **不採用（理由は ledger に記録）**: HEP FIVE 2026（主題が観覧車）、海遊館の入口写真（付属棟）、アゼリア大正の 4 件（プロレス選手の人物写真。自動判定は誤検出）。
+- 自動判定の限界: 名称が説明に含まれ、座標が近く、日付が新しくても、人物・イベント写真が通る（アゼリア大正）。したがって採用は常に人手の目視を要する。
+
+### 10.2 古さの監査（`node tools/mission37f-photo-age-audit.cjs`、基準日 2026-10-12、先頭写真・検証済み撮影日のみ）
+| 区分 | 建物数 |
+|---|---|
+| 5 年未満 | 104 |
+| 5〜10 年 | 96 |
+| 10 年以上 | 353 |
+| 撮影日未確認（年数を推測しない） | 21 |
+| 合計（表示可能な建物） | 574 |
+- 移転ロック 2 件、holds 2 件、adds 5 件。詳細と上位 40 件は `data/reports/mission37f-photo-audit/age-audit.json`。
+- これは再調査の優先順位であり、外観か・建物一致かの判定ではない。
+
+### 10.3 増分更新（月 1 回の手動調査を想定）
+1. `node tools/mission37f-candidate-survey.cjs --incremental --n 14 --out data/reports/mission37f-candidates/survey-YYYY-MM-DD.json`
+   - `ledger.json` にある調査済み建物を除き、行政区ごとに分散して新規建物を選ぶ。`--ids a,b` で建物を指定、`--recheck-days` で再調査間隔を調整。
+   - ledger は建物ごとに `lastSurveyedAt`、候補ごとに `autoVerdict` / `autoReasons` / 証拠 URL を保持する。既存の人手の `decision` は上書きしない。
+2. 自動採用候補と、座標なしだけが理由の候補を目視する（`node tools/mission37f-preview-images.cjs <list.json>`で 640px サムネイルを `data/cache/mission37f-commons/preview/` に保存）。
+3. 採用するものを `tools/mission37f-build-adds.cjs` の `APPROVED`（根拠付き）、不採用を `REJECTED`（理由付き）に追記して実行。カテゴリ・日付整合・ライセンス・URL を再検証し、`photo-review.json` の `adds` と ledger の `decision` を更新する。検証に失敗したら何も書かない。
+4. `node tools/mission37f-photo-age-audit.cjs`、`node --test tests/mission37f-*.test.cjs`、`mission37f_adds_panel_qa.mjs` を実行。
+- 無審査の自動掲載はしない。GitHub Actions の定期実行は設定していない（今回は追加しない）。
+
+### 10.4 検証
+- `node --test`（37E・37D・37F の 5 ファイル）65 件 pass（ledger・採用 2 件の新規 3 件を追加）。
+- 実 Chrome: adds 5 件すべて `displayed`（画像 complete・naturalWidth=330・表示幅 220）。**写真パネル単体の描画であり、3D の実クリックではない**。実クリック QA は 5 施設中 4 件 displayed（阪和住吉総合病院のみ not-clickable）。Google 通信 0・JS 例外 0。

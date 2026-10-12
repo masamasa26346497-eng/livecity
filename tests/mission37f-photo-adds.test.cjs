@@ -38,7 +38,7 @@ test('[37F-4] adds: 未承認・別建物・https/作者/日付/ライセンス�
 });
 
 test('[37F-4] 実データ: adds は索引の canonicalId・Commons 公式 URL・オープンライセンス・検証済み日付・根拠を保持し、現先頭より新しい', () => {
-  assert.ok(REVIEW.adds.length >= 1 && REVIEW.adds.length <= 3);
+  assert.ok(REVIEW.adds.length >= 1 && REVIEW.adds.length <= 8);
   const exclude = REVIEW.holds.map((h) => h.file);
   for (const a of REVIEW.adds) {
     const e = INDEX[a.canonicalId];
@@ -66,4 +66,43 @@ test('[37F-4] 37D ページは adds を読み込んで rankPhotos に渡し、Go
   const html = fs.readFileSync(path.join(root, 'public/mission37d-sumiyoshi-mvp.html'), 'utf8');
   assert.match(html, /adds: \(idx && idx\.__adds\) \|\| \[\]/);
   assert.match(fs.readFileSync(path.join(root, 'public/mission37e-places-ui-kit.js'), 'utf8'), /ENABLED\s*=\s*false/);
+});
+
+// ---- 37F-5: 増分更新 ledger ----
+const LEDGER = JSON.parse(fs.readFileSync(path.join(root, 'data/reports/mission37f-candidates/ledger.json'), 'utf8'));
+
+test('[37F-5] ledger: 調査済み建物は再調査日時と候補ごとの自動判定・理由を持ち、索引の canonicalId と一致する', () => {
+  const ids = Object.keys(LEDGER.buildings);
+  assert.ok(ids.length >= 30);
+  for (const cid of ids) {
+    const b = LEDGER.buildings[cid];
+    assert.ok(INDEX[cid], 'in index: ' + cid);
+    assert.ok(!Number.isNaN(Date.parse(b.lastSurveyedAt)));
+    for (const c of Object.values(b.candidates)) {
+      assert.ok(['auto-adoptable', 'rejected', undefined].includes(c.autoVerdict));
+      if (c.decision) assert.ok(['adopted', 'rejected-by-review'].includes(c.decision) && c.decisionBasis && c.decidedAt);
+    }
+  }
+});
+
+test('[37F-5] ledger: adds の各写真は decision=adopted と根拠が記録され、人手不採用の写真は adds に入らない', () => {
+  const addedFiles = REVIEW.adds.map((a) => a.photo.title.replace(/^File:/, ''));
+  for (const a of REVIEW.adds) {
+    const c = LEDGER.buildings[a.canonicalId].candidates[a.photo.title.replace(/^File:/, '')];
+    assert.equal(c && c.decision, 'adopted', a.photo.title);
+    assert.ok(c.decisionBasis);
+  }
+  for (const b of Object.values(LEDGER.buildings)) for (const [f, c] of Object.entries(b.candidates)) if (c.decision === 'rejected-by-review') assert.ok(!addedFiles.includes(f), f);
+});
+
+test('[37F-5] 松竹座(2021-03-18)・海遊館(2019-02-01)の新写真が先頭になり、holds と阪和の移転ロックは維持される', () => {
+  const exclude = REVIEW.holds.map((h) => h.file);
+  const want = { 'cg_bldg_bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1': '2021-03-18', 'cg_bldg_osm_143328734': '2019-02-01' };
+  for (const [cid, takenAt] of Object.entries(want)) {
+    const r = PS.rankPhotos(INDEX[cid], { dates: DATES, exclude, adds: REVIEW.adds }).photos[0];
+    assert.equal(r.date.takenAt, takenAt, cid);
+    assert.equal(r.date.basis, 'verified');
+  }
+  assert.ok(REVIEW.holds.some((h) => /Hankyu_Osaka-Umeda/.test(h.file)) && REVIEW.holds.some((h) => /Tenjimbashi6/.test(h.file)));
+  assert.ok(!REVIEW.adds.some((a) => /ec74351a|fae25b63/.test(a.canonicalId)));
 });
