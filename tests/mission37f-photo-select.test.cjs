@@ -78,7 +78,7 @@ test('[37F] 37D ページは共通モジュールを読み込み、移転除外(
   const html = fs.readFileSync(path.join(root, 'public/mission37d-sumiyoshi-mvp.html'), 'utf8');
   assert.match(html, /<script src="mission37f-photo-select\.js"><\/script>/);
   assert.match(html, /LiveCityPhotoSelect\.rankPhotos\(entry, \{/);
-  assert.match(html, /exclude: reloc \? reloc\.exclude : \[\]/);
+  assert.match(html, /exclude: \(reloc \? reloc\.exclude : \[\]\)\.concat/);
   assert.match(html, /const RELOCATED = /);
   const kit = fs.readFileSync(path.join(root, 'public/mission37e-places-ui-kit.js'), 'utf8');
   assert.match(kit, /ENABLED\s*=\s*false/);

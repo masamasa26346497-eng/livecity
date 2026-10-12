@@ -1,0 +1,23 @@
+{
+ "schema": "mission37f-photo-review/1",
+ "policy": "holds は『新しい日付があっても、現建物との一致が確定するまで表示候補にしない』写真。索引(36L)は変更しない。画像情報は残し、監査対象とする。",
+ "holds": [
+  {
+   "canonicalId": "bldg_8e4695fb-0c30-41d2-bd5e-37f2b10c467e",
+   "file": "Hankyu_Osaka-Umeda-STA_Premises.jpg",
+   "reason": "被写体は阪急大阪梅田駅のホーム全景(Commons 説明・カテゴリ Platforms of Osaka-Umeda Station (Hankyu))。建物 footprint の Wikidata は『梅田駅』で複数駅を含む名称のため、この建物の外観写真と確定できない。Commons に撮影座標なし。",
+   "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hankyu_Osaka-Umeda-STA_Premises.jpg",
+   "status": "hold-unverified-subject"
+  },
+  {
+   "canonicalId": "bldg_8ad5d70f-2cb7-411f-a234-299b6e6af56f",
+   "file": "Tenjimbashi6_on_Tenjimbashisuji-Mall.JPG",
+   "reason": "被写体は天神橋筋商店街の通り(説明『天神橋筋商店街・天神橋六』、カテゴリ Tenjinbashisuji Shopping Street)で、今昔館の建物そのものの写真とは確認できない。建物名のカテゴリを持つ Osaka_Museum_of_Housing_and_Living_in_2013.jpg を優先する。",
+   "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tenjimbashi6_on_Tenjimbashisuji-Mall.JPG",
+   "status": "hold-unverified-subject"
+  }
+ ],
+ "notes": [
+  "愛國貯金銀行.png(丼池繊維会館): Commons カテゴリは Dobuike Hall(同建物)だが、1929年の書籍図版のスキャンで DateTimeOriginal(2025-01-19)はスキャン日。photo-dates.json で historic-scan-category として日付を不採用にし、検証済み日付を持つ Dobuike_Hall.jpg(2021-09-07)が先頭に戻る。"
+ ]
+}

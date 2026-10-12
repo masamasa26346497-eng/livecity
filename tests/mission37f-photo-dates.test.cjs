@@ -3,7 +3,7 @@
 const test = require('node:test'), assert = require('node:assert');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const { parseTakenAt, stripTags, fileNameOf } = require('../tools/mission37f-fetch-photo-dates.cjs');
+const { parseTakenAt, categoryDateConflict, stripTags, fileNameOf } = require('../tools/mission37f-fetch-photo-dates.cjs');
 const sb = { module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'public/mission37f-photo-select.js'), 'utf8'), sb);
 const PS = sb.module.exports;
@@ -15,7 +15,7 @@ test('ISO の撮影日だけ verified（時刻は落として精度を保持）'
   assert.strictEqual(parseTakenAt('<time datetime="x">2019-08-30</time>', null, NOW).takenAt, '2019-08-30');
 });
 test('非 ISO・範囲・曖昧・異常値は verified にしない', () => {
-  for (const raw of ['Taken on 26 December 2014', '1 December 2023, 16:48:09', '2010-2012', 'circa 1990', '2020-07-19 / 2020-07-20', '', null])
+  for (const raw of ['2010-2012', 'circa 1990', '2020-07-19 / 2020-07-20', '', null])
     assert.strictEqual(parseTakenAt(raw, null, NOW).verified, false, String(raw));
   assert.strictEqual(parseTakenAt('1850-01-01', null, NOW).reason, 'year-out-of-range');
   assert.strictEqual(parseTakenAt('2020-13-01', null, NOW).reason, 'invalid-month');
@@ -73,4 +73,41 @@ test('37D ページは photo-dates.json を任意で読み、検証済みの日�
   const h = fs.readFileSync(path.join(root, 'public/mission37d-sumiyoshi-mvp.html'), 'utf8');
   assert.ok(h.includes('photo-dates.json') && h.includes('idx.__dates') && h.includes("dinfo.basis === 'verified'") && h.includes('data-photo-taken'));
   assert.ok(/ENABLED\s*=\s*false/.test(fs.readFileSync(path.join(root, 'public/mission37e-places-ui-kit.js'), 'utf8')));
+});
+
+test('英文の一義的な日付だけ変換して verified、範囲・upload date 注記・自由文・和文・月名の誤りは拒否', () => {
+  const ok = (raw, want) => { const r = parseTakenAt(raw, null, NOW); assert.strictEqual(r.verified, true, raw); assert.strictEqual(r.takenAt, want, raw); assert.strictEqual(r.parse, 'english-dmy'); };
+  ok('Taken on 26 December 2014', '2014-12-26');
+  ok('1 December 2023, 16:48:09', '2023-12-01');
+  ok('Taken on 21 March 2009, 09:47 (according to Exif data)', '2009-03-21');
+  ok('10 May 2026 13:29:00', '2026-05-10');
+  for (const raw of ['15 July 2009 (original upload date)', '30 December 2007 (original upload date)2007.02', '2024年1月19日', 'Unknown date (before 1941)',
+    'Photo: Taken on 24 June 2006 Statue: It survived a fire in 1945', '3 Sept 2010', '31 Febuary 2010', '31 February 2010', '5 May 2010 (Mon to Wed)', '1 January 2999'])
+    assert.strictEqual(parseTakenAt(raw, null, NOW).verified, false, raw);
+  assert.strictEqual(parseTakenAt('26 December 2014', '2014-01-01T00:00:00Z', NOW).reason, 'taken-after-upload');
+});
+test('古写真スキャン／カテゴリの撮影年と食い違う日付は不採用', () => {
+  assert.strictEqual(categoryDateConflict(['Buildings photographed in 1929', 'PD-Japan-oldphoto'], '2025-01-19'), 'historic-scan-category');
+  assert.strictEqual(categoryDateConflict(['Japan photographs taken on 2022-01-03'], '2022-01-03'), null);
+  assert.strictEqual(categoryDateConflict(['Japan photographs taken on 2019-01-03'], '2022-01-03'), 'category-year-mismatch');
+  assert.strictEqual(categoryDateConflict([], '2022-01-03'), null);
+});
+test('photo-review.json の保留写真は 37D ページで除外され、画像は索引に残る（監査対象）', () => {
+  const rev = JSON.parse(fs.readFileSync(path.join(root, 'public/map-data/osaka-city/derived/photo-review.json'), 'utf8'));
+  const idx = JSON.parse(fs.readFileSync(path.join(root, 'public/map-data/osaka-city/derived/building-photo-index.json'), 'utf8'));
+  const dates = JSON.parse(fs.readFileSync(path.join(root, 'public/map-data/osaka-city/derived/photo-dates.json'), 'utf8')).dates;
+  assert.ok(rev.holds.length >= 1);
+  for (const h of rev.holds) {
+    assert.ok(/^https:\/\//.test(h.evidenceUrl) && h.reason);
+    const e = idx.byCanonicalId['cg_bldg_' + h.canonicalId];
+    const files = (r) => r.photos.map((x) => PS.fileName(x.photo));
+    assert.ok(files(PS.rankPhotos(e, { dates })).includes(h.file), '索引には残る');
+    assert.ok(!files(PS.rankPhotos(e, { dates, exclude: [h.file] })).includes(h.file));
+  }
+  const umeda = idx.byCanonicalId['cg_bldg_bldg_8e4695fb-0c30-41d2-bd5e-37f2b10c467e'];
+  assert.notStrictEqual(PS.fileName(PS.rankPhotos(umeda, { dates, exclude: rev.holds.map((h) => h.file) }).photos[0].photo), 'Hankyu_Osaka-Umeda-STA_Premises.jpg');
+  const dob = idx.byCanonicalId['cg_bldg_bldg_30319fab-0161-41f2-8505-dcf6d5740994'];
+  assert.strictEqual(PS.fileName(PS.rankPhotos(dob, { dates }).photos[0].photo), 'Dobuike_Hall.jpg');
+  const h = fs.readFileSync(path.join(root, 'public/mission37d-sumiyoshi-mvp.html'), 'utf8');
+  assert.ok(h.includes('photo-review.json') && h.includes('idx.__holds'));
 });

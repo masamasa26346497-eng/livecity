@@ -1294,16 +1294,19 @@
     reason: 'No Google network requests until an enforced budget guard is implemented'
   });
   const PHOTO_DATES_URL = 'map-data/osaka-city/derived/photo-dates.json';
+  const PHOTO_REVIEW_URL = 'map-data/osaka-city/derived/photo-review.json';
   const PHOTO_INDEX_URL ='map-data/osaka-city/derived/building-photo-index.json';
   let photoIdxPromise = null;
   function loadPhotoIndex() {
     if (!photoIdxPromise) {
       // 撮影日表（Mission 37F, Commons DateTimeOriginal）は任意。取得できなくても写真表示は従来どおり（日付は「未確認」扱い）
       const datesP = fetch(PHOTO_DATES_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d && d.dates) || null).catch(() => null);
+      // 写真レビュー(保留リスト)も任意。取得できなければ保留なし(従来動作)
+      const reviewP = fetch(PHOTO_REVIEW_URL).then((r) => (r.ok ? r.json() : null)).then((d) => (d && Array.isArray(d.holds) ? d.holds : [])).catch(() => []);
       photoIdxPromise = fetch(PHOTO_INDEX_URL).then((r) => {
         if (!r.ok) throw new Error(PHOTO_INDEX_URL + ' → HTTP ' + r.status);
         return r.json();
-      }).then(async (idx) => { idx.__dates = await datesP; return idx; });
+      }).then(async (idx) => { idx.__dates = await datesP; idx.__holds = await reviewP; return idx; });
       photoIdxPromise.catch(() => { photoIdxPromise = null; }); // 失敗時は次のクリックで再試行
     }
     return photoIdxPromise;
@@ -1346,7 +1349,7 @@
     // 共通の優先順位(mission37f-photo-select.js): 適格性(信頼度・ライセンス・https・移転除外) → 新しい日付の根拠 → 元の順序
     const ranked = LiveCityPhotoSelect.rankPhotos(entry, {
       okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
-      exclude: reloc ? reloc.exclude : [],
+      exclude: (reloc ? reloc.exclude : []).concat(((idx && idx.__holds) || []).filter((h) => h.canonicalId === id).map((h) => h.file)),
       dates: (idx && idx.__dates) || {}
     });
     const photos = ranked.photos.map((r) => r.photo);

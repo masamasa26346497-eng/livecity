@@ -29,9 +29,32 @@ function fileNameOf(p) {
 
 // ── 撮影日の厳密な解釈（純関数。テスト対象）──
 const stripTags = (s) => String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+// 英文の「[Taken on ]D Month YYYY[,] [HH:MM[:SS]][ (according to Exif data)]」だけを ISO に変換する。
+// 範囲 (to)、"(original upload date)"、自由文、和文、月名の省略形などは変換せず null（呼び出し側で unknown）。
+function englishToIso(text) {
+  const m = text.match(/^(?:Taken on )?(\d{1,2}) ([A-Za-z]+) (\d{4})(?:,? (\d{2}):(\d{2})(?::(\d{2}))?)?(?: \(according to Exif data\))?$/);
+  if (!m) return null;
+  const mi = MONTHS.indexOf(m[2].toLowerCase());
+  if (mi < 0) return null;
+  const pad = (n) => String(n).padStart(2, '0');
+  return m[3] + '-' + pad(mi + 1) + '-' + pad(+m[1]) + (m[4] ? ' ' + m[4] + ':' + m[5] + (m[6] ? ':' + m[6] : '') : '');
+}
+// カテゴリが示す撮影年と DateTimeOriginal が食い違う、または古写真/スキャン系カテゴリのとき、その日付は撮影日として採用しない
+// （例: 1929年の書籍図版のスキャンで DateTimeOriginal がスキャン日 2025-01-19 になっているケース）
+function categoryDateConflict(categories, takenAt) {
+  const cats = categories || [];
+  if (cats.some((c) => /^PD-(Japan-)?old|oldphoto|^PD-1996|^PD-Japan-film|^PD-old/i.test(c))) return 'historic-scan-category';
+  const years = [];
+  for (const c of cats) { const m = c.match(/(?:photographed in|taken on|taken in)\s+(\d{4})/i); if (m) years.push(m[1]); }
+  if (years.length && !years.includes(String(takenAt).slice(0, 4))) return 'category-year-mismatch';
+  return null;
+}
 function parseTakenAt(raw, uploadedIso, now) {
-  const text = stripTags(raw);
+  let text = stripTags(raw);
   if (!text) return { verified: false, reason: 'empty' };
+  const iso = englishToIso(text);
+  if (iso) { const r = parseTakenAt(iso, uploadedIso, now); return r.verified ? Object.assign(r, { parse: 'english-dmy' }) : r; }
   // 日付範囲・曖昧表現（between / circa / ~ / 複数日付 / 和文）は自動変換しない
   const m = text.match(/^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
   if (!m) return { verified: false, reason: 'non-iso-or-ambiguous' };
@@ -86,7 +109,7 @@ async function getJson(url, attempt) {
 
 async function fetchBatch(names) {
   const u = new URL(API);
-  u.search = new URLSearchParams({ action: 'query', format: 'json', formatversion: '2', prop: 'imageinfo', iiprop: 'extmetadata|timestamp',
+  u.search = new URLSearchParams({ action: 'query', format: 'json', formatversion: '2', prop: 'imageinfo|categories', cllimit: 'max', iiprop: 'extmetadata|timestamp',
     iiextmetadatafilter: 'DateTimeOriginal|DateTime', titles: names.map((n) => 'File:' + n).join('|'), maxlag: String(MAXLAG) }).toString();
   const j = await getJson(u.toString());
   const norm = {}; // 正規化後タイトル → 元タイトル
@@ -98,7 +121,7 @@ async function fetchBatch(names) {
     if (!key) continue;
     if (pg.missing || !pg.imageinfo || !pg.imageinfo[0]) { out[key] = { missing: true }; continue; }
     const ii = pg.imageinfo[0], em = ii.extmetadata || {};
-    out[key] = { uploadedAt: ii.timestamp || null,
+    out[key] = { categories: (pg.categories || []).map((c) => c.title.replace(/^Category:/, '')), uploadedAt: ii.timestamp || null,
       dateTimeOriginal: em.DateTimeOriginal ? { value: em.DateTimeOriginal.value, source: em.DateTimeOriginal.source } : null };
   }
   return out;
@@ -141,9 +164,10 @@ async function main() {
     else if (c.missing || c.notReturned) rec = { verified: false, reason: c.missing ? 'file-missing' : 'not-returned' };
     else if (!c.dateTimeOriginal) rec = { verified: false, reason: 'no-DateTimeOriginal', uploadedAt: c.uploadedAt };
     else {
-      const p = parseTakenAt(c.dateTimeOriginal.value, c.uploadedAt, now);
+      let p = parseTakenAt(c.dateTimeOriginal.value, c.uploadedAt, now);
+      if (p.verified) { const cf = categoryDateConflict(c.categories, p.takenAt); if (cf) p = { verified: false, reason: cf }; }
       rec = p.verified
-        ? { verified: true, takenAt: p.takenAt, precision: p.precision, field: 'extmetadata.DateTimeOriginal', fieldSource: c.dateTimeOriginal.source, raw: stripTags(c.dateTimeOriginal.value), uploadedAt: c.uploadedAt }
+        ? { verified: true, takenAt: p.takenAt, precision: p.precision, field: 'extmetadata.DateTimeOriginal', parse: p.parse || 'iso', fieldSource: c.dateTimeOriginal.source, raw: stripTags(c.dateTimeOriginal.value), uploadedAt: c.uploadedAt }
         : { verified: false, reason: p.reason, raw: stripTags(c.dateTimeOriginal.value).slice(0, 200), uploadedAt: c.uploadedAt };
     }
     rec.evidenceUrl = evidenceUrl;
@@ -157,4 +181,4 @@ async function main() {
   console.log(JSON.stringify({ stat, net }));
 }
 if (require.main === module) main().catch((e) => { console.error(e); process.exit(1); });
-module.exports = { parseTakenAt, stripTags, fileNameOf };
+module.exports = { parseTakenAt, categoryDateConflict, englishToIso, stripTags, fileNameOf };
