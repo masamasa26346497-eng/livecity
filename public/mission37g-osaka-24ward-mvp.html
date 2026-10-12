@@ -1199,9 +1199,22 @@
   //   3D 建物の配信状況は COVERAGE に実数で持つ。住吉区の 9 tile だけが配信済み。他の区は「未配信」と表示する。
   // ══════════════════════════════════════════════════════════════
   const WARDS_URL = 'mission37g-data/osaka-24-wards.json';
-  const COVERAGE = {
-    '27120': { state: 'partial', tiles: 9, buildings: 10546, text: '3D建物: 一部配信（9タイル・10,546棟。住吉区全体ではありません）' },
-  };
+  //   COVERAGE は固定値ではなく、実際に読み込む tileset 隣の build-report.json（変換ツールの実測）から算出する。
+  //   読めなかった・住吉区以外の区は「未配信」。24/24 の 3D 完成とは決して表示しない。
+  const COVERAGE = {};
+  async function loadCoverage(sourceBuildings) {
+    try {
+      const r = await fetch(TILES_BASE + 'build-report.json');
+      if (!r.ok) return;
+      const b = await r.json();
+      const tiles = b.selectedTiles | 0, n = ((b.totals && b.totals.buildings) || b.buildings) | 0;
+      if (!tiles || !n) return;
+      const full = n >= sourceBuildings;
+      COVERAGE['27120'] = { state: full ? 'full' : 'partial', tiles, buildings: n,
+        text: full ? '3D建物: 配信済み（' + tiles + 'タイル・' + fmt(n) + '棟）'
+          : '3D建物: 一部配信（' + tiles + 'タイル・' + fmt(n) + '棟。住吉区の元データ ' + fmt(sourceBuildings) + '棟のうち）' };
+    } catch (e) { /* 未配信扱い */ }
+  }
   const WardUI = (function () {
     let data = null, loading = null, lines = null, labels = null, selLines = null, selected = null;
     function validate(d) {
@@ -1217,10 +1230,11 @@
       if (!loading) loading = fetch(WARDS_URL).then((r) => {
         if (!r.ok) throw new Error(WARDS_URL + ' → HTTP ' + r.status + '（生成: node tools/mission37g-build-wards.cjs）');
         return r.json();
-      }).then((d) => {
+      }).then(async (d) => {
         const v = validate(d);
         stats.wardValidation = v;
         if (!v.ok) throw new Error('区データの検証に失敗: ' + JSON.stringify(v));
+        await loadCoverage((d.wards.find((x) => x.wardCode === '27120') || {}).sourceBuildings || Infinity);
         for (const w of d.wards) {
           const big = w.polygons.reduce((a, p) => (p.outer.length > a.outer.length ? p : a), w.polygons[0]);
           w.centroid = centroidOf(big.outer);
@@ -1231,7 +1245,7 @@
         }
         data = d;
         stats.coverage = { mapWards: d.wards.length, wardsWith3d: d.wards.filter((w) => w.cover.state !== 'none').length,
-          tiles3d: 9, buildings3d: 10546, sourceBuildingsTotal: d.sourceBuildingsTotal, sourceTilesTotal: d.sourceTilesTotal };
+          tiles3d: Object.values(COVERAGE).reduce((a, c) => a + c.tiles, 0), buildings3d: Object.values(COVERAGE).reduce((a, c) => a + c.buildings, 0), sourceBuildingsTotal: d.sourceBuildingsTotal, sourceTilesTotal: d.sourceTilesTotal };
         return d;
       });
       return loading;
@@ -1341,7 +1355,7 @@
       for (const w of d.wards) {
         const b = el('button', null, { type: 'button', class: 'lc-wardbtn', 'data-code': w.wardCode, 'aria-pressed': 'false', title: w.cover.text });
         b.appendChild(el('span', w.wardName));
-        b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : '3D一部', { class: 'tag ' + w.cover.state }));
+        b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : (w.cover.state === 'full' ? '3D配信済み' : '3D一部'), { class: 'tag ' + w.cover.state }));
         b.onclick = () => { clearSelection(); select(w, true); };
         box.appendChild(b);
       }

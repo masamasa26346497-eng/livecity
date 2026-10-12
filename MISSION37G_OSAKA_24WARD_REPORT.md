@@ -44,3 +44,25 @@
 - 区境界の線は 24 区全部で約 2px の線のみ（塗りつぶしなし）。
 - Vercel Preview の画面確認は、保護の設定によりこちらからはできない。
 - 37E の QA スクリプトを 37G に向けて再実行した際に上書きされた 37E のレポートファイルは、コミットに含めていない。
+
+## 7. 第2段階: 住吉区 52 tile の実測（生成物は commit していない）
+計測は `node tools/mission37b-build-3dtiles.cjs --all`（出力先 `public/mission37b-3dtiles/osaka-sumiyoshi-all/`、`.gitignore` 済み）と `node tools/mission37g-verify-52tile.cjs temp/m37g2-all`。入力は読み取り専用。
+
+| 項目 | 9 tile（commit 済み） | 52 tile（ローカル生成のみ） |
+|---|---|---|
+| tile 数 / 建物数 | 9 / 10,546 | 52 / 35,031（元データ全件。skipped 0、fallback 0） |
+| 総容量（du） | 約 11MB | 約 37MB（leaf GLB 約 28.2MB、sidecar ids 約 1.5MB、残りは LOD と tileset） |
+| 変換時間 | — | 約 0.9 秒（CPU user 1.4 秒。メモリは未計測） |
+
+- 検証: 全 GLB が構造解析に成功。`ids/*.json` の canonicalId 35,031 件は元 tile と完全一致、重複 0。建物代表点 35,031 点のうち、N03 住吉区ポリゴン外は 1 点（境界上の建物）。
+- 実 Chrome（headless、ローカル）で `?set=osaka-sumiyoshi-all` を開き、3D 建物の実クリックで阪和病院・東福寺の写真が `displayed`。Google 通信 0、JS 例外 0（`data/reports/mission37g-wards/qa-52tile-photo-display.json`）。
+- **commit / push は見送り**: 約 26MB 増（既存の約 2.4 倍）の追加バイナリになる。Vercel 無料枠の配信上限は未確認で、確認できるまで増やさない判断。52 tile の公開は未実施で、Preview の既定は従来どおり 9 tile。
+- ページ側: `COVERAGE` を固定値から、読み込む tileset の `build-report.json` 実測値による算出に変更。52 tile を読み込んだ場合のみ住吉区が「3D配信済み」になり、他の 23 区は引き続き「地図のみ」。
+- 性能（FPS / p95 / 初期ロード）は未計測。headless のソフトウェア描画では根拠にならない。
+- 近傍 tile のみ読む動的ロードは、Cesium3DTileset の SSE と group LOD に任せる現構成のまま。tile を足す前に 52 tile の実機計測が必要で、今回は未実装。
+- 重なり建物の `drillPick` 選択 UI は未着手（別段階）。
+
+### 配信の選択肢（いずれも未実施。費用・新サービスは事前承認が必要）
+1. Git に 52 tile を追加（約 +26MB）。無料だが、リポジトリ肥大と Vercel の上限確認が前提。
+2. 初回はこの方式で足りるか、デプロイ時間・転送量を Vercel の画面で確認してから判断。
+3. 全市（外挿で約 590MB）は Git 不向き。外部ストレージ／CDN が必要で、費用が発生し得る。

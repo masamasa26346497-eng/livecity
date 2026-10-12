@@ -59,10 +59,11 @@ test('[37G] 住吉区の区コードは 27120 で、元データの件数が建�
   assert.equal(wards.wards.reduce((a, w) => a + w.sourceBuildings, 0), man.buildingCount);
 });
 
-test('[37G] 3D 建物の配信は住吉区 9 tile だけで、ページもそう表示する（誤称しない）', () => {
-  assert.match(page, /'27120': \{ state: 'partial', tiles: 9, buildings: 10546/);
+test('[37G] 3D 建物の配信は住吉区だけで、COVERAGE は build-report の実測から算出する（誤称しない）', () => {
+  assert.match(page, /COVERAGE\['27120'\] = \{ state: full \? 'full' : 'partial'/);
+  assert.match(page, /TILES_BASE \+ 'build-report.json'/);
   assert.match(page, /3D建物データ未配信/);
-  assert.match(page, /住吉区の一部（9タイル・10,546棟）/);
+  assert.match(page, /住吉区の元データ/);
   assert.ok(!/24区の3D建物が(完成|見え)/.test(page));
   const tiles = JSON.parse(read('public/mission37b-3dtiles/osaka-sumiyoshi-9tile/build-report.json'));
   assert.ok(JSON.stringify(tiles).includes('10546') || JSON.stringify(tiles).includes('10,546'));

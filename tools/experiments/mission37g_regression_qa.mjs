@@ -16,7 +16,7 @@ const srv = http.createServer((req, res) => {
   fs.createReadStream(p).pipe(res);
 });
 await new Promise((r) => srv.listen(8139, r));
-process.env.MISSION37E_URL = 'http://localhost:8139/mission37g-osaka-24ward-mvp.html';
+process.env.MISSION37E_URL = 'http://localhost:8139/mission37g-osaka-24ward-mvp.html' + (process.argv[3] || process.env.MISSION37G_QUERY || '');
 process.env.MISSION37E_ONLY = '東福寺,阪和病院';
 const kind = process.argv[2] || 'photo';
 try {
