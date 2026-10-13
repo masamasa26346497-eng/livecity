@@ -114,6 +114,23 @@ test('CLI: 不正な引数・未知refは非0（fail closed）', () => {
   assert.equal(spawnSync(process.execPath, [SCRIPT, '--base', 'origin/main', 'no-such-ref-1', 'no-such-ref-2'], { encoding: 'utf8' }).status, 2);
 });
 
-test('本テストが npm test に登録されている', () => {
-  assert.ok(readFileSync(new URL('../package.json', import.meta.url), 'utf8').includes('tests/ci-parallel-merge-gate.test.js'));
+test('CI v2 提案の ci-tools ジョブが本テストを実際に実行する', () => {
+  const yml = readFileSync(new URL('../docs/development/proposed-workflows/pr-fast-tests.v2.yml.txt', import.meta.url), 'utf8');
+  const lines = yml.split('\n');
+  const start = lines.findIndex((l) => /^  ci-tools:\s*$/.test(l));
+  assert.ok(start >= 0, 'ci-tools ジョブが存在する');
+  // 次のジョブ（インデント2のキー）までを ci-tools ジョブ本体とみなす
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^  [A-Za-z0-9_-]+:\s*$/.test(lines[i])) { end = i; break; }
+  }
+  const job = lines.slice(start, end).filter((l) => !/^\s*#/.test(l));
+  const runLines = job.filter((l) => /^\s*-\s*run:\s*node --test\b/.test(l));
+  assert.ok(runLines.length >= 1, 'ci-tools に node --test の run ステップがある');
+  assert.ok(
+    runLines.some((l) => l.split(/\s+/).includes('tests/ci-parallel-merge-gate.test.js')),
+    'ci-tools の node --test 引数に tests/ci-parallel-merge-gate.test.js が含まれる',
+  );
+  assert.ok(!job.some((l) => /continue-on-error:\s*true/.test(l)), 'ci-tools は continue-on-error で赤を許さない');
+  assert.ok(!job.some((l) => /\|\|\s*true/.test(l)), 'ci-tools は || true で失敗を握りつぶさない');
 });
