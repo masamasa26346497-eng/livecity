@@ -36,7 +36,7 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: node --test tests/ci-select-tests.test.js tests/ci-baseline.test.js
+      - run: node --test tests/ci-select-tests.test.js tests/ci-baseline.test.js tests/ci-parallel-merge-gate.test.js
   related:
     # 関連テスト（変更により FULL へ切替あり）。baseline 外の失敗のみ赤。既知の赤は warning で表示
     if: ${{ !inputs.full }}
