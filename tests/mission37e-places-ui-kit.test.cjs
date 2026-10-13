@@ -91,6 +91,9 @@ test('[37E] ENABLED=false で、要素生成（=課金イベント）が必ず�
 test('[37E] 課金は「コンポーネント生成ごと」だと明記され、SKU と無料枠を持っている', () => {
   assert.equal(kit.BILLING.billingTrigger, 'per component instantiation');
   assert.equal(kit.BILLING.sku, 'Places UI Kit Pro');
+  // 37I: SKU の対応は未検証であることをデータ上で明示している
+  assert.equal(kit.BILLING.skuVerification, 'unverified-possible-mixup');
+  assert.ok(kit.ACTIVATION_BLOCKERS.some((b) => /SKU/.test(b)));
   assert.equal(kit.BILLING.pricePer1000Usd, 5);
   assert.equal(kit.BILLING.freeMonthlyEvents, 5000);
   assert.match(kit.BILLING.billingTriggerQuote, /billed per component instantiation/);

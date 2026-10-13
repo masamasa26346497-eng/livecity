@@ -51,6 +51,10 @@
     element: 'AdvancedPlaceDetailsElement (<gmp-place-details>)',
     sku: 'Places UI Kit Pro',
     skuId: '42AB-1FB3-B56A',
+    // 2026-10-13: オーナーより「gmp-place-details=Essentials / gmp-advanced-place-details=Pro」
+    // という公式の新しい区別が指摘された。この環境では公式ページを取得できず未検証。
+    // 上の element/sku は取り違えの疑いがあるため、通信前に必ず再監査する（下の ACTIVATION_BLOCKERS）。
+    skuVerification: 'unverified-possible-mixup',
     pricePer1000Usd: 5.00,
     freeMonthlyEvents: 5000,
     billingTrigger: 'per component instantiation',
@@ -85,6 +89,7 @@
     '写真の作者クレジット表示の実装・確認が未了',
     'API キーの保管方法と配信方法が未決定（ソースに書かない）',
     'オーナーの明示的な再承認が未取得',
+    'SKU/要素の対応が未再監査（gmp-place-details=Essentials か、gmp-advanced-place-details=Pro か。公式の最新仕様で確認するまで金額見積もりは無効）',
   ]);
 
   // ══════════════════════════════════════════════════════════════════════════
