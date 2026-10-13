@@ -4,6 +4,26 @@
 **事実ベース**: 以下は実際にアップロードされたリポジトリ一式（config/, tools/, tests/, data/, public/）を
 読んだ上での記述です。推測や一般論は含めていません。
 
+## 開発運用ルール（Mission 38・最優先）
+
+詳細: `docs/development/mission38-audit.md`, `docs/development/parallel-development-runbook.md`
+
+- **保護対象**: 旧本番Three.js画面（`public/osaka_3d_buildings.html`）、大阪市全域のPLATEAU/OSMデータ、
+  canonicalId・座標、3D Tiles、既存の建物/施設写真と著作権帰属は、Issueで明示されない限り変更しない。
+  canonicalId は厳守（再採番・流用禁止）。
+- **Cesium試作**（`public/mission37d-sumiyoshi-mvp.html` 等）は PR #24 側の別ブランチ。**main には存在しない**。
+  mainに無いページのテストを成功扱いにしない。他PR（#21, #24）のブランチは checkout/push/変更しない。
+- **無課金**: Google Places / Maps SDK / Photorealistic Tiles 等の有料API・課金対象通信は個別承認なしに実行しない。
+  APIキー・認証情報は記録・出力しない。新しい従量課金サービスを有効化しない。
+- **ブランチ分離**: 1 Issue = 1 ブランチ = 1 PR（Draft開始）。起点は `git fetch origin main` で確認した最新main。
+  同一ブランチへ複数Claudeを同時pushしない。mainへの直接push/merge・自動merge・自動デプロイ・force push 禁止。
+  マージは人間の明示承認のみ。
+- **テスト**: 日常は `npm run test:pr`（関連テスト選択。不明時は自動で全件）、マージ前は `npm test`（全件）。
+  ブラウザ確認は `npm run smoke:browser`。実行できなかった検証は「未実行・理由」と書き、green を実画面保証と言わない。
+- **完了報告**: コミットSHA、Draft PR URL、変更ファイル一覧、テスト結果（未実行は明示）、残課題、次に必要な承認。
+- `.github/workflows` は Claude Code Action では変更できない。CI変更は `docs/development/proposed-workflows/` に提案として置く。
+- Issue/PR は `.github/ISSUE_TEMPLATE/mission.md` と `.github/PULL_REQUEST_TEMPLATE.md` に従う。
+
 ## プロジェクト概要
 
 `livecity-data-pipeline`（v0.2.0）は、大阪都市デジタルツイン「Live City」向けの、再利用可能な
@@ -175,7 +195,10 @@ HTML内に直接埋め込まれたままである**（このHTMLファイルは3
 
 ## テストスイートの注意点（実測・要注意）
 
-`npm test` は次の9ファイルのみを実行する:
+> **注意（Mission 38で確認）**: 以下は初期時点の記述で古い。現在の `npm test` は `package.json` の `scripts.test`
+> に列挙された約180ファイルを実行する（一覧は package.json が正）。件数の数値は実行して確認すること。
+
+`npm test` は初期時点では次の9ファイルのみを実行していた:
 ```
 demographics.test.js, paths.test.js, html-regression.test.js, boundary-master.test.js,
 household-composition.test.js, population-2015.test.js, population-change.test.js,

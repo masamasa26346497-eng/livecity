@@ -1,0 +1,532 @@
+{
+ "source": "GitHub Actions run 38190403528 / job related (PR #29 head 1edb08d, FULL 182/182 files)",
+ "note": "mainとの同条件比較は未実施。これは「PR上で観測した既知の赤」であり成功ではない。",
+ "totals": {
+  "tests": 2366,
+  "pass": 1836,
+  "fail": 104,
+  "skipped": 426
+ },
+ "failures": [
+  {
+   "name": "[ALIGNMENT-RESET §7-§10/§27] 動的: GSI Road Edge Authoritative Layer が manifest を読み city-wide tile を fetch できる",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[VISIBILITY-FINAL] 動的: 6地点全てで PLATEAU/GSI Building/GSI Road Edge の count が 0 でない（§11/§12）",
+   "category": "assertion",
+   "error": "umeda: PLATEAU footprint count が0（§12: Canonical building overlay generation bug）'"
+  },
+  {
+   "name": "[VISIBILITY-FINAL §10] site切替のたびに overlay が refresh され、前siteのcountに固定されない",
+   "category": "assertion",
+   "error": "site切替後もPLATEAU footprint countが変わっていない（refresh漏れ疑い）'"
+  },
+  {
+   "name": "[FIX24 §1] derived/near/buildings の simplificationToleranceM が 0（canonical exact footprint）",
+   "category": "data-missing",
+   "error": "near buildings manifest が無い'"
+  },
+  {
+   "name": "[FIX24 §20] road/water/park/rail の near tier tolerance は変更していない（tolM=2のまま）",
+   "category": "data-missing",
+   "error": "roads near manifest が無い'"
+  },
+  {
+   "name": "[FIX10 §18/§19] source geometry 不変・placement policy 再計算不要（geometry 未変更）",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[33A] runtime: ラベルデータを読み込み、canonical residual を壊さない",
+   "category": "assertion",
+   "error": "地名 0'"
+  },
+  {
+   "name": "[33B §1/§2] production は dev から生成したビルド成果物（profile だけが違う）",
+   "category": "data-missing",
+   "error": "ビルド記録が無い'"
+  },
+  {
+   "name": "[33B §24] protected は不変",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "35D V2N の PLATEAU 数が変わっていない",
+   "category": "data-missing",
+   "error": "V2N manifest が無い'"
+  },
+  {
+   "name": "[FIX11 §22/§23/§24] geometry / placement policy / conflict は不変（再build なし）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/data/processed/osaka-city/canonical/buildings/manifest.json'\""
+  },
+  {
+   "name": "extractExactBuildingGeometry: non-indexed meshから対象建物の頂点だけを、元meshと完全に同じ座標でコピーする",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "extractExactBuildingGeometry: indexed meshでもindex経由で正しい頂点を取り出す",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "extractExactBuildingGeometry: 対象biの三角形が0枚ならnullを返す(空のoverlayを描かせない)",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "[32R §5-§9] 最寄駅: 直書きの駅リスト・乱数・徒歩時間を使わない",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/derived/rail-stations.json'\""
+  },
+  {
+   "name": "[32R §10] 駅データの北端（OSM 抽出 34.74°）より北、または北端の方が近い建物では駅名を断定しない",
+   "category": "data-missing",
+   "error": "Cannot read properties of null (reading 'latCliff')\""
+  },
+  {
+   "name": "[32R §14] runtime: 駅データを読み、検索の範囲判定が 24 区で動く",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[FIX20 §29] canonical building / road は完全不変（今回615,617棟を書き換えていない）",
+   "category": "data-missing",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[FIX21 §36] source protection: canonical building/road/FIX13 refined が完全不変",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[README] data/raw/gsi/building-outline/README.md が存在し取得手順を明示している",
+   "category": "data-missing",
+   "error": "-"
+  },
+  {
+   "name": "[FIX15 §1] data/raw/gsi/road-edge/ input directory + README が存在する",
+   "category": "data-missing",
+   "error": "input directory が無い'"
+  },
+  {
+   "name": "[FIX15 §0] canonical / building / FIX13 refined-road-surface は不変",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/data/processed/osaka-city/canonical/buildings/manifest.json'\""
+  },
+  {
+   "name": "[FIX19 §37] canonical / building / FIX13 は完全不変",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[FIX17 §37] canonical / building / FIX13 は完全不変",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[FIX18 §37] canonical / building / FIX13 は完全不変",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[FIX16 §0/§19/§20] canonical / building / FIX13 は完全不変",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[33E §2] 設定ファイルに必須項目がそろっている",
+   "category": "data-missing",
+   "error": "landmark-models.json が無い'"
+  },
+  {
+   "name": "[33E §4/§7] 大阪城: 実データと様式化の切り分けが設定に書かれている",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'landmarks')\""
+  },
+  {
+   "name": "[33E §検証] HD は LOD1 の箱より明確に高精細",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'landmarks')\""
+  },
+  {
+   "name": "[33E §3] 切替と抑制の設定が整合している",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'landmarks')\""
+  },
+  {
+   "name": "[33E] production / protected は変更していない",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[FIX19C §3/§4/§27] 動的: async race — ownership取得中の fetch 完了後も新規 building mesh を作らない",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[FIX23 §18/§30] 動的: 実機repro条件（osaka-kita, ownership取得中の非同期race）でも building tile が一切残らない",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[FIX23B §6/§9] 動的: Road mode切替（FIX13/HYBRID_V1/DIFF_DEBUG）いずれでも Legacy residual = 0（HYBRID_V1/DIFF_DEBUGのownerタグ漏れバグを修正）",
+   "category": "assertion",
+   "error": "DIFF_DEBUGのHybridV1DebugがDEBUG計上されていない'"
+  },
+  {
+   "name": "[32D 動的] MAP AUDIT トグルON/OFF・地点/レイヤー切替でresidualが0を維持する",
+   "category": "assertion",
+   "error": "GSI_EDGEメッシュが作られていない'"
+  },
+  {
+   "name": "[34D §2] 建物総数を変えていない",
+   "category": "data-missing",
+   "error": "canonical manifest が無い'"
+  },
+  {
+   "name": "[34A §12] 出力の namespace と宣言",
+   "category": "data-missing",
+   "error": "building-lod-high の manifest が無い'"
+  },
+  {
+   "name": "[34A §11] 高 LOD は canonicalId に紐づく別表現（ID を作り替えない）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/derived-v2-osmv2/building-lod-high'\""
+  },
+  {
+   "name": "[34A §16/§19] 色を変えない / 同じ card へ到達する",
+   "category": "data-missing",
+   "error": "-"
+  },
+  {
+   "name": "[34A] production / protected は変更していない",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "extractExactTriUnionGeometry: 1棟が複数meshに分割されたfixtureで、overlayが全meshのtriangle unionと一致する",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "extractExactTriUnionGeometry: fragmentの一部が解決できなくても、解決できた分だけunionする(0件ならnull)",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "resolveExactTriSource(kind:tri): canonicalId索引に複数fragmentが登録されていれば、hitした1meshだけでなく全fragmentをunionする",
+   "category": "data-missing",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "resolveExactTriSource(kind:tri): 索引が無い(未登録)ときは36D互換でtriSource自体の{mesh,bi}だけを使う",
+   "category": "data-missing",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "resolveExactTriSource(kind:tri): 隣接する別棟のfragmentは混ざらない",
+   "category": "not-defined",
+   "error": "crGetBiTriIndex is not defined'"
+  },
+  {
+   "name": "[Mission06] 配信データ: znorth-neg-v1 / emitted / 多重ゲート検証を全通過",
+   "category": "data-missing",
+   "error": "water-surface.json が無い（node tools/build-water-surface.js）'"
+  },
+  {
+   "name": "[Mission06] 配信データ: 既知の内陸/沿岸市街地点が海面に含まれない",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/water-surface/water-surface.json'\""
+  },
+  {
+   "name": "[Mission06] 配信データ: 総面積が妥当（陸を塗っていない）/ bbox は西・南のみ",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/water-surface/water-surface.json'\""
+  },
+  {
+   "name": "[Mission08] hover/select ハイライトは独立（弱めても強調表示は明確）",
+   "category": "assertion",
+   "error": "selectHL が変わっている'"
+  },
+  {
+   "name": "[Mission10] 実データ分布のサニティ（>=100m 建物が存在＝スカイライン表現に足る）",
+   "category": "assertion",
+   "error": "建物データが少ない (35031)'"
+  },
+  {
+   "name": "[Mission11] 配信データ landmarks.json: 健全性",
+   "category": "data-missing",
+   "error": "landmarks.json が無い（node tools/build-landmark-registry.js）'"
+  },
+  {
+   "name": "[Mission11B] 配信データ landmarks.json: PoC 3 件が procedural geometry を焼き込み済み",
+   "category": "data-missing",
+   "error": "landmarks.json が無い'"
+  },
+  {
+   "name": "[Mission11B] Data QA: 異常 height（>500m）はランドマーク候補に採用されていない",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/landmarks/landmarks.json'\""
+  },
+  {
+   "name": "[Mission12] 実データ: 公園 area feature 数と面積3分類",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/parks'\""
+  },
+  {
+   "name": "[Mission12] 実データ: 主要大公園が面積classificationで large になる（名前一致に依存しない）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/parks'\""
+  },
+  {
+   "name": "[Mission13] 実データ: railway tag 内訳と3クラス分類",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission13] 実データ: 主要路線相当の geometry が存在（name 欠落でも表示できる）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission13] 実データ: station node 233件前後・全件 name 付き（Mission 14 用に保持）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission14] 実データ: 233 station → cluster 後は大幅減、MAJOR は 10〜25",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission14] 実データ: 大阪・梅田 / なんば / 天王寺 が MAJOR で1ラベルに統合",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission14] 実データ: 重複 canonical label は既知の別駅（中津/野江/平野/今里 等）のみ",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission14] 地下鉄駅の扱い: FAR は major(override)のみ → 地下鉄単独駅は FAR で出ない",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/public/map-data/osaka-city/railways'\""
+  },
+  {
+   "name": "[Mission19] 白基調: body 背景が light、暗色 rgba(5,10,24…) を新規追加していない",
+   "category": "assertion",
+   "error": "Mission19 CSS ブロックに暗色パネル背景が混入'"
+  },
+  {
+   "name": "[Mission21] 巨大 1 枚 ground mesh を敷いていない（配信データはタイル分割・多数三角形）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/land-surface/land-surface.json'\""
+  },
+  {
+   "name": "[Mission21] 配信データ: znorth-neg-v1 / emitted / geometry 検証全通過",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/land-surface/land-surface.json'\""
+  },
+  {
+   "name": "[Mission21] 夢洲コアは N03 欠落補完（konohana / N03 には無い）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/land-surface/land-surface.json'\""
+  },
+  {
+   "name": "[Mission21] WaterSurfaceLayer 配信データ回帰（Mission06 の意味ゲート維持）",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/water-surface/water-surface.json'\""
+  },
+  {
+   "name": "[Mission21] runtime: 例外なく評価 / __LAND_COVERAGE_DEBUG__ が形を返す / gnd.visible=false",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[Mission21B] root manifest: 24 ward dataset + OSM 補完 dataset / totals 整合",
+   "category": "unknown",
+   "error": "Cannot read properties of undefined (reading 'classified')\""
+  },
+  {
+   "name": "[Mission21B] tile completeness: missing tile 0 / empty tile 0",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, open '/home/runner/work/livecity/livecity/public/map-data/osaka-city/buildings/osaka-kita/manifest.json'\""
+  },
+  {
+   "name": "[Mission21B] runtime: 例外なく評価 / __BUILDING_COVERAGE_DEBUG__ が集計を返す / fallback dataset 登録",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[Mission21C] runtime: __VISIBLE_BUILDING_GAP_DEBUG__ / __BUILDING_GAP_FOCUS__ が形を返す",
+   "category": "assertion",
+   "error": "fallback 拡張が反映されていない: 0'"
+  },
+  {
+   "name": "[Mission22] runtime: 例外なく評価 / __RIVER_NETWORK_DEBUG__ が集計を返す",
+   "category": "assertion",
+   "error": "major=0'"
+  },
+  {
+   "name": "[Mission23] runtime: 例外なく評価 / __ROAD_NETWORK_DEBUG__ が集計を返す",
+   "category": "assertion",
+   "error": "local が major より少ない（生活道路が読めていない）'"
+  },
+  {
+   "name": "[Mission28] runtime: __RIVER_NETWORK_DEBUG__ が micro / byClass / visibleByLod を返す",
+   "category": "assertion",
+   "error": "micro=0'"
+  },
+  {
+   "name": "[Mission29] runtime: __BUILDING_COVERAGE_DEBUG__ が fallback / confidence を返す",
+   "category": "assertion",
+   "error": "osmFallbackBuildings=0'"
+  },
+  {
+   "name": "[Mission30] runtime: __MAP_DETAIL_AUDIT_DEBUG__ が summary を返す / runtimeMissing 0",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "35E 旧 road source を消していない",
+   "category": "data-missing",
+   "error": "旧 road source のバックアップが無い'"
+  },
+  {
+   "name": "35F 駅ラベルが読むファイルは canonical の駅数と一致する",
+   "category": "data-missing",
+   "error": "画面が読む駅ファイルが無い: map-data/osaka-city/derived/station-index.json'"
+  },
+  {
+   "name": "35F 旧 source を消していない",
+   "category": "data-missing",
+   "error": "railways-osm.osaka-latest-backup.json が無い'"
+  },
+  {
+   "name": "35C 作業フォルダは repo の外にある",
+   "category": "assertion",
+   "error": "WORK_DIR が repo の中にある: C:\\\\LiveCityAssets\\\\orthophoto-audit'"
+  },
+  {
+   "name": "35C 35B で置いた raw の probe 成果が残っている",
+   "category": "assertion",
+   "error": "aerial-probe が消えている'"
+  },
+  {
+   "name": "[32Q §10-§13] SUPPRESS 2 棟: 個別確認の根拠を残し、placement 全体は再生成しない",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32U] production は cutover 時のビルド成果物そのもの（手編集されていない）",
+   "category": "data-missing",
+   "error": "production-cutover-build.json が無い'"
+  },
+  {
+   "name": "[32U] dev が昇格時点から進んでいなければ production は dev の生成結果と一致する",
+   "category": "data-missing",
+   "error": "-"
+  },
+  {
+   "name": "[32U §1/§23] protected は不変",
+   "category": "data-missing",
+   "error": "baseline hash が無い'"
+  },
+  {
+   "name": "[32J 動的] QA overlay ON/OFF で表示が復元され residual が 0 を維持する",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32K 動的] QA トグルで緑線を出して戻せる（§8: QA では残す）",
+   "category": "assertion",
+   "error": "QA ON にしても緑線が読み込まれない'"
+  },
+  {
+   "name": "[32G 動的] QA overlay ON/OFFでbuilding表示が復元されresidualが0を維持する",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32H 動的] QA overlay ON/OFFで表示が復元されresidualが0を維持する",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32C 動的] Block QA overlay ON/OFF で plane+building meshが構築されresidualが0を維持する",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32F 動的] LAND_BLOCKモード/QAトグルが安全に切り替わりresidualが0を維持する",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32P §3/§17] 起動直後の runtime は既定の namespace だけを読む（V1 / 旧 OSM の fetch 0）",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'canonicalBuildingCount')\""
+  },
+  {
+   "name": "[32P §26] V1 前提の過去レポートは削除せず historical-invalidated-by-v2 を明記",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "35G production は自分のビルド記録と一致する（cutover 後に手で触っていない）",
+   "category": "data-missing",
+   "error": "ビルド記録が無い'"
+  },
+  {
+   "name": "35G snapshot は前後で同じ項目を読む",
+   "category": "assertion",
+   "error": "roads を読めていない'"
+  },
+  {
+   "name": "[32B §2] GSI BldA(building polygon)が実データから抽出されている（推測ではない）",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "[32B §0] Canonical Buildings/Roadsは一切変更されていない",
+   "category": "unknown",
+   "error": "Cannot read properties of null (reading 'featureCount')\""
+  },
+  {
+   "name": "[32B §26] Visual Building tileはcanonicalId(単一)とcanonicalIds(配列)の両方を保持する",
+   "category": "data-missing",
+   "error": "ENOENT: no such file or directory, scandir '/home/runner/work/livecity/livecity/data/processed/osaka-city/visual-buildings'\""
+  },
+  {
+   "name": "35J production は dev からプロファイル 1 行だけの変換",
+   "category": "assertion",
+   "error": "-"
+  },
+  {
+   "name": "35J protected は 1 バイトも変えていない",
+   "category": "data-missing",
+   "error": "protected の基準 hash が無い'"
+  },
+  {
+   "name": "validator: 実 servable dataset + 実 HTML で RESULT PASS（生成済み前提。無ければskip扱い）",
+   "category": "data-missing",
+   "error": "-"
+  },
+  {
+   "name": "実データ: 各区の building 500m tile 集合が bbox から算出したものと概ね一致する",
+   "category": "assertion",
+   "error": "検証対象の区が1つも無かった'"
+  },
+  {
+   "name": "[33D §23] production / protected は変更していない",
+   "category": "assertion",
+   "error": "-"
+  }
+ ]
+}

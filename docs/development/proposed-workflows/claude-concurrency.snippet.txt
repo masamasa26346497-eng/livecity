@@ -1,0 +1,25 @@
+# .github/workflows/claude.yml の jobs.claude 直下に追加する提案（未適用。GitHub App に workflow 書込権限が無いため人手で適用）
+# 同一 Issue/PR に対する Claude 実行を直列化し、実行中のものはキャンセルしない（作業の途中破棄を避ける）。
+# github.event.issue.number / pull_request.number のどちらかが入る。他イベント用に run_id へフォールバック。
+    concurrency:
+      group: claude-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: false
+#
+# ===== 精査結果（Mission 38 / 未適用の提案に対する注意） =====
+# 1. 【pending の置換】GitHub concurrency は同一 group に「実行中1件 + 待機1件」しか保持しない。
+#    実行中に3件目が来ると、待機中の2件目は *キャンセル* される（cancel-in-progress:false でも同様）。
+#    → 同一 Issue/PR 上で連続して @claude を投稿すると、中間の指示が黙って捨てられ得る。
+#      実行が終わるのを待ってから次を投稿する。捨てられた指示は再投稿が必要。
+# 2. 【group の粒度の限界】group は Issue/PR 番号単位。別 Issue (#N) で「PR #29 のブランチを編集せよ」と
+#    指示された場合、group が異なるため直列化されず、同一ブランチへ2本が同時 push し得る。
+#    → 運用ルールで禁止する: 1 Issue = 1 専用ブランチ。他 Issue/PR のブランチを作業対象に指定しない。
+#      指示に既存の別ブランチが含まれていたら実行せず、コメントで停止報告する。
+#    → 将来案: ブランチ名を group に使う（例: claude-${{ github.event.pull_request.head.ref || github.event.issue.number }}）。
+#      ただし issue_comment イベントでは PR の head ref が payload に無いため、別途 API 取得が要る。未検証。
+# 3. 【並列 Issue 間】別 Issue 同士は group が別なので意図通り並列に動く（Issue #33/#34 の PoC で確認済み）。
+#    その安全性は group ではなく「ブランチ分離 + tools/ci/parallel-merge-gate.js」で担保する。
+# 4. 【取消手順】Actions > 該当 run > Cancel workflow run。待機中の run も同様に取消可能。
+#    取消後の部分 push の有無は `git log origin/<branch>` で確認し、不要なら人手で revert する（force push しない）。
+# 5. 【再開手順】取消・破棄された指示は、実行中の run が無いことを Actions で確認してから @claude を再投稿する。
+#    自動リトライはしない。
+# 6. 実ワークフロー (.github/workflows/claude.yml) はこの PR では変更していない。
