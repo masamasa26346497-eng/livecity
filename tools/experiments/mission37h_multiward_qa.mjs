@@ -28,10 +28,13 @@ const URL_ = 'http://localhost:8139/mission37g-osaka-24ward-mvp.html?qa=1';
 const WARDS = [
   { id: 'kita', name: '北区', dir: 'public/mission37h-3dtiles/kita-sample/' },
   { id: 'chuo', name: '中央区', dir: 'public/mission37h-3dtiles/chuo-sample/' },
+  { id: 'tennoji', name: '天王寺区', dir: 'public/mission37h-3dtiles/tennoji-sample/' },
+  { id: 'nishi', name: '西区', dir: 'public/mission37h-3dtiles/nishi-sample/' },
 ];
 for (const w of WARDS) {
   const byId = {};
   for (const f of fs.readdirSync(w.dir + 'attrs')) Object.assign(byId, JSON.parse(fs.readFileSync(w.dir + 'attrs/' + f, 'utf8')).byId);
+  w.code = JSON.parse(fs.readFileSync(w.dir + 'source.json', 'utf8')).wardCode;
   w.attrCount = Object.keys(byId).length;
   w.targets = Object.entries(byId).filter(([, a]) => a[0] >= 40 && a[0] <= 120).sort((a, b) => b[1][0] - a[1][0]).slice(0, 3)
     .map(([id, a]) => ({ id, h: a[0], x: a[2], z: a[3] }));
@@ -55,9 +58,13 @@ const shot = async (name) => {
   fs.writeFileSync(path.join(OUT_DIR, name + '.jpg'), Buffer.from(data, 'base64'));
   return `${OUT_DIR}/${name}.jpg`;
 };
-async function settle(x, z, h, range, pitch) {
+async function settle(x, z, h, range, pitch, code) {
   await ev(`window.__mission37dQA.lookAtLocal(${x}, ${z}, ${h}, ${range}, ${pitch}, 0)`);
   await sleep(1500);
+  if (code) {
+    await ev('window.__mission37dQA.updateExtraNear()').catch(() => {});
+    for (let i = 0; i < 40; i++) { if (await ev(`window.__mission37g.extraSets.some((e) => e.wardCode === '${code}')`)) break; await sleep(500); }
+  }
   for (let i = 0; i < 60; i++) { if (await ev('window.__mission37dQA.tilesReady()')) break; await sleep(500); }
   await sleep(1000);
 }
@@ -81,7 +88,7 @@ try {
     if (ok === true) break;
   }
   await sleep(3000);
-  out.extraSets = await ev('JSON.stringify(window.__mission37g.extraSets)').then(JSON.parse);
+  out.extraSetsAtStart = await ev('JSON.stringify(window.__mission37g.extraSets)').then(JSON.parse);   // 全域ビューでは 0 件のはず（遅延 mount）
   out.coverage = await ev('JSON.stringify(window.__mission37g.coverage)').then(JSON.parse);
   out.status = await ev('window.__mission37g.status');
   for (const w of WARDS) {
@@ -90,9 +97,9 @@ try {
     for (const t of w.targets) {
       const r = { id: t.id, heightM: t.h, realClick: false };
       rec.targets.push(r);
-      await settle(t.x, t.z, t.h / 2, 300, -50);
+      await settle(t.x, t.z, t.h / 2, 300, -50, w.code);
       let p = await findClickable(t);
-      if (!p) { await settle(t.x, t.z, t.h / 2, 160, -70); p = await findClickable(t); }
+      if (!p) { await settle(t.x, t.z, t.h / 2, 160, -70, w.code); p = await findClickable(t); }
       if (!p) { r.note = 'scene.pick が目的の建物を返す画面点が見つからない'; continue; }
       await click(p.x, p.y);
       await sleep(900);
@@ -105,6 +112,15 @@ try {
     }
     rec.pass = rec.targets.length > 0 && rec.targets.every((x) => x.realClick && x.sidecarMatch && x.wardMatches);
   }
+  // 遠ざかったら破棄されること（高度 > 20km）
+  await ev('window.__mission37dQA.lookAtLocal(-2000, 0, 0, 30000, -60, 0)');
+  await sleep(1500);
+  await ev('window.__mission37dQA.updateExtraNear()').catch(() => {});
+  await sleep(1500);
+  out.extraSetsAfterZoomOut = await ev('JSON.stringify(window.__mission37g.extraSets)').then(JSON.parse);
+  out.extraMounted = await ev('window.__mission37g.extraMountedTotal');
+  out.extraUnmounted = await ev('window.__mission37g.extraUnmountedTotal');
+  out.coverage = await ev('JSON.stringify(window.__mission37g.coverage)').then(JSON.parse);
   out.wardsWith3dCount = out.coverage ? out.coverage.wardsWith3d : null;
   // 住吉区 回帰: 9 tile の建物も従来どおり選べること
   const sumi = { id: 'bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0' };
@@ -113,7 +129,7 @@ try {
   out.fps = await ev('window.__mission37g.fps');
   out.jsErrorCount = out.jsErrors.length;
   out.googleRequestCount = out.googleRequests.length;
-  out.pass = out.wards.every((w) => w.pass) && out.jsErrors.length === 0 && out.googleRequests.length === 0;
+  out.pass = out.extraSetsAtStart.length === 0 && out.extraSetsAfterZoomOut.length === 0 && out.wards.every((w) => w.pass) && out.jsErrors.length === 0 && out.googleRequests.length === 0;
 } catch (e) {
   out.fatal = String(e && e.stack || e);
 } finally {

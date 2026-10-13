@@ -10,6 +10,8 @@ const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const SETS = [
   { id: 'kita', code: '27127' },
   { id: 'chuo', code: '27128' },
+  { id: 'tennoji', code: '27109' },
+  { id: 'nishi', code: '27106' },
 ];
 
 function idsOf(dir) {
@@ -53,17 +55,25 @@ for (const s of SETS) {
   });
 }
 
-test('区をまたいだ canonicalId 衝突なし（住吉 9 tile + 北 + 中央）', () => {
+test('区をまたいだ canonicalId 衝突なし（住吉 9 tile + 北・中央・天王寺・西）', () => {
   const all = [...idsOf('public/mission37b-3dtiles/osaka-sumiyoshi-9tile'), ...SETS.flatMap((s) => idsOf(`public/mission37h-3dtiles/${s.id}-sample`))];
   assert.strictEqual(new Set(all).size, all.length);
 });
 
 test('37G ページ: 追加 tileset を tileset ごとの配信ベースで扱い、COVERAGE は実際に読み込めたものだけ', () => {
   const h = fs.readFileSync(path.join(ROOT, 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
-  assert.ok(/EXTRA_SET_DEFS/.test(h) && /mission37h-3dtiles\/kita-sample\//.test(h) && /mission37h-3dtiles\/chuo-sample\//.test(h));
+  assert.ok(/EXTRA_SET_DEFS/.test(h) && /mission37h-3dtiles\/kita-sample\//.test(h) && /mission37h-3dtiles\/chuo-sample\//.test(h) && /tennoji-sample\//.test(h) && /nishi-sample\//.test(h));
   assert.ok(/tilesBaseOf\(feature\)/.test(h), 'sidecar/attrs は tileset 別 base（tile 名が区間で衝突するため）');
-  assert.ok(/for \(const e of extraSets\)[\s\S]{0,400}COVERAGE\[e\.source\.wardCode\]/.test(h));
+  assert.ok(/for \(const e of extraMeta\)[\s\S]{0,400}COVERAGE\[e\.source\.wardCode\]/.test(h));
   assert.ok(/区全体ではありません/.test(h), '一部配信を明記');
+});
+
+test('37H-2: 追加 tileset は近傍でだけ mount し、遠方では破棄する／PLATEAU 出典表示', () => {
+  const h = fs.readFileSync(path.join(ROOT, 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
+  assert.ok(/async function updateExtraNear/.test(h) && /scene\.primitives\.remove\(e\.tileset\)/.test(h));
+  assert.ok(/EXTRA_NEAR_M[\s\S]*EXTRA_FAR_M/.test(h));
+  assert.ok(/国土交通省 Project PLATEAU/.test(h));
+  assert.ok(!/Cesium3DTileset\.fromUrl\(def\.base/.test(h), '起動時に全 tileset を無条件ロードしない');
 });
 
 test('本番 HTML は 37H で変更されていない（参照なし）', () => {

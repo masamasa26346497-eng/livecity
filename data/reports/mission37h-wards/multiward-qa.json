@@ -2,7 +2,7 @@
   "mission": "37H",
   "url": "http://localhost:8139/mission37g-osaka-24ward-mvp.html?qa=1",
   "browser": "Chrome/154.0.8037.97",
-  "generatedAt": "2026-10-12T22:57:04.832Z",
+  "generatedAt": "2026-10-13T10:38:44.827Z",
   "googleRequests": [],
   "failedRequests": [
     "404 http://localhost:8139/favicon.ico"
@@ -114,33 +114,129 @@
       ],
       "screenshot": "data/reports/mission37h-wards/ward-chuo-click.jpg",
       "pass": true
-    }
-  ],
-  "extraSets": [
-    {
-      "id": "kita-sample",
-      "wardCode": "27127",
-      "tiles": 13,
-      "buildings": 2698
     },
     {
-      "id": "chuo-sample",
-      "wardCode": "27128",
-      "tiles": 15,
-      "buildings": 5629
+      "ward": "天王寺区",
+      "attrCount": 6593,
+      "targets": [
+        {
+          "id": "bldg_94b16c40-da1d-425e-b537-85fe09fc407e",
+          "heightM": 119,
+          "realClick": true,
+          "selected": "bldg_94b16c40-da1d-425e-b537-85fe09fc407e",
+          "panel": {
+            "cid": "bldg_94b16c40-da1d-425e-b537-85fe09fc407e",
+            "ward": "天王寺区",
+            "side": "✓ 一致",
+            "h": "119.0 m",
+            "usage": "412"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_b71713c6-bb76-4c8d-8080-1ac1f669eb0d",
+          "heightM": 98.9,
+          "realClick": true,
+          "selected": "bldg_b71713c6-bb76-4c8d-8080-1ac1f669eb0d",
+          "panel": {
+            "cid": "bldg_b71713c6-bb76-4c8d-8080-1ac1f669eb0d",
+            "ward": "天王寺区",
+            "side": "✓ 一致",
+            "h": "98.9 m",
+            "usage": "461"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_11112708-9ed5-4bea-90ea-253756fa96cb",
+          "heightM": 91.5,
+          "realClick": true,
+          "selected": "bldg_11112708-9ed5-4bea-90ea-253756fa96cb",
+          "panel": {
+            "cid": "bldg_11112708-9ed5-4bea-90ea-253756fa96cb",
+            "ward": "天王寺区",
+            "side": "✓ 一致",
+            "h": "91.5 m",
+            "usage": "403"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        }
+      ],
+      "screenshot": "data/reports/mission37h-wards/ward-tennoji-click.jpg",
+      "pass": true
+    },
+    {
+      "ward": "西区",
+      "attrCount": 3893,
+      "targets": [
+        {
+          "id": "bldg_15879424-53c4-4d72-b8d0-833fb27d5a06",
+          "heightM": 105.3,
+          "realClick": true,
+          "selected": "bldg_15879424-53c4-4d72-b8d0-833fb27d5a06",
+          "panel": {
+            "cid": "bldg_15879424-53c4-4d72-b8d0-833fb27d5a06",
+            "ward": "西区",
+            "side": "✓ 一致",
+            "h": "105.3 m",
+            "usage": "412"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_71caec4a-e4d8-4dca-8533-10bad69b690d",
+          "heightM": 87.3,
+          "realClick": true,
+          "selected": "bldg_71caec4a-e4d8-4dca-8533-10bad69b690d",
+          "panel": {
+            "cid": "bldg_71caec4a-e4d8-4dca-8533-10bad69b690d",
+            "ward": "西区",
+            "side": "✓ 一致",
+            "h": "87.3 m",
+            "usage": "401"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        },
+        {
+          "id": "bldg_c94efb8e-2eee-4843-a1c6-01bdbf95dd2a",
+          "heightM": 85.9,
+          "realClick": true,
+          "selected": "bldg_c94efb8e-2eee-4843-a1c6-01bdbf95dd2a",
+          "panel": {
+            "cid": "bldg_c94efb8e-2eee-4843-a1c6-01bdbf95dd2a",
+            "ward": "西区",
+            "side": "✓ 一致",
+            "h": "85.9 m",
+            "usage": "401"
+          },
+          "sidecarMatch": true,
+          "wardMatches": true
+        }
+      ],
+      "screenshot": "data/reports/mission37h-wards/ward-nishi-click.jpg",
+      "pass": true
     }
   ],
+  "extraSetsAtStart": [],
   "coverage": {
     "mapWards": 24,
-    "wardsWith3d": 3,
-    "tiles3d": 37,
-    "buildings3d": 18873,
+    "wardsWith3d": 5,
+    "tiles3d": 64,
+    "buildings3d": 29359,
     "sourceBuildingsTotal": 574213,
     "sourceTilesTotal": 1097
   },
   "status": "loading tiles…",
-  "wardsWith3dCount": 3,
-  "fps": 1.5,
+  "extraSetsAfterZoomOut": [],
+  "extraMounted": 4,
+  "extraUnmounted": 4,
+  "wardsWith3dCount": 5,
+  "fps": 2,
   "jsErrorCount": 0,
   "googleRequestCount": 0,
   "pass": true

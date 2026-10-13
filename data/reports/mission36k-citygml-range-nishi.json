@@ -1,0 +1,56 @@
+{
+  "mission": "36K-citygml-ward-range",
+  "generatedAt": "2026-10-13T10:37:26.816Z",
+  "wardId": "nishi",
+  "wardName": "西区",
+  "wardCode": "27106",
+  "wardBoundaryBbox": {
+    "minX": -5786.09,
+    "maxX": -2507.83,
+    "minZ": -9869.45,
+    "maxZ": -6964.09
+  },
+  "wardGeoBbox": {
+    "south": 34.66676719870643,
+    "north": 34.69286637226015,
+    "west": 135.46187162172654,
+    "east": 135.49764998026552
+  },
+  "boundaryGeneratedAt": "2026-08-31T11:25:21.269Z",
+  "selectionMethod": "third-level mesh bbox intersects authoritative N03 ward boundary bbox; deliberate safe overfetch, final buildings are N03 point-in-polygon classified",
+  "candidateEntries": 16,
+  "candidateMeshes": [
+    "52350306",
+    "52350307",
+    "52350308",
+    "52350309",
+    "52350316",
+    "52350317",
+    "52350318",
+    "52350319",
+    "52350326",
+    "52350327",
+    "52350328",
+    "52350329",
+    "52350336",
+    "52350337",
+    "52350338",
+    "52350339"
+  ],
+  "compressedBytes": 26947721,
+  "uncompressedBytes": 596920603,
+  "dryRun": false,
+  "maxFiles": null,
+  "extracted": [
+    {
+      "mesh": "52350318",
+      "file": "temp/gml-nishi/52350318_bldg_6697_op.gml",
+      "bytes": 28777203
+    },
+    {
+      "mesh": "52350319",
+      "file": "temp/gml-nishi/52350319_bldg_6697_op.gml",
+      "bytes": 36260231
+    }
+  ]
+}
