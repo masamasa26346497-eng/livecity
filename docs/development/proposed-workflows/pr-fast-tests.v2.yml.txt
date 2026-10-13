@@ -1,3 +1,12 @@
+# ===== GitHub UI での適用手順（未適用。適用済みではない） =====
+# 1. GitHub 上で claude/issue-28-20261011-1537 ブランチの .github/workflows/pr-fast-tests.yml を開き、編集する。
+# 2. 内容をこのファイルの YAML 部分（「name: PR fast tests」以降）で置き換える。
+# 3. 「Commit directly to the claude/issue-28-20261011-1537 branch」を選んでコミット（main へは直接コミットしない）。
+# 4. PR #29 の Checks で ci-tools（緑必須）と related を確認。related は baseline 比較で、既知の赤は ::warning:: 表示（全件合格ではない）。
+# 5. full ジョブは workflow が main に存在するまで workflow_dispatch できない。main 側の基準値は
+#    docs/development/mission38-ci-failures.md の手順で独立環境にて取得する。
+# 6. 必須チェック候補は ci-tools のみ。related/full は main との同条件比較が済むまで必須にしない。
+# ==========================================================
 # 提案（未適用）: .github/workflows/pr-fast-tests.yml の置き換え案
 # GitHub App に workflow 書き込み権限が無いため、UI/権限のある資格情報で人手適用すること。
 # 注意: workflow_dispatch は workflow がデフォルトブランチに存在しないと使えない。
