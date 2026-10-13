@@ -1,0 +1,109 @@
+{
+  "mission": "37J",
+  "url": "http://localhost:8140/mission37g-osaka-24ward-mvp.html?qa=1",
+  "browser": "Chrome/154.0.8037.97",
+  "generatedAt": "2026-10-13T12:39:55.797Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8140/favicon.ico"
+  ],
+  "jsErrors": [],
+  "cases": [
+    {
+      "ward": "北区",
+      "target": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism"
+      },
+      "loaded": {
+        "loaded": 5655,
+        "fileRecords": 5655,
+        "license": "ODbL 1.0 / © OpenStreetMap contributors"
+      },
+      "expectedFileRecords": 5655,
+      "projected": {
+        "x": 750,
+        "y": 488.1239207481457,
+        "inCanvas": true
+      },
+      "pickAtPoint": "osm-node-10031129617",
+      "selectedPoi": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism",
+        "sourceId": "node/10031129617"
+      },
+      "panel": {
+        "name": "路上喫煙禁止地区案内図",
+        "src": "出典: © OpenStreetMap contributors（ODbL 1.0）"
+      },
+      "realClick": true,
+      "srcShown": true,
+      "screenshot": "data/reports/mission37j-facilities/poi-kita.jpg",
+      "searchHit": [
+        "飲食Le progrès"
+      ],
+      "searchFound": true
+    },
+    {
+      "ward": "鶴見区（3D 未配信）",
+      "target": {
+        "id": "osm-node-10281802247",
+        "name": "北野歯科医院",
+        "category": "medical"
+      },
+      "loaded": {
+        "loaded": 842,
+        "fileRecords": 842,
+        "license": "ODbL 1.0 / © OpenStreetMap contributors"
+      },
+      "expectedFileRecords": 842,
+      "projected": {
+        "x": 750.0000000012226,
+        "y": 488.1239207493682,
+        "inCanvas": true
+      },
+      "pickAtPoint": "osm-node-10281802247",
+      "selectedPoi": {
+        "id": "osm-node-10281802247",
+        "name": "北野歯科医院",
+        "category": "medical",
+        "sourceId": "node/10281802247"
+      },
+      "panel": {
+        "name": "北野歯科医院",
+        "src": "出典: © OpenStreetMap contributors（ODbL 1.0）"
+      },
+      "realClick": true,
+      "srcShown": true,
+      "screenshot": "data/reports/mission37j-facilities/poi-tsurumi.jpg"
+    }
+  ],
+  "facilityWardsAtStart": {},
+  "control": {
+    "id": "osm-node-1422980337",
+    "projected": {
+      "x": 750,
+      "y": 488.12392074938305,
+      "inCanvas": true
+    },
+    "pick": "osm-node-1422980337"
+  },
+  "sumiyoshi": {
+    "loaded": {
+      "loaded": 875,
+      "fileRecords": 965,
+      "license": "ODbL 1.0 / © OpenStreetMap contributors"
+    },
+    "expectedAdded": 875,
+    "fileRecords": 965,
+    "base37d": 149,
+    "noDuplicate": true,
+    "shot": "data/reports/mission37j-facilities/sumiyoshi-after.jpg"
+  },
+  "fps": 0.6,
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}

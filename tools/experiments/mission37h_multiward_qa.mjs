@@ -103,6 +103,10 @@ try {
       if (!p) { r.note = 'scene.pick が目的の建物を返す画面点が見つからない'; continue; }
       await click(p.x, p.y);
       await sleep(900);
+      // 37J: 施設の区別ロードと並走するため、sidecar 照合の完了を最大 15 秒待ち、所要時間を記録する
+      const tSide = Date.now();
+      for (let i = 0; i < 60; i++) { if ((await ev("document.getElementById('lb-side').textContent")) !== '照合中…') break; await sleep(250); }
+      r.sidecarWaitMs = Date.now() - tSide + 900;
       r.selected = await ev('window.__mission37g.selectedCanonicalId');
       r.realClick = r.selected === t.id;
       r.panel = await ev(`JSON.stringify({ cid: document.getElementById('lc-cid').textContent, ward: document.getElementById('lb-ward').textContent, side: document.getElementById('lb-side').textContent, h: document.getElementById('lb-h').textContent, usage: document.getElementById('lb-usage').textContent })`).then(JSON.parse);

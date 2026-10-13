@@ -1009,35 +1009,93 @@
     }
     return facPromise;
   }
+  // 37J: 区別の施設データ（map-data/osaka-city/facilities/wards/{wardId}.json、OSM/ODbL、24 区分が同一形式）。
+  //   カメラの真下の区だけを遅延ロードして POI レイヤーへ追加する。住吉区は 37D の束があるため重複（sourceId）は入れない。
+  //   旧 Three.js 版の FacilityDataStore（区別ロード）と同じデータ・同じ局所座標（znorth-neg-v1）。
+  const FAC_WARD_BASE = 'map-data/osaka-city/facilities/wards/';
+  const FAC_WARD_MAX_CAM_H = 9000;
+  const facExtra = [];                 // 区別ファイルから追加した施設（重複除去済み）
+  const facSeen = new Set();           // 追加済み sourceId（37D 束を含む）
+  const facWards = new Map();          // wardId → Promise
+  const poiLayers = [];
+  FAC_CAT.dining = ['飲食', '#f2b36b'];
+  FAC_CAT.lodging = ['宿泊', '#d49bd8'];
+  function allFacilities() { return loadFacilities().then((base) => base.concat(facExtra)); }
+  function ensureWardFacilities(w) {
+    if (!w || !w.wardId) return Promise.resolve(0);
+    if (!facWards.has(w.wardId)) {
+      facWards.set(w.wardId, (async () => {
+        const base = await loadFacilities().catch(() => []);
+        for (const r of base) if (r.sourceId) facSeen.add(r.sourceId);
+        const url = FAC_WARD_BASE + w.wardId + '.json';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(url + ' → HTTP ' + res.status);
+        const j = await res.json();
+        const fresh = (j.records || []).filter((r) => Number.isFinite(r.localX) && Number.isFinite(r.localZ) && r.sourceId && !facSeen.has(r.sourceId));
+        for (const r of fresh) { facSeen.add(r.sourceId); facExtra.push(r); }
+        for (const l of poiLayers) l.addRecs(fresh);
+        searchIndex = null;   // 検索インデックスを次回再構築
+        stats.facilityWards = stats.facilityWards || {};
+        stats.facilityWards[w.wardId] = { loaded: fresh.length, fileRecords: (j.records || []).length, license: 'ODbL 1.0 / © OpenStreetMap contributors' };
+        return fresh.length;
+      })().catch((e) => { facWards.delete(w.wardId); fail('facilities:' + w.wardId, e); return 0; }));
+    }
+    return facWards.get(w.wardId);
+  }
+  let facBusy = false;
+  async function updateFacilitiesNear() {
+    if (facBusy || !viewer || q.get('fac') === '0') return;
+    const c = viewer.camera.positionCartographic;
+    if (!c || c.height > FAC_WARD_MAX_CAM_H) return;
+    facBusy = true;
+    try {
+      const g = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      const gc = g ? Cesium.Cartographic.fromCartesian(g) : c;
+      const lat = Cesium.Math.toDegrees(gc.latitude), lon = Cesium.Math.toDegrees(gc.longitude);
+      const w = WardUI.hit((lon - PROJ.clon) * COS_CLAT * PROJ.mpd, -((lat - PROJ.clat) * PROJ.mpd));
+      if (w) await ensureWardFacilities(w);
+    } finally { facBusy = false; }
+  }
   function makePoiLayer(id, label, swatch, hint, filter) {
-    return {
+    const layer = {
       id, label, swatch, defaultOn: true, hint, pts: null, labels: null,
+      addRecs(list, extra) {
+        if (!this.pts) return;   // mount 前は mount() が facExtra を取り込む
+        for (const r of list.filter(filter)) this.addOne(r, extra !== false);
+        scene.requestRender();
+      },
       async mount() {
         const recs = (await loadFacilities()).filter(filter);
         this.pts = scene.primitives.add(new Cesium.PointPrimitiveCollection());
         this.labels = scene.primitives.add(new Cesium.LabelCollection());
-        for (const r of recs) {
-          const col = Cesium.Color.fromCssColorString((FAC_CAT[r.category] || ['', swatch])[1]);
-          const pos = toCart(r.localX, r.localZ, 6);
-          this.pts.add({ position: pos, pixelSize: 9, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
-            disableDepthTestDistance: Number.POSITIVE_INFINITY, id: { poi: r },
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 12000) });   // 37G: 全域ビューでは点を出さない（住吉区のみのデータ）
-          // ラベルはズームに応じて間引く（近づいたときだけ出す）
-          this.labels.add({ position: pos, text: r.name || '', font: '500 12px sans-serif', fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            pixelOffset: new Cesium.Cartesian2(0, -14), verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            disableDepthTestDistance: Number.POSITIVE_INFINITY,
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, id === 'spots' ? 4000 : 1400), id: { poi: r } });
-        }
+        for (const r of recs) this.addOne(r, false);
+        for (const r of facExtra.filter(filter)) this.addOne(r, true);
         return { count: recs.length };
+      },
+      addOne(r, fromWardFile) {
+        // 区別ファイル由来の飲食店は点のみ（数千件のラベル生成を避ける。名称はクリック/検索で出る）
+        const noLabel = fromWardFile && r.category === 'dining';
+        const col = Cesium.Color.fromCssColorString((FAC_CAT[r.category] || ['', swatch])[1]);
+        const pos = toCart(r.localX, r.localZ, 6);
+        this.pts.add({ position: pos, pixelSize: 9, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY, id: { poi: r },
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, r.category === 'dining' ? 3000 : 12000) });   // 37G: 全域ビューでは点を出さない
+        if (noLabel) return;
+        // ラベルはズームに応じて間引く（近づいたときだけ出す）
+        this.labels.add({ position: pos, text: r.name || '', font: '500 12px sans-serif', fillColor: Cesium.Color.WHITE,
+          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          pixelOffset: new Cesium.Cartesian2(0, -14), verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, id === 'spots' ? 4000 : 1400), id: { poi: r } });
       },
       applyVisible(on) { if (this.pts) this.pts.show = on; if (this.labels) this.labels.show = on; },
     };
+    return layer;
   }
-  LayerRegistry.register(makePoiLayer('facilities', '施設（学校・医療・公共・交通・店舗）', '#8fc0ff',
-    'OSM 由来。学校・医療・公共・交通・店舗の POI', (r) => r.category !== 'tourism' && r.category !== 'park'));
-  LayerRegistry.register(makePoiLayer('spots', '観光スポット', '#7fcf9a',
-    'OSM の tourism タグのみ（件数が少ない。住吉大社などは施設データに無い）', (r) => r.category === 'tourism'));
+  poiLayers.push(LayerRegistry.register(makePoiLayer('facilities', '施設（学校・医療・公共・交通・店舗）', '#8fc0ff',
+    'OSM 由来。学校・医療・公共・交通・店舗の POI', (r) => r.category !== 'tourism' && r.category !== 'park')));   // register() は複製を返す。pts を持つのは複製側
+  poiLayers.push(LayerRegistry.register(makePoiLayer('spots', '観光スポット', '#7fcf9a',
+    'OSM の tourism タグのみ（件数が少ない。住吉大社などは施設データに無い）', (r) => r.category === 'tourism')));
 
   // ══════════════════════════════════════════════════════════════
   // 37D 追加: 町丁目（住吉区 104 件）— 境界・ラベル・検索・選択
@@ -1711,7 +1769,7 @@
     const slot = $('lc-nearby-slot');
     slot.textContent = '読み込み中…';
     let facs = [], stations = [];
-    try { facs = await loadFacilities(); } catch (e) { fail('facilities', e); }
+    try { const w0 = WardUI.hit(x, z); if (w0) await ensureWardFacilities(w0); facs = await allFacilities(); } catch (e) { fail('facilities', e); }
     try { stations = ((await fetchLayerJson('labels.json')).items || []).filter((i) => i.kind === 'station'); } catch (e) { /* ラベル無しでも続行 */ }
     if (seq !== selSeq) return;
     const rows = [];
@@ -1783,6 +1841,11 @@
       drillIds(px, py) { // 同じ画面点に重なる全建物（診断用）
         const r = rect();
         return scene.drillPick(new Cesium.Cartesian2(px - r.left, py - r.top), 8).map((f) => (f && typeof f.getProperty === 'function' ? f.getProperty('canonicalId') : null));
+      },
+      pickPoiId(px, py) { // 37J: 画面点の POI（施設）id。診断用（選択処理は呼ばない）
+        const r = rect();
+        const f = scene.pick(new Cesium.Cartesian2(px - r.left, py - r.top));
+        return f && f.id && f.id.poi ? f.id.poi.id : (f ? 'other:' + Object.prototype.toString.call(f.id) : null);
       },
       pickId(px, py) {
         const r = rect();
@@ -1952,7 +2015,7 @@
       }
     } catch (e) { partial = 'ラベル'; fail('search:labels', e); }
     try {
-      for (const f of await loadFacilities()) {
+      for (const f of await allFacilities()) {
         if (!f.name) continue;
         idx.push({ name: f.name, key: norm(f.name), kind: (FAC_CAT[f.category] || [f.category])[0], x: f.localX, z: f.localZ, poi: f, rank: 2 });
       }
@@ -2052,6 +2115,7 @@
     mctx.fillStyle = C.accent; mctx.beginPath(); mctx.arc(px(cx), pz(cz), 4, 0, 6.283); mctx.fill();
   }
   setInterval(mmDraw, 500);
+  setInterval(() => { updateFacilitiesNear().catch((e) => fail('facilities:near', e)); }, 1500);   // 37J
 
   // ── 診断: theme 値・tileset stats（getter で常に最新値）──
   Object.defineProperty(stats, 'theme', { enumerable: true, get() {
