@@ -95,3 +95,15 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
   - 逆投影の範囲テストは粗い妥当性確認で、CityGML原座標との直接誤差測定ではない。N03 判定の精度は点内判定の範囲。
   - ライセンス条件（PLATEAU利用規約）の最終確認は未実施。公開前に要確認。
   - 浪速区のうち1メッシュのみ（区全体ではない）。「24区完了」ではない。本体37Gには未統合。
+
+## 追加: 浪速区 2 つ目のメッシュ 51357389（naniwa-mesh2）
+
+- 取得: `tools/mission36k-fetch-citygml-ward-range.mjs --ward naniwa --meshes=51357389`（HTTP Range、ZIP 全量なし）。GML 32,195,516 B。
+- GML sha256: `05ac5432c054a694d4567252ffafc382666927e96aa7a67ca01248ebc4e5cb6f`
+- 変換: 2,388 棟（重複ID 0、skip 0。高さ measuredHeight 2,059 / LOD1 zRange 329）。
+- N03 浪速区の点内判定で **1,801 棟採用、587 棟を区外として除外**（メッシュ内の区内率は計画上 0.76）。wardHint は区判定に不使用。
+- 既存 naniwa-mesh（2,466 棟）との ID 重複 0（ビルダーの `--exclude-set` で除外済み・重複は 0 件）。
+- 出力: `public/mission38e-3dtiles/naniwa-mesh2/`（tile 9 + 粗 LOD、約 2.3MB）。プレビュー: `?set=naniwa-mesh2`（未表示確認）。
+- 累計（浪速区）: 2,466 + 1,801 = **4,267 棟**、追加容量合計 約 5.6MB。
+- テスト: `node --test tests/mission38e-*.test.cjs` 28/28 pass。
+- 未実施: Chrome QA、原CityGML座標との直接位置誤差、利用条件最終確認。区全体ではない（「24区完了」ではない）。

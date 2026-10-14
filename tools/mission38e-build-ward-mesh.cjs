@@ -50,14 +50,22 @@ function main() {
   if (!ward) throw new Error('unknown ward ' + wardId);
 
   const tiles = new Map();
-  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, meshes: new Set() };
+  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, existingDuplicate: 0, meshes: new Set() };
   const seen = new Set();
+  // --exclude-set <name>: 既存セット（public/mission38e-3dtiles/<name>/ids）に既にあるIDは除外（重複防止）
+  const existing = new Set();
+  const exName = opt('exclude-set');
+  if (exName) {
+    const d = path.join(ROOT, 'public', 'mission38e-3dtiles', exName, 'ids');
+    for (const f of fs.readdirSync(d)) for (const id of JSON.parse(fs.readFileSync(path.join(d, f), 'utf8'))) existing.add(id);
+  }
   for (const line of fs.readFileSync(jsonl, 'utf8').split('\n')) {
     if (!line) continue;
     const b = JSON.parse(line);
     stat.read++;
     if (seen.has(b.id)) { stat.duplicate++; continue; }
     seen.add(b.id);
+    if (existing.has(b.id)) { stat.existingDuplicate++; continue; }
     const [rx, rz] = centroid(b.fp);
     if (!inWard(rx, rz, ward)) { stat.outsideWard++; continue; }
     stat.inWard++;
@@ -76,7 +84,7 @@ function main() {
   }
   fs.writeFileSync(path.join(src, 'manifest.json'), JSON.stringify({ coordinateConvention: 'znorth-neg-v1', tiles: manifestTiles }));
 
-  const out = path.join(ROOT, 'public', 'mission38e-3dtiles', wardId + '-mesh');
+  const out = path.join(ROOT, 'public', 'mission38e-3dtiles', opt('name') || (wardId + '-mesh'));
   const report = build({ dataset: 'osaka-' + wardId, srcDir: src, out, all: true, group: 4, coarseError: 40, coarseMinArea: 100 });
 
   fs.mkdirSync(path.join(out, 'attrs'), { recursive: true });
@@ -96,7 +104,7 @@ function main() {
     fetchMethod: 'HTTP Range（mission36k-fetch-citygml-ward-range.mjs）。ZIP 全量は取得していない',
     sourceMeshes: meshes, canonicalId: 'CityGML gml:id (bldg_<uuid>) をそのまま使用。新規採番なし',
     wardClassification: 'N03 区ポリゴンの点内判定（代表点=footprint 重心）。ポリゴン外は除外。wardHint は区判定に使っていない',
-    counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate },
+    counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate, existingDuplicate: stat.existingDuplicate }, excludedSet: exName || null,
     note: 'メッシュ単位の限定取得。区全体ではない。',
     licenseNote: '出典: 国土交通省 Project PLATEAU。利用条件の最終確認はリポジトリ内に記録なし（公開前に要確認）。',
   }, null, 1));
