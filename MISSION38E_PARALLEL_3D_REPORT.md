@@ -46,3 +46,16 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
 
 ## テスト
 `node --test tests/mission38e-subset.test.cjs` → 7 tests / 7 pass / 0 fail（監査テスト1件を追加）。
+`node --test tests/mission38e-subset.test.cjs tests/mission38e-ward-evidence.test.cjs` → 9 tests / 9 pass / 0 fail。
+
+## 区ラベル不整合の解決（独立根拠あり）
+**結論: 「東住吉区」は建物の実属性ではなく定数スタンプで、区の根拠にならない。平野区（N03判定）を採用する。**
+1. `building.ward` は住吉区33,594・東住吉区38,266・平野区43,843＝計115,703棟すべてで「東住吉区」（`labelCensus()`）。実属性なら区ごとに分布が異なるはず。
+2. `data/reports/building-ward-classification.json`: 全584,490棟が同ラベルで、「一致」扱いは東住吉区N03の38,489棟のみ。不一致サンプルは全件 attrWard=東住吉区（住之江区の座標の建物にも付く）。
+3. 変換器 `tools/mission36k-convert-citygml-runtime.mjs:180` は `ward: meta.wardHint || ''` と引数をそのまま書く（CityGMLから区を読まない）。
+4. 座標側の独立2系統: 旧 TOWN_POLYGONS 由来分類とN03判定が平野区で 43,625/43,843 一致（99.5%、`data/reports/ward-classification-vs-poc.json`）。
+- 未確定: `znorth-neg-v1` 原点と実世界緯度経度のPLATEAU原典との直接照合は未実施（外部通信不可）。PLATEAU 100% とは書かない。ラベルは書き換えていない。
+
+## Chrome 実機QAが不可能な理由と手順
+- 理由: Cesium 1.121.1 をCDN読込、本環境は外部通信不可、ローカルコピーなし。
+- 手順（ローカルPC）: `npx http-server public -p 8080` → Chrome で `http://localhost:8080/mission38e-3d-preview.html?set=hirano-subset` → Console にJS例外なし・Networkに404なし、左ドラッグで回転、建物クリックで `bldg_<uuid>` 表示を確認。

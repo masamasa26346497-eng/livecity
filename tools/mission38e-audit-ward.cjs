@@ -27,7 +27,22 @@ function audit(dataset, tiles) {
   }
   return res;
 }
-module.exports = { audit };
+// 3データセット全体の building.ward ラベル分布（定数スタンプか実属性かの判定材料）。
+function labelCensus() {
+  const B = path.join(ROOT, 'public/__test__/ward-poc/buildings');
+  const out = {};
+  for (const d of ['osaka-sumiyoshi', 'osaka-higashisumiyoshi', 'osaka-hirano']) {
+    const L = {};
+    let n = 0;
+    for (const f of fs.readdirSync(path.join(B, d))) {
+      if (!f.startsWith('tile_')) continue;
+      for (const b of JSON.parse(fs.readFileSync(path.join(B, d, f), 'utf8')).buildings) { L[b.ward] = (L[b.ward] || 0) + 1; n++; }
+    }
+    out[d] = { n, labels: L };
+  }
+  return out;
+}
+module.exports = { audit, labelCensus };
 if (require.main === module) {
   const a = process.argv.slice(2);
   const o = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
