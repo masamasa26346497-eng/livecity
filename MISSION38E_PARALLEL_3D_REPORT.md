@@ -77,3 +77,21 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
 - 取得コマンド（ネットワーク可能なローカルPCで）: `node tools/mission36k-fetch-citygml-ward-range.mjs --ward naniwa --meshes=51357399 --out temp/gml-naniwa` → `mission36k-convert-citygml-runtime.mjs` → `mission37h-build-ward-sample.cjs`。取得後に sha256 を記録すること。
 - 未実施: 実取得・変換・3D Tiles化・sha256記録・Chrome QA。浪速区の建物は一棟も追加していない。既存5区＋平野区subset・本体37G・写真は無変更。
 - テスト: `tests/mission38e-plan.test.cjs` を追加。`node --test tests/mission38e-*.test.cjs` → 17 tests / 17 pass / 0 fail（`npm test` は未実行）。
+
+## 浪速区 実PLATEAU メッシュ 51357399 の取得・変換・3D Tiles化（今回ジョブ・実施済み）
+- 取得: `node tools/mission36k-fetch-citygml-ward-range.mjs --ward naniwa --meshes=51357399`（HTTP Range、ZIP全量は取得せず）。外部通信は `node` 経由で成功した。
+  - 出典: 上記 PLATEAU 大阪市 CityGML(v4) ZIP の `51357399_bldg_6697_op.gml`（展開 34,534,516 B）。
+  - **GML sha256: `7730f4f7e30c045537bc1c706720a88532b9329d6fa7543f1a8de4f7b823dbef`**（`public/mission38e-3dtiles/naniwa-mesh/source.json` にも記録）。
+- 変換: `mission36k-convert-citygml-runtime.mjs`（既存・無変更）→ 建物 2,522（重複ID 0、skipped 0）。footprint は全件 LOD0 footPrint、高さは measuredHeight 2,329 / LOD1 zRange 193。
+- 3D Tiles化: 新規 `tools/mission38e-build-ward-mesh.cjs`（37H builderの出力先だけ変えたコピー。37Hの本体は無変更）。
+  - N03 浪速区ポリゴン点内判定（代表点=footprint 重心）で **2,466 棟を採用、56 棟は区外として除外**。`--ward-hint` は区判定に使っていない。
+  - tile: leaf 6（500m）+ 粗LOD 1。canonicalId は gml:id（bldg_<uuid>）そのまま、2,466 件すべて一意、新規採番なし。
+  - 追加容量: GLB 2,942,560 B / attrs 182,373 B / 合計 3,301,809 B（≒3.3MB、10MB以下）。出力先 `public/mission38e-3dtiles/naniwa-mesh/`。
+- テスト: 新規 `tests/mission38e-naniwa-mesh.test.cjs`（出典・SHA記録、ID形式と重複0、逆投影した全棟が浪速区bbox±0.002°内、既存テスト用3区＋37H 4区＋平野subsetとのID重複0、tileset参照の存在、10MB以下）。
+  `node --test tests/mission38e-*.test.cjs` → **22 tests / 22 pass / 0 fail**（`npm test` は未実行）。
+- プレビュー: `public/mission38e-3d-preview.html?set=naniwa-mesh`（HTMLは汎用の set パラメータで変更なし）。
+- 限界・未実施:
+  - **Chrome 実機QA、性能測定は未実施**（Cesium を CDN から読む構成でブラウザ検証環境なし）。表示・回転・クリックは未確認。
+  - 逆投影の範囲テストは粗い妥当性確認で、CityGML原座標との直接誤差測定ではない。N03 判定の精度は点内判定の範囲。
+  - ライセンス条件（PLATEAU利用規約）の最終確認は未実施。公開前に要確認。
+  - 浪速区のうち1メッシュのみ（区全体ではない）。「24区完了」ではない。本体37Gには未統合。
