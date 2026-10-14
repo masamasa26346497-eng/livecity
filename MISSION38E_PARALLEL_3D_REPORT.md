@@ -32,3 +32,17 @@
 node tools/mission38e-build-subset.cjs --survey
 node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --tiles 5_-3,5_-4,6_-3,6_-4
 ```
+
+## 監査追記（再開ジョブ・区ラベル不整合）
+`node tools/mission38e-audit-ward.cjs` で、対象4 tile + `tile_10_-1` の全棟を全24区のN03ポリゴンと突合した。
+- 全5 tile（計5,432棟）: `building.ward` ラベルは全件「東住吉区」、N03判定は全件「平野区」のみ（複数区ヒット0・区外0）。
+- したがって不整合は再現した。ただし**どちらが正しいかは本環境では未確定**。N03ポリゴンと テスト用座標が同一投影(`znorth-neg-v1`)であることの独立検証、およびラベルの出所の特定は未実施。ラベルは書き換えていない。
+- 平野区の判定は「N03ポリゴン基準」であり、PLATEAU原典での裏付けではない。
+
+## 実ブラウザQA（今回も未実施）
+- この環境は外部通信不可で、Cesium 1.121.1 のCDN取得と、リポジトリ内にもCesiumのローカルコピーが無いため、表示・回転・クリック・404・JS例外の実測は**未計測**。
+- ローカルで `public/` を静的配信し Chrome で `/mission38e-3d-preview.html?set=hirano-subset` を開いて確認が必要。
+- 正式PLATEAU新規取得: 外部通信不可のため**未実施**。新区の追加なし。
+
+## テスト
+`node --test tests/mission38e-subset.test.cjs` → 7 tests / 7 pass / 0 fail（監査テスト1件を追加）。

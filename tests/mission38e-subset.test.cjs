@@ -83,3 +83,14 @@ test('プレビューHTMLは 37G 本体・課金APIを参照しない', () => {
   assert.ok(!/googleapis|maps\.google|PhotorealisticTiles|createGooglePhotorealistic/i.test(html));
   assert.match(html, /canonicalId/);
 });
+
+// 38E 監査: ward ラベル（東住吉区）と N03 判定（平野区）の不一致を固定化する。ラベルは根拠にしない。
+test('audit: label vs N03 mismatch is documented per tile', () => {
+  const { audit } = require('../tools/mission38e-audit-ward.cjs');
+  const r = audit('osaka-hirano', ['5_-3', '5_-4', '6_-3', '6_-4']);
+  for (const k of Object.keys(r)) {
+    assert.deepStrictEqual(Object.keys(r[k].labels), ['東住吉区']);
+    assert.deepStrictEqual(Object.keys(r[k].n03), ['hirano']);
+    assert.strictEqual(r[k].none, 0);
+  }
+});
