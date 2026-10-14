@@ -68,3 +68,12 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
 - 合計テスト: `node --test tests/mission38e-*.test.cjs` → 12 tests / 12 pass / 0 fail。
 - 未実施: 正式PLATEAU取得（外部通信不可。`tools/plateau-sources.json` の大阪市27100の url は null で、取得にはG空間情報センター/CKAN検索が必要）、Chrome QA、容量以外の性能測定、新区の追加。
 - 24区展開の現実的手順（ローカルPC）: ①`tools/mission36k-fetch-citygml-ward-range.mjs` でHTTP Rangeにより対象メッシュのみ取得（ZIP全体は取得しない）→ ②`mission36k-convert-citygml-runtime.mjs` でJSONL化（`--ward-hint` は定数スタンプなので区判定にはN03点内判定を使う）→ ③`mission37h-build-ward-sample.cjs` で3D Tiles化 → ④既存IDとの重複0・原点逆変換・10MB以内をテストで確認。原点の厳密検証は、CityGML原座標と変換結果の直接照合（②の入出力比較）で行う。
+
+## 新区(浪速区)最小メッシュ取得プラン（今回ジョブ・取得は未実施）
+- 訂正: 前回「取得元URLが不明」としたのは `tools/plateau-sources.json`(大阪市 url:null)のみの話。既存の36K probe（`data/reports/mission36k-citygml-zip-probe.json`）には実URL・ETag・ZIP中央ディレクトリ実測値が記録済み。
+  - 出典: PLATEAU 大阪市 CityGML（v4）`https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip`（1,523,942,100 B / ETag `982370ac…3fe` / Last-Modified 2025-03-31）。Range対応は36K probeで確認済み（本ジョブでは再確認していない）。ライセンス条件は未再確認。
+- 新規 `tools/mission38e-plan-ward-mesh.cjs`（オフライン・読み取り専用）: probeのentryとN03区ポリゴンから、5×5サンプル点の区内率でメッシュを選定。出力 `public/mission38e-3dtiles/plans/naniwa-mesh-plan.json`。
+- 浪速区の選定結果: メッシュ **51357399**（区内率 100%、圧縮 1,392,193 B ≒1.3MB、展開 34.5MB）。候補は9メッシュ。福島区も算出可能（テストのみ、ファイル未出力）。
+- 取得コマンド（ネットワーク可能なローカルPCで）: `node tools/mission36k-fetch-citygml-ward-range.mjs --ward naniwa --meshes=51357399 --out temp/gml-naniwa` → `mission36k-convert-citygml-runtime.mjs` → `mission37h-build-ward-sample.cjs`。取得後に sha256 を記録すること。
+- 未実施: 実取得・変換・3D Tiles化・sha256記録・Chrome QA。浪速区の建物は一棟も追加していない。既存5区＋平野区subset・本体37G・写真は無変更。
+- テスト: `tests/mission38e-plan.test.cjs` を追加。`node --test tests/mission38e-*.test.cjs` → 17 tests / 17 pass / 0 fail（`npm test` は未実行）。
