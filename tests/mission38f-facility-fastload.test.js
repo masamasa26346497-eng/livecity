@@ -169,3 +169,77 @@ test('preview: showSample goes through the token-protected selectSample; catches
   assert.ok(!/loader\.loadStartup\(\)\.then/.test(html), 'showSample must not bypass the token');
   assert.match(html, /loader\.isCurrent\(/);
 });
+
+// ── 38F next: cache cap (LRU) + distance culling ─────────────────────────────
+const mkCap = (log, max) => F.createLoader({ baseUrl: 'x/facilities/', fetchImpl: fsFetch(log), maxCachedWards: max });
+
+test('LRU: cache holds at most maxCachedWards wards; oldest is evicted and refetched on revisit', async () => {
+  const log = [];
+  const l = mkCap(log, 2);
+  await l.loadWard('abeno'); await l.loadWard('chuo'); await l.loadWard('nishi');
+  assert.deepStrictEqual([...l.getCachedWards()].sort(), ['chuo', 'nishi']);
+  assert.strictEqual(l.isWardCached('abeno'), false);
+  const n = log.filter((x) => x === 'wards/abeno.json').length;
+  await l.loadWard('abeno');
+  assert.strictEqual(log.filter((x) => x === 'wards/abeno.json').length, n + 1);
+});
+
+test('LRU: a cache hit refreshes recency (recently used ward survives)', async () => {
+  const l = mkCap([], 2);
+  await l.loadWard('abeno'); await l.loadWard('chuo');
+  await l.loadWard('abeno');            // touch
+  await l.loadWard('nishi');            // evicts chuo, not abeno
+  assert.deepStrictEqual([...l.getCachedWards()].sort(), ['abeno', 'nishi']);
+});
+
+test('LRU: default cap is 3; releaseWard / clearCache free memory', async () => {
+  const l = F.createLoader({ baseUrl: 'x/facilities/', fetchImpl: fsFetch([]) });
+  for (const w of ['abeno', 'chuo', 'nishi', 'naniwa']) await l.loadWard(w);
+  assert.strictEqual(l.getCachedWards().length, 3);
+  assert.strictEqual(l.releaseWard('chuo'), true);
+  assert.strictEqual(l.releaseWard('chuo'), false);
+  l.clearCache();
+  assert.strictEqual(l.getCachedWards().length, 0);
+  assert.ok(l.getStats().evictions >= 1);
+});
+
+test('LRU: cap of 1 does not break the stale-safe selectWard result', async () => {
+  const l = mkCap([], 1);
+  const r = await l.selectWard('chuo');
+  assert.strictEqual(r.stale, false);
+  assert.strictEqual(r.records.length, 5084);
+});
+
+test('cullByDistance: drops far points, nearest-first, honours cap and label range', async () => {
+  const l = mk([]);
+  const recs = await l.loadWard('chuo');
+  const c = recs.find((r) => Number.isFinite(r.localX));
+  const out = F.cullByDistance(recs, c.localX, c.localZ, { cap: 100, ptMax: 12000, lbMax: 1400 });
+  assert.ok(out.points.length <= 100);
+  assert.ok(out.points.every((p, i, a) => i === 0 || a[i - 1].d <= p.d), 'sorted nearest first');
+  assert.ok(out.labels.every((p) => p.d <= 1400));
+  const far = F.cullByDistance(recs, c.localX + 1e6, c.localZ, { cap: 100 });
+  assert.strictEqual(far.points.length, 0);
+  assert.strictEqual(far.labels.length, 0);
+});
+
+test('cullByDistance: full 40585 never yields more than the cap; coordinate-less records are skipped', async () => {
+  const l = F.createLoader({ baseUrl: 'x/facilities/', fetchImpl: fsFetch([]), maxCachedWards: 24 });
+  const m = await l.loadManifest();
+  let all = [];
+  for (const w of m.wards) all = all.concat(await l.loadWard(w.wardId));
+  assert.strictEqual(all.length, 40585);
+  const out = F.cullByDistance(all.concat([{ name: 'x', sourceId: 'nocoord' }]), 0, 0, {});
+  assert.strictEqual(F.POI_CAP, 2500);
+  assert.ok(out.points.length <= F.POI_CAP);
+  assert.ok(out.points.every((p) => p.r.sourceId !== 'nocoord'));
+});
+
+test('cullByDistance: per-category ptMax (dining is short range)', () => {
+  const recs = [
+    { sourceId: 'a', category: 'dining', localX: 5000, localZ: 0 },
+    { sourceId: 'b', category: 'shopping', localX: 5000, localZ: 0 }
+  ];
+  const out = F.cullByDistance(recs, 0, 0, {});
+  assert.deepStrictEqual([...out.points.map((p) => p.r.sourceId)], ['b']);
+});

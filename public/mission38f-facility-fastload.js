@@ -56,6 +56,30 @@
     };
   }
 
+  var DEFAULT_MAX_CACHED_WARDS = 3;   // parsed records of 3 wards; all 24 wards would be ~44 MB of JSON
+  var POI_CAP = 2500;                 // same per-layer simultaneous point cap as 37K
+
+  /** Distance thinning (pure). Coordinates are local metres (record.localX/localZ, znorth-neg-v1).
+   *  Mirrors the 37K rules: point range 12000 m (dining 3000 m), label range 1400 m, nearest-first cap.
+   *  Returns {points:[{r,d}], labels:[{r,d}], dropped}; never more than `cap` points. */
+  function cullByDistance(records, cx, cz, o) {
+    o = o || {};
+    var cap = o.cap > 0 ? o.cap : POI_CAP;
+    var lbMax = o.lbMax || 1400;
+    var cand = [];
+    for (var i = 0; i < records.length; i++) {
+      var r = records[i];
+      if (!isFinite(r.localX) || !isFinite(r.localZ)) continue;
+      var dx = r.localX - cx, dz = r.localZ - cz;
+      var d = Math.sqrt(dx * dx + dz * dz);
+      if (d <= (o.ptMax || (r.category === 'dining' ? 3000 : 12000))) cand.push({ r: r, d: d });
+    }
+    cand.sort(function (a, b) { return a.d - b.d; });
+    var points = cand.slice(0, cap);
+    var labels = points.filter(function (p) { return p.d <= lbMax; });
+    return { points: points, labels: labels, dropped: cand.length - points.length };
+  }
+
   function createLoader(opts) {
     opts = opts || {};
     var baseUrl = (opts.baseUrl || 'map-data/osaka-city/facilities/').replace(/\/?$/, '/');
@@ -63,9 +87,11 @@
     var now = opts.now || function () { return (typeof performance !== 'undefined' ? performance.now() : Date.now()); };
     if (!fetchImpl) throw new Error('fetch implementation required');
 
+    var maxCached = opts.maxCachedWards > 0 ? Math.floor(opts.maxCachedWards) : DEFAULT_MAX_CACHED_WARDS;
     var cache = Object.create(null);     // wardId -> records[]
+    var lru = [];                        // wardIds, least recently used first
     var inflight = Object.create(null);  // wardId -> Promise
-    var stats = { requests: 0, failures: 0, wardLoads: Object.create(null), startup: null };
+    var stats = { requests: 0, failures: 0, evictions: 0, wardLoads: Object.create(null), startup: null };
     var manifest = null;
     var startup = null;
     var activeToken = 0;
@@ -98,8 +124,25 @@
     }
 
     /** Full per-ward data; cached, concurrent calls share one request, failures are not cached. */
+    function touch(wardId) {
+      var i = lru.indexOf(wardId);
+      if (i >= 0) lru.splice(i, 1);
+      lru.push(wardId);
+    }
+    function evictOverCap() {
+      while (lru.length > maxCached) { delete cache[lru.shift()]; stats.evictions++; }
+    }
+    function releaseWard(wardId) {
+      if (!cache[wardId]) return false;
+      delete cache[wardId];
+      lru.splice(lru.indexOf(wardId), 1);
+      stats.evictions++;
+      return true;
+    }
+    function clearCache() { while (lru.length) releaseWard(lru[0]); }
+
     function loadWard(wardId) {
-      if (cache[wardId]) return Promise.resolve(cache[wardId]);
+      if (cache[wardId]) { touch(wardId); return Promise.resolve(cache[wardId]); }
       if (inflight[wardId]) return inflight[wardId];
       var p = loadManifest().then(function (m) {
         var entry = (m.wards || []).filter(function (w) { return w.wardId === wardId; })[0];
@@ -107,6 +150,8 @@
         return getJson(entry.url).then(function (r) {
           var records = dedupeBySourceId(r.json.records || []);
           cache[wardId] = records;
+          touch(wardId);
+          evictOverCap();
           stats.wardLoads[wardId] = { ms: r.ms, chars: r.bytes, count: records.length, expected: entry.recordCount };
           return records;
         });
@@ -148,6 +193,8 @@
       isCurrent: function (token) { return token === activeToken; },
       currentToken: function () { return activeToken; },
       isWardCached: function (id) { return !!cache[id]; },
+      getCachedWards: function () { return lru.slice(); },
+      releaseWard: releaseWard, clearCache: clearCache,
       getStats: function () { return stats; }
     };
   }
@@ -174,7 +221,8 @@
 
   return {
     MISSING: MISSING, ATTRIBUTION: ATTRIBUTION, CATEGORY_LABELS: CATEGORY_LABELS,
-    createLoader: createLoader, search: search, describe: describe,
+    createLoader: createLoader, cullByDistance: cullByDistance, POI_CAP: POI_CAP,
+    DEFAULT_MAX_CACHED_WARDS: DEFAULT_MAX_CACHED_WARDS, search: search, describe: describe,
     dedupeBySourceId: dedupeBySourceId, normalizeText: normalizeText
   };
 });
