@@ -131,3 +131,41 @@ test('preview HTML: no Google/external scripts, uses textContent not innerHTML, 
   assert.ok(!/<script[^>]+src="https?:/i.test(html));
   assert.match(html, /ATTRIBUTION/);
 });
+
+test('cancelSelection: slow ward finishing after cancel (back to sample) is stale', async () => {
+  const l = mk([], { delay: { 'wards/chuo.json': 60 } });
+  const slow = l.selectWard('chuo');
+  l.cancelSelection(); // user went back to the sample view
+  assert.strictEqual((await slow).stale, true);
+});
+
+test('cancelSelection: failure of a cancelled ward request is silent', async () => {
+  const l = mk([], { fail: (rel) => rel === 'wards/chuo.json', delay: { 'wards/chuo.json': 30 } });
+  const slow = l.selectWard('chuo');
+  l.cancelSelection();
+  assert.strictEqual((await slow).stale, true);
+});
+
+test('selectSample: slow sample finishing after a ward selection is stale; ward wins', async () => {
+  const l = mk([], { delay: { 'facilities-startup.json': 60 } });
+  const sample = l.selectSample();
+  const ward = l.selectWard('abeno');
+  const [s, w] = await Promise.all([sample, ward]);
+  assert.strictEqual(s.stale, true);
+  assert.strictEqual(w.stale, false);
+  assert.strictEqual(w.records.length, 851);
+});
+
+test('selectSample: returns the 1120 sample when it is the latest selection', async () => {
+  const l = mk([]);
+  const s = await l.selectSample();
+  assert.strictEqual(s.stale, false);
+  assert.strictEqual(s.records.length, 1120);
+});
+
+test('preview: showSample goes through the token-protected selectSample; catches ignore stale', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'mission38f-facility-preview.html'), 'utf8');
+  assert.match(html, /loader\.selectSample\(\)/);
+  assert.ok(!/loader\.loadStartup\(\)\.then/.test(html), 'showSample must not bypass the token');
+  assert.match(html, /loader\.isCurrent\(/);
+});

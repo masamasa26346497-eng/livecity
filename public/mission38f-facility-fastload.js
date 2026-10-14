@@ -128,8 +128,25 @@
       });
     }
 
+    /** Invalidate any pending selectWard()/selectSample(); their results resolve as {stale:true}. */
+    function cancelSelection() { return ++activeToken; }
+
+    /** Stale-safe sample select, sharing the same token as selectWard(). */
+    function selectSample() {
+      var token = ++activeToken;
+      return loadStartup().then(function (s) {
+        return token === activeToken ? { stale: false, records: s.records, sampleCount: s.sampleCount } : { stale: true };
+      }, function (err) {
+        if (token !== activeToken) return { stale: true };
+        throw err;
+      });
+    }
+
     return {
       loadManifest: loadManifest, loadStartup: loadStartup, loadWard: loadWard, selectWard: selectWard,
+      cancelSelection: cancelSelection, selectSample: selectSample,
+      isCurrent: function (token) { return token === activeToken; },
+      currentToken: function () { return activeToken; },
       isWardCached: function (id) { return !!cache[id]; },
       getStats: function () { return stats; }
     };

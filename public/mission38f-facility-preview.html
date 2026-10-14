@@ -117,26 +117,34 @@
   }
 
   function showSample() {
-    state.mode = 'sample';
-    return loader.loadStartup().then(function (s) {
-      state.records = s.records; state.selected = null; refresh();
+    // selectSample() bumps the same token as selectWard(), so a still-pending ward load becomes stale.
+    var token = loader.currentToken() + 1;
+    return loader.selectSample().then(function (r) {
+      if (r.stale) return;
+      state.mode = 'sample'; state.wardId = ''; state.records = r.records; state.selected = null; refresh();
       setStatus('');
-    });
+    }, function (err) { failIfCurrent(token, err); });
   }
 
   function chooseWard(wardId, wardName) {
     state.wardId = wardId;
-    if (!wardId) { return showSample().catch(fail); }
+    if (!wardId) { return showSample(); }
     setStatus(wardName + ' を読み込み中…');
+    var token = loader.currentToken() + 1;
     return loader.selectWard(wardId).then(function (r) {
       if (r.stale) return;
       state.mode = 'ward'; state.loadedWardId = wardId; state.wardName = wardName; state.records = r.records; state.selected = null;
       setStatus(''); refresh();
-    }).catch(fail);
+    }, function (err) { failIfCurrent(token, err); });
   }
 
   function fail(err) {
     setStatus('読み込みに失敗しました: ' + err.message, true);
+  }
+
+  // Only the latest selection may show an error; older async failures are ignored.
+  function failIfCurrent(token, err) {
+    if (loader.isCurrent(token)) fail(err);
   }
 
   $('retry').addEventListener('click', function () {
