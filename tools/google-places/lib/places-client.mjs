@@ -15,6 +15,26 @@ import { createRequestGuard } from './rate-guard.mjs';
 
 const API_BASE = 'https://places.googleapis.com/v1';
 
+/**
+ * 429/403 等の診断用。HTTP status / Retry-After / Google の error.status 列挙値(例 RESOURCE_EXHAUSTED)と
+ * 数値 error.code だけを返す。レスポンス本文・message・details・URL・キーは一切返さない（許可リスト方式）。
+ */
+export async function sanitizeHttpErrorDiagnostics(res) {
+  const out = { httpStatus: Number(res?.status) || null, retryAfter: null, errorCode: null, errorStatus: null };
+  try {
+    const ra = res?.headers?.get?.('retry-after');
+    if (ra != null && /^[0-9A-Za-z ,:+\-]{1,40}$/.test(String(ra))) out.retryAfter = String(ra);
+  } catch { /* ignore */ }
+  try {
+    const body = await res.json();
+    const code = Number(body?.error?.code);
+    if (Number.isInteger(code) && code >= 100 && code <= 599) out.errorCode = code;
+    const st = body?.error?.status;
+    if (typeof st === 'string' && /^[A-Z_]{3,40}$/.test(st)) out.errorStatus = st;
+  } catch { /* body absent or not JSON */ }
+  return out;
+}
+
 export function createPlacesClient(opts = {}) {
   const apiKey = opts.apiKey || null;
   const fetchImpl = opts.fetchImpl || (typeof fetch === 'function' ? fetch : null);
@@ -52,7 +72,7 @@ export function createPlacesClient(opts = {}) {
       const res = await fetchImpl(API_BASE + '/places:searchText', {
         method: 'POST', headers: headers(SEARCH_FIELD_MASK), body: JSON.stringify(body),
       });
-      if (!res.ok) return { ok: false, reason: 'http-' + res.status, places: [] };
+      if (!res.ok) return { ok: false, reason: 'http-' + res.status, places: [], diagnostics: await sanitizeHttpErrorDiagnostics(res) };
       const json = await res.json();
       const places = (json.places || []).map((p) => ({
         placeId: p.id, displayName: p.displayName && p.displayName.text,
