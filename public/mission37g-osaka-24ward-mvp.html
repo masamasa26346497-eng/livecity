@@ -472,7 +472,7 @@
     accent: '#50a0ff', hi: '#8fc0ff', text: '#eef1f3', dim: '#9cb8d8', mute: '#5a7aa0',
     navy: '#050a18', amber: '#d8a868',
     roadMajor: '#9fb4c9', roadMid: '#aabdce', roadLocal: '#bac8d7', roadCasing: '#7d93ab',
-    rail: '#8396aa', waterLine: '#9ec6e0', waterArea: '#b4d4ea', park: '#bcd3b4',
+    rail: '#8396aa', waterLine: '#4f9fd6', waterArea: '#8dc3e8', park: '#bcd3b4',
   };
   // 建物トーン（3D Tiles の頂点色に掛ける係数。淡色＝ほぼ素の淡い青灰のまま）
   const TONE = { pale: '#f4f8fd', mid: '#dbe6f2', deep: '#b9c9dd' };
@@ -954,23 +954,23 @@
   LayerRegistry.register(buildingLayer);
   LayerRegistry.register(Object.assign({
     id: 'roads', label: '道路', swatch: C.roadMajor, defaultOn: true,
-    hint: 'OSM 由来。tier (major/mid/local) で太さと色を分ける',
+    hint: 'OSM 由来。tier (major/mid/local) で太さと色を分ける。配信範囲は住吉区の一部（約2.1km四方）のみ',
   }, makeLineLayer('roads.json', (f) => {
     const t = f.tier || 'local';
     if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
     if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
-    return { width: 2.4, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
+    return { width: 3.0, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
   })));
   LayerRegistry.register(Object.assign({
     id: 'railways', label: '鉄道・駅', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
   }, makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }))));
   LayerRegistry.register(Object.assign({
-    id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）',
+    id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）。配信範囲は住吉区の一部（約2.1km四方）のみ',
   }, (function () {
     const lines = makeLineLayer('waterways.json', (f) => f.kind === 'line'
-      ? { width: f.waterClass === 'canal' ? 5 : 3.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways }
+      ? { width: f.waterClass === 'canal' ? 6 : 4.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways }
       : null);
-    const areas = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.88, height: LAYER_H.waterways });
+    const areas = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways });
     return {
       async mount() { const a = await lines.mount(); const b = await areas.mount(); return { count: a.count + b.count }; },
       applyVisible(on) { lines.applyVisible(on); areas.applyVisible(on); },
@@ -1916,7 +1916,8 @@
         viewer.camera.lookAt(toCart(x, z, h), new Cesium.HeadingPitchRange(Cesium.Math.toRadians(headingDeg || 0), Cesium.Math.toRadians(pitchDeg), range));
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
-      tilesReady: () => !!tileset && tileset.tilesLoaded && extraSets.every((e) => e.tileset.tilesLoaded),
+      setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
+      tilesReady: () => !!tileset &&tileset.tilesLoaded && extraSets.every((e) => e.tileset.tilesLoaded),
       updateExtraNear,
       // 写真パネルだけを実コード(renderPhoto)で描く。3D 選択は経由しない＝実クリックではない（37F-4: 9 tile 外の建物の確認用）
       async renderPhotoOnly(id) { if (!stats.lastPicked) stats.lastPicked = {}; return !!renderPhoto(id, await loadPhotoIndex()); },
