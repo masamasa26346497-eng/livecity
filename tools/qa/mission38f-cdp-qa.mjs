@@ -8,7 +8,10 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public');
 const chrome = process.argv[2] || '/usr/bin/chromium';
-const server = http.createServer((req, res) => {
+const delays = {};
+const server = http.createServer(async (req, res) => {
+  const d = delays[req.url.split('?')[0]];
+  if (d) await new Promise((r) => setTimeout(r, d));
   const p = path.join(root, decodeURIComponent(req.url.split('?')[0]));
   if (!p.startsWith(root) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { 'content-type': p.endsWith('.json') ? 'application/json' : p.endsWith('.js') ? 'text/javascript' : 'text/html; charset=utf-8' });
@@ -23,10 +26,12 @@ let targets;
 for (let i = 0; i < 50; i++) { try { targets = await (await fetch(`http://127.0.0.1:${dbg}/json`)).json(); break; } catch { await sleep(200); } }
 const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
 await new Promise((r) => (ws.onopen = r));
+const exceptions = [];
 let id = 0; const pending = new Map(); const requests = []; const sizes = {};
 ws.onmessage = (m) => {
   const d = JSON.parse(m.data);
   if (d.id && pending.has(d.id)) { pending.get(d.id)(d); pending.delete(d.id); }
+  if (d.method === 'Runtime.exceptionThrown') exceptions.push(d.params.exceptionDetails.text + ' ' + (d.params.exceptionDetails.exception?.description || ''));
   if (d.method === 'Network.requestWillBeSent') requests.push(d.params.request.url);
   if (d.method === 'Network.loadingFinished') sizes[d.params.requestId] = d.params.encodedDataLength;
   if (d.method === 'Network.responseReceived') sizes[d.params.requestId + ':url'] = d.params.response.url;
@@ -82,6 +87,33 @@ await send('Network.setBlockedURLs', { urls: [] });
 await ev(`document.getElementById('retry').click()`);
 await waitFor(`window.__m38f.state.loadedWardId==='nishi'`);
 check('recovers after retry (nishi 2,071)', await ev(`window.__m38f.state.records.length`) === 2071);
+
+// race: slow ward -> back to sample -> late ward response must not overwrite the sample
+const W = '/map-data/osaka-city/facilities/wards/';
+const setWard = (v) => ev(`(()=>{const s=document.getElementById('ward');s.value='${v}';s.dispatchEvent(new Event('change'));})()`);
+delays[W + 'naniwa.json'] = 1500;
+await setWard('naniwa'); await sleep(200); await setWard('');
+await waitFor(`window.__m38f.state.mode==='sample' && window.__m38f.state.records.length===1120`);
+await sleep(2000);
+check('race: late ward response does not overwrite sample', await ev(`window.__m38f.state.mode==='sample' && window.__m38f.state.records.length===1120 && window.__m38f.state.loadedWardId!=='naniwa'`));
+check('race: no error shown after stale completion', await ev(`document.getElementById('status').className!=='err'`));
+// slow earlier ward must not overwrite a later one
+delays[W + 'chuo.json'] = 1500;
+await setWard('chuo'); await sleep(100); await setWard('abeno');
+await waitFor(`window.__m38f.state.loadedWardId==='abeno'`);
+await sleep(2000);
+check('race: slow earlier ward does not overwrite later ward', await ev(`window.__m38f.state.loadedWardId==='abeno'`));
+delete delays[W + 'chuo.json'];
+// stale failure after the user moved on must stay silent
+delays[W + 'nishinari.json'] = 1000;
+await send('Network.setBlockedURLs', { urls: ['*/wards/nishinari.json'] });
+await setWard('nishinari'); await sleep(100); await setWard('');
+await waitFor(`window.__m38f.state.mode==='sample'`);
+await sleep(1500);
+await send('Network.setBlockedURLs', { urls: [] });
+check('race: stale failure shows no error', await ev(`document.getElementById('status').className!=='err' && window.__m38f.state.mode==='sample'`));
+out.timings.jsHeapMB = await ev(`performance.memory ? Math.round(performance.memory.usedJSHeapSize/1048576) : null`);
+check('JS exceptions = 0', exceptions.length === 0, exceptions);
 
 // resources
 const urls = requests.filter((u) => u.startsWith('http'));

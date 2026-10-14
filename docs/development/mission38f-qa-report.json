@@ -67,15 +67,37 @@
       "ok": true
     },
     {
+      "name": "race: late ward response does not overwrite sample",
+      "ok": true
+    },
+    {
+      "name": "race: no error shown after stale completion",
+      "ok": true
+    },
+    {
+      "name": "race: slow earlier ward does not overwrite later ward",
+      "ok": true
+    },
+    {
+      "name": "race: stale failure shows no error",
+      "ok": true
+    },
+    {
+      "name": "JS exceptions = 0",
+      "ok": true,
+      "extra": []
+    },
+    {
       "name": "Google / external requests = 0",
       "ok": true,
       "extra": []
     }
   ],
   "timings": {
-    "initialSampleMs": 286,
-    "sumiyoshiLoadMs": 109,
-    "chuoLoadMs": 142,
+    "initialSampleMs": 405,
+    "sumiyoshiLoadMs": 62,
+    "chuoLoadMs": 162,
+    "jsHeapMB": 14,
     "fileBytes": {
       "facilities-startup.json": 905867,
       "ward-manifest.json": 2345,
@@ -85,30 +107,42 @@
     }
   },
   "loaderStats": {
-    "requests": 6,
-    "failures": 1,
+    "requests": 9,
+    "failures": 2,
     "wardLoads": {
       "sumiyoshi": {
-        "ms": 30.900000000023283,
+        "ms": 11.799999999988358,
         "chars": 744605,
         "count": 965,
         "expected": 965
       },
       "chuo": {
-        "ms": 82.19999999995343,
+        "ms": 126,
         "chars": 3918784,
         "count": 5084,
         "expected": 5084
       },
       "nishi": {
-        "ms": 32,
+        "ms": 21.20000000001164,
         "chars": 1590839,
         "count": 2071,
         "expected": 2071
+      },
+      "naniwa": {
+        "ms": 1514,
+        "chars": 1056195,
+        "count": 1363,
+        "expected": 1363
+      },
+      "abeno": {
+        "ms": 10,
+        "chars": 656206,
+        "count": 851,
+        "expected": 851
       }
     },
     "startup": {
-      "ms": 56.09999999997672,
+      "ms": 111.29999999998836,
       "chars": 868335,
       "count": 1120
     }
