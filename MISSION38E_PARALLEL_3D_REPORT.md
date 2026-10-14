@@ -59,3 +59,12 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
 ## Chrome 実機QAが不可能な理由と手順
 - 理由: Cesium 1.121.1 をCDN読込、本環境は外部通信不可、ローカルコピーなし。
 - 手順（ローカルPC）: `npx http-server public -p 8080` → Chrome で `http://localhost:8080/mission38e-3d-preview.html?set=hirano-subset` → Console にJS例外なし・Networkに404なし、左ドラッグで回転、建物クリックで `bldg_<uuid>` 表示を確認。
+
+## 原点・ID の静的検証（今回ジョブ）
+- `tests/mission38e-origin-check.test.cjs`（新規・外部通信なし）:
+  - 平野区subset 4,695棟の footprint 重心を `config/areas/osaka-city.json` の投影（centerLat 34.604208 / centerLon 135.52502 / 111320 m/deg）で緯度経度へ逆変換 → 全棟が北緯34.58–34.66・東経135.50–135.60に入る。**この範囲は地理的な目安で公式境界ではなく、PLATEAU原典との照合ではない**（位置誤差の実測値ではなく粗い妥当性確認）。
+  - 投影定数が37B/37C/設定と一致。
+  - 平野区subsetのIDは住吉区・東住吉区テストデータと重複0。
+- 合計テスト: `node --test tests/mission38e-*.test.cjs` → 12 tests / 12 pass / 0 fail。
+- 未実施: 正式PLATEAU取得（外部通信不可。`tools/plateau-sources.json` の大阪市27100の url は null で、取得にはG空間情報センター/CKAN検索が必要）、Chrome QA、容量以外の性能測定、新区の追加。
+- 24区展開の現実的手順（ローカルPC）: ①`tools/mission36k-fetch-citygml-ward-range.mjs` でHTTP Rangeにより対象メッシュのみ取得（ZIP全体は取得しない）→ ②`mission36k-convert-citygml-runtime.mjs` でJSONL化（`--ward-hint` は定数スタンプなので区判定にはN03点内判定を使う）→ ③`mission37h-build-ward-sample.cjs` で3D Tiles化 → ④既存IDとの重複0・原点逆変換・10MB以内をテストで確認。原点の厳密検証は、CityGML原座標と変換結果の直接照合（②の入出力比較）で行う。
