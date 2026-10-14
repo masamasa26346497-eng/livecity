@@ -831,7 +831,8 @@
     }
     stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
     await updateExtraNear();
-    setInterval(updateExtraNear, 1000);
+    const exGate = makeCamGate();
+    setInterval(() => { if (exGate()) updateExtraNear(); }, 1000);   // 37K: カメラ停止中は何もしない
   }
   const visTiles = new Set();
   let curTiles = 0, curBldg = 0;
@@ -1038,11 +1039,11 @@
         stats.facilityWards = stats.facilityWards || {};
         stats.facilityWards[w.wardId] = { loaded: fresh.length, fileRecords: (j.records || []).length, license: 'ODbL 1.0 / © OpenStreetMap contributors' };
         return fresh.length;
-      })().catch((e) => { facWards.delete(w.wardId); fail('facilities:' + w.wardId, e); return 0; }));
+      })().catch((e) => { facWards.delete(w.wardId); facRetry = true; fail('facilities:' + w.wardId, e); return 0; }));
     }
     return facWards.get(w.wardId);
   }
-  let facBusy = false;
+  let facBusy = false, facRetry = false;
   async function updateFacilitiesNear() {
     if (facBusy || !viewer || q.get('fac') === '0') return;
     const c = viewer.camera.positionCartographic;
@@ -1056,37 +1057,82 @@
       if (w) await ensureWardFacilities(w);
     } finally { facBusy = false; }
   }
+  // 37K: カメラが動いたときだけ true を返すゲート（停止中の定期処理を空振りさせない）。
+  function makeCamGate() {
+    let last = '';
+    return function changed() {
+      const c = viewer.camera.positionCartographic;
+      if (!c) return false;
+      const k = [c.longitude.toFixed(5), c.latitude.toFixed(5), Math.round(c.height / 5), viewer.camera.heading.toFixed(2), viewer.camera.pitch.toFixed(2)].join('|');
+      if (k === last) return false;
+      last = k; return true;
+    };
+  }
+  const POI_CAP = 2500;   // 37K: 1 レイヤーの同時生成点数の上限
+  const poiStats = { culling: true, created: 0, removed: 0 };
+  stats.poi = poiStats;
   function makePoiLayer(id, label, swatch, hint, filter) {
     const layer = {
       id, label, swatch, defaultOn: true, hint, pts: null, labels: null,
+      all: [],   // 37K: {r, fromWard, px, lb}（px/lb は生成済みプリミティブ。見える可能性のあるものだけ生成）
       addRecs(list, extra) {
-        if (!this.pts) return;   // mount 前は mount() が facExtra を取り込む
-        for (const r of list.filter(filter)) this.addOne(r, extra !== false);
-        scene.requestRender();
+        for (const r of list.filter(filter)) this.all.push({ r, fromWard: extra !== false, px: null, lb: null });
+        this.sync();
       },
       async mount() {
         const recs = (await loadFacilities()).filter(filter);
         this.pts = scene.primitives.add(new Cesium.PointPrimitiveCollection());
         this.labels = scene.primitives.add(new Cesium.LabelCollection());
-        for (const r of recs) this.addOne(r, false);
-        for (const r of facExtra.filter(filter)) this.addOne(r, true);
+        for (const r of recs) this.all.push({ r, fromWard: false, px: null, lb: null });
+        for (const r of facExtra.filter(filter)) this.all.push({ r, fromWard: true, px: null, lb: null });
+        this.sync();
         return { count: recs.length };
       },
-      addOne(r, fromWardFile) {
-        // 区別ファイル由来の飲食店は点のみ（数千件のラベル生成を避ける。名称はクリック/検索で出る）
-        const noLabel = fromWardFile && r.category === 'dining';
+      // 37K: distanceDisplayCondition はカメラとの 3D 距離で効くため、水平距離が最大値を超える点は原理的に見えない。
+      //   表示条件の距離値は 37G/37J のまま（見た目は変えない）。超過分は生成せず、生成済みでも 1.25 倍超で破棄する。
+      sync() {
+        if (!this.pts || !viewer) return;
+        const c = viewer.camera.positionCartographic;
+        if (!c) return;
+        const cx = (Cesium.Math.toDegrees(c.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd;
+        const cz = -((Cesium.Math.toDegrees(c.latitude) - PROJ.clat) * PROJ.mpd);
+        const cand = [];   // 点の候補（生成済みは 1.25 倍まで維持。ヒステリシス）
+        for (const e of this.all) {
+          const d = Math.hypot(e.r.localX - cx, e.r.localZ - cz);
+          const dining = e.r.category === 'dining';
+          const ptMax = dining ? 3000 : 12000, lbMax = id === 'spots' ? 4000 : 1400;
+          if (e.px ? d <= ptMax * 1.25 : d <= ptMax) cand.push({ e, d }); else if (e.px) { this.pts.remove(e.px); e.px = null; poiStats.removed++; }
+          if (e.lb && d > lbMax * 1.25) { this.labels.remove(e.lb); e.lb = null; poiStats.removed++; }
+          // 区別ファイル由来の飲食店は点のみ（数千件のラベル生成を避ける。名称はクリック/検索で出る）
+          if (!e.lb && !(e.fromWard && dining) && d <= lbMax) this.addLabel(e);
+        }
+        // 点の同時数は POI_CAP まで。カメラに近いものを優先し、溢れた遠方の生成済み点は破棄する
+        cand.sort((x, y) => x.d - y.d);
+        let livePts = 0;
+        for (let i = 0; i < cand.length; i++) {
+          const e = cand[i].e;
+          if (i < POI_CAP) { if (!e.px) this.addPoint(e); livePts++; }
+          else if (e.px) { this.pts.remove(e.px); e.px = null; poiStats.removed++; }
+        }
+        stats.poi[id] = { total: this.all.length, points: livePts, labels: this.labels.length };
+        scene.requestRender();
+      },
+      addPoint(e) {
+        const r = e.r;
         const col = Cesium.Color.fromCssColorString((FAC_CAT[r.category] || ['', swatch])[1]);
-        const pos = toCart(r.localX, r.localZ, 6);
-        this.pts.add({ position: pos, pixelSize: 9, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
+        e.px = this.pts.add({ position: toCart(r.localX, r.localZ, 6), pixelSize: 9, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
           disableDepthTestDistance: Number.POSITIVE_INFINITY, id: { poi: r },
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, r.category === 'dining' ? 3000 : 12000) });   // 37G: 全域ビューでは点を出さない
-        if (noLabel) return;
-        // ラベルはズームに応じて間引く（近づいたときだけ出す）
-        this.labels.add({ position: pos, text: r.name || '', font: '500 12px sans-serif', fillColor: Cesium.Color.WHITE,
+        poiStats.created++;
+      },
+      addLabel(e) {
+        const r = e.r;
+        e.lb = this.labels.add({ position: toCart(r.localX, r.localZ, 6), text: r.name || '', font: '500 12px sans-serif', fillColor: Cesium.Color.WHITE,
           outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
           pixelOffset: new Cesium.Cartesian2(0, -14), verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, id === 'spots' ? 4000 : 1400), id: { poi: r } });
+        poiStats.created++;
       },
       applyVisible(on) { if (this.pts) this.pts.show = on; if (this.labels) this.labels.show = on; },
     };
@@ -2114,8 +2160,17 @@
     const cz = -((Cesium.Math.toDegrees(c.latitude) - PROJ.clat) * PROJ.mpd);
     mctx.fillStyle = C.accent; mctx.beginPath(); mctx.arc(px(cx), pz(cz), 4, 0, 6.283); mctx.fill();
   }
-  setInterval(mmDraw, 500);
-  setInterval(() => { updateFacilitiesNear().catch((e) => fail('facilities:near', e)); }, 1500);   // 37J
+  // 37K: 定期処理はカメラが動いたときだけ実処理を行う（停止中は比較のみ）。POI の生成/破棄も同じゲートで同期する。
+  const mmGate = makeCamGate(), facGate = makeCamGate();
+  setInterval(() => { if (mmGate()) mmDraw(); }, 500);
+  function facTick() {
+    facRetry = false;
+    for (const l of poiLayers) { try { l.sync(); } catch (e) { fail('poi:sync', e); } }
+    updateFacilitiesNear().catch((e) => fail('facilities:near', e));   // 37J
+  }
+  setInterval(() => { if (facGate() || facRetry) facTick(); }, 1500);
+  let moveEndT = 0;   // カメラ移動の終了直後に即時同期（定期処理の待ちで近景の点が遅れないように。debounce 150ms）
+  viewer.camera.moveEnd.addEventListener(() => { clearTimeout(moveEndT); moveEndT = setTimeout(facTick, 150); });
 
   // ── 診断: theme 値・tileset stats（getter で常に最新値）──
   Object.defineProperty(stats, 'theme', { enumerable: true, get() {

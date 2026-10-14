@@ -84,6 +84,7 @@ try {
     await sleep(2500);
     const p = await ev(`JSON.stringify(window.__mission37dQA.project(${t.localX}, ${t.localZ}, 6))`).then(JSON.parse);
     rec.projected = p;
+    rec.poiStats = await ev('JSON.stringify({ poi: window.__mission37g.poi, errors: window.__mission37g.errors, cam: window.__mission37g.camera })').then(JSON.parse);   // 37K 診断
     if (p && p.inCanvas) {
       rec.pickAtPoint = await ev(`window.__mission37dQA.pickPoiId(${p.x}, ${p.y})`);
       await click(p.x, p.y);
