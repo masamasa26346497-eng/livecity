@@ -9,3 +9,6 @@
 - 大量データ・Google課金API・本番deploy・他PR merge禁止。
 
 この文書はブランチとDraft PRを起こすための作業概要であり、機能実装完了を意味しません。
+
+## 系統A 実装状況
+新規プレビュー `public/mission38e-3d-preview.html` と部分3D Tiles（平野区ポリゴン内の既存テスト用実形状4 tile）を追加。詳細は `MISSION38E_PARALLEL_3D_REPORT.md`。新区PLATEAUは未取得、ブラウザQAは未実施。

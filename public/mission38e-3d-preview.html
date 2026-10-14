@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Mission 38E-A 3D preview（本体37G未統合）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  Mission 38E 系統A: 独立プレビュー。Live City 本体（mission37g-osaka-24ward-mvp.html）には統合していない。
+  データ: public/mission38e-3dtiles/hirano-subset/ — 既存テスト用実形状（public/__test__/ward-poc, osaka-hirano）の 4 tile 部分3D可視化。
+          区は N03 区ポリゴンで再判定（building.ward ラベルは使わない）。PLATEAU 原典との一致は未証明（PLATEAU 100% とは主張しない）。
+  canonicalId = 既存 building.id（bldg_<uuid>）。採番しない。
+  課金 API 不使用。背景地図は既定で無し（?imagery=1 で無料の OSM タイルを重ねる）。
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>
+  html, body, #cesiumContainer { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0b1220; }
+  #panel { position: absolute; top: 8px; left: 8px; z-index: 5; max-width: 360px; padding: 8px 10px; border-radius: 6px;
+    background: rgba(11,18,32,.85); color: #e6edf6; font: 12px/1.5 system-ui, sans-serif; }
+  #panel b { color: #ffd166; }
+  #picked { margin-top: 6px; word-break: break-all; color: #9be7a3; }
+</style>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id="panel">
+  <b>Mission 38E-A プレビュー（本体37G未統合）</b><br>
+  既存テスト用実形状の部分3D可視化（平野区ポリゴン内 4 tile）。PLATEAU原典との一致は未証明。<br>
+  <span id="info">読み込み中…</span>
+  <div id="picked">建物をクリック → canonicalId</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script>
+(async function () {
+  const q = new URLSearchParams(location.search);
+  const BASE = 'mission38e-3dtiles/' + (q.get('set') || 'hirano-subset') + '/';
+  const $ = (id) => document.getElementById(id);
+  const stats = { status: 'loading', tilesetBuildings: null, lastPickedCanonicalId: null, lastPickMatchesSidecar: null, pickLog: [], error: null };
+  window.__mission38e = stats;
+
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false,
+    sceneModePicker: false, navigationHelpButton: false, animation: false, timeline: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false,
+  });
+  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#1c2733');
+  viewer.scene.globe.depthTestAgainstTerrain = false;
+  if (q.get('imagery') === '1') {
+    viewer.imageryLayers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' }));
+  }
+
+  let tileset;
+  try {
+    tileset = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json', { maximumScreenSpaceError: 16 });
+    viewer.scene.primitives.add(tileset);
+    const r = Math.max(600, tileset.boundingSphere.radius * 2.2);
+    viewer.camera.lookAt(tileset.boundingSphere.center,
+      new Cesium.HeadingPitchRange(Cesium.Math.toRadians(20), Cesium.Math.toRadians(-40), r));
+    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+    stats.tilesetBuildings = tileset.extras && tileset.extras.buildings;
+    stats.status = 'ready';
+    $('info').textContent = '建物 ' + stats.tilesetBuildings + ' 棟 / ドラッグで回転・ホイールで拡大縮小';
+  } catch (e) {
+    stats.status = 'error'; stats.error = String(e);
+    $('info').textContent = '読み込み失敗: ' + e;
+    return;
+  }
+
+  const sidecars = new Map();
+  function sidecarIds(feature) {
+    const tile = feature.content && feature.content.tile;
+    const ex = tile && (tile.extras || (tile._header && tile._header.extras));
+    if (!ex || !ex.idsUri) return Promise.resolve(null);
+    if (!sidecars.has(ex.idsUri)) sidecars.set(ex.idsUri, fetch(BASE + ex.idsUri).then((r) => r.json()).catch(() => null));
+    return sidecars.get(ex.idsUri);
+  }
+  let lastFeature = null;
+  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction(async (click) => {
+    if (lastFeature) { try { lastFeature.color = Cesium.Color.WHITE; } catch (e) { /* tile 破棄済み */ } lastFeature = null; }
+    const picked = viewer.scene.pick(click.position);
+    if (!Cesium.defined(picked) || typeof picked.getProperty !== 'function') {
+      stats.lastPickedCanonicalId = null; $('picked').textContent = '(建物なし)'; return;
+    }
+    const id = picked.getProperty('canonicalId');
+    if (typeof id !== 'string' || !/^bldg_/.test(id)) {
+      stats.lastPickedCanonicalId = null; $('picked').textContent = '(canonicalId なし)'; return;
+    }
+    try { picked.color = Cesium.Color.fromCssColorString('#ff9f1c'); lastFeature = picked; } catch (e) { /* ignore */ }
+    stats.lastPickedCanonicalId = id;
+    const side = await sidecarIds(picked);
+    const sideId = side ? side[picked.featureId] : null;
+    stats.lastPickMatchesSidecar = sideId == null ? null : sideId === id;
+    stats.pickLog.push({ canonicalId: id, featureId: picked.featureId, sidecar: sideId });
+    if (stats.pickLog.length > 20) stats.pickLog.shift();
+    $('picked').textContent = 'canonicalId: ' + id + (sideId == null ? '  (sidecar 未照合)' : sideId === id ? '  ✓ sidecar一致' : '  ✗ sidecar不一致: ' + sideId);
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+})();
+</script>
+</body>
+</html>
