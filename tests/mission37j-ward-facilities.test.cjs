@@ -56,6 +56,14 @@ test('37G ページ: 区別ロード・sourceId 重複除去・飲食/宿泊カ�
   assert.match(html, /updateFacilitiesNear/);
 });
 
+test('38F 統合: LRU ローダー経由で区別施設を取得し、LRU 外の区は POI から解放する', () => {
+  assert.match(html, /<script src="mission38f-facility-fastload\.js"><\/script>/);
+  assert.match(html, /maxCachedWards: 3/);
+  assert.match(html, /function dropWardFacilities/);
+  assert.match(html, /facLoader\.isWardCached\(id\)/);
+  assert.doesNotMatch(html, /maps\.googleapis\.com|places\.googleapis\.com/);
+});
+
 test('課金ロック・本番 HTML は無変更', () => {
   assert.doesNotMatch(html, /maps\.googleapis\.com|places\.googleapis\.com/);
   const ui = fs.readFileSync(path.join(ROOT, 'public/mission37e-places-ui-kit.js'), 'utf8');

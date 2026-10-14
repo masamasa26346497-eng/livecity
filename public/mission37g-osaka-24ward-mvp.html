@@ -439,6 +439,7 @@
 <script src="mission37d-data/town-normalize.js"></script>
 <script src="mission37f-photo-select.js"></script>
 <script src="mission37k-poi-select.js"></script>
+<script src="mission38f-facility-fastload.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -1023,26 +1024,54 @@
   FAC_CAT.dining = ['飲食', '#f2b36b'];
   FAC_CAT.lodging = ['宿泊', '#d49bd8'];
   function allFacilities() { return loadFacilities().then((base) => base.concat(facExtra)); }
+  // 38F 統合: 区別ファイルの取得・同時リクエスト共有・LRU（既定 3 区）は mission38f-facility-fastload.js のローダーに任せる。
+  //   LRU から外れた区の施設は POI レイヤーから取り除いてメモリを解放する（選択中の施設は残す）。
+  const FacMod = window.Mission38FFacility;
+  const facLoader = FacMod ? FacMod.createLoader({ baseUrl: 'map-data/osaka-city/facilities/', maxCachedWards: 3 }) : null;
+  const facWardRecs = new Map();       // wardId → 現在 POI に載っている施設（重複除去済み）
+  function dropWardFacilities(wardId) {
+    const recs = facWardRecs.get(wardId);
+    facWardRecs.delete(wardId);
+    if (!recs) return;
+    const gone = new Set(recs.filter((r) => r !== poiFly));
+    for (const layer of poiLayers) {
+      layer.all = layer.all.filter((e) => {
+        if (!gone.has(e.r)) return true;
+        if (e.px && layer.pts) layer.pts.remove(e.px);
+        if (e.lb && layer.labels) layer.labels.remove(e.lb);
+        return false;
+      });
+    }
+    for (const r of gone) facSeen.delete(r.sourceId);
+    for (let i = facExtra.length - 1; i >= 0; i--) if (gone.has(facExtra[i])) facExtra.splice(i, 1);
+    searchIndex = null;
+    stats.facilityEvictions = (stats.facilityEvictions || 0) + 1;
+  }
   function ensureWardFacilities(w) {
     if (!w || !w.wardId) return Promise.resolve(0);
-    if (!facWards.has(w.wardId)) {
-      facWards.set(w.wardId, (async () => {
+    if (!facLoader) { fail('facilities:loader', new Error('mission38f-facility-fastload.js 未読込')); return Promise.resolve(0); }
+    const id = w.wardId;
+    if (facWardRecs.has(id)) { facLoader.loadWard(id).catch(() => {}); return Promise.resolve(0); }   // LRU の使用順を更新
+    if (!facWards.has(id)) {
+      facWards.set(id, (async () => {
         const base = await loadFacilities().catch(() => []);
         for (const r of base) if (r.sourceId) facSeen.add(r.sourceId);
-        const url = FAC_WARD_BASE + w.wardId + '.json';
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(url + ' → HTTP ' + res.status);
-        const j = await res.json();
-        const fresh = (j.records || []).filter((r) => Number.isFinite(r.localX) && Number.isFinite(r.localZ) && r.sourceId && !facSeen.has(r.sourceId));
+        const recs = await facLoader.loadWard(id);
+        // 待っている間に LRU から外れた区は載せない（古い非同期結果の混入防止）
+        if (!facLoader.isWardCached(id) || facWardRecs.has(id)) return 0;
+        const fresh = recs.filter((r) => Number.isFinite(r.localX) && Number.isFinite(r.localZ) && r.sourceId && !facSeen.has(r.sourceId));
         for (const r of fresh) { facSeen.add(r.sourceId); facExtra.push(r); }
+        facWardRecs.set(id, fresh);
         for (const l of poiLayers) l.addRecs(fresh);
+        for (const k of Array.from(facWardRecs.keys())) if (!facLoader.isWardCached(k)) dropWardFacilities(k);
         searchIndex = null;   // 検索インデックスを次回再構築
         stats.facilityWards = stats.facilityWards || {};
-        stats.facilityWards[w.wardId] = { loaded: fresh.length, fileRecords: (j.records || []).length, license: 'ODbL 1.0 / © OpenStreetMap contributors' };
+        stats.facilityWards[id] = { loaded: fresh.length, fileRecords: recs.length, license: 'ODbL 1.0 / © OpenStreetMap contributors' };
+        stats.facilityCachedWards = facLoader.getCachedWards();
         return fresh.length;
-      })().catch((e) => { facWards.delete(w.wardId); facRetry = true; fail('facilities:' + w.wardId, e); return 0; }));
+      })().then((n) => { facWards.delete(id); return n; }, (e) => { facWards.delete(id); facRetry = true; fail('facilities:' + id, e); return 0; }));
     }
-    return facWards.get(w.wardId);
+    return facWards.get(id);
   }
   let facBusy = false, facRetry = false;
   async function updateFacilitiesNear() {
