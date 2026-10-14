@@ -8,20 +8,21 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
 
 test('POI は近傍のみ生成し、遠方は破棄する（sync）', () => {
-  assert.match(html, /sync\(\) \{/);
-  assert.match(html, /POI_CAP = 2500/);
-  assert.match(html, /this\.pts\.remove\(e\.px\)/);
-  assert.match(html, /this\.labels\.remove\(e\.lb\)/);
+  assert.match(html, /function poiSyncAll\(\)/);
+  assert.match(html, /POI_PROJECT_MAX = 600/);
+  assert.match(html, /layer\.pts\.remove\(e\.px\)/);
+  assert.match(html, /layer\.labels\.remove\(e\.lb\)/);
 });
 
 test('距離閾値は 37G/37J のまま（点 12000/飲食 3000、ラベル 1400/観光 4000）', () => {
   assert.match(html, /DistanceDisplayCondition\(0, r\.category === 'dining' \? 3000 : 12000\)/);
   assert.match(html, /DistanceDisplayCondition\(0, id === 'spots' \? 4000 : 1400\)/);
-  assert.match(html, /ptMax = dining \? 3000 : 12000, lbMax = id === 'spots' \? 4000 : 1400/);
+  assert.match(html, /const ptMax = r\.category === 'dining' \? 3000 : 12000/);
+  assert.match(html, /e\.lbMax = layer\.id === 'spots' \? 4000 : 1400/);
 });
 
 test('区別ファイルの飲食店はラベルを作らない（従来仕様）', () => {
-  assert.match(html, /!\(e\.fromWard && dining\)/);
+  assert.match(html, /!\(e\.fromWard && r\.category === 'dining'\)/);
 });
 
 test('定期処理はカメラ停止中は実処理しない', () => {

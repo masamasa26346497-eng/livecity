@@ -438,6 +438,7 @@
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
 <script src="mission37d-data/town-normalize.js"></script>
 <script src="mission37f-photo-select.js"></script>
+<script src="mission37k-poi-select.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -1068,7 +1069,74 @@
       last = k; return true;
     };
   }
-  const POI_CAP = 2500;   // 37K: 1 レイヤーの同時生成点数の上限
+  // 37K-2: 全 POI レイヤー横断で、画面空間の予算・グリッド・矩形衝突により点とラベルを選ぶ（mission37k-poi-select.js）。
+  //   ラベルは選ばれたものだけ生成する（全件生成しない）。データ・検索対象は消さない。選択中の施設は常に点+名前を維持する。
+  const PS = window.LiveCityPoiSelect;
+  const syncMs = [];
+  const POI_PROJECT_MAX = 600;   // 画面投影する候補の上限（近い順）
+  function poiSyncAll() {
+    if (!viewer || !PS) return;
+    const t0 = performance.now();
+    const c = viewer.camera.positionCartographic;
+    if (!c) return;
+    const W = scene.canvas.clientWidth, H = scene.canvas.clientHeight;
+    const cx = (Cesium.Math.toDegrees(c.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd;
+    const cz = -((Cesium.Math.toDegrees(c.latitude) - PROJ.clat) * PROJ.mpd);
+    const selOn = $('lc-poi-body').classList.contains('on');
+    const refs = [];
+    let total = 0;
+    for (const layer of poiLayers) {
+      if (!layer.pts) continue;
+      for (const e of layer.all) {
+        total++;
+        const r = e.r, d = Math.hypot(r.localX - cx, r.localZ - cz);
+        const ptMax = r.category === 'dining' ? 3000 : 12000;
+        const selected = selOn && poiFly === r;
+        e.d = d; e.lbMax = layer.id === 'spots' ? 4000 : 1400; e.layer = layer;
+        if (!selected && d > ptMax) continue;
+        refs.push({ e, selected });
+      }
+    }
+    // 近い順に上限件だけ画面投影する（全件投影しない）。選択中は必ず含める。
+    refs.sort((x, y) => (y.selected ? 1 : 0) - (x.selected ? 1 : 0) || x.e.d - y.e.d);
+    if (refs.length > POI_PROJECT_MAX) refs.length = POI_PROJECT_MAX;
+    const win = new Cesium.Cartesian2();
+    const kept = [], items = [];
+    for (const rf of refs) {
+      const e = rf.e, r = e.r;
+      if (!e.cart) e.cart = toCart(r.localX, r.localZ, 6);
+      const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, e.cart, win);
+      if (!w) continue;   // 背面など
+      kept.push(rf);
+      items.push({ x: w.x, y: w.y, d: e.d, cat: r.category, name: r.name || '', selected: rf.selected,
+        labelOk: !(e.fromWard && r.category === 'dining') && e.d <= e.lbMax });
+    }
+    const res = PS.select(items, { viewW: W, viewH: H, height: c.height });
+    const want = new Set();
+    let livePts = 0, liveLbs = 0;
+    kept.forEach((rf, i) => {
+      const e = rf.e;
+      want.add(e);
+      if (res.points.has(i)) { if (!e.px) e.layer.addPoint(e); livePts++; } else if (e.px) { e.layer.pts.remove(e.px); e.px = null; poiStats.removed++; }
+      if (res.labels.has(i)) { if (!e.lb) e.layer.addLabel(e); liveLbs++; } else if (e.lb) { e.layer.labels.remove(e.lb); e.lb = null; poiStats.removed++; }
+    });
+    // 候補外（遠方・画面外・背面）の生成済みプリミティブを破棄
+    const perLayer = {};
+    for (const layer of poiLayers) {
+      if (!layer.pts) continue;
+      for (const e of layer.all) {
+        if (want.has(e)) continue;
+        if (e.px) { layer.pts.remove(e.px); e.px = null; poiStats.removed++; }
+        if (e.lb) { layer.labels.remove(e.lb); e.lb = null; poiStats.removed++; }
+      }
+      perLayer[layer.id] = { total: layer.all.length, points: layer.pts.length, labels: layer.labels.length };
+    }
+    Object.assign(poiStats, perLayer, { total, candidates: refs.length, livePoints: livePts, liveLabels: liveLbs, budget: PS.budgets(W) });
+    syncMs.push(performance.now() - t0); if (syncMs.length > 200) syncMs.shift();
+    const srt = syncMs.slice().sort((a, b) => a - b);
+    poiStats.syncMs = { n: srt.length, avg: srt.reduce((a, b) => a + b, 0) / srt.length, p95: srt[Math.floor(srt.length * 0.95)] || 0, max: srt[srt.length - 1] };
+    scene.requestRender();
+  }
   const poiStats = { culling: true, created: 0, removed: 0 };
   stats.poi = poiStats;
   function makePoiLayer(id, label, swatch, hint, filter) {
@@ -1088,39 +1156,12 @@
         this.sync();
         return { count: recs.length };
       },
-      // 37K: distanceDisplayCondition はカメラとの 3D 距離で効くため、水平距離が最大値を超える点は原理的に見えない。
-      //   表示条件の距離値は 37G/37J のまま（見た目は変えない）。超過分は生成せず、生成済みでも 1.25 倍超で破棄する。
-      sync() {
-        if (!this.pts || !viewer) return;
-        const c = viewer.camera.positionCartographic;
-        if (!c) return;
-        const cx = (Cesium.Math.toDegrees(c.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd;
-        const cz = -((Cesium.Math.toDegrees(c.latitude) - PROJ.clat) * PROJ.mpd);
-        const cand = [];   // 点の候補（生成済みは 1.25 倍まで維持。ヒステリシス）
-        for (const e of this.all) {
-          const d = Math.hypot(e.r.localX - cx, e.r.localZ - cz);
-          const dining = e.r.category === 'dining';
-          const ptMax = dining ? 3000 : 12000, lbMax = id === 'spots' ? 4000 : 1400;
-          if (e.px ? d <= ptMax * 1.25 : d <= ptMax) cand.push({ e, d }); else if (e.px) { this.pts.remove(e.px); e.px = null; poiStats.removed++; }
-          if (e.lb && d > lbMax * 1.25) { this.labels.remove(e.lb); e.lb = null; poiStats.removed++; }
-          // 区別ファイル由来の飲食店は点のみ（数千件のラベル生成を避ける。名称はクリック/検索で出る）
-          if (!e.lb && !(e.fromWard && dining) && d <= lbMax) this.addLabel(e);
-        }
-        // 点の同時数は POI_CAP まで。カメラに近いものを優先し、溢れた遠方の生成済み点は破棄する
-        cand.sort((x, y) => x.d - y.d);
-        let livePts = 0;
-        for (let i = 0; i < cand.length; i++) {
-          const e = cand[i].e;
-          if (i < POI_CAP) { if (!e.px) this.addPoint(e); livePts++; }
-          else if (e.px) { this.pts.remove(e.px); e.px = null; poiStats.removed++; }
-        }
-        stats.poi[id] = { total: this.all.length, points: livePts, labels: this.labels.length };
-        scene.requestRender();
-      },
+      // 37K-2: 同期は全 POI レイヤー横断（poiSyncAll）。点・ラベルは画面空間の予算で選ばれたものだけ生成する。
+      sync() { poiSyncAll(); },
       addPoint(e) {
         const r = e.r;
         const col = Cesium.Color.fromCssColorString((FAC_CAT[r.category] || ['', swatch])[1]);
-        e.px = this.pts.add({ position: toCart(r.localX, r.localZ, 6), pixelSize: 9, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2,
+        e.px = this.pts.add({ position: toCart(r.localX, r.localZ, 6), pixelSize: 7, color: col, outlineColor: Cesium.Color.fromCssColorString('#050a18').withAlpha(0.55), outlineWidth: 1,
           disableDepthTestDistance: Number.POSITIVE_INFINITY, id: { poi: r },
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, r.category === 'dining' ? 3000 : 12000) });   // 37G: 全域ビューでは点を出さない
         poiStats.created++;
@@ -1858,6 +1899,7 @@
     $('lp-src').textContent = '出典: ' + (r.attribution || r.source || '—') + (r.license ? '（' + r.license + '）' : '');
     poiFly = r;
     stats.selectedPoi = { id: r.id, name: r.name, category: r.category, sourceId: r.sourceId };
+    try { poiSyncAll(); } catch (e) { fail('poi:select-sync', e); }   // 37K-2: 選択中は点+名前を維持
   }
   $('btn-poi-fly').onclick = () => { if (poiFly) flyToLocal(poiFly.localX, poiFly.localZ, 80, 500); };
   $('btn-fly').onclick = () => {
