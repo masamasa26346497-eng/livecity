@@ -36,12 +36,14 @@
   const $ = (id) => document.getElementById(id);
   const stats = { status: 'loading', tilesetBuildings: null, lastPickedCanonicalId: null, lastPickMatchesSidecar: null, pickLog: [], error: null };
   window.__mission38e = stats;
+  window.__mission38eViewer = null; // QA(CDP)用にviewerを公開
 
   const viewer = new Cesium.Viewer('cesiumContainer', {
     baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false,
     sceneModePicker: false, navigationHelpButton: false, animation: false, timeline: false,
     fullscreenButton: false, infoBox: false, selectionIndicator: false,
   });
+  window.__mission38eViewer = viewer;
   viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#1c2733');
   viewer.scene.globe.depthTestAgainstTerrain = false;
   if (q.get('imagery') === '1') {
