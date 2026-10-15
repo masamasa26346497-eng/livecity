@@ -1,0 +1,487 @@
+{
+ "generatedAt": "2026-10-15T18:22:41.998Z",
+ "rootManifest": {
+  "buildingCount": 574213,
+  "tileCount": 1097,
+  "wardCount": 24,
+  "note": "manifest の件数は記録値。タイル実体の有無は legacyTilesLocal を見ること"
+ },
+ "totals": {
+  "wardsWithLegacyTilesLocal": 1,
+  "legacyBuildingsLocal": 35031,
+  "wardsWithCesium3dTiles": 6,
+  "cesiumBuildings": 33626,
+  "manifestBuildingsWithoutLocalTiles": 539182
+ },
+ "wards": [
+  {
+   "wardId": "kita",
+   "ward": "北区",
+   "wardCode": "27127",
+   "manifestBuildings": 15779,
+   "manifestTiles": 44,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission37h-3dtiles/kita-sample"
+    ],
+    "tiles": 13,
+    "buildings": 2698
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "miyakojima",
+   "ward": "都島区",
+   "wardCode": "27102",
+   "manifestBuildings": 13199,
+   "manifestTiles": 33,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "fukushima",
+   "ward": "福島区",
+   "wardCode": "27103",
+   "manifestBuildings": 11159,
+   "manifestTiles": 25,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "konohana",
+   "ward": "此花区",
+   "wardCode": "27104",
+   "manifestBuildings": 13437,
+   "manifestTiles": 58,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "chuo",
+   "ward": "中央区",
+   "wardCode": "27128",
+   "manifestBuildings": 18279,
+   "manifestTiles": 52,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission37h-3dtiles/chuo-sample"
+    ],
+    "tiles": 15,
+    "buildings": 5629
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "nishi",
+   "ward": "西区",
+   "wardCode": "27106",
+   "manifestBuildings": 12098,
+   "manifestTiles": 29,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission37h-3dtiles/nishi-sample"
+    ],
+    "tiles": 15,
+    "buildings": 3893
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "minato",
+   "ward": "港区",
+   "wardCode": "27107",
+   "manifestBuildings": 15489,
+   "manifestTiles": 34,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "taisho",
+   "ward": "大正区",
+   "wardCode": "27108",
+   "manifestBuildings": 17363,
+   "manifestTiles": 40,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "tennoji",
+   "ward": "天王寺区",
+   "wardCode": "27109",
+   "manifestBuildings": 14244,
+   "manifestTiles": 30,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission37h-3dtiles/tennoji-sample"
+    ],
+    "tiles": 12,
+    "buildings": 6593
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "naniwa",
+   "ward": "浪速区",
+   "wardCode": "27111",
+   "manifestBuildings": 10133,
+   "manifestTiles": 30,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission38e-3dtiles/naniwa-mesh",
+     "mission38e-3dtiles/naniwa-mesh2"
+    ],
+    "tiles": 15,
+    "buildings": 4267
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "ward": "西淀川区",
+   "wardCode": "27113",
+   "manifestBuildings": 23242,
+   "manifestTiles": 47,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "yodogawa",
+   "ward": "淀川区",
+   "wardCode": "27123",
+   "manifestBuildings": 34289,
+   "manifestTiles": 62,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "ward": "東淀川区",
+   "wardCode": "27114",
+   "manifestBuildings": 34685,
+   "manifestTiles": 66,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "higashinari",
+   "ward": "東成区",
+   "wardCode": "27115",
+   "manifestBuildings": 21976,
+   "manifestTiles": 29,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "ikuno",
+   "ward": "生野区",
+   "wardCode": "27116",
+   "manifestBuildings": 46212,
+   "manifestTiles": 50,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "asahi",
+   "ward": "旭区",
+   "wardCode": "27117",
+   "manifestBuildings": 22424,
+   "manifestTiles": 35,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "joto",
+   "ward": "城東区",
+   "wardCode": "27118",
+   "manifestBuildings": 32447,
+   "manifestTiles": 48,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "tsurumi",
+   "ward": "鶴見区",
+   "wardCode": "27124",
+   "manifestBuildings": 22068,
+   "manifestTiles": 46,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "abeno",
+   "ward": "阿倍野区",
+   "wardCode": "27119",
+   "manifestBuildings": 26924,
+   "manifestTiles": 38,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "suminoe",
+   "ward": "住之江区",
+   "wardCode": "27125",
+   "manifestBuildings": 21608,
+   "manifestTiles": 67,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "sumiyoshi",
+   "ward": "住吉区",
+   "wardCode": "27120",
+   "manifestBuildings": 35031,
+   "manifestTiles": 52,
+   "legacyTilesLocal": {
+    "present": true,
+    "tileFiles": 52,
+    "buildings": 35031,
+    "complete": true
+   },
+   "cesium3dTiles": {
+    "tilesets": [
+     "mission37b-3dtiles/osaka-sumiyoshi-9tile"
+    ],
+    "tiles": 9,
+    "buildings": 10546
+   },
+   "action": "converted-partial-or-full: use --force to rebuild"
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "ward": "東住吉区",
+   "wardCode": "27121",
+   "manifestBuildings": 38489,
+   "manifestTiles": 59,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "hirano",
+   "ward": "平野区",
+   "wardCode": "27126",
+   "manifestBuildings": 44434,
+   "manifestTiles": 83,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  },
+  {
+   "wardId": "nishinari",
+   "ward": "西成区",
+   "wardCode": "27122",
+   "manifestBuildings": 29204,
+   "manifestTiles": 40,
+   "legacyTilesLocal": {
+    "present": false,
+    "tileFiles": 0,
+    "buildings": 0,
+    "complete": false
+   },
+   "cesium3dTiles": {
+    "tilesets": [],
+    "tiles": 0,
+    "buildings": 0
+   },
+   "action": "legacy tiles not in this checkout: needs owner-local tiles or PLATEAU re-fetch"
+  }
+ ]
+}
