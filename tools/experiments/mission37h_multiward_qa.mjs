@@ -62,7 +62,7 @@ async function settle(x, z, h, range, pitch, code) {
   await ev(`window.__mission37dQA.lookAtLocal(${x}, ${z}, ${h}, ${range}, ${pitch}, 0)`);
   await sleep(1500);
   if (code) {
-    await ev('window.__mission37dQA.updateExtraNear()').catch(() => {});
+    await ev(`window.__mission37dQA.setBuildingWard('${code}')`).catch(() => {});
     for (let i = 0; i < 40; i++) { if (await ev(`window.__mission37g.extraSets.some((e) => e.wardCode === '${code}')`)) break; await sleep(500); }
   }
   for (let i = 0; i < 60; i++) { if (await ev('window.__mission37dQA.tilesReady()')) break; await sleep(500); }
@@ -119,7 +119,7 @@ try {
   // 遠ざかったら破棄されること（高度 > 20km）
   await ev('window.__mission37dQA.lookAtLocal(-2000, 0, 0, 30000, -60, 0)');
   await sleep(1500);
-  await ev('window.__mission37dQA.updateExtraNear()').catch(() => {});
+  await ev('window.__mission37dQA.setBuildingWard(null)').catch(() => {});
   await sleep(1500);
   out.extraSetsAfterZoomOut = await ev('JSON.stringify(window.__mission37g.extraSets)').then(JSON.parse);
   out.extraMounted = await ev('window.__mission37g.extraMountedTotal');

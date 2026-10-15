@@ -77,7 +77,7 @@ test('[37G] 区一覧・検索・全域に戻る・flyTo・ラベルの配線', 
   assert.match(page, /id: 'wards'/);
   assert.match(page, /id: 'wardlabels'/);
   assert.match(page, /cityHome = \{ center:/);
-  assert.match(page, /FALLBACK|if \(!cityHome && wardsSettled\) resetCamera\(\)/);
+  assert.match(page, /FALLBACK|if \(!cityHome && wardsSettled\) resetCamera\(\)|if \(!cityHome\) \{ await setBuildingWard\(BASE_WARD\)/);
   // 境界を矩形などで作っていない
   assert.ok(!/Rectangle\.fromDegrees|new Cesium\.RectangleGeometry/.test(page));
 });

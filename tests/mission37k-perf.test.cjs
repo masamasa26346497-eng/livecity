@@ -28,7 +28,7 @@ test('区別ファイルの飲食店はラベルを作らない（従来仕様�
 test('定期処理はカメラ停止中は実処理しない', () => {
   assert.match(html, /function makeCamGate\(\)/);
   assert.match(html, /if \(mmGate\(\)\) mmDraw\(\)/);
-  assert.match(html, /if \(exGate\(\)\) updateExtraNear\(\)/);
+  assert.doesNotMatch(html, /updateExtraNear|exGate/, '39B: 追加 tileset のカメラ常時ポーリングは廃止');
   assert.doesNotMatch(html, /setInterval\(mmDraw, 500\)/);
 });
 

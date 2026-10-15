@@ -45,7 +45,7 @@ async function scenario(label, query, viewport) {
     await page.send('Network.enable');
     if (viewport.mobile) await page.send('Emulation.setDeviceMetricsOverride', { width: viewport.width, height: viewport.height, deviceScaleFactor: 2, mobile: true });
     const t0 = Date.now();
-    await page.send('Page.navigate', { url: `http://localhost:8142/mission37g-osaka-24ward-mvp.html?qa=1${query}` });
+    await page.send('Page.navigate', { url: `http://localhost:8142/mission37g-osaka-24ward-mvp.html?qa=1&bw=27120${query}` });
     let ready = false;
     for (let i = 0; i < 120; i++) { await sleep(500); try { if (await ev("!!window.__mission37g && typeof window.__mission37g.status === 'string' && window.__mission37g.status !== 'error' && window.__mission37g.status.indexOf('loading') !== 0 || (window.__mission37g && window.__mission37g.status === 'loading tiles…')")) { ready = true; break; } } catch { /* loading */ } }
     r.startup = { ready, readyMs: Date.now() - t0, heapMB: await heap() };

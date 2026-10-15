@@ -68,10 +68,10 @@ test('37G ページ: 追加 tileset を tileset ごとの配信ベースで扱�
   assert.ok(/区全体ではありません/.test(h), '一部配信を明記');
 });
 
-test('37H-2: 追加 tileset は近傍でだけ mount し、遠方では破棄する／PLATEAU 出典表示', () => {
+test('37H-2/39B: 追加 tileset は選択区でだけ mount し、切替で破棄する／PLATEAU 出典表示', () => {
   const h = fs.readFileSync(path.join(ROOT, 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
-  assert.ok(/async function updateExtraNear/.test(h) && /scene\.primitives\.remove\(e\.tileset\)/.test(h));
-  assert.ok(/EXTRA_NEAR_M[\s\S]*EXTRA_FAR_M/.test(h));
+  assert.ok(/async function setBuildingWard/.test(h) && /scene\.primitives\.remove\(e\.tileset\)/.test(h));
+  assert.ok(/gen !== bldgGen/.test(h));
   assert.ok(/国土交通省 Project PLATEAU/.test(h));
   assert.ok(!/Cesium3DTileset\.fromUrl\(def\.base/.test(h), '起動時に全 tileset を無条件ロードしない');
 });
