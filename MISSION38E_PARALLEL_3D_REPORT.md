@@ -107,3 +107,10 @@ node tools/mission38e-build-subset.cjs --dataset osaka-hirano --ward hirano --ti
 - 累計（浪速区）: 2,466 + 1,801 = **4,267 棟**、追加容量合計 約 5.6MB。
 - テスト: `node --test tests/mission38e-*.test.cjs` 28/28 pass。
 - 未実施: Chrome QA、原CityGML座標との直接位置誤差、利用条件最終確認。区全体ではない（「24区完了」ではない）。
+
+## 統合準備（37G へは未統合）
+
+- 結合プレビュー: `public/mission38e-3d-preview.html?set=naniwa-all` で naniwa-mesh（2,466）+ naniwa-mesh2（1,801）= 4,267 棟を同時 mount。sidecar は `ts._lcBase` で引く（tile 名が set 間で衝突するため）。ブラウザでは未確認。
+- 37G 本体は編集していない。理由: (1) 本ブランチの 37G は 54aa42b 系で、PR #24 の現行ベース（46974c2, 39B）は区選択時 1 tileset mount 方式に変わっており差分 +243/-126。(2) 39B は `extraMeta.find(wardCode)` で 1 区 = 1 tileset を前提とし、浪速区の 2 tileset には「区 → tileset 配列」への変更が必要。(3) COVERAGE も wardCode 単位で後勝ちのため合算が必要。(4) 本ブランチと PR #24 は merge base が無い。
+- 37G 側で必要な変更（PR #24 側で実施）: `EXTRA_SET_DEFS` に `mission38e-3dtiles/naniwa-mesh/` と `naniwa-mesh2/` の 2 件追加、`setBuildingWard` で同一 wardCode の meta を全件 mount、COVERAGE を棟数/tile 合算。`tilesBaseOf` は既存の `ts._lcBase` を利用可。source.json / build-report.json の形式は互換（テストで確認）。
+- Vercel preview は認証保護のため未検証（保護設定は変更していない）。

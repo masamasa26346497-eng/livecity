@@ -32,7 +32,10 @@
 <script>
 (async function () {
   const q = new URLSearchParams(location.search);
-  const BASE = 'mission38e-3dtiles/' + (q.get('set') || 'hirano-subset') + '/';
+  // ?set=naniwa-all は浪速区 2 メッシュ（naniwa-mesh + naniwa-mesh2）を同時に mount する。tile 名は set 間で衝突するため、
+  // sidecar は tileset ごとの配信ベース（ts._lcBase）で引く。
+  const SET_GROUPS = { 'naniwa-all': ['naniwa-mesh', 'naniwa-mesh2'] };
+  const SETS = SET_GROUPS[q.get('set')] || [q.get('set') || 'hirano-subset'];
   const $ = (id) => document.getElementById(id);
   const stats = { status: 'loading', tilesetBuildings: null, lastPickedCanonicalId: null, lastPickMatchesSidecar: null, pickLog: [], error: null };
   window.__mission38e = stats;
@@ -50,17 +53,23 @@
     viewer.imageryLayers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' }));
   }
 
-  let tileset;
+  const tilesets = [];
   try {
-    tileset = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json', { maximumScreenSpaceError: 16 });
-    viewer.scene.primitives.add(tileset);
-    const r = Math.max(600, tileset.boundingSphere.radius * 2.2);
-    viewer.camera.lookAt(tileset.boundingSphere.center,
-      new Cesium.HeadingPitchRange(Cesium.Math.toRadians(20), Cesium.Math.toRadians(-40), r));
+    for (const name of SETS) {
+      const base = 'mission38e-3dtiles/' + name + '/';
+      const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', { maximumScreenSpaceError: 16 });
+      ts._lcBase = base;
+      viewer.scene.primitives.add(ts);
+      tilesets.push(ts);
+    }
+    const bs = Cesium.BoundingSphere.fromBoundingSpheres(tilesets.map((t) => t.boundingSphere));
+    viewer.camera.lookAt(bs.center,
+      new Cesium.HeadingPitchRange(Cesium.Math.toRadians(20), Cesium.Math.toRadians(-40), Math.max(600, bs.radius * 2.2)));
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-    stats.tilesetBuildings = tileset.extras && tileset.extras.buildings;
+    stats.tilesetBuildings = tilesets.reduce((n, t) => n + ((t.extras && t.extras.buildings) | 0), 0);
+    stats.tilesetCount = tilesets.length;
     stats.status = 'ready';
-    $('info').textContent = '建物 ' + stats.tilesetBuildings + ' 棟 / ドラッグで回転・ホイールで拡大縮小';
+    $('info').textContent = '建物 ' + stats.tilesetBuildings + ' 棟（' + tilesets.length + ' tileset） / ドラッグで回転・ホイールで拡大縮小';
   } catch (e) {
     stats.status = 'error'; stats.error = String(e);
     $('info').textContent = '読み込み失敗: ' + e;
@@ -72,8 +81,9 @@
     const tile = feature.content && feature.content.tile;
     const ex = tile && (tile.extras || (tile._header && tile._header.extras));
     if (!ex || !ex.idsUri) return Promise.resolve(null);
-    if (!sidecars.has(ex.idsUri)) sidecars.set(ex.idsUri, fetch(BASE + ex.idsUri).then((r) => r.json()).catch(() => null));
-    return sidecars.get(ex.idsUri);
+    const url = ((tile.tileset && tile.tileset._lcBase) || '') + ex.idsUri;
+    if (!sidecars.has(url)) sidecars.set(url, fetch(url).then((r) => r.json()).catch(() => null));
+    return sidecars.get(url);
   }
   let lastFeature = null;
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
