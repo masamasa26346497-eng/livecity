@@ -777,6 +777,10 @@
     { id: 'chuo-sample',    base: 'mission37h-3dtiles/chuo-sample/' },
     { id: 'tennoji-sample', base: 'mission37h-3dtiles/tennoji-sample/' },
     { id: 'nishi-sample',   base: 'mission37h-3dtiles/nishi-sample/' },
+    // 40A: 浪速区は 1 区に複数 tileset（PLATEAU メッシュ 51357399 と 51357389。PR#41 由来・重複 ID は 0。区全体ではない）。
+    //   tile 名（t_-5_-13 など）が 2 つの tileset 間でも衝突するため、ids/attrs は必ず tileset 別の _lcBase から取得する。
+    { id: 'naniwa-mesh',    base: 'mission38e-3dtiles/naniwa-mesh/' },
+    { id: 'naniwa-mesh2',   base: 'mission38e-3dtiles/naniwa-mesh2/' },
   ];
   // 39B: 3D 建物は「選択された区」のぶんだけ mount する。起動時は 0 区（区境界・地名・道路・施設のみ）。
   //   source.json / build-report.json（各 1〜2KB）だけ最初に読み、COVERAGE と区コードを得る。tileset.json と GLB は区選択時に初めて取得する。
@@ -812,28 +816,39 @@
     if (!wardCode) { syncBldgSelect(); scene.requestRender(); return false; }
     try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
     if (gen !== bldgGen) return false;
-    const meta = wardCode === BASE_WARD ? null : extraMeta.find((m) => m.source.wardCode === wardCode);
+    const metas = wardCode === BASE_WARD ? [] : extraMeta.filter((m) => m.source.wardCode === wardCode);   // 40A: 1 区に複数 tileset
+    const meta = metas.length > 0;
     if (wardCode !== BASE_WARD && (!meta || q.get('extra') === '0')) { stats.buildingState = 'unavailable'; syncBldgSelect(wardCode); return false; }
     stats.buildingState = 'loading'; bldgWard = wardCode; stats.buildingWard = wardCode; syncBldgSelect();
     const t0 = performance.now();
     try {
-      const ts = await mountTileset(meta ? meta.base : TILES_BASE, gen);
-      if (!ts || gen !== bldgGen) return false;   // 古い要求の結果は捨てる
-      if (meta) extraSets.push({ id: meta.id, base: meta.base, tileset: ts, source: meta.source, report: meta.report });
+      const settled = await Promise.allSettled((meta ? metas.map((m) => m.base) : [TILES_BASE]).map((b) => mountTileset(b, gen)));
+      const mounted = settled.map((s) => (s.status === 'fulfilled' ? s.value : null));
+      const rejected = settled.find((s) => s.status === 'rejected');
+      if (gen !== bldgGen || rejected || mounted.some((t) => !t)) {
+        // 古い要求・一部失敗: 既に scene へ追加済みの tileset を残さず解放する（mountTileset が null を返した分は破棄済み）
+        for (const t of mounted) { if (t && !t.isDestroyed()) { try { scene.primitives.remove(t); } catch (e) { /* noop */ } } }
+        if (rejected && gen === bldgGen) throw rejected.reason;
+        return false;
+      }
+      const ts = mounted[0];
+      if (meta) metas.forEach((m, i) => extraSets.push({ id: m.id, base: m.base, tileset: mounted[i], source: m.source, report: m.report }));
       else {
         tileset = ts;
         sumiHome = { center: ts.boundingSphere.center, range: Math.max(600, ts.boundingSphere.radius * 2.2) };
         stats.tilesetBounds = { radiusM: Math.round(ts.boundingSphere.radius) };
       }
-      const n = meta ? (meta.report.totals.buildings | 0) : ((COVERAGE[BASE_WARD] && COVERAGE[BASE_WARD].buildings) || (ts.extras && ts.extras.buildings) || 0);
+      const n = meta ? metas.reduce((a, m) => a + (m.report.totals.buildings | 0), 0) : ((COVERAGE[BASE_WARD] && COVERAGE[BASE_WARD].buildings) || (ts.extras && ts.extras.buildings) || 0);
       stats.tilesetBuildings = n; stats.buildingState = 'ready';
       if (meta) stats.extraMountedTotal = (stats.extraMountedTotal | 0) + 1; else stats.baseMountedTotal = (stats.baseMountedTotal | 0) + 1;
       $('hs-bldg').textContent = fmt(n);
       stats.lastBuildingMountMs = Math.round(performance.now() - t0);
-      ts.allTilesLoaded.addEventListener(() => {
-        if (gen !== bldgGen || stats.buildingFirstMs != null) return;
+      const allLoaded = new Set();   // 40A: 1 区に複数 tileset のとき、全部が一度読み終わった時点を初回表示時間とする
+      mounted.forEach((t) => t.allTilesLoaded.addEventListener(() => {
+        allLoaded.add(t);
+        if (gen !== bldgGen || stats.buildingFirstMs != null || allLoaded.size < mounted.length) return;
         stats.buildingFirstMs = Math.round(performance.now() - t0);
-      });
+      }));
       stats.extraSets = extraSets.map((e) => ({ id: e.id, wardCode: e.source.wardCode, tiles: e.report.selectedTiles, buildings: e.report.totals.buildings }));
       syncBldgSelect(); scene.requestRender();
       return true;
@@ -1467,11 +1482,18 @@
     } catch (e) { /* 未配信扱い */ }
     // 37H: 実際に読み込めた追加区の tileset だけを COVERAGE に入れる（限定メッシュなので常に 'partial'）
     try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
+    // 40A: 1 区に複数 tileset があるときは合算する（メッシュ・タイル・棟数）
+    const agg = {};
     for (const e of extraMeta) {
       const n = e.report.totals.buildings | 0, tiles = e.report.selectedTiles | 0;
       if (!n || !tiles) continue;
-      COVERAGE[e.source.wardCode] = { state: 'partial', tiles, buildings: n,
-        text: '3D建物: 一部のみ配信（実PLATEAU ' + e.source.sourceMeshes.length + 'メッシュ・' + tiles + 'タイル・' + fmt(n) + '棟。区全体ではありません）' };
+      const a = agg[e.source.wardCode] || (agg[e.source.wardCode] = { tiles: 0, buildings: 0, meshes: 0 });
+      a.tiles += tiles; a.buildings += n; a.meshes += e.source.sourceMeshes.length;
+    }
+    for (const code of Object.keys(agg)) {
+      const a = agg[code];
+      COVERAGE[code] = { state: 'partial', tiles: a.tiles, buildings: a.buildings,
+        text: '3D建物: 一部のみ配信（実PLATEAU ' + a.meshes + 'メッシュ・' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。区全体ではありません）' };
     }
   }
   const WardUI = (function () {

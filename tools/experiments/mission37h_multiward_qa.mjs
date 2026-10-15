@@ -30,14 +30,19 @@ const WARDS = [
   { id: 'chuo', name: '中央区', dir: 'public/mission37h-3dtiles/chuo-sample/' },
   { id: 'tennoji', name: '天王寺区', dir: 'public/mission37h-3dtiles/tennoji-sample/' },
   { id: 'nishi', name: '西区', dir: 'public/mission37h-3dtiles/nishi-sample/' },
+  // 40A: 浪速区は 1 区 2 tileset（各 tileset から 3 棟ずつ検証）
+  { id: 'naniwa', name: '浪速区', dirs: ['public/mission38e-3dtiles/naniwa-mesh/', 'public/mission38e-3dtiles/naniwa-mesh2/'] },
 ];
 for (const w of WARDS) {
-  const byId = {};
-  for (const f of fs.readdirSync(w.dir + 'attrs')) Object.assign(byId, JSON.parse(fs.readFileSync(w.dir + 'attrs/' + f, 'utf8')).byId);
-  w.code = JSON.parse(fs.readFileSync(w.dir + 'source.json', 'utf8')).wardCode;
-  w.attrCount = Object.keys(byId).length;
-  w.targets = Object.entries(byId).filter(([, a]) => a[0] >= 40 && a[0] <= 120).sort((a, b) => b[1][0] - a[1][0]).slice(0, 3)
-    .map(([id, a]) => ({ id, h: a[0], x: a[2], z: a[3] }));
+  w.attrCount = 0; w.targets = [];
+  for (const dir of (w.dirs || [w.dir])) {
+    const byId = {};
+    for (const f of fs.readdirSync(dir + 'attrs')) Object.assign(byId, JSON.parse(fs.readFileSync(dir + 'attrs/' + f, 'utf8')).byId);
+    w.code = JSON.parse(fs.readFileSync(dir + 'source.json', 'utf8')).wardCode;
+    w.attrCount += Object.keys(byId).length;
+    w.targets.push(...Object.entries(byId).filter(([, a]) => a[0] >= 40 && a[0] <= 120).sort((a, b) => b[1][0] - a[1][0]).slice(0, 3)
+      .map(([id, a]) => ({ id, h: a[0], x: a[2], z: a[3] })));
+  }
 }
 
 const b = await launchBrowser({ width: 1500, height: 940 });

@@ -64,7 +64,7 @@ test('37G ページ: 追加 tileset を tileset ごとの配信ベースで扱�
   const h = fs.readFileSync(path.join(ROOT, 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
   assert.ok(/EXTRA_SET_DEFS/.test(h) && /mission37h-3dtiles\/kita-sample\//.test(h) && /mission37h-3dtiles\/chuo-sample\//.test(h) && /tennoji-sample\//.test(h) && /nishi-sample\//.test(h));
   assert.ok(/tilesBaseOf\(feature\)/.test(h), 'sidecar/attrs は tileset 別 base（tile 名が区間で衝突するため）');
-  assert.ok(/for \(const e of extraMeta\)[\s\S]{0,400}COVERAGE\[e\.source\.wardCode\]/.test(h));
+  assert.ok(/for \(const e of extraMeta\)[\s\S]{0,500}agg\[e\.source\.wardCode\][\s\S]{0,800}COVERAGE\[code\]/.test(h), '40A: 1 区複数 tileset は合算して COVERAGE へ');
   assert.ok(/区全体ではありません/.test(h), '一部配信を明記');
 });
 

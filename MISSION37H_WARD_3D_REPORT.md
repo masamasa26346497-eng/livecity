@@ -82,3 +82,11 @@ node tools/mission36k-convert-citygml-runtime.mjs --input temp/gml-tennoji --out
 node tools/mission37h-build-ward-sample.cjs --ward tennoji --jsonl temp/h37/tennoji.jsonl
 # 西区: --ward nishi --meshes=52350318,52350319
 ```
+
+## 40A: 浪速区（PR#41 由来の PLATEAU 2 メッシュ）を統合
+
+- 取り込み元: `origin/mission38e-parallel-3d-ward-pilot`（`5c8e4d2`）の `public/mission38e-3dtiles/naniwa-mesh`（6 tile・2,466 棟）と `naniwa-mesh2`（9 tile・1,801 棟）だけ。合計 15 tile・4,267 棟・約 5.7MB。PR#41/#42/main は変更していない。hirano-subset は取り込んでいない。
+- 出典: PLATEAU 3D都市モデル 大阪市 2024 LOD1（HTTP Range 取得）。**利用条件の最終確認は未了**（`source.json` の licenseNote のとおり）。区全体ではなく 2 メッシュの一部。
+- 37G ページ: `EXTRA_SET_DEFS` に 2 tileset を追加。`setBuildingWard` は同じ区コードの全 tileset を並列 mount（`Promise.allSettled`、generation token、一部失敗・古い要求は mount 済み分も remove）。COVERAGE は区ごとに合算。ids/attrs は tileset 別の `_lcBase` から取得（tile 名 `t_-5_-13` 等が 2 tileset で重複するため）。
+- canonicalId は 5 区既存分・2 tileset 間とも衝突 0（`tests/mission40a-naniwa-integration.test.cjs`）。
+- 3D 建物が見える区: 5 → 6 / 24（いずれも一部）。ページ coverage: 79 tile・33,626 棟。
