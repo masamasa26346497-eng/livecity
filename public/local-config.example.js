@@ -10,4 +10,6 @@
 // 制限をかけないキーをコミット・配布しないこと。
 window.LIVECITY_CONFIG = {
   googlePlacesApiKey: '',
+  // [Mission 37] Google Map Tiles API / Photorealistic 3D Tiles 用。Places APIキーとは分離推奨。
+  googleMapTilesApiKey: '',
 };
