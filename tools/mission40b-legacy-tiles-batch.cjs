@@ -11,6 +11,7 @@
 //   node tools/mission40b-legacy-tiles-batch.cjs --ward <wardId> [--tiles tx_tz,tx_tz,...] [--out <dir>] [--force]
 //       1 区を変換。既定の出力は temp/mission40b/<ward>/（gitignore 済み）。既に 37B/37H/38E で
 //       tileset がある区は --force が無ければ再生成しない。
+//   共通: --src <旧 buildings ディレクトリ> （コピー不要・読み取り専用）。--validate で 24 区の整合性検証。
 //   node tools/mission40b-legacy-tiles-batch.cjs --all-available
 //       旧タイルがローカルに完全に揃っていて、未変換の区だけを順に変換する。
 //   node tools/mission40b-legacy-tiles-batch.cjs --verify <wardId> --against <dir>
@@ -21,7 +22,11 @@ const path = require('node:path');
 const { build } = require('./mission37b-build-3dtiles.cjs');
 
 const ROOT = path.join(__dirname, '..');
-const BLD = path.join(ROOT, 'public/map-data/osaka-city/buildings');
+const REPO_BLD = path.join(ROOT, 'public/map-data/osaka-city/buildings');
+// 入力ルート。既定はリポジトリ内。--src <dir> または環境変数 LIVECITY_LEGACY_BUILDINGS で、コピーせずに
+// 外部（例: 旧 livecity-data-pipeline の buildings/）を読み取り専用で直接指定できる。
+let BLD = REPO_BLD;
+function setSource(dir) { BLD = path.resolve(dir); }
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const r1 = (v) => Math.round(v * 10) / 10;
 
@@ -46,7 +51,8 @@ function existingTilesets() {
 }
 
 function inventory() {
-  const root = readJson(path.join(BLD, 'manifest.json'));
+  const rootPath = fs.existsSync(path.join(BLD, 'manifest.json')) ? path.join(BLD, 'manifest.json') : path.join(REPO_BLD, 'manifest.json');
+  const root = readJson(rootPath);
   const built = existingTilesets();
   const wards = root.datasets.map((d) => {
     const dir = path.join(BLD, d.id);
@@ -69,6 +75,7 @@ function inventory() {
   const sum = (f) => wards.reduce((n, w) => n + f(w), 0);
   const rep = {
     generatedAt: new Date().toISOString(),
+    sourceRoot: BLD === REPO_BLD ? 'repo' : BLD,
     rootManifest: { buildingCount: root.buildingCount, tileCount: root.tileCount, wardCount: root.wardCount, note: 'manifest の件数は記録値。タイル実体の有無は legacyTilesLocal を見ること' },
     totals: {
       wardsWithLegacyTilesLocal: wards.filter((w) => w.legacyTilesLocal.complete).length,
@@ -79,7 +86,7 @@ function inventory() {
     },
     wards,
   };
-  const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse/inventory.json');
+  const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse', BLD === REPO_BLD ? 'inventory.json' : 'inventory-external.json');
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, JSON.stringify(rep, null, 1));
   return rep;
@@ -160,22 +167,77 @@ function verify(aDir, bDir) {
   return { a: a.size, b: b.size, common, onlyA: a.size - common, onlyB: b.size - common, identical: common === a.size && common === b.size };
 }
 
+// 24 区の整合性検証（読み取りのみ）: manifest 件数 vs 実ファイル、ID 一意・形式、座標・高さ・タイル帰属
+function validate() {
+  const root = readJson(fs.existsSync(path.join(BLD, 'manifest.json')) ? path.join(BLD, 'manifest.json') : path.join(REPO_BLD, 'manifest.json'));
+  const seen = new Map(); // canonicalId -> ward（区間重複検出）
+  const wards = [];
+  let problems = 0;
+  for (const d of root.datasets) {
+    const dir = path.join(BLD, d.id);
+    const w = { wardId: d.wardId, ward: d.ward, manifestBuildings: d.buildings, manifestTiles: d.tiles, status: 'ok', tilesFound: 0, tilesMissing: [], buildings: 0,
+      countMismatchTiles: 0, badId: 0, dupIdWithinWard: 0, dupIdAcrossWards: 0, badFootprint: 0, badHeight: 0, outOfTile: 0, outOfBounds: 0, maxHeight: 0, issues: [] };
+    const mf = path.join(dir, 'manifest.json');
+    if (!fs.existsSync(mf)) { w.status = 'missing'; w.issues.push('ward manifest not found'); wards.push(w); problems++; continue; }
+    const m = readJson(mf);
+    const b = m.bounds, ts = m.tileSize || 500, tol = 1;
+    const own = new Set();
+    for (const t of m.tiles || []) {
+      const f = path.join(dir, t.file || `tile_${t.tx}_${t.tz}.json`);
+      if (!fs.existsSync(f)) { w.tilesMissing.push(path.basename(f)); continue; }
+      w.tilesFound++;
+      const tile = readJson(f);
+      if (tile.buildings.length !== (t.count != null ? t.count : tile.count)) w.countMismatchTiles++;
+      for (const x of tile.buildings) {
+        w.buildings++;
+        if (typeof x.id !== 'string' || !/^bldg_/.test(x.id)) w.badId++;
+        if (own.has(x.id)) w.dupIdWithinWard++; else own.add(x.id);
+        if (seen.has(x.id) && seen.get(x.id) !== d.wardId) w.dupIdAcrossWards++; else seen.set(x.id, d.wardId);
+        const fp = x.fp;
+        if (!Array.isArray(fp) || fp.length < 3 || !fp.every((q) => Array.isArray(q) && Number.isFinite(q[0]) && Number.isFinite(q[1]))) w.badFootprint++;
+        const h = x.h;
+        if (!Number.isFinite(h) || h <= 0 || h > 400) w.badHeight++; else if (h > w.maxHeight) w.maxHeight = h;
+        if (Number.isFinite(x.repX) && Number.isFinite(x.repZ)) {
+          if (Math.floor(x.repX / ts) !== t.tx || Math.floor(x.repZ / ts) !== t.tz) w.outOfTile++;
+          if (b && (x.repX < b.minX - tol || x.repX > b.maxX + tol || x.repZ < b.minZ - tol || x.repZ > b.maxZ + tol)) w.outOfBounds++;
+        }
+      }
+    }
+    if (w.tilesMissing.length) w.issues.push(w.tilesMissing.length + ' tile files missing');
+    if (w.buildings !== d.buildings) w.issues.push(`buildings ${w.buildings} != root manifest ${d.buildings}`);
+    if (w.tilesFound + w.tilesMissing.length !== d.tiles) w.issues.push(`tiles ${w.tilesFound + w.tilesMissing.length} != root manifest ${d.tiles}`);
+    for (const k of ['countMismatchTiles', 'badId', 'dupIdWithinWard', 'dupIdAcrossWards', 'badFootprint', 'badHeight', 'outOfTile', 'outOfBounds']) if (w[k]) w.issues.push(k + '=' + w[k]);
+    if (w.issues.length) { w.status = 'issues'; problems++; }
+    wards.push(w);
+  }
+  const rep = { generatedAt: new Date().toISOString(), sourceRoot: BLD === REPO_BLD ? 'repo' : BLD,
+    totals: { wards: wards.length, ok: wards.filter((w) => w.status === 'ok').length, missing: wards.filter((w) => w.status === 'missing').length, withIssues: wards.filter((w) => w.status === 'issues').length,
+      buildings: wards.reduce((n, w) => n + w.buildings, 0), manifestBuildings: root.buildingCount }, wards };
+  const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse', BLD === REPO_BLD ? 'validate.json' : 'validate-external.json');
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(out, JSON.stringify(rep, null, 1));
+  return rep;
+}
+
 function main() {
   const args = process.argv.slice(2);
   const has = (k) => args.includes('--' + k);
   const opt = (k, d) => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : d; };
+  const src = opt('src', process.env.LIVECITY_LEGACY_BUILDINGS);
+  if (src) { if (!fs.existsSync(src)) { console.error('--src not found: ' + src); process.exit(2); } setSource(src); }
+  if (has('validate')) { const r = validate(); console.log(JSON.stringify(r.totals, null, 1)); for (const w of r.wards) if (w.status !== 'ok') console.log(w.wardId, w.status, w.issues.join('; ')); process.exit(r.totals.ok === r.totals.wards ? 0 : 1); }
   if (has('inventory')) { console.log(JSON.stringify(inventory().totals, null, 1)); return; }
   if (has('verify')) { console.log(JSON.stringify(verify(opt('against'), opt('verify')), null, 1)); return; }
   if (has('all-available')) {
     const inv = inventory();
     for (const w of inv.wards) {
       if (!w.legacyTilesLocal.complete || w.cesium3dTiles.buildings > 0) continue;
-      console.log(JSON.stringify(convertWard(w.wardId, { force: has('force') })));
+      console.log(JSON.stringify(convertWard(w.wardId, { force: has('force'), out: opt('out-root') ? path.join(opt('out-root'), w.wardId) : undefined })));
     }
     return;
   }
   const ward = opt('ward');
-  if (!ward) { console.error('usage: --inventory | --ward <id> [--tiles tx_tz,...] [--out dir] [--force] | --all-available | --verify <dir> --against <dir>'); process.exit(2); }
+  if (!ward) { console.error('usage: [--src <buildings dir>] --inventory | --validate | --ward <id> [--tiles tx_tz,...] [--out dir] [--force] | --all-available | --verify <dir> --against <dir>'); process.exit(2); }
   const tiles = opt('tiles') ? opt('tiles').split(',') : null;
   if (tiles) {
     console.log(JSON.stringify(convertSubset(ward, tiles, opt('out', path.join(ROOT, 'temp/mission40b', ward))), null, 1));
@@ -184,5 +246,5 @@ function main() {
   }
 }
 
-module.exports = { inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
+module.exports = { setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
 if (require.main === module) main();

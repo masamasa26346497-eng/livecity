@@ -34,3 +34,12 @@
 
 ## 旧版 LOD / ラベル制御
 旧版は `WARD_LABEL_*`（距離フェード・倍率クランプ）等を持つが、Cesium 版は 37K-2 の POI 予算・`distanceDisplayCondition` で既に代替済み。今回は移植していない。
+
+## 40C: 外部入力ディレクトリ指定とローカル一括実行
+
+- `--src <dir>`（または環境変数 `LIVECITY_LEGACY_BUILDINGS`）で、旧 `buildings/` をコピーせず読み取り専用で直接指定できる。
+- `--validate`: 24 区の manifest 対実ファイル、棟数、`bldg_` ID 形式、区内/区間の ID 重複、footprint 有限性、高さ(0<h≤400)、タイル帰属、区 bounds を検証。結果は `validate-external.json`（外部 src 時）。
+- `--all-available --out-root <dir>`: 揃った区を順に変換（既存 tileset がある区はスキップ）。
+- `tools/mission40c-run-local.ps1`: validate → inventory → convert のワンショット。元データへ書かず、出力先が非空なら中止。出力は既定でリポジトリ外。
+- 実行例: `powershell -ExecutionPolicy Bypass -File tools\mission40c-run-local.ps1 -LegacyBuildings "<旧>\public\map-data\osaka-city\buildings"`
+- 配信設計: 全市の変換物は約 0.6GB と外挿（未実測）。Git 不可。区単位 tileset（選択区のみ mount、39B 方式）で、静的配信先は別途承認が必要。

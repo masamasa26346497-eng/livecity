@@ -44,3 +44,23 @@ test('ツールは Google/ネットワークを参照しない', () => {
   const src = fs.readFileSync(path.join(__dirname, '../tools/mission40b-legacy-tiles-batch.cjs'), 'utf8');
   assert.ok(!/https?:\/\/|fetch\(|googleapis/.test(src.replace(/\/\/.*$/gm, '')));
 });
+
+test('40C: 外部入力指定 (--src) と validate は読み取り専用で、住吉の実データは整合する', () => {
+  const { validate, setSource } = require('../tools/mission40b-legacy-tiles-batch.cjs');
+  const src = fs.readFileSync(path.join(__dirname, '../tools/mission40b-legacy-tiles-batch.cjs'), 'utf8');
+  assert.match(src, /LIVECITY_LEGACY_BUILDINGS/);
+  assert.ok(!/unlinkSync|rmSync\([^)]*BLD|rmdirSync/.test(src.replace(/fs\.rmSync\(tmp[^;]*;/, '')), '元データを消す処理が無い');
+  setSource(path.join(__dirname, '../public/map-data/osaka-city/buildings'));
+  const r = validate();
+  const s = r.wards.find((w) => w.wardId === 'sumiyoshi');
+  assert.strictEqual(s.status, 'ok', JSON.stringify(s.issues));
+  assert.strictEqual(s.buildings, 35031);
+  assert.strictEqual(r.wards.length, 24);
+  for (const w of r.wards) if (w.wardId !== 'sumiyoshi') assert.ok(['ok', 'missing'].includes(w.status) || w.buildings > 0);
+});
+
+test('40C: PowerShell ワンショットは元データへ書かず、出力先が非空なら中止する', () => {
+  const ps = fs.readFileSync(path.join(__dirname, '../tools/mission40c-run-local.ps1'), 'utf8');
+  assert.match(ps, /上書きしません/);
+  assert.ok(!/Remove-Item|robocopy|Copy-Item|Move-Item/i.test(ps.replace(/<#[\s\S]*?#>/, '')));
+});
