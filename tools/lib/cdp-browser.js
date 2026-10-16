@@ -10,6 +10,12 @@ export const BROWSER_CANDIDATES = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
   'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  // Linux（GitHub Actions ubuntu-latest 等）
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/microsoft-edge',
 ];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -20,6 +26,7 @@ export async function launchBrowser({ executable, port = 9300 + Math.floor(Math.
   const args = [
     ...(headless ? ['--headless=new'] : []),
     `--remote-debugging-port=${port}`, `--user-data-dir=${userDir}`, `--window-size=${width},${height}`,
+    ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-dev-shm-usage'] : []),
     '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--mute-audio',
     '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--disable-background-timer-throttling',
     '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows',
