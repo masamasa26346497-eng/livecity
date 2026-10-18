@@ -711,7 +711,13 @@
     }
     return matCache.get(key);
   }
-  function makeLineLayer(file, styleOf, base) {
+  // 40M: 区単位レイヤー用。opt.clip(pts) → 区ポリゴン内の連続区間の配列 / st.maxDist: 距離表示条件 / alpha 付き材質
+  function alphaMat(css, a) {
+    const key = 'a:' + css + ':' + a;
+    if (!matCache.has(key)) matCache.set(key, Cesium.Material.fromType('Color', { color: Cesium.Color.fromCssColorString(css).withAlpha(a) }));
+    return matCache.get(key);
+  }
+  function makeLineLayer(file, styleOf, base, opt) {
     let coll = null;
     return {
       async mount() {
@@ -721,14 +727,21 @@
         for (const f of data.features || []) {
           const st = styleOf(f);
           if (!st || !Array.isArray(f.p) || f.p.length < 2) continue;
-          const positions = f.p.map((pt) => toCart(pt[0], pt[1], st.height));
-          // 太い道路は外側に暗い線を重ねて、地図らしい縁取りにする（major/mid のみ）
-          if (st.casing) {
-            coll.add({ positions, width: st.width + st.casing, material: solidMat(C.roadCasing),
-                       id: { layer: file, casing: true } });
+          const runs = opt && opt.clip ? opt.clip(f.p) : [f.p];
+          const ddc = st.maxDist ? new Cesium.DistanceDisplayCondition(0, st.maxDist) : undefined;
+          let used = false;
+          for (const run of runs) {
+            if (run.length < 2) continue;
+            const positions = run.map((pt) => toCart(pt[0], pt[1], st.height));
+            // 太い道路は外側に暗い線を重ねて、地図らしい縁取りにする（major/mid のみ）
+            if (st.casing) {
+              coll.add({ positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing),
+                         distanceDisplayCondition: ddc, id: { layer: file, casing: true } });
+            }
+            coll.add({ positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: f.id, name: f.name || null } });
+            used = true;
           }
-          coll.add({ positions, width: st.width, material: st.material, id: { layer: file, featureId: f.id, name: f.name || null } });
-          n++;
+          if (used) n++;
         }
         return { count: n };
       },
@@ -743,6 +756,27 @@
     if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
     if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
     return { width: 3.0, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
+  }
+  // 40M: 区単位レイヤー（福島区など）の道路。階層別に細く・半透明にし、細街路は近距離だけ表示して建物を覆わない。住吉区の束（roadStyle）は変更しない。
+  function roadStyleWard(f) {
+    const t = f.tier || 'local';
+    if (t === 'major') return { width: 4.5, casing: 1.5, material: alphaMat(C.roadMajor, 0.8), casingMaterial: alphaMat(C.roadCasing, 0.55), height: LAYER_H.roads };
+    if (t === 'mid') return { width: 3.0, casing: 1.0, material: alphaMat(C.roadMid, 0.7), casingMaterial: alphaMat(C.roadCasing, 0.4), height: LAYER_H.roads, maxDist: 12000 };
+    return { width: 1.8, casing: 0, material: alphaMat(C.roadLocal, 0.6), height: LAYER_H.roads, maxDist: 3000 };
+  }
+  // 40M: 区ポリゴン内の頂点だけを残す。境界をまたぐ線は外側の隣接頂点 1 点までで切る（境界で線が途切れない）
+  function makeWardClip(polys) {
+    const inside = (x, z) => polys.some((p) => pointInRing(x, z, p.outer) && !(p.holes || []).some((h) => pointInRing(x, z, h)));
+    return function clip(pts) {
+      const ins = pts.map((q) => inside(q[0], q[1]));
+      const runs = []; let cur = null;
+      for (let i = 0; i < pts.length; i++) {
+        const near = ins[i] || (i > 0 && ins[i - 1]) || (i < pts.length - 1 && ins[i + 1]);
+        if (near) { (cur = cur || []).push(pts[i]); } else if (cur) { runs.push(cur); cur = null; }
+      }
+      if (cur) runs.push(cur);
+      return runs;
+    };
   }
   function waterLineStyle(f) {
     return f.kind === 'line' ? { width: f.waterClass === 'canal' ? 6 : 4.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways } : null;
@@ -845,15 +879,15 @@
   //   区の 3D 建物を mount したときだけ読み込み、区の切替・解除で primitives.remove する。layers/ が無ければ何もしない（捏造しない）。
   //   既存の住吉区束（mission37c-layers）とは別 primitive。住吉区の束は変更しない。
   const WARD_VEC_FILES = {
-    roads: (b) => makeLineLayer('roads.json', roadStyle, b),
-    waterways: (b) => {
-      const l = makeLineLayer('waterways.json', waterLineStyle, b);
+    roads: (b, o) => makeLineLayer('roads.json', roadStyleWard, b, o),
+    waterways: (b, o) => {
+      const l = makeLineLayer('waterways.json', waterLineStyle, b, o);
       const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b);
       return { async mount() { const x = await l.mount(); const y = await a.mount(); return { count: x.count + y.count }; },
                applyVisible(on) { l.applyVisible(on); a.applyVisible(on); }, destroy() { l.destroy(); a.destroy(); } };
     },
     parks: (b) => makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks }, b),
-    railways: (b) => makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }), b),
+    railways: (b, o) => makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }), b, o),
   };
   let wardVec = [];   // { id, layer, count }
   stats.wardVec = { ward: null, state: 'none', layers: {} };
@@ -874,8 +908,15 @@
     if (gen !== bldgGen) return;
     stats.wardVec = { ward: wc, state: 'loading', layers: {} };
     const made = [];
+    let opt = {};
+    try {   // 40M: 区境界の外へはみ出す線を切る。区ポリゴンが得られなければ従来どおり（切らない）
+      const wd = await WardUI.load();
+      const w = wd.wards.find((x) => x.wardCode === wc);
+      if (w) { opt = { clip: makeWardClip(w.polygons) }; stats.wardVec.clip = 'ward-polygon'; }
+    } catch (e) { stats.wardVec.clip = 'none'; }
+    if (gen !== bldgGen) return;
     for (const id of Object.keys(WARD_VEC_FILES)) {
-      const layer = WARD_VEC_FILES[id](base);
+      const layer = WARD_VEC_FILES[id](base, opt);
       try {
         const r = await layer.mount();
         if (gen !== bldgGen) { layer.destroy(); for (const w of made) w.layer.destroy(); return; }   // 古い要求: 作った分を破棄
