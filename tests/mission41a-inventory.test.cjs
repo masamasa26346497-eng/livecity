@@ -109,3 +109,10 @@ test('cjs failure cases: non-empty out and out-inside-root refused; multiple roo
   inv.run(['--roots', a + ';' + b, '--out', out]);
   assert.ok(fs.existsSync(path.join(out, 'report.md')));
 });
+
+
+test('ps1: absolute TEMP OutDir is passed directly to GetFullPath, not joined with cwd', () => {
+  const ps = fs.readFileSync(path.join(__dirname, '..', 'tools', 'mission41a-inventory.ps1'), 'utf8');
+  assert.ok(/IsPathRooted\(\$OutDir\)/.test(ps));
+  assert.ok(/if \(\[System\.IO\.Path\]::IsPathRooted\(\$OutDir\)\) \{\s*\$OutDir = \[System\.IO\.Path\]::GetFullPath\(\$OutDir\)/.test(ps));
+});
