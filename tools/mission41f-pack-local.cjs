@@ -148,6 +148,15 @@ function quarantine(outDir, file) {
   return path.basename(to);
 }
 
+// Error text without any path. fs errors carry the file path in e.message, so only the code is kept.
+function explainErr(e) {
+  const c = e && e.code;
+  if (!c) return String((e && e.message) || e).replace(/[A-Za-z]:\\[^\s'"]*|\/[^\s'"]+\/[^\s'"]*/g, '<path>');
+  const cloud = 'read error: a OneDrive cloud-only file is likely not downloaded (set "Always keep on this device")';
+  const hint = { EIO: cloud + ' or the disk failed', UNKNOWN: cloud, EINVAL: cloud, EBUSY: 'file is locked by another program', EACCES: 'permission denied', EPERM: 'permission denied', ENOENT: 'file disappeared' }[c] || 'filesystem error';
+  return 'source-read-failed (' + c + '): ' + hint + '; nothing was finalised, run stopped';
+}
+
 // Build one archive into <out>/.staging/<name>.partial, verify, then rename into place. Never overwrites.
 function buildPart(part, name, roots, outDir, hooks) {
   const stage = path.join(outDir, '.staging'); fs.mkdirSync(stage, { recursive: true });
@@ -199,7 +208,7 @@ function buildPart(part, name, roots, outDir, hooks) {
   } catch (e) {
     if (fd !== null) { try { fs.closeSync(fd); } catch { /* ignore */ } }
     let q = null; if (fs.existsSync(partial)) q = quarantine(outDir, partial);
-    return { name, state: 'failed', error: e.message, quarantined: q, quarantinedOld };
+    return { name, state: 'failed', error: explainErr(e), quarantined: q, quarantinedOld };
   }
 }
 
@@ -267,7 +276,43 @@ function create(m, roots, opts, hooks) {
   return { code: ok ? 0 : 1, report, reportFile: rn };
 }
 
+// Re-check finished archives against the newest pack-report: presence, byte count, SHA-256, tar structure.
+// Needs only the output folder (no source data). Prints counts and hashes only, no paths.
+function verifyOut(outDir) {
+  const num = (n) => parseInt((n.match(/-(\d+)\.json$/) || [0, 0])[1], 10);
+  const reps = fs.readdirSync(outDir).filter((n) => /^pack-report(-\d+)?\.json$/.test(n)).sort((a, b) => num(a) - num(b));
+  if (!reps.length) throw new Error('no pack-report*.json in --out');
+  const rep = JSON.parse(fs.readFileSync(path.join(outDir, reps[reps.length - 1]), 'utf8'));
+  const rows = []; let ok = true;
+  for (const p of rep.parts || []) {
+    if (p.state !== 'created' && p.state !== 'already-packed-verified') continue;
+    const row = { files: p.files, bytes: p.bytes, sha256: p.sha256 };
+    try {
+      const file = path.join(outDir, p.name);
+      row.bytesOk = fs.statSync(file).size === p.bytes;
+      row.shaOk = sha256Of(file) === p.sha256;
+      row.membersOk = readTar(file).length === p.files;
+    } catch (e) { row.bytesOk = row.shaOk = row.membersOk = false; row.error = explainErr(e); }
+    row.ok = !!(row.bytesOk && row.shaOk && row.membersOk); if (!row.ok) ok = false; rows.push(row);
+  }
+  if (!rows.length) ok = false;
+  return { ok, tars: rows };
+}
+function summaryLines(rep) {
+  const done = rep.parts.filter((p) => p.state === 'created' || p.state === 'already-packed-verified');
+  return ['SUMMARY (anonymous): tar files=' + done.length + ' source files=' + done.reduce((a, p) => a + (p.files || 0), 0) + ' tar bytes=' + done.reduce((a, p) => a + (p.bytes || 0), 0),
+    ...done.map((p, i) => '  tar' + (i + 1) + ' files=' + p.files + ' bytes=' + p.bytes + ' sha256=' + p.sha256)];
+}
+
 function run(argv) {
+  if (argv[0] === 'verify') {
+    const i = argv.indexOf('--out'); if (i < 0 || !argv[i + 1]) throw new Error('usage: verify --out <dir>');
+    const r = verifyOut(path.resolve(argv[i + 1]));
+    console.log(['SHA256 verification of finished archives (offline, no source data needed)',
+      ...r.tars.map((t, k) => '  tar' + (k + 1) + ' files=' + t.files + ' bytes=' + t.bytes + ' sha256=' + t.sha256 + ' -> ' + (t.ok ? 'OK' : 'FAILED ' + (t.error || ''))),
+      'result: ' + (r.ok ? 'ALL VERIFIED' : 'PROBLEM'), 'gates still closed: licenceApproved,noSecretsReviewed,noPersonalDataReviewed; readyToUpload: false'].join('\n'));
+    return r.ok ? 0 : 1;
+  }
   if (argv[0] !== 'create') throw new Error('usage: create --manifest <manifest.json> --roots-file <roots.json> --out <dir> [--path-contains x] [--only-category a,b]');
   const a = {};
   for (let i = 1; i < argv.length; i++) {
@@ -301,10 +346,11 @@ function run(argv) {
   console.log(['pack create (offline, local tar only; NOTHING uploaded, no network)',
     'selected parts: ' + (rep.parts.length || 0) + ' created/checked; excluded by category: ' + rep.excluded.categoryFiles + ' files, by name hint: ' + rep.excluded.nameHintFiles + ' files (hint only, NOT a secret scan)',
     ...rep.parts.map((p) => '  ' + p.state + ': files=' + (p.files || '-') + ' bytes=' + (p.bytes || '-') + (p.error ? ' error=' + p.error : '')),
+    ...summaryLines(rep),
     'problems: ' + rep.problems.length + (rep.problems.length ? ' ' + JSON.stringify(rep.problems.slice(0, 5)) : ''),
     'gates still closed: licenceApproved,noSecretsReviewed,noPersonalDataReviewed; readyToUpload: false'].join('\n'));
   return r.code;
 }
 
-module.exports = { header, readTar, splitName, selectForPack, assetName, create, buildPart, verifyExisting, run, SECRET_NAME_HINT, EXCLUDED_CATEGORIES };
+module.exports = { header, readTar, splitName, selectForPack, assetName, create, buildPart, verifyExisting, run, verifyOut, summaryLines, explainErr, SECRET_NAME_HINT, EXCLUDED_CATEGORIES };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2))); } catch (e) { console.error(e.message); process.exit(1); } }

@@ -20,7 +20,8 @@ param(
   [string]$Roots = '',
   [string]$OutDir = '',
   [string]$PathContains = 'fukushima',
-  [string]$OnlyCategory = ''
+  [string]$OnlyCategory = '',
+  [switch]$VerifyOnly
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
@@ -28,6 +29,13 @@ $tool = Join-Path $repo 'tools\mission41f-pack-local.cjs'
 if (-not (Test-Path -LiteralPath $tool)) { throw ('tool not found: ' + $tool) }
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'node (18+) was not found in PATH' }
 $cwd = (Get-Location).Path
+if ($VerifyOnly) {
+  if ([string]::IsNullOrEmpty($OutDir)) { throw '-VerifyOnly needs -OutDir (the 41F output folder)' }
+  $vo = $OutDir.Trim().Trim('"')
+  if (-not [System.IO.Path]::IsPathRooted($vo)) { $vo = Join-Path $cwd $vo }
+  & node $tool 'verify' '--out' ([System.IO.Path]::GetFullPath($vo))
+  exit $LASTEXITCODE
+}
 function Resolve-Abs([string]$p) {
   $p = $p.Trim().Trim('"')
   if ([System.IO.Path]::IsPathRooted($p)) { return [System.IO.Path]::GetFullPath($p) }
@@ -68,6 +76,11 @@ if (-not [string]::IsNullOrEmpty($OnlyCategory)) { $nodeArgs += @('--only-catego
 Write-Host 'Local packaging only. Source files are only read. Nothing is uploaded, overwritten or deleted.'
 & node @nodeArgs
 $code = $LASTEXITCODE
+if ($code -eq 0) {
+  Write-Host ''
+  & node $tool 'verify' '--out' $OutDir
+  $code = $LASTEXITCODE
+}
 if ($code -eq 3) { Write-Host 'The filter matched zero packable files (see 41D -ListCategories).' }
 elseif ($code -ne 0) { Write-Host ('packaging reported a problem, exit code ' + $code + '. Partial files, if any, are in the quarantine folder.') }
 Write-Host ('Output folder: ' + $OutDir)
