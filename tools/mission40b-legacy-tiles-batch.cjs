@@ -92,6 +92,40 @@ function inventory() {
   return rep;
 }
 
+// ---- 40E: 高さ欠損値(sentinel)の扱い ----
+// 29997 等はメートルではなく欠損値マーカーの疑い。元データは変更せず、attrs には原値を保持し、
+// 描画用の高さだけを明示的な仮高さ(DISPLAY_FALLBACK_H)に分離する。対象は sentinel 値の建物のみ（他の異常値は触らない）。
+const HEIGHT_SENTINELS = [29997, 29999, 30000];
+const DISPLAY_FALLBACK_H = 3;
+function isSentinelHeight(h) { return HEIGHT_SENTINELS.includes(h); }
+// sentinel を含むタイルだけ仮高さに差し替えた一時ソースを作る。無ければ tmp=null（元ディレクトリをそのまま使う）。
+function planHeightPolicy(dir, manifest) {
+  const flagged = {}; // 'tx_tz' -> { id: {raw, display, reason} }
+  let any = false;
+  for (const t of manifest.tiles) {
+    const f = path.join(dir, t.file || 'tile_' + t.tx + '_' + t.tz + '.json');
+    for (const b of readJson(f).buildings) {
+      if (!isSentinelHeight(b.h)) continue;
+      const k = t.tx + '_' + t.tz;
+      (flagged[k] = flagged[k] || {})[b.id] = { raw: b.h, display: DISPLAY_FALLBACK_H, reason: 'sentinel-like height (suspected missing-data marker); display height is a fixed fallback, not a measurement' };
+      any = true;
+    }
+  }
+  if (!any) return { tmp: null, flagged };
+  const os = require('node:os');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'm40e-src-'));
+  for (const name of fs.readdirSync(dir)) {
+    const m = /^tile_(-?\d+)_(-?\d+)\.json$/.exec(name);
+    if (!m && name !== 'manifest.json') continue;
+    const fl = m && flagged[m[1] + '_' + m[2]];
+    if (!fl) { fs.copyFileSync(path.join(dir, name), path.join(tmp, name)); continue; }
+    const j = readJson(path.join(dir, name));
+    for (const b of j.buildings) if (fl[b.id]) { b.h = DISPLAY_FALLBACK_H; delete b.dz; }
+    fs.writeFileSync(path.join(tmp, name), JSON.stringify(j));
+  }
+  return { tmp, flagged };
+}
+
 function convertWard(wardId, opts) {
   const dataset = 'osaka-' + wardId;
   const dir = path.join(BLD, dataset);
@@ -103,18 +137,27 @@ function convertWard(wardId, opts) {
   const sel = manifest.tiles;
   if (!sel.length) throw new Error('no tiles');
   const t0 = Date.now();
-  const rep = build({ dataset, srcDir: dir, out, all: true, group: 4, coarseError: 40, coarseMinArea: 100 });
-  return finishWard(wardId, dir, out, sel, rep, Date.now() - t0);
+  const hp = planHeightPolicy(dir, manifest);
+  try {
+    const rep = build({ dataset, srcDir: hp.tmp || dir, out, all: true, group: 4, coarseError: 40, coarseMinArea: 100 });
+    return finishWard(wardId, dir, out, sel, rep, Date.now() - t0, hp.flagged);
+  } finally { if (hp.tmp) fs.rmSync(hp.tmp, { recursive: true, force: true }); }
 }
 
-function finishWard(wardId, dir, out, sel, rep, ms) {
+function finishWard(wardId, dir, out, sel, rep, ms, flagged) {
+  flagged = flagged || {};
+  const manifest0 = readJson(path.join(dir, 'manifest.json'));
+  let heightFallbacks = 0;
   fs.mkdirSync(path.join(out, 'attrs'), { recursive: true });
   let attrBytes = 0;
   for (const t of sel) {
     const tile = readJson(path.join(dir, t.file || `tile_${t.tx}_${t.tz}.json`));
     const byId = {};
     for (const b of tile.buildings) byId[b.id] = [b.h, b.usage || null, b.repX, b.repZ, b.z0 || 0];
-    const s = JSON.stringify({ tx: t.tx, tz: t.tz, count: tile.buildings.length, fields: ['h', 'usage', 'repX', 'repZ', 'z0'], byId });
+    // 40E: ward/wardCode を attrs に持たせ (wardCode + 元 ID) の複合キーで区別できるようにする。byId の h は原値のまま。
+    const fl = flagged[t.tx + '_' + t.tz];
+    if (fl) heightFallbacks += Object.keys(fl).length;
+    const s = JSON.stringify(Object.assign({ tx: t.tx, tz: t.tz, ward: wardId, wardCode: manifest0.wardCode, count: tile.buildings.length, fields: ['h', 'usage', 'repX', 'repZ', 'z0'], byId }, fl ? { heightFallback: fl } : {}));
     attrBytes += s.length;
     fs.writeFileSync(path.join(out, 'attrs', `t_${t.tx}_${t.tz}.json`), s);
   }
@@ -125,7 +168,9 @@ function finishWard(wardId, dir, out, sel, rep, ms) {
     mission: '40B', wardId, wardCode: manifest.wardCode, generatedAt: new Date().toISOString(),
     source: '旧 Live City 建物タイル public/map-data/osaka-city/buildings/' + path.basename(dir) + '（PLATEAU 大阪市 2024 LOD1 由来。再ダウンロードなし）',
     canonicalId: '旧タイルの id（CityGML gml:id）をそのまま使用。新規採番なし',
-    counts: { tiles: sel.length, buildings: rep.totals.buildings, skipped: rep.totals.skipped },
+    counts: { tiles: sel.length, buildings: rep.totals.buildings, skipped: rep.totals.skipped, heightFallbacks },
+    heightPolicy: { sentinels: HEIGHT_SENTINELS, displayFallbackM: DISPLAY_FALLBACK_H, note: 'attrs keep the raw h; only the rendered extrusion uses the fallback; source tiles are untouched' },
+    idPolicy: 'canonicalId unchanged. Legacy data reuses some ids across wards; the viewer keys by (wardCode + originalId) and sidecars are per tileset.',
     licenseNote: '出典: 国土交通省 Project PLATEAU。利用条件の最終確認はリポジトリ内に記録なし（公開前に要確認）。',
   }, null, 1));
   return { ward: wardId, tiles: sel.length, buildings: rep.totals.buildings, uniqueIds: rep.totals.uniqueCanonicalIds, skipped: rep.totals.skipped, fallbacks: rep.totals.fallbacks,
@@ -340,6 +385,7 @@ function diagnose(opts) {
     for (const e of badH) if (e.file === path.relative(BLD, f) && !e.neighbors) { e.neighbors = tile.buildings.filter((y) => y.id !== e.b.id && Number.isFinite(y.h) && y.h > 0 && y.h <= 400 && Math.hypot(y.repX - e.b.repX, y.repZ - e.b.repZ) <= 100).map((y) => y.h); }
   }
   // 衝突の集計
+  const overlapping = []; // 40E: overlapping-version-or-shifted は全件（形状つき）
   const byCause = {}; const byPair = {}; const samples = []; let ownershipAgree = 0, ownershipTotal = 0;
   for (const [id, list] of occ) {
     for (let i = 1; i < list.length; i++) {
@@ -354,6 +400,12 @@ function diagnose(opts) {
       const own = ha && hb ? 'both' : ha ? 'first' : hb ? 'second' : 'neither';
       bp.insideOwnWardPolygon[own]++;
       if (ha !== null && hb !== null) { ownershipTotal++; if (ha !== hb) ownershipAgree++; }
+      if (c.cause === 'overlapping-version-or-shifted') {
+        const ma = fpMetrics(a.fp), mb = fpMetrics(b.fp);
+        overlapping.push(Object.assign({ id }, c, { offsetXZ: [r1(mb.centroid[0] - ma.centroid[0]), r1(mb.centroid[1] - ma.centroid[1])], areaRatio: ma.area > 0 ? Math.round((mb.area / ma.area) * 1000) / 1000 : null,
+          first: { ward: a.ward, file: a.file, h: a.h, z0: a.z0, usage: a.usage, rep: [a.repX, a.repZ], insideOwnWardPolygon: ha, fp: a.fp },
+          second: { ward: b.ward, file: b.file, h: b.h, z0: b.z0, usage: b.usage, rep: [b.repX, b.repZ], insideOwnWardPolygon: hb, fp: b.fp } }));
+      }
       if (samples.length < 80) samples.push({ id, ...c, first: { ward: a.ward, file: a.file, rep: [a.repX, a.repZ], h: a.h, usage: a.usage, insideOwnWardPolygon: ha }, second: { ward: b.ward, file: b.file, rep: [b.repX, b.repZ], h: b.h, usage: b.usage, insideOwnWardPolygon: hb } });
     }
   }
@@ -365,7 +417,7 @@ function diagnose(opts) {
     const note = !Number.isFinite(h) ? 'non-finite (missing value)' : h === 29997 || h === 29999 || h === 30000 ? 'sentinel-like value (suspected missing-data marker; NOT metres)' : h <= 0 ? 'non-positive' : h > 400 ? 'implausible (>400m)' : '';
     return { ward: e.ward, id: e.b.id, file: e.file, h, z0: e.b.z0, usage: e.b.usage || null, rep: [e.b.repX, e.b.repZ], footprintVertices: (e.b.fp || []).length, footprintAreaM2: e.b.fp ? r1(fpMetrics(e.b.fp).area) : null, neighborsWithin100m: nb.length, neighborMedianH: med, neighborMaxH: nb.length ? nb[nb.length - 1] : null, note, action: 'none: source untouched. convert policy: keep building, mark height as unknown (see --height-policy) - owner decision' };
   });
-  const rep = { generatedAt: new Date().toISOString(), sourceRoot: BLD === REPO_BLD ? 'repo' : BLD, duplicateIds: dupIds.size, conflictsByCause: byCause, byPair, ownership: { comparablePairs: ownershipTotal, exactlyOneInsideOwnWardPolygon: ownershipAgree, note: 'N03 ward polygon point-in-polygon of the representative point; exactly-one means the ward of origin is unambiguous' }, samples, heightAnomalies,
+  const rep = { generatedAt: new Date().toISOString(), sourceRoot: BLD === REPO_BLD ? 'repo' : BLD, duplicateIds: dupIds.size, conflictsByCause: byCause, byPair, ownership: { comparablePairs: ownershipTotal, exactlyOneInsideOwnWardPolygon: ownershipAgree, note: 'N03 ward polygon point-in-polygon of the representative point; exactly-one means the ward of origin is unambiguous' }, samples, overlappingCases: overlapping, heightAnomalies,
     policy: 'read-only. Nothing is deleted/corrected. Ward tilesets mount one ward at a time, so a cross-ward duplicate never renders twice; for id-reuse-distinct-buildings the click sidecar is per ward/tileset (_lcBase), so ids do not collide in the viewer but are not globally unique' };
   const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse', BLD === REPO_BLD ? 'diagnose.json' : 'diagnose-external.json');
   fs.mkdirSync(path.dirname(out), { recursive: true });
@@ -386,6 +438,7 @@ function main() {
     for (const [k, v] of Object.entries(r.byPair)) console.log('pair ' + k + ' ' + JSON.stringify(v));
     console.log('ownership: ' + JSON.stringify(r.ownership));
     for (const h of r.heightAnomalies) console.log('height', JSON.stringify(h));
+    for (const o of r.overlappingCases) console.log('overlap', JSON.stringify({ id: o.id, pair: o.first.ward + '|' + o.second.ward, iou: o.bboxIoU, centroidDistM: o.centroidDistM, offsetXZ: o.offsetXZ, areaRatio: o.areaRatio, heightDiffM: o.heightDiffM, insideOwn: [o.first.insideOwnWardPolygon, o.second.insideOwnWardPolygon] }));
     return;
   }
   if (has('inventory')) { console.log(JSON.stringify(inventory().totals, null, 1)); return; }
@@ -412,5 +465,5 @@ function main() {
   }
 }
 
-module.exports = { diagnose, classifyConflict, fpMetrics, fpHash, classifyDup, countTiles, tileScope, setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
+module.exports = { HEIGHT_SENTINELS, DISPLAY_FALLBACK_H, planHeightPolicy, diagnose, classifyConflict, fpMetrics, fpHash, classifyDup, countTiles, tileScope, setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
 if (require.main === module) main();

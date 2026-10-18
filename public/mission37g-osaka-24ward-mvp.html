@@ -1786,7 +1786,7 @@
     if (silhouette) silhouette.selected = [];
     if (stats.selectedCanonicalId) {
       $('lc-bldg-body').classList.remove('on'); $('lc-bldg-empty').style.display = '';
-      stats.selectedCanonicalId = null; selSeq++;
+      stats.selectedCanonicalId = null; stats.selectedKey = null; selSeq++;
       window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: null } }));
     }
   }
@@ -1801,7 +1801,7 @@
     WardUI.clear();
     $('lc-bldg-empty').style.display = '';
     flyTarget = null;
-    stats.selectedCanonicalId = null;
+    stats.selectedCanonicalId = null; stats.selectedKey = null;
     window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: null } }));
     stats.selectedPoi = null;
     selSeq++; // 取得中の非同期結果を捨てる
@@ -2056,6 +2056,8 @@
 
     stats.lastPicked = { canonicalId: id, featureId: picked.featureId };
     stats.selectedCanonicalId = id;
+    // 40E: 区間で同一 ID が再利用されている（40D 実測 262 件）ため、区コード+元 ID の複合キーも併せて保持する。canonicalId 自体は不変。
+    stats.selectedKey = (extraSrc ? extraSrc.source.wardCode : BASE_WARD) + ':' + id;
     // Non-billable integration point: future UI Kit adapter receives exact canonical ID.
     // Never dispatch a guessed Google Place ID or load Google JS on a map click.
     window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: id } }));
@@ -2076,7 +2078,9 @@
       if (a) {
         const [h, usage, repX, repZ] = a;
         const labels = (bundleManifest && bundleManifest.usageLabels && bundleManifest.usageLabels.labels) || {};
-        $('lb-h').textContent = h.toFixed(1) + ' m';
+        // 40E: 高さが欠損値(sentinel)疑いの建物は、原値を保持したまま表示は「高さ不明」にする（実高さは捏造しない）
+        const hf = attrs.data.heightFallback && attrs.data.heightFallback[id];
+        $('lb-h').textContent = hf ? '高さ不明（原値 ' + hf.raw + ' は欠損値の疑い。表示は仮の ' + hf.display + ' m）' : h.toFixed(1) + ' m';
         $('lb-usage').textContent = usage == null ? '—' : usage;
         $('lc-usage').textContent = (usage != null && labels[usage]) ? labels[usage] : '用途不明';
         $('lb-ll').textContent = toLat(repZ).toFixed(6) + ' / ' + toLon(repX).toFixed(6);
