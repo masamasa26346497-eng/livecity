@@ -47,6 +47,37 @@ function insideRoot(real, rootReal) {
   return r && !r.startsWith('..') && !path.isAbsolute(r);
 }
 
+// True when child is dir itself or lives under dir. Windows paths compare case-insensitively.
+function isUnder(child, dir, plat) {
+  const P = plat === 'win32' ? path.win32 : path.posix;
+  let c = P.resolve(child), d = P.resolve(dir);
+  if (plat === 'win32') { c = c.toLowerCase(); d = d.toLowerCase(); }
+  return (c + P.sep).startsWith(d.endsWith(P.sep) ? d : d + P.sep);
+}
+
+// Root names used by the manifest (first path segment), with file counts.
+function manifestRootNames(parts) {
+  const m = new Map();
+  for (const p of parts) for (const f of p.files) { const i = f.path.indexOf('/'); const r = i < 0 ? f.path : f.path.slice(0, i); m.set(r, (m.get(r) || 0) + 1); }
+  return m;
+}
+
+function categorySummary(m) {
+  const c = new Map();
+  for (const p of m.parts) { const x = c.get(p.category) || { parts: 0, files: 0, bytes: 0 }; x.parts++; x.files += p.files.length; x.bytes += p.files.reduce((a, f) => a + f.size, 0); c.set(p.category, x); }
+  return [...c.entries()].map(([category, v]) => ({ category, ...v }));
+}
+
+// Returns an informative message when a root name used by the selected files is not mapped, else null.
+function rootPreflight(parts, roots) {
+  const need = manifestRootNames(parts);
+  const lack = [...need.keys()].filter((r) => !roots[r]);
+  if (!lack.length) return null;
+  return 'root name(s) used by the manifest are not mapped: ' + lack.join(', ') + '. Mapped root folder names: ' + (Object.keys(roots).join(', ') || '(none)') +
+    '. The root folder name is the folder\'s OWN name and must equal the first path segment in the manifest. ' +
+    'Pass -Roots with a folder named ' + lack[0] + ' (when the inventory was one root, usually the parent folder: -Roots ..).';
+}
+
 function loadManifest(file) {
   const m = JSON.parse(fs.readFileSync(file, 'utf8'));
   if (!m || !Array.isArray(m.parts)) throw new Error('not a 41B manifest.json');
@@ -106,6 +137,10 @@ function dryRun(m, roots, opts) {
   const limitBytes = Math.floor((opts.partLimitGiB || DEFAULT_PART_GIB) * GIB);
   if (limitBytes >= RELEASE_ASSET_LIMIT) throw new Error('part limit must be < 2 GiB');
   const parts = selectParts(m, opts);
+  const manifestFiles = m.parts.reduce((a, p) => a + p.files.length, 0);
+  const matchedFiles = parts.reduce((a, p) => a + p.files.length, 0);
+  const selection = { pathContains: opts.pathContains || null, onlyCategory: opts.onlyCategory || null, matchedFiles, manifestFiles, manifestParts: m.parts.length,
+    subset: matchedFiles !== manifestFiles };
   const cache = new Map();
   const results = parts.map((p) => checkPart(p, roots, limitBytes, cache));
   const total = results.reduce((a, r) => a + r.tarEstimate, 0);
@@ -122,7 +157,7 @@ function dryRun(m, roots, opts) {
   };
   const blocked = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
   return {
-    schema: 1, mode: 'dry-run', network: false, wroteInsideRoots: false,
+    schema: 1, mode: 'dry-run', selection, network: false, wroteInsideRoots: false,
     partLimitBytes: limitBytes, parts: results.length, totalTarEstimate: total, largestPartEstimate: largest,
     freeBytesAtOut: free, diskOk, problems: results.reduce((a, r) => a + r.problems.filter((p) => p.kind !== 'hardlink-warning').length, 0),
     gates, blockedBy: blocked, readyToUpload: false, // never true in 41D
@@ -204,22 +239,42 @@ function run(argv, env) {
     if (!a.manifest || !a.rootsFile || !a.out) throw new Error('usage: pack --manifest <manifest.json> --roots-file <roots.json> --out <new dir> [--dry-run]');
     if (a.dry === false) throw new Error('only --dry-run is supported in 41D');
     const m = loadManifest(a.manifest);
-    let roots = JSON.parse(fs.readFileSync(a.rootsFile, 'utf8').replace(/^﻿/, ''));
+    const sel = selectParts(m, a);
+    const selFiles = sel.reduce((x, p) => x + p.files.length, 0);
+    if (selFiles === 0) {
+      console.log(['pack --dry-run: NOTHING MATCHED the filter (0 files of ' + m.parts.reduce((x, p) => x + p.files.length, 0) + ' in the manifest).',
+        'filter: path-contains=' + (a.pathContains || '-') + ' only-category=' + ((a.onlyCategory || []).join(',') || '-'),
+        'Categories in this manifest (use -OnlyCategory for a category-only dry-run):', ...categorySummary(m).map((c) => '  ' + c.category + ': ' + c.files + ' files, ' + (c.bytes / GIB).toFixed(2) + ' GiB'),
+        'Nothing was checked. This is NOT a pass.'].join('\n'));
+      return 3;
+    }
+    const roots = JSON.parse(fs.readFileSync(a.rootsFile, 'utf8').replace(/^﻿/, ''));
     const outAbs = path.resolve(a.out);
     for (const [name, dir] of Object.entries(roots)) {
       const rd = path.resolve(dir);
       if (!fs.existsSync(rd) || !fs.statSync(rd).isDirectory()) throw new Error('root not found: ' + name);
-      if ((outAbs + path.sep).startsWith(rd + path.sep)) throw new Error('--out must be outside every data root (' + name + ')');
+      if (isUnder(outAbs, rd, process.platform)) throw new Error('--out must be outside every data root (' + name + ')');
       roots[name] = rd;
     }
+    const pre = rootPreflight(sel, roots);
+    if (pre) throw new Error(pre);
     if (fs.existsSync(outAbs) && fs.readdirSync(outAbs).length) throw new Error('--out is not empty (will not overwrite)');
     fs.mkdirSync(outAbs, { recursive: true });
     const rep = dryRun(m, roots, { ...a, outDir: outAbs });
     writeNew(outAbs, 'pack-dry-run.json', rep);
-    console.log(['pack --dry-run (offline, read-only)', 'parts: ' + rep.parts, 'tar estimate total: ' + (rep.totalTarEstimate / GIB).toFixed(2) + ' GiB, largest part: ' + (rep.largestPartEstimate / GIB).toFixed(2) + ' GiB (limit ' + (rep.partLimitBytes / GIB).toFixed(2) + ')',
+    console.log(['pack --dry-run (offline, read-only)',
+      (rep.selection.subset ? 'SUBSET dry-run: ' : 'FULL manifest dry-run: ') + 'checked ' + rep.selection.matchedFiles + ' of ' + rep.selection.manifestFiles + ' manifest files' + (rep.selection.subset ? ' (does NOT cover the whole manifest)' : ''),
+      'parts: ' + rep.parts, 'tar estimate total: ' + (rep.totalTarEstimate / GIB).toFixed(2) + ' GiB, largest part: ' + (rep.largestPartEstimate / GIB).toFixed(2) + ' GiB (limit ' + (rep.partLimitBytes / GIB).toFixed(2) + ')',
       'free disk at out: ' + (rep.freeBytesAtOut === null ? 'unknown' : (rep.freeBytesAtOut / GIB).toFixed(1) + ' GiB') + ', staging ok: ' + rep.diskOk,
       'problems: ' + rep.problems, 'gates still closed: ' + (rep.blockedBy.join(',') || 'none'), 'readyToUpload: false'].join('\n'));
     return rep.problems === 0 ? 0 : 1;
+  }
+  if (cmd === 'categories') {
+    if (!a.manifest) throw new Error('usage: categories --manifest <manifest.json>');
+    const m = loadManifest(a.manifest);
+    console.log(['manifest: ' + m.parts.length + ' parts', ...categorySummary(m).map((c) => '  ' + c.category + ': ' + c.parts + ' parts, ' + c.files + ' files, ' + (c.bytes / GIB).toFixed(2) + ' GiB'),
+      'root names: ' + [...manifestRootNames(m.parts).keys()].join(', ')].join('\n'));
+    return 0;
   }
   if (cmd === 'verify') {
     if (!a.manifest || !a.partsDir) throw new Error('usage: verify --manifest <manifest.json> --parts-dir <dir> [--state state.json]');
@@ -236,8 +291,8 @@ function run(argv, env) {
     console.log(r.reason);
     return 2;
   }
-  throw new Error('commands: pack | verify | upload(disabled)');
+  throw new Error('commands: pack | categories | verify | upload(disabled)');
 }
 
-module.exports = { checkRel, tarEstimate, checkPart, dryRun, verify, upload, selectParts, run, GIB, RELEASE_ASSET_LIMIT };
+module.exports = { isUnder, manifestRootNames, categorySummary, rootPreflight, checkRel, tarEstimate, checkPart, dryRun, verify, upload, selectParts, run, GIB, RELEASE_ASSET_LIMIT };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2), process.env)); } catch (e) { console.error(e.message); process.exit(1); } }

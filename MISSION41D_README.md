@@ -4,11 +4,15 @@ Read-only and offline. Nothing is copied, moved, deleted or uploaded. Real data 
 
 ## Flow on the PC (Windows PowerShell 5.1, repo root)
 1. `tools\mission41c-quick.ps1` (existing) -> prints anonymous summary and writes `manifest.json`, `deferred-ledger.json` under `%TEMP%\livecity-plan-*`.
-2. Dry-run of the pack (checks every listed file; first small transfer = Fukushima):
+2. Dry-run of the pack (41E: ONE command; the newest `livecity-plan-*` is found automatically; `-Roots` defaults to `..`):
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41d-pack.ps1 -Manifest "$env:TEMP\livecity-plan-XXXX\manifest.json" -Roots "..\livecity-data-pipeline;..\livecity-3dtiles-out-fukushima" -PathContains fukushima
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41d-pack.ps1 -PathContains fukushima
 ```
-Root folder names must equal the root names in the inventory. Japanese paths are passed via a UTF-8 JSON file, not the command line.
+The 41A inventory used a single root (`LiveCity`), so manifest paths start with `LiveCity/`. `-Roots ..` maps the parent folder (its own name must be `LiveCity`). Do NOT list `livecity-data-pipeline;livecity-3dtiles-out-fukushima` as roots for this inventory: preflight reports `root name(s) ... not mapped` with a hint.
+- `-PathContains` is a case-insensitive substring match on the manifest path. Zero matches: categories are printed, exit code 3, NOT a pass. Fallback: `-ListCategories`, then `-OnlyCategory <name>`.
+- A filtered run prints `SUBSET dry-run: checked X of Y manifest files`; only an unfiltered run says `FULL manifest dry-run`. `pack-dry-run.json` has a `selection` block.
+- Absolute (TEMP) and relative paths are both accepted (`IsPathRooted`), so the earlier GetFullPath failure on absolute paths cannot recur.
+- Japanese paths are passed via a UTF-8 JSON file, not the command line.
 3. After parts exist (future step): `... -Verify -PartsDir <dir>`.
 
 ## What the dry-run checks
