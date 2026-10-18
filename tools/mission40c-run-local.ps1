@@ -11,6 +11,8 @@ Usage (from the repository root):
 param(
   [Parameter(Mandatory = $true)][string]$LegacyBuildings,
   [string]$OutRoot = '',
+  [string]$Wards = '',
+  [switch]$OnlyOk,
   [ValidateSet('all', 'validate', 'inventory', 'convert')][string]$Mode = 'all'
 )
 $ErrorActionPreference = 'Stop'
@@ -21,8 +23,7 @@ if (-not (Test-Path $tool)) { throw ('tool not found: ' + $tool) }
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'node (18+) was not found in PATH' }
 $LegacyBuildings = [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $LegacyBuildings))
 if (-not (Test-Path (Join-Path $LegacyBuildings 'manifest.json'))) { throw ('manifest.json not found in ' + $LegacyBuildings + ' (point to the buildings folder)') }
-$tiles = (Get-ChildItem -Path $LegacyBuildings -Recurse -Filter 'tile_*.json' -File | Measure-Object).Count
-Write-Host ('tile_*.json count: ' + $tiles + ' (expected 1097)')
+Write-Host 'Tile counts are scoped by Node: the 24 ward folders vs other folders (osm-fallback, unclassified) are reported separately.'
 
 if ($Mode -eq 'all' -or $Mode -eq 'validate') {
   & node $tool --src $LegacyBuildings --validate
@@ -40,7 +41,10 @@ if ($Mode -eq 'all' -or $Mode -eq 'convert') {
   $OutRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $OutRoot))
   if ((Test-Path $OutRoot) -and (Get-ChildItem $OutRoot -Force | Select-Object -First 1)) { throw ('Output dir is not empty (will not overwrite): ' + $OutRoot) }
   New-Item -ItemType Directory -Force -Path $OutRoot | Out-Null
-  & node $tool --src $LegacyBuildings --all-available --out-root $OutRoot
+  $nodeArgs = @($tool, '--src', $LegacyBuildings, '--all-available', '--out-root', $OutRoot)
+  if (-not [string]::IsNullOrEmpty($Wards)) { $nodeArgs += @('--wards', $Wards) }
+  if ($OnlyOk) { $nodeArgs += '--only-ok' }
+  & node @nodeArgs
   if ($LASTEXITCODE -ne 0) { throw ('convert failed, exit code ' + $LASTEXITCODE) }
   $sum = (Get-ChildItem $OutRoot -Recurse -File | Measure-Object Length -Sum).Sum
   if ($null -eq $sum) { $sum = 0 }

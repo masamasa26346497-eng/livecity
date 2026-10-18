@@ -167,16 +167,51 @@ function verify(aDir, bDir) {
   return { a: a.size, b: b.size, common, onlyA: a.size - common, onlyB: b.size - common, identical: common === a.size && common === b.size };
 }
 
+// ---- 40D: 重複 ID の診断ポリシー（元データは変更しない・建物は削除しない） ----
+const crypto = require('node:crypto');
+// footprint を 0.1m に丸め、頂点列を並べ替えて正規化（開始点・向きに依存しない）→ 短いハッシュ
+function fpHash(fp, h) {
+  const pts = (fp || []).map((q) => r1(q[0]) + ',' + r1(q[1]));
+  if (pts.length > 1 && pts[0] === pts[pts.length - 1]) pts.pop();
+  pts.sort();
+  return crypto.createHash('md5').update(pts.join(';') + '|' + r1(h || 0)).digest('hex').slice(0, 12);
+}
+// 同一 ID が 2 区にあるとき: identical = 形状・高さが同じ（境界またぎの重複収録＝無害）、conflict = 同じ ID で形状が違う（真の衝突）
+function classifyDup(a, b) { return a.hash === b.hash ? 'identical' : 'conflict'; }
+function countTiles(dir) {
+  let n = 0;
+  if (!fs.existsSync(dir)) return 0;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) n += countTiles(p); else if (/^tile_.*\.json$/.test(e.name)) n++;
+  }
+  return n;
+}
+// タイル数のスコープ: 24 区ディレクトリ（root manifest の id）と、それ以外（osm-fallback / unclassified 等）を分けて集計
+function tileScope(root) {
+  const wardDirs = new Set(root.datasets.map((d) => d.id));
+  const perWard = {}; const other = {}; let wardTotal = 0; let otherTotal = 0;
+  for (const e of fs.readdirSync(BLD, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const n = countTiles(path.join(BLD, e.name));
+    if (wardDirs.has(e.name)) { perWard[e.name] = n; wardTotal += n; } else { other[e.name] = n; otherTotal += n; }
+  }
+  return { wardDirTiles: wardTotal, otherDirTiles: otherTotal, otherDirs: other, totalRecursive: wardTotal + otherTotal, expectedFromManifest: root.tileCount, perWard };
+}
+
 // 24 区の整合性検証（読み取りのみ）: manifest 件数 vs 実ファイル、ID 一意・形式、座標・高さ・タイル帰属
 function validate() {
   const root = readJson(fs.existsSync(path.join(BLD, 'manifest.json')) ? path.join(BLD, 'manifest.json') : path.join(REPO_BLD, 'manifest.json'));
-  const seen = new Map(); // canonicalId -> ward（区間重複検出）
+  const seen = new Map(); // canonicalId -> {ward, hash, file, repX, repZ, h}（区間重複検出）
+  const dupPairs = {}; // 'wardA|wardB' -> {identical, conflict}
+  const dupSamples = []; // 区組・座標・footprint 比較（最大 60 件）
+  const badHeightSamples = []; // 最大 50 件
   const wards = [];
   let problems = 0;
   for (const d of root.datasets) {
     const dir = path.join(BLD, d.id);
     const w = { wardId: d.wardId, ward: d.ward, manifestBuildings: d.buildings, manifestTiles: d.tiles, status: 'ok', tilesFound: 0, tilesMissing: [], buildings: 0,
-      countMismatchTiles: 0, badId: 0, dupIdWithinWard: 0, dupIdAcrossWards: 0, badFootprint: 0, badHeight: 0, outOfTile: 0, outOfBounds: 0, maxHeight: 0, issues: [] };
+      countMismatchTiles: 0, badId: 0, dupIdWithinWard: 0, dupIdAcrossWards: 0, dupIdAcrossWardsIdentical: 0, dupIdAcrossWardsConflict: 0, badFootprint: 0, badHeight: 0, outOfTile: 0, outOfBounds: 0, maxHeight: 0, issues: [] };
     const mf = path.join(dir, 'manifest.json');
     if (!fs.existsSync(mf)) { w.status = 'missing'; w.issues.push('ward manifest not found'); wards.push(w); problems++; continue; }
     const m = readJson(mf);
@@ -192,11 +227,25 @@ function validate() {
         w.buildings++;
         if (typeof x.id !== 'string' || !/^bldg_/.test(x.id)) w.badId++;
         if (own.has(x.id)) w.dupIdWithinWard++; else own.add(x.id);
-        if (seen.has(x.id) && seen.get(x.id) !== d.wardId) w.dupIdAcrossWards++; else seen.set(x.id, d.wardId);
+        const cur = { ward: d.wardId, file: path.relative(BLD, f), hash: fpHash(x.fp, x.h), repX: x.repX, repZ: x.repZ, h: x.h };
+        const prev = seen.get(x.id);
+        if (prev && prev.ward !== d.wardId) {
+          w.dupIdAcrossWards++;
+          const kind = classifyDup(prev, cur);
+          if (kind === 'identical') w.dupIdAcrossWardsIdentical++; else w.dupIdAcrossWardsConflict++;
+          const key = prev.ward + '|' + d.wardId;
+          (dupPairs[key] = dupPairs[key] || { identical: 0, conflict: 0 })[kind]++;
+          if (dupSamples.length < 60 && (kind === 'conflict' || dupSamples.length < 30)) {
+            dupSamples.push({ id: x.id, kind, first: prev, second: cur, distM: Number.isFinite(prev.repX) && Number.isFinite(x.repX) ? r1(Math.hypot(prev.repX - x.repX, prev.repZ - x.repZ)) : null, fpVertices: (x.fp || []).length });
+          }
+        } else if (!prev) seen.set(x.id, cur);
         const fp = x.fp;
         if (!Array.isArray(fp) || fp.length < 3 || !fp.every((q) => Array.isArray(q) && Number.isFinite(q[0]) && Number.isFinite(q[1]))) w.badFootprint++;
         const h = x.h;
-        if (!Number.isFinite(h) || h <= 0 || h > 400) w.badHeight++; else if (h > w.maxHeight) w.maxHeight = h;
+        if (!Number.isFinite(h) || h <= 0 || h > 400) {
+          w.badHeight++;
+          if (badHeightSamples.length < 50) badHeightSamples.push({ ward: d.wardId, id: x.id, h: Number.isFinite(h) ? h : String(h), file: path.relative(BLD, f), repX: x.repX, repZ: x.repZ, usage: x.usage || null });
+        } else if (h > w.maxHeight) w.maxHeight = h;
         if (Number.isFinite(x.repX) && Number.isFinite(x.repZ)) {
           if (Math.floor(x.repX / ts) !== t.tx || Math.floor(x.repZ / ts) !== t.tz) w.outOfTile++;
           if (b && (x.repX < b.minX - tol || x.repX > b.maxX + tol || x.repZ < b.minZ - tol || x.repZ > b.maxZ + tol)) w.outOfBounds++;
@@ -206,11 +255,15 @@ function validate() {
     if (w.tilesMissing.length) w.issues.push(w.tilesMissing.length + ' tile files missing');
     if (w.buildings !== d.buildings) w.issues.push(`buildings ${w.buildings} != root manifest ${d.buildings}`);
     if (w.tilesFound + w.tilesMissing.length !== d.tiles) w.issues.push(`tiles ${w.tilesFound + w.tilesMissing.length} != root manifest ${d.tiles}`);
-    for (const k of ['countMismatchTiles', 'badId', 'dupIdWithinWard', 'dupIdAcrossWards', 'badFootprint', 'badHeight', 'outOfTile', 'outOfBounds']) if (w[k]) w.issues.push(k + '=' + w[k]);
+    // 形状まで同一の区間重複は無害（境界またぎの重複収録）として notes 扱い。形状が違う ID 衝突だけを issue とする
+    if (w.dupIdAcrossWardsIdentical) w.notes = ['dupIdAcrossWardsIdentical=' + w.dupIdAcrossWardsIdentical + ' (same geometry; benign, kept)'];
+    for (const k of ['countMismatchTiles', 'badId', 'dupIdWithinWard', 'dupIdAcrossWardsConflict', 'badFootprint', 'badHeight', 'outOfTile', 'outOfBounds']) if (w[k]) w.issues.push(k + '=' + w[k]);
     if (w.issues.length) { w.status = 'issues'; problems++; }
     wards.push(w);
   }
   const rep = { generatedAt: new Date().toISOString(), sourceRoot: BLD === REPO_BLD ? 'repo' : BLD,
+    tileScope: tileScope(root), dupPairs, dupSamples, badHeightSamples,
+    policy: 'read-only; no building is removed; identical cross-ward duplicates are benign (ward tilesets are mounted one ward at a time); same-id/different-geometry is a conflict and that ward is excluded from --only-ok',
     totals: { wards: wards.length, ok: wards.filter((w) => w.status === 'ok').length, missing: wards.filter((w) => w.status === 'missing').length, withIssues: wards.filter((w) => w.status === 'issues').length,
       buildings: wards.reduce((n, w) => n + w.buildings, 0), manifestBuildings: root.buildingCount }, wards };
   const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse', BLD === REPO_BLD ? 'validate.json' : 'validate-external.json');
@@ -225,13 +278,17 @@ function main() {
   const opt = (k, d) => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : d; };
   const src = opt('src', process.env.LIVECITY_LEGACY_BUILDINGS);
   if (src) { if (!fs.existsSync(src)) { console.error('--src not found: ' + src); process.exit(2); } setSource(src); }
-  if (has('validate')) { const r = validate(); console.log(JSON.stringify(r.totals, null, 1)); for (const w of r.wards) if (w.status !== 'ok') console.log(w.wardId, w.status, w.issues.join('; ')); process.exit(r.totals.ok === r.totals.wards ? 0 : 1); }
+  if (has('validate')) { const r = validate(); console.log(JSON.stringify(r.totals, null, 1)); const sc = r.tileScope; console.log('tile scope: ward dirs=' + sc.wardDirTiles + ' (expected ' + sc.expectedFromManifest + '), other dirs=' + sc.otherDirTiles + ' ' + JSON.stringify(sc.otherDirs)); console.log('dup pairs: ' + JSON.stringify(r.dupPairs)); for (const b of r.badHeightSamples.slice(0, 10)) console.log('badHeight', JSON.stringify(b)); for (const w of r.wards) if (w.status !== 'ok') console.log(w.wardId, w.status, w.issues.join('; ')); process.exit(r.totals.ok === r.totals.wards ? 0 : 1); }
   if (has('inventory')) { console.log(JSON.stringify(inventory().totals, null, 1)); return; }
   if (has('verify')) { console.log(JSON.stringify(verify(opt('against'), opt('verify')), null, 1)); return; }
   if (has('all-available')) {
     const inv = inventory();
+    const only = opt('wards') ? new Set(opt('wards').split(',')) : null; // 段階変換: 指定区のみ
+    const okSet = has('only-ok') ? new Set(validate().wards.filter((x) => x.status === 'ok').map((x) => x.wardId)) : null; // 検証合格区のみ
     for (const w of inv.wards) {
       if (!w.legacyTilesLocal.complete || w.cesium3dTiles.buildings > 0) continue;
+      if (only && !only.has(w.wardId)) continue;
+      if (okSet && !okSet.has(w.wardId)) { console.log(JSON.stringify({ ward: w.wardId, skipped: 'not validated ok (--only-ok)' })); continue; }
       console.log(JSON.stringify(convertWard(w.wardId, { force: has('force'), out: opt('out-root') ? path.join(opt('out-root'), w.wardId) : undefined })));
     }
     return;
@@ -246,5 +303,5 @@ function main() {
   }
 }
 
-module.exports = { setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
+module.exports = { fpHash, classifyDup, countTiles, tileScope, setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
 if (require.main === module) main();
