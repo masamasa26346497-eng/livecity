@@ -160,7 +160,10 @@ function plan(files) {
     bigFileStrategy,
     singleRepoOk: total <= 1 * GB && !oversize.length,
     parts,
+    partsOverTarget: parts.filter((p) => p.bytes > LIMITS.partTarget).length,
+    maxPartBytes: parts.reduce((m, p) => Math.max(m, p.bytes), 0),
     notes: [
+      'WARNING: this 41A grouping never splits a group, so parts can exceed the target (see partsOverTarget/maxPartBytes). Use tools/mission41b-plan.cjs for a limit-enforcing plan.',
       'Recommended repo size is under 1 GB (hard cap 5 GB soft); parts above target 900 MB each.',
       'Exclusions (not uploaded): secrets-candidate, photos-unverified-rights, node-modules-cache. Resolve each before inclusion.',
       'Source attribution and licence must be recorded per dataset before any public serving (PLATEAU, OSM ODbL, N03, e-Stat, Wikimedia).',
@@ -185,7 +188,7 @@ function report(inv, pl, meta) {
   L.push('## Skipped', '', '- symlinks: ' + inv.skipped.symlinks, '- unreadable: ' + inv.skipped.unreadable, '- excluded dirs: ' + inv.skipped.excludedDirs.length, '');
   L.push('## Upload plan (private repos, plan only)', '', pl.visibility, '');
   for (const p of pl.parts) L.push('- ' + p.name + ': ' + fmt(p.bytes) + ', ' + p.files + ' files, ' + p.groups.length + ' groups');
-  L.push('', ...pl.notes.map((n) => '- ' + n), '');
+  L.push('', '- Parts over ' + fmt(LIMITS.partTarget) + ' target: ' + pl.partsOverTarget + ' (largest ' + fmt(pl.maxPartBytes) + ') <- 41A grouping does not split; use mission41b-plan', ...pl.notes.map((n) => '- ' + n), '');
   return L.join('\n');
 }
 
@@ -215,7 +218,7 @@ function run(argv) {
   fs.writeFileSync(path.join(out, 'inventory.json'), JSON.stringify({ meta, categories: inv.cats, skipped: inv.skipped, duplicates: inv.dupCandidates, files: slim }, null, 1), { flag: 'wx' });
   fs.writeFileSync(path.join(out, 'upload-plan.json'), JSON.stringify(pl, null, 1), { flag: 'wx' });
   fs.writeFileSync(path.join(out, 'report.md'), report(inv, pl, meta), { flag: 'wx' });
-  console.log(JSON.stringify({ out, files: inv.files.length, over100MB: pl.filesOver100MB.length, secretCandidates: slim.filter((f) => f.secretByName || f.secrets.length).length, eligible: fmt(pl.eligibleBytes), parts: pl.parts.length, strategy: pl.bigFileStrategy }));
+  console.log(JSON.stringify({ out, files: inv.files.length, over100MB: pl.filesOver100MB.length, secretCandidates: slim.filter((f) => f.secretByName || f.secrets.length).length, eligible: fmt(pl.eligibleBytes), parts: pl.parts.length, partsOverTarget: pl.partsOverTarget, maxPart: fmt(pl.maxPartBytes), strategy: pl.bigFileStrategy }));
 }
 
 module.exports = { inventory, plan, report, classify, scanSecrets, run, LIMITS };
