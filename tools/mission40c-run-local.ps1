@@ -13,7 +13,7 @@ param(
   [string]$OutRoot = '',
   [string]$Wards = '',
   [switch]$OnlyOk,
-  [ValidateSet('all', 'validate', 'inventory', 'convert')][string]$Mode = 'all'
+  [ValidateSet('all', 'validate', 'inventory', 'convert', 'diagnose')][string]$Mode = 'all'
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
@@ -32,6 +32,11 @@ if ($Mode -eq 'all' -or $Mode -eq 'validate') {
     Write-Warning 'Some wards failed validation. See data\reports\mission40b-legacy-reuse\validate-external.json. Use -Mode convert to convert anyway.'
   }
   if ($Mode -eq 'all' -and $validateExit -ne 0) { throw 'Validation failed; conversion aborted (use -Mode convert to force).' }
+}
+if ($Mode -eq 'diagnose') {
+  & node $tool --src $LegacyBuildings --diagnose
+  if ($LASTEXITCODE -ne 0) { throw ('diagnose failed, exit code ' + $LASTEXITCODE) }
+  Write-Host 'Report: data\reports\mission40b-legacy-reuse\diagnose-external.json (read-only; source untouched).'
 }
 if ($Mode -eq 'all' -or $Mode -eq 'inventory') {
   & node $tool --src $LegacyBuildings --inventory

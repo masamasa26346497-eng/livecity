@@ -272,6 +272,107 @@ function validate() {
   return rep;
 }
 
+// ---- 40D-2: 区間 ID 衝突・高さ異常の原因切り分け（読み取りのみ。補正・削除・書き換えはしない） ----
+function pointInRing(x, z, ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i][0], zi = ring[i][1], xj = ring[j][0], zj = ring[j][1];
+    if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function inWardPoly(x, z, ward) {
+  const bb = ward.bbox;
+  if (x < bb.minX || x > bb.maxX || z < bb.minZ || z > bb.maxZ) return false;
+  return ward.polygons.some((p) => pointInRing(x, z, p.outer) && !(p.holes || []).some((h) => pointInRing(x, z, h)));
+}
+function fpMetrics(fp) {
+  let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity, a = 0, cx = 0, cz = 0;
+  for (let i = 0; i < fp.length; i++) {
+    const p = fp[i], q = fp[(i + 1) % fp.length];
+    minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minZ = Math.min(minZ, p[1]); maxZ = Math.max(maxZ, p[1]);
+    const c = p[0] * q[1] - q[0] * p[1]; a += c; cx += (p[0] + q[0]) * c; cz += (p[1] + q[1]) * c;
+  }
+  a /= 2;
+  const bboxC = [(minX + maxX) / 2, (minZ + maxZ) / 2];
+  return { bbox: [minX, minZ, maxX, maxZ], area: Math.abs(a), centroid: a ? [cx / (6 * a), cz / (6 * a)] : bboxC };
+}
+function bboxIoU(a, b) {
+  const w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+  if (w <= 0 || h <= 0) return 0;
+  const i = w * h, u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i;
+  return u > 0 ? i / u : 0;
+}
+// 2 つの収録を比較して原因カテゴリを返す（推測ではなく幾何の事実だけで分類）
+function classifyConflict(a, b) {
+  const ma = fpMetrics(a.fp), mb = fpMetrics(b.fp);
+  const iou = bboxIoU(ma.bbox, mb.bbox);
+  const cd = Math.hypot(ma.centroid[0] - mb.centroid[0], ma.centroid[1] - mb.centroid[1]);
+  const dh = Math.abs((a.h || 0) - (b.h || 0));
+  let cause;
+  if (iou === 0 || cd > 50) cause = 'id-reuse-distinct-buildings'; // 離れた別建物に同じ ID（実質 ID 衝突）
+  else if (iou >= 0.9 && dh < 0.1) cause = 'same-building-vertex-differences'; // ほぼ同位置・同高さ（頂点表現の差）
+  else if (iou >= 0.9) cause = 'same-building-height-differs';
+  else cause = 'overlapping-version-or-shifted'; // 重なるが位置・形が違う（版違い・境界処理差）
+  return { cause, bboxIoU: Math.round(iou * 1000) / 1000, centroidDistM: r1(cd), heightDiffM: r1(dh), areaA: r1(ma.area), areaB: r1(mb.area) };
+}
+function diagnose(opts) {
+  opts = opts || {};
+  const root = readJson(fs.existsSync(path.join(BLD, 'manifest.json')) ? path.join(BLD, 'manifest.json') : path.join(REPO_BLD, 'manifest.json'));
+  const wardsFile = opts.wardsFile || path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json');
+  const polys = fs.existsSync(wardsFile) ? Object.fromEntries(readJson(wardsFile).wards.map((w) => [w.wardId, w])) : {};
+  const listTiles = (d) => { const dir = path.join(BLD, d.id); const mf = path.join(dir, 'manifest.json'); if (!fs.existsSync(mf)) return []; return (readJson(mf).tiles || []).map((t) => path.join(dir, t.file || `tile_${t.tx}_${t.tz}.json`)).filter((f) => fs.existsSync(f)); };
+  // pass 1: ID -> 初出の区。2 区以上に現れる ID を特定（軽量）
+  const first = new Map(); const dupIds = new Set();
+  for (const d of root.datasets) for (const f of listTiles(d)) for (const x of readJson(f).buildings) {
+    const p = first.get(x.id);
+    if (p === undefined) first.set(x.id, d.wardId); else if (p !== d.wardId) dupIds.add(x.id);
+  }
+  // pass 2: 重複 ID の全収録と、高さ異常の近傍比較用の同タイル高さを集める
+  const occ = new Map(); const badH = [];
+  for (const d of root.datasets) for (const f of listTiles(d)) {
+    const tile = readJson(f); const hs = [];
+    for (const x of tile.buildings) {
+      if (dupIds.has(x.id)) { if (!occ.has(x.id)) occ.set(x.id, []); occ.get(x.id).push({ ward: d.wardId, file: path.relative(BLD, f), fp: x.fp, h: x.h, z0: x.z0, usage: x.usage || null, repX: x.repX, repZ: x.repZ }); }
+      if (Number.isFinite(x.h) && x.h > 0 && x.h <= 400) hs.push({ x: x.repX, z: x.repZ, h: x.h });
+      if (!Number.isFinite(x.h) || x.h <= 0 || x.h > 400) badH.push({ ward: d.wardId, file: path.relative(BLD, f), b: x, ok: hs });
+    }
+    for (const e of badH) if (e.file === path.relative(BLD, f) && !e.neighbors) { e.neighbors = tile.buildings.filter((y) => y.id !== e.b.id && Number.isFinite(y.h) && y.h > 0 && y.h <= 400 && Math.hypot(y.repX - e.b.repX, y.repZ - e.b.repZ) <= 100).map((y) => y.h); }
+  }
+  // 衝突の集計
+  const byCause = {}; const byPair = {}; const samples = []; let ownershipAgree = 0, ownershipTotal = 0;
+  for (const [id, list] of occ) {
+    for (let i = 1; i < list.length; i++) {
+      const a = list[0], b = list[i];
+      const c = classifyConflict(a, b);
+      const home = (o) => (polys[o.ward] ? inWardPoly(o.repX, o.repZ, polys[o.ward]) : null);
+      const ha = home(a), hb = home(b);
+      const key = a.ward + '|' + b.ward;
+      byCause[c.cause] = (byCause[c.cause] || 0) + 1;
+      const bp = (byPair[key] = byPair[key] || { total: 0, causes: {}, insideOwnWardPolygon: { first: 0, second: 0, both: 0, neither: 0 } });
+      bp.total++; bp.causes[c.cause] = (bp.causes[c.cause] || 0) + 1;
+      const own = ha && hb ? 'both' : ha ? 'first' : hb ? 'second' : 'neither';
+      bp.insideOwnWardPolygon[own]++;
+      if (ha !== null && hb !== null) { ownershipTotal++; if (ha !== hb) ownershipAgree++; }
+      if (samples.length < 80) samples.push({ id, ...c, first: { ward: a.ward, file: a.file, rep: [a.repX, a.repZ], h: a.h, usage: a.usage, insideOwnWardPolygon: ha }, second: { ward: b.ward, file: b.file, rep: [b.repX, b.repZ], h: b.h, usage: b.usage, insideOwnWardPolygon: hb } });
+    }
+  }
+  // 高さ異常: 値そのものと同タイル近傍(100m)との比較。補正はしない
+  const heightAnomalies = badH.map((e) => {
+    const nb = (e.neighbors || []).sort((x, y) => x - y);
+    const med = nb.length ? nb[Math.floor(nb.length / 2)] : null;
+    const h = e.b.h;
+    const note = !Number.isFinite(h) ? 'non-finite (missing value)' : h === 29997 || h === 29999 || h === 30000 ? 'sentinel-like value (suspected missing-data marker; NOT metres)' : h <= 0 ? 'non-positive' : h > 400 ? 'implausible (>400m)' : '';
+    return { ward: e.ward, id: e.b.id, file: e.file, h, z0: e.b.z0, usage: e.b.usage || null, rep: [e.b.repX, e.b.repZ], footprintVertices: (e.b.fp || []).length, footprintAreaM2: e.b.fp ? r1(fpMetrics(e.b.fp).area) : null, neighborsWithin100m: nb.length, neighborMedianH: med, neighborMaxH: nb.length ? nb[nb.length - 1] : null, note, action: 'none: source untouched. convert policy: keep building, mark height as unknown (see --height-policy) - owner decision' };
+  });
+  const rep = { generatedAt: new Date().toISOString(), sourceRoot: BLD === REPO_BLD ? 'repo' : BLD, duplicateIds: dupIds.size, conflictsByCause: byCause, byPair, ownership: { comparablePairs: ownershipTotal, exactlyOneInsideOwnWardPolygon: ownershipAgree, note: 'N03 ward polygon point-in-polygon of the representative point; exactly-one means the ward of origin is unambiguous' }, samples, heightAnomalies,
+    policy: 'read-only. Nothing is deleted/corrected. Ward tilesets mount one ward at a time, so a cross-ward duplicate never renders twice; for id-reuse-distinct-buildings the click sidecar is per ward/tileset (_lcBase), so ids do not collide in the viewer but are not globally unique' };
+  const out = path.join(ROOT, 'data/reports/mission40b-legacy-reuse', BLD === REPO_BLD ? 'diagnose.json' : 'diagnose-external.json');
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(out, JSON.stringify(rep, null, 1));
+  return rep;
+}
+
 function main() {
   const args = process.argv.slice(2);
   const has = (k) => args.includes('--' + k);
@@ -279,6 +380,14 @@ function main() {
   const src = opt('src', process.env.LIVECITY_LEGACY_BUILDINGS);
   if (src) { if (!fs.existsSync(src)) { console.error('--src not found: ' + src); process.exit(2); } setSource(src); }
   if (has('validate')) { const r = validate(); console.log(JSON.stringify(r.totals, null, 1)); const sc = r.tileScope; console.log('tile scope: ward dirs=' + sc.wardDirTiles + ' (expected ' + sc.expectedFromManifest + '), other dirs=' + sc.otherDirTiles + ' ' + JSON.stringify(sc.otherDirs)); console.log('dup pairs: ' + JSON.stringify(r.dupPairs)); for (const b of r.badHeightSamples.slice(0, 10)) console.log('badHeight', JSON.stringify(b)); for (const w of r.wards) if (w.status !== 'ok') console.log(w.wardId, w.status, w.issues.join('; ')); process.exit(r.totals.ok === r.totals.wards ? 0 : 1); }
+  if (has('diagnose')) {
+    const r = diagnose();
+    console.log('duplicate ids: ' + r.duplicateIds + ' causes: ' + JSON.stringify(r.conflictsByCause));
+    for (const [k, v] of Object.entries(r.byPair)) console.log('pair ' + k + ' ' + JSON.stringify(v));
+    console.log('ownership: ' + JSON.stringify(r.ownership));
+    for (const h of r.heightAnomalies) console.log('height', JSON.stringify(h));
+    return;
+  }
   if (has('inventory')) { console.log(JSON.stringify(inventory().totals, null, 1)); return; }
   if (has('verify')) { console.log(JSON.stringify(verify(opt('against'), opt('verify')), null, 1)); return; }
   if (has('all-available')) {
@@ -303,5 +412,5 @@ function main() {
   }
 }
 
-module.exports = { fpHash, classifyDup, countTiles, tileScope, setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
+module.exports = { diagnose, classifyConflict, fpMetrics, fpHash, classifyDup, countTiles, tileScope, setSource, validate, inventory, convertWard, convertSubset, verify, idSet, existingTilesets };
 if (require.main === module) main();

@@ -94,3 +94,42 @@ test('CLI/PS1: --wards / --only-ok が配線され、ps1 は ASCII で元デー�
   assert.ok(!/Remove-Item|Copy-Item|robocopy|Move-Item/i.test(t));
   assert.ok(!t.includes('-Recurse -Filter'), 'tile count must not recurse over the whole root');
 });
+
+test('classifyConflict: 幾何の事実だけで原因カテゴリを分ける', () => {
+  const A = { fp: sq(0, 0), h: 10 };
+  assert.strictEqual(tool.classifyConflict(A, { fp: sq(0, 0), h: 10 }).cause, 'same-building-vertex-differences');
+  assert.strictEqual(tool.classifyConflict(A, { fp: sq(0, 0), h: 14 }).cause, 'same-building-height-differs');
+  assert.strictEqual(tool.classifyConflict(A, { fp: sq(4, 4), h: 10 }).cause, 'overlapping-version-or-shifted');
+  const far = tool.classifyConflict(A, { fp: sq(900, 900), h: 10 });
+  assert.strictEqual(far.cause, 'id-reuse-distinct-buildings');
+  assert.ok(far.centroidDistM > 1000);
+});
+
+test('diagnose: 区ポリゴンでの帰属と高さ異常(29997)の近傍比較。補正せず元ファイルも不変', () => {
+  const dir = makeFixture();
+  const aFile = path.join(dir, 'osaka-a/tile_0_0.json');
+  const t = JSON.parse(fs.readFileSync(aFile, 'utf8'));
+  t.buildings.push({ ...bld('bldg_sent', 60, 60, 29997), usage: '461' }, bld('bldg_nb', 70, 70, 9));
+  fs.writeFileSync(aFile, JSON.stringify(t));
+  const wf = path.join(dir, 'wards.json');
+  const box = (x0, x1) => [[x0, 0], [x1, 0], [x1, 500], [x0, 500]];
+  const wardsDoc = { wards: [
+    { wardId: 'a', bbox: { minX: 0, maxX: 250, minZ: 0, maxZ: 500 }, polygons: [{ outer: box(0, 250), holes: [] }] },
+    { wardId: 'b', bbox: { minX: 250, maxX: 500, minZ: 0, maxZ: 500 }, polygons: [{ outer: box(250, 500), holes: [] }] },
+  ] };
+  fs.writeFileSync(wf, JSON.stringify(wardsDoc));
+  const before = fs.readFileSync(aFile, 'utf8');
+  try {
+    tool.setSource(dir);
+    const r = tool.diagnose({ wardsFile: wf });
+    assert.strictEqual(r.duplicateIds, 2);
+    assert.strictEqual(r.conflictsByCause['same-building-vertex-differences'], 1);
+    assert.strictEqual(r.byPair['a|b'].total, 2);
+    const s = r.heightAnomalies.find((h) => h.id === 'bldg_sent');
+    assert.strictEqual(s.h, 29997);
+    assert.ok(/sentinel/.test(s.note));
+    assert.ok(s.neighborsWithin100m >= 1 && s.neighborMaxH < 400);
+    assert.ok(/source untouched/.test(s.action));
+    assert.strictEqual(fs.readFileSync(aFile, 'utf8'), before);
+  } finally { tool.setSource(path.join(__dirname, '../public/map-data/osaka-city/buildings')); fs.rmSync(dir, { recursive: true, force: true }); }
+});
