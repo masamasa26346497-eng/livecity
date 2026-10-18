@@ -40,7 +40,11 @@ if ([string]::IsNullOrEmpty($OutDir)) {
   $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
   $OutDir = Join-Path ([System.IO.Path]::GetTempPath()) ('livecity-inventory-' + $stamp)
 }
-$OutDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $OutDir))
+if ([System.IO.Path]::IsPathRooted($OutDir)) {
+  $OutDir = [System.IO.Path]::GetFullPath($OutDir)
+} else {
+  $OutDir = [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $OutDir))
+}
 foreach ($f in $full) {
   $rootNorm = $f.TrimEnd('\') + '\'
   $outNorm = $OutDir.TrimEnd('\') + '\'
