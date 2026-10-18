@@ -611,8 +611,8 @@
                  'gsi-blank': '地理院タイル（白地図） / 国土地理院',
                  osm: '© OpenStreetMap contributors', none: '（なし）' }[bgKind];
     $('lc-src').innerHTML = [
-      '建物: 出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2024）を加工して作成。Mission 37B 3D Tiles（' + SET + '）',
-      '道路・鉄道・水路・公園: OpenStreetMap（ODbL）' + (publishedWards.length ? '。区別レイヤー（' + publishedWards.join(', ') + '）は © OpenStreetMap contributors の派生データ（ODbL 1.0）' : ''),
+      '建物: 出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2024）を加工して作成（<a href="https://www.mlit.go.jp/plateau/faq/" target="_blank" rel="noopener noreferrer">PLATEAU FAQ・利用条件</a>）。Mission 37B 3D Tiles（' + SET + '）',
+      '道路・鉄道・水路・公園: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>（ODbL 1.0）' + (publishedWards.length ? '。区別レイヤー（' + publishedWards.join(', ') + '）は © OpenStreetMap contributors の派生データ（ODbL 1.0）' : ''),
       '施設・観光スポット: © OpenStreetMap contributors（ODbL 1.0）',
       '写真: Wikimedia Commons（Mission 36L 索引。ライセンス・作者は写真の下に表示）',
       'ラベル: Live City 派生データ',

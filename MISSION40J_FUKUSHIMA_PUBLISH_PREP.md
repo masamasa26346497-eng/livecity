@@ -21,3 +21,24 @@ node tools\mission40j-stage-public.cjs --src "..\livecity-3dtiles-out-fukushima\
 node tools\mission40j-stage-public.cjs --src "..\livecity-3dtiles-out-fukushima\fukushima" --ward fukushima --execute --license-checked --owner-approved-release --approved-by "<名前>"
 ```
 その後の `git add -f` / push は、承認後に別途依頼してください。
+
+## 公式一次資料に基づくライセンス根拠（オーナーが確認した出典。Claude 環境では直接取得できていない）
+
+| 対象 | 根拠資料 | 実装への反映 |
+|---|---|---|
+| PLATEAU 建物 | PLATEAU FAQ https://www.mlit.go.jp/plateau/faq/ （商用利用可、CC BY 4.0 等の旨） | ページ出典欄に「出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2024）を加工して作成」と FAQ へのリンク |
+| OSM 道路・河川・公園・鉄道 | OSMF Attribution Guidelines https://osmfoundation.org/wiki/Attribution_Guidelines （地図の近くで OSM/ODbL を表示） | 出典欄に「© OpenStreetMap contributors（ODbL 1.0）」と https://www.openstreetmap.org/copyright へのリンク。Cesium Credit にも常時表示 |
+| OSM 抽出データ | OSMF Produced Work Guideline https://osmfoundation.org/wiki/Licence/Community_Guidelines/Produced_Work_-_Guideline | 区別レイヤー JSON は抽出可能な派生データのため、公開前に Produced Work か Derivative Database かの判断が必要（下記） |
+
+## 未確認事項（公開前に解決する）
+1. 大阪市の元データ固有の条件: PLATEAU 大阪市 2024 データセット個別の利用条件・クレジット表記指定（FAQ の一般論とは別に確認が必要）。
+2. ODbL の派生データベース: 福島区の `layers/*.json` は OSM から切り出した抽出データで、公開すると Derivative Database として ODbL の share-alike（同条件での提供・データ入手手段の提示）が及ぶ可能性がある。法的判断は未了。
+3. 1・2 が未解決のうちは `--license-checked` を付けないこと。
+
+## ユーザーPCでの dry-run 最小手順（何も書き込まれない）
+```powershell
+git fetch origin
+git merge --ff-only origin/claude/issue-23-20261007-1424
+node tools\mission40j-stage-public.cjs --src "..\livecity-3dtiles-out-fukushima\fukushima" --ward fukushima
+```
+出力の `problems` が空か、`size`、`buildings`（期待 11,159）、layers 完全性を確認して結果を貼ってください。`--execute` と `git add -f` はまだ実行しないでください。

@@ -90,3 +90,11 @@ test('stage script has no git/network/delete calls', () => {
   const s = fs.readFileSync(path.join(root, 'tools/mission40j-stage-public.cjs'), 'utf8');
   assert.ok(!/child_process|https?\.request|fetch\(|unlinkSync|rmSync|rmdirSync/.test(s));
 });
+
+test('attribution links and unresolved license items are documented', () => {
+  assert.ok(html.includes('https://www.mlit.go.jp/plateau/faq/'));
+  assert.ok(html.includes('https://www.openstreetmap.org/copyright'));
+  const doc = fs.readFileSync(path.join(root, 'MISSION40J_FUKUSHIMA_PUBLISH_PREP.md'), 'utf8');
+  for (const u of ['mlit.go.jp/plateau/faq', 'Attribution_Guidelines', 'Produced_Work_-_Guideline']) assert.ok(doc.includes(u), u);
+  assert.ok(doc.includes('未確認事項') && doc.includes('share-alike'));
+});
