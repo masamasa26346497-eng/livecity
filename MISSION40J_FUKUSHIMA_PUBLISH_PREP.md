@@ -42,3 +42,20 @@ git merge --ff-only origin/claude/issue-23-20261007-1424
 node tools\mission40j-stage-public.cjs --src "..\livecity-3dtiles-out-fukushima\fukushima" --ward fukushima
 ```
 出力の `problems` が空か、`size`、`buildings`（期待 11,159）、layers 完全性を確認して結果を貼ってください。`--execute` と `git add -f` はまだ実行しないでください。
+
+## dry-run 実測結果（オーナー PC、Claude 環境からは再確認不可）
+mode=dry-run / ward=fukushima / files=91 / 14,085,050 bytes（13.43MB）/ wardCode 27103 / buildings=11159 / ids=11159 / hasLayers=true / problems=[] / maxMb=40。実データは Claude 環境にないため、Git に追加していない（追加できない）。
+
+## 公開前に残る権利・帰属の課題（WebFetch 不許可のため一次資料は未取得。以下は未確認事項の整理）
+1. **PLATEAU 大阪市 2024 個別条件**: 大阪市データセットの G 空間情報センター掲載ページの利用条件（ライセンス名・クレジット文言）を原文で確認する。加工物のため「加工して作成」の表記要否も確認。
+2. **OSM 抽出レイヤー（layers/*.json）**: 区ごとの道路・河川・公園・鉄道は OSM の抽出ベクターで、Produced Work ではなく Derivative Database と扱われる可能性がある。その場合 ODbL の share-alike（同ライセンスでの提供、データ入手方法の明示）が必要。判断が付かなければ layers は公開せず、建物 tileset のみ公開する案もある。
+3. **帰属表示**: 地図近傍に「© OpenStreetMap contributors（ODbL 1.0）」と PLATEAU 出典を常時表示（37G ページに実装済み）。公開 Preview 上での表示は未確認。
+4. **PLATEAU 出典の source.json**: stage スクリプトは PLATEAU 記載がなければ中止する（実データで通過済み）。
+
+## 公開時の manifest 登録（実装済み、未実行）
+`--execute`（--license-checked --owner-approved-release --approved-by 必須）が、新規ファイルのみコピーし、`public/mission40j-3dtiles/published.json` に `{ward, approved:true, approvedBy, approvedAt, licenseChecked, bytes, buildings}` を追記する。ビューアは `approved===true` の区のみ同一オリジン tileset として登録（`pub-<ward>`）。
+
+## 公開後のプレビュー確認方法（承認後）
+1. `git add -f public/mission40j-3dtiles/fukushima public/mission40j-3dtiles/published.json` → push（最終承認後のみ）。
+2. Vercel Preview で「3D建物の区」から福島区を選択。HUD の建物数 11,159、`__mission37g.stats.publishedWards` に `fukushima`。
+3. 建物クリックで canonicalId・区名・高さ、DevTools の 404 / 例外 / Google 通信が 0、出典欄に PLATEAU と OSM が表示されること。
