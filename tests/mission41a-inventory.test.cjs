@@ -84,3 +84,28 @@ test('no network, no deletion/copy/upload code in tool; ps1 is ASCII and safe', 
   assert.strictEqual((code.match(/\{/g) || []).length, (code.match(/\}/g) || []).length);
   for (const line of code.split('\n')) assert.strictEqual((line.match(/'/g) || []).length % 2, 0, line);
 });
+
+test('ps1 (PS 5.1 -File semantics): extra roots never become OutDir; commas/semicolons split; default out in TEMP', () => {
+  const ps = fs.readFileSync(path.join(__dirname, '..', 'tools', 'mission41a-inventory.ps1'), 'utf8');
+  assert.ok(/PositionalBinding\s*=\s*\$false/.test(ps));
+  assert.ok(/ValueFromRemainingArguments\s*=\s*\$true\)\]\[string\[\]\]\$Roots/.test(ps));
+  assert.ok(/-split '\[;,\]'/.test(ps));
+  assert.ok(/GetTempPath\(\)/.test(ps));
+  assert.ok(!/Split-Path -Parent \$repo\) \('livecity-inventory/.test(ps));
+  assert.ok(/OutDir must be outside every scanned root/.test(ps));
+  assert.ok(!/Position\s*=\s*\d/.test(ps));
+});
+
+test('cjs failure cases: non-empty out and out-inside-root refused; multiple roots with semicolon work', () => {
+  const a = fs.mkdtempSync(path.join(os.tmpdir(), 'lc41a-'));
+  const b = fs.mkdtempSync(path.join(os.tmpdir(), 'lc41b-'));
+  fs.writeFileSync(path.join(a, 'x.txt'), 'x');
+  fs.writeFileSync(path.join(b, 'y.txt'), 'y');
+  const full = fs.mkdtempSync(path.join(os.tmpdir(), 'lc41o-'));
+  fs.writeFileSync(path.join(full, 'z'), 'z');
+  assert.throws(() => inv.run(['--roots', a + ';' + b, '--out', full]), /not empty/);
+  assert.throws(() => inv.run(['--roots', a + ';' + b, '--out', path.join(a, 'o')]), /inside a root/);
+  const out = path.join(os.tmpdir(), 'lc41new-' + Date.now());
+  inv.run(['--roots', a + ';' + b, '--out', out]);
+  assert.ok(fs.existsSync(path.join(out, 'report.md')));
+});
