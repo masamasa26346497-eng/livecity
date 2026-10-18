@@ -136,5 +136,8 @@ public/map-data/osaka-city/gsi-building-outline/
 # 52 tile 版は大きいので commit しない（9 tile 版のみ最小サンプルとして commit 可）。
 public/mission37b-3dtiles/*-all/
 
+# Mission 40J: 公開用に配置した区の変換物は、利用条件確認＋オーナーの最終承認後に `git add -f` で明示的に追加する（誤 commit 防止）。
+public/mission40j-3dtiles/*/
+
 # Mission 37F Commons imageinfo cache (再生成可能)
 data/cache/mission37f-commons/

@@ -612,7 +612,7 @@
                  osm: '© OpenStreetMap contributors', none: '（なし）' }[bgKind];
     $('lc-src').innerHTML = [
       '建物: 出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2024）を加工して作成。Mission 37B 3D Tiles（' + SET + '）',
-      '道路・鉄道・水路・公園: OpenStreetMap（ODbL）',
+      '道路・鉄道・水路・公園: OpenStreetMap（ODbL）' + (publishedWards.length ? '。区別レイヤー（' + publishedWards.join(', ') + '）は © OpenStreetMap contributors の派生データ（ODbL 1.0）' : ''),
       '施設・観光スポット: © OpenStreetMap contributors（ODbL 1.0）',
       '写真: Wikimedia Commons（Mission 36L 索引。ライセンス・作者は写真の下に表示）',
       'ラベル: Live City 派生データ',
@@ -804,6 +804,23 @@
       if (/^[a-z0-9-]+$/.test(n)) EXTRA_SET_DEFS.push({ id: 'ext-' + n, base: 'ext-3dtiles/' + n + '/', external: true });
     }
   }
+  // 40J: 公開承認済みの区の変換 tileset（同一オリジン）。published.json に approved:true で載った区だけ登録する。
+  //   載っていなければ何もしない（404 も出さない）。実データの配置は tools/mission40j-stage-public.cjs --execute のみが行う。
+  const publishedWards = [];
+  async function loadPublishedDefs() {
+    try {
+      const r = await fetch('mission40j-3dtiles/published.json');
+      if (!r.ok) return;
+      const j = await r.json();
+      for (const w of (j.wards || [])) {
+        if (w && w.approved === true && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'pub-' + w.ward)) {
+          EXTRA_SET_DEFS.push({ id: 'pub-' + w.ward, base: 'mission40j-3dtiles/' + w.ward + '/', external: true, published: true });
+          publishedWards.push(w.ward);
+        }
+      }
+      stats.publishedWards = publishedWards.slice();
+    } catch (e) { /* published.json が無い/壊れている: 追加しない */ }
+  }
   // 39B: 3D 建物は「選択された区」のぶんだけ mount する。起動時は 0 区（区境界・地名・道路・施設のみ）。
   //   source.json / build-report.json（各 1〜2KB）だけ最初に読み、COVERAGE と区コードを得る。tileset.json と GLB は区選択時に初めて取得する。
   //   区を切り替える・「表示しない」を選ぶと、前の区の tileset は primitives.remove（destroy）で GPU/CPU 資源ごと解放する。
@@ -940,6 +957,7 @@
   }
   async function loadExtraMeta() {
     if (q.get('extra') === '0') return;
+    await loadPublishedDefs();
     for (const def of EXTRA_SET_DEFS) {
       try {
         const [src, rep] = await Promise.all([
@@ -949,6 +967,7 @@
         extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external });
       } catch (e) { fail('extra-meta ' + def.id, e); }
     }
+    if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
     stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
   }
   const visTiles = new Set();
