@@ -46,3 +46,13 @@ test('tool is read-only (no writes, deletes or network)', () => {
   const s = fs.readFileSync(path.join(ROOT, 'tools/mission40n-coord-diagnose.cjs'), 'utf8');
   assert.ok(!/writeFileSync|unlinkSync|rmSync|renameSync|copyFileSync|https?\.request|fetch\(/.test(s));
 });
+
+test('N03 polygon shape {outer} is read; real Sumiyoshi building points fall inside the ward (was a 0% false reading)', () => {
+  assert.strictEqual(D.ringOf({ outer: [[0, 0], [1, 0], [1, 1]] }).length, 3);
+  const bdir = path.join(ROOT, 'public/map-data/osaka-city/buildings/osaka-sumiyoshi');
+  if (!fs.existsSync(bdir)) return;
+  const w = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json'), 'utf8')).wards.find((x) => x.wardId === 'sumiyoshi');
+  const bs = D.readBuildings(bdir).filter((b) => Number.isFinite(b.repX));
+  const inside = bs.filter((b) => w.polygons.some((p) => D.pip(D.ringOf(p), b.repX, b.repZ))).length;
+  assert.ok(inside / bs.length > 0.99, 'inside ' + inside + '/' + bs.length);
+});

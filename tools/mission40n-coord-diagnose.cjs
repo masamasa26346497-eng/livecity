@@ -59,6 +59,12 @@ function pip(ring, x, z) {
   return inside;
 }
 
+/** N03 polygons are stored as {outer:[[x,z]..], holes?}; older shapes were [ring] or ring. */
+function ringOf(poly) {
+  if (poly && Array.isArray(poly.outer)) return poly.outer;
+  return (Array.isArray(poly) && Array.isArray(poly[0]) && Array.isArray(poly[0][0])) ? poly[0] : poly;
+}
+
 function readBuildings(dir) {
   const out = [];
   for (const f of fs.readdirSync(dir)) {
@@ -160,11 +166,11 @@ function main() {
     const w = (readJson(wp).wards || []).find((x) => x.wardId === a.ward);
     if (w && w.polygons) {
       let inside = 0, total = 0;
-      for (const b of bs) { if (!Number.isFinite(b.repX)) continue; total++; if (w.polygons.some((poly) => pip(poly[0] || poly, b.repX, b.repZ))) inside++; }
+      for (const b of bs) { if (!Number.isFinite(b.repX)) continue; total++; if (w.polygons.some((poly) => pip(ringOf(poly), b.repX, b.repZ))) inside++; }
       report.n03 = { ward: a.ward, repPointsInsidePolygonPct: total ? +(100 * inside / total).toFixed(1) : null, total };
     } else report.n03 = { ward: a.ward, status: 'ward-not-found-or-no-polygons' };
   }
   console.log(JSON.stringify(report, null, 2));
 }
-module.exports = { parseArgs, frameRoundTrip, pip, readBuildings, indexBuildings, insideAny, sampleLines, offsetSearch, verdict };
+module.exports = { ringOf, parseArgs, frameRoundTrip, pip, readBuildings, indexBuildings, insideAny, sampleLines, offsetSearch, verdict };
 if (require.main === module) { try { main(); } catch (e) { console.error('ERROR: ' + e.message); process.exit(1); } }
