@@ -782,6 +782,13 @@
     { id: 'naniwa-mesh',    base: 'mission38e-3dtiles/naniwa-mesh/' },
     { id: 'naniwa-mesh2',   base: 'mission38e-3dtiles/naniwa-mesh2/' },
   ];
+  // 40F: ローカル変換した tileset（Git 非管理）を localhost 限定で接続する。?ext=fukushima[,name2]
+  //   tools/mission40f-serve-local.cjs が --ext <dir> の <dir>/<name>/ を /ext-3dtiles/<name>/ として読み取り専用で配信する。公開ホストでは無効。
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    for (const n of (new URLSearchParams(location.search).get('ext') || '').split(',')) {
+      if (/^[a-z0-9-]+$/.test(n)) EXTRA_SET_DEFS.push({ id: 'ext-' + n, base: 'ext-3dtiles/' + n + '/', external: true });
+    }
+  }
   // 39B: 3D 建物は「選択された区」のぶんだけ mount する。起動時は 0 区（区境界・地名・道路・施設のみ）。
   //   source.json / build-report.json（各 1〜2KB）だけ最初に読み、COVERAGE と区コードを得る。tileset.json と GLB は区選択時に初めて取得する。
   //   区を切り替える・「表示しない」を選ぶと、前の区の tileset は primitives.remove（destroy）で GPU/CPU 資源ごと解放する。
@@ -876,7 +883,7 @@
           fetch(def.base + 'source.json').then((r) => { if (!r.ok) throw new Error('source.json HTTP ' + r.status); return r.json(); }),
           fetch(def.base + 'build-report.json').then((r) => { if (!r.ok) throw new Error('build-report.json HTTP ' + r.status); return r.json(); }),
         ]);
-        extraMeta.push({ id: def.id, base: def.base, source: src, report: rep });
+        extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external });
       } catch (e) { fail('extra-meta ' + def.id, e); }
     }
     stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
@@ -1488,12 +1495,13 @@
       const n = e.report.totals.buildings | 0, tiles = e.report.selectedTiles | 0;
       if (!n || !tiles) continue;
       const a = agg[e.source.wardCode] || (agg[e.source.wardCode] = { tiles: 0, buildings: 0, meshes: 0 });
-      a.tiles += tiles; a.buildings += n; a.meshes += e.source.sourceMeshes.length;
+      a.tiles += tiles; a.buildings += n; a.meshes += (e.source.sourceMeshes || []).length; if (e.external) a.external = true;
     }
     for (const code of Object.keys(agg)) {
       const a = agg[code];
       COVERAGE[code] = { state: 'partial', tiles: a.tiles, buildings: a.buildings,
-        text: '3D建物: 一部のみ配信（実PLATEAU ' + a.meshes + 'メッシュ・' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。区全体ではありません）' };
+        text: a.external ? '3D建物: ローカル変換データ（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開）'
+          : '3D建物: 一部のみ配信（実PLATEAU ' + a.meshes + 'メッシュ・' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。区全体ではありません）' };
     }
   }
   const WardUI = (function () {
