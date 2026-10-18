@@ -24,7 +24,7 @@ function fixture() {
   for (const [rel, buf] of Object.entries(files)) { const p = path.join(root, ...rel.split('/')); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, buf); }
   const entry = (rel) => ({ path: 'LiveCity/' + rel, size: files[rel].length });
   const fk = Object.keys(files).filter((r) => r.includes('fukushima'));
-  const m = { schema: 1, parts: [
+  const m = { schema: 2, sizing: 'tar-estimate', parts: [
     { asset: 'lcdata-3dtiles-output-001.tar', category: '3dtiles-output', files: fk.map(entry) },
     { asset: 'lcdata-other-002.tar', category: 'other', files: [entry('other/o.bin')] }] };
   return { base, root, files, m, roots: { LiveCity: root }, out: path.join(base, 'out'), fk };

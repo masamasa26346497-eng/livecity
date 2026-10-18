@@ -115,15 +115,24 @@ function summarize(inv, top) {
 // Group key depth grows until each group fits, then groups are bin-packed (first-fit decreasing).
 // A single file larger than the limit cannot be packed in one asset: it is reported as `unsplittable`
 // (needs byte-level chunking, flagged, never silently placed).
+// 41G: sizes are TAR sizes (512B header + data padded to 512B per member + 1024B end marker), the same
+// model 41D tarEstimate uses, minus a safety margin. Raw bytes alone let parts exceed the limit.
+const TAR_BLOCK = 512;
+const TAR_END = 2 * TAR_BLOCK;
+const TAR_MARGIN = 4 * MB;
+function tarCost(size) { return TAR_BLOCK + Math.ceil(size / TAR_BLOCK) * TAR_BLOCK; }
+
 function pack(files, limitBytes) {
+  const budget = limitBytes - TAR_END - TAR_MARGIN; // max sum of tarCost per part
   const unsplittable = [];
   const fitting = [];
-  for (const f of files) (f.size > limitBytes ? unsplittable : fitting).push(f);
+  const cost = new Map();
+  for (const f of files) { const c = tarCost(f.size); cost.set(f, c); (c > budget ? unsplittable : fitting).push(f); }
 
   const units = [];
   const split = (items, depth, prefix) => {
-    const total = items.reduce((a, f) => a + f.size, 0);
-    if (total <= limitBytes) { units.push({ key: prefix, bytes: total, files: items }); return; }
+    const total = items.reduce((a, f) => a + cost.get(f), 0);
+    if (total <= budget) { units.push({ key: prefix, bytes: items.reduce((a, f) => a + f.size, 0), cost: total, files: items }); return; }
     const groups = new Map();
     for (const f of items) {
       const segs = f.rel.split('/');
@@ -133,10 +142,11 @@ function pack(files, limitBytes) {
     if (groups.size === 1 && items.some((f) => f.rel.split('/').length > depth)) { split(items, depth + 1, prefix); return; }
     if (groups.size === 1) {
       // path depth exhausted: chunk by file order
-      let cur = { key: prefix + '#chunk', bytes: 0, files: [] };
+      const mk = () => ({ key: prefix + '#chunk', bytes: 0, cost: 0, files: [] });
+      let cur = mk();
       for (const f of items.sort((a, b) => a.rel < b.rel ? -1 : 1)) {
-        if (cur.bytes + f.size > limitBytes && cur.files.length) { units.push(cur); cur = { key: prefix + '#chunk', bytes: 0, files: [] }; }
-        cur.bytes += f.size; cur.files.push(f);
+        if (cur.cost + cost.get(f) > budget && cur.files.length) { units.push(cur); cur = mk(); }
+        cur.bytes += f.size; cur.cost += cost.get(f); cur.files.push(f);
       }
       if (cur.files.length) units.push(cur);
       return;
@@ -148,13 +158,14 @@ function pack(files, limitBytes) {
   for (const [k, items] of byLayer) split(items, 1, k);
 
   const parts = [];
-  for (const u of units.sort((a, b) => b.bytes - a.bytes)) {
+  for (const u of units.sort((a, b) => b.cost - a.cost)) {
     // never mix categories in one part (keeps licence handling per-asset)
     const cat = u.files[0].category;
-    let p = parts.find((x) => x.category === cat && x.bytes + u.bytes <= limitBytes);
-    if (!p) { p = { category: cat, bytes: 0, files: [], groups: [] }; parts.push(p); }
-    p.bytes += u.bytes; p.files.push(...u.files); p.groups.push(u.key);
+    let p = parts.find((x) => x.category === cat && x.tarBytes + u.cost <= budget);
+    if (!p) { p = { category: cat, bytes: 0, tarBytes: 0, files: [], groups: [] }; parts.push(p); }
+    p.bytes += u.bytes; p.tarBytes += u.cost; p.files.push(...u.files); p.groups.push(u.key);
   }
+  for (const p of parts) p.tarBytes += TAR_END; // final tar size estimate
   parts.sort((a, b) => (a.category < b.category ? -1 : a.category > b.category ? 1 : b.bytes - a.bytes));
   parts.forEach((p, i) => { p.name = 'lcdata-' + p.category + '-' + String(i + 1).padStart(3, '0'); });
   return { parts, unsplittable };
@@ -195,10 +206,10 @@ function buildPlan(inv, opts) {
     p.licenceNote = NEEDS_LICENCE_NOTE[p.category] || 'record source + licence';
   });
   const totalBytes = candidates.reduce((a, f) => a + f.size, 0);
-  const overLimit = parts.filter((p) => p.bytes > limitBytes);
+  const overLimit = parts.filter((p) => p.tarBytes >= limitBytes);
   const releases = [...new Set(parts.map((p) => p.release))];
   const validation = {
-    limitBytes, maxPartBytes: parts.reduce((m, p) => Math.max(m, p.bytes), 0),
+    limitBytes, maxPartBytes: parts.reduce((m, p) => Math.max(m, p.bytes), 0), maxPartTarBytes: parts.reduce((m, p) => Math.max(m, p.tarBytes), 0),
     partsOverLimit: overLimit.length, unsplittableFiles: unsplittable.length,
     allFilesPlacedOnce: new Set(parts.flatMap((p) => p.files.map((f) => f.root + ':' + f.rel))).size + unsplittable.length === candidates.length,
     bytesMatch: parts.reduce((a, p) => a + p.bytes, 0) + unsplittable.reduce((a, f) => a + f.size, 0) === totalBytes,
@@ -215,11 +226,11 @@ function emit(plan, outDir) {
   fs.mkdirSync(outDir, { recursive: true });
   const wx = { flag: 'wx' };
   const manifest = plan.parts.map((p) => ({
-    asset: p.asset, release: p.release, category: p.category, bytes: p.bytes, fileCount: p.files.length,
+    asset: p.asset, release: p.release, category: p.category, bytes: p.bytes, tarEstimate: p.tarBytes, fileCount: p.files.length,
     approved: p.approved, licenceNote: p.licenceNote, sha256: null,
     files: p.files.map((f) => ({ path: f.root + '/' + f.rel, size: f.size })),
   }));
-  fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify({ schema: 1, partLimitBytes: plan.limitBytes, parts: manifest, unsplittable: plan.unsplittable.map((f) => ({ path: f.root + '/' + f.rel, size: f.size })) }, null, 1), wx);
+  fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify({ schema: 2, sizing: 'tar-estimate', partLimitBytes: plan.limitBytes, parts: manifest, unsplittable: plan.unsplittable.map((f) => ({ path: f.root + '/' + f.rel, size: f.size })) }, null, 1), wx);
   // resumable state: a future uploader marks parts done; nothing here uploads
   const state = { schema: 1, parts: Object.fromEntries(plan.parts.map((p) => [p.asset, { status: 'pending', attempts: 0, sha256: null, uploadedBytes: 0 }])) };
   fs.writeFileSync(path.join(outDir, 'state.json'), JSON.stringify(state, null, 1), wx);
@@ -238,7 +249,7 @@ function planMd(plan) {
   const v = plan.validation;
   const L = ['# Mission 41B dry-run plan (no upload performed)', '', 'Part limit: ' + fmt(plan.limitBytes) + ' (GitHub release asset must be < 2 GiB)', '',
     '## Validation', '', '- ok: ' + v.ok, '- candidate files: ' + plan.candidates + ', ' + fmt(plan.totalBytes),
-    '- parts: ' + plan.parts.length + ', largest part: ' + fmt(v.maxPartBytes), '- parts over limit: ' + v.partsOverLimit,
+    '- parts: ' + plan.parts.length + ', largest part: ' + fmt(v.maxPartBytes) + ' raw, ' + fmt(v.maxPartTarBytes) + ' tar estimate', '- parts over limit: ' + v.partsOverLimit,
     '- files larger than the limit (unsplittable, need chunking): ' + v.unsplittableFiles, '- every file placed exactly once: ' + v.allFilesPlacedOnce,
     '- releases: ' + plan.releases.length + ', max assets per release: ' + v.maxAssetsPerRelease + ' (cap 1000)', '', '## Held back (not planned)', ''];
   for (const [k, h] of Object.entries(plan.held)) L.push('- ' + k + ': ' + h.files + ' files, ' + fmt(h.bytes) + ' [deferred: ' + h.phase + '] - ' + h.reason);
@@ -290,7 +301,7 @@ function run(argv) {
     for (const [k, v] of Object.entries(sm.categories)) lines.push('  ' + k + ': ' + v.files + ' files, ' + v.size + (v.over100MB ? ', >100MB: ' + v.over100MB : ''));
     lines.push('secret candidates: ' + sm.exclusionCandidates.secretFiles + ' ' + JSON.stringify(sm.exclusionCandidates.byType));
     lines.push('duplicate groups: ' + sm.duplicatesGroups + ' (sha256-confirmed: ' + sm.confirmedDuplicateGroups + ')');
-    lines.push('== dry-run plan (nothing uploaded) ==', 'parts ' + pl.parts.length + ', largest ' + fmt(pl.validation.maxPartBytes) + ', over limit ' + pl.validation.partsOverLimit + ', unsplittable ' + pl.validation.unsplittableFiles + ', releases ' + pl.releases.length + ', ok ' + pl.validation.ok);
+    lines.push('== dry-run plan (nothing uploaded) ==', 'parts ' + pl.parts.length + ', largest ' + fmt(pl.validation.maxPartTarBytes) + ' (tar est.)' + ', over limit ' + pl.validation.partsOverLimit + ', unsplittable ' + pl.validation.unsplittableFiles + ', releases ' + pl.releases.length + ', ok ' + pl.validation.ok);
     for (const [k, h] of Object.entries(pl.held)) lines.push('  deferred ' + k + ': ' + h.files + ' files, ' + fmt(h.bytes) + ' (' + h.phase + ')');
     console.log(lines.join('\n'));
     if (!pl.validation.ok) process.exitCode = 2;
@@ -300,14 +311,14 @@ function run(argv) {
     if (!a.out) throw new Error('--out <new dir> required');
     const pl = buildPlan(inv, { maxPartGiB: a.gib, approved: a.approved, include: a.include });
     emit(pl, path.resolve(a.out));
-    console.log(JSON.stringify({ parts: pl.parts.length, candidates: pl.candidates, candidateSize: fmt(pl.totalBytes), largestPart: fmt(pl.validation.maxPartBytes), partsOverLimit: pl.validation.partsOverLimit, unsplittableFiles: pl.validation.unsplittableFiles, releases: pl.releases.length, ok: pl.validation.ok, uploaded: false }));
+    console.log(JSON.stringify({ parts: pl.parts.length, candidates: pl.candidates, candidateSize: fmt(pl.totalBytes), largestPart: fmt(pl.validation.maxPartTarBytes), partsOverLimit: pl.validation.partsOverLimit, unsplittableFiles: pl.validation.unsplittableFiles, releases: pl.releases.length, ok: pl.validation.ok, uploaded: false }));
     if (!pl.validation.ok) process.exitCode = 2;
     return;
   }
   throw new Error('unknown command: ' + cmd);
 }
 
-module.exports = { applyHashes, PHASE, summarize, buildPlan, pack, emit, nextPending, markResult, verifyPart, loadInventory, run, GIB_RELEASE_ASSET_LIMIT };
+module.exports = { tarCost, applyHashes, PHASE, summarize, buildPlan, pack, emit, nextPending, markResult, verifyPart, loadInventory, run, GIB_RELEASE_ASSET_LIMIT };
 if (require.main === module) {
   try { run(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(1); }
 }

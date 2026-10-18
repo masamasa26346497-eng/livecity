@@ -81,6 +81,8 @@ function rootPreflight(parts, roots) {
 function loadManifest(file) {
   const m = JSON.parse(fs.readFileSync(file, 'utf8'));
   if (!m || !Array.isArray(m.parts)) throw new Error('not a 41B manifest.json');
+  // 41G: manifests before schema 2 were packed by raw bytes and can exceed the limit once tar overhead is added.
+  m.legacySizing = m.schema !== 2 || m.sizing !== 'tar-estimate';
   return m;
 }
 
@@ -163,6 +165,18 @@ function dryRun(m, roots, opts) {
     gates, blockedBy: blocked, readyToUpload: false, // never true in 41D
     results,
   };
+}
+
+// 41G: anonymous problem summary - kinds, counts and part ordinals only. No paths, file ids or root names.
+function anonSummary(rep) {
+  const byKind = {};
+  const parts = [];
+  rep.results.forEach((r, i) => {
+    const per = {};
+    for (const p of r.problems) { if (p.kind === 'hardlink-warning') continue; byKind[p.kind] = (byKind[p.kind] || 0) + 1; per[p.kind] = (per[p.kind] || 0) + 1; }
+    if (Object.keys(per).length) parts.push({ part: 'part-' + String(i + 1).padStart(3, '0'), kinds: per });
+  });
+  return { byKind, parts };
 }
 
 function sha256File(file) {
@@ -262,11 +276,16 @@ function run(argv, env) {
     fs.mkdirSync(outAbs, { recursive: true });
     const rep = dryRun(m, roots, { ...a, outDir: outAbs });
     writeNew(outAbs, 'pack-dry-run.json', rep);
+    const anon = anonSummary(rep);
     console.log(['pack --dry-run (offline, read-only)',
       (rep.selection.subset ? 'SUBSET dry-run: ' : 'FULL manifest dry-run: ') + 'checked ' + rep.selection.matchedFiles + ' of ' + rep.selection.manifestFiles + ' manifest files' + (rep.selection.subset ? ' (does NOT cover the whole manifest)' : ''),
       'parts: ' + rep.parts, 'tar estimate total: ' + (rep.totalTarEstimate / GIB).toFixed(2) + ' GiB, largest part: ' + (rep.largestPartEstimate / GIB).toFixed(2) + ' GiB (limit ' + (rep.partLimitBytes / GIB).toFixed(2) + ')',
       'free disk at out: ' + (rep.freeBytesAtOut === null ? 'unknown' : (rep.freeBytesAtOut / GIB).toFixed(1) + ' GiB') + ', staging ok: ' + rep.diskOk,
-      'problems: ' + rep.problems, 'gates still closed: ' + (rep.blockedBy.join(',') || 'none'), 'readyToUpload: false'].join('\n'));
+      'problems: ' + rep.problems,
+      ...Object.entries(anon.byKind).map(([k, n]) => '  problem kind ' + k + ': ' + n),
+      ...anon.parts.map((q) => '  ' + q.part + ': ' + Object.entries(q.kinds).map(([k, n]) => k + '=' + n).join(', ')),
+      ...(m.legacySizing ? ['WARNING: this manifest was planned by raw bytes (pre-41G). Regenerate the plan from the inventory (41C quick) with the current tools; do not reuse it.'] : []),
+      'gates still closed: ' + (rep.blockedBy.join(',') || 'none'), 'readyToUpload: false'].join('\n'));
     return rep.problems === 0 ? 0 : 1;
   }
   if (cmd === 'categories') {
@@ -294,5 +313,5 @@ function run(argv, env) {
   throw new Error('commands: pack | categories | verify | upload(disabled)');
 }
 
-module.exports = { isUnder, manifestRootNames, categorySummary, rootPreflight, checkRel, tarEstimate, checkPart, dryRun, verify, upload, selectParts, run, GIB, RELEASE_ASSET_LIMIT };
+module.exports = { anonSummary, isUnder, manifestRootNames, categorySummary, rootPreflight, checkRel, tarEstimate, checkPart, dryRun, verify, upload, selectParts, run, GIB, RELEASE_ASSET_LIMIT };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2), process.env)); } catch (e) { console.error(e.message); process.exit(1); } }

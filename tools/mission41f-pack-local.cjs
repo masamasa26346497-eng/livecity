@@ -226,6 +226,8 @@ function create(m, roots, opts, hooks) {
     excluded: { ...excluded, note: 'secrets-candidate and backup-archive are never packed; the file-name hint is NOT a secret scan' },
     gates: { licenceApproved: false, noSecretsReviewed: false, noPersonalDataReviewed: false }, readyToUpload: false, parts: [], problems: [] };
   if (!parts.length) { report.problems.push({ kind: 'nothing-selected' }); return { code: 3, report }; }
+  // 41G: a plan sized by raw bytes (pre-41G) can exceed the limit; refuse before touching anything.
+  if (m.legacySizing) { report.problems.push({ kind: 'legacy-manifest-regenerate-plan' }); return { code: 1, report }; }
 
   // Preflight: 41D checks + intermediate-directory symlinks. Nothing is written when anything is wrong.
   const rootReal = new Map(); const dirCache = new Map();
@@ -278,6 +280,7 @@ function run(argv) {
   if (!a.manifest || !a.rootsFile || !a.out) throw new Error('--manifest, --roots-file and --out are required');
   const m = JSON.parse(fs.readFileSync(a.manifest, 'utf8'));
   if (!m || !Array.isArray(m.parts)) throw new Error('not a 41B manifest.json');
+  m.legacySizing = m.schema !== 2 || m.sizing !== 'tar-estimate';
   const roots = JSON.parse(fs.readFileSync(a.rootsFile, 'utf8').replace(/^﻿/, ''));
   const outAbs = path.resolve(a.out);
   for (const [name, dir] of Object.entries(roots)) {
