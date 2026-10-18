@@ -61,6 +61,6 @@ test('40C: 外部入力指定 (--src) と validate は読み取り専用で、�
 
 test('40C: PowerShell ワンショットは元データへ書かず、出力先が非空なら中止する', () => {
   const ps = fs.readFileSync(path.join(__dirname, '../tools/mission40c-run-local.ps1'), 'utf8');
-  assert.match(ps, /上書きしません/);
+  assert.match(ps, /will not overwrite/);
   assert.ok(!/Remove-Item|robocopy|Copy-Item|Move-Item/i.test(ps.replace(/<#[\s\S]*?#>/, '')));
 });
