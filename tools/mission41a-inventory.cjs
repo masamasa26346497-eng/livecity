@@ -30,7 +30,10 @@ const CATS = [
   ['secrets-candidate', null, 'exclude'],
   ['photos-unverified-rights', null, 'exclude-until-license-ledger'],
   ['3dtiles-output', /(^|\/)(3dtiles|mission\d+\w*-3dtiles|livecity-3dtiles-out[^/]*)(\/|$)|\.glb$|tileset\.json$/i, 'private-data-repo'],
-  ['plateau-raw', /(plateau|citygml|\.gml$|\.zip$)/i, 'private-data-repo'],
+  ['backup-archive', null, 'review-deferred'],
+  ['dem-raw', null, 'review-deferred'],
+  ['archive-review', null, 'review-deferred'],
+  ['plateau-raw', /(plateau|citygml|\.gml$)/i, 'private-data-repo'],
   ['building-tiles', /(^|\/)buildings(\/|$)/i, 'private-data-repo'],
   ['osm-layers', /(^|\/)(roads|waterways|parks|railways|osm)(\/|$)/i, 'private-data-repo'],
   ['boundaries', /(boundar|n03|admin|ward|shp$|\.shp|\.dbf$)/i, 'private-data-repo'],
@@ -43,9 +46,24 @@ const CATS = [
 function norm(p) { return p.split(path.sep).join('/'); }
 function fmt(n) { return n >= GB ? (n / GB).toFixed(2) + ' GB' : (n / MB).toFixed(1) + ' MB'; }
 
+// Mission 41C: archives are no longer all "plateau-raw". Decided by NAME only (no content read).
+const ARCHIVE_EXT = new Set(['.zip', '.7z', '.rar', '.tar', '.gz', '.tgz']);
+const BACKUP_NAME = /(back-?up|full|livecity-data-pipeline|\(\d+\)|copy|_bak|\.bak)/i;
+const PLATEAU_NAME = /(plateau|citygml|3d-?tiles?|bldg|udx|27100|27\d{3}_osaka)/i;
+const DEM_NAME = /(fg-?gml|dem\d*[a-z]?\b|fgd)/i;
+const CATMAP = Object.fromEntries(CATS.map((c) => [c[0], c]));
+
 function classify(rel, ext, secretByName) {
   if (secretByName) return CATS[1];
   if (IMG_EXT.has(ext)) return CATS[2];
+  const base = rel.split('/').pop();
+  if (ARCHIVE_EXT.has(ext)) {
+    if (BACKUP_NAME.test(base)) return CATMAP['backup-archive'];
+    if (DEM_NAME.test(base)) return CATMAP['dem-raw'];
+    if (PLATEAU_NAME.test(rel)) return CATMAP['plateau-raw'];
+    return CATMAP['archive-review'];
+  }
+  if ((ext === '.gml' || ext === '.xml') && DEM_NAME.test(base)) return CATMAP['dem-raw'];
   for (const c of CATS) if (c[1] && c[1].test(rel)) return c;
   return ['other', null, 'review'];
 }
@@ -221,7 +239,17 @@ function run(argv) {
   console.log(JSON.stringify({ out, files: inv.files.length, over100MB: pl.filesOver100MB.length, secretCandidates: slim.filter((f) => f.secretByName || f.secrets.length).length, eligible: fmt(pl.eligibleBytes), parts: pl.parts.length, partsOverTarget: pl.partsOverTarget, maxPart: fmt(pl.maxPartBytes), strategy: pl.bigFileStrategy }));
 }
 
-module.exports = { inventory, plan, report, classify, scanSecrets, run, LIMITS };
+// Re-apply the current rules to a record of an existing inventory.json (no PC rescan).
+// Name-based only; only plateau-raw / other records can move; secrets and photos are never touched.
+function reclassify(f) {
+  if (f.category !== 'plateau-raw' && f.category !== 'other') return f;
+  const c = classify(f.rel, f.ext || path.extname(f.rel).toLowerCase(), false);
+  if (c[0] === f.category || c[0] === 'other') return f;
+  if (f.category === 'other' && !['backup-archive', 'dem-raw', 'archive-review'].includes(c[0])) return f;
+  return { ...f, category: c[0], decision: c[2] };
+}
+
+module.exports = { inventory, plan, report, classify, reclassify, scanSecrets, run, LIMITS };
 if (require.main === module) {
   try { run(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(1); }
 }

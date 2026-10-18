@@ -71,7 +71,7 @@ test('emit writes new files only, refuses non-empty out, no network/upload code'
   const out = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'lc41b-')), 'o');
   const plan = b.buildPlan({ files: [mk('roads/t.json', MB, 'osm-layers')] }, {});
   b.emit(plan, out);
-  assert.deepStrictEqual(fs.readdirSync(out).sort(), ['manifest.json', 'plan.md', 'provenance-ledger.json', 'state.json']);
+  assert.deepStrictEqual(fs.readdirSync(out).sort(), ['deferred-ledger.json', 'manifest.json', 'plan.md', 'provenance-ledger.json', 'state.json']);
   assert.throws(() => b.emit(plan, out), /not empty/);
   const src = fs.readFileSync(path.join(__dirname, '../tools/mission41b-plan.cjs'), 'utf8');
   assert.ok(!/require\(['"]node:(https?|net|child_process)['"]\)|fetch\(|unlinkSync|rmSync|copyFile/.test(src));
