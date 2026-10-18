@@ -370,5 +370,5 @@ function main() {
   if (r.totals.buildings + r.totals.skipped !== r.totals.sourceBuildings) { console.error('building count mismatch'); process.exit(1); }
 }
 
-module.exports = { buildGlb, parseGlb, build, makeFrame, frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
+module.exports = { buildGlb, parseGlb, build, makeFrame, toEnu,frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
 if (require.main === module) main();
