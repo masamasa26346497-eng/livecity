@@ -671,6 +671,7 @@
         const rec = defs.get(id); if (!rec) return;
         rec.visible = !!on;
         if (rec.state === 'ready') rec.applyVisible(rec.visible);
+        if (typeof wardVecApply === 'function') wardVecApply(id, rec.visible);
         sync(rec);
         scene.requestRender();
       },
@@ -681,14 +682,16 @@
   // ── レイヤー束 manifest / 取得ヘルパ ──
   let bundleManifest = null;
   const jsonCache = new Map();
-  function fetchLayerJson(name) {
-    if (!jsonCache.has(name)) {
-      jsonCache.set(name, fetch(LAYER_BASE + name).then((r) => {
-        if (!r.ok) throw new Error(LAYER_BASE + name + ' → HTTP ' + r.status);
+  function fetchLayerJson(name, base) {
+    base = base || LAYER_BASE;
+    const key = base + name;
+    if (!jsonCache.has(key)) {
+      jsonCache.set(key, fetch(base + name).then((r) => {
+        if (!r.ok) { jsonCache.delete(key); throw new Error(base + name + ' → HTTP ' + r.status); }
         return r.json();
       }));
     }
-    return jsonCache.get(name);
+    return jsonCache.get(key);
   }
 
   // ── 線レイヤー: PolylineCollection（material を共有してバッチさせる）──
@@ -708,11 +711,11 @@
     }
     return matCache.get(key);
   }
-  function makeLineLayer(file, styleOf) {
+  function makeLineLayer(file, styleOf, base) {
     let coll = null;
     return {
       async mount() {
-        const data = await fetchLayerJson(file);
+        const data = await fetchLayerJson(file, base);
         coll = scene.primitives.add(new Cesium.PolylineCollection());
         let n = 0;
         for (const f of data.features || []) {
@@ -730,15 +733,26 @@
         return { count: n };
       },
       applyVisible(on) { if (coll) coll.show = on; },
+      destroy() { if (coll) { try { scene.primitives.remove(coll); } catch (e) { /* noop */ } coll = null; } },
     };
   }
 
+  // 40G: 道路・河川の線スタイル（住吉区の束と、区単位の ward layers で共有）
+  function roadStyle(f) {
+    const t = f.tier || 'local';
+    if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
+    if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
+    return { width: 3.0, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
+  }
+  function waterLineStyle(f) {
+    return f.kind === 'line' ? { width: f.waterClass === 'canal' ? 6 : 4.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways } : null;
+  }
   // ── 面レイヤー: 1 レイヤー = 1 Primitive（37B の建物 Primitive と同じ作り）──
-  function makeAreaLayer(file, opts) {
+  function makeAreaLayer(file, opts, base) {
     let prim = null;
     return {
       async mount() {
-        const data = await fetchLayerJson(file);
+        const data = await fetchLayerJson(file, base);
         const instances = [];
         for (const f of data.features || []) {
           if (f.kind !== 'area' || !Array.isArray(f.p) || f.p.length < 3) continue;
@@ -763,6 +777,7 @@
         return { count: instances.length };
       },
       applyVisible(on) { if (prim) prim.show = on; },
+      destroy() { if (prim) { try { scene.primitives.remove(prim); } catch (e) { /* noop */ } prim = null; } },
     };
   }
 
@@ -809,7 +824,54 @@
     ts.tileVisible.addEventListener((tile) => { if (tile.hasRenderableContent !== false) visTiles.add(tile); });
     return ts;
   }
+  // 40G: 区単位の道路・河川・公園・鉄道（<ext>/<区>/layers/*.json。tools/mission40g-build-ward-layers.cjs が旧 OSM タイルから切り出す）。
+  //   区の 3D 建物を mount したときだけ読み込み、区の切替・解除で primitives.remove する。layers/ が無ければ何もしない（捏造しない）。
+  //   既存の住吉区束（mission37c-layers）とは別 primitive。住吉区の束は変更しない。
+  const WARD_VEC_FILES = {
+    roads: (b) => makeLineLayer('roads.json', roadStyle, b),
+    waterways: (b) => {
+      const l = makeLineLayer('waterways.json', waterLineStyle, b);
+      const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b);
+      return { async mount() { const x = await l.mount(); const y = await a.mount(); return { count: x.count + y.count }; },
+               applyVisible(on) { l.applyVisible(on); a.applyVisible(on); }, destroy() { l.destroy(); a.destroy(); } };
+    },
+    parks: (b) => makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks }, b),
+    railways: (b) => makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }), b),
+  };
+  let wardVec = [];   // { id, layer, count }
+  stats.wardVec = { ward: null, state: 'none', layers: {} };
+  function wardVecApply(id, on) { for (const w of wardVec) if (w.id === id) w.layer.applyVisible(on); }
+  function unmountWardVec() {
+    for (const w of wardVec.splice(0)) { try { w.layer.destroy(); } catch (e) { /* noop */ } }
+    stats.wardVec = { ward: null, state: 'none', layers: {} };
+  }
+  async function mountWardVec(metas, gen) {
+    const m = metas.find((x) => x.external);
+    if (!m) return;
+    const base = m.base + 'layers/';
+    const wc = m.source.wardCode;
+    try {
+      const probe = await fetch(base + 'layers-report.json');
+      if (!probe.ok) { if (gen === bldgGen) stats.wardVec = { ward: wc, state: 'no-layers', layers: {} }; return; }   // 未生成: 道路・河川は出さない
+    } catch (e) { return; }
+    if (gen !== bldgGen) return;
+    stats.wardVec = { ward: wc, state: 'loading', layers: {} };
+    const made = [];
+    for (const id of Object.keys(WARD_VEC_FILES)) {
+      const layer = WARD_VEC_FILES[id](base);
+      try {
+        const r = await layer.mount();
+        if (gen !== bldgGen) { layer.destroy(); for (const w of made) w.layer.destroy(); return; }   // 古い要求: 作った分を破棄
+        made.push({ id, layer, count: r.count });
+        const rec = LayerRegistry.get(id);
+        layer.applyVisible(rec ? rec.visible : true);
+        stats.wardVec.layers[id] = r.count;
+      } catch (e) { stats.wardVec.layers[id] = 'error'; fail('wardvec ' + id, e); layer.destroy(); }
+    }
+    wardVec = made; stats.wardVec.state = 'ready'; scene.requestRender();
+  }
   function unmountBuildings() {
+    unmountWardVec();
     clearBuildingPick();
     if (tileset) { scene.primitives.remove(tileset); tileset = null; stats.baseUnmountedTotal = (stats.baseUnmountedTotal | 0) + 1; }
     for (const e of extraSets.splice(0)) { scene.primitives.remove(e.tileset); stats.extraUnmountedTotal = (stats.extraUnmountedTotal | 0) + 1; }
@@ -840,6 +902,7 @@
       }
       const ts = mounted[0];
       if (meta) metas.forEach((m, i) => extraSets.push({ id: m.id, base: m.base, tileset: mounted[i], source: m.source, report: m.report }));
+      if (meta) mountWardVec(metas, gen);   // 40G: 区の道路・河川（外部変換 tileset のみ。非同期・失敗しても建物表示に影響しない）
       else {
         tileset = ts;
         sumiHome = { center: ts.boundingSphere.center, range: Math.max(600, ts.boundingSphere.radius * 2.2) };
@@ -982,21 +1045,14 @@
   LayerRegistry.register(Object.assign({
     id: 'roads', label: '道路', swatch: C.roadMajor, defaultOn: true,
     hint: 'OSM 由来。tier (major/mid/local) で太さと色を分ける。配信範囲は住吉区の一部（約2.1km四方）のみ',
-  }, makeLineLayer('roads.json', (f) => {
-    const t = f.tier || 'local';
-    if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
-    if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
-    return { width: 3.0, casing: 0, material: solidMat(C.roadLocal), height: LAYER_H.roads };
-  })));
+  }, makeLineLayer('roads.json', roadStyle)));
   LayerRegistry.register(Object.assign({
     id: 'railways', label: '鉄道・駅', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
   }, makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }))));
   LayerRegistry.register(Object.assign({
     id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）。配信範囲は住吉区の一部（約2.1km四方）のみ',
   }, (function () {
-    const lines = makeLineLayer('waterways.json', (f) => f.kind === 'line'
-      ? { width: f.waterClass === 'canal' ? 6 : 4.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways }
-      : null);
+    const lines = makeLineLayer('waterways.json', waterLineStyle);
     const areas = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways });
     return {
       async mount() { const a = await lines.mount(); const b = await areas.mount(); return { count: a.count + b.count }; },
