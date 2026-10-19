@@ -126,7 +126,7 @@ function scan(o) {
   if (!state.files) state.files = {};
   const fingerprint = detectorFingerprint();
   let stateInvalidated = null;
-  if (state.scannerVersion !== SCANNER_VERSION || state.detectorFingerprint !== fingerprint) {
+  if ((state.scannerVersion !== SCANNER_VERSION || state.detectorFingerprint !== fingerprint) && Object.keys(state.files).length) {
     stateInvalidated = { reason: state.scannerVersion ? 'scanner-or-detector-changed' : 'legacy-state-without-version', droppedEntries: Object.keys(state.files).length };
     state.files = {}; // old results came from other detectors: discard, never reuse
   }
