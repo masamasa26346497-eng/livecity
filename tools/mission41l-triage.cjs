@@ -309,5 +309,5 @@ function run(argv) {
   }
   throw new Error('usage: report | classify | fields | glb-meta');
 }
-module.exports = { kindOf, crosstab, reportView, classifyMatches, classifyFile, fieldTriage, fieldsFile, glbJsonChunk, globalGlbMeta, run };
+module.exports = { keyClass, parseJsonLoose, SRC_META_KEY, kindOf, crosstab, reportView, classifyMatches, classifyFile, fieldTriage, fieldsFile, glbJsonChunk, globalGlbMeta, run };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2))); } catch (e) { console.error(e.message); process.exit(1); } }

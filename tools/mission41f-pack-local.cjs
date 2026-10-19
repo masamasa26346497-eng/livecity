@@ -17,6 +17,7 @@ const BLOCK = 512;
 const EXCLUDED_CATEGORIES = ['secrets-candidate', 'backup-archive'];
 const SECRET_NAME_HINT = /(^|\/)\.env(\.|$)|\.(pem|key|pfx|p12|kdbx|ppk)$|(^|\/)id_(rsa|dsa|ecdsa|ed25519)|credential|secret|token|service[-_]?account|\.npmrc$|\.netrc$/i;
 
+const sha8x = (root, rel) => crypto.createHash('sha256').update(root + ':' + rel).digest('hex').slice(0, 8); // same id as 41C/41J/41K
 const sha8 = (s) => crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 8);
 
 function octal(n, len) { return n.toString(8).padStart(len - 1, '0') + '\0'; }
@@ -84,7 +85,15 @@ function dirSymlinkProblem(rootDir, rel, cache) {
 // Select + filter. Returns { parts, excluded:{categories,nameHints}, problems }.
 function selectForPack(m, opts) {
   let sel = d.selectParts(m, opts);
-  const excluded = { categoryFiles: 0, nameHintFiles: 0, categories: [] };
+  const excluded = { categoryFiles: 0, nameHintFiles: 0, categories: [], planFiles: 0 };
+  // 41N: ids from an owner-made exclusion plan (anonymous sha256(root:rel) first 8 hex). Nothing is deleted; the file is just not packed.
+  if (opts.excludeIds && opts.excludeIds.size) {
+    sel = sel.map((p) => {
+      const keep = p.files.filter((f) => { const i = f.path.indexOf('/'); return !opts.excludeIds.has(sha8x(f.path.slice(0, i), f.path.slice(i + 1))); });
+      excluded.planFiles += p.files.length - keep.length;
+      return { ...p, files: keep, bytes: keep.reduce((a, f) => a + f.size, 0), fileCount: keep.length, subselection: p.subselection || keep.length !== p.files.length };
+    }).filter((p) => p.files.length);
+  }
   sel = sel.filter((p) => { if (EXCLUDED_CATEGORIES.includes(p.category)) { excluded.categoryFiles += p.files.length; excluded.categories.push(p.category); return false; } return true; });
   sel = sel.map((p) => {
     const keep = p.files.filter((f) => !SECRET_NAME_HINT.test(f.path));
@@ -319,7 +328,7 @@ function run(argv) {
     const k = argv[i];
     if (k === '--manifest') a.manifest = argv[++i]; else if (k === '--roots-file') a.rootsFile = argv[++i]; else if (k === '--out') a.out = argv[++i];
     else if (k === '--path-contains') a.pathContains = argv[++i]; else if (k === '--only-category') a.onlyCategory = argv[++i].split(',').filter(Boolean);
-    else if (k === '--part-limit-gib') a.partLimitGiB = Number(argv[++i]); else if (k === '--min-free-gib') a.minFreeGiB = Number(argv[++i]);
+    else if (k === '--exclude-plan') a.excludePlan = argv[++i]; else if (k === '--part-limit-gib') a.partLimitGiB = Number(argv[++i]); else if (k === '--min-free-gib') a.minFreeGiB = Number(argv[++i]);
     else throw new Error('unknown option: ' + k);
   }
   if (!a.manifest || !a.rootsFile || !a.out) throw new Error('--manifest, --roots-file and --out are required');
@@ -334,6 +343,11 @@ function run(argv) {
     if (d.isUnder(outAbs, rd, process.platform)) throw new Error('--out must be outside every data root (' + name + ')');
     roots[name] = rd;
   }
+  if (a.excludePlan) {
+    const pl = JSON.parse(fs.readFileSync(a.excludePlan, 'utf8').replace(/^﻿/, ''));
+    if (!pl || pl.tool !== 'mission41n-exclude' || !Array.isArray(pl.excludeIds) || !pl.excludeIds.every((x) => /^[0-9a-f]{8}$/.test(x))) throw new Error('not a 41N exclusion plan');
+    a.excludeIds = new Set(pl.excludeIds);
+  }
   const { parts } = selectForPack(m, a);
   const pre = d.rootPreflight(parts, roots); if (pre) throw new Error(pre);
   // resume is allowed only into a folder that 41F created before (it holds pack-report*.json) or an empty one
@@ -344,7 +358,7 @@ function run(argv) {
   const r = create(m, roots, { ...a, outDir: outAbs });
   const rep = r.report;
   console.log(['pack create (offline, local tar only; NOTHING uploaded, no network)',
-    'selected parts: ' + (rep.parts.length || 0) + ' created/checked; excluded by category: ' + rep.excluded.categoryFiles + ' files, by name hint: ' + rep.excluded.nameHintFiles + ' files (hint only, NOT a secret scan)',
+    'selected parts: ' + (rep.parts.length || 0) + ' created/checked; excluded by category: ' + rep.excluded.categoryFiles + ' files, by name hint: ' + rep.excluded.nameHintFiles + ' files (hint only, NOT a secret scan); by exclusion plan: ' + (rep.excluded.planFiles || 0) + ' files',
     ...rep.parts.map((p) => '  ' + p.state + ': files=' + (p.files || '-') + ' bytes=' + (p.bytes || '-') + (p.error ? ' error=' + p.error : '')),
     ...summaryLines(rep),
     'problems: ' + rep.problems.length + (rep.problems.length ? ' ' + JSON.stringify(rep.problems.slice(0, 5)) : ''),
