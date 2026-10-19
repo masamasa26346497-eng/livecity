@@ -7,6 +7,8 @@ From the repository root:
     powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41l-triage.ps1
   Classify one detection (shape CLASSES only, never the value); use an id from the Report:
     powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41l-triage.ps1 -Mode Classify -Id 1a2b3c4d
+  Field-level triage of one JSON file (counts by key class / value form / prefix; no value, key name or path printed):
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41l-triage.ps1 -Mode Fields -Id 1a2b3c4d
   GLB JSON-chunk metadata check (BIN chunks are not inspected; GLB stays unscanned):
     powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41l-triage.ps1 -Mode GlbMeta -PathContains fukushima
 
@@ -14,7 +16,7 @@ Nothing is changed, moved, deleted or sent. Nothing is approved: gates stay fals
 #>
 [CmdletBinding(PositionalBinding = $false)]
 param(
-  [ValidateSet('Report', 'Classify', 'GlbMeta')][string]$Mode = 'Report',
+  [ValidateSet('Report', 'Classify', 'Fields', 'GlbMeta')][string]$Mode = 'Report',
   [string]$Plan = '',
   [string]$Roots = '..',
   [string]$Id = '',
@@ -70,6 +72,14 @@ if ($map.Count -eq 0) { throw 'no roots given' }
 $stamp = [guid]::NewGuid().ToString('N')
 $rootsFile = Join-Path $tmp ('livecity-roots41l-' + $stamp + '.json')
 [System.IO.File]::WriteAllText($rootsFile, ($map | ConvertTo-Json), (New-Object System.Text.UTF8Encoding($false)))
+
+if ($Mode -eq 'Fields') {
+  if ($Id -notmatch '^[0-9a-f]{8}$') { throw '-Id must be an 8-character hex id from the Report' }
+  & node $tool 'fields' '--manifest' $manifest '--roots-file' $rootsFile '--id' $Id '--detector' $Detector
+  if ($LASTEXITCODE -ne 0) { throw ('fields failed, exit ' + $LASTEXITCODE) }
+  Write-Host 'Counts and classes only. HOLD means do not transfer the file; nothing is approved or excluded automatically.'
+  exit 0
+}
 
 if ($Mode -eq 'Classify') {
   if ($Id -notmatch '^[0-9a-f]{8}$') { throw '-Id must be an 8-character hex id from the Report' }

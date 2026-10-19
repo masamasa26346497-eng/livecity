@@ -165,3 +165,42 @@ test('41L sources: ps1 is ASCII, no write/delete/copy/network commands; cjs has 
   assert.strictEqual((strip.match(/\{/g) || []).length, (strip.match(/\}/g) || []).length);
   assert.strictEqual((strip.match(/\(/g) || []).length, (strip.match(/\)/g) || []).length);
 });
+
+// ---------- 41M: field-level triage ----------
+test('fields: contact keys only -> owner review, never safe; no value/key/path in output', () => {
+  const body = JSON.stringify({ license: 'ODbL', features: [{ properties: { name: 'secretname', phone: TEL }, id: 'x' }] });
+  const s = setup([['f.json', body]]);
+  const r = t.fieldsFile({ manifest: s.mf, rootsFile: s.rf, id: k.fid('LiveCity', 'f.json') });
+  assert.strictEqual(r.matches, 1);
+  assert.strictEqual(r.byKeyClass['contact-key'], 1);
+  assert.strictEqual(r.sourceMetadata.presentAtTopLevel, true);
+  assert.match(r.recommendation, /^owner-review-required/);
+  assert.strictEqual(r.autoApproved, false);
+  const out = JSON.stringify(r);
+  for (const leak of [TEL, 'secretname', 'f.json', s.base, '"phone"']) assert.ok(!out.includes(leak), 'leak: ' + leak);
+});
+test('fields: mobile, memo text and unknown keys -> HOLD', () => {
+  const body = JSON.stringify([{ memo: 'call me ' + MOBILE + ' tonight' }, { zzz: TEL }, { arr: [TEL] }]);
+  const s = setup([['g.json', body]]);
+  const r = t.fieldsFile({ manifest: s.mf, rootsFile: s.rf, id: k.fid('LiveCity', 'g.json') });
+  assert.strictEqual(r.matches, 3);
+  assert.match(r.recommendation, /^HOLD/);
+  assert.ok(r.holdReasons.length >= 3);
+  assert.strictEqual(r.byValueForm['embedded-in-longer-text'], 1);
+  assert.strictEqual(r.autoExcluded, false);
+  assert.ok(!JSON.stringify(r).includes(MOBILE));
+});
+test('fields: ndjson, non-json and parse failure handled without leaking', () => {
+  const s = setup([['h.ndjson', JSON.stringify({ tel: TEL }) + '\n' + JSON.stringify({ tel: TEL }) + '\n'], ['i.csv', 'a,b'], ['j.json', '[broken ' + TEL]]);
+  const a = t.fieldsFile({ manifest: s.mf, rootsFile: s.rf, id: k.fid('LiveCity', 'h.ndjson') });
+  assert.strictEqual(a.parsedAs, 'ndjson'); assert.strictEqual(a.matches, 2);
+  assert.match(t.fieldsFile({ manifest: s.mf, rootsFile: s.rf, id: k.fid('LiveCity', 'i.csv') }).error, /not-a-json/);
+  const c = t.fieldsFile({ manifest: s.mf, rootsFile: s.rf, id: k.fid('LiveCity', 'j.json') });
+  assert.match(c.error, /parse-failed/); assert.ok(!JSON.stringify(c).includes(TEL));
+});
+test('fields: ps1 has Fields mode, stays ASCII, no delete/copy/network commands', () => {
+  const ps = fs.readFileSync(path.join(__dirname, '..', 'tools', 'mission41l-triage.ps1'), 'utf8');
+  assert.ok(ps.includes("'Fields'"));
+  assert.ok(!/[^\x00-\x7f]/.test(ps));
+  assert.ok(!/Remove-Item|Copy-Item|Move-Item|robocopy|Invoke-WebRequest|Invoke-RestMethod/i.test(ps));
+});

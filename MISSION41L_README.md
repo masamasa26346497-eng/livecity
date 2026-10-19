@@ -44,6 +44,20 @@ Record the decision yourself; the tools never auto-mark safe/excluded and never 
 GLB header + JSON chunk (cap 8 MiB), runs the 41K detectors on it, and reports flags (extras, asset.copyright, data URI, external URI,
 standard extension names). It never reads BIN chunks or textures. Images (EXIF), archives and other formats stay unscanned.
 
+## 5b. 41M: field-level triage (`-Mode Fields`)
+`classify` cannot tell a facility contact from a personal number inside `free-text-or-field`. For JSON/GeoJSON/NDJSON files use:
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41l-triage.ps1 -Mode Fields -Id <8hex>
+```
+It parses the file and prints only counts: matches by key class (contact-key / coordinate-key / id-key / name-or-address-key /
+free-text-key / other-key / array-element), by value form (whole-value / embedded-in-longer-text / bare-number-value), by prefix class,
+and whether source/licence metadata keys exist. It never prints a number, a key name, a context or a path.
+- `HOLD`: mobile/050 prefix, number inside longer text, memo-like key, or any key that is not contact-like. Do not transfer the file.
+- `owner-review-required`: every match sits under a contact-like key (possible public facility contact). Still not approved: check the
+  data source licence and open the file yourself (`lookup`, see section 3). Nothing is ever marked safe or excluded automatically.
+Exclusion/redaction is the owner's local action on the file or the source data field; record it yourself. Non-JSON files: use `classify`.
+Not run on real data; synthetic fixtures only. All gates stay false.
+
 ## 6. Next step proposal
 After re-running Stage Fukushima: `tools\mission41k-content-scan.ps1 -Stage All -MaxFiles 5000` (resumable; repeat until
 `notReached=0`) for the 43,258 files. Expect more phone/e-mail matches in CSV/JSON; use `report` (anonymous aggregate) to review.

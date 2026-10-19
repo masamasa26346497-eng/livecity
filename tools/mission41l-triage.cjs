@@ -118,6 +118,98 @@ function classifyFile(o) {
   return { error: 'id-not-in-manifest' };
 }
 
+// ---------- fields (41M): JSON field-level anonymous triage; never prints values, keys, paths or context ----------
+// ASCII-only source: non-ASCII key names are written as \u escapes.
+const KEY_CLASSES = [
+  ['contact-key', /^(?:phone|tel|telephone|fax|contact|mobile|cell|電話|連絡先)$|phone|^tel[_:-]|[_:-]tel$/i],
+  ['coordinate-key', /^(?:coordinates|coords|geometry|lat|lon|lng|latitude|longitude|x|y|z|bbox|fp|rep[xz]|positions?)$/i],
+  ['id-key', /(?:^|[_:-])(?:id|uuid|guid|code|ref)$|^canonicalid$/i],
+  ['name-or-address-key', /^(?:name|title|label|addr(?:ess)?|street|city|ward|住所|名称)(?::.*)?$|^addr:/i],
+  ['free-text-key', /^(?:description|desc|note|notes|memo|comment|comments|remarks?|text|body|content|備考|メモ)$/i],
+];
+const SRC_META_KEY = /licen[cs]e|attribution|copyright|source|provenance|generator|odbl|publisher|dataset/i;
+function keyClass(key) {
+  if (key === null) return 'array-element(no-key)';
+  for (const [c, re] of KEY_CLASSES) if (re.test(key)) return c;
+  return 'other-key';
+}
+// Walks a parsed JSON value iteratively. Returns aggregate counts only.
+function fieldTriage(root, detectorType) {
+  const det = k.DETECTORS.find((d) => d.type === (detectorType || 'jp-phone-number'));
+  if (!det) throw new Error('unknown detector');
+  const agg = { byKeyClass: {}, byValueForm: {}, byPrefix: {}, matchTotal: 0, stringsScanned: 0, sourceMetaKeyOccurrences: 0, topLevelSourceMeta: 0 };
+  const bump = (o, key) => { o[key] = (o[key] || 0) + 1; };
+  const stack = [[root, null, 0]];
+  while (stack.length) {
+    const [v, key, depth] = stack.pop();
+    if (v === null || v === undefined) continue;
+    if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) stack.push([v[i], key, depth + 1]); continue; }
+    if (typeof v === 'object') {
+      for (const kk of Object.keys(v)) {
+        if (SRC_META_KEY.test(kk)) { agg.sourceMetaKeyOccurrences++; if (depth === 0) agg.topLevelSourceMeta++; }
+        stack.push([v[kk], kk, depth + 1]);
+      }
+      continue;
+    }
+    const isNum = typeof v === 'number';
+    const str = isNum ? String(v) : (typeof v === 'string' ? v : null);
+    if (str === null) continue;
+    if (!isNum) agg.stringsScanned++;
+    const re = new RegExp(det.re.source, det.re.flags); let m;
+    while ((m = re.exec(str))) {
+      if (!m[0].length) { re.lastIndex++; continue; }
+      agg.matchTotal++;
+      const whole = m[0].length === str.trim().length;
+      bump(agg.byValueForm, isNum ? 'bare-number-value' : (whole ? 'whole-value' : 'embedded-in-longer-text'));
+      bump(agg.byKeyClass, keyClass(key));
+      bump(agg.byPrefix, prefixClass(m[0].replace(/^\+81[- ]?/, '0').replace(/-/g, '')));
+    }
+  }
+  const kc = agg.byKeyClass, vf = agg.byValueForm, pf = agg.byPrefix;
+  const personalRisk = (pf['mobile(070/080/090)'] || 0) + (pf['ip-phone(050)'] || 0);
+  const reasons = [];
+  if (personalRisk) reasons.push('mobile/ip-phone prefixes present (possible personal number)');
+  if (vf['embedded-in-longer-text']) reasons.push('numbers embedded in free text');
+  if (kc['free-text-key']) reasons.push('matches under memo/description-like keys');
+  if (kc['other-key'] || kc['name-or-address-key'] || kc['array-element(no-key)'] || kc['id-key'] || kc['coordinate-key']) reasons.push('matches under keys that are not contact keys (unknown purpose)');
+  let recommendation;
+  if (agg.matchTotal === 0) recommendation = 'no-match-with-current-detector';
+  else if (reasons.length) recommendation = 'HOLD: do not transfer this file until the owner has reviewed it locally';
+  else recommendation = 'owner-review-required: all matches are under contact-like keys (possible public facility contact); publish only if the source licence allows';
+  return { matches: agg.matchTotal, stringsScanned: agg.stringsScanned, byKeyClass: kc, byValueForm: vf, byPrefix: pf,
+    nonContactKeyMatches: agg.matchTotal - (kc['contact-key'] || 0),
+    sourceMetadata: { keyOccurrences: agg.sourceMetaKeyOccurrences, presentAtTopLevel: agg.topLevelSourceMeta > 0 },
+    holdReasons: reasons, recommendation };
+}
+function parseJsonLoose(text) {
+  try { return { value: JSON.parse(text), form: 'json' }; } catch (e) { /* maybe ndjson */ }
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length);
+  if (lines.length < 2) return null;
+  const arr = [];
+  for (const l of lines) { try { arr.push(JSON.parse(l)); } catch (e) { return null; } }
+  return { value: arr, form: 'ndjson' };
+}
+function fieldsFile(o) {
+  const m = k.loadJson(o.manifest); const roots = k.loadJson(o.rootsFile);
+  for (const f of k.manifestFiles(m)) {
+    const { root, rel } = k.splitPath(f.path);
+    if (k.fid(root, rel) !== o.id) continue;
+    const ext = k.extOf(rel);
+    if (!/^\.?(?:json|geojson|jsonl|ndjson)$/i.test(ext)) return { error: 'not-a-json-file(use classify)' };
+    if (!roots[root]) return { error: 'root-not-given' };
+    const full = path.join(roots[root], ...rel.split('/'));
+    let st; try { st = fs.statSync(full); } catch (e) { return { error: 'unreadable-or-cloud-only' }; }
+    if (st.size > 128 * MIB) return { error: 'over-128MiB-not-parsed' };
+    let text; try { text = fs.readFileSync(full, 'utf8'); } catch (e) { return { error: 'unreadable-or-cloud-only' }; }
+    const parsed = parseJsonLoose(text.replace(/^﻿/, ''));
+    if (!parsed) return { error: 'json-parse-failed(use classify)' };
+    const r = fieldTriage(parsed.value, o.detector);
+    return Object.assign({ id: o.id, category: f.category, ext: ext || '(none)', detector: o.detector || 'jp-phone-number', parsedAs: parsed.form }, r,
+      { autoApproved: false, autoExcluded: false, note: 'counts and classes only: no value, key name, path or context is printed. Never a safe verdict.' });
+  }
+  return { error: 'id-not-in-manifest' };
+}
+
 // ---------- glb-meta: JSON chunk only ----------
 const STD_EXT = /^(?:KHR|EXT|MSFT|CESIUM|NV|ADOBE|AGI)_[A-Za-z0-9_]{1,60}$/;
 function glbJsonChunk(buf) {
@@ -205,12 +297,17 @@ function run(argv) {
     if (!o.manifest || !o.rootsFile || !/^[0-9a-f]{8}$/.test(o.id || '')) throw new Error('--manifest, --roots-file and --id (8 hex) are required');
     const r = classifyFile(o); console.log(JSON.stringify(r, null, 1)); return r.error ? 1 : 0;
   }
+  if (cmd === 'fields') {
+    const o = { manifest: arg(argv, '--manifest'), rootsFile: arg(argv, '--roots-file'), id: arg(argv, '--id'), detector: arg(argv, '--detector') };
+    if (!o.manifest || !o.rootsFile || !/^[0-9a-f]{8}$/.test(o.id || '')) throw new Error('--manifest, --roots-file and --id (8 hex) are required');
+    const r = fieldsFile(o); console.log(JSON.stringify(r, null, 1)); return r.error ? 1 : 0;
+  }
   if (cmd === 'glb-meta') {
     const o = { manifest: arg(argv, '--manifest'), rootsFile: arg(argv, '--roots-file'), pathContains: arg(argv, '--path-contains') || '', skipFile: arg(argv, '--skip-file'), maxFiles: Number(arg(argv, '--max-files')) || 0 };
     if (!o.manifest || !o.rootsFile) throw new Error('--manifest and --roots-file are required');
     const r = globalGlbMeta(o); console.log(JSON.stringify(r, null, 1)); return r.filesWithFindingsTotal ? 2 : 0;
   }
-  throw new Error('usage: report | classify | glb-meta');
+  throw new Error('usage: report | classify | fields | glb-meta');
 }
-module.exports = { kindOf, crosstab, reportView, classifyMatches, classifyFile, glbJsonChunk, globalGlbMeta, run };
+module.exports = { kindOf, crosstab, reportView, classifyMatches, classifyFile, fieldTriage, fieldsFile, glbJsonChunk, globalGlbMeta, run };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2))); } catch (e) { console.error(e.message); process.exit(1); } }
