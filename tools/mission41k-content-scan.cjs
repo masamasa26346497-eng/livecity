@@ -32,6 +32,15 @@ const DETECTORS = [
   { type: 'email-address', kind: 'personal', re: /[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63}){1,5}/g },
   { type: 'jp-phone-number', kind: 'personal', re: /(?<![\d.-])(?:\+81[- ]?)?0\d{1,4}-\d{1,4}-\d{4}(?![\d-])/g },
 ];
+// Cache key part (41L): any change to a detector, the binary-extension sets or the chunking invalidates old state.
+const SCANNER_VERSION = '41L-1';
+function detectorFingerprint() {
+  const h = crypto.createHash('sha256');
+  h.update(SCANNER_VERSION + '|' + CHUNK + '|' + OVERLAP);
+  for (const d of DETECTORS) h.update('|' + d.type + ':' + d.kind + ':' + d.re.source + ':' + d.re.flags);
+  h.update('|' + [...BINARY_EXT].sort().join(',') + '|' + [...ARCHIVE_EXT].sort().join(','));
+  return h.digest('hex').slice(0, 16);
+}
 const EXAMPLE_EMAIL = /@(?:example\.(?:com|org|net)|[^@]*noreply\.github\.com|localhost)$/i;
 const SECRET_NAME = /(^|\/)\.env(\.|$)|\.(pem|key|pfx|p12|kdbx|ppk)$|(^|\/)id_(rsa|dsa|ecdsa|ed25519)|credential|secret|token|service[-_]?account|\.npmrc$|\.netrc$|local-config\.js$/i;
 
@@ -115,11 +124,18 @@ function scan(o) {
   const needle = o.pathContains ? o.pathContains.toLowerCase() : null;
   const state = fs.existsSync(o.state) ? loadJson(o.state) : { schema: 1, note: 'ids/sizes/mtimes/detector counts only; no paths or values', files: {} };
   if (!state.files) state.files = {};
+  const fingerprint = detectorFingerprint();
+  let stateInvalidated = null;
+  if (state.scannerVersion !== SCANNER_VERSION || state.detectorFingerprint !== fingerprint) {
+    stateInvalidated = { reason: state.scannerVersion ? 'scanner-or-detector-changed' : 'legacy-state-without-version', droppedEntries: Object.keys(state.files).length };
+    state.files = {}; // old results came from other detectors: discard, never reuse
+  }
+  state.scannerVersion = SCANNER_VERSION; state.detectorFingerprint = fingerprint;
   const maxFileBytes = (o.maxFileMiB || 512) * MIB;
   const started = Date.now();
   const sel = []; let manifestTotal = 0;
   for (const f of manifestFiles(m)) { manifestTotal++; if (!needle || f.path.toLowerCase().includes(needle)) sel.push(f); }
-  const stats = { selected: sel.length, manifestFiles: manifestTotal, processedThisRun: 0, resumedFromState: 0, stoppedEarly: null, rootMissing: 0, sizeChangedSinceManifest: 0 };
+  const stats = { selected: sel.length, manifestFiles: manifestTotal, processedThisRun: 0, resumedFromState: 0, stateInvalidated, stoppedEarly: null, rootMissing: 0, sizeChangedSinceManifest: 0 };
   const rows = [];
   let sinceSave = 0;
   for (const f of sel) {
@@ -189,7 +205,7 @@ function summarize(rows, stats, selected, o) {
     status: 'owner-confirm-required', approved: false, redistributionAllowed: null,
   }));
   return {
-    schema: 1, tool: 'mission41k-content-scan',
+    schema: 1, tool: 'mission41k-content-scan', scannerVersion: SCANNER_VERSION, detectorFingerprint: detectorFingerprint(),
     scope: { pathContains: o.pathContains || null },
     stats, byStatus,
     complete: byStatus.notReached === 0 && byStatus.unscanned === 0,
@@ -212,7 +228,7 @@ function summarize(rows, stats, selected, o) {
 }
 
 function consoleSummary(r) {
-  return { selected: r.stats.selected, scanned: r.byStatus.scanned, unscanned: r.byStatus.unscanned, notReached: r.byStatus.notReached, resumedFromState: r.stats.resumedFromState, processedThisRun: r.stats.processedThisRun, stoppedEarly: r.stats.stoppedEarly,
+  return { selected: r.stats.selected, scanned: r.byStatus.scanned, unscanned: r.byStatus.unscanned, notReached: r.byStatus.notReached, resumedFromState: r.stats.resumedFromState, stateInvalidated: r.stats.stateInvalidated, scannerVersion: r.scannerVersion, processedThisRun: r.stats.processedThisRun, stoppedEarly: r.stats.stoppedEarly,
     filesWithFindings: r.filesWithFindingsTotal, detectorTotals: r.detectorTotals, secretLikeNameFiles: r.secretLikeNameFiles, unscannedByReason: r.unscanned.byReason,
     mixedOriginCategories: r.provenance.filter((p) => p.mixedOrigin).map((p) => p.category), complete: r.complete, gates: r.gates, verdict: r.verdict };
 }
@@ -240,5 +256,5 @@ function run(argv) {
   console.log('report: ' + path.basename(outFile) + ' (new file, next to the manifest unless --out)');
   return report.filesWithFindingsTotal ? 2 : (report.byStatus.unscanned || report.byStatus.notReached ? 3 : 0);
 }
-module.exports = { scan, scanFile, DETECTORS, fid, skey, run, summarize };
+module.exports = { SCANNER_VERSION, detectorFingerprint, manifestFiles, splitPath, extOf, loadJson, BINARY_EXT, scan, scanFile, DETECTORS, fid, skey, run, summarize };
 if (require.main === module) { try { process.exit(run(process.argv.slice(2))); } catch (e) { console.error(e.message); process.exit(1); } }
