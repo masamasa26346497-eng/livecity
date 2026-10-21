@@ -129,7 +129,7 @@ function summarize(m, stateInfo, opts) {
       note: 'a capped sample of anonymous ids, not the full list. The full hold list is the 41O proposal.' },
     unscanned: unscannedCohorts(unscanned),
     notInPlace: { files: other.length, byStatus: tally(other, (r) => r.status), note: 'not reached / stale state / size changed: unreviewed' },
-    sanitizePlan: { autoApply: false, note: 'a blanket plan that blanks all 335 phone-shaped values would also blank 219 non-phone values: never auto-applied; a human reviews per cohort.' },
+    sanitizePlan: { autoApply: false, note: 'the owner HOLD file has 335 contact-key string values; only 116 of them match the phone regex and the other 219 do not look like phone numbers. A derived copy that blanks all 335 is NOT approved and is never generated automatically; a human reviews per cohort.' },
     licenceLedger: { approved: false, note: 'licence / source-family ledger (PLATEAU, OSM, N03, e-Stat, Commons) is a separate manual gate and stays unapproved.' },
     hold: { allUnscannedAlwaysHold: true, allFindingsHold: true },
     caveats: ['no values, key names, paths, file names or context are printed', 'scan cache validity is size+mtime; regex detectors only; clean is not a review',
