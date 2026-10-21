@@ -5,23 +5,27 @@ From the repository root:
   powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41s-triage.ps1 -Mode credential
   powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41s-triage.ps1 -Mode phone-groups
   powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41s-triage.ps1 -Mode contact-subclass -ProgressFile ..\41s-progress.json   (41T; read-only, writes nothing)
+  powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission41s-triage.ps1 -Mode review-ledger -ProgressFile ..\41s-progress.json   (41U; read-only; -InitDecisions <file outside the repo> only if YOU ask for a template)
 Options: -Plan <folder> (default: newest livecity-plan-* under TEMP), -Roots ".." (root folders, ';' separated), -Ids a,b (credential only),
          -Max 500 (phone-groups per-run cap), -ProgressFile <file> (phone-groups resume file; holds only anonymous id -> class).
 Output: ids, categories, extensions, coarse shape classes and count buckets only. No values, key names, paths or context. Everything stays HOLD.
 #>
 [CmdletBinding(PositionalBinding = $false)]
 param(
-  [ValidateSet('credential', 'phone-groups', 'contact-subclass')][string]$Mode = 'credential',
+  [ValidateSet('credential', 'phone-groups', 'contact-subclass', 'review-ledger')][string]$Mode = 'credential',
   [string]$Plan = '',
   [string]$Roots = '..',
   [string]$Ids = '',
   [int]$Max = 500,
-  [string]$ProgressFile = ''
+  [string]$ProgressFile = '',
+  [string]$DecisionsFile = '',
+  [string]$InitDecisions = ''
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 $tool = Join-Path $repo 'tools\mission41s-triage.cjs'
 if ($Mode -eq 'contact-subclass') { $tool = Join-Path $repo 'tools\mission41t-contact-subclass.cjs' }
+if ($Mode -eq 'review-ledger') { $tool = Join-Path $repo 'tools\mission41u-review-ledger.cjs' }
 if (-not (Test-Path -LiteralPath $tool)) { throw ('tool not found: ' + $tool) }
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'node (18+) was not found in PATH' }
 if ($Max -lt 1) { throw '-Max must be 1 or more' }
@@ -55,7 +59,12 @@ if ($map.Count -eq 0) { throw 'no roots given' }
 $rootsFile = Join-Path $tmp ('livecity-roots41s-' + [guid]::NewGuid().ToString('N') + '.json')
 [System.IO.File]::WriteAllText($rootsFile, ($map | ConvertTo-Json), (New-Object System.Text.UTF8Encoding($false)))
 $a = @($tool, $Mode, '--manifest', $manifest, '--roots-file', $rootsFile)
-if ($Mode -eq 'contact-subclass') {
+if ($Mode -eq 'review-ledger') {
+  if ([string]::IsNullOrEmpty($ProgressFile)) { throw '-ProgressFile (the 41S phone-groups resume file) is required for review-ledger' }
+  $a = @($tool, '--manifest', $manifest, '--roots-file', $rootsFile, '--progress-file', (Resolve-Abs $ProgressFile))
+  if (-not [string]::IsNullOrEmpty($DecisionsFile)) { $a += @('--decisions-file', (Resolve-Abs $DecisionsFile)) }
+  if (-not [string]::IsNullOrEmpty($InitDecisions)) { $a += @('--init-decisions', (Resolve-Abs $InitDecisions)) }
+} elseif ($Mode -eq 'contact-subclass') {
   if ([string]::IsNullOrEmpty($ProgressFile)) { throw '-ProgressFile (the 41S phone-groups resume file) is required for contact-subclass' }
   $a = @($tool, '--manifest', $manifest, '--roots-file', $rootsFile, '--progress-file', (Resolve-Abs $ProgressFile))
 } elseif ($Mode -eq 'credential') {

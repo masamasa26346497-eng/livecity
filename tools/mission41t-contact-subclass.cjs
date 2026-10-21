@@ -33,7 +33,9 @@ function phoneType(raw) {
   if (/^0[1-9]/.test(d)) return 'landline-or-other-format';
   return 'other-format';
 }
-function newAcc() { return { cls: {}, types: {}, hits: 0, parseErrLines: 0, skippedLines: 0, lines: 0 }; }
+// hits = phone-format matches that are NOT id/numeric shaped (41U name: nonIdPhoneCandidates).
+// idStr = strings whose every match is id/numeric shaped; idMatches = those matches. raw phone matches = hits + idMatches.
+function newAcc() { return { cls: {}, types: {}, hits: 0, idStr: 0, idMatches: 0, parseErrLines: 0, skippedLines: 0, lines: 0 }; }
 
 // Walk one parsed JSON value iteratively; counts only (keys give a coarse class and are dropped).
 function walk(root, acc) {
@@ -46,7 +48,11 @@ function walk(root, acc) {
       if (v.length < 8 || !mk().test(v)) continue;
       const ctx = l.classifyMatches(v, 'jp-phone-number');
       const real = Object.keys(ctx).filter((c) => !/inside-uuid-like-id|inside-numeric-list|adjacent-to-letters/.test(c));
-      if (!real.length) { acc.cls['idish-only'] = (acc.cls['idish-only'] || 0) + 1; continue; }
+      if (!real.length) {
+        acc.cls['idish-only'] = (acc.cls['idish-only'] || 0) + 1; acc.idStr++;
+        const r2 = mk(); while (r2.exec(v)) acc.idMatches++;
+        continue;
+      }
       const kc = l.keyClass(key); const whole = WHOLE.test(v);
       let c;
       if (kc === 'contact-key') c = whole ? 'contact-key-whole-value' : 'contact-key-embedded-text';
@@ -64,28 +70,37 @@ const parse = (t) => JSON.parse(t.charCodeAt(0) === 0xFEFF ? t.slice(1) : t);
 // Streaming JSONL: bounded memory (one chunk + one line <= MAX_LINE); no whole-file read, no whole-file parse.
 function streamJsonl(full, acc, maxSeconds) {
   const fd = fs.openSync(full, 'r'); const buf = Buffer.allocUnsafe(CHUNK); const t0 = Date.now();
-  let carry = ''; let overflow = false; let partial = false;
+  // 41U: split on the 0x0A BYTE and decode each whole line as UTF-8 (the old latin1 decode garbled non-ASCII key names, which could
+  // mis-class a Japanese contact-like key). 0x0A never occurs inside a multi-byte character, so no line is cut mid-character.
+  let carry = []; let carryLen = 0; let overflow = false; let partial = false;
   const handle = (line) => {
     if (!line.trim()) return; acc.lines++;
     let j; try { j = parse(line); } catch (e) { acc.parseErrLines++; return; }
     walk(j, acc);
   };
+  const flush = () => { const b = Buffer.concat(carry, carryLen); carry = []; carryLen = 0; return b.toString('utf8'); };
   try {
     for (;;) {
       if (maxSeconds && (Date.now() - t0) / 1000 > maxSeconds) { partial = true; break; }
       const n = fs.readSync(fd, buf, 0, CHUNK, null); if (n <= 0) break;
-      const parts = (carry + buf.toString('latin1', 0, n)).split('\n'); carry = parts.pop();
-      for (const p of parts) { if (overflow) { overflow = false; acc.skippedLines++; continue; } handle(p); }
-      if (carry.length > MAX_LINE) { carry = ''; overflow = true; }
+      let start = 0;
+      for (;;) {
+        const nl = buf.indexOf(0x0a, start); if (nl < 0 || nl >= n) break;
+        if (overflow) { overflow = false; acc.skippedLines++; carry = []; carryLen = 0; }
+        else { carry.push(Buffer.from(buf.subarray(start, nl))); carryLen += nl - start; handle(flush()); }
+        start = nl + 1;
+      }
+      if (!overflow && start < n) { carry.push(Buffer.from(buf.subarray(start, n))); carryLen += n - start; }
+      if (carryLen > MAX_LINE) { carry = []; carryLen = 0; overflow = true; }
     }
-    if (!partial) { if (overflow) acc.skippedLines++; else handle(carry); }
+    if (!partial) { if (overflow) acc.skippedLines++; else if (carryLen) handle(flush()); }
   } finally { fs.closeSync(fd); }
   return partial;
 }
 
 function finish(acc, kind, note) {
   const present = PRIORITY.filter((c) => acc.cls[c]);
-  const out = { cls: present.length ? kind + ':' + present[0] : kind + ':no-phone-match-in-string-values', hits: acc.hits, types: Object.keys(acc.types).sort(), distinct: present.length, note };
+  const out = { idShapedStrings: acc.idStr, nonIdPhoneCandidates: acc.hits, rawPhoneMatches: acc.hits + acc.idMatches, cls: present.length ? kind + ':' + present[0] : kind + ':no-phone-match-in-string-values', hits: acc.hits, types: Object.keys(acc.types).sort(), distinct: present.length, note };
   if (kind === 'jsonl') { out.lines = acc.lines; out.parseErrLines = acc.parseErrLines; out.skippedLines = acc.skippedLines; }
   return out;
 }
@@ -109,27 +124,38 @@ function classifyOne(rec, roots, ext, opts) {
   } catch (e) { return { cls: 'unreadable' }; }
 }
 
-function subclass(m, stateInfo, roots, progress, opts) {
-  const idsMax = Math.min(12, Math.max(0, opts.idsMax == null ? 12 : opts.idsMax));
+function collect(m, stateInfo, roots, progress, opts) {
   const rows = o.classifyAll(m, stateInfo); const loc = new Map();
   for (const f of k.manifestFiles(m)) { const { root, rel } = k.splitPath(f.path); loc.set(k.fid(root, rel), { root, rel }); }
   const targets = rows.filter((r) => r.status === 'findings' && r.detections && r.detections['jp-phone-number']
     && ['free-text/contact', 'over-128MiB-not-classified'].includes(progress[r.id])).sort((a, b) => a.id.localeCompare(b.id));
-  const res = targets.map((r) => ({ r, c: classifyOne(loc.get(r.id), roots, r.ext, opts) }));
+  return targets.map((r) => ({ r, c: classifyOne(loc.get(r.id), roots, r.ext, opts) }));
+}
+
+function subclass(m, stateInfo, roots, progress, opts) {
+  const idsMax = Math.min(12, Math.max(0, opts.idsMax == null ? 12 : opts.idsMax));
+  const res = collect(m, stateInfo, roots, progress, opts);
   const tally = (fn) => sortObj(res.reduce((a, x) => { const y = fn(x); a[y] = (a[y] || 0) + 1; return a; }, {}));
   const rank = (c) => { const i = PRIORITY.findIndex((p) => c.endsWith(':' + p)); return i < 0 ? 99 : i; };
   const attention = res.filter((x) => x.c.cls !== 'no-match-now').sort((a, b) => rank(a.c.cls) - rank(b.c.cls) || a.r.id.localeCompare(b.r.id));
   const typeCount = {}; for (const x of res) for (const t of x.c.types || []) typeCount[t] = (typeCount[t] || 0) + 1;
   return { schema: 1, tool: 'mission41t-contact-subclass', mode: 'contact-subclass', readOnly: true, wroteNothing: true, stateValid: stateInfo.valid,
     uploadAllowed: false, eligibleForPackOrUpload: 0, autoApproved: false, autoExcluded: false,
-    selectedFiles: targets.length, progressClassesUsed: ['free-text/contact', 'over-128MiB-not-classified'],
+    selectedFiles: res.length, progressClassesUsed: ['free-text/contact', 'over-128MiB-not-classified'],
     byClass: tally((x) => x.c.cls), byCategoryExtensionClass: tally((x) => x.r.category + ' | ' + (x.r.ext || '(none)') + ' | ' + x.c.cls),
     filesWithPhonePrefixType: sortObj(typeCount), fileHitBuckets: tally((x) => 'hits ' + bucket(x.c.hits || 0)),
     streamedJsonl: res.filter((x) => x.c.lines !== undefined).map((x) => ({ id: x.r.id, linesBucket: bucket(x.c.lines), parseErrorLinesBucket: bucket(x.c.parseErrLines),
       skippedOverlongLinesBucket: bucket(x.c.skippedLines), partial: x.c.note === 'stream-time-cap-partial' })).slice(0, idsMax),
     ids: attention.slice(0, idsMax).map((x) => ({ id: x.r.id, category: x.r.category, extension: x.r.ext || '(none)', class: x.c.cls, hitsBucket: bucket(x.c.hits || 0),
+      nonIdPhoneCandidateBucket: bucket(x.c.nonIdPhoneCandidates || 0), idShapedStringBucket: bucket(x.c.idShapedStrings || 0),
+      rawPhoneMatchesBucket: bucket(x.c.rawPhoneMatches || 0), rawPhoneMatchesZero: (x.c.rawPhoneMatches || 0) === 0,
       phonePrefixTypes: x.c.types || [], distinctClasses: x.c.distinct || 0 })),
     idsOmitted: Math.max(0, attention.length - idsMax),
+    metricMeaning: {
+      hitsBucket: 'legacy name of nonIdPhoneCandidateBucket: phone-format matches that are NOT id/numeric shaped. 0 does NOT mean the phone matcher found nothing.',
+      idShapedStringBucket: 'strings whose every phone-format match looked like part of an id/number list (bucket only)',
+      rawPhoneMatchesBucket: 'all phone-format matches = non-id + id-shaped. rawPhoneMatchesZero=true only when the matcher found nothing at all',
+      note: 'an id-shaped-only file is a false-positive CANDIDATE, not a verdict and not a miss; it stays HOLD' },
     classMeaning: {
       'contact-key-whole-value': 'whole string is one phone-format value under a contact-like key (structure only; not judged public or personal)',
       'contact-key-embedded-text': 'phone-format text inside longer text under a contact-like key',
@@ -154,7 +180,7 @@ function run(argv) {
     { idsMax: arg(argv, '--ids-max') == null ? 12 : Number(arg(argv, '--ids-max')), maxSeconds: Number(arg(argv, '--max-seconds')) || 600 });
   console.log(JSON.stringify(out, null, 1)); return 0;
 }
-module.exports = { phoneType, walk, streamJsonl, classifyOne, subclass, run, PRIORITY };
+module.exports = { collect, phoneType, walk, streamJsonl, classifyOne, subclass, run, PRIORITY };
 if (require.main === module) {
   try { process.exit(run(process.argv.slice(2))); } catch (e) { console.error(String(e.message).replace(/[A-Za-z]:\\[^\s'"]*|\/[^\s'"]+\/[^\s'"]*/g, '<path>')); process.exit(1); }
 }
