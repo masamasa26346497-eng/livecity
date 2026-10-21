@@ -61,7 +61,8 @@ function progress(m, stateInfo, slice) {
   slice = slice || 5000;
   const rows = classifyAll(m, stateInfo);
   const total = rows.length;
-  const reached = rows.filter((r) => r.status !== 'not-reached' && r.status !== 'stale-state').length;
+  // 41P: a file whose size differs from the manifest was NOT looked at in its current form
+  const reached = rows.filter((r) => r.status !== 'not-reached' && r.status !== 'stale-state' && r.status !== 'changed-since-manifest').length;
   const remaining = total - reached;
   return { tool: 'mission41o-holdplan', mode: 'progress', total, reached, notReached: remaining, percent: total ? Math.round((reached / total) * 1000) / 10 : 0,
     stateValid: stateInfo.valid, stateNote: stateInfo.reason, byStatus: tally(rows, (r) => r.status),
@@ -102,7 +103,10 @@ function propose(m, stateInfo, holdIds) {
     impactIfAllHeld: impact(m, holdIdsOut),
     complete: rows.every((r) => r.status === 'findings' || r.status === 'scanned-no-pattern'),
     gates: { ...GATES }, autoApproved: false, autoExcluded: false,
-    caveats: ['a hold list built from an incomplete or stale scan is a MINIMUM: more files may need holding after the scan completes',
+    // 41P: "not a hold candidate" is NOT "may be packed/uploaded". Only an owner-reviewed allowlist plus open gates can make a file eligible (see mission41p-transfer-gate.cjs).
+    transfer: { uploadAllowed: false, eligibleForPackOrUpload: 0, notHoldCandidateMeansSafe: false, requires: ['owner-reviewed manifest allowlist', 'licenceApproved', 'noSecretsReviewed', 'noPersonalDataReviewed', 'separate owner-approved transfer phase'] },
+    caveats: [
+      'scan cache validity is size + mtimeMs only (no content hash): a file edited in place with the same size and mtime keeps its old result; detectors are regex patterns, so a clean result is not a review','a hold list built from an incomplete or stale scan is a MINIMUM: more files may need holding after the scan completes',
       'detections are pattern matches (false positives exist); holding them out is conservative and reversible, and does not clear anything else',
       'this proposal is not accepted by 41F directly: run the approve command with --confirm-hold to write a 41N-compatible ids-only plan'] };
 }
