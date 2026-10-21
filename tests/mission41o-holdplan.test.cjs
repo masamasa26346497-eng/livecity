@@ -153,3 +153,14 @@ test('source and wiring: read-only, offline, ASCII-only ps1, no delete/copy comm
   assert.ok(t.includes('mission41k-content-scan.ps1') && t.includes('-MaxFiles'));
   assert.strictEqual((t.match(/\{/g) || []).length, (t.match(/\}/g) || []).length);
 });
+
+test('41Q: ps1 helper functions do not leak node stdout into return values', () => {
+  const t = fs.readFileSync(path.join(__dirname, '..', 'tools', 'mission41o-batch.ps1'), 'utf8');
+  const fn = t.match(/function Invoke-Progress [\s\S]*?\n\}/)[0];
+  assert.ok(/\| Out-Host/.test(fn), 'node stdout must go to host');
+  assert.ok(/return \[int\]\$LASTEXITCODE/.test(fn));
+  const prop = t.match(/function Invoke-Propose [\s\S]*?\n\}/)[0];
+  assert.ok(/& node @a \| Out-Host/.test(prop));
+  assert.ok(/\$c = \[int\]\(@\(Invoke-Progress\)\[-1\]\)/.test(t));
+  assert.ok(!/\$c = Invoke-Progress/.test(t));
+});

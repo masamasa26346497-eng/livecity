@@ -67,20 +67,21 @@ if (-not (Test-Path -LiteralPath $manifest)) { throw 'manifest not found in the 
 Write-Host ('Using plan: ' + (Split-Path -Leaf $planDir))
 
 function Invoke-Progress {
-  & node $tool 'progress' '--manifest' $manifest '--slice' ([string]$SliceSize)
-  return $LASTEXITCODE
+  # node stdout goes to the console only, so the function output is exactly one [int] exit code
+  & node $tool 'progress' '--manifest' $manifest '--slice' ([string]$SliceSize) | Out-Host
+  return [int]$LASTEXITCODE
 }
 function Invoke-Propose {
   $a = @($tool, 'propose', '--manifest', $manifest)
   if ($HoldId -ne '') { $a += @('--hold-id', $HoldId) }
   if (-not [string]::IsNullOrEmpty($WriteProposalDir)) { $a += @('--write-dir', (Resolve-Abs $WriteProposalDir)) }
-  & node @a
-  $c = $LASTEXITCODE
+  & node @a | Out-Host
+  $c = [int]$LASTEXITCODE
   if ($c -ne 0 -and $c -ne 3) { throw ('propose failed, exit ' + $c) }
 }
 
 if ($Mode -eq 'Progress') {
-  $c = Invoke-Progress
+  $c = [int](@(Invoke-Progress)[-1])
   if ($c -ne 0 -and $c -ne 3) { throw ('progress failed, exit ' + $c) }
   exit 0
 }
@@ -91,8 +92,8 @@ if ($Mode -eq 'TarCheck') {
   if (-not (Test-Path -LiteralPath $t -PathType Container)) { throw 'tar folder not found' }
   $a = @($tool, 'tar-check', '--manifest', $manifest, '--tar-dir', $t)
   if ($HoldId -ne '') { $a += @('--hold-id', $HoldId) }
-  & node @a
-  $c = $LASTEXITCODE
+  & node @a | Out-Host
+  $c = [int]$LASTEXITCODE
   if ($c -ne 0 -and $c -ne 2) { throw ('tar-check failed, exit ' + $c) }
   if ($c -eq 2) { Write-Host 'A tar contains hold candidates: re-create it into a NEW folder with --exclude-plan. Tars were not touched.' }
   exit 0
@@ -125,7 +126,7 @@ while ($true) {
   Write-Host ('--- slice ' + $slice + ' (up to ' + $SliceSize + ' new files) ---')
   & powershell -NoProfile -ExecutionPolicy Bypass -File $scanPs1 -Stage All -Manifest $manifest -Roots $Roots -MaxFiles $SliceSize
   if ($LASTEXITCODE -ne 0) { throw ('41K scan slice failed, exit ' + $LASTEXITCODE) }
-  $c = Invoke-Progress
+  $c = [int](@(Invoke-Progress)[-1])
   if ($c -eq 0) { Write-Host 'Every manifest file has been reached (reached is not reviewed).'; break }
   if ($c -ne 3) { throw ('progress failed, exit ' + $c) }
   if ($MaxSlices -gt 0 -and $slice -ge $MaxSlices) { Write-Host 'Stopped after the requested slices. Run the same command again to continue.'; break }
