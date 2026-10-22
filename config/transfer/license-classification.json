@@ -1,0 +1,82 @@
+{
+  "_readme": [
+    "[Mission 42] 出典候補ごとの再配布条件の一次分類。tools/audit/ingest-local-inventory.js が参照する。",
+    "これは法的判断ではなく、移管ゲートの初期値。decision は hold / conditional / blocked の3値のみで、『自動承認(approved)』は存在しない。",
+    "conditional は『条件を満たす確認が取れれば公開候補になりうる』の意味で、公開してよいという意味ではない。",
+    "確認できないもの・unknown はすべて hold。ゲートを緩める変更はユーザーの明示承認と根拠URL/日付の記録が必要。",
+    "リポジトリ内の根拠: config/datasets/*.json の license / attribution 欄。それ以外は『要確認』と明記する。"
+  ],
+  "version": 1,
+  "decisionOrder": ["blocked", "hold", "conditional"],
+  "classes": {
+    "plateau": {
+      "label": "PLATEAU（国土交通省 3D都市モデル）",
+      "decision": "conditional",
+      "repoEvidence": "config/datasets/plateau-osaka-buildings-lod2.json: CC BY 4.0 / 政府標準利用規約2.0",
+      "conditions": ["出典表示（国土交通省 Project PLATEAU「3D都市モデル 大阪市」）", "取得元ページ・取得日・版（年度）を台帳に記録", "加工した場合は加工した旨を明記", "G空間情報センターの当該データセットページで利用条件を再確認"],
+      "notes": "原本GML/CityGML（巨大）は再配布可能性が高いが、公開は配信用に変換した派生物（タイル）を優先し、原本は外部ストレージ非公開で保管する案を推奨。"
+    },
+    "osm": {
+      "label": "OpenStreetMap（Overpass/PBF）",
+      "decision": "conditional",
+      "repoEvidence": "config/datasets/osaka-sumiyoshi-facilities-osm.json: ODbL 1.0",
+      "conditions": ["© OpenStreetMap contributors の表示", "派生データベースを公開する場合は ODbL で提供（Share-Alike）", "Produced Work（描画結果）と Derived Database（抽出JSON等）を区別して扱う", "Overpassの取得日時を記録"],
+      "notes": "抽出JSONの公開は ODbL 条件の遵守が前提。他ライセンスのデータと結合した派生物は条件が複雑になるため hold 寄りで個別判断。"
+    },
+    "estat": {
+      "label": "e-Stat / 国勢調査（政府統計の総合窓口）",
+      "decision": "conditional",
+      "repoEvidence": "config/datasets/osaka-census-*.json: e-Stat利用規約に準拠（商用利用可）",
+      "conditions": ["出典表示（政府統計の総合窓口(e-Stat)）", "加工した場合は加工した旨を明記", "統計表ごとの提供元の注記を確認", "APIキーを含むファイル・取得ログは公開対象外"],
+      "notes": "町丁目境界（小地域境界）は統計表とは別の利用条件になりうるため、境界データは個別に確認するまで hold。"
+    },
+    "gsi": {
+      "label": "国土地理院（基盤地図情報・地理院タイル等）",
+      "decision": "hold",
+      "repoEvidence": "リポジトリ内に利用条件の記録なし",
+      "conditions": ["利用規約（測量法に基づく承認要否を含む）をデータ種別ごとに確認", "出典表示"],
+      "notes": "確認できていないため保留。"
+    },
+    "ipss": {
+      "label": "国立社会保障・人口問題研究所 将来推計",
+      "decision": "hold",
+      "repoEvidence": "config/datasets/ipss-regional-population-projection-2023.json: 出典明記が必要、商用利用可否は要確認",
+      "conditions": ["商用利用可否を提供元に確認し、回答を記録"],
+      "notes": "リポジトリ自身が『要確認』と記載しているため保留。"
+    },
+    "osaka-city-open": {
+      "label": "大阪市オープンデータ",
+      "decision": "hold",
+      "repoEvidence": "リポジトリ内に利用条件の記録なし",
+      "conditions": ["データセットごとのライセンス表記を確認"],
+      "notes": "確認できていないため保留。"
+    },
+    "google": {
+      "label": "Google 由来（Places / Maps / Street View / 写真 等）",
+      "decision": "blocked",
+      "repoEvidence": "data/photos/google-places-pilot-candidates.json は OSM由来の座標のみで、Google由来コンテンツは含まない設計",
+      "conditions": ["Google Maps Platform 利用規約はコンテンツのキャッシュ・再配布・独自データベース化を制限する", "例外（Place IDの保存など）を個別に規約で確認できた場合のみ別途検討"],
+      "notes": "公開・移管対象外。ローカル保管のみ。ゲート解除はしない。"
+    },
+    "unknown": {
+      "label": "出典不明",
+      "decision": "hold",
+      "repoEvidence": "なし",
+      "conditions": ["出典を特定し台帳に記録するまで公開不可"],
+      "notes": "拡張子やファイル名から出典を推定できないものはすべて保留。"
+    }
+  },
+  "riskClasses": {
+    "secret-name": { "decision": "blocked", "reason": "秘密情報の可能性（ファイル名/拡張子）。内容確認は所有者がローカルで行う。" },
+    "pii-name": { "decision": "blocked", "reason": "個人情報の可能性（ファイル名/拡張子）。" },
+    "sync-conflict-or-temp": { "decision": "hold", "reason": "同期競合コピー/一時ファイル。正本ではない可能性。" },
+    "reparse-point": { "decision": "hold", "reason": "シンボリックリンク/ジャンクション。実体が対象外の場所にある可能性。" },
+    "content:*": { "decision": "blocked", "reason": "内容スキャンで秘密/個人情報らしきパターンを検出（一致文字列は保持していない）。" }
+  },
+  "storageTiers": {
+    "_comment": "サイズ別の保存先候補。decision が conditional のファイルにだけ付与される（hold/blocked は none）。",
+    "github-repo": { "maxBytes": 52428800, "note": "通常のgit管理。GitHubは50MB超で警告、100MB超でpushを拒否。リポジトリ全体は1GB未満を推奨。" },
+    "external-object-storage": { "maxBytes": 2147483648, "note": "GitHub Releases の1ファイル上限は2GiB。それ以上、または多数の大容量ファイルは外部ストレージ。" },
+    "external-object-storage-multipart": { "maxBytes": null, "note": "2GiB超。マルチパートアップロードが可能な外部ストレージのみ。" }
+  }
+}

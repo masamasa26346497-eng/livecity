@@ -21,6 +21,10 @@ Thumbs.db
 # Large raw datasets
 data/raw/
 
+# Mission 42: ローカルインベントリの実パス対応表・出力（共有/コミット禁止）
+path-map.local.csv
+**/lc-inventory*/
+
 # Large generated 24-ward building datasets (P1-4). Regenerate with:
 #   node tools/build-ward-building-datasets.js                              (nested, data/processed)
 #   node tools/build-ward-building-datasets.js --layout flat --out public/map-data/osaka-city/buildings --force   (P1-5 servable)
