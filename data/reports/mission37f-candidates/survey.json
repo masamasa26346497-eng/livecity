@@ -1,0 +1,1965 @@
+{
+ "generatedAt": "2026-10-12T00:52:27.476Z",
+ "note": "調査サンプル。本番の索引・日付表には反映しない。auto-adoptable も人手確認を経て photo-review/索引に取り込む前提。",
+ "sampleSize": 16,
+ "totals": {
+  "candidates": 126,
+  "autoAdoptable": 0,
+  "rejectedReasons": {
+   "no-coordinates": 109,
+   "coordinates-too-far": 15,
+   "no-name-in-title-or-description": 87,
+   "non-iso-or-ambiguous": 10,
+   "not-newer": 51,
+   "no-DateTimeOriginal": 28,
+   "year-out-of-range": 1,
+   "historic-scan-category": 5
+  }
+ },
+ "buildings": [
+  {
+   "canonicalId": "cg_bldg_bldg_a7f2ebae-8127-4079-99fb-aa3f939f57dd",
+   "name": "イオン喜連瓜破ショッピングセンター",
+   "ward": "hirano",
+   "current": {
+    "file": "DIAMOND_CITY_Higashisumiyoshi.JPG",
+    "takenAt": "1997-04-17",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "AEON Kireuriwari Shopping Center 1.JPG",
+     "takenAt": "2012-01-14",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:AEON%20Kireuriwari%20Shopping%20Center%201.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "AEON Kireuriwari Shopping Center 2.JPG",
+     "takenAt": "2012-01-14",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:AEON%20Kireuriwari%20Shopping%20Center%202.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Vending machines in ÆON Kireuriwari shopping center.JPG",
+     "takenAt": "2012-11-06",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Vending%20machines%20in%20%C3%86ON%20Kireuriwari%20shopping%20center.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Aeon Mall Kire-Uriwari Station 20190131.jpg",
+     "takenAt": "2019-01-31",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 130,
+     "size": "3980x2985",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Aeon%20Mall%20Kire-Uriwari%20Station%2020190131.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:130m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Ion-kireuriwari-shoppingcenter-for-wiki.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "819x614",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Ion-kireuriwari-shoppingcenter-for-wiki.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "ÆON KIRE-URIWARI SHOPPING CENTER PARKING LOT.jpg",
+     "takenAt": "2024-01-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%C3%86ON%20KIRE-URIWARI%20SHOPPING%20CENTER%20PARKING%20LOT.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "ÆON KIREURIWARI SHOPPING CENTER.jpg",
+     "takenAt": "2024-01-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%C3%86ON%20KIREURIWARI%20SHOPPING%20CENTER.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "ÆON Kireuriwari Shopping Center.jpg",
+     "takenAt": "2024-01-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%C3%86ON%20Kireuriwari%20Shopping%20Center.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "ÆON Kire-Uriwari Shopping Center.jpg",
+     "takenAt": "2024-01-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%C3%86ON%20Kire-Uriwari%20Shopping%20Center.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 9,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_fae25b63-cddc-4545-8004-c41620676308",
+   "name": "阪和記念病院",
+   "ward": "sumiyoshi",
+   "current": {
+    "file": "Hanwa_memorial_hospital_2023-12_1.jpg",
+    "takenAt": "2023-12",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Hanwa memorial hospital 2023-12 2.jpg",
+     "takenAt": "2023-12",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa%20memorial%20hospital%202023-12%202.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanwa memorial hospital 2023-12 3.jpg",
+     "takenAt": "2023-12",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa%20memorial%20hospital%202023-12%203.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "NDL2956919 官報 1928年07月07日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "10450x6700",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2956919%20%E5%AE%98%E5%A0%B1%201928%E5%B9%B407%E6%9C%8807%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00130136722 京城日報 1940-11-29.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3079x4166",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00130136722%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201940-11-29.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 4,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_ef3be94e-ff1b-4174-acd2-646dd9c4542d",
+   "name": "阪和住吉総合病院",
+   "ward": "sumiyoshi",
+   "current": {
+    "file": "Hanwasumiyoshi_General_hospital-01.jpg",
+    "takenAt": "2020-07-19",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
+   "name": "阪和病院",
+   "ward": "sumiyoshi",
+   "current": {
+    "file": "Hanwa_memorial_hospital_2023-12_2.jpg",
+    "takenAt": "2023-12",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Hanwa Memorial Hospital.JPG",
+     "takenAt": "2012-03-13",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2816x2112",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa%20Memorial%20Hospital.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanwasumiyoshi General hospital-01.jpg",
+     "takenAt": "2020-07-19",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3900x2600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwasumiyoshi%20General%20hospital-01.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "CADAL11110253 文章修養.djvu",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3185x4301",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CADAL11110253%20%E6%96%87%E7%AB%A0%E4%BF%AE%E9%A4%8A.djvu",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanwa memorial hospital 2023-12 3.jpg",
+     "takenAt": "2023-12",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa%20memorial%20hospital%202023-12%203.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanwa memorial hospital 2023-12 1.jpg",
+     "takenAt": "2023-12",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa%20memorial%20hospital%202023-12%201.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "NDL2956919 官報 1928年07月07日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "10450x6700",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2956919%20%E5%AE%98%E5%A0%B1%201928%E5%B9%B407%E6%9C%8807%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL2957360 官報 1929年12月19日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "10450x6700",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2957360%20%E5%AE%98%E5%A0%B1%201929%E5%B9%B412%E6%9C%8819%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL2957504 官報 1930年06月16日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "10450x6700",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2957504%20%E5%AE%98%E5%A0%B1%201930%E5%B9%B406%E6%9C%8816%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanwa-Daiichi-Senboku Hospital.jpg",
+     "takenAt": "2024-01",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanwa-Daiichi-Senboku%20Hospital.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00130136722 京城日報 1940-11-29.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3079x4166",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00130136722%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201940-11-29.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Mrdical Corporation Seiwakai Hanwaizumi Hospital.jpg",
+     "takenAt": "2026-02",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2432x1824",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Mrdical%20Corporation%20Seiwakai%20Hanwaizumi%20Hospital.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 11,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_d717578a-7192-4d11-ab62-e8a1537568e0",
+   "name": "住吉警察署",
+   "ward": "sumiyoshi",
+   "current": {
+    "file": "Sumiyoshi_Plice_Station.JPG",
+    "takenAt": "2008-04-07",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Hankai 162 IMG 1392 20130302.JPG",
+     "takenAt": "2013-03-02",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hankai%20162%20IMG%201392%2020130302.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hankai 164 IMG 1387 20130302.JPG",
+     "takenAt": "2013-03-02",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hankai%20164%20IMG%201387%2020130302.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "HPS Sumiyoshi koban.jpg",
+     "takenAt": "2009-06-03",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2112x2816",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HPS%20Sumiyoshi%20koban.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "住吉警察署（旧庁舎）.jpg",
+     "takenAt": "2018-09-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1280x883",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E4%BD%8F%E5%90%89%E8%AD%A6%E5%AF%9F%E7%BD%B2%EF%BC%88%E6%97%A7%E5%BA%81%E8%88%8E%EF%BC%89.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "NLC416-14jh009005-81868 大阪博覽會便覽.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "693x1045",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NLC416-14jh009005-81868%20%E5%A4%A7%E9%98%AA%E5%8D%9A%E8%A6%BD%E6%9C%83%E4%BE%BF%E8%A6%BD.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL946235 富の函館 - 一名・函館案内 part1.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "6331x4100",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL946235%20%E5%AF%8C%E3%81%AE%E5%87%BD%E9%A4%A8%20-%20%E4%B8%80%E5%90%8D%E3%83%BB%E5%87%BD%E9%A4%A8%E6%A1%88%E5%86%85%20part1.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL1107044 躍進石巻市 - 市制実施七週年記念 part1.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "6385x4356",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL1107044%20%E8%BA%8D%E9%80%B2%E7%9F%B3%E5%B7%BB%E5%B8%82%20-%20%E5%B8%82%E5%88%B6%E5%AE%9F%E6%96%BD%E4%B8%83%E9%80%B1%E5%B9%B4%E8%A8%98%E5%BF%B5%20part1.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL966056 大阪府写真帖 part1.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "6489x4235",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL966056%20%E5%A4%A7%E9%98%AA%E5%BA%9C%E5%86%99%E7%9C%9F%E5%B8%96%20part1.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL2954550 官報 1920年09月14日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "10450x6700",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2954550%20%E5%AE%98%E5%A0%B1%201920%E5%B9%B409%E6%9C%8814%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL2964114 官報 1952年03月24日.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "4900x8450",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL2964114%20%E5%AE%98%E5%A0%B1%201952%E5%B9%B403%E6%9C%8824%E6%97%A5.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL765683 神戸名勝案内記 - 附・近傍 part1.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "5564x4012",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL765683%20%E7%A5%9E%E6%88%B8%E5%90%8D%E5%8B%9D%E6%A1%88%E5%86%85%E8%A8%98%20-%20%E9%99%84%E3%83%BB%E8%BF%91%E5%82%8D%20part1.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL763431 能代由緒記.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "7045x4968",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL763431%20%E8%83%BD%E4%BB%A3%E7%94%B1%E7%B7%92%E8%A8%98.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00088264802 嶺南日報 1949-06-08.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2220x3091",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00088264802%20%E5%B6%BA%E5%8D%97%E6%97%A5%E5%A0%B1%201949-06-08.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00112938945 朝鮮新聞 1935-11-20.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3058x4106",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00112938945%20%E6%9C%9D%E9%AE%AE%E6%96%B0%E8%81%9E%201935-11-20.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00118620785 京城日報 1925-01-03.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2214x3087",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00118620785%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201925-01-03.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00119901254 京城日報 1927-01-03.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2214x3087",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00119901254%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201927-01-03.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00124837282 朝鮮新聞 1939-05-12.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3014x4208",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00124837282%20%E6%9C%9D%E9%AE%AE%E6%96%B0%E8%81%9E%201939-05-12.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Sumiyoshi PL in Osaka Prefecture.svg",
+     "takenAt": "2026-06-01",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "750x1100",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Sumiyoshi%20PL%20in%20Osaka%20Prefecture.svg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Sumiyoshi Police station Sugimotocho Ekimae Koban.jpg",
+     "takenAt": "2026-06-06",
+     "license": "CC BY 4.0",
+     "distanceM": 2591,
+     "size": "3265x2451",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Sumiyoshi%20Police%20station%20Sugimotocho%20Ekimae%20Koban.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:2591m"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_867c2448-0dcd-4a35-bfa6-3d7b7b93c1d8",
+   "name": "荘厳浄土寺",
+   "ward": "sumiyoshi",
+   "current": {
+    "file": "Shogon-jodoji,_hondou.jpg",
+    "takenAt": "2017-10-08",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Shogon jyodoji1.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji1.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji2.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji2.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji4.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji4.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji5.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2448x3264",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji5.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji amidado.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji%20amidado.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji hondo.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji%20hondo.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon jyodoji3.jpg",
+     "takenAt": "2008-03-09",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2448x3264",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon%20jyodoji3.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shogon-jodoji, sanmon.jpg",
+     "takenAt": "2017-10-08",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shogon-jodoji%2C%20sanmon.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "荘厳浄土寺歌碑.JPG",
+     "takenAt": "2006-09-25",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "480x320",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E8%8D%98%E5%8E%B3%E6%B5%84%E5%9C%9F%E5%AF%BA%E6%AD%8C%E7%A2%91.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "荘厳浄土寺山門.JPG",
+     "takenAt": "2006-09-25",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "480x320",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E8%8D%98%E5%8E%B3%E6%B5%84%E5%9C%9F%E5%AF%BA%E5%B1%B1%E9%96%80.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 10,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_752de9ab-48f5-4628-a91c-c2d55ebb4b33",
+   "name": "大阪市長居障害者スポーツセンター",
+   "ward": "higashisumiyoshi",
+   "current": {
+    "file": "Osaka_City_Nagai_Sports_Center_for_Persons_with_Disabilities.JPG",
+    "takenAt": "2015-10-12",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_31a75e05-aba2-44e5-a0f3-f754b3d27323",
+   "name": "大阪市立田辺中学校",
+   "ward": "higashisumiyoshi",
+   "current": {
+    "file": "Osakashiritsu_Tanabe_Cyugakko.jpg",
+    "takenAt": "2008-03-15",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "NDL814305 中学程度入学試験問題集 南海道之部.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "7704x5906",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL814305%20%E4%B8%AD%E5%AD%A6%E7%A8%8B%E5%BA%A6%E5%85%A5%E5%AD%A6%E8%A9%A6%E9%A8%93%E5%95%8F%E9%A1%8C%E9%9B%86%20%E5%8D%97%E6%B5%B7%E9%81%93%E4%B9%8B%E9%83%A8.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 1,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_3967a4f3-66ba-48aa-8990-492fc89fb041",
+   "name": "大阪公立大学医学部附属病院",
+   "ward": "abeno",
+   "current": {
+    "file": "Osaka_Metropolitan_University_Hospital_sign.jpg",
+    "takenAt": "2022-06-20",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Osaka City University Faculty of Nursing.JPG",
+     "takenAt": "2014-11-02",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2700x2024",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20City%20University%20Faculty%20of%20Nursing.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Tennoji - panoramio (32).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 143,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tennoji%20-%20panoramio%20(32).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:143m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka City University Faculty of Nursing 20191228.jpg",
+     "takenAt": "2019-12-28",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "4849x3637",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20City%20University%20Faculty%20of%20Nursing%2020191228.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Osaka Metropolitan University logotype.png",
+     "takenAt": "2022-03-19",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "768x91",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Metropolitan%20University%20logotype.png",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Omu Nakamozu.jpg",
+     "takenAt": "2023-06-29",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 10773,
+     "size": "6520x4890",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Omu%20Nakamozu.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:10773m",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 5,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_8e4695fb-0c30-41d2-bd5e-37f2b10c467e",
+   "name": "大阪梅田",
+   "ward": "kita",
+   "current": {
+    "file": "OsakaUmeda_Twin_Towers_South.jpg",
+    "takenAt": "2022-01-03",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Hanshin Umeda station track map.svg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "450x270",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Umeda%20station%20track%20map.svg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Umeda Station Sign (Hanshin).jpg",
+     "takenAt": "2015-09-20",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 511,
+     "size": "3065x2299",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Umeda%20Station%20Sign%20(Hanshin).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:511m",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin Umeda station - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 377,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Umeda%20station%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:377m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanshin Umeda station - panoramio - DVMG.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 509,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Umeda%20station%20-%20panoramio%20-%20DVMG.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:509m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanshin Umeda Station - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 84,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Umeda%20Station%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanshin-Umeda-Station-Exit-F23.jpg",
+     "takenAt": "2018-09-24",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3884x2994",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Umeda-Station-Exit-F23.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin Railway Umeda Station Elevator 20181119 1916 (46684176384).jpg",
+     "takenAt": "2018-11-19",
+     "license": "CC BY 2.0",
+     "distanceM": 402,
+     "size": "3845x2163",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Railway%20Umeda%20Station%20Elevator%2020181119%201916%20(46684176384).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:402m",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin Osaka-Umeda Station.jpg",
+     "takenAt": "2019-10-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2558x1918",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Osaka-Umeda%20Station.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "阪急大阪梅田駅 発車直前の様子.ogv",
+     "takenAt": "2020-01-24",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x1080",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E9%98%AA%E6%80%A5%E5%A4%A7%E9%98%AA%E6%A2%85%E7%94%B0%E9%A7%85%20%E7%99%BA%E8%BB%8A%E7%9B%B4%E5%89%8D%E3%81%AE%E6%A7%98%E5%AD%90.ogv",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin Osaka-Umeda Station (50762243237).jpg",
+     "takenAt": "2020-11-24",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Osaka-Umeda%20Station%20(50762243237).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin Osaka-Umeda Station (50761397478).jpg",
+     "takenAt": "2020-11-24",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Osaka-Umeda%20Station%20(50761397478).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home4 Get-off.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home4%20Get-off.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home2-3 Get-off.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home2-3%20Get-off.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home1.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home1.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home-view.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home-view.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home2.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home2.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hanshin-Osaka-Umeda-STA Home3-4.jpg",
+     "takenAt": "2021-12-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin-Osaka-Umeda-STA%20Home3-4.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "LAWSON HA Hanshin Umeda-Higashi shop.jpg",
+     "takenAt": "2023-11-06",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:LAWSON%20HA%20Hanshin%20Umeda-Higashi%20shop.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanshin Expo Train sign at Hanshin Umeda station.jpg",
+     "takenAt": "2024-04-13",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "4608x3072",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Expo%20Train%20sign%20at%20Hanshin%20Umeda%20station.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hanshin Osaka-Umeda Station 260124.jpg",
+     "takenAt": "2026-01-24",
+     "license": "CC0",
+     "distanceM": 525,
+     "size": "4032x2268",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hanshin%20Osaka-Umeda%20Station%20260124.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:525m",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 20,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_osm_161451126",
+   "name": "HEP FIVE",
+   "ward": "kita",
+   "current": {
+    "file": "HEP_FIVE.jpg",
+    "takenAt": "2020-10-29",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "HEP Five Ferris wheel, October 2005.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "640x480",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20Five%20Ferris%20wheel%2C%20October%202005.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hep-hep riots.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "576x457",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-hep%20riots.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "HEP FIVE Ferris Wheel. Osaka, Kansai region, Island of Honshu, Japan.jpg",
+     "takenAt": "2010-03-25",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x800",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%20Ferris%20Wheel.%20Osaka%2C%20Kansai%20region%2C%20Island%20of%20Honshu%2C%20Japan.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP-FIVE in 201409 002.JPG",
+     "takenAt": "2014-09-09",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP-FIVE%20in%20201409%20002.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP at Night in 201408.JPG",
+     "takenAt": "2014-08-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20at%20Night%20in%20201408.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP in 201409.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20in%20201409.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "TOHO CINEMAS Umeda in 201409.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:TOHO%20CINEMAS%20Umeda%20in%20201409.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP Five in 201411.JPG",
+     "takenAt": "2014-11-28",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2300",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20Five%20in%20201411.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP Five Ferris Wheel.jpg",
+     "takenAt": "2006-08-14",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1000x660",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20Five%20Ferris%20Wheel.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP FIVE - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 101,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:101m"
+     ]
+    },
+    {
+     "file": "Umeda HEP-Five Pottwale.jpg",
+     "takenAt": "2019-03-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Umeda%20HEP-Five%20Pottwale.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP-FIVE,Osaka-Japan.JPG",
+     "takenAt": "2008-04-02",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3072x2304",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP-FIVE%2COsaka-Japan.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Hep-Hep-Krawalle Würzburg Senatsbeschluss 1819.jpg",
+     "takenAt": null,
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2065x2526",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-Hep-Krawalle%20W%C3%BCrzburg%20Senatsbeschluss%201819.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "year-out-of-range",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hep-five.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "240x320",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-five.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "HEP FIVE 01.jpg",
+     "takenAt": "2008-11",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%2001.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP FIVE 02.jpg",
+     "takenAt": "2008-11",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%2002.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP FIVE on 26th March 2025.jpg",
+     "takenAt": "2025-03-26",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%20on%2026th%20March%202025.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "HEP FIVE 20260223.jpg",
+     "takenAt": "2026-02-23",
+     "license": "CC BY 4.0",
+     "distanceM": null,
+     "size": "3024x4032",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20FIVE%2020260223.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 18,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
+   "name": "大阪松竹座",
+   "ward": "chuo",
+   "current": {
+    "file": "Shochikuza_2020-09.jpg",
+    "takenAt": "2020-09-18",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Namba6.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "640x480",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Namba6.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Dotonbori-4.jpg",
+     "takenAt": "2005-08-08",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "960x1280",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Dotonbori-4.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shochiku(OSK) The Girl from Arles 1923-5.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "732x905",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shochiku(OSK)%20The%20Girl%20from%20Arles%201923-5.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "historic-scan-category",
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Shochiku(OSK) Kotobuki-no-Odori 1928-8.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1411x476",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shochiku(OSK)%20Kotobuki-no-Odori%201928-8.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "historic-scan-category",
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "OSK Spring Dance Finale 1932-3.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "753x540",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:OSK%20Spring%20Dance%20Finale%201932-3.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "historic-scan-category",
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "OSK Shochiku Grand Revue poster 1930-6.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "477x696",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:OSK%20Shochiku%20Grand%20Revue%20poster%201930-6.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "松竹芸能 角座広場 (17540509890) (4).jpg",
+     "takenAt": "2015-04-17",
+     "license": "CC BY-SA 2.0",
+     "distanceM": 262,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%9D%BE%E7%AB%B9%E8%8A%B8%E8%83%BD%20%E8%A7%92%E5%BA%A7%E5%BA%83%E5%A0%B4%20(17540509890)%20(4).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:262m",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Doutonbori, Osaka (6797953609).jpg",
+     "takenAt": "2012-01-24",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "5616x3744",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Doutonbori%2C%20Osaka%20(6797953609).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Shochikuza - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 61,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Shochikuza%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "第二十四回 堂本剛 独演会 (10665879456).jpg",
+     "takenAt": "2013-11-02",
+     "license": "CC BY-SA 2.0",
+     "distanceM": null,
+     "size": "2448x3264",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%9B%9E%20%E5%A0%82%E6%9C%AC%E5%89%9B%20%E7%8B%AC%E6%BC%94%E4%BC%9A%20(10665879456).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Osaka Shochikuza.jpg",
+     "takenAt": "2021-03-18",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Shochikuza.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Dotonbori Syochikuza c. 1938.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1007x966",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Dotonbori%20Syochikuza%20c.%201938.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "historic-scan-category",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "大阪松竹座.jpg",
+     "takenAt": "2007-05",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "800x780",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E5%A4%A7%E9%98%AA%E6%9D%BE%E7%AB%B9%E5%BA%A7.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Tsuruha Drug Doutonbori.jpg",
+     "takenAt": "2021-09-15",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 110,
+     "size": "3024x4032",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tsuruha%20Drug%20Doutonbori.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:110m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Ganko Doutonbori.jpg",
+     "takenAt": "2021-09-15",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 114,
+     "size": "3024x4032",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Ganko%20Doutonbori.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:114m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Kuidaore 2021.jpg",
+     "takenAt": "2021-09-15",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 117,
+     "size": "3024x4032",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kuidaore%202021.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:117m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka Shochiku Revue Company “The 4th Spring Dances Open Culture”.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "954x841",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Shochiku%20Revue%20Company%20%E2%80%9CThe%204th%20Spring%20Dances%20Open%20Culture%E2%80%9D.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "historic-scan-category",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NDL1644447 松竹兄弟物語 part1.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "7491x5125",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NDL1644447%20%E6%9D%BE%E7%AB%B9%E5%85%84%E5%BC%9F%E7%89%A9%E8%AA%9E%20part1.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 18,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_243b9395-72e7-46fc-91c1-4197b8f0310b",
+   "name": "天王寺ミオ プラザ館",
+   "ward": "tennoji",
+   "current": {
+    "file": "Tennoji_Station_20190203.jpg",
+    "takenAt": "2019-02-03",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_3323c394-2a88-4007-9cbf-1a1d7ad34e77",
+   "name": "ABC-MART梅田ビル",
+   "ward": "kita",
+   "current": {
+    "file": "ABC_Mart_Umeda_Building_IMG_2785-2_20130505.JPG",
+    "takenAt": "2013-05-05",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Umeda OPA & H&M UMEDA & ABC-MART Grand Stage UMEDA.jpg",
+     "takenAt": "2013-04-20",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1886x2534",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Umeda%20OPA%20%26%20H%26M%20UMEDA%20%26%20ABC-MART%20Grand%20Stage%20UMEDA.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "H&M Umeda Osaka IMG 2786-2 20130505.JPG",
+     "takenAt": "2013-05-05",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:H%26M%20Umeda%20Osaka%20IMG%202786-2%2020130505.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "PRESTIA Automated Teller Machine at the 1st floor of ABC-MART Umeda Building.JPG",
+     "takenAt": "2015-11-13",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1864x2518",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:PRESTIA%20Automated%20Teller%20Machine%20at%20the%201st%20floor%20of%20ABC-MART%20Umeda%20Building.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "ABC-MART Umeda Building.jpg",
+     "takenAt": "2019-05-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:ABC-MART%20Umeda%20Building.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "ABC-MART UMEDA BUILDING.jpg",
+     "takenAt": "2019-05-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:ABC-MART%20UMEDA%20BUILDING.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "ABC-MART UMEDA Building.jpg",
+     "takenAt": "2020-11-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:ABC-MART%20UMEDA%20Building.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 6,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_e4b3fe4c-ce1a-4bee-9caa-a05a6f0d90f2",
+   "name": "Asue大阪プール",
+   "ward": "minato",
+   "current": {
+    "file": "Osaka_Pool.png",
+    "takenAt": "2018-10-01",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_77c99bae-6cd9-4b6b-815c-010ccc1395f8",
+   "name": "CITY TOWER NISHI-UMEDA",
+   "ward": "fukushima",
+   "current": {
+    "file": "CityTower-Nishiumeda.jpg",
+    "takenAt": "2007-11-10",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "City Tower Nishiumeda Views from Umeda Sky Building IMG 0785 20130112.JPG",
+     "takenAt": "2013-01-12",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:City%20Tower%20Nishiumeda%20Views%20from%20Umeda%20Sky%20Building%20IMG%200785%2020130112.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "City Tower Nishiumeda - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 136,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:City%20Tower%20Nishiumeda%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:136m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Sights of Old Capital, by Akiyama, Aisaburō, 1919, from the Internet Archive - sightsoldcapita00akiy.pdf",
+     "takenAt": "1919",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1141x1712",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Sights%20of%20Old%20Capital%2C%20by%20Akiyama%2C%20Aisabur%C5%8D%2C%201919%2C%20from%20the%20Internet%20Archive%20-%20sightsoldcapita00akiy.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Bamboo bridge - USACE-p16021coll8-1268.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1275x1650",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Bamboo%20bridge%20-%20USACE-p16021coll8-1268.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Rosalynn Carter's Trip to Japan and Korea, 6-25-79-7-1-79 - DPLA - 4fcf02a183e6d8344a56f15e65f4effa.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1275x1650",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Rosalynn%20Carter's%20Trip%20to%20Japan%20and%20Korea%2C%206-25-79-7-1-79%20-%20DPLA%20-%204fcf02a183e6d8344a56f15e65f4effa.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 5,
+    "autoAdoptable": 0
+   }
+  }
+ ]
+}

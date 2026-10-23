@@ -1,0 +1,303 @@
+{
+  "schema": "livecity.mission43b.viewer-audit/1",
+  "method": "static: parses viewer EXTRA_SET_DEFS and reads tracked files. NOT a browser run.",
+  "browserE2E": "not-run-in-this-report (see test log / PR comment for the headless run, if any)",
+  "ok": true,
+  "problems": [],
+  "summary": {
+    "wardsRegistry": 24,
+    "wardsWithTrackedViewable3d": 6,
+    "wardsUnavailable": 18,
+    "extraDefs": 6,
+    "baseWard": "27120",
+    "publishedGateWired": true,
+    "publishedApprovedWards": 0
+  },
+  "note": "Every ward counted here is a PARTIAL slice of the ward. This is not \"24 wards done\".",
+  "sets": [
+    {
+      "id": "base:osaka-sumiyoshi-9tile",
+      "kind": "base",
+      "ward": "sumiyoshi",
+      "wardCode": "27120",
+      "metaState": "inferred",
+      "tracked": true,
+      "tilesetRefs": {
+        "uris": 11,
+        "glb": 11,
+        "problems": []
+      },
+      "buildings": 10546,
+      "leafTiles": 9,
+      "attrsSidecars": 9,
+      "note": "attrs are served from LAYER_BASE (mission37c-layers), not from the tileset dir"
+    },
+    {
+      "id": "kita-sample",
+      "kind": "extra",
+      "base": "mission37h-3dtiles/kita-sample/",
+      "exists": true,
+      "tracked": true,
+      "ward": "kita",
+      "wardCode": "27127",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 15,
+        "glb": 15,
+        "problems": []
+      },
+      "buildings": 2698,
+      "leafTiles": 13,
+      "idsSidecars": 13,
+      "attrsSidecars": 13,
+      "idsTotal": 2698,
+      "attrsTotal": 2698
+    },
+    {
+      "id": "chuo-sample",
+      "kind": "extra",
+      "base": "mission37h-3dtiles/chuo-sample/",
+      "exists": true,
+      "tracked": true,
+      "ward": "chuo",
+      "wardCode": "27128",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 19,
+        "glb": 19,
+        "problems": []
+      },
+      "buildings": 5629,
+      "leafTiles": 15,
+      "idsSidecars": 15,
+      "attrsSidecars": 15,
+      "idsTotal": 5629,
+      "attrsTotal": 5629
+    },
+    {
+      "id": "tennoji-sample",
+      "kind": "extra",
+      "base": "mission37h-3dtiles/tennoji-sample/",
+      "exists": true,
+      "tracked": true,
+      "ward": "tennoji",
+      "wardCode": "27109",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 14,
+        "glb": 14,
+        "problems": []
+      },
+      "buildings": 6593,
+      "leafTiles": 12,
+      "idsSidecars": 12,
+      "attrsSidecars": 12,
+      "idsTotal": 6593,
+      "attrsTotal": 6593
+    },
+    {
+      "id": "nishi-sample",
+      "kind": "extra",
+      "base": "mission37h-3dtiles/nishi-sample/",
+      "exists": true,
+      "tracked": true,
+      "ward": "nishi",
+      "wardCode": "27106",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 19,
+        "glb": 19,
+        "problems": []
+      },
+      "buildings": 3893,
+      "leafTiles": 15,
+      "idsSidecars": 15,
+      "attrsSidecars": 15,
+      "idsTotal": 3893,
+      "attrsTotal": 3893
+    },
+    {
+      "id": "naniwa-mesh",
+      "kind": "extra",
+      "base": "mission38e-3dtiles/naniwa-mesh/",
+      "exists": true,
+      "tracked": true,
+      "ward": "naniwa",
+      "wardCode": "27111",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 7,
+        "glb": 7,
+        "problems": []
+      },
+      "buildings": 2466,
+      "leafTiles": 6,
+      "idsSidecars": 6,
+      "attrsSidecars": 6,
+      "idsTotal": 2466,
+      "attrsTotal": 2466
+    },
+    {
+      "id": "naniwa-mesh2",
+      "kind": "extra",
+      "base": "mission38e-3dtiles/naniwa-mesh2/",
+      "exists": true,
+      "tracked": true,
+      "ward": "naniwa",
+      "wardCode": "27111",
+      "metaState": "consistent",
+      "tilesetRefs": {
+        "uris": 11,
+        "glb": 11,
+        "problems": []
+      },
+      "buildings": 1801,
+      "leafTiles": 9,
+      "idsSidecars": 9,
+      "attrsSidecars": 9,
+      "idsTotal": 1801,
+      "attrsTotal": 1801
+    }
+  ],
+  "unregisteredTrackedSets": [],
+  "wardCoverage": [
+    {
+      "ward": "kita",
+      "code": "27127",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "miyakojima",
+      "code": "27102",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "fukushima",
+      "code": "27103",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "konohana",
+      "code": "27104",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "chuo",
+      "code": "27128",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "nishi",
+      "code": "27106",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "minato",
+      "code": "27107",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "taisho",
+      "code": "27108",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "tennoji",
+      "code": "27109",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "naniwa",
+      "code": "27111",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "nishiyodogawa",
+      "code": "27113",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "yodogawa",
+      "code": "27123",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "higashiyodogawa",
+      "code": "27114",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "higashinari",
+      "code": "27115",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "ikuno",
+      "code": "27116",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "asahi",
+      "code": "27117",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "joto",
+      "code": "27118",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "tsurumi",
+      "code": "27124",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "abeno",
+      "code": "27119",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "suminoe",
+      "code": "27125",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "sumiyoshi",
+      "code": "27120",
+      "viewer3d": "partial"
+    },
+    {
+      "ward": "higashisumiyoshi",
+      "code": "27121",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "hirano",
+      "code": "27126",
+      "viewer3d": "unavailable"
+    },
+    {
+      "ward": "nishinari",
+      "code": "27122",
+      "viewer3d": "unavailable"
+    }
+  ],
+  "missingConditionsFor24WardDynamicLoading": [
+    "18 wards have no tileset in Git: setBuildingWard() returns false and the UI shows \"3D unavailable\" (viewer line ~948).",
+    "All 6 covered wards are partial (PLATEAU mesh slices; Sumiyoshi 9 of 52 source tiles).",
+    "A new ward needs: tileset.json + GLBs + ids/ + attrs/ + source.json(wardCode) + build-report.json under a tracked dir, plus an EXTRA_SET_DEFS entry or an approved:true row in mission40j-3dtiles/published.json.",
+    "published.json approves 0 wards; local-only ?ext= sets work on localhost only.",
+    "ward ids are not globally unique (Mission 40D conflicts); the viewer keys sidecars per tileset (_lcBase), so only one ward may be mounted at a time.",
+    "Hosting: full-city output is estimated at ~0.6 GB, not suitable for Git/Vercel static hosting without owner approval of storage."
+  ],
+  "licence": {
+    "licenceApproved": false,
+    "generalPolicy": {
+      "plateau": "MLIT PLATEAU site policy (https://www.mlit.go.jp/plateau/site-policy/) states PDL1.0 / CC BY compatibility for covered content incl. 3D city models and requires source + modification notices; FAQ (https://www.mlit.go.jp/plateau/faq/) states commercial use is allowed. Reported by the requester; this audit did not fetch it.",
+      "osm": "OpenStreetMap data is ODbL 1.0; attribution \"(c) OpenStreetMap contributors\" required (https://www.openstreetmap.org/copyright).",
+      "googlePlaces": "Paid Google Places data is NOT used."
+    },
+    "datasetSpecific": "Osaka City 2024 dataset page (https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024) returned HTTP 403 to the requester: its README / per-resource terms and redistribution / modification rights are UNVERIFIED. Per the product spec (https://www.mlit.go.jp/plateaudocument/toc8/toc8_06/toc8_06_03/) a README states per-dataset terms, so the general policy must not be treated as approval of this dataset.",
+    "attributionAlreadyShownInViewer": "see licenseNote in each source.json"
+  }
+}

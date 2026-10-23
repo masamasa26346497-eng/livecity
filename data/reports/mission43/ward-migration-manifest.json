@@ -1,0 +1,658 @@
+{
+  "schema": "livecity.mission43.ward-migration/1",
+  "gates": {
+    "licenceApproved": false,
+    "noSecretsReviewed": false,
+    "noPersonalDataReviewed": false,
+    "uploadAllowed": 0
+  },
+  "excluded": [
+    "whole-PC bulk (~75GB)",
+    "secret/credential/contact candidates",
+    "Google Places paid mapping",
+    "41* scan artifacts",
+    "original tar archives"
+  ],
+  "transferredNow": {
+    "files": 0,
+    "bytes": 0
+  },
+  "summary": {
+    "wards": 24,
+    "wardsWith3dInGit": 6,
+    "wardsLegacyTilesCompleteInGit": 1,
+    "wardsNeedingSourceData": 23
+  },
+  "wards": [
+    {
+      "ward": "kita",
+      "name": "北区",
+      "code": "27127",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37h-3dtiles/kita-sample"
+          ],
+          "buildings": 2698
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "partial-3D-in-Git; full ward needs public re-fetch (PLATEAU mesh range, licence unapproved) or owner-PC legacy tiles",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-kita), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "miyakojima",
+      "name": "都島区",
+      "code": "27102",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-miyakojima), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "fukushima",
+      "name": "福島区",
+      "code": "27103",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-fukushima), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "konohana",
+      "name": "此花区",
+      "code": "27104",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-konohana), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "chuo",
+      "name": "中央区",
+      "code": "27128",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37h-3dtiles/chuo-sample"
+          ],
+          "buildings": 5629
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "partial-3D-in-Git; full ward needs public re-fetch (PLATEAU mesh range, licence unapproved) or owner-PC legacy tiles",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-chuo), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "nishi",
+      "name": "西区",
+      "code": "27106",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37h-3dtiles/nishi-sample"
+          ],
+          "buildings": 3893
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "partial-3D-in-Git; full ward needs public re-fetch (PLATEAU mesh range, licence unapproved) or owner-PC legacy tiles",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-nishi), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "minato",
+      "name": "港区",
+      "code": "27107",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-minato), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "taisho",
+      "name": "大正区",
+      "code": "27108",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-taisho), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "tennoji",
+      "name": "天王寺区",
+      "code": "27109",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37h-3dtiles/tennoji-sample"
+          ],
+          "buildings": 6593
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "partial-3D-in-Git; full ward needs public re-fetch (PLATEAU mesh range, licence unapproved) or owner-PC legacy tiles",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-tennoji), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "naniwa",
+      "name": "浪速区",
+      "code": "27111",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission38e-3dtiles/naniwa-mesh",
+            "public/mission38e-3dtiles/naniwa-mesh2"
+          ],
+          "buildings": 4267
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "partial-3D-in-Git; full ward needs public re-fetch (PLATEAU mesh range, licence unapproved) or owner-PC legacy tiles",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-naniwa), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "nishiyodogawa",
+      "name": "西淀川区",
+      "code": "27113",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-nishiyodogawa), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "yodogawa",
+      "name": "淀川区",
+      "code": "27123",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-yodogawa), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "higashiyodogawa",
+      "name": "東淀川区",
+      "code": "27114",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-higashiyodogawa), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "higashinari",
+      "name": "東成区",
+      "code": "27115",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-higashinari), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "ikuno",
+      "name": "生野区",
+      "code": "27116",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-ikuno), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "asahi",
+      "name": "旭区",
+      "code": "27117",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-asahi), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "joto",
+      "name": "城東区",
+      "code": "27118",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-joto), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "tsurumi",
+      "name": "鶴見区",
+      "code": "27124",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-tsurumi), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "abeno",
+      "name": "阿倍野区",
+      "code": "27119",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-abeno), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "suminoe",
+      "name": "住之江区",
+      "code": "27125",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-suminoe), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "sumiyoshi",
+      "name": "住吉区",
+      "code": "27120",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37b-3dtiles/osaka-sumiyoshi-9tile"
+          ],
+          "buildings": 10546
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "in-Git-complete",
+          "tiles": 52
+        },
+        "osmLayers": {
+          "state": "in-Git-partial",
+          "path": "public/mission37c-layers/osaka-sumiyoshi-9tile"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "rebuildable-from-Git-tracked-legacy-tiles (rebuild --ward sumiyoshi)",
+      "localOnlyMinimum": [],
+      "osmLayersRoute": "in Git (partial)"
+    },
+    {
+      "ward": "higashisumiyoshi",
+      "name": "東住吉区",
+      "code": "27121",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-higashisumiyoshi), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "hirano",
+      "name": "平野区",
+      "code": "27126",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-hirano), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    },
+    {
+      "ward": "nishinari",
+      "name": "西成区",
+      "code": "27122",
+      "groups": {
+        "buildings3dInGit": {
+          "state": "not-in-Git"
+        },
+        "legacyBuildingTilesInGit": {
+          "state": "not-in-Git",
+          "tracked": 0
+        },
+        "osmLayers": {
+          "state": "not-in-Git"
+        },
+        "facilities": {
+          "state": "in-Git"
+        }
+      },
+      "route": "needs public re-fetch (PLATEAU CityGML via 36K) or owner-PC legacy tiles; nothing in Git",
+      "localOnlyMinimum": [
+        "legacy building tiles for this ward (osaka-nishinari), only if public re-fetch is not approved"
+      ],
+      "osmLayersRoute": "rebuild from OSM (ODbL) via 40G needs source tiles or Overpass; licenceApproved=false"
+    }
+  ]
+}
