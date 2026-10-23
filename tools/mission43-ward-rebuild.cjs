@@ -238,6 +238,36 @@ function rebuild(wardId, outDir) {
   return report;
 }
 
+// ---- regress: rebuild Sumiyoshi from Git-tracked legacy tiles into a NEW untracked dir and compare numerically with the
+// committed 37B 9-tile tileset. Writes nothing under the repo, uploads nothing, deletes nothing.
+const REF_9TILE = 'public/mission37b-3dtiles/osaka-sumiyoshi-9tile';
+function regress(outDir) {
+  const rep = rebuild('sumiyoshi', outDir);
+  const ref = path.join(ROOT, REF_9TILE); outDir = path.resolve(outDir);
+  const refRep = readJson(path.join(ref, 'build-report.json')); const newRep = readJson(path.join(outDir, 'build-report.json'));
+  const newLeaf = new Map((newRep.leaf || []).map((l) => [l.name, l]));
+  const c = { refTiles: 0, glbByteIdentical: 0, glbDiffer: 0, glbMissing: 0, idsIdentical: 0, idsMissing: 0, idsOnlyInRef: 0, leafStatsIdentical: 0, leafStatsDiffer: 0, refBuildings: 0, refBuildingsFoundInRebuild: 0 };
+  const problems = [];
+  for (const l of refRep.leaf || []) {
+    c.refTiles++; c.refBuildings += l.buildings;
+    const g1 = path.join(ref, 'tiles', l.name + '.glb'), g2 = path.join(outDir, 'tiles', l.name + '.glb');
+    if (!fs.existsSync(g2)) { c.glbMissing++; problems.push('glb missing in rebuild: ' + l.name); }
+    else if (Buffer.compare(fs.readFileSync(g1), fs.readFileSync(g2)) === 0) c.glbByteIdentical++; else { c.glbDiffer++; problems.push('glb differs: ' + l.name); }
+    const i1 = path.join(ref, 'ids', l.name + '.json'), i2 = path.join(outDir, 'ids', l.name + '.json');
+    if (!fs.existsSync(i2)) { c.idsMissing++; problems.push('ids missing: ' + l.name); }
+    else {
+      const a = readJson(i1), b = readJson(i2); const la = Array.isArray(a) ? a : a.ids, lb = Array.isArray(b) ? b : b.ids;
+      const sb = new Set(lb); c.refBuildingsFoundInRebuild += la.filter((x) => sb.has(x)).length;
+      const miss = la.filter((x) => !sb.has(x)).length; c.idsOnlyInRef += miss;
+      if (miss === 0 && la.length === lb.length && la.every((x, k) => x === lb[k])) c.idsIdentical++; else problems.push('ids differ: ' + l.name);
+    }
+    const n = newLeaf.get(l.name);
+    if (n && ['buildings', 'skipped', 'fallbacks', 'vertices', 'triangles', 'bytes'].every((k) => n[k] === l[k])) c.leafStatsIdentical++; else { c.leafStatsDiffer++; problems.push('leaf stats differ: ' + l.name); }
+  }
+  const ok = rep.verify.ok && problems.length === 0 && c.refBuildings === c.refBuildingsFoundInRebuild && rep.convert.buildings === 35031;
+  return { schema: 'livecity.mission43.regress/1', ward: 'sumiyoshi', ok, rebuilt: { tiles: rep.convert.tiles, buildings: rep.convert.buildings, uniqueIds: rep.convert.uniqueIds, skipped: rep.convert.skipped, fallbacks: rep.convert.fallbacks, totalBytes: rep.convert.totalBytes, verifyOk: rep.verify.ok }, vsCommitted9Tile: c, problems, published: false, committed: false, uploadAllowed: 0 };
+}
+
 // ---- preflight for the owner PC: anonymous counts only
 function preflight(src, gatesFile) {
   src = path.resolve(src);
@@ -382,6 +412,9 @@ async function main() {
     } else if (cmd === 'rebuild') {
       if (!opt('ward') || !opt('out')) throw new Error('--ward and --out required');
       console.log(JSON.stringify(rebuild(opt('ward'), opt('out')), null, 1));
+    } else if (cmd === 'regress') {
+      const out = opt('out') || path.join(fs.mkdtempSync(path.join(require('os').tmpdir(), 'm43-regress-')), 'sumiyoshi');
+      const r = regress(out); console.log(JSON.stringify(r, null, 1)); process.exit(r.ok ? 0 : 1);
     } else if (cmd === 'verify') {
       const r = verifyDir(opt('dir') || ''); console.log(JSON.stringify(r, null, 1)); process.exit(r.ok ? 0 : 1);
     } else if (cmd === 'preflight') {
@@ -393,8 +426,8 @@ async function main() {
       const r = await sources(has('online'));
       if (has('write')) { fs.mkdirSync(REPORT_DIR, { recursive: true }); fs.writeFileSync(path.join(REPORT_DIR, 'sources-check.json'), JSON.stringify(r, null, 2) + '\n'); }
       console.log(JSON.stringify(r, null, 1));
-    } else { console.error('usage: manifest | rebuild | verify | preflight | inspect | sources'); process.exit(2); }
+    } else { console.error('usage: manifest | rebuild | regress | verify | preflight | inspect | sources'); process.exit(2); }
   } catch (e) { console.error(e.message); process.exit(e.code || 1); }
 }
-module.exports = { normalizeWardCode, resolveSetWard, existingSets, checkSetRefs, collectUris, buildManifest, verifyDir, rebuild, preflight, inspect, sources };
+module.exports = { normalizeWardCode, resolveSetWard, existingSets, checkSetRefs, collectUris, buildManifest, verifyDir, rebuild, regress, preflight, inspect, sources };
 if (require.main === module) main();
