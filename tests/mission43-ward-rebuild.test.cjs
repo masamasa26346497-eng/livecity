@@ -99,3 +99,66 @@ test('CLI: rebuild exit code 3 on fail-closed', () => {
   try { execFileSync('node', [tool, 'rebuild', '--ward', 'kita', '--out', path.join(tmp(), 'k')], { stdio: 'pipe' }); } catch (e) { code = e.status; }
   assert.strictEqual(code, 3);
 });
+
+// ---- 43A: preflight root-file classification + anonymous inspect (synthetic fixtures only)
+const mkSrc = (opts = {}) => {
+  const src = tmp();
+  const ids = T.buildManifest().wards.map((w) => w.ward);
+  const datasets = ids.map((id) => ({ id: 'osaka-' + id, wardId: id, buildings: 2, tiles: 1 }));
+  if (!opts.noRoot) fs.writeFileSync(path.join(src, 'manifest.json'), JSON.stringify({ wardCount: 24, datasets }));
+  for (const id of ids) {
+    const d = path.join(src, 'osaka-' + id); fs.mkdirSync(d);
+    fs.writeFileSync(path.join(d, 'manifest.json'), JSON.stringify({ tiles: [{ tx: 0, tz: 0, file: 'tile_0_0.json', count: 2 }] }));
+    fs.writeFileSync(path.join(d, 'tile_0_0.json'), JSON.stringify({ buildings: [{ id: 'bldg_' + id + '1' }, { id: 'bldg_' + id + '2' }] }));
+  }
+  return { src, ids };
+};
+test('preflight: root manifest.json counts as JSON, only real non-JSON is risky', () => {
+  const { src } = mkSrc();
+  const p0 = T.preflight(src);
+  assert.strictEqual(p0.riskyFileCounts.nonJson, 0);
+  assert.deepStrictEqual(p0.rootFiles, { files: 1, jsonFiles: 1, nonJsonFiles: 0, hasManifestJson: true });
+  fs.writeFileSync(path.join(src, 'notes.txt'), 'x');
+  const p = T.preflight(src);
+  assert.strictEqual(p.riskyFileCounts.nonJson, 1);
+  assert.strictEqual(p.rootFiles.nonJsonFiles, 1);
+  assert.strictEqual(p.uploadAllowed, 0);
+  assert.strictEqual(p.eligibleForUpload, 0);
+  assert.ok(!JSON.stringify(p).includes('notes'));
+});
+test('inspect: ok on clean fixture, anonymous, writes nothing', () => {
+  const { src } = mkSrc();
+  const before = JSON.stringify(fs.readdirSync(src, { recursive: true }).sort());
+  const r = T.inspect(src);
+  assert.strictEqual(r.ok, true);
+  assert.strictEqual(r.totals.wards, 24);
+  assert.strictEqual(r.totals.buildings, 48);
+  assert.strictEqual(r.rootManifest.wardCountMatches, true);
+  assert.strictEqual(JSON.stringify(fs.readdirSync(src, { recursive: true }).sort()), before);
+  assert.ok(!JSON.stringify(r).includes(src) && !/bldg_/.test(JSON.stringify(r)));
+});
+test('inspect: fail-closed on missing root manifest, syntax error, missing tile, bad id', () => {
+  assert.strictEqual(T.inspect(mkSrc({ noRoot: true }).src).ok, false);
+  const a = mkSrc();
+  fs.writeFileSync(path.join(a.src, 'osaka-kita', 'tile_0_0.json'), '{bad');
+  const ra = T.inspect(a.src);
+  assert.strictEqual(ra.ok, false);
+  assert.strictEqual(ra.wards.kita.jsonSyntaxErrors, 1);
+  const b = mkSrc();
+  fs.rmSync(path.join(b.src, 'osaka-kita', 'tile_0_0.json'));
+  assert.strictEqual(T.inspect(b.src).wards.kita.tilesMissing, 1);
+  const c = mkSrc();
+  fs.writeFileSync(path.join(c.src, 'osaka-kita', 'tile_0_0.json'), JSON.stringify({ buildings: [{ id: 'x' }, { id: 'bldg_k' }] }));
+  assert.strictEqual(T.inspect(c.src).wards.kita.badId, 1);
+  assert.throws(() => T.inspect(''), /--src required/);
+  assert.throws(() => T.inspect(path.join(tmp(), 'nope')), /not found/);
+});
+test('inspect: manifest path traversal neutralised; other folders classified only', () => {
+  const { src } = mkSrc();
+  fs.writeFileSync(path.join(src, 'osaka-kita', 'manifest.json'), JSON.stringify({ tiles: [{ tx: 0, tz: 0, file: '../../etc/x.json', count: 1 }] }));
+  assert.strictEqual(T.inspect(src).wards.kita.tilesMissing, 1);
+  fs.mkdirSync(path.join(src, 'osaka-osm-fallback'));
+  fs.writeFileSync(path.join(src, 'osaka-osm-fallback', 'a.json'), '{}');
+  fs.writeFileSync(path.join(src, 'osaka-osm-fallback', 'b.bin'), '1');
+  assert.deepStrictEqual(T.inspect(src).otherFolders, { dirs: 1, files: 2, jsonFiles: 1, otherFiles: 1 });
+});

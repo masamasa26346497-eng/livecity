@@ -185,10 +185,16 @@ function preflight(src, gatesFile) {
   if (!fs.existsSync(src) || !fs.statSync(src).isDirectory()) throw new Error('source dir not found');
   const wardIds = new Set(wards().map((w) => 'osaka-' + w.id));
   const perWard = {}; const other = { dirs: 0, files: 0, bytes: 0 }; const risky = { archives: 0, nonJson: 0 };
+  const root = { files: 0, jsonFiles: 0, nonJsonFiles: 0, hasManifestJson: false };
   for (const d of fs.readdirSync(src, { withFileTypes: true })) {
     if (d.isSymbolicLink()) continue;
     const p = path.join(src, d.name);
-    if (!d.isDirectory()) { risky.nonJson++; if (/\.(tar|zip|gz|7z|tgz)$/i.test(d.name)) risky.archives++; continue; }
+    if (!d.isDirectory()) {
+      root.files++;
+      if (/\.json$/i.test(d.name)) { root.jsonFiles++; if (d.name === 'manifest.json') root.hasManifestJson = true; } else { root.nonJsonFiles++; risky.nonJson++; }
+      if (/\.(tar|zip|gz|7z|tgz)$/i.test(d.name)) risky.archives++;
+      continue;
+    }
     let files = 0, bytes = 0;
     for (const e of fs.readdirSync(p, { recursive: true, withFileTypes: true })) {
       if (!e.isFile()) continue; files++; bytes += fs.statSync(path.join(e.parentPath || e.path, e.name)).size;
@@ -204,10 +210,85 @@ function preflight(src, gatesFile) {
   const missingWards = [...wardIds].map((x) => x.replace(/^osaka-/, '')).filter((x) => !perWard[x]);
   return {
     schema: 'livecity.mission43.preflight/1', wardsFound: Object.keys(perWard).length, missingWards, perWard,
-    otherFolders: other, riskyFileCounts: risky, gates,
+    otherFolders: other, rootFiles: root, riskyFileCounts: risky, gates,
     eligibleForUpload: 0, uploadAllowed: 0,
     note: 'Counts and sizes only; no names, paths or values. eligible/uploadAllowed stay 0 regardless of gates: transfer is a separate owner-approved phase. Nothing is packed or sent.',
   };
+}
+
+// ---- inspect: anonymous read-only integrity check of the owner's legacy buildings dir. Writes nothing.
+// Output = counts only (no names, no paths, no values). Fail-closed: any problem => ok:false, exit 1.
+const MAX_TILE_BYTES = 64 << 20; // larger single files are skipped and counted (skippedTooLarge)
+function inspect(src) {
+  if (!src) throw new Error('--src required');
+  src = path.resolve(src);
+  if (!fs.existsSync(src) || !fs.statSync(src).isDirectory()) throw new Error('source dir not found');
+  const out = { schema: 'livecity.mission43.inspect/1', readOnly: true, ok: false, rootManifest: { present: false, valid: false, wardCountMatches: false },
+    wards: {}, totals: { wards: 0, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0, dupIdAcrossWards: 0 },
+    otherFolders: { dirs: 0, files: 0, jsonFiles: 0, otherFiles: 0 }, problems: [],
+    note: 'Anonymous counts only. Nothing was written, copied, or sent. Not proof the rebuild succeeds.' };
+  const fail = (m) => { if (out.problems.length < 50) out.problems.push(m); };
+  let root = null;
+  const rm = path.join(src, 'manifest.json');
+  if (fs.existsSync(rm)) {
+    out.rootManifest.present = true;
+    try { root = readJson(rm); out.rootManifest.valid = Array.isArray(root.datasets); } catch (e) { fail('root manifest unreadable'); }
+  } else fail('root manifest.json missing');
+  const reg = wards().map((w) => 'osaka-' + w.id);
+  const listed = root && Array.isArray(root.datasets) ? root.datasets.map((d) => d.id) : [];
+  out.rootManifest.wardCountMatches = listed.length === 24 && new Set(listed).size === 24 && reg.every((id) => listed.includes(id));
+  if (!out.rootManifest.wardCountMatches) fail('root manifest does not list exactly the 24 registry wards');
+  const seen = new Set(); let crossDup = 0;
+  const sumKeys = ['jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge', 'tilesListed', 'tilesFound', 'tilesMissing', 'buildings'];
+  for (const d of (root && root.datasets) || []) {
+    const wid = String(d.wardId || d.id || '').replace(/^osaka-/, '');
+    const w = { manifestPresent: false, manifestBuildings: d.buildings, manifestTiles: d.tiles, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0 };
+    out.wards[wid] = w; out.totals.wards++;
+    const dir = path.join(src, String(d.id));
+    const mf = path.join(dir, 'manifest.json');
+    if (!/^osaka-[a-z]+$/.test(String(d.id)) || !fs.existsSync(mf)) { fail('ward manifest missing: ' + wid); continue; }
+    w.manifestPresent = true;
+    let m;
+    try { m = readJson(mf); } catch (e) { w.jsonSyntaxErrors++; out.totals.jsonSyntaxErrors++; fail('ward manifest unreadable: ' + wid); continue; }
+    const own = new Set();
+    for (const t of m.tiles || []) {
+      w.tilesListed++;
+      const fname = typeof t.file === 'string' ? path.basename(t.file) : 'tile_' + t.tx + '_' + t.tz + '.json'; // basename: no traversal
+      const f = path.join(dir, fname);
+      let st; try { st = fs.statSync(f); } catch (e) { w.tilesMissing++; continue; }
+      if (st.size > MAX_TILE_BYTES) { w.skippedTooLarge++; continue; }
+      let tile;
+      try { tile = JSON.parse(fs.readFileSync(f, 'utf8')); }
+      catch (e) { if (e instanceof SyntaxError) w.jsonSyntaxErrors++; else w.skippedUnreadable++; continue; } // IO error / cloud-only => skipped, not a syntax error
+      w.tilesFound++;
+      const bs = Array.isArray(tile.buildings) ? tile.buildings : [];
+      if (!Array.isArray(tile.buildings)) w.jsonSyntaxErrors++;
+      if (t.count != null && bs.length !== t.count) w.countMismatch++;
+      for (const b of bs) {
+        w.buildings++;
+        if (!b || typeof b.id !== 'string' || !/^bldg_/.test(b.id)) { w.badId++; continue; }
+        if (own.has(b.id)) w.dupIdWithinWard++; else own.add(b.id);
+      }
+    }
+    for (const id of own) { if (seen.has(id)) crossDup++; else seen.add(id); }
+    for (const k of sumKeys) out.totals[k] += w[k];
+    if (d.buildings != null && w.buildings !== d.buildings && !w.skippedUnreadable && !w.skippedTooLarge) fail('building count differs from root manifest: ' + wid);
+    for (const k of ['tilesMissing', 'jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge']) if (w[k]) fail(k + ': ' + wid);
+  }
+  out.totals.dupIdAcrossWards = crossDup; // informational: known conflicts (Mission 40D), not a fail condition
+  const wardIds = new Set(listed);
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    if (e.isSymbolicLink() || !e.isDirectory() || wardIds.has(e.name)) continue;
+    out.otherFolders.dirs++;
+    try {
+      for (const f of fs.readdirSync(path.join(src, e.name), { recursive: true, withFileTypes: true })) {
+        if (!f.isFile()) continue; out.otherFolders.files++;
+        if (/\.json$/i.test(f.name)) out.otherFolders.jsonFiles++; else out.otherFolders.otherFiles++;
+      }
+    } catch (x) { fail('other folder unreadable'); }
+  }
+  out.ok = out.problems.length === 0;
+  return out;
 }
 
 function head(url) {
@@ -247,12 +328,14 @@ async function main() {
     } else if (cmd === 'preflight') {
       if (!opt('src')) throw new Error('--src required');
       console.log(JSON.stringify(preflight(opt('src'), opt('gates')), null, 1));
+    } else if (cmd === 'inspect') {
+      const r = inspect(opt('src')); console.log(JSON.stringify(r, null, 1)); process.exit(r.ok ? 0 : 1);
     } else if (cmd === 'sources') {
       const r = await sources(has('online'));
       if (has('write')) { fs.mkdirSync(REPORT_DIR, { recursive: true }); fs.writeFileSync(path.join(REPORT_DIR, 'sources-check.json'), JSON.stringify(r, null, 2) + '\n'); }
       console.log(JSON.stringify(r, null, 1));
-    } else { console.error('usage: manifest | rebuild | verify | preflight | sources'); process.exit(2); }
+    } else { console.error('usage: manifest | rebuild | verify | preflight | inspect | sources'); process.exit(2); }
   } catch (e) { console.error(e.message); process.exit(e.code || 1); }
 }
-module.exports = { buildManifest, verifyDir, rebuild, preflight, sources };
+module.exports = { buildManifest, verifyDir, rebuild, preflight, inspect, sources };
 if (require.main === module) main();
