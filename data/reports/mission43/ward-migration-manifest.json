@@ -19,7 +19,7 @@
   },
   "summary": {
     "wards": 24,
-    "wardsWith3dInGit": 5,
+    "wardsWith3dInGit": 6,
     "wardsLegacyTilesCompleteInGit": 1,
     "wardsNeedingSourceData": 23
   },
@@ -556,7 +556,12 @@
       "code": "27120",
       "groups": {
         "buildings3dInGit": {
-          "state": "not-in-Git"
+          "state": "in-Git",
+          "partial": true,
+          "sets": [
+            "public/mission37b-3dtiles/osaka-sumiyoshi-9tile"
+          ],
+          "buildings": 10546
         },
         "legacyBuildingTilesInGit": {
           "state": "in-Git-complete",

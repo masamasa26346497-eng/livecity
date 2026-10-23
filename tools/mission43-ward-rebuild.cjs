@@ -28,7 +28,64 @@ function dirBytes(dir) {
   return n;
 }
 
-// ---- existing published tilesets (Git-tracked) keyed by wardCode
+// ---- wardCode normalisation (Mission 43B). config/wards/registry.json is the single source of truth.
+// Accepts "27111", " 27111 ", 27111, "27111.0", full-width digits. Anything else => null (never guessed).
+function normalizeWardCode(v) {
+  if (v == null) return null;
+  const s = String(v).normalize('NFKC').trim().replace(/\.0+$/, '');
+  if (!/^\d{5}$/.test(s)) return null;
+  return wards().some((w) => w.code === s) ? s : null;
+}
+const nfkc = (v) => String(v == null ? '' : v).normalize('NFKC').trim();
+// Resolve the registry ward of a tileset from ALL its metadata. Disagreement => 'inconsistent' (not counted).
+function resolveSetWard(source, report) {
+  const reg = wards(); const votes = []; const via = [];
+  const add = (w, how) => { if (w) { votes.push(w.id); via.push(how); } };
+  if (source) {
+    const c = normalizeWardCode(source.wardCode); add(c && reg.find((w) => w.code === c), 'source.wardCode');
+    const id = nfkc(source.wardId).toLowerCase(); add(id && reg.find((w) => w.id === id), 'source.wardId');
+    const nm = nfkc(source.ward); add(nm && reg.find((w) => w.name === nm), 'source.ward');
+  }
+  const ds = report && typeof report.dataset === 'string' ? nfkc(report.dataset).toLowerCase() : '';
+  add(ds && reg.find((w) => w.datasetId === ds), 'build-report.dataset');
+  const ids = [...new Set(votes)];
+  const problems = [];
+  if (source && source.wardCode != null && String(source.wardCode).trim() !== '' && !normalizeWardCode(source.wardCode)) problems.push('source.wardCode is not a registry code: ' + JSON.stringify(String(source.wardCode)));
+  if (ids.length > 1) return { wardId: null, state: 'inconsistent', via, problems: problems.concat('metadata disagree: ' + ids.join(' vs ')) };
+  if (!ids.length) return { wardId: null, state: 'unknown', via, problems: problems.concat('no usable ward metadata') };
+  const w = reg.find((x) => x.id === ids[0]);
+  const exact = !!source && normalizeWardCode(source.wardCode) === w.code;
+  if (!exact) problems.push('source.json has no valid wardCode; ward inferred from ' + via.join(','));
+  else if (String(source.wardCode) !== w.code) problems.push('wardCode written non-canonically (' + JSON.stringify(source.wardCode) + '); normalised to ' + w.code);
+  return { wardId: w.id, wardCode: w.code, state: exact ? 'consistent' : 'inferred', via, problems };
+}
+function leafBuildings(report) {
+  if (!report) return null;
+  const t = report.totals || report;
+  if (t.buildings != null) return Number(t.buildings);
+  if (Array.isArray(report.leaf)) return report.leaf.reduce((n, l) => n + (l.buildings | 0), 0);
+  return null;
+}
+// Light reference check: every tileset.json URI exists and GLBs carry a glTF v2 header.
+function checkSetRefs(dir) {
+  const problems = []; let uris = 0, glb = 0;
+  try {
+    const list = [...new Set(collectUris(readJson(path.join(dir, 'tileset.json')).root, []))];
+    for (const u of list) {
+      if (/^[a-z]+:/i.test(u) || u.startsWith('/') || u.includes('..')) { problems.push('non-local uri'); continue; }
+      uris++;
+      const p = path.join(dir, u);
+      if (!fs.existsSync(p)) { problems.push('uri target missing: ' + u); continue; }
+      if (u.endsWith('.glb')) {
+        const b = fs.readFileSync(p);
+        if (b.length < 20 || b.toString('ascii', 0, 4) !== 'glTF' || b.readUInt32LE(4) !== 2) problems.push('bad glb: ' + u); else glb++;
+      }
+    }
+  } catch (e) { problems.push('tileset.json unreadable'); }
+  return { uris, glb, problems };
+}
+
+// ---- existing published tilesets (Git-tracked), resolved to registry wards
 function existingSets() {
   const res = [];
   for (const base of ['mission37b-3dtiles', 'mission37h-3dtiles', 'mission38e-3dtiles', 'mission40j-3dtiles']) {
@@ -36,14 +93,16 @@ function existingSets() {
     if (!fs.existsSync(b)) continue;
     for (const d of fs.readdirSync(b, { withFileTypes: true })) {
       if (!d.isDirectory()) continue;
-      const sj = path.join(b, d.name, 'source.json'), bj = path.join(b, d.name, 'build-report.json');
+      const dir = path.join(b, d.name);
       const rel = 'public/' + base + '/' + d.name;
-      if (!fs.existsSync(path.join(b, d.name, 'tileset.json'))) continue;
+      if (!fs.existsSync(path.join(dir, 'tileset.json'))) continue;
       const tracked = gitTracked(rel).length > 0;
-      let wardCode = null, buildings = null;
-      try { wardCode = fs.existsSync(sj) ? String(readJson(sj).wardCode || '') || null : null; } catch (e) { /* ignore */ }
-      try { if (fs.existsSync(bj)) { const t = readJson(bj).totals || readJson(bj); buildings = t.buildings != null ? t.buildings : null; } } catch (e) { /* ignore */ }
-      res.push({ rel, wardCode, buildings, tracked });
+      let source = null, report = null;
+      try { if (fs.existsSync(path.join(dir, 'source.json'))) source = readJson(path.join(dir, 'source.json')); } catch (e) { /* ignore */ }
+      try { if (fs.existsSync(path.join(dir, 'build-report.json'))) report = readJson(path.join(dir, 'build-report.json')); } catch (e) { /* ignore */ }
+      const r = resolveSetWard(source, report);
+      res.push({ rel, wardId: r.wardId, wardCode: r.wardCode || null, metaState: r.state, via: r.via, metaProblems: r.problems,
+        buildings: leafBuildings(report), tracked, refs: checkSetRefs(dir) });
     }
   }
   return res;
@@ -61,10 +120,10 @@ function buildManifest() {
     if (tracked.includes(mfRel)) { try { expectedTiles = readJson(path.join(ROOT, mfRel)).tiles.length; } catch (e) { /* ignore */ } }
     const tileFiles = tracked.filter((f) => /\/tile_[^/]+\.json$/.test(f)).length;
     const legacyComplete = expectedTiles != null && tileFiles === expectedTiles;
-    const own = sets.filter((s) => s.wardCode === w.code && s.tracked);
+    const own = sets.filter((s) => s.wardId === w.id && s.tracked && s.metaState !== 'inconsistent' && !s.refs.problems.length);
     const groups = {
       buildings3dInGit: own.length
-        ? { state: 'in-Git', partial: w.id !== 'sumiyoshi' || undefined, sets: own.map((s) => s.rel), buildings: own.reduce((n, s) => n + (s.buildings || 0), 0) }
+        ? { state: 'in-Git', partial: true, sets: own.map((s) => s.rel), buildings: own.reduce((n, s) => n + (s.buildings || 0), 0) }
         : { state: 'not-in-Git' },
       legacyBuildingTilesInGit: legacyComplete ? { state: 'in-Git-complete', tiles: tileFiles } : { state: 'not-in-Git', tracked: tileFiles },
       // layers: only the Sumiyoshi 9-tile OSM slice is tracked
@@ -337,5 +396,5 @@ async function main() {
     } else { console.error('usage: manifest | rebuild | verify | preflight | inspect | sources'); process.exit(2); }
   } catch (e) { console.error(e.message); process.exit(e.code || 1); }
 }
-module.exports = { buildManifest, verifyDir, rebuild, preflight, inspect, sources };
+module.exports = { normalizeWardCode, resolveSetWard, existingSets, checkSetRefs, collectUris, buildManifest, verifyDir, rebuild, preflight, inspect, sources };
 if (require.main === module) main();
