@@ -73,6 +73,8 @@ function checkOutRoot(outRoot, src) {
   if (st) {
     if (!st.isDirectory() || st.isSymbolicLink()) throw err('output root must be a real directory', 4);
     const entries = fs.readdirSync(o);
+    // 43G audit: a planted link (e.g. status.json.tmp -> elsewhere) would let writeFileSync follow it; any link in the root is refused.
+    for (const e of fs.readdirSync(o, { withFileTypes: true })) if (e.isSymbolicLink()) throw err('output root contains a link/junction; refusing', 4);
     if (entries.length) {
       let marker = null; try { marker = readJson(path.join(o, MARKER)); } catch (e) { /* foreign */ }
       const ids = reg().map((w) => w.id);
