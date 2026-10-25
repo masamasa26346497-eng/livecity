@@ -47,6 +47,8 @@ function audit(src) {
       if (i.countMismatch) issues.push('tile-count-mismatch');
       if (i.skippedUnreadable) issues.push('unreadable-or-cloud-only'); // fatal-to-ready
       if (i.skippedTooLarge) issues.push('file-over-64MiB');
+      if (i.badGeometry) issues.push('bad-geometry');
+      if (i.manifestPresent && !i.tilesListed) issues.push('no-tiles-listed');
       if (i.manifestBuildings != null && i.buildings !== i.manifestBuildings && !i.skippedUnreadable && !i.skippedTooLarge) issues.push('root-manifest-building-count');
       if (i.manifestTiles != null && i.tilesListed !== i.manifestTiles) issues.push('root-manifest-tile-count');
       try { // ward manifest wardCode must equal the registry code when present (43B normalisation)
@@ -64,7 +66,8 @@ function audit(src) {
   }
   const rep = {
     schema: 'livecity.mission43d.audit/1', readOnly: true, ready: readyWards === 24 && insp.rootManifest.wardCountMatches, readyWards, wards: out,
-    rootManifest: insp.rootManifest, totals: insp.totals, otherFolders: insp.otherFolders,
+    rootManifest: insp.rootManifest, totals: insp.totals,
+    warnings: { crossWardDuplicateIds: insp.totals.dupIdAcrossWards, meaning: 'informational (Mission 40D known conflicts); data is never altered and readiness is not affected' }, otherFolders: insp.otherFolders,
     rootProblemKinds: [...new Set(insp.problems.map(kind))].sort(),
     gates: GATES,
     note: 'Counts and issue kinds only; no paths, ids or values. Cross-ward duplicate ids are informational (Mission 40D). Unreadable/cloud-only files make a ward not ready.',
@@ -73,25 +76,52 @@ function audit(src) {
 }
 
 // ---- batch-plan (offline). Reuses 43B plan for categories; adds size estimates and a strict 4-way status.
+// A PC-side verdict is trusted only with the exact schema, not fatal, and (for audit) ready overall.
+const wardClean = (i) => !!i && i.manifestPresent && i.tilesListed > 0 && i.tilesFound === i.tilesListed && i.buildings > 0 &&
+  !(i.tilesMissing || i.jsonSyntaxErrors || i.badId || i.dupIdWithinWard || i.countMismatch || i.skippedUnreadable || i.skippedTooLarge || i.badGeometry) &&
+  (i.manifestBuildings == null || i.manifestBuildings === i.buildings);
+function pcVerdict(inspectJson, auditJson, ward) {
+  if (auditJson) {
+    if (auditJson.schema !== 'livecity.mission43d.audit/1') throw new Error('--audit: unexpected schema');
+    const a = auditJson.wards && auditJson.wards[ward];
+    // overall ready:false (fatal, root-manifest problem, any other ward) => nothing is treated as PC-usable
+    const usable = auditJson.ready === true && !auditJson.fatal && !!a && a.ready === true && !!a.buildings && a.buildings.found > 0;
+    return { usable, source: 'audit', buildings: a ? a.buildings.found : null, tiles: a ? a.tiles.found : null };
+  }
+  if (inspectJson) {
+    const i = inspectJson.wards && inspectJson.wards[ward];
+    return { usable: inspectJson.ok === true && wardClean(i), source: 'inspect', buildings: i ? i.buildings : null, tiles: i ? i.tilesFound : null };
+  }
+  return { usable: false, source: 'none', buildings: null, tiles: null };
+}
+function trackedEvidence(ward) {
+  const dir = path.join(ROOT, 'public/map-data/osaka-city/buildings/osaka-' + ward);
+  try {
+    const mf = readJson(path.join(dir, 'manifest.json'));
+    const onDisk = fs.readdirSync(dir).filter((f) => /^tile_.*\.json$/.test(f)).length;
+    return { tilesOnDisk: onDisk, tilesInManifest: mf.tileCount, buildingsInManifest: mf.totalBuildings, consistent: onDisk === mf.tileCount && Number.isFinite(mf.totalBuildings) };
+  } catch (e) { return { consistent: false }; }
+}
 function batchPlan(inspectJson, auditJson) {
+  if (inspectJson && inspectJson.schema !== 'livecity.mission43.inspect/1') throw new Error('--inspect: unexpected schema');
   const base = A.plan(inspectJson || null, null);
   const man = T.buildManifest();
   const wards = base.wards.map((p) => {
     const mw = man.wards.find((x) => x.ward === p.ward);
-    const tracked = mw.groups.legacyBuildingTilesInGit.state === 'in-Git-complete';
-    const a = auditJson && auditJson.wards && auditJson.wards[p.ward];
-    const pcBuildings = a ? a.buildings.found : (p.sourceBuildings ? p.sourceBuildings.foundOnPc : null);
-    const pcTiles = a ? a.tiles.found : (p.sourceTiles ? p.sourceTiles.foundOnPc : null);
-    let status;
-    if (tracked) status = 'tracked-legacy-rebuildable';
-    else if (a ? a.ready : (pcBuildings > 0)) status = 'pc-only';
-    else status = 'not-ready';
-    const buildings = tracked ? mw.groups.legacyBuildingTilesInGit.tiles && readJson(path.join(ROOT, 'public/map-data/osaka-city/buildings/osaka-' + p.ward + '/manifest.json')).totalBuildings : pcBuildings;
-    const tilesIn = tracked ? mw.groups.legacyBuildingTilesInGit.tiles : pcTiles;
+    const ev = mw.groups.legacyBuildingTilesInGit.state === 'in-Git-complete' ? trackedEvidence(p.ward) : null;
+    const tracked = !!ev && ev.consistent; // counted from files present in Git, not only the manifest claim
+    const v = pcVerdict(inspectJson, auditJson, p.ward);
+    let status, reason;
+    if (tracked) { status = 'tracked-legacy-rebuildable'; reason = 'tile files counted in Git match the ward manifest'; }
+    else if (v.usable) { status = 'pc-only'; reason = 'anonymous ' + v.source + ' reports this ward clean' + (v.source === 'audit' ? ' and the audit overall ready' : ''); }
+    else { status = 'not-ready'; reason = v.source === 'none' ? 'unknown: no anonymous PC output provided' : 'PC ' + v.source + ' does not show a clean, overall-ready source'; }
+    const buildings = tracked ? ev.buildingsInManifest : (v.usable ? v.buildings : null);
+    const tilesIn = tracked ? ev.tilesOnDisk : (v.usable ? v.tiles : null);
+    const pcBuildings = v.buildings, pcTiles = v.tiles;
     return {
-      ward: p.ward, code: p.code, status,
+      ward: p.ward, code: p.code, status, statusReason: reason, trackedEvidence: ev,
       knownFromGit: { legacyTilesTracked: tracked, partial3dBuildings: p.gitBuildings3d },
-      knownFromPcOutput: a || p.sourceTiles.foundOnPc != null ? { tiles: pcTiles, buildings: pcBuildings } : 'unknown (no anonymous inspect/audit output provided)',
+      knownFromPcOutput: v.source !== 'none' ? { source: v.source, tiles: pcTiles, buildings: pcBuildings } : 'unknown (no anonymous inspect/audit output provided)',
       minInputTiles: tilesIn == null ? 'unknown' : tilesIn,
       estimatedOutputGlb: tilesIn == null ? 'unknown' : tilesIn + Math.ceil(tilesIn / 9),
       estimatedOutputBytes: buildings == null ? 'unknown' : Math.round(buildings * BYTES_PER_BUILDING),
@@ -141,7 +171,7 @@ function run(wardsArg, outRoot, execute) {
       results.push(id === 'sumiyoshi'
         ? { ward: id, state: ok ? 'ok' : 'failed', buildings: rep.rebuilt.buildings, uniqueIds: rep.rebuilt.uniqueIds, bytes: rep.rebuilt.totalBytes, regress37b: { glbIdentical: rep.vsCommitted9Tile.glbByteIdentical, idsIdentical: rep.vsCommitted9Tile.idsIdentical, statsIdentical: rep.vsCommitted9Tile.leafStatsIdentical, of: rep.vsCommitted9Tile.refTiles }, problems: rep.problems.length }
         : { ward: id, state: ok ? 'ok' : 'failed', buildings: rep.convert.buildings, uniqueIds: rep.convert.uniqueIds, bytes: rep.convert.totalBytes, problems: v.problems.length });
-    } catch (e) { results.push({ ward: id, state: 'failed', reason: kind(e.message).slice(0, 80) }); }
+    } catch (e) { results.push({ ward: id, state: 'failed', reason: /verif|mismatch|differ/i.test(String(e.message)) ? 'verification-failed' : 'rebuild-error' }); }
   }
   const rep = {
     schema: 'livecity.mission43d.run/1', mode: execute ? 'execute' : 'dry-run', gates: GATES, published: false, uploaded: false, uploadAllowed: 0,
@@ -160,14 +190,29 @@ function main() {
       const r = audit(opt('src'));
       if (opt('write')) fs.writeFileSync(opt('write'), JSON.stringify(r, null, 2) + '\n', { flag: 'wx' });
       console.log(JSON.stringify(r, null, 1)); process.exit(r.ready ? 0 : 1);
+    } else if (cmd === 'audit-plan') { // audit -> batch-plan in one process; writes nothing; prints a compact anonymous summary
+      const a = audit(opt('src'));
+      const p = batchPlan(null, a);
+      console.log(JSON.stringify(assertAnonymous({
+        schema: 'livecity.mission43e.audit-plan/1', auditReady: a.ready, readyWards: a.readyWards, fatal: a.fatal || null,
+        totals: a.totals || null, warnings: a.warnings || null, rootProblemKinds: a.rootProblemKinds || [],
+        wardIssues: Object.fromEntries(Object.entries(a.wards).filter(([, w]) => !w.ready).map(([k, w]) => [k, w.issues])),
+        planSummary: p.summary, gates: GATES, uploadAllowed: 0, transferredNow: p.transferredNow,
+        note: 'Counts and issue kinds only. Nothing written, copied or sent. pc-only is never an approval.',
+      }), null, 1));
+      process.exit(a.ready ? 0 : 1);
     } else if (cmd === 'batch-plan') {
       console.log(JSON.stringify(batchPlan(opt('inspect') && readJson(opt('inspect')), opt('audit') && readJson(opt('audit'))), null, 1));
     } else if (cmd === 'run') {
       if (!opt('out-root')) throw Object.assign(new Error('--out-root required'), { code: 2 });
       const r = run(opt('wards'), opt('out-root'), has('execute'));
       console.log(JSON.stringify(r, null, 1)); process.exit(r.ok ? 0 : 3);
-    } else { console.error('usage: audit | batch-plan | run'); process.exit(2); }
-  } catch (e) { console.error(e.message); process.exit(e.code || 1); }
+    } else { console.error('usage: audit | audit-plan | batch-plan | run'); process.exit(2); }
+  } catch (e) { // only our own numeric-coded errors (fixed text, no paths) are printed; system errors (ENOENT/EEXIST...) carry paths
+    const own = Number.isInteger(e.code);
+    console.error(own ? e.message : 'error: operation failed (details suppressed so no path or id is printed)');
+    process.exit(own ? e.code : 1);
+  }
 }
 module.exports = { audit, batchPlan, run, checkOutRoot, assertAnonymous, BYTES_PER_BUILDING };
 if (require.main === module) main();

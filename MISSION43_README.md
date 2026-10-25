@@ -23,3 +23,10 @@ Owner-PC (only if public re-fetch is not approved): `tools/mission40c-run-local.
 - `run --wards <ids|all-tracked> --out-root <NEW dir outside repo> [--execute]`: dry-run by default; Git-tracked tiles only (PC-only wards fail closed); Sumiyoshi also regresses against the committed 37B 9 tiles.
 
 Owner PC, one command: `node tools/mission43d-ward-batch.cjs audit --src <legacy buildings dir>` (prints counts only).
+
+## Mission 43E: hardening
+
+- `inspect`/`audit` now also count `badGeometry` (footprint < 3 finite points or non-finite height) and flag `no-tiles-listed`; cross-ward duplicate ids are reported as `warnings` only (never alter data).
+- `batch-plan`: pc-only requires a schema-valid, non-fatal, **overall-ready** audit (or a clean `ok` inspect); tracked status is counted from tile files in Git. Everything else is `not-ready`/unknown. Gates stay false, uploadAllowed 0.
+- CLI never prints system error text (paths). New `audit-plan --src` chains audit -> batch-plan in one process, writes nothing.
+- Owner PC, one command (PS 5.1, read-only): `powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission43e-audit.ps1` (default folder `..\livecity-data-pipeline\public\map-data\osaka-city\buildings`).

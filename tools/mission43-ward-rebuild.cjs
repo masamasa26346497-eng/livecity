@@ -313,7 +313,7 @@ function inspect(src) {
   src = path.resolve(src);
   if (!fs.existsSync(src) || !fs.statSync(src).isDirectory()) throw new Error('source dir not found');
   const out = { schema: 'livecity.mission43.inspect/1', readOnly: true, ok: false, rootManifest: { present: false, valid: false, wardCountMatches: false },
-    wards: {}, totals: { wards: 0, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0, dupIdAcrossWards: 0 },
+    wards: {}, totals: { wards: 0, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0, dupIdAcrossWards: 0, badGeometry: 0 },
     otherFolders: { dirs: 0, files: 0, jsonFiles: 0, otherFiles: 0 }, problems: [],
     note: 'Anonymous counts only. Nothing was written, copied, or sent. Not proof the rebuild succeeds.' };
   const fail = (m) => { if (out.problems.length < 50) out.problems.push(m); };
@@ -328,10 +328,10 @@ function inspect(src) {
   out.rootManifest.wardCountMatches = listed.length === 24 && new Set(listed).size === 24 && reg.every((id) => listed.includes(id));
   if (!out.rootManifest.wardCountMatches) fail('root manifest does not list exactly the 24 registry wards');
   const seen = new Set(); let crossDup = 0;
-  const sumKeys = ['jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge', 'tilesListed', 'tilesFound', 'tilesMissing', 'buildings'];
+  const sumKeys = ['jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge', 'badGeometry', 'tilesListed', 'tilesFound', 'tilesMissing', 'buildings'];
   for (const d of (root && root.datasets) || []) {
     const wid = String(d.wardId || d.id || '').replace(/^osaka-/, '');
-    const w = { manifestPresent: false, manifestBuildings: d.buildings, manifestTiles: d.tiles, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0 };
+    const w = { manifestPresent: false, manifestBuildings: d.buildings, manifestTiles: d.tiles, tilesListed: 0, tilesFound: 0, tilesMissing: 0, buildings: 0, jsonSyntaxErrors: 0, badId: 0, dupIdWithinWard: 0, countMismatch: 0, skippedUnreadable: 0, skippedTooLarge: 0, badGeometry: 0 };
     out.wards[wid] = w; out.totals.wards++;
     const dir = path.join(src, String(d.id));
     const mf = path.join(dir, 'manifest.json');
@@ -357,12 +357,15 @@ function inspect(src) {
         w.buildings++;
         if (!b || typeof b.id !== 'string' || !/^bldg_/.test(b.id)) { w.badId++; continue; }
         if (own.has(b.id)) w.dupIdWithinWard++; else own.add(b.id);
+        // geometry sanity (counts only): footprint >= 3 finite [x,z] points and a finite height
+        const fpOk = Array.isArray(b.fp) && b.fp.length >= 3 && b.fp.every((q) => Array.isArray(q) && Number.isFinite(q[0]) && Number.isFinite(q[1]));
+        if (!fpOk || !Number.isFinite(b.h)) w.badGeometry++;
       }
     }
     for (const id of own) { if (seen.has(id)) crossDup++; else seen.add(id); }
     for (const k of sumKeys) out.totals[k] += w[k];
     if (d.buildings != null && w.buildings !== d.buildings && !w.skippedUnreadable && !w.skippedTooLarge) fail('building count differs from root manifest: ' + wid);
-    for (const k of ['tilesMissing', 'jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge']) if (w[k]) fail(k + ': ' + wid);
+    for (const k of ['tilesMissing', 'jsonSyntaxErrors', 'badId', 'dupIdWithinWard', 'countMismatch', 'skippedUnreadable', 'skippedTooLarge', 'badGeometry']) if (w[k]) fail(k + ': ' + wid);
   }
   out.totals.dupIdAcrossWards = crossDup; // informational: known conflicts (Mission 40D), not a fail condition
   const wardIds = new Set(listed);

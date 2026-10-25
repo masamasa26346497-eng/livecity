@@ -109,7 +109,7 @@ const mkSrc = (opts = {}) => {
   for (const id of ids) {
     const d = path.join(src, 'osaka-' + id); fs.mkdirSync(d);
     fs.writeFileSync(path.join(d, 'manifest.json'), JSON.stringify({ tiles: [{ tx: 0, tz: 0, file: 'tile_0_0.json', count: 2 }] }));
-    fs.writeFileSync(path.join(d, 'tile_0_0.json'), JSON.stringify({ buildings: [{ id: 'bldg_' + id + '1' }, { id: 'bldg_' + id + '2' }] }));
+    fs.writeFileSync(path.join(d, 'tile_0_0.json'), JSON.stringify({ buildings: [{ id: 'bldg_' + id + '1', fp: [[0, 0], [5, 0], [5, 5]], h: 3 }, { id: 'bldg_' + id + '2', fp: [[0, 0], [5, 0], [5, 5]], h: 3 }] }));
   }
   return { src, ids };
 };

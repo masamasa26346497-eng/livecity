@@ -18,7 +18,7 @@ function fixture(mut) {
   wards.forEach((w, wi) => {
     const dir = path.join(src, 'osaka-' + w.id); const tiles = [];
     for (let t = 0; t < 2; t++) {
-      const bs = [0, 1, 2].map((k) => ({ id: 'bldg_' + String(wi).padStart(2, '0') + t + k + '-fixture', h: 10 }));
+      const bs = [0, 1, 2].map((k) => ({ id: 'bldg_' + String(wi).padStart(2, '0') + t + k + '-fixture', fp: [[0, 0], [10, 0], [10, 10]], h: 10 }));
       wj(path.join(dir, 'tile_' + t + '_0.json'), { buildings: bs });
       tiles.push({ tx: t, tz: 0, count: 3, file: 'tile_' + t + '_0.json' });
     }
