@@ -1758,7 +1758,16 @@
     }
     function select(w, fly) {
       clear();
-      selected = w; setBuildingWard(w.wardCode);
+      selected = w;
+      // 44A: 区を選ぶだけで建物が見えるように、3D が実際に mount できたら、建物データのある範囲（tileset の境界球）へ寄せる。
+      //   区全体の俯瞰（下の flyToBoundingSphere）では、一部メッシュだけの 3D が小さすぎて「建物がない」ように見えるため。
+      setBuildingWard(w.wardCode).then((ok) => {
+        if (!ok || !fly || selected !== w || bldgWard !== w.wardCode) return;
+        const sets = [tileset, ...extraSets.map((e) => e.tileset)].filter((t) => t && !t.isDestroyed());
+        if (!sets.length) return;
+        const sphere = sets.length === 1 ? sets[0].boundingSphere : Cesium.BoundingSphere.fromBoundingSpheres(sets.map((t) => t.boundingSphere));
+        viewer.camera.flyToBoundingSphere(sphere, { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), Math.max(600, sphere.radius * 2.2)) });
+      });
       stats.selectedWard = { wardCode: w.wardCode, wardName: w.wardName, coverage: w.cover.state };
       selLines = scene.primitives.add(new Cesium.PolylineCollection());
       for (const p of w.polygons) selLines.add({ positions: ringPts(p.outer, 5), width: 4, material: solidMat(C.accent) });
@@ -2126,6 +2135,12 @@
       setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
       tilesReady: () => stats.buildingState !== 'loading' && (!tileset || tileset.tilesLoaded) && extraSets.every((e) => e.tileset.tilesLoaded),
       setBuildingWard,
+      // 44A: カメラと mount 中 tileset 境界球の中心との距離 / 半径（区を選んだ後に建物へ寄れているかの診断。読み取りのみ）
+      cameraVsTilesets() {
+        const out = [];
+        for (let i = 0; i < scene.primitives.length; i++) { const p = scene.primitives.get(i); if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) out.push({ distM: Math.round(Cesium.Cartesian3.distance(viewer.camera.positionWC, p.boundingSphere.center)), radiusM: Math.round(p.boundingSphere.radius) }); }
+        return out;
+      },
       // 39B: scene.primitives 上の実 Cesium3DTileset 数（destroy 済みを除く）と mount 中の base
       tilesetCount() { let n = 0; const bases = []; for (let i = 0; i < scene.primitives.length; i++) { const p = scene.primitives.get(i); if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) { n++; bases.push(p._lcBase || null); } } return { n, bases, heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null }; },
       // 写真パネルだけを実コード(renderPhoto)で描く。3D 選択は経由しない＝実クリックではない（37F-4: 9 tile 外の建物の確認用）

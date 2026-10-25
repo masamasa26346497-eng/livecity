@@ -24,7 +24,7 @@ test('区選択・セレクト・未整備区の表示が配線されている',
   assert.match(html, /id="sel-bldg-ward"/);
   assert.match(html, /建物を表示しない/);
   assert.match(html, /3D建物未整備/);
-  assert.match(html, /selected = w; setBuildingWard\(w\.wardCode\)/);
+  assert.match(html, /selected = w;[\s\S]{0,400}setBuildingWard\(w\.wardCode\)/);
 });
 
 test('POI 予算・LRU・座標定数・課金ロックは触っていない', () => {
