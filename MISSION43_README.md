@@ -15,3 +15,11 @@ Gates (`licenceApproved`, `noSecretsReviewed`, `noPersonalDataReviewed`) stay fa
 Licence notes: general PLATEAU site policy and OSM ODbL (attribution "© OpenStreetMap contributors") are general terms. The Osaka 2024 dataset page terms must be read per dataset by a human (other Osaka datasets, e.g. Expo 2025 site, can differ). Until recorded, no third-party data is committed.
 
 Owner-PC (only if public re-fetch is not approved): `tools/mission40c-run-local.ps1 -Mode validate|convert -Wards <id>`, then `preflight`.
+
+## Mission 43D: batch orchestration (`tools/mission43d-ward-batch.cjs`)
+
+- `audit --src <dir>`: read-only 24-ward completeness/quality check (reuses `inspect`); ward ids, counts and issue kinds only. Unreadable/cloud-only = not ready.
+- `batch-plan [--inspect f] [--audit f]`: tracked-legacy-rebuildable / pc-only / not-ready per ward with estimated output size (1,164 B/building, Sumiyoshi measured). Nothing is approved for transfer.
+- `run --wards <ids|all-tracked> --out-root <NEW dir outside repo> [--execute]`: dry-run by default; Git-tracked tiles only (PC-only wards fail closed); Sumiyoshi also regresses against the committed 37B 9 tiles.
+
+Owner PC, one command: `node tools/mission43d-ward-batch.cjs audit --src <legacy buildings dir>` (prints counts only).
