@@ -211,3 +211,22 @@ test('hotfix: pure Git-vs-PC source mismatch is reported but not retried endless
   assert.strictEqual(r2.complete, false);
   assert.strictEqual(fs.readdirSync(out).sort().join(','), names, 'no new attempt for a deterministic source mismatch');
 });
+
+// ---- Mission 45D safety fix: default output outside OneDrive, absolute OutRoot, sync-root refusal (static; PS5.1 not runnable here).
+test('ps1 safety: default OutRoot under LOCALAPPDATA, abs path resolve, OneDrive roots refused on convert, no full path in error', () => {
+  const buf = fs.readFileSync(path.join(ROOT, 'tools/mission45d-convert-all.ps1'));
+  assert.ok(buf.every((b) => b < 128));
+  const t = buf.toString('utf8');
+  assert.ok(t.includes("[string]$OutRoot = ''"));
+  assert.ok(!t.includes("$OutRoot = '.."));
+  assert.ok(t.includes('LiveCity-3DTiles-Out-24') && t.includes('$env:LOCALAPPDATA'));
+  assert.ok(t.includes('if (-not $env:LOCALAPPDATA) { throw'), 'fail-closed');
+  assert.ok(t.includes('IsPathRooted'));
+  for (const v of ['$env:OneDrive,', '$env:OneDriveConsumer', '$env:OneDriveCommercial', "'OneDrive'"]) assert.ok(t.includes(v), v);
+  assert.ok(t.includes("if ($Step -eq 'convert') { throw 'Output folder is inside a OneDrive"));
+  assert.ok(t.includes('ReparsePoint'));
+  assert.ok(/-not \(\$Execute -and \$Approved\)/.test(t));
+  assert.ok(!t.includes('Looked for') && !/Source folder not found[^\n]*\$src/.test(t));
+  assert.ok(/\$LegacyBuildings/.test(t) && !/\$Src\b/.test(t));
+  assert.ok(!fs.readFileSync(path.join(ROOT, 'MISSION45D_README.md'), 'utf8').includes('-Src '));
+});

@@ -22,7 +22,8 @@ Git 追跡済みの住吉区 52 tile（35,031 棟）の再構築でのみ検証�
 ```powershell
 # 1) dry-run（何も作らない）
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission45d-convert-all.ps1
-# 2) 承認後のみ: 別フォルダ ..\livecity-3dtiles-out-24 へローカル変換（アップロードなし）
+# 2) 承認後のみ: 既定 %LOCALAPPDATA%\LiveCity-3DTiles-Out-24（OneDrive 外・非同期）へローカル変換（アップロードなし）
+#    入力指定の引数名は -LegacyBuildings のみ。出力先を変える場合は絶対パスの -OutRoot（OneDrive 配下は convert で拒否）
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission45d-convert-all.ps1 -Step convert -Execute -Approved
 # 3) 読み取り専用の再検証
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission45d-convert-all.ps1 -Step verify
