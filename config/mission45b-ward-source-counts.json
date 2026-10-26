@@ -1,0 +1,35 @@
+{
+  "_readme": [
+    "Mission 45B: 24区の旧建物 source 棟数・tile 数と、Git 追跡済み 3D の限定棟数。",
+    "値は MISSION45A_README.md (PR #24) の棚卸し表と、既報の read-only audit (readyWards 24 / 574,213棟 / 1,097 tile) の転記。",
+    "この環境で再測定した値ではない。PC側の 43D audit 出力で照合される前提の期待値であり、検証の分母として使う。",
+    "パス・建物ID・個人情報は含まない。"
+  ],
+  "schema": "livecity.mission45b.source-counts/1",
+  "wards": {
+    "27127": { "id": "kita", "sourceBuildings": 15779, "sourceTiles": 44, "gitTracked3dBuildings": 2698 },
+    "27102": { "id": "miyakojima", "sourceBuildings": 13199, "sourceTiles": 33, "gitTracked3dBuildings": 0 },
+    "27103": { "id": "fukushima", "sourceBuildings": 11159, "sourceTiles": 25, "gitTracked3dBuildings": 0 },
+    "27104": { "id": "konohana", "sourceBuildings": 13437, "sourceTiles": 58, "gitTracked3dBuildings": 0 },
+    "27128": { "id": "chuo", "sourceBuildings": 18279, "sourceTiles": 52, "gitTracked3dBuildings": 5629 },
+    "27106": { "id": "nishi", "sourceBuildings": 12098, "sourceTiles": 29, "gitTracked3dBuildings": 3893 },
+    "27107": { "id": "minato", "sourceBuildings": 15489, "sourceTiles": 34, "gitTracked3dBuildings": 0 },
+    "27108": { "id": "taisho", "sourceBuildings": 17363, "sourceTiles": 40, "gitTracked3dBuildings": 0 },
+    "27109": { "id": "tennoji", "sourceBuildings": 14244, "sourceTiles": 30, "gitTracked3dBuildings": 6593 },
+    "27111": { "id": "naniwa", "sourceBuildings": 10133, "sourceTiles": 30, "gitTracked3dBuildings": 4267 },
+    "27113": { "id": "nishiyodogawa", "sourceBuildings": 23242, "sourceTiles": 47, "gitTracked3dBuildings": 0 },
+    "27123": { "id": "yodogawa", "sourceBuildings": 34289, "sourceTiles": 62, "gitTracked3dBuildings": 0 },
+    "27114": { "id": "higashiyodogawa", "sourceBuildings": 34685, "sourceTiles": 66, "gitTracked3dBuildings": 0, "note": "height-sentinel-2-buildings(40E)" },
+    "27115": { "id": "higashinari", "sourceBuildings": 21976, "sourceTiles": 29, "gitTracked3dBuildings": 0 },
+    "27116": { "id": "ikuno", "sourceBuildings": 46212, "sourceTiles": 50, "gitTracked3dBuildings": 0 },
+    "27117": { "id": "asahi", "sourceBuildings": 22424, "sourceTiles": 35, "gitTracked3dBuildings": 0 },
+    "27118": { "id": "joto", "sourceBuildings": 32447, "sourceTiles": 48, "gitTracked3dBuildings": 0 },
+    "27124": { "id": "tsurumi", "sourceBuildings": 22068, "sourceTiles": 46, "gitTracked3dBuildings": 0 },
+    "27119": { "id": "abeno", "sourceBuildings": 26924, "sourceTiles": 38, "gitTracked3dBuildings": 0, "note": "id-collision(40D)" },
+    "27125": { "id": "suminoe", "sourceBuildings": 21608, "sourceTiles": 67, "gitTracked3dBuildings": 0, "note": "id-collision(40D)" },
+    "27120": { "id": "sumiyoshi", "sourceBuildings": 35031, "sourceTiles": 52, "gitTracked3dBuildings": 10546, "note": "git-tracked-9-of-52-tiles" },
+    "27121": { "id": "higashisumiyoshi", "sourceBuildings": 38489, "sourceTiles": 59, "gitTracked3dBuildings": 0, "note": "id-collision(40D)" },
+    "27126": { "id": "hirano", "sourceBuildings": 44434, "sourceTiles": 83, "gitTracked3dBuildings": 0 },
+    "27122": { "id": "nishinari", "sourceBuildings": 29204, "sourceTiles": 40, "gitTracked3dBuildings": 0, "note": "id-collision(40D)" }
+  }
+}
