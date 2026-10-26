@@ -838,6 +838,20 @@
       if (/^[a-z0-9-]+$/.test(n)) EXTRA_SET_DEFS.push({ id: 'ext-' + n, base: 'ext-3dtiles/' + n + '/', external: true });
     }
   }
+  // 45E: ?ext45=1（localhost 限定）。tools/mission45e-preview.cjs が検証済みの 24 区を /ext-3dtiles/<区>/ で読み取り専用配信し、
+  //   /ext-3dtiles/index.json に区の一覧を出す。ここで全区を ext 定義として登録する（URL に 24 区を並べない）。無ければ何もしない。
+  async function loadExt45Defs() {
+    if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || new URLSearchParams(location.search).get('ext45') !== '1') return;
+    try {
+      const r = await fetch('ext-3dtiles/index.json');
+      if (!r.ok) return;
+      const j = await r.json();
+      for (const w of (j.wards || [])) {
+        if (w && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'ext-' + w.ward)) EXTRA_SET_DEFS.push({ id: 'ext-' + w.ward, base: 'ext-3dtiles/' + w.ward + '/', external: true });
+      }
+      stats.ext45 = { wards: (j.wards || []).length };
+    } catch (e) { /* index が無い/壊れている: 追加しない */ }
+  }
   // 40J: 公開承認済みの区の変換 tileset（同一オリジン）。published.json に approved:true で載った区だけ登録する。
   //   載っていなければ何もしない（404 も出さない）。実データの配置は tools/mission40j-stage-public.cjs --execute のみが行う。
   const publishedWards = [];
@@ -943,7 +957,10 @@
     if (!wardCode) { syncBldgSelect(); scene.requestRender(); return false; }
     try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
     if (gen !== bldgGen) return false;
-    const metas = wardCode === BASE_WARD ? [] : extraMeta.filter((m) => m.source.wardCode === wardCode);   // 40A: 1 区に複数 tileset
+    let metas = extraMeta.filter((m) => m.source.wardCode === wardCode);   // 40A: 1 区に複数 tileset
+    // 45E: 同じ区にローカル変換のフル tileset（external）があれば、Git 管理の部分 tileset（住吉 9 tile・他区サンプル）より優先する
+    if (metas.some((m) => m.external)) metas = metas.filter((m) => m.external);
+    else if (wardCode === BASE_WARD) metas = [];
     const meta = metas.length > 0;
     if (wardCode !== BASE_WARD && (!meta || q.get('extra') === '0')) { stats.buildingState = 'unavailable'; syncBldgSelect(wardCode); return false; }
     stats.buildingState = 'loading'; bldgWard = wardCode; stats.buildingWard = wardCode; syncBldgSelect();
@@ -999,6 +1016,7 @@
   async function loadExtraMeta() {
     if (q.get('extra') === '0') return;
     await loadPublishedDefs();
+    await loadExt45Defs();
     for (const def of EXTRA_SET_DEFS) {
       try {
         const [src, rep] = await Promise.all([
@@ -1607,9 +1625,11 @@
     try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
     // 40A: 1 区に複数 tileset があるときは合算する（メッシュ・タイル・棟数）
     const agg = {};
+    const extWards = new Set(extraMeta.filter((e) => e.external).map((e) => e.source.wardCode));   // 45E: ローカルのフル変換がある区は Git の部分 tileset を数えない
     for (const e of extraMeta) {
       const n = e.report.totals.buildings | 0, tiles = e.report.selectedTiles | 0;
       if (!n || !tiles) continue;
+      if (!e.external && extWards.has(e.source.wardCode)) continue;
       const a = agg[e.source.wardCode] || (agg[e.source.wardCode] = { tiles: 0, buildings: 0, meshes: 0 });
       a.tiles += tiles; a.buildings += n; a.meshes += (e.source.sourceMeshes || []).length; if (e.external) a.external = true;
     }
