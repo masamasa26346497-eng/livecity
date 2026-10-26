@@ -14,6 +14,7 @@ const require = createRequire(import.meta.url);
 const C = require('../mission43f-pc-convert.cjs');
 const P = require('../mission43g-local-preview.cjs');
 const L = require('../mission40b-legacy-tiles-batch.cjs');
+const K = require('../mission45c-coverage.cjs');   // [45C] source-vs-converted-vs-rendered（件数のみ）
 const ROOT = path.resolve('.');
 const wards = JSON.parse(fs.readFileSync('config/wards/registry.json', 'utf8')).wards;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -74,6 +75,9 @@ try {
   // 区外（verified でない区）は配信されないこと: 別の区コードを選んでも ext tileset は mount されない
   await ev("window.__mission37dQA.setBuildingWard('27103')"); await sleep(800);
   res.steps.otherWardTilesets = JSON.parse(await ev('JSON.stringify(window.__mission37dQA.tilesetCount())')).n;
+  // [45C] 区別 coverage: source(旧タイル) vs converted(43F出力) vs rendered(ビューアが mount した棟数)。合成 fixture なので kind=synthetic
+  { const es = (res.steps.extraSets || [])[0] || {}; const px = res.steps.pixels || {};
+    res.coverage = K.compute({ src, converted: out, ward: W, kind: 'synthetic', rendered: { tilesets: res.steps.tilesets, mountedBuildings: es.buildings || 0, http200: res.steps.http.tileset200 >= 1 && res.steps.http.glb200 >= 1 && res.steps.http.bad.length === 0, pixelsChanged: px.pct > 0.05, clickedIdVerified: false, peakResidentWards: 1 } }); }
 } catch (e) { res.error = String(e.message || e); }
 finally { try { await b?.close?.(); } catch { /* noop */ } await new Promise((r) => server.close(r)); L.setSource && L.setSource(path.join(ROOT, 'public/map-data/osaka-city/buildings')); fs.rmSync(tmp, { recursive: true, force: true }); }
 const s = res.steps;
