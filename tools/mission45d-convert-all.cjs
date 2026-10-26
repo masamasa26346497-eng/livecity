@@ -86,13 +86,25 @@ function convertSumiyoshi(o, opts) {
     return { state: 'failed', attempt: n, reason: 'convert-error' };
   } finally { L.setSource(REPO_BLD); }
 }
+// B.run(id, outRoot) writes the real output ONE level deeper: <outRoot>/<id>. The synthetic test seam writes flat into outRoot.
+// The tileset location is resolved from what is actually on disk (nested preferred); nothing else is ever accepted.
+const SOURCE_COMPARE = /^(building count differs from audited source|canonical id set differs from source)$/;
+function sumiyoshiOutDir(attemptDir) {
+  const nested = path.join(attemptDir, 'sumiyoshi');
+  const ns = lst(nested);
+  if (ns && ns.isDirectory() && !ns.isSymbolicLink() && lst(path.join(nested, 'tileset.json'))) return nested;
+  if (lst(path.join(attemptDir, 'tileset.json'))) return attemptDir; // flat (test seam only)
+  return null;
+}
 function verifySumiyoshi(o, src, entry, audit, reg) {
   const w = reg.find((x) => x.id === 'sumiyoshi');
   if (!entry || entry.state !== 'ok') return { state: 'absent', reasons: ['no-ok-entry'] };
-  const dir = path.join(o, 'sumiyoshi-a' + entry.attempt);
-  const st = lst(dir);
-  if (!st || !st.isDirectory() || st.isSymbolicLink()) return { state: 'not-ready', reasons: ['dir-missing'] };
-  if (G.linkScan(dir)) return { state: 'not-ready', reasons: ['link-in-output'] };
+  const attemptDir = path.join(o, 'sumiyoshi-a' + entry.attempt);
+  const st = lst(attemptDir);
+  if (!st || !st.isDirectory() || st.isSymbolicLink()) return { state: 'not-ready', reasons: ['dir-missing'], integrity: true };
+  if (G.linkScan(attemptDir)) return { state: 'not-ready', reasons: ['link-in-output'], integrity: true };
+  const dir = sumiyoshiOutDir(attemptDir);
+  if (!dir) return { state: 'not-ready', reasons: ['tileset-missing'], integrity: true };
   const aw = audit.wards.sumiyoshi;
   if (!aw || !aw.ready) return { state: 'not-ready', reasons: ['source-ward-not-audit-ready'] };
   try {
@@ -100,8 +112,10 @@ function verifySumiyoshi(o, src, entry, audit, reg) {
     const v = C.verifyWard(dir, src, 'sumiyoshi', w.code, { buildings: aw.buildings.found });
     const reasons = v.problems.slice();
     G.idsAttrsIdentity(dir).forEach((p) => reasons.push(p));
-    return { state: reasons.length ? 'not-ready' : 'verified', reasons: [...new Set(reasons)], buildings: v.ids, uniqueIds: v.uniqueIds, glb: v.glb, bytes: v.bytes };
-  } catch (e) { return { state: 'not-ready', reasons: ['verification-error'] }; }
+    const uniq = [...new Set(reasons)];
+    // integrity = some problem is damage/missing output; a pure Git-vs-PC source difference cannot be fixed by converting again
+    return { state: reasons.length ? 'not-ready' : 'verified', reasons: uniq, integrity: uniq.length > 0 && !uniq.every((r) => SOURCE_COMPARE.test(r)), buildings: v.ids, uniqueIds: v.uniqueIds, glb: v.glb, bytes: v.bytes };
+  } catch (e) { return { state: 'not-ready', reasons: ['verification-error'], integrity: true }; }
 }
 
 // ---- completion proof (anonymous aggregates only). Called after convert and by --verify-only.
@@ -155,13 +169,15 @@ function run(opts) {
   if (opts.verifyOnly) return proof(dest.out, src, audit, opts);
 
   const prev = dest.resume ? readState(dest.out) : null;
-  const sumDone = prev && prev.sumiyoshi && prev.sumiyoshi.state === 'ok';
+  // done = recorded ok AND the output on disk re-verifies now. A pure source mismatch is not retried (deterministic); damage is (new attempt dir).
+  const sumCheck = prev && prev.sumiyoshi && prev.sumiyoshi.state === 'ok' ? verifySumiyoshi(dest.out, src, prev.sumiyoshi, audit, reg) : null;
+  const sumDone = !!sumCheck && (sumCheck.state === 'verified' || sumCheck.integrity === false);
   const pcStatus = dest.resume ? C.readStatus(path.join(dest.out, PC_SUB)) : null;
   const pcIds = reg.filter((w) => w.id !== 'sumiyoshi').map((w) => w.id);
   const pcPending = pcIds.filter((id) => !(pcStatus && pcStatus.wards[id] && pcStatus.wards[id].state === 'ok'));
   const est = Math.round(audit.totals.buildings * B.BYTES_PER_BUILDING);
   const free = freeBytes(path.dirname(dest.out));
-  const plan = { sumiyoshi: sumDone ? 'already-ok' : 'would-rebuild-from-git-tracked-tiles', pc23Pending: pcPending.length, estimatedBytes: est, freeBytes: free, enoughDisk: free == null ? null : free >= est * 2 };
+  const plan = { sumiyoshi: sumDone ? 'already-ok' : (sumCheck ? 'would-rebuild-new-attempt(disk-verification-failed)' : 'would-rebuild-from-git-tracked-tiles'), pc23Pending: pcPending.length, estimatedBytes: est, freeBytes: free, enoughDisk: free == null ? null : free >= est * 2 };
   if (!execute) {
     // strict dry-run: 43F dry-run only inspects (creates nothing)
     const probe = dest.exists ? path.join(dest.out, PC_SUB) : dest.out + '-probe'; // never created: dry-run only inspects
@@ -217,5 +233,5 @@ function main() {
     process.exit(own ? e.code : 1);
   }
 }
-module.exports = { run, proof, checkRoot, convertSumiyoshi, verifySumiyoshi, readState, SCHEMA, MARKER };
+module.exports = { run, proof, checkRoot, convertSumiyoshi, verifySumiyoshi, sumiyoshiOutDir, readState, SCHEMA, MARKER };
 if (require.main === module) main();

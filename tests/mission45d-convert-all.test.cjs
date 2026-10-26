@@ -142,3 +142,72 @@ test('static: ps1 is ASCII, needs both flags, has no delete/copy/network command
   for (const bad of ['rmSync', 'unlinkSync', 'rmdirSync', "require('http", "require('https", "require('net", 'fetch(', 'child_process', 'copyFileSync']) assert.ok(!js.includes(bad), bad);
   assert.ok(!/\b(?:574213|574,213)\b/.test(js), 'total building count must come from the runtime audit');
 });
+
+// ---- Mission 45D hotfix: real nested Sumiyoshi output (B.run writes <attempt>/sumiyoshi), disk re-verification, 24/24 with the REAL Sumiyoshi.
+// PC-source stand-in = the Git-tracked Sumiyoshi tiles copied into a temp dir (no owner data involved).
+function fixtureRealSumiyoshi() {
+  const src = fixture();
+  fs.rmSync(path.join(src, 'osaka-sumiyoshi'), { recursive: true });
+  fs.cpSync(path.join(REPO_BLD, 'osaka-sumiyoshi'), path.join(src, 'osaka-sumiyoshi'), { recursive: true });
+  const rm = JSON.parse(fs.readFileSync(path.join(src, 'manifest.json'), 'utf8'));
+  const d = rm.datasets.find((x) => x.wardId === 'sumiyoshi'); d.buildings = 35031; d.tiles = 52;
+  fs.writeFileSync(path.join(src, 'manifest.json'), JSON.stringify(rm));
+  return src;
+}
+const realRun = (src, out) => A.run({ src, outRoot: out, execute: true, approved: true });
+
+test('hotfix: real B.run output is nested (<attempt>/sumiyoshi) and verifySumiyoshi points there -> verified, 24/24 complete', () => {
+  const src = fixtureRealSumiyoshi(); const out = newOut();
+  const r = realRun(src, out);
+  const st = A.readState(out);
+  assert.strictEqual(st.sumiyoshi.state, 'ok', JSON.stringify(st.sumiyoshi));
+  const attempt = path.join(out, 'sumiyoshi-a' + st.sumiyoshi.attempt);
+  assert.ok(fs.existsSync(path.join(attempt, 'sumiyoshi', 'tileset.json')), 'real output is nested');
+  assert.ok(!fs.existsSync(path.join(attempt, 'tileset.json')), 'not flat');
+  assert.strictEqual(A.sumiyoshiOutDir(attempt), path.join(attempt, 'sumiyoshi'));
+  const audit = require('../tools/mission43d-ward-batch.cjs').audit(src);
+  const sv = A.verifySumiyoshi(out, src, st.sumiyoshi, audit, wards);
+  assert.strictEqual(sv.state, 'verified', JSON.stringify(sv.reasons));
+  assert.strictEqual(sv.buildings, 35031);
+  assert.strictEqual(r.kind, 'real'); assert.strictEqual(r.sumiyoshi.state, 'verified');
+  assert.strictEqual(r.convertedWards, 24); assert.strictEqual(r.complete, true, JSON.stringify(r.problems));
+  const names = fs.readdirSync(out).sort().join(',');
+  const r2 = realRun(src, out);
+  assert.strictEqual(r2.complete, true); assert.strictEqual(fs.readdirSync(out).sort().join(','), names);
+  assert.ok(r2.steps.some((x) => x.ward === 'sumiyoshi' && x.state === 'already-ok'));
+});
+
+test('hotfix: GLB removed after state ok -> proof fails closed; rerun makes a NEW attempt non-destructively and completes', () => {
+  const src = fixtureRealSumiyoshi(); const out = newOut();
+  assert.strictEqual(realRun(src, out).complete, true);
+  const tiles1 = path.join(out, 'sumiyoshi-a1', 'sumiyoshi', 'tiles');
+  const glb = fs.readdirSync(tiles1).find((f) => f.endsWith('.glb'));
+  fs.rmSync(path.join(tiles1, glb));
+  const v = A.run({ src, outRoot: out, verifyOnly: true });
+  assert.strictEqual(v.complete, false); assert.ok(v.problems.some((p) => /^sumiyoshi:/.test(p)));
+  const plan = A.run({ src, outRoot: out });
+  assert.match(plan.plan.sumiyoshi, /new-attempt/);
+  assert.ok(!fs.readdirSync(out).includes('sumiyoshi-a2'), 'plan writes nothing');
+  const r = realRun(src, out);
+  assert.strictEqual(r.complete, true, JSON.stringify(r.problems));
+  assert.strictEqual(A.readState(out).sumiyoshi.attempt, 2);
+  assert.ok(fs.existsSync(path.join(out, 'sumiyoshi-a1', 'sumiyoshi', 'tileset.json')), 'old attempt kept');
+  assert.ok(!fs.existsSync(path.join(tiles1, glb)), 'old attempt not repaired in place');
+});
+
+test('hotfix: damaged ids on disk is caught; recorded state alone never counts as done', () => {
+  const src = fixtureRealSumiyoshi(); const out = newOut();
+  realRun(src, out);
+  const ids = path.join(out, 'sumiyoshi-a1', 'sumiyoshi', 'ids');
+  fs.writeFileSync(path.join(ids, fs.readdirSync(ids).find((f) => /^t_.*\.json$/.test(f))), '{ broken'); // g_* are coarse-LOD sidecars (not checked by design)
+  assert.strictEqual(A.run({ src, outRoot: out, verifyOnly: true }).complete, false);
+});
+
+test('hotfix: pure Git-vs-PC source mismatch is reported but not retried endlessly', () => {
+  const src = fixture(); const out = newOut(); // fixture Sumiyoshi has 6 buildings
+  realRun(src, out);
+  const names = fs.readdirSync(out).sort().join(',');
+  const r2 = realRun(src, out);
+  assert.strictEqual(r2.complete, false);
+  assert.strictEqual(fs.readdirSync(out).sort().join(','), names, 'no new attempt for a deterministic source mismatch');
+});
