@@ -697,7 +697,9 @@
     base = base || LAYER_BASE;
     const key = base + name;
     if (!jsonCache.has(key)) {
+      const tf = performance.now(); if (stats.vec45i) stats.vec45i.layerFetches++;
       jsonCache.set(key, fetch(base + name).then((r) => {
+        if (stats.vec45i) stats.vec45i.layerFetchMs = Math.round((stats.vec45i.layerFetchMs + performance.now() - tf) * 10) / 10;
         if (!r.ok) { jsonCache.delete(key); throw new Error(base + name + ' → HTTP ' + r.status); }
         return r.json();
       }));
@@ -734,16 +736,26 @@
       async mount() {
         const data = await fetchLayerJson(file, base);
         coll = scene.primitives.add(new Cesium.PolylineCollection());
-        let n = 0;
+        let n = 0, seen = 0, lastY = performance.now();
+        const V = stats.vec45i, t0 = performance.now();
         for (const f of data.features || []) {
+          // 45J: 長い構築を ~12ms ごとにブラウザへ返す（操作・3D Tiles 読み込みと競合しない）。古い要求なら途中で打ち切る
+          if ((++seen & 63) === 0 && performance.now() - lastY > 12) {
+            await new Promise((r) => setTimeout(r, 0)); lastY = performance.now(); V.yields = (V.yields | 0) + 1;
+            if (opt && opt.isStale && opt.isStale()) break;
+          }
           const st = styleOf(f);
           if (!st || !Array.isArray(f.p) || f.p.length < 2) continue;
-          const runs = opt && opt.clip ? opt.clip(f.p) : [f.p];
+          // 45J: ビルド時に区ポリゴンで切り済み（data.clipped === 'ward-polygon'）なら wardClip を省く。束との二重線除外 (clip) は常に適用
+          let runs = opt && opt.wardClip && data.clipped !== 'ward-polygon' ? opt.wardClip(f.p) : [f.p];
+          if (data.clipped === 'ward-polygon') V.prebuiltClip = (V.prebuiltClip | 0) + 1;
+          if (opt && opt.clip) runs = runs.flatMap((r) => opt.clip(r));
           const ddc = st.maxDist ? new Cesium.DistanceDisplayCondition(0, st.maxDist) : undefined;
           let used = false;
           for (const run of runs) {
             if (run.length < 2) continue;
             const positions = run.map((pt) => toCart(pt[0], pt[1], st.height));
+            V.polylines = (V.polylines | 0) + 1; V.vertices = (V.vertices | 0) + run.length;
             // 太い道路は外側に暗い線を重ねて、地図らしい縁取りにする（major/mid のみ）
             if (st.casing) {
               coll.add({ positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing),
@@ -754,6 +766,7 @@
           }
           if (used) n++;
         }
+        V.convertMs = Math.round(((V.convertMs || 0) + performance.now() - t0) * 10) / 10;
         return { count: n };
       },
       applyVisible(on) { if (coll) coll.show = on; },
@@ -777,15 +790,13 @@
   }
   // 40M: 区ポリゴン内の頂点だけを残す。境界をまたぐ線は外側の隣接頂点 1 点までで切る（境界で線が途切れない）
   function makeWardClip(polys) {
-    const inside = (x, z) => polys.some((p) => pointInRing(x, z, p.outer) && !(p.holes || []).some((h) => pointInRing(x, z, h)));
+    // 45J: 厳密判定は境界セルだけ（セル前計算）。結果は pointInRing と同一。clipMs / pipExact / pipFast を stats.vec45i に記録
+    const inside = LC45I.makeInsideTester(polys, 64);
     return function clip(pts) {
-      const ins = pts.map((q) => inside(q[0], q[1]));
-      const runs = []; let cur = null;
-      for (let i = 0; i < pts.length; i++) {
-        const near = ins[i] || (i > 0 && ins[i - 1]) || (i < pts.length - 1 && ins[i + 1]);
-        if (near) { (cur = cur || []).push(pts[i]); } else if (cur) { runs.push(cur); cur = null; }
-      }
-      if (cur) runs.push(cur);
+      const t = performance.now();
+      const runs = LC45I.clipRuns(pts, inside);
+      const V = stats.vec45i; V.clipMs = Math.round(((V.clipMs || 0) + performance.now() - t) * 10) / 10;
+      V.pipExact = inside.stats.exactCalls; V.pipFast = inside.stats.fastCalls;
       return runs;
     };
   }
@@ -925,14 +936,19 @@
   var vecAll = new Map();   // wardCode -> { level, layers:[{id,layer}], release }
   var vecWards = new Set(); // レイヤーを配信できる wardId（index.json の layersWards）
   let vecBusy = false, vecDirty = false;
-  stats.vec45i = { available: 0, mounted: {}, ticks: 0, mountsTotal: 0, dropsTotal: 0, lastPlan: null, lastError: null, sumiyoshiBundleExcluded: null };
+  stats.vec45i = { clipMs: 0, convertMs: 0, polylines: 0, vertices: 0, yields: 0, layerFetches: 0, layerFetchMs: 0, available: 0, mounted: {}, ticks: 0, mountsTotal: 0, dropsTotal: 0, lastPlan: null, lastError: null, sumiyoshiBundleExcluded: null };
   function vecSync() {
     stats.vec45i.available = vecWards.size;
-    stats.vec45i.mounted = {}; for (const [k, r] of vecAll) stats.vec45i.mounted[k] = { level: r.level, layers: r.layers.map((l) => l.id + ':' + l.count) };
+    stats.vec45i.mounted = {}; for (const [k, r] of vecAll) stats.vec45i.mounted[k] = { level: r.level, layers: r.layers.map((l) => (l.key || l.id) + ':' + l.count) };
   }
   function wardVecApply(id, on) {
     for (const w of wardVec) if (w.id === id) w.layer.applyVisible(on);
-    if (vecAll) for (const r of vecAll.values()) for (const w of r.layers) if (w.id === id) w.layer.applyVisible(on);
+    if (vecAll) for (const r of vecAll.values()) for (const w of r.layers) if (w.id === id) w.layer.applyVisible(on && vecKeyShown(r, w.key));
+  }
+  // 45J: 詳細度の切替は破棄ではなく show/hide。レベルに含まれない tier は隠すだけ（構築済みジオメトリを保持して再利用）
+  function vecKeyShown(rec, key) { return !rec.level || (LC45I.KEYS_BY_LEVEL[rec.level] || []).includes(key); }
+  function vecVis(rec) {
+    for (const w of rec.layers) { const reg = LayerRegistry.get(w.id); w.layer.applyVisible(vecKeyShown(rec, w.key) && (reg ? reg.visible : true)); }
   }
   function unmountWardVec() {
     for (const w of wardVec.splice(0)) { try { w.layer.destroy(); } catch (e) { /* noop */ } }
@@ -946,47 +962,101 @@
     for (const l of r.layers) { try { l.layer.destroy(); } catch (e) { /* noop */ } }
     r.release(); stats.vec45i.dropsTotal++; vecSync(); scene.requestRender();
   }
-  // 区のベクタ一式を作る。level=null は従来の 1 区モード（全レイヤー・全 tier）。isStale() が真になったら作った分を破棄して null を返す。
-  //   住吉区は mission37c の 9 tile 束と二重線にならないよう、道路・鉄道だけを束の範囲外に限定する（公園・河川面は束側のみ）。
-  async function buildVecSet(wardCode, base, level, isStale) {
+  // 45J: ベクタ 1 キー（roads:major / roads:mid / roads:local / waterways / parks / railways）= 独立 primitive。
+  //   tier 別に分けることで、詳細度の切替を「全 destroy + 再 fetch + 再 clip」ではなく「不足分の追加 + show/hide」にする。
+  function makeVecLayer(key, base, opt) {
+    const id = LC45I.keyLayer(key), tier = String(key).split(':')[1];
+    if (id === 'roads' && tier) return makeLineLayer('roads.json', (f) => ((f.tier || 'local') === tier ? roadStyleWard(f) : null), base, opt);
+    return WARD_VEC_FILES[id](base, opt);
+  }
+  // 区ごとに 1 回だけ作る文脈（区ポリゴンの高速判定、住吉区の束との二重線回避）
+  async function vecContext(wardCode) {
     let opt = {}, clipKind = 'none';
     try {
       const w = (await WardUI.load()).wards.find((x) => x.wardCode === wardCode);
-      if (w) { opt = { clip: makeWardClip(w.polygons) }; clipKind = 'ward-polygon'; }
+      if (w) { opt = { wardClip: makeWardClip(w.polygons) }; clipKind = 'ward-polygon'; }
     } catch (e) { /* 切らない */ }
-    let ids = level ? LC45I.layersFor(level) : Object.keys(WARD_VEC_FILES);
-    if (wardCode === BASE_WARD) {
-      ids = ids.filter((i) => i === 'roads' || i === 'railways');
+    const onlyRR = wardCode === BASE_WARD;   // 住吉区は mission37c の 9 tile 束と二重線にならないよう、道路・鉄道だけを束の範囲外に限定する
+    if (onlyRR) {
       let box = null; try { box = ((await fetchLayerJson('manifest.json')).bboxLocal) || null; } catch (e) { /* 束が無ければ除外しない */ }
-      if (box) { const c0 = opt.clip; opt.clip = (pts) => (c0 ? c0(pts) : [pts]).flatMap((r) => LC45I.clipOutBox(r, box)); }
+      if (box) opt.clip = (pts) => LC45I.clipOutBox(pts, box);
       stats.vec45i.sumiyoshiBundleExcluded = !!box;
     }
-    const files = {}, layers = [];
-    const release = () => { for (const f of Object.keys(files)) jsonCache.delete(f); };
-    for (const id of ids) {
-      const layer = WARD_VEC_FILES[id](base, opt, level);
+    return { opt, clipKind, onlyRR };
+  }
+  // keys を順に構築して out に積む。古い要求になったら false（呼び出し側が out を破棄する）
+  async function vecBuildKeys(ctx, base, keys, isStale, out, files) {
+    for (const key of keys) {
+      const id = LC45I.keyLayer(key);
+      if (ctx.onlyRR && id !== 'roads' && id !== 'railways') continue;
+      const layer = makeVecLayer(key, base, Object.assign({}, ctx.opt, { isStale }));
       files[base + id + '.json'] = 1;
       try {
         const r = await layer.mount();
-        if (isStale()) { layer.destroy(); for (const l of layers) l.layer.destroy(); release(); return null; }
-        const rec = LayerRegistry.get(id);
-        layer.applyVisible(rec ? rec.visible : true);
-        layers.push({ id, layer, count: r.count });
+        if (isStale()) { layer.destroy(); return false; }
+        out.push({ id, key, layer, count: r.count });
+        stats.vec45i.builtKeysTotal = (stats.vec45i.builtKeysTotal | 0) + 1;
       } catch (e) {
         layer.destroy();
-        if (!/HTTP 404/.test(String(e && e.message))) fail('vec ' + id, e);   // 元データに無いレイヤーは 404 = 空（エラー扱いにしない）
+        if (!/HTTP 404/.test(String(e && e.message))) fail('vec ' + key, e);   // 元データに無いレイヤーは 404 = 空（エラー扱いにしない）
       }
     }
-    return { layers, release, clipKind };
+    return true;
+  }
+  // 区のベクタ一式を作る。level=null は従来の 1 区モード（全レイヤー・全 tier）。isStale() が真になったら作った分を破棄して null を返す。
+  async function buildVecSet(wardCode, base, level, isStale) {
+    const ctx = await vecContext(wardCode);
+    const keys = level ? LC45I.planKeys([], level).add : ['roads', 'waterways', 'parks', 'railways'];
+    const files = {}, layers = [];
+    const release = () => { for (const f of Object.keys(files)) jsonCache.delete(f); };
+    const ok = await vecBuildKeys(ctx, base, keys, isStale, layers, files);
+    if (!ok) { for (const l of layers) l.layer.destroy(); release(); return null; }
+    return { layers, release, clipKind: ctx.clipKind, ctx, files };
   }
   async function vecMount(w, level, gen) {
-    const rec = { level, layers: [], release() {} };
+    const rec = { level, layers: [], release() {}, ctx: null, files: {}, base: 'ext-3dtiles/' + w.wardId + '/layers/' };
     vecAll.set(w.wardCode, rec);   // pending 中も上限・重複判定に数える
-    const set = await buildVecSet(w.wardCode, 'ext-3dtiles/' + w.wardId + '/layers/', level, () => gen !== bldgGen || !allMode || vecAll.get(w.wardCode) !== rec);
+    const set = await buildVecSet(w.wardCode, rec.base, level, () => gen !== bldgGen || !allMode || vecAll.get(w.wardCode) !== rec);
     if (!set) { if (vecAll.get(w.wardCode) === rec) vecAll.delete(w.wardCode); return; }
-    rec.layers = set.layers; rec.release = set.release;
+    rec.layers = set.layers; rec.release = set.release; rec.ctx = set.ctx; rec.files = set.files;
+    vecVis(rec);
     stats.vec45i.mountsTotal++; vecSync(); scene.requestRender();
+    if (q.get('align') === '1') vecAlignDiag(w, rec);
   }
+  // 45J: ?align=1 — 描画に使った道路頂点が、同じ座標系の N03 区ポリゴンにどれだけ入るかを数える（回転・符号・原点ずれの一次診断）。
+  //   区の外側に 150m 以内の余白があるデータなので 100% にはならない。ずれ・回転があると割合が大きく下がる。結果は stats.vec45i.align[wardCode]。
+  async function vecAlignDiag(w, rec) {
+    try {
+      const data = await fetchLayerJson('roads.json', rec.base);
+      const wd = (await WardUI.load()).wards.find((x) => x.wardCode === w.wardCode);
+      const inside = LC45I.makeInsideTester(wd.polygons, 64);
+      let n = 0, ins = 0, x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+      for (const f of data.features || []) for (const p of f.p || []) {
+        if ((n++ & 7) !== 0) continue;
+        if (inside(p[0], p[1])) ins++;
+        if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < z0) z0 = p[1]; if (p[1] > z1) z1 = p[1];
+      }
+      const sampled = Math.ceil(n / 8);
+      stats.vec45i.align = stats.vec45i.align || {};
+      stats.vec45i.align[w.wardCode] = { sampled, insideWardPct: sampled ? Math.round((ins / sampled) * 1000) / 10 : null, roadBBoxLocal: { minX: x0, maxX: x1, minZ: z0, maxZ: z1 }, wardBBoxLocal: wd.bbox, header: { convention: data.coordinateConvention || null, clipped: data.clipped || null } };
+    } catch (e) { stats.vec45i.align = stats.vec45i.align || {}; stats.vec45i.align[w.wardCode] = { error: String(e && e.message || e) }; }
+  }
+  // 詳細度が変わった区: 構築済みジオメトリは破棄せず、不足キーだけ追加して show/hide（再 fetch・再 clip なし）
+  async function vecRelevel(code, level, gen) {
+    const rec = vecAll.get(code); if (!rec || !rec.ctx) return 0;
+    const pk = LC45I.planKeys(rec.layers.map((l) => l.key), level);
+    const stale = () => gen !== bldgGen || !allMode || vecAll.get(code) !== rec;
+    if (pk.add.length) {
+      const extra = [];
+      const ok = await vecBuildKeys(rec.ctx, rec.base, pk.add, stale, extra, rec.files);
+      if (!ok) { for (const l of extra) l.layer.destroy(); return 0; }
+      rec.layers.push(...extra);
+    } else stats.vec45i.reuseTotal = (stats.vec45i.reuseTotal | 0) + 1;
+    rec.level = level; vecVis(rec);
+    stats.vec45i.relevelsTotal = (stats.vec45i.relevelsTotal | 0) + 1; vecSync(); scene.requestRender();
+    return pk.add.length;
+  }
+  let vecRetryT = 0;
   async function vecTick(c, height, gen) {
     if (!vecWards.size || q.get('vec') === '0') return;
     if (vecBusy) { vecDirty = true; return; }
@@ -996,10 +1066,21 @@
       const cur = {}; for (const [k, r] of vecAll) cur[k] = r.level;
       const p = LC45I.plan({ x: c.x, z: c.z, height }, cand, cur);
       stats.vec45i.ticks++; stats.vec45i.lastPlan = p.want;
-      for (const code of p.drop.concat(p.relevel)) vecDrop(code);
-      for (const code of p.mount.concat(p.relevel)) {
+      for (const code of p.drop) vecDrop(code);   // 常駐上限（4 区）を超える/遠い区だけ破棄。relevel では破棄しない
+      // カメラ操作中は新規構築しない（重い構築を操作と競合させない）。止まったら再計画する
+      if (isMoving() && (p.mount.length || p.relevel.length)) {
+        stats.vec45i.deferredMoving = (stats.vec45i.deferredMoving | 0) + 1;
+        clearTimeout(vecRetryT); vecRetryT = setTimeout(() => { if (allMode) scheduleAll(); }, 450);
+        return;
+      }
+      // 1 tick に構築するのは 1 区まで（最も近い区から）。残りは次の tick（vecDirty）
+      const todo = p.relevel.concat(p.mount);
+      let did = 0;
+      for (const code of todo) {
         if (!allMode || gen !== bldgGen) break;
-        await vecMount(cand.find((x) => x.wardCode === code), p.want[code], gen);
+        if (did >= 1) { vecDirty = true; break; }
+        if (vecAll.has(code)) { if (await vecRelevel(code, p.want[code], gen)) did++; }   // 再利用だけ（構築なし）の relevel は数えない
+        else { await vecMount(cand.find((x) => x.wardCode === code), p.want[code], gen); did++; }
       }
     } catch (e) { stats.vec45i.lastError = String(e && e.message || e); fail('vecTick', e); }
     finally { vecBusy = false; if (vecDirty && allMode) { vecDirty = false; scheduleAll(); } }

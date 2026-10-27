@@ -14,6 +14,8 @@
 const fs = require('fs');
 const path = require('path');
 const L = require('./mission40g-build-ward-layers.cjs');
+const A = require('./lib/mission45j-align.cjs');
+const VEC = (() => { const m = require('../public/mission45i-vec.js'); return m && m.makeInsideTester ? m : globalThis.LC45I; })();   // package.json が type:module のため .js は ESM 扱い → globalThis.LC45I
 
 const ROOT = path.resolve(__dirname, '..');
 const MARKER = '.livecity-45i-layers.json';
@@ -86,14 +88,41 @@ function buildWard(ward, src, layersRoot, margin, planOnly) {
   const outDir = path.join(layersRoot, ward.wardId, 'layers');
   const res = { ward: ward.wardId, wardCode: ward.wardCode, stage: 'sourceAvailable', layers: {} };
   if (!planOnly && lst(outDir)) { res.stage = 'skipped-exists'; res.note = 'layers dir already exists; not overwritten'; return res; }
-  const data = {}; let anyOk = false;
+  const data = {}; let anyOk = false; const manifests = {};
   for (const l of LAYERS) {
     const r = L.readLayer(src, l, box);
-    data[l] = r.features;
+    data[l] = r.features; if (r.manifest) manifests[l] = r.manifest;
     res.layers[l] = r.status === 'ok' ? { status: 'ok', features: r.features.length, vertices: r.stats.vertices, sourceTiles: r.stats.sourceTiles, missingTiles: r.stats.missingTiles, tiers: l === 'roads' ? tierCounts(r.features) : undefined } : { status: r.status };
     if (r.status === 'ok' && r.features.length) anyOk = true;
   }
   if (!anyOk) { res.stage = 'no-source-data'; return res; }
+  // 45J: 座標規約の検証。manifest の宣言 + N03 区ポリゴンとの突き合わせ（8 通りの軸/符号）。合致しなければ書き出さない（偽の規約を埋め込まない）
+  const evidence = { manifests: {}, probe: null };
+  const problems = [];
+  for (const l of Object.keys(manifests)) { const v = A.validateSourceManifest(manifests[l]); evidence.manifests[l] = v; if (!v.ok) problems.push(l + ': ' + v.problems.join('; ')); }
+  if (ward.polygons && data.roads.length) {
+    const pts = []; for (const f of data.roads) for (const p of f.p) { if (pts.length < 20000) pts.push(p); }
+    evidence.probe = A.probeConvention(pts, ward.polygons);
+    if (evidence.probe.verdict === 'alternative-fits-better') problems.push('N03 probe: an axis/sign transform fits the ward polygon better than identity');
+  }
+  res.alignment = { verdict: evidence.probe ? evidence.probe.verdict : 'no-probe', problems };
+  if (problems.length) { res.stage = 'convention-mismatch'; res.note = problems.join(' | '); return res; }
+  const convention = (manifests.roads || manifests[Object.keys(manifests)[0]] || {}).coordinateConvention;
+  // 45J: 区ポリゴンでの切り出しをビルド時に 1 回だけ行う（ビューアは clipped:'ward-polygon' を見て再 clip しない）
+  let clippedKind = 'bbox';
+  if (ward.polygons) {
+    const inside = VEC.makeInsideTester(ward.polygons, 64);
+    for (const l of ['roads', 'railways', 'waterways']) {
+      const out = [];
+      for (const f of data[l]) {
+        if (f.kind === 'area') { out.push(f); continue; }
+        const runs = VEC.clipRuns(f.p, inside);
+        runs.forEach((run, i) => { if (run.length >= 2) out.push(Object.assign({}, f, { id: runs.length > 1 ? f.id + '~' + i : f.id, p: run })); });
+      }
+      data[l] = out; if (res.layers[l] && res.layers[l].status === 'ok') { res.layers[l].features = out.length; res.layers[l].vertices = out.reduce((a, f) => a + f.p.length, 0); }
+    }
+    clippedKind = 'ward-polygon';
+  }
   const items = [].concat(namedItems('road', data.roads), namedItems('rail', data.railways));
   res.labels = { roads: items.filter((i) => i.kind === 'road').length, rails: items.filter((i) => i.kind === 'rail').length };
   if (planOnly) return res;
@@ -101,11 +130,11 @@ function buildWard(ward, src, layersRoot, margin, planOnly) {
   for (const l of LAYERS) {
     if (res.layers[l].status !== 'ok') continue;
     const file = path.join(outDir, l + '.json');
-    fs.writeFileSync(file, JSON.stringify({ layer: l, mission: '45I', ward: ward.wardId, coordinateConvention: 'znorth-neg-v1', coordinateSystem: 'local-meters', bboxLocal: box, count: data[l].length, features: data[l] }), { flag: 'wx' });
+    fs.writeFileSync(file, JSON.stringify({ layer: l, mission: '45I', ward: ward.wardId, coordinateConvention: convention, coordinateSystem: 'local-meters', clipped: clippedKind, bboxLocal: box, count: data[l].length, features: data[l] }), { flag: 'wx' });
     res.layers[l].bytes = fs.statSync(file).size;
   }
   fs.writeFileSync(path.join(outDir, 'labels.json'), JSON.stringify({ schema: SCHEMA, ward: ward.wardId, wardCode: ward.wardCode, source: 'OSM names carried by the old Live City road / railway tiles', items }), { flag: 'wx' });
-  fs.writeFileSync(path.join(outDir, 'layers-report.json'), JSON.stringify({ schema: SCHEMA, mission: '45I', ward: ward.wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(), marginM: margin, clipBoxLocal: box, layers: res.layers, labels: res.labels, license: 'OpenStreetMap contributors (ODbL) via the old Live City tiles', alignment: 'not computed here (use tools/mission40g-build-ward-layers.cjs --check-only against a converted ward)' }, null, 1), { flag: 'wx' });
+  fs.writeFileSync(path.join(outDir, 'layers-report.json'), JSON.stringify({ schema: SCHEMA, mission: '45I', ward: ward.wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(), marginM: margin, clipBoxLocal: box, layers: res.layers, labels: res.labels, license: 'OpenStreetMap contributors (ODbL) via the old Live City tiles', alignment: res.alignment, alignmentEvidence: evidence, clipped: clippedKind }, null, 1), { flag: 'wx' });
   res.stage = 'generated';
   return res;
 }

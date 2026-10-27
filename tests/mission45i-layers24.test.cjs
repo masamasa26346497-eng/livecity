@@ -53,12 +53,13 @@ test('clipOutBox: removes the part inside the bundle box, splits through-lines, 
   assert.deepStrictEqual(V.clipOutBox([[1, 1], [2, 2]], null), [[[1, 1], [2, 2]]]);
 });
 
-function fixture(w) {
+function manifestOf(size, o) { return Object.assign({ tileSize: size, coordinateSystem: 'meters-local', coordinateConvention: 'znorth-neg-v1', bboxLocal: { minX: -30000, maxX: 30000, minZ: -30000, maxZ: 30000 } }, o || {}); }
+function fixture(w, opts) {
   const src = tmp('lc45i-src-');
   const c = mid(w), size = 2000, tx = Math.floor(c.x / size), tz = Math.floor(c.z / size);
   for (const l of ['roads', 'waterways', 'parks', 'railways']) {
     fs.mkdirSync(path.join(src, l));
-    fs.writeFileSync(path.join(src, l, 'manifest.json'), JSON.stringify({ tileSize: size }));
+    fs.writeFileSync(path.join(src, l, 'manifest.json'), JSON.stringify(manifestOf(size, opts)));
     const f = [];
     if (l === 'roads') f.push({ id: 'r1', kind: 'line', tier: 'major', name: '御堂筋', p: [[c.x, c.z], [c.x + 200, c.z]] }, { id: 'r2', kind: 'line', tier: 'local', p: [[c.x, c.z + 50], [c.x + 30, c.z + 50]] }, { id: 'r1b', kind: 'line', tier: 'mid', name: '御堂筋', p: [[c.x, c.z + 9], [c.x + 20, c.z + 9]] });
     if (l === 'railways') f.push({ id: 'k1', kind: 'line', name: '大阪メトロ', p: [[c.x, c.z + 80], [c.x + 100, c.z + 80]] });
@@ -137,7 +138,8 @@ test('viewer wiring: LC45I loaded, independent vec manager, generation token, su
   assert.match(html, /LC45I\.plan\(/);
   assert.match(html, /gen !== bldgGen \|\| !allMode \|\| vecAll\.get\(w\.wardCode\) !== rec/);
   assert.match(html, /LC45I\.clipOutBox/);
-  assert.match(html, /wardCode === BASE_WARD[\s\S]{0,200}'roads' \|\| i === 'railways'/);
+  assert.match(html, /onlyRR = wardCode === BASE_WARD/);   // 45J: vecContext に移動
+  assert.match(html, /ctx\.onlyRR && id !== 'roads' && id !== 'railways'/);
   assert.match(html, /jsonCache\.delete\(f\)/);
   assert.match(html, /layersWards/);
   assert.match(html, /labels\.json'\)\.then/);

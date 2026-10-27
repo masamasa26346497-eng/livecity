@@ -184,5 +184,5 @@ function main() {
   }
   if (Object.values(report.layers).every((l) => l.status !== 'ok')) process.exitCode = 2;
 }
-module.exports = { clipLine, inWard, analyze, readLayer, parseArgs };
+module.exports = { clipLine, inWard, analyze, readLayer, parseArgs, buildingPoints };
 if (require.main === module) { try { main(); } catch (e) { console.error('ERROR: ' + e.message); process.exit(1); } }

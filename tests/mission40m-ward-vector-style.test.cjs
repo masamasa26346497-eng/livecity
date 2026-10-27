@@ -30,7 +30,9 @@ test('区単位の道路スタイルは階層別に細く、細街路は距離�
 
 test('makeWardClip: 区内の線は保持、完全に外の線は捨て、境界をまたぐ線は隣接頂点 1 点まで', () => {
   const pointInRing = new Function(extract('pointInRing') + '; return pointInRing;')();
-  const makeWardClip = new Function('pointInRing', extract('makeWardClip') + '; return makeWardClip;')(pointInRing);
+  // 45J: makeWardClip は LC45I（高速 inside + clipRuns）と stats.vec45i を使う。結果の規則は 40M と同一
+  const LC45I = (() => { const m = require('../public/mission45i-vec.js'); return m && m.makeInsideTester ? m : globalThis.LC45I; })();
+  const makeWardClip = new Function('pointInRing', 'LC45I', 'stats', 'performance', extract('makeWardClip') + '; return makeWardClip;')(pointInRing, LC45I, { vec45i: {} }, performance);
   const clip = makeWardClip([{ outer: [[0, 0], [100, 0], [100, 100], [0, 100], [0, 0]] }]);
   assert.deepStrictEqual(clip([[10, 10], [20, 20]]), [[[10, 10], [20, 20]]]);
   assert.deepStrictEqual(clip([[500, 500], [600, 600]]), []);
