@@ -89,7 +89,8 @@ test('viewer: ward vector layers are scoped to the selected ward and released', 
   assert.match(page, /mountWardVec\(metas, gen\)/);
   const i = page.indexOf('function unmountBuildings()');
   assert.match(page.slice(i, i + 200), /unmountWardVec\(\)/);
-  assert.match(page, /gen !== bldgGen\) \{ layer\.destroy\(\)/);   // stale async result is destroyed
+  assert.match(page, /buildVecSet\(wc, base, null, \(\) => gen !== bldgGen\)/);   // 45I: stale check is passed into the shared builder
+  assert.match(page, /if \(isStale\(\)\) \{ layer\.destroy\(\)/);                  // stale async result is destroyed
   assert.match(page, /layers-report\.json/);                       // absent layers => nothing drawn, no invention
   assert.match(page, /wardVecApply\(id, rec\.visible\)/);          // layer toggles reach ward layers
   assert.match(page, /fetchLayerJson\(file, base\)/);

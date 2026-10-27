@@ -10,6 +10,7 @@ Note: the page loads CesiumJS from a CDN and base-map tiles from external server
 param(
   [string]$LegacyBuildings = '..\livecity-data-pipeline\public\map-data\osaka-city\buildings',
   [string]$OutRoot = '',
+  [string]$LayersRoot = '',
   [int]$Port = 8137,
   [switch]$Plan
 )
@@ -29,6 +30,7 @@ if (-not (Test-Path -LiteralPath $src)) { throw 'Source folder not found. Pass -
 if (-not (Test-Path -LiteralPath $out)) { throw 'Output folder not found. Run tools\mission45d-convert-all.ps1 first. (path not shown on purpose)' }
 $tool = Join-Path $repo 'tools\mission45e-preview.cjs'
 $nodeArgs = @($tool, '--src', $src, '--out-root', $out, '--port', [string]$Port)
+if ($LayersRoot -ne '') { $nodeArgs += @('--layers-root', (Resolve-AbsPath $LayersRoot)) }
 if (-not $Plan) { $nodeArgs += '--serve' }
 & node @nodeArgs
 $code = $LASTEXITCODE

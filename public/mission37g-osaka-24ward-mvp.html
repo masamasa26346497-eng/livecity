@@ -452,6 +452,7 @@
 <script src="mission38f-facility-fastload.js"></script>
 <script src="mission45f-streaming.js"></script>
 <script src="mission45g-perf.js"></script>
+<script src="mission45i-vec.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -860,6 +861,8 @@
         if (w && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'ext-' + w.ward)) EXTRA_SET_DEFS.push({ id: 'ext-' + w.ward, base: 'ext-3dtiles/' + w.ward + '/', external: true, verified45: j.verified === true });
       }
       stats.ext45 = { wards: (j.wards || []).length, verified: j.verified === true };
+      vecWards = new Set((j.layersWards || []).map((x) => x && x.ward).filter((x) => /^[a-z0-9-]+$/.test(x || '')));   // 45I
+      vecSync();
     } catch (e) { /* index が無い/壊れている: 追加しない */ }
   }
   // 40J: 公開承認済みの区の変換 tileset（同一オリジン）。published.json に approved:true で載った区だけ登録する。
@@ -903,7 +906,7 @@
   //   区の 3D 建物を mount したときだけ読み込み、区の切替・解除で primitives.remove する。layers/ が無ければ何もしない（捏造しない）。
   //   既存の住吉区束（mission37c-layers）とは別 primitive。住吉区の束は変更しない。
   const WARD_VEC_FILES = {
-    roads: (b, o) => makeLineLayer('roads.json', roadStyleWard, b, o),
+    roads: (b, o, lv) => makeLineLayer('roads.json', lv ? (f) => (LC45I.tierAllows(lv, f.tier) ? roadStyleWard(f) : null) : roadStyleWard, b, o),
     waterways: (b, o) => {
       const l = makeLineLayer('waterways.json', waterLineStyle, b, o);
       const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b);
@@ -914,11 +917,92 @@
     railways: (b, o) => makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }), b, o),
   };
   let wardVec = [];   // { id, layer, count }
+  let wardVecRelease = null;
   stats.wardVec = { ward: null, state: 'none', layers: {} };
-  function wardVecApply(id, on) { for (const w of wardVec) if (w.id === id) w.layer.applyVisible(on); }
+  // 45I: 全域3Dモードで画面に現れる区のベクタ（道路・河川・公園・鉄道）を、建物の mount と独立に管理する。
+  //   計画は public/mission45i-vec.js（LC45I.plan）: 常駐は最大 4 区、近景=全 tier、中景=major+mid、遠景=major のみ。変更/離脱で destroy + JSON キャッシュ解放。
+  //   レイヤー（<layers-root>/<区>/layers/）は mission45e-preview の --layers-root が配信した区だけ（index.json の layersWards）。無ければ何も描かない。
+  var vecAll = new Map();   // wardCode -> { level, layers:[{id,layer}], release }
+  var vecWards = new Set(); // レイヤーを配信できる wardId（index.json の layersWards）
+  let vecBusy = false, vecDirty = false;
+  stats.vec45i = { available: 0, mounted: {}, ticks: 0, mountsTotal: 0, dropsTotal: 0, lastPlan: null, lastError: null, sumiyoshiBundleExcluded: null };
+  function vecSync() {
+    stats.vec45i.available = vecWards.size;
+    stats.vec45i.mounted = {}; for (const [k, r] of vecAll) stats.vec45i.mounted[k] = { level: r.level, layers: r.layers.map((l) => l.id + ':' + l.count) };
+  }
+  function wardVecApply(id, on) {
+    for (const w of wardVec) if (w.id === id) w.layer.applyVisible(on);
+    if (vecAll) for (const r of vecAll.values()) for (const w of r.layers) if (w.id === id) w.layer.applyVisible(on);
+  }
   function unmountWardVec() {
     for (const w of wardVec.splice(0)) { try { w.layer.destroy(); } catch (e) { /* noop */ } }
+    if (wardVecRelease) { wardVecRelease(); wardVecRelease = null; }
+    for (const k of [...vecAll.keys()]) vecDrop(k);
     stats.wardVec = { ward: null, state: 'none', layers: {} };
+  }
+  function vecDrop(code) {
+    const r = vecAll.get(code); if (!r) return;
+    vecAll.delete(code);
+    for (const l of r.layers) { try { l.layer.destroy(); } catch (e) { /* noop */ } }
+    r.release(); stats.vec45i.dropsTotal++; vecSync(); scene.requestRender();
+  }
+  // 区のベクタ一式を作る。level=null は従来の 1 区モード（全レイヤー・全 tier）。isStale() が真になったら作った分を破棄して null を返す。
+  //   住吉区は mission37c の 9 tile 束と二重線にならないよう、道路・鉄道だけを束の範囲外に限定する（公園・河川面は束側のみ）。
+  async function buildVecSet(wardCode, base, level, isStale) {
+    let opt = {}, clipKind = 'none';
+    try {
+      const w = (await WardUI.load()).wards.find((x) => x.wardCode === wardCode);
+      if (w) { opt = { clip: makeWardClip(w.polygons) }; clipKind = 'ward-polygon'; }
+    } catch (e) { /* 切らない */ }
+    let ids = level ? LC45I.layersFor(level) : Object.keys(WARD_VEC_FILES);
+    if (wardCode === BASE_WARD) {
+      ids = ids.filter((i) => i === 'roads' || i === 'railways');
+      let box = null; try { box = ((await fetchLayerJson('manifest.json')).bboxLocal) || null; } catch (e) { /* 束が無ければ除外しない */ }
+      if (box) { const c0 = opt.clip; opt.clip = (pts) => (c0 ? c0(pts) : [pts]).flatMap((r) => LC45I.clipOutBox(r, box)); }
+      stats.vec45i.sumiyoshiBundleExcluded = !!box;
+    }
+    const files = {}, layers = [];
+    const release = () => { for (const f of Object.keys(files)) jsonCache.delete(f); };
+    for (const id of ids) {
+      const layer = WARD_VEC_FILES[id](base, opt, level);
+      files[base + id + '.json'] = 1;
+      try {
+        const r = await layer.mount();
+        if (isStale()) { layer.destroy(); for (const l of layers) l.layer.destroy(); release(); return null; }
+        const rec = LayerRegistry.get(id);
+        layer.applyVisible(rec ? rec.visible : true);
+        layers.push({ id, layer, count: r.count });
+      } catch (e) {
+        layer.destroy();
+        if (!/HTTP 404/.test(String(e && e.message))) fail('vec ' + id, e);   // 元データに無いレイヤーは 404 = 空（エラー扱いにしない）
+      }
+    }
+    return { layers, release, clipKind };
+  }
+  async function vecMount(w, level, gen) {
+    const rec = { level, layers: [], release() {} };
+    vecAll.set(w.wardCode, rec);   // pending 中も上限・重複判定に数える
+    const set = await buildVecSet(w.wardCode, 'ext-3dtiles/' + w.wardId + '/layers/', level, () => gen !== bldgGen || !allMode || vecAll.get(w.wardCode) !== rec);
+    if (!set) { if (vecAll.get(w.wardCode) === rec) vecAll.delete(w.wardCode); return; }
+    rec.layers = set.layers; rec.release = set.release;
+    stats.vec45i.mountsTotal++; vecSync(); scene.requestRender();
+  }
+  async function vecTick(c, height, gen) {
+    if (!vecWards.size || q.get('vec') === '0') return;
+    if (vecBusy) { vecDirty = true; return; }
+    vecBusy = true;
+    try {
+      const cand = (await WardUI.load()).wards.filter((w) => vecWards.has(w.wardId));
+      const cur = {}; for (const [k, r] of vecAll) cur[k] = r.level;
+      const p = LC45I.plan({ x: c.x, z: c.z, height }, cand, cur);
+      stats.vec45i.ticks++; stats.vec45i.lastPlan = p.want;
+      for (const code of p.drop.concat(p.relevel)) vecDrop(code);
+      for (const code of p.mount.concat(p.relevel)) {
+        if (!allMode || gen !== bldgGen) break;
+        await vecMount(cand.find((x) => x.wardCode === code), p.want[code], gen);
+      }
+    } catch (e) { stats.vec45i.lastError = String(e && e.message || e); fail('vecTick', e); }
+    finally { vecBusy = false; if (vecDirty && allMode) { vecDirty = false; scheduleAll(); } }
   }
   async function mountWardVec(metas, gen) {
     const m = metas.find((x) => x.external);
@@ -931,26 +1015,12 @@
     } catch (e) { return; }
     if (gen !== bldgGen) return;
     stats.wardVec = { ward: wc, state: 'loading', layers: {} };
-    const made = [];
-    let opt = {};
-    try {   // 40M: 区境界の外へはみ出す線を切る。区ポリゴンが得られなければ従来どおり（切らない）
-      const wd = await WardUI.load();
-      const w = wd.wards.find((x) => x.wardCode === wc);
-      if (w) { opt = { clip: makeWardClip(w.polygons) }; stats.wardVec.clip = 'ward-polygon'; }
-    } catch (e) { stats.wardVec.clip = 'none'; }
-    if (gen !== bldgGen) return;
-    for (const id of Object.keys(WARD_VEC_FILES)) {
-      const layer = WARD_VEC_FILES[id](base, opt);
-      try {
-        const r = await layer.mount();
-        if (gen !== bldgGen) { layer.destroy(); for (const w of made) w.layer.destroy(); return; }   // 古い要求: 作った分を破棄
-        made.push({ id, layer, count: r.count });
-        const rec = LayerRegistry.get(id);
-        layer.applyVisible(rec ? rec.visible : true);
-        stats.wardVec.layers[id] = r.count;
-      } catch (e) { stats.wardVec.layers[id] = 'error'; fail('wardvec ' + id, e); layer.destroy(); }
-    }
-    wardVec = made; stats.wardVec.state = 'ready'; scene.requestRender();
+    // 40M/45I: 区ポリゴンで切る・住吉区は束との二重線を避ける、は buildVecSet に集約（1 区モードは level=null＝全レイヤー・全 tier）
+    const set = await buildVecSet(wc, base, null, () => gen !== bldgGen);
+    if (!set) return;   // 古い要求: 作った分は破棄済み
+    stats.wardVec.clip = set.clipKind;
+    for (const l of set.layers) stats.wardVec.layers[l.id] = l.count;
+    wardVec = set.layers; wardVecRelease = set.release; stats.wardVec.state = 'ready'; scene.requestRender();
   }
   function unmountBuildings() {
     unmountWardVec();
@@ -1076,6 +1146,7 @@
       const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
       const pos = cartToLocal(cam.positionWC);
       const c = ctr ? cartToLocal(ctr) : pos;
+      vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
       const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
       const cand = wd.wards.filter((w) => extCodes.has(w.wardCode));
       const mounted = {}; for (const [k, r] of allSets) mounted[k] = r.level;
@@ -2626,6 +2697,16 @@
         idx.push({ name: i.name, key: norm(i.name), kind: KIND_JA[i.kind] || i.kind, x: i.x, z: i.z, rank: i.importance === 'major' ? 0 : 1 });
       }
     } catch (e) { partial = 'ラベル'; fail('search:labels', e); }
+    // 45I: 道路名・鉄道名（OSM の name。--layers-root を配信しているときだけ）。区ごとの labels.json（小さい）を並列取得。無い区は黙って飛ばす。
+    if (vecWards.size) {
+      const seen = new Set();
+      await Promise.all([...vecWards].map((wid) => fetch('ext-3dtiles/' + wid + '/layers/labels.json').then((r) => (r.ok ? r.json() : null)).then((j) => {
+        for (const i of (j && j.items) || []) {
+          const k = i.kind + '|' + wid + '|' + i.name; if (seen.has(k) || !i.name) continue; seen.add(k);
+          idx.push({ name: i.name, key: norm(i.name), kind: i.kind === 'rail' ? '鉄道' : '道路', x: i.x, z: i.z, rank: 3 });
+        }
+      }).catch(() => {})));
+    }
     try {
       for (const f of await allFacilities()) {
         if (!f.name) continue;

@@ -79,8 +79,8 @@ function plan(opts) {
 }
 
 // 45F: verified=true only when plan() recomputed a complete, non-synthetic 45D proof (24/24, source == converted). The viewer uses it for the full/partial label.
-function indexJson(servable, synthetic, lod0) {
-  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', verified: synthetic === false, lod0Wards: lod0 ? lod0.wards.slice() : [], wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
+function indexJson(servable, synthetic, lod0, layers) {
+  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', verified: synthetic === false, lod0Wards: lod0 ? lod0.wards.slice() : [], layersWards: layers ? layers.wards.map((w) => ({ ward: w })) : [], wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
 }
 // <ward>/<rel> inside a servable ward dir; whitelist + regular-file-only + realpath stays inside
 function resolveExt(servable, rest) {
@@ -117,8 +117,32 @@ function resolveLod0(lod0, rest) {
   try { const st = fs.lstatSync(file); if (!st.isFile() || st.isSymbolicLink()) return null; if (!fs.realpathSync(file).startsWith(fs.realpathSync(lod0.dir) + path.sep)) return null; } catch (e) { return null; }
   return file;
 }
-function makeServer(servable, getPort, synthetic, lod0) {
-  const idx = Buffer.from(indexJson(servable, synthetic, lod0));
+// 45I: 道路・河川・公園・鉄道・名称の区別レイヤー（tools/mission45i-build-layers-24.cjs の出力）。45D ルートとは別の private ルート。
+//   マーカー必須・45D ルート/OneDrive/リポジトリ配下は拒否。<区>/layers/ 直下の既知 6 ファイルだけを配信（読み取り専用・リンク不可）。
+const LAYERS_MARKER = '.livecity-45i-layers.json';
+const LAYER_FILES = /^(roads|waterways|parks|railways|labels|layers-report)\.json$/;
+function layersPlan(dir) {
+  if (!dir) return null;
+  const d = path.resolve(dir);
+  if (underSync(d)) throw err('--layers-root is inside a OneDrive sync root; refusing', 4);
+  if ((d + path.sep).toLowerCase().startsWith(ROOT.toLowerCase() + path.sep)) throw err('--layers-root must be outside the repository; refusing', 4);
+  const st = lst(d);
+  if (!st || !st.isDirectory() || st.isSymbolicLink()) throw err('--layers-root missing or not a real directory', 4);
+  if (lst(path.join(d, '.livecity-45d-root.json'))) throw err('--layers-root is a 45D root; layers must live in a separate folder', 4);
+  let m; try { m = JSON.parse(fs.readFileSync(path.join(d, LAYERS_MARKER), 'utf8')); } catch (e) { throw err('--layers-root has no 45I marker; not served', 3); }
+  if (m.schema !== 'livecity.mission45i.layers/1') throw err('--layers-root marker mismatch; not served', 3);
+  const wards = fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory() && /^[a-z0-9-]+$/.test(e.name) && lst(path.join(d, e.name, 'layers', 'layers-report.json'))).map((e) => e.name).sort();
+  return { dir: d, wards };
+}
+function resolveLayers(layers, rest) {
+  const mm = /^([a-z0-9-]+)\/layers\/([A-Za-z-]+\.json)$/.exec(rest);
+  if (!layers || !mm || !layers.wards.includes(mm[1]) || !LAYER_FILES.test(mm[2])) return null;
+  const file = path.join(layers.dir, mm[1], 'layers', mm[2]);
+  try { const st = fs.lstatSync(file); if (!st.isFile() || st.isSymbolicLink()) return null; if (!fs.realpathSync(file).startsWith(fs.realpathSync(layers.dir) + path.sep)) return null; } catch (e) { return null; }
+  return file;
+}
+function makeServer(servable, getPort, synthetic, lod0, layers) {
+  const idx = Buffer.from(indexJson(servable, synthetic, lod0, layers));
   return http.createServer((req, res) => {
     const port = getPort();
     const deny = (c, m) => { res.writeHead(c, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(m); };
@@ -130,7 +154,7 @@ function makeServer(servable, getPort, synthetic, lod0) {
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': idx.length, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(req.method === 'HEAD' ? undefined : idx);
     }
-    const file = u.startsWith(PREFIX + '_lod0/') ? resolveLod0(lod0, u.slice((PREFIX + '_lod0/').length)) : u.startsWith(PREFIX) ? resolveExt(servable, u.slice(PREFIX.length)) : P.resolveStatic(u === '/' ? PAGE : u);
+    const file = u.startsWith(PREFIX + '_lod0/') ? resolveLod0(lod0, u.slice((PREFIX + '_lod0/').length)) : u.startsWith(PREFIX) ? (/^[^/]+\/layers\//.test(u.slice(PREFIX.length)) ? resolveLayers(layers, u.slice(PREFIX.length)) : resolveExt(servable, u.slice(PREFIX.length))) : P.resolveStatic(u === '/' ? PAGE : u);
     if (!file) return deny(404, 'not found');
     fs.lstat(file, (e, st) => {
       if (e || !st.isFile() || st.isSymbolicLink()) return deny(404, 'not found');
@@ -143,7 +167,7 @@ function makeServer(servable, getPort, synthetic, lod0) {
 async function serve(opts) {
   const p = plan(opts);
   let port = Number.isInteger(opts.port) ? opts.port : 8137;
-  const server = makeServer(p.servable, () => port, p.synthetic, lod0Plan(opts.lod0));
+  const server = makeServer(p.servable, () => port, p.synthetic, lod0Plan(opts.lod0), layersPlan(opts.layersRoot));
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', () => { port = server.address().port; resolve({ server, port, plan: p }); });
@@ -157,7 +181,7 @@ function summary(p) {
 function main() {
   const a = process.argv.slice(2);
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
-  const opts = { src: opt('src'), outRoot: opt('out-root'), port: opt('port') ? parseInt(opt('port'), 10) : undefined, lod0: opt('lod0') };
+  const opts = { src: opt('src'), outRoot: opt('out-root'), port: opt('port') ? parseInt(opt('port'), 10) : undefined, lod0: opt('lod0'), layersRoot: opt('layers-root') };
   const fail = (e) => { console.error(Number.isInteger(e.code) ? e.message : 'error: operation failed (details suppressed)'); process.exit(Number.isInteger(e.code) ? e.code : 1); };
   try {
     if (!a.includes('--serve')) { console.log(JSON.stringify(Object.assign({ mode: 'plan', serving: false }, summary(plan(opts))), null, 1)); process.exit(0); }
@@ -169,5 +193,5 @@ function main() {
     }, fail);
   } catch (e) { fail(e); }
 }
-module.exports = { plan, serve, makeServer, resolveExt, lod0Plan, resolveLod0, indexJson, underSync, SCHEMA, PREFIX };
+module.exports = { plan, serve, makeServer, resolveExt, lod0Plan, resolveLod0, layersPlan, resolveLayers, LAYERS_MARKER, indexJson, underSync, SCHEMA, PREFIX };
 if (require.main === module) main();

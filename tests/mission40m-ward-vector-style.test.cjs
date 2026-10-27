@@ -24,7 +24,7 @@ test('区単位の道路スタイルは階層別に細く、細街路は距離�
   const old = extract('roadStyle');
   assert.match(old, /width: 7\.5/);
   assert.match(old, /width: 3\.0/);
-  assert.match(page, /roads: \(b, o\) => makeLineLayer\('roads\.json', roadStyleWard/);
+  assert.match(page, /roads: \(b, o, lv\) => makeLineLayer\('roads\.json', lv \? \(f\) => \(LC45I\.tierAllows\(lv, f\.tier\) \? roadStyleWard\(f\) : null\) : roadStyleWard/);
   assert.match(page, /makeLineLayer\('roads\.json', roadStyle\)\)\)/);   // 住吉束はそのまま
 });
 
@@ -43,7 +43,7 @@ test('makeWardClip: 区内の線は保持、完全に外の線は捨て、境界
 
 test('mountWardVec は区ポリゴンでクリップし、取得不能なら従来動作。Google 参照なし', () => {
   assert.match(page, /makeWardClip\(w\.polygons\)/);
-  assert.match(page, /stats\.wardVec\.clip = 'none'/);
+  assert.match(page, /clipKind = 'none'/);
   assert.match(page, /distanceDisplayCondition: ddc/);
   assert.doesNotMatch(extract('makeWardClip') + extract('roadStyleWard'), /google/i);
 });
