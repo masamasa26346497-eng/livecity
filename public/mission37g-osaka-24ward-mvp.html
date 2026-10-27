@@ -453,6 +453,7 @@
 <script src="mission45f-streaming.js"></script>
 <script src="mission45g-perf.js"></script>
 <script src="mission45i-vec.js"></script>
+<script src="mission45k-viewcull.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -731,10 +732,11 @@
     return matCache.get(key);
   }
   function makeLineLayer(file, styleOf, base, opt) {
-    let coll = null;
+    let coll = null, cullRec = null;
     return {
       async mount() {
         const data = await fetchLayerJson(file, base);
+        if (opt && opt.viewCull && root45kOn()) return mountCulled(data);
         coll = scene.primitives.add(new Cesium.PolylineCollection());
         let n = 0, seen = 0, lastY = performance.now();
         const V = stats.vec45i, t0 = performance.now();
@@ -770,8 +772,58 @@
         return { count: n };
       },
       applyVisible(on) { if (coll) coll.show = on; },
-      destroy() { if (coll) { try { scene.primitives.remove(coll); } catch (e) { /* noop */ } coll = null; } },
+      destroy() { if (cullRec) { cullLayers.delete(cullRec); try { cullRec.res.clear(); } catch (e) { /* noop */ } cullRec = null; } if (coll) { try { scene.primitives.remove(coll); } catch (e) { /* noop */ } coll = null; } },
     };
+    // 45K: 視野付近のセルだけを PolylineCollection に載せる。索引（線分→400m セル）は mount 時に 1 回だけ作り、
+    //   Cartesian3 生成・区 clip・Polyline 作成は、そのセルが視野に入ったときだけ行う。
+    async function mountCulled(data) {
+      coll = scene.primitives.add(new Cesium.PolylineCollection());
+      const K = stats.vec45k, t0 = performance.now();
+      const idx = LC45K.buildIndex(data.features || [], styleOf, 400);
+      const prebuilt = data.clipped === 'ward-polygon';
+      const build = (key, cell) => {
+        const made = [];
+        for (const run of cell.runs) {
+          const st = run.st;
+          let runs = opt.wardClip && !prebuilt ? opt.wardClip(run.pts) : [run.pts];
+          if (opt.clip) runs = runs.flatMap((r) => opt.clip(r));
+          const ddc = st.maxDist ? new Cesium.DistanceDisplayCondition(0, st.maxDist) : undefined;
+          for (const r of runs) {
+            if (r.length < 2) continue;
+            const positions = r.map((pt) => toCart(pt[0], pt[1], st.height));
+            if (st.casing) made.push(coll.add({ positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing), distanceDisplayCondition: ddc, id: { layer: file, casing: true } }));
+            made.push(coll.add({ positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: run.f.id, name: run.f.name || null } }));
+            K.polylinesBuilt += 1; K.verticesBuilt += r.length;
+          }
+        }
+        return made;
+      };
+      const destroyH = (made) => { for (const pl of made) { try { coll.remove(pl); } catch (e) { /* noop */ } } };
+      const res = LC45K.makeResidency(idx, build, destroyH, {});
+      const rec = { res, idx, file, sync: (rect, canBuild) => (coll ? res.sync(rect, canBuild) : null) };
+      cullRec = rec; cullLayers.add(rec);
+      K.indexedSegments += idx.stats.segments; K.indexedFeatures += idx.stats.features;
+      K.indexMs = Math.round((K.indexMs + performance.now() - t0) * 10) / 10;
+      if (lastView) rec.sync(LC45K.viewRect(lastView.x, lastView.z, lastView.h), !isMoving());
+      return { count: idx.stats.features };
+    }
+  }
+  const cullLayers = new Set();
+  let lastView = null, cullRetryT = 0;
+  const root45kOn = () => typeof LC45K !== 'undefined' && q.get('vcull') !== '0';
+  // 45K: カメラ足元の矩形（max(1200m, 高度×1.8)×余白1.5）に触れるセルだけを GPU へ載せ、hysteresis 1.5 倍の外へ出たセルを外す。
+  function vecViewSync(c, height) {
+    lastView = { x: c.x, z: c.z, h: height };
+    if (!cullLayers.size) return;
+    const rect = LC45K.viewRect(c.x, c.z, height), moving = isMoving(), K = stats.vec45k;
+    const t = performance.now();
+    let pending = 0;
+    for (const rec of cullLayers) { const r = rec.sync(rect, !moving); if (r) pending += r.pending; }
+    const ms = performance.now() - t;
+    K.syncs++; K.syncMsTotal = Math.round((K.syncMsTotal + ms) * 10) / 10; K.syncMsMax = Math.max(K.syncMsMax, Math.round(ms * 10) / 10);
+    K.pendingCells = pending; K.lastRectRadius = Math.round(rect.r);
+    if (pending || moving) { clearTimeout(cullRetryT); cullRetryT = setTimeout(() => { if (allMode) scheduleAll(); }, moving ? 450 : 120); }   // 予算超過/移動中に見送った分は止まってから段階的に
+    scene.requestRender();
   }
 
   // 40G: 道路・河川の線スタイル（住吉区の束と、区単位の ward layers で共有）
@@ -936,6 +988,7 @@
   var vecAll = new Map();   // wardCode -> { level, layers:[{id,layer}], release }
   var vecWards = new Set(); // レイヤーを配信できる wardId（index.json の layersWards）
   let vecBusy = false, vecDirty = false;
+  stats.vec45k = { enabled: true, indexedSegments: 0, indexedFeatures: 0, indexMs: 0, polylinesBuilt: 0, verticesBuilt: 0, syncs: 0, syncMsTotal: 0, syncMsMax: 0, pendingCells: 0, lastRectRadius: 0 };
   stats.vec45i = { clipMs: 0, convertMs: 0, polylines: 0, vertices: 0, yields: 0, layerFetches: 0, layerFetchMs: 0, available: 0, mounted: {}, ticks: 0, mountsTotal: 0, dropsTotal: 0, lastPlan: null, lastError: null, sumiyoshiBundleExcluded: null };
   function vecSync() {
     stats.vec45i.available = vecWards.size;
@@ -982,6 +1035,7 @@
       if (box) opt.clip = (pts) => LC45I.clipOutBox(pts, box);
       stats.vec45i.sumiyoshiBundleExcluded = !!box;
     }
+    opt.viewCull = true;   // 45K: 視野セルのみ GPU へ（?vcull=0 で従来の全 feature 一括）
     return { opt, clipKind, onlyRR };
   }
   // keys を順に構築して out に積む。古い要求になったら false（呼び出し側が out を破棄する）
@@ -1227,6 +1281,7 @@
       const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
       const pos = cartToLocal(cam.positionWC);
       const c = ctr ? cartToLocal(ctr) : pos;
+      vecViewSync(c, pos.h);   // 45K: 視野セルの GPU 常駐を更新
       vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
       const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
       const cand = wd.wards.filter((w) => extCodes.has(w.wardCode));
@@ -1436,6 +1491,15 @@
       mountedWards: lv.length, detailWards: lv.filter((v) => v === 'detail').length, coarseWards: lv.filter((v) => v === 'coarse').length,
       mounts: w.mountsTotal | 0, drops: w.dropsTotal | 0, culled: w.culledTotal | 0, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null }, perf);
   }
+  // 45K: 数値のみ（URL・パス・ID・位置は含めない）。?vcull=0 と既定を同じ視点で比べるための値。
+  window.__mission45k = { snapshot() {
+    let polys = 0, verts = 0, cells = 0, indexed = 0;
+    for (const r of cullLayers) { cells += r.res.size(); verts += r.res.stats.residentVertices; indexed += r.idx.cells.size; }
+    const K = stats.vec45k, cl = scene.frameState && scene.frameState.commandList;
+    return { vcull: root45kOn(), indexedCells: indexed, residentCells: cells, residentVertices: verts, polylinesBuilt: K.polylinesBuilt, verticesBuilt: K.verticesBuilt,
+      indexedSegments: K.indexedSegments, indexMs: K.indexMs, syncs: K.syncs, syncMsAvg: K.syncs ? Math.round((K.syncMsTotal / K.syncs) * 100) / 100 : 0, syncMsMax: K.syncMsMax, pendingCells: K.pendingCells,
+      primitives: scene.primitives.length, commandList: cl ? cl.length : null, vec45i: { polylines: stats.vec45i.polylines, vertices: stats.vec45i.vertices, convertMs: stats.vec45i.convertMs, clipMs: stats.vec45i.clipMs }, frames: perfSnapshot().frames };
+  } };
   window.__mission45g = { snapshot: perfSnapshot, resetFrames: () => { frameLog.length = 0; perf.renders = 0; } };
   stats.perfSnapshot = perfSnapshot;
   // 遠景 LOD0: tools/mission45g-build-lod0.cjs の出力（localhost の index.json が lod0Wards を返したときだけ）。
