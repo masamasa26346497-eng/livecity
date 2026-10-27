@@ -1055,6 +1055,7 @@
       if (!stale) stats.allMode.lastError = 'mount failed: ' + code;
       return;
     }
+    ok.forEach((t) => { try { t.allTilesLoaded.addEventListener(() => scene.requestRender()); } catch (er) { /* noop */ } });   // 45H: RR 下でも読み込み完了時に再描画
     metas.forEach((m, i) => { const e = { id: m.id, base: m.base, tileset: ok[i], source: m.source, report: m.report, level: rec.level }; ok[i].maximumScreenSpaceError = lvlSse(rec.level); extraSets.push(e); rec.entries.push(e); });
     stats.allMode.mountsTotal++; stats.extraMountedTotal = (stats.extraMountedTotal | 0) + 1;
   }
@@ -1088,7 +1089,16 @@
       for (const code of p.drop) allDrop(code);
       for (const [code, lvl] of Object.entries(p.want)) { if (allSets.has(code)) allSetLevel(code, lvl); }
       const adds = Object.entries(p.want).filter(([code]) => !allSets.has(code));
-      await Promise.all(adds.map(([code, lvl]) => allMount(code, lvl, gen)));
+      // 45H: 詳細区（近い順）を先に、以降も最大 2 並行で段階 mount。視点が動いた/モード解除なら残りは再計画に任せ、不要な DL / GLB parse を避ける。
+      const dist = (code) => { const w = cand.find((x) => x.wardCode === code); return w ? Math.hypot((w.bbox.minX + w.bbox.maxX) / 2 - c.x, (w.bbox.minZ + w.bbox.maxZ) / 2 - c.z) : 0; };
+      adds.sort((a, b) => ((a[1] === 'detail' ? 0 : 1) - (b[1] === 'detail' ? 0 : 1)) || dist(a[0]) - dist(b[0]));
+      const BATCH = 2;
+      for (let i = 0; i < adds.length; i += BATCH) {
+        if (!allMode || gen !== bldgGen) break;
+        if (i > 0 && allDirty) break;
+        await Promise.all(adds.slice(i, i + BATCH).map(([code, lvl]) => allMount(code, lvl, gen)));
+        allSync(); scene.requestRender();
+      }
       allSync(); scene.requestRender();
     } catch (e) { stats.allMode.lastError = String(e && e.message || e); fail('allTick', e); }
     finally { allBusy = false; if (allDirty && allMode) { allDirty = false; allTick(); } }
@@ -1204,25 +1214,33 @@
   //   すべて localhost の ?ext45=1 のときだけ既定 ON（?rr=0 ?res=fixed ?cache=0 ?cull=0 ?lod0=0 で個別に無効化＝A/B 比較用）。公開ページの挙動は変えない。
   //   計測値は件数・バイト・ms のみ（URL・パス・建物 ID は入れない）。実 PC の数値はここでは取得していない。
   const perf = { requestRenderMode: RR, ext45: EXT45, renders: 0, devicePixelRatio: window.devicePixelRatio || 1, resolutionScale: 1, resolutionChanges: 0,
-    preset: q.get('res') === 'fixed' ? 'quality' : 'auto', cachePerTilesetMB: null, tilesets: 0, tilesetMemoryMB: null, settleMs: null,
+    preset: 'balanced', cachePerTilesetMB: null, tilesets: 0, tilesetMemoryMB: null, settleMs: null,
     net: { requests: 0, bytes: 0, glb: 0, json: 0, other: 0 }, lod0: { wards: 0, shown: 0 } };
   stats.perf = perf;
   const frameLog = [];   // 直近の描画フレーム間隔(ms)。requestRenderMode では「描画されたフレーム」だけが入る
   let lastCamMove = 0, moveStartedAt = 0, settleArmed = false, lastRenderAt = performance.now();
-  const lod0Sets = new Map();   // wardCode → Cesium3DTileset（遠景用の概略形状。実棟ではない）
+  const lod0Sets = new Map();   // wardCode → Cesium3DTileset（遠景用の概略形状。実棟ではない）。読み込み中は null
+  const lod0Pending = new Set();   // 45H: fromUrl 実行中の区（並行 reload 防止）
+  const lod0Live = () => [...lod0Sets.values()].filter((t) => t && !t.isDestroyed());   // 45H: null プレースホルダを除く
   const isMoving = () => performance.now() - lastCamMove < 400;
   const allTilesetsNow = () => [tileset, ...extraSets.map((e) => e.tileset)].filter((t) => t && !t.isDestroyed());
   let lastBudgetN = -1;
   function applyCacheBudget() {
     if (q.get('cache') === '0') return;
-    const ts = allTilesetsNow().concat([...lod0Sets.values()].filter((t) => !t.isDestroyed()));
+    const ts = allTilesetsNow().concat(lod0Live());
     if (ts.length === lastBudgetN) return;
     lastBudgetN = ts.length;
     const b = LC45G.cacheBudget(ts.length || 1, q.get('cacheMB') ? { cacheTotalMB: +q.get('cacheMB') || 768 } : {});
     for (const t of ts) { if ('cacheBytes' in t) t.cacheBytes = b.cacheBytes; if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
     perf.cachePerTilesetMB = b.perMB;
   }
-  const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || q.get('res') === 'fixed' });
+  // 45H: プリセット。balanced(既定: 下限 0.8) / speed(下限 0.6) / quality(?res=fixed|quality: 常に 1.0)。いずれも静止後 700ms で必ず 1.0 に戻す。
+  const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'fixed' || q.get('res') === 'quality') ? 'quality' : 'balanced';
+  perf.preset = RES_PRESET;
+  const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
+  function applyRes(s) { if (s === null) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
+  let resT = 0;
+  viewer.camera.moveEnd.addEventListener(() => { clearTimeout(resT); resT = setTimeout(() => applyRes(resCtl.tick(performance.now(), false)), LC45G.DEFAULTS.restoreMs + 50); });
   // ext45 の既定は「画質優先」ではなく自動。useBrowserRecommendedResolution=true（Cesium 既定）は DPR を無視した 1.0 倍の解像度で描く。
   //   ?dpr=1 で devicePixelRatio をそのまま使う（高 DPI で鮮明だが重い）。
   if (EXT45 && q.get('dpr') === '1') viewer.useBrowserRecommendedResolution = false;
@@ -1233,19 +1251,19 @@
     const now = performance.now(), dt = now - lastRenderAt; lastRenderAt = now;
     perf.renders++;
     if (dt < 2000) { frameLog.push(dt); if (frameLog.length > 300) frameLog.shift(); }
-    const s = resCtl.frame(dt, isMoving());
-    if (s !== null) { viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
+    applyRes(resCtl.frame(dt, isMoving(), now));
   });
   // 読み込み中は描画を止めない。tileset が全 tile を読み終えるまで 250ms ごとに 1 回描画を要求する（RR のとき）。
   function anyLoading() {
     for (const t of allTilesetsNow()) if (!t.tilesLoaded) return true;
-    for (const t of lod0Sets.values()) if (!t.isDestroyed() && !t.tilesLoaded) return true;
+    for (const t of lod0Live()) if (!t.tilesLoaded) return true;
     return false;
   }
   let hb = 0;
   setInterval(() => {
     if (document.hidden) return;
     applyCacheBudget();
+    applyRes(resCtl.tick(performance.now(), isMoving()));   // 45H: 保険（moveEnd が来なくても静止 700ms 後に最高画質へ）
     const loading = anyLoading();
     if (RR && (loading || (++hb % 8 === 0))) scene.requestRender();   // 読み込み中は 250ms、静止中は 2 秒の保険（POI / ラベルの取りこぼし対策）
     if (!loading && settleArmed && !isMoving()) { perf.settleMs = Math.round(performance.now() - moveStartedAt); settleArmed = false; moveStartedAt = 0; }
@@ -1255,13 +1273,13 @@
   }
   function perfSnapshot() {
     netNow();
-    const ts = allTilesetsNow().concat([...lod0Sets.values()].filter((t) => !t.isDestroyed()));
+    const ts = allTilesetsNow().concat(lod0Live());
     let mem = 0, known = true;
     for (const t of ts) { if (typeof t.totalMemoryUsageInBytes === 'number') mem += t.totalMemoryUsageInBytes; else known = false; }
     perf.tilesets = ts.length; perf.tilesetMemoryMB = known ? +(mem / 1048576).toFixed(1) : null;
     const w = stats.allMode || {};
     const lv = Object.values(w.mounted || {});
-    perf.lod0.wards = lod0Sets.size; perf.lod0.shown = [...lod0Sets.values()].filter((t) => !t.isDestroyed() && t.show).length;
+    perf.lod0.wards = lod0Sets.size; perf.lod0.shown = lod0Live().filter((t) => t.show).length;
     return Object.assign({ at: Math.round(performance.now()), frames: LC45G.summarizeFrames(frameLog), visibleTiles: curTiles, visibleBuildings: curBldg,
       mountedWards: lv.length, detailWards: lv.filter((v) => v === 'detail').length, coarseWards: lv.filter((v) => v === 'coarse').length,
       mounts: w.mountsTotal | 0, drops: w.dropsTotal | 0, culled: w.culledTotal | 0, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null }, perf);
@@ -1275,14 +1293,14 @@
     const show = (code) => !allSets.has(code) && allMode;
     for (const code of lod0Wards) {
       let t = lod0Sets.get(code);
-      if (!t && allMode) {
-        lod0Sets.set(code, null);
+      if (!t && allMode && !lod0Pending.has(code)) {   // 45H: pending 中の二重 fromUrl を防ぐ
+        lod0Pending.add(code); lod0Sets.set(code, null);
         try {
           t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/_lod0/' + code + '/tileset.json', { maximumScreenSpaceError: 16 });
           t._lcLod0 = true;
           t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
           scene.primitives.add(t); lod0Sets.set(code, t);
-        } catch (e) { lod0Sets.delete(code); continue; }
+        } catch (e) { lod0Sets.delete(code); t = null; } finally { lod0Pending.delete(code); }
       }
       if (t && !t.isDestroyed()) t.show = show(code);
     }

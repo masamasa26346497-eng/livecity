@@ -4,7 +4,8 @@
   'use strict';
   const DEFAULTS = {
     // 解像度の自動調整（動作中だけ下げ、止まれば戻す）。minScale 未満には下げない。
-    minScale: 0.6, maxScale: 1.0, step: 0.1,
+    minScale: 0.8, maxScale: 1.0, step: 0.1,   // 45H: 文字の読みやすさ優先で下限 0.8（?res=speed のみ 0.6）
+    restoreMs: 700,      // 45H: 最後の移動からこの壁時計時間が経てば maxScale へ戻す（フレーム数に依存しない）
     downMs: 40,          // 直近 downWindow フレームの平均がこれを超えたら下げる
     upMs: 22,            // 直近 upWindow フレームの平均がこれ未満なら戻す
     downWindow: 20, upWindow: 60,
@@ -26,13 +27,23 @@
    * preset 'quality' / opt.fixed は常に maxScale 固定。moving=false が続けば maxScale へ戻す。 */
   function createResolutionController(opt) {
     const o = Object.assign({}, DEFAULTS, opt || {});
-    let scale = o.maxScale, cool = 0, idle = 0;
+    let scale = o.maxScale, cool = 0, idle = 0, lastMoveMs = -Infinity;
     const buf = [];
     const r2 = (v) => Math.round(v * 100) / 100;
     return {
       get scale() { return scale; },
-      frame(ms, moving) {
+      /* 45H: 壁時計ベースの復元。requestRenderMode では静止後に描画フレームがほとんど来ないため、frame() の 20 フレーム待ちでは戻らない。
+       * タイマー / camera.moveEnd から呼ぶ。戻すべきなら maxScale を返し、不要なら null。 */
+      tick(nowMs, moving) {
         if (o.fixed) return null;
+        if (moving) { lastMoveMs = nowMs; return null; }
+        if (scale >= o.maxScale || nowMs - lastMoveMs < o.restoreMs) return null;
+        scale = o.maxScale; cool = o.cooldownFrames; buf.length = 0; idle = 0;
+        return scale;
+      },
+      frame(ms, moving, nowMs) {
+        if (o.fixed) return null;
+        if (moving && typeof nowMs === 'number') lastMoveMs = nowMs;
         if (cool > 0) cool--;
         buf.push(ms); if (buf.length > o.upWindow) buf.shift();
         const avg = (n) => { const a = buf.slice(-n); return a.reduce((s, v) => s + v, 0) / (a.length || 1); };
