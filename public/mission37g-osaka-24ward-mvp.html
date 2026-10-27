@@ -345,6 +345,11 @@
       <select class="lc-select" id="sel-bldg-ward" aria-label="3D建物を表示する区">
         <option value="">建物を表示しない</option>
       </select></div>
+    <div class="lc-row"><span class="k">3D表示モード</span>
+      <select class="lc-select" id="sel-bldg-mode" aria-label="3D建物の表示モード">
+        <option value="single" selected>選択した1区のみ</option>
+        <option value="all" disabled>全域3D（視点に応じて遅延ロード）</option>
+      </select></div>
     <div class="lc-note" id="bldg-ward-note" role="status">3D建物は非表示（区を選ぶと表示）</div>
     <div class="lc-row"><span class="k">建物トーン</span>
       <select class="lc-select" id="sel-tone">
@@ -445,6 +450,7 @@
 <script src="mission37f-photo-select.js"></script>
 <script src="mission37k-poi-select.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
+<script src="mission45f-streaming.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -847,9 +853,9 @@
       if (!r.ok) return;
       const j = await r.json();
       for (const w of (j.wards || [])) {
-        if (w && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'ext-' + w.ward)) EXTRA_SET_DEFS.push({ id: 'ext-' + w.ward, base: 'ext-3dtiles/' + w.ward + '/', external: true });
+        if (w && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'ext-' + w.ward)) EXTRA_SET_DEFS.push({ id: 'ext-' + w.ward, base: 'ext-3dtiles/' + w.ward + '/', external: true, verified45: j.verified === true });
       }
-      stats.ext45 = { wards: (j.wards || []).length };
+      stats.ext45 = { wards: (j.wards || []).length, verified: j.verified === true };
     } catch (e) { /* index が無い/壊れている: 追加しない */ }
   }
   // 40J: 公開承認済みの区の変換 tileset（同一オリジン）。published.json に approved:true で載った区だけ登録する。
@@ -1002,8 +1008,117 @@
       return false;
     }
   }
+  // ── 45F: 全域3Dモード ──────────────────────────────────────────────
+  //   ローカル変換済み（external）の区だけを対象に、視線中心・高度から LC45F.plan が選んだ区を遅延 mount / 破棄する。
+  //   詳細（ユーザー指定 SSE）は最大 2 区、粗い LOD（SSE 128 = group の簡略 LOD だけ）は最大 8 区。残りの区は mount しない（GPU 常駐しない）。
+  //   遠景の粗い LOD は「分布の把握用」であり、全 24 区の詳細描画ではない。HUD / stats に mount 中の区と段階を実数で出す。
+  let allMode = false, allBusy = false, allDirty = false, allT = 0;
+  const allSets = new Map();   // wardCode → { level: 'detail'|'coarse', entries: [extraSets の要素] }
+  stats.allMode = { on: false, mounted: {}, mountsTotal: 0, dropsTotal: 0, ticks: 0, buildings: 0, lastError: null };
+  const cartToLocal = (c) => { const g = Cesium.Cartographic.fromCartesian(c); return { x: (Cesium.Math.toDegrees(g.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd, z: -(Cesium.Math.toDegrees(g.latitude) - PROJ.clat) * PROJ.mpd, h: g.height }; };
+  const lvlSse = (lvl) => (lvl === 'coarse' ? LC45F.DEFAULTS.coarseSse : (stats.sse || SSE0));
+  function allSync() {
+    const m = {}; let n = 0;
+    for (const [c, r] of allSets) { m[c] = r.level; for (const e of r.entries) n += e.report.totals.buildings | 0; }
+    stats.allMode.mounted = m; stats.allMode.buildings = n;
+    stats.extraSets = extraSets.map((e) => ({ id: e.id, wardCode: e.source.wardCode, tiles: e.report.selectedTiles, buildings: e.report.totals.buildings, level: e.level || null }));
+    $('hs-bldg').textContent = fmt(n);
+    const note = $('bldg-ward-note');
+    if (note && allMode) note.textContent = '全域3D: 詳細 ' + Object.values(m).filter((v) => v === 'detail').length + ' 区 / 粗いLOD ' + Object.values(m).filter((v) => v === 'coarse').length + ' 区を表示中（視点に近い区のみ。全24区の詳細描画ではありません）';
+  }
+  function allDrop(code) {
+    const r = allSets.get(code); if (!r) return;
+    clearBuildingPick();
+    for (const e of r.entries) {
+      const i = extraSets.indexOf(e); if (i >= 0) extraSets.splice(i, 1);
+      try { scene.primitives.remove(e.tileset); } catch (er) { /* noop */ }
+      stats.extraUnmountedTotal = (stats.extraUnmountedTotal | 0) + 1;
+    }
+    allSets.delete(code); stats.allMode.dropsTotal++;
+  }
+  async function allMount(code, level, gen) {
+    const metas = extraMeta.filter((m) => m.external && m.source.wardCode === code);
+    if (!metas.length) return;
+    const rec = { level, entries: [] };
+    allSets.set(code, rec);   // 先に登録（pending 中も上限・重複判定に数える）
+    const settled = await Promise.allSettled(metas.map((m) => mountTileset(m.base, gen)));
+    const ok = settled.map((s) => (s.status === 'fulfilled' ? s.value : null));
+    const stale = gen !== bldgGen || !allMode || allSets.get(code) !== rec;   // モード解除・別 plan で落とされた: 作った分を破棄
+    if (stale || ok.some((t) => !t)) {
+      for (const t of ok) if (t && !t.isDestroyed()) { try { scene.primitives.remove(t); } catch (e) { /* noop */ } }
+      if (allSets.get(code) === rec) allSets.delete(code);
+      if (!stale) stats.allMode.lastError = 'mount failed: ' + code;
+      return;
+    }
+    metas.forEach((m, i) => { const e = { id: m.id, base: m.base, tileset: ok[i], source: m.source, report: m.report, level: rec.level }; ok[i].maximumScreenSpaceError = lvlSse(rec.level); extraSets.push(e); rec.entries.push(e); });
+    stats.allMode.mountsTotal++; stats.extraMountedTotal = (stats.extraMountedTotal | 0) + 1;
+  }
+  function allSetLevel(code, level) {
+    const r = allSets.get(code); if (!r || r.level === level) return;
+    r.level = level;
+    for (const e of r.entries) { e.level = level; e.tileset.maximumScreenSpaceError = lvlSse(level); }
+  }
+  async function allTick() {
+    if (!allMode) return;
+    if (allBusy) { allDirty = true; return; }   // 実行中に来た要求は 1 回にまとめて再実行（レース・多重 mount を防ぐ）
+    allBusy = true; const gen = bldgGen;
+    try {
+      try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
+      const wd = await WardUI.load();
+      if (!allMode || gen !== bldgGen) return;
+      const cam = viewer.camera;
+      const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      const pos = cartToLocal(cam.positionWC);
+      const c = ctr ? cartToLocal(ctr) : pos;
+      const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
+      const cand = wd.wards.filter((w) => extCodes.has(w.wardCode));
+      const mounted = {}; for (const [k, r] of allSets) mounted[k] = r.level;
+      const p = LC45F.plan({ x: c.x, z: c.z, height: pos.h }, cand, mounted);
+      stats.allMode.ticks++; stats.allMode.lastPlan = p.want;
+      for (const code of p.drop) allDrop(code);
+      for (const [code, lvl] of Object.entries(p.want)) { if (allSets.has(code)) allSetLevel(code, lvl); }
+      const adds = Object.entries(p.want).filter(([code]) => !allSets.has(code));
+      await Promise.all(adds.map(([code, lvl]) => allMount(code, lvl, gen)));
+      allSync(); scene.requestRender();
+    } catch (e) { stats.allMode.lastError = String(e && e.message || e); fail('allTick', e); }
+    finally { allBusy = false; if (allDirty && allMode) { allDirty = false; allTick(); } }
+  }
+  function scheduleAll() { if (!allMode) return; clearTimeout(allT); allT = setTimeout(allTick, 200); }
+  async function setAllMode(on) {
+    if (on === allMode) return;
+    ++bldgGen;   // 進行中の mount を全て無効化
+    unmountBuildings(); bldgWard = null; stats.buildingWard = null;
+    allSets.clear(); allMode = on; stats.allMode.on = on; stats.allMode.mounted = {}; stats.allMode.buildings = 0;
+    stats.buildingState = on ? 'ready' : 'none';
+    $('hs-bldg').textContent = '0';
+    const sw = $('sel-bldg-ward'); if (sw) sw.disabled = false;
+    if (on) { try { await ensureExtraMeta(); } catch (e) { /* noop */ } allTick(); } else syncBldgSelect();
+    scene.requestRender();
+  }
+  // 区の全域 fit: N03 区 bbox と tileset 境界球の両方を含む円が、サイドパネルを除いた見える部分に収まる距離まで引く。
+  function viewInsets() {
+    const cw = viewer.canvas.clientWidth; if (innerWidth <= 720) return { left: 0, right: 0 };
+    const o = { left: 0, right: 0 };
+    for (const id of ['lc-left', 'lc-right']) {
+      const e = $(id); if (!e || e.offsetParent === null) continue;
+      const r = e.getBoundingClientRect(); if (r.width < 40) continue;
+      if (r.left + r.width / 2 < cw / 2) o.left = Math.max(o.left, r.right); else o.right = Math.max(o.right, cw - r.left);
+    }
+    return o;
+  }
+  function fitWard(w, sphere) {
+    const sp = sphere ? (() => { const l = cartToLocal(sphere.center); return { x: l.x, z: l.z, r: sphere.radius }; })() : null;
+    const u = LC45F.unionCircle(w.bbox, sp);
+    const fr = viewer.camera.frustum, fov = fr.fovy || fr.fov;
+    const pitch = Cesium.Math.toRadians(-55);
+    const ins = viewInsets();
+    const range = Math.max(2500, LC45F.fitRange(u.r, fov, { w: viewer.canvas.clientWidth, h: viewer.canvas.clientHeight }, ins, pitch));
+    stats.lastFit = { ward: w.wardCode, circle: { x: Math.round(u.x), z: Math.round(u.z), r: Math.round(u.r) }, rangeM: Math.round(range), insets: ins };
+    viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(toCart(u.x, u.z, 0), u.r), { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, pitch, range) });
+  }
   function syncBldgSelect(unavailCode) {
     const sel = $('sel-bldg-ward'); if (!sel) return;
+    if (allMode) { allSync(); return; }
     sel.value = bldgWard || unavailCode || '';
     const note = $('bldg-ward-note');
     if (note) note.textContent = stats.buildingState === 'ready' ? '3D建物を表示中（この区のみ）' : stats.buildingState === 'loading' ? '3D建物を読み込み中…'
@@ -1023,12 +1138,21 @@
           fetch(def.base + 'source.json').then((r) => { if (!r.ok) throw new Error('source.json HTTP ' + r.status); return r.json(); }),
           fetch(def.base + 'build-report.json').then((r) => { if (!r.ok) throw new Error('build-report.json HTTP ' + r.status); return r.json(); }),
         ]);
-        extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external });
+        extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external, verified45: def.verified45 === true });
       } catch (e) { fail('extra-meta ' + def.id, e); }
     }
     if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
     stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
+    // 45F: ローカル変換（external）の区が 1 つでもあるときだけ「全域3D」を選べる。Vercel など公開側では無効のまま。
+    const opt = document.querySelector('#sel-bldg-mode option[value="all"]');
+    if (opt && extraMeta.some((m) => m.external)) opt.disabled = false;
   }
+  $('sel-bldg-mode').onchange = (e) => {
+    const on = e.target.value === 'all';
+    if (on) clearSelection();
+    setAllMode(on);
+    if (on) { const v = cityHome; if (v) { viewer.camera.cancelFlight(); viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(v.center, v.range / 2.2), { duration: 1.2, offset: new Cesium.HeadingPitchRange(0, v.pitch, v.range) }); } }
+  };
   const visTiles = new Set();
   let curTiles = 0, curBldg = 0;
   const CAM_PITCH = Cesium.Math.toRadians(-45);
@@ -1063,7 +1187,8 @@
   }
   $('btn-home').onclick = resetCamera;
   $('sel-sse').value = String(SSE0);
-  $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; for (const x of extraSets) x.tileset.maximumScreenSpaceError = stats.sse; };
+  $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; for (const x of extraSets) x.tileset.maximumScreenSpaceError = x.level === 'coarse' ? LC45F.DEFAULTS.coarseSse : stats.sse; };
+  viewer.camera.moveEnd.addEventListener(() => { if (allMode) scheduleAll(); });   // 45F: 全域3Dは移動終了後 200ms の debounce で区を再計画（定期ポーリングはしない）
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
 
   // ══════════════════════════════════════════════════════════════
@@ -1609,7 +1734,7 @@
   //   COVERAGE は固定値ではなく、実際に読み込む tileset 隣の build-report.json（変換ツールの実測）から算出する。
   //   読めなかった・住吉区以外の区は「未配信」。24/24 の 3D 完成とは決して表示しない。
   const COVERAGE = {};
-  async function loadCoverage(sourceBuildings) {
+  async function loadCoverage(sourceBuildings, wardList) {
     try {
       const r = await fetch(TILES_BASE + 'build-report.json');
       if (!r.ok) return;
@@ -1631,12 +1756,18 @@
       if (!n || !tiles) continue;
       if (!e.external && extWards.has(e.source.wardCode)) continue;
       const a = agg[e.source.wardCode] || (agg[e.source.wardCode] = { tiles: 0, buildings: 0, meshes: 0 });
-      a.tiles += tiles; a.buildings += n; a.meshes += (e.source.sourceMeshes || []).length; if (e.external) a.external = true;
+      a.tiles += tiles; a.buildings += n; a.meshes += (e.source.sourceMeshes || []).length; if (e.external) { a.external = true; a.verified = e.verified45 === true; }
     }
     for (const code of Object.keys(agg)) {
       const a = agg[code];
-      COVERAGE[code] = { state: 'partial', tiles: a.tiles, buildings: a.buildings,
-        text: a.external ? '3D建物: ローカル変換データ（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開）'
+      // 45F: full は「45E が 45D の検証済み証明を再計算して配信」かつ棟数・タイル数が区の元データ以上の場合だけ。それ以外は partial のまま。
+      let st = 'partial';
+      if (a.external && a.verified && wardList) {
+        st = LC45F.coverageState({ verified45: true, report: { totals: { buildings: a.buildings }, selectedTiles: a.tiles } }, wardList.find((x) => x.wardCode === code));
+      }
+      COVERAGE[code] = { state: st, tiles: a.tiles, buildings: a.buildings,
+        text: st === 'full' ? '3D建物: ローカル全域変換済み（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開。ブラウザでの全域視認は未確認）'
+          : a.external ? '3D建物: ローカル変換データ（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開・全域とは未確認）'
           : '3D建物: 一部のみ配信（実PLATEAU ' + a.meshes + 'メッシュ・' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。区全体ではありません）' };
     }
   }
@@ -1659,7 +1790,7 @@
         const v = validate(d);
         stats.wardValidation = v;
         if (!v.ok) throw new Error('区データの検証に失敗: ' + JSON.stringify(v));
-        await loadCoverage((d.wards.find((x) => x.wardCode === '27120') || {}).sourceBuildings || Infinity);
+        await loadCoverage((d.wards.find((x) => x.wardCode === '27120') || {}).sourceBuildings || Infinity, d.wards);
         for (const w of d.wards) {
           const big = w.polygons.reduce((a, p) => (p.outer.length > a.outer.length ? p : a), w.polygons[0]);
           w.centroid = centroidOf(big.outer);
@@ -1672,7 +1803,10 @@
         stats.coverage = { mapWards: d.wards.length, wardsWith3d: d.wards.filter((w) => w.cover.state !== 'none').length,
           tiles3d: Object.values(COVERAGE).reduce((a, c) => a + c.tiles, 0), buildings3d: Object.values(COVERAGE).reduce((a, c) => a + c.buildings, 0), sourceBuildingsTotal: d.sourceBuildingsTotal, sourceTilesTotal: d.sourceTilesTotal };
         const cv = stats.coverage, nw = cv.wardsWith3d;
-        $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。3D建物が見えるのは ' + nw + ' 区（' + d.wards.filter((w) => w.cover.state !== 'none').map((w) => w.wardName).join('・')
+        const nfull = d.wards.filter((w) => w.cover.state === 'full').length;
+        cv.wardsFullLocal = nfull;
+        if (nfull > 0) $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。この PC にはローカル全域変換済みの区が ' + nfull + ' 区あります（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟。未公開。ブラウザでの全域視認は区ごとの確認が必要）。';
+        else $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。3D建物が見えるのは ' + nw + ' 区（' + d.wards.filter((w) => w.cover.state !== 'none').map((w) => w.wardName).join('・')
           + '）の一部だけ（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟）で、残り ' + (24 - nw) + ' 区は未配信です。';
         populateBldgSelect(d);
         return d;
@@ -1684,13 +1818,13 @@
       for (const w of d.wards) {
         const o = document.createElement('option');
         o.value = w.wardCode;
-        o.textContent = w.wardName + (w.cover.state === 'none' ? '（3D未整備）' : '（3D一部）');
+        o.textContent = w.wardName + (w.cover.state === 'none' ? '（3D未整備）' : w.cover.state === 'full' ? '（ローカル全域変換済み）' : '（3D一部）');
         sel.appendChild(o);
       }
       sel.value = bldgWard || '';
       sel.onchange = () => {
         const code = sel.value;
-        if (!code) { setBuildingWard(null); return; }
+        if (!code) { if (allMode) { $('sel-bldg-mode').value = 'single'; setAllMode(false); } setBuildingWard(null); return; }
         const w = d.wards.find((x) => x.wardCode === code);
         if (w) { clearSelection(); select(w, true); }
       };
@@ -1781,11 +1915,14 @@
       selected = w;
       // 44A: 区を選ぶだけで建物が見えるように、3D が実際に mount できたら、建物データのある範囲（tileset の境界球）へ寄せる。
       //   区全体の俯瞰（下の flyToBoundingSphere）では、一部メッシュだけの 3D が小さすぎて「建物がない」ように見えるため。
-      setBuildingWard(w.wardCode).then((ok) => {
+      //   45F: 全域3Dモードでは区の選択で mount を切り替えない（視点に応じたストリーミングが担当）。区全域 fit だけ行う。
+      //   full（ローカル全域変換済み）の区は N03 bbox と tileset 境界球の両方を含めて区全域を fit する（部分メッシュに寄りすぎない）。
+      if (allMode) { /* 下の fit に任せる */ } else setBuildingWard(w.wardCode).then((ok) => {
         if (!ok || !fly || selected !== w || bldgWard !== w.wardCode) return;
         const sets = [tileset, ...extraSets.map((e) => e.tileset)].filter((t) => t && !t.isDestroyed());
         if (!sets.length) return;
         const sphere = sets.length === 1 ? sets[0].boundingSphere : Cesium.BoundingSphere.fromBoundingSpheres(sets.map((t) => t.boundingSphere));
+        if (w.cover.state === 'full') { fitWard(w, sphere); return; }
         viewer.camera.flyToBoundingSphere(sphere, { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), Math.max(600, sphere.radius * 2.2)) });
       });
       stats.selectedWard = { wardCode: w.wardCode, wardName: w.wardName, coverage: w.cover.state };
@@ -1795,12 +1932,13 @@
       $('wc-code').textContent = '区コード ' + w.wardCode;
       $('wc-3d').textContent = w.cover.text;
       $('wc-3d').dataset.state = w.cover.state;
-      $('wc-src').textContent = '元データ（未変換・未配信）: ' + fmt(w.sourceBuildings) + '棟 / ' + fmt(w.sourceTiles) + 'タイル。境界: 国土数値情報 N03（国土交通省）';
+      $('wc-src').textContent = (w.cover.state === 'full' ? '元データ（ローカル変換済み・未公開）: ' : '元データ（未変換・未配信）: ') + fmt(w.sourceBuildings) + '棟 / ' + fmt(w.sourceTiles) + 'タイル。境界: 国土数値情報 N03（国土交通省）';
       $('lc-ward-card').classList.add('on');
       const btn = document.querySelector('.lc-wardbtn[data-code="' + w.wardCode + '"]');
       if (btn) btn.setAttribute('aria-pressed', 'true');
       if (fly) {
-        viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(toCart(w.cx, w.cz, 0), w.radius),
+        if (w.cover.state === 'full' || allMode) fitWard(w, null);   // 45F: パネル幅・キャンバス比を考慮した区全域 fit
+        else viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(toCart(w.cx, w.cz, 0), w.radius),
           { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), Math.max(2500, w.radius * 2.6)) });
       }
       scene.requestRender();
@@ -1810,7 +1948,7 @@
       for (const w of d.wards) {
         const b = el('button', null, { type: 'button', class: 'lc-wardbtn', 'data-code': w.wardCode, 'aria-pressed': 'false', title: w.cover.text });
         b.appendChild(el('span', w.wardName));
-        b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : (w.cover.state === 'full' ? '3D配信済み' : '3D一部'), { class: 'tag ' + w.cover.state }));
+        b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : (w.cover.state === 'full' ? (w.cover.text.indexOf('ローカル') >= 0 ? 'ローカル全域' : '3D配信済み') : '3D一部'), { class: 'tag ' + w.cover.state }));
         b.onclick = () => { clearSelection(); select(w, true); };
         box.appendChild(b);
       }

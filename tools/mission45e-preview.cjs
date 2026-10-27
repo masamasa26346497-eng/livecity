@@ -78,8 +78,9 @@ function plan(opts) {
   return { outRoot: o, proof, servable, synthetic };
 }
 
-function indexJson(servable) {
-  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
+// 45F: verified=true only when plan() recomputed a complete, non-synthetic 45D proof (24/24, source == converted). The viewer uses it for the full/partial label.
+function indexJson(servable, synthetic) {
+  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', verified: synthetic === false, wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
 }
 // <ward>/<rel> inside a servable ward dir; whitelist + regular-file-only + realpath stays inside
 function resolveExt(servable, rest) {
@@ -99,8 +100,8 @@ function resolveExt(servable, rest) {
   } catch (e) { return null; }
   return file;
 }
-function makeServer(servable, getPort) {
-  const idx = Buffer.from(indexJson(servable));
+function makeServer(servable, getPort, synthetic) {
+  const idx = Buffer.from(indexJson(servable, synthetic));
   return http.createServer((req, res) => {
     const port = getPort();
     const deny = (c, m) => { res.writeHead(c, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(m); };
@@ -125,7 +126,7 @@ function makeServer(servable, getPort) {
 async function serve(opts) {
   const p = plan(opts);
   let port = Number.isInteger(opts.port) ? opts.port : 8137;
-  const server = makeServer(p.servable, () => port);
+  const server = makeServer(p.servable, () => port, p.synthetic);
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', () => { port = server.address().port; resolve({ server, port, plan: p }); });
