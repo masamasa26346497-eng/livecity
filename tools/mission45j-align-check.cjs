@@ -13,11 +13,23 @@ const path = require('path');
 const L = require('./mission40g-build-ward-layers.cjs');
 const A = require('./lib/mission45j-align.cjs');
 const ROOT = path.resolve(__dirname, '..');
+const err = (msg, code) => Object.assign(new Error(msg), { code });
+
+// --out-root: 45D 出力ルートを 45E plan() で再検証し（24/24 の証明を原本から再計算）、検証済みの区ディレクトリ
+// （pc23/<ward>-aN、sumiyoshi は入れ子）だけを返す。未検証・偽物・欠落なら例外（パスを含まないメッセージ）。何も書かない。
+function resolveVerifiedWardDir(opts) {
+  const E = require('./mission45e-preview.cjs');
+  const p = E.plan({ src: path.join(opts.src, 'buildings'), outRoot: opts.outRoot, allowSynthetic: opts.allowSynthetic, sumiyoshiRun: opts.sumiyoshiRun });
+  const s = p.servable.find((x) => x.ward === opts.ward);
+  if (!s) throw err('ward is not among the verified wards of the 45D root', 3);
+  if (!fs.existsSync(path.join(s.dir, 'attrs'))) throw err('verified ward dir has no attrs folder', 3);
+  return { dir: s.dir, verified: true, synthetic: p.synthetic, servableWards: p.servable.length };
+}
 
 function main() {
   const a = process.argv.slice(2);
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
-  const src = opt('src'), wardId = opt('ward'), ext = opt('ext');
+  const src = opt('src'), wardId = opt('ward'), ext = opt('ext'), outRoot = opt('out-root');
   if (!src || !wardId) throw new Error('--src and --ward are required');
   const ward = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json'), 'utf8')).wards.find((w) => w.wardId === wardId);
   if (!ward) throw new Error('unknown ward ' + wardId);
@@ -28,9 +40,19 @@ function main() {
   out.manifest = A.validateSourceManifest(roads.manifest);
   const pts = []; for (const f of roads.features) for (const p of f.p) { if (pts.length < 40000) pts.push(p); }
   out.probe = A.probeConvention(pts, ward.polygons);
-  if (ext) {
-    const bp = L.buildingPoints(path.join(ext, wardId));
-    out.buildings = { repPoints: bp.length };
+  if (ext && outRoot) throw new Error('use either --ext or --out-root, not both');
+  if (ext || outRoot) {
+    let wardDir, how;
+    if (outRoot) { wardDir = resolveVerifiedWardDir({ src, ward: wardId, outRoot }).dir; how = '45d-verified'; }
+    else { wardDir = path.join(ext, wardId); how = 'ext-legacy'; }
+    const bp = L.buildingPoints(wardDir);
+    out.buildings = { repPoints: bp.length, source: how };
+    if (bp.length === 0) {
+      out.buildings.warning = 'repPoints=0: no building points were read; this is NOT a successful diagnosis. For 45D output use --out-root <45D root>.';
+      console.log(JSON.stringify(out, null, 1));
+      console.error('ERROR: repPoints=0 (wrong or empty building folder)');
+      process.exit(4);
+    }
     const lines = roads.features.filter((f) => f.kind !== 'area').map((f) => f.p);
     const near = A.roadIndex(lines, 50);
     const sample = bp.length > 5000 ? bp.filter((_, i) => i % Math.ceil(bp.length / 5000) === 0) : bp;
@@ -42,4 +64,5 @@ function main() {
   console.log(JSON.stringify(out, null, 1));
   if (out.probe.verdict === 'alternative-fits-better' || !out.manifest.ok) process.exitCode = 3;
 }
-try { main(); } catch (e) { console.error('ERROR: ' + e.message); process.exit(1); }
+module.exports = { resolveVerifiedWardDir };
+if (require.main === module) { try { main(); } catch (e) { console.error('ERROR: ' + e.message); process.exit(Number.isInteger(e.code) ? e.code : 1); } }

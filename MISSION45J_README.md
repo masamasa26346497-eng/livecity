@@ -47,3 +47,23 @@ node tools\mission45j-align-check.cjs --src "..\livecity-data-pipeline\public\ma
 - 実データで `probe` / `yaw` がどう出るか。
 - `makeAreaLayer`（河川・公園の PolygonGeometry）は未変更。重い場合は `vec` の near だけで生成される。
 - 既存 45I private root のファイルは再生成していない（`clipped` ヘッダなし = 従来どおりビューアで clip）。
+
+## 追記: 45D 出力の位置ずれ診断は `--out-root` を使う（実機未確認）
+
+`--ext` は旧形式（`<ext>/<ward>/attrs`）専用で、45D の実レイアウト（`pc23/<ward>-aN/attrs`、住吉は `sumiyoshi-aN/sumiyoshi/attrs`）では建物点 0 件になります。
+45D 出力には `--out-root` を使います。45E `plan()` が 45D ルートを原本から再検証（24/24、棟数一致）し、検証済みの区ディレクトリだけを読みます。
+`--src` は旧 OSM ルート（`buildings/` と `roads/` を含む `osaka-city`）のままです。何も書きません。console は集計値のみ。
+
+```powershell
+node tools\mission45j-align-check.cjs --src "..\livecity-data-pipeline\public\map-data\osaka-city" --ward fukushima --out-root "$env:LOCALAPPDATA\LiveCity-3DTiles-Out-24" --yaw
+```
+
+- 45D ルートが検証できない／区がない場合は、パスを含まないエラーで終了します。
+- 建物点が 0 件のときは成功扱いにせず、警告を出して終了コード 4 になります（`--ext` でも同様）。
+- 上記コマンドの Windows 実機での動作は未確認です（合成 fixture のテスト `tests/mission45j-align-outroot.test.cjs` のみ）。
+- 45D の検証に時間がかかる場合があります（原本から再計算するため）。
+
+### `--plan`（45I 既存 private root）の表示最適化と v2 root 再生成の違い
+- 既存 private root の `clipped` 未収載は、ビューア側の表示最適化（fast clip）で緩和できる範囲があります。
+- ビルド時の事前 clip の恩恵は、v2 root を再生成した場合のみです。再生成には PC での変換が必要で、ここでは実施していません。
+- 実機での位置ずれの原因は不明のままです。診断結果（probe / nearest / yaw）を見るまで断定しません。
