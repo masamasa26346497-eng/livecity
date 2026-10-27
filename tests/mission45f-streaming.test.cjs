@@ -90,5 +90,5 @@ test('page keeps wardCode namespace, per-tileset _lcBase and Google lock', () =>
 test('45E index.json carries verified only for non-synthetic proof', () => {
   const src = fs.readFileSync(path.join(ROOT, 'tools/mission45e-preview.cjs'), 'utf8');
   assert.match(src, /verified: synthetic === false/);
-  assert.match(src, /makeServer\(p\.servable, \(\) => port, p\.synthetic\)/);
+  assert.match(src, /makeServer\(p\.servable, \(\) => port, p\.synthetic(, lod0Plan\(opts\.lod0\))?\)/);
 });

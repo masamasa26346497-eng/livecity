@@ -451,6 +451,7 @@
 <script src="mission37k-poi-select.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
 <script src="mission45f-streaming.js"></script>
+<script src="mission45g-perf.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -508,10 +509,13 @@
   // ══════════════════════════════════════════════════════════════
   // Cesium: 標準 UI は全部オフ（要件1）
   // ══════════════════════════════════════════════════════════════
+  // 45G: 常時描画をやめる requestRenderMode。ext45（localhost 全域3D）では既定 ON、?rr=0 で従来の常時描画（A/B 用）。他の状態では ?rr=1 のときだけ ON。
+  const EXT45 = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('ext45') === '1';
+  const RR = LC45G.useRequestRender(EXT45, q.get('rr'));
   const viewer = new Cesium.Viewer('cesiumContainer', {
     baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false,
     sceneModePicker: false, navigationHelpButton: false, animation: false, timeline: false,
-    fullscreenButton: false, infoBox: false, selectionIndicator: false, requestRenderMode: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false, requestRenderMode: RR, maximumRenderTimeChange: Infinity,
     scene3DOnly: true, shouldAnimate: false,
   });
   const scene = viewer.scene;
@@ -1023,6 +1027,7 @@
     stats.allMode.mounted = m; stats.allMode.buildings = n;
     stats.extraSets = extraSets.map((e) => ({ id: e.id, wardCode: e.source.wardCode, tiles: e.report.selectedTiles, buildings: e.report.totals.buildings, level: e.level || null }));
     $('hs-bldg').textContent = fmt(n);
+    if (typeof lod0Sync === 'function') lod0Sync();   // 45G: 遠景 LOD0 の表示対象（45F が mount していない区）を更新
     const note = $('bldg-ward-note');
     if (note && allMode) note.textContent = '全域3D: 詳細 ' + Object.values(m).filter((v) => v === 'detail').length + ' 区 / 粗いLOD ' + Object.values(m).filter((v) => v === 'coarse').length + ' 区を表示中（視点に近い区のみ。全24区の詳細描画ではありません）';
   }
@@ -1073,7 +1078,12 @@
       const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
       const cand = wd.wards.filter((w) => extCodes.has(w.wardCode));
       const mounted = {}; for (const [k, r] of allSets) mounted[k] = r.level;
-      const p = LC45F.plan({ x: c.x, z: c.z, height: pos.h }, cand, mounted);
+      let p = LC45F.plan({ x: c.x, z: c.z, height: pos.h }, cand, mounted);
+      if (EXT45 && q.get('cull') !== '0') {   // 45G: 斜め視点で画面外の粗 LOD 区は mount しない（詳細区は対象外）
+        const fr = cam.frustum;
+        p = LC45G.cullPlan(p, { x: pos.x, z: pos.z, headingRad: cam.heading, pitchRad: cam.pitch, fovRad: fr.fovy || fr.fov, aspect: fr.aspectRatio || (viewer.canvas.clientWidth / viewer.canvas.clientHeight) }, cand, mounted);
+        stats.allMode.culledTotal = (stats.allMode.culledTotal | 0) + p.culled.length;
+      }
       stats.allMode.ticks++; stats.allMode.lastPlan = p.want;
       for (const code of p.drop) allDrop(code);
       for (const [code, lvl] of Object.entries(p.want)) { if (allSets.has(code)) allSetLevel(code, lvl); }
@@ -1092,7 +1102,7 @@
     stats.buildingState = on ? 'ready' : 'none';
     $('hs-bldg').textContent = '0';
     const sw = $('sel-bldg-ward'); if (sw) sw.disabled = false;
-    if (on) { try { await ensureExtraMeta(); } catch (e) { /* noop */ } allTick(); } else syncBldgSelect();
+    if (on) { try { await ensureExtraMeta(); } catch (e) { /* noop */ } allTick(); } else { syncBldgSelect(); if (typeof lod0Sync === 'function') lod0Sync(); }
     scene.requestRender();
   }
   // 区の全域 fit: N03 区 bbox と tileset 境界球の両方を含む円が、サイドパネルを除いた見える部分に収まる距離まで引く。
@@ -1189,6 +1199,104 @@
   $('sel-sse').value = String(SSE0);
   $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; for (const x of extraSets) x.tileset.maximumScreenSpaceError = x.level === 'coarse' ? LC45F.DEFAULTS.coarseSse : stats.sse; };
   viewer.camera.moveEnd.addEventListener(() => { if (allMode) scheduleAll(); });   // 45F: 全域3Dは移動終了後 200ms の debounce で区を再計画（定期ポーリングはしない）
+
+  // ── 45G: 高速化（requestRenderMode / 解像度の自動調整 / キャッシュ予算 / 計測 / 遠景 LOD0） ──────────────────────
+  //   すべて localhost の ?ext45=1 のときだけ既定 ON（?rr=0 ?res=fixed ?cache=0 ?cull=0 ?lod0=0 で個別に無効化＝A/B 比較用）。公開ページの挙動は変えない。
+  //   計測値は件数・バイト・ms のみ（URL・パス・建物 ID は入れない）。実 PC の数値はここでは取得していない。
+  const perf = { requestRenderMode: RR, ext45: EXT45, renders: 0, devicePixelRatio: window.devicePixelRatio || 1, resolutionScale: 1, resolutionChanges: 0,
+    preset: q.get('res') === 'fixed' ? 'quality' : 'auto', cachePerTilesetMB: null, tilesets: 0, tilesetMemoryMB: null, settleMs: null,
+    net: { requests: 0, bytes: 0, glb: 0, json: 0, other: 0 }, lod0: { wards: 0, shown: 0 } };
+  stats.perf = perf;
+  const frameLog = [];   // 直近の描画フレーム間隔(ms)。requestRenderMode では「描画されたフレーム」だけが入る
+  let lastCamMove = 0, moveStartedAt = 0, settleArmed = false, lastRenderAt = performance.now();
+  const lod0Sets = new Map();   // wardCode → Cesium3DTileset（遠景用の概略形状。実棟ではない）
+  const isMoving = () => performance.now() - lastCamMove < 400;
+  const allTilesetsNow = () => [tileset, ...extraSets.map((e) => e.tileset)].filter((t) => t && !t.isDestroyed());
+  let lastBudgetN = -1;
+  function applyCacheBudget() {
+    if (q.get('cache') === '0') return;
+    const ts = allTilesetsNow().concat([...lod0Sets.values()].filter((t) => !t.isDestroyed()));
+    if (ts.length === lastBudgetN) return;
+    lastBudgetN = ts.length;
+    const b = LC45G.cacheBudget(ts.length || 1, q.get('cacheMB') ? { cacheTotalMB: +q.get('cacheMB') || 768 } : {});
+    for (const t of ts) { if ('cacheBytes' in t) t.cacheBytes = b.cacheBytes; if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
+    perf.cachePerTilesetMB = b.perMB;
+  }
+  const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || q.get('res') === 'fixed' });
+  // ext45 の既定は「画質優先」ではなく自動。useBrowserRecommendedResolution=true（Cesium 既定）は DPR を無視した 1.0 倍の解像度で描く。
+  //   ?dpr=1 で devicePixelRatio をそのまま使う（高 DPI で鮮明だが重い）。
+  if (EXT45 && q.get('dpr') === '1') viewer.useBrowserRecommendedResolution = false;
+  viewer.camera.changed.addEventListener(() => { lastCamMove = performance.now(); if (!moveStartedAt) moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
+  viewer.camera.percentageChanged = Math.min(viewer.camera.percentageChanged, 0.02);
+  viewer.camera.moveStart.addEventListener(() => { lastCamMove = performance.now(); moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
+  scene.postRender.addEventListener(() => {
+    const now = performance.now(), dt = now - lastRenderAt; lastRenderAt = now;
+    perf.renders++;
+    if (dt < 2000) { frameLog.push(dt); if (frameLog.length > 300) frameLog.shift(); }
+    const s = resCtl.frame(dt, isMoving());
+    if (s !== null) { viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
+  });
+  // 読み込み中は描画を止めない。tileset が全 tile を読み終えるまで 250ms ごとに 1 回描画を要求する（RR のとき）。
+  function anyLoading() {
+    for (const t of allTilesetsNow()) if (!t.tilesLoaded) return true;
+    for (const t of lod0Sets.values()) if (!t.isDestroyed() && !t.tilesLoaded) return true;
+    return false;
+  }
+  let hb = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    applyCacheBudget();
+    const loading = anyLoading();
+    if (RR && (loading || (++hb % 8 === 0))) scene.requestRender();   // 読み込み中は 250ms、静止中は 2 秒の保険（POI / ラベルの取りこぼし対策）
+    if (!loading && settleArmed && !isMoving()) { perf.settleMs = Math.round(performance.now() - moveStartedAt); settleArmed = false; moveStartedAt = 0; }
+  }, 250);
+  function netNow() {
+    try { perf.net = LC45G.netSummary(performance.getEntriesByType('resource')); } catch (e) { /* noop */ }
+  }
+  function perfSnapshot() {
+    netNow();
+    const ts = allTilesetsNow().concat([...lod0Sets.values()].filter((t) => !t.isDestroyed()));
+    let mem = 0, known = true;
+    for (const t of ts) { if (typeof t.totalMemoryUsageInBytes === 'number') mem += t.totalMemoryUsageInBytes; else known = false; }
+    perf.tilesets = ts.length; perf.tilesetMemoryMB = known ? +(mem / 1048576).toFixed(1) : null;
+    const w = stats.allMode || {};
+    const lv = Object.values(w.mounted || {});
+    perf.lod0.wards = lod0Sets.size; perf.lod0.shown = [...lod0Sets.values()].filter((t) => !t.isDestroyed() && t.show).length;
+    return Object.assign({ at: Math.round(performance.now()), frames: LC45G.summarizeFrames(frameLog), visibleTiles: curTiles, visibleBuildings: curBldg,
+      mountedWards: lv.length, detailWards: lv.filter((v) => v === 'detail').length, coarseWards: lv.filter((v) => v === 'coarse').length,
+      mounts: w.mountsTotal | 0, drops: w.dropsTotal | 0, culled: w.culledTotal | 0, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null }, perf);
+  }
+  window.__mission45g = { snapshot: perfSnapshot, resetFrames: () => { frameLog.length = 0; perf.renders = 0; } };
+  stats.perfSnapshot = perfSnapshot;
+  // 遠景 LOD0: tools/mission45g-build-lod0.cjs の出力（localhost の index.json が lod0Wards を返したときだけ）。
+  //   区ごとの小さな tileset を mount し、その区が 45F の mount 対象（detail / coarse）でない間だけ表示する。実棟ではなく概略形状。
+  async function lod0Sync() {
+    if (!EXT45 || q.get('lod0') === '0' || !lod0Wards.length) return;
+    const show = (code) => !allSets.has(code) && allMode;
+    for (const code of lod0Wards) {
+      let t = lod0Sets.get(code);
+      if (!t && allMode) {
+        lod0Sets.set(code, null);
+        try {
+          t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/_lod0/' + code + '/tileset.json', { maximumScreenSpaceError: 16 });
+          t._lcLod0 = true;
+          t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
+          scene.primitives.add(t); lod0Sets.set(code, t);
+        } catch (e) { lod0Sets.delete(code); continue; }
+      }
+      if (t && !t.isDestroyed()) t.show = show(code);
+    }
+    scene.requestRender();
+  }
+  let lod0Wards = [];
+  fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
+  viewer.camera.moveEnd.addEventListener(() => { lod0Sync(); });
+  if (EXT45 && q.get('perf') === '1') {
+    const el = document.createElement('pre');
+    el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:50;margin:0;padding:6px 8px;background:rgba(10,18,32,.82);color:#cfe3ff;font:11px/1.35 monospace;pointer-events:none;max-width:44vw;white-space:pre-wrap';
+    document.body.appendChild(el);
+    setInterval(() => { const s = perfSnapshot(), f = s.frames || {}; el.textContent = 'RR ' + (RR ? 'on' : 'off') + ' | res x' + s.resolutionScale + ' (dpr ' + s.devicePixelRatio + ')\nrender ' + (f.avgFps || '-') + ' fps(描画時) p95 ' + (f.p95Ms || '-') + 'ms\ntiles vis ' + s.visibleTiles + ' / sets ' + s.tilesets + ' / GPU ' + (s.tilesetMemoryMB == null ? '?' : s.tilesetMemoryMB) + 'MB\nwards d' + s.detailWards + ' c' + s.coarseWards + ' lod0 ' + s.lod0.shown + '\nnet ' + s.net.requests + ' req / ' + (s.net.bytes / 1048576).toFixed(1) + 'MB\nsettle ' + (s.settleMs == null ? '-' : s.settleMs + 'ms'); }, 1000);
+  }
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
 
   // ══════════════════════════════════════════════════════════════

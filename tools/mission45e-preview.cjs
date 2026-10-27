@@ -79,8 +79,8 @@ function plan(opts) {
 }
 
 // 45F: verified=true only when plan() recomputed a complete, non-synthetic 45D proof (24/24, source == converted). The viewer uses it for the full/partial label.
-function indexJson(servable, synthetic) {
-  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', verified: synthetic === false, wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
+function indexJson(servable, synthetic, lod0) {
+  return JSON.stringify({ schema: SCHEMA, kind: 'local-only', verified: synthetic === false, lod0Wards: lod0 ? lod0.wards.slice() : [], wards: servable.map((s) => ({ ward: s.ward, wardCode: s.wardCode, buildings: s.buildings })) });
 }
 // <ward>/<rel> inside a servable ward dir; whitelist + regular-file-only + realpath stays inside
 function resolveExt(servable, rest) {
@@ -100,8 +100,25 @@ function resolveExt(servable, rest) {
   } catch (e) { return null; }
   return file;
 }
-function makeServer(servable, getPort, synthetic) {
-  const idx = Buffer.from(indexJson(servable, synthetic));
+// 45G: 遠景 LOD0（tools/mission45g-build-lod0.cjs の出力）。45D ルートの外の別フォルダ。マーカー必須、<5桁区コード>/tileset.json と tiles/lod0.glb だけを配信。
+const LOD0_MARKER = '.livecity-45g-lod0.json';
+function lod0Plan(dir) {
+  if (!dir) return null;
+  const d = path.resolve(dir);
+  let m; try { m = JSON.parse(fs.readFileSync(path.join(d, LOD0_MARKER), 'utf8')); } catch (e) { throw err('--lod0 folder has no LOD0 marker; not served', 3); }
+  if (m.schema !== 'livecity.mission45g.lod0/1') throw err('--lod0 marker mismatch; not served', 3);
+  const wards = fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory() && /^[0-9]{5}$/.test(e.name) && lst(path.join(d, e.name, 'tileset.json'))).map((e) => e.name).sort();
+  return { dir: d, wards };
+}
+function resolveLod0(lod0, rest) {
+  const mm = /^([0-9]{5})\/(tileset\.json|tiles\/lod0\.glb)$/.exec(rest);
+  if (!lod0 || !mm || !lod0.wards.includes(mm[1])) return null;
+  const file = path.join(lod0.dir, mm[1], ...mm[2].split('/'));
+  try { const st = fs.lstatSync(file); if (!st.isFile() || st.isSymbolicLink()) return null; if (!fs.realpathSync(file).startsWith(fs.realpathSync(lod0.dir) + path.sep)) return null; } catch (e) { return null; }
+  return file;
+}
+function makeServer(servable, getPort, synthetic, lod0) {
+  const idx = Buffer.from(indexJson(servable, synthetic, lod0));
   return http.createServer((req, res) => {
     const port = getPort();
     const deny = (c, m) => { res.writeHead(c, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(m); };
@@ -113,7 +130,7 @@ function makeServer(servable, getPort, synthetic) {
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': idx.length, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
       return res.end(req.method === 'HEAD' ? undefined : idx);
     }
-    const file = u.startsWith(PREFIX) ? resolveExt(servable, u.slice(PREFIX.length)) : P.resolveStatic(u === '/' ? PAGE : u);
+    const file = u.startsWith(PREFIX + '_lod0/') ? resolveLod0(lod0, u.slice((PREFIX + '_lod0/').length)) : u.startsWith(PREFIX) ? resolveExt(servable, u.slice(PREFIX.length)) : P.resolveStatic(u === '/' ? PAGE : u);
     if (!file) return deny(404, 'not found');
     fs.lstat(file, (e, st) => {
       if (e || !st.isFile() || st.isSymbolicLink()) return deny(404, 'not found');
@@ -126,7 +143,7 @@ function makeServer(servable, getPort, synthetic) {
 async function serve(opts) {
   const p = plan(opts);
   let port = Number.isInteger(opts.port) ? opts.port : 8137;
-  const server = makeServer(p.servable, () => port, p.synthetic);
+  const server = makeServer(p.servable, () => port, p.synthetic, lod0Plan(opts.lod0));
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', () => { port = server.address().port; resolve({ server, port, plan: p }); });
@@ -140,7 +157,7 @@ function summary(p) {
 function main() {
   const a = process.argv.slice(2);
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
-  const opts = { src: opt('src'), outRoot: opt('out-root'), port: opt('port') ? parseInt(opt('port'), 10) : undefined };
+  const opts = { src: opt('src'), outRoot: opt('out-root'), port: opt('port') ? parseInt(opt('port'), 10) : undefined, lod0: opt('lod0') };
   const fail = (e) => { console.error(Number.isInteger(e.code) ? e.message : 'error: operation failed (details suppressed)'); process.exit(Number.isInteger(e.code) ? e.code : 1); };
   try {
     if (!a.includes('--serve')) { console.log(JSON.stringify(Object.assign({ mode: 'plan', serving: false }, summary(plan(opts))), null, 1)); process.exit(0); }
@@ -152,5 +169,5 @@ function main() {
     }, fail);
   } catch (e) { fail(e); }
 }
-module.exports = { plan, serve, makeServer, resolveExt, indexJson, underSync, SCHEMA, PREFIX };
+module.exports = { plan, serve, makeServer, resolveExt, lod0Plan, resolveLod0, indexJson, underSync, SCHEMA, PREFIX };
 if (require.main === module) main();

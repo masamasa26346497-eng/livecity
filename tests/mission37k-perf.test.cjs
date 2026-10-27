@@ -33,6 +33,8 @@ test('定期処理はカメラ停止中は実処理しない', () => {
 });
 
 test('課金ロックと requestRenderMode は変更していない', () => {
-  assert.match(html, /requestRenderMode: false/);
+  // 45G: requestRenderMode は localhost の ?ext45=1 でだけ既定 ON。それ以外（公開ページ）は従来どおり常時描画（?rr=1 で明示した場合のみ ON）
+  assert.match(html, /requestRenderMode: RR/);
+  assert.match(html, /const RR = LC45G\.useRequestRender\(EXT45, q\.get\('rr'\)\)/);
   assert.doesNotMatch(html, /maps\.googleapis\.com|places\.googleapis\.com/);
 });
