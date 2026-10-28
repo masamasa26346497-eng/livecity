@@ -1582,6 +1582,16 @@
   let lod0Wards = [];
   fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
   viewer.camera.moveEnd.addEventListener(() => { lod0Sync(); });
+  // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
+  //   既定では建物の品質・表示範囲を変えない。操作中は粗くなる（画質トレードオフ）ため、測ってから採否を決める。
+  const SSE_MOVE = Math.max(0, +q.get('sseMove') || 0);
+  if (EXT45 && SSE_MOVE > 0) {
+    const orig = new WeakMap(); let raised = false, restoreT = 0;
+    const restore = () => { raised = false; for (const t of allTilesetsNow()) { if (orig.has(t)) { t.maximumScreenSpaceError = orig.get(t); orig.delete(t); } } scene.requestRender(); };
+    const raise = () => { clearTimeout(restoreT); if (!raised) { raised = true; for (const t of allTilesetsNow()) { orig.set(t, t.maximumScreenSpaceError); if (SSE_MOVE > t.maximumScreenSpaceError) t.maximumScreenSpaceError = SSE_MOVE; } } restoreT = setTimeout(restore, 400); };
+    viewer.camera.moveStart.addEventListener(raise); viewer.camera.changed.addEventListener(raise);
+    stats.sseMove = SSE_MOVE;
+  }
   if (EXT45 && q.get('perf') === '1') {
     const el = document.createElement('pre');
     el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:50;margin:0;padding:6px 8px;background:rgba(10,18,32,.82);color:#cfe3ff;font:11px/1.35 monospace;pointer-events:none;max-width:44vw;white-space:pre-wrap';
@@ -1597,13 +1607,38 @@
     mkBtn('建物 ON', (b) => { st45n.buildings = !st45n.buildings; b.textContent = '建物 ' + (st45n.buildings ? 'ON' : 'OFF'); for (const t of allTilesetsNow().concat(lod0Live())) t.show = st45n.buildings; scene.requestRender(); });
     mkBtn('道路/面 ON', (b) => { st45n.vectors = !st45n.vectors; b.textContent = '道路/面 ' + (st45n.vectors ? 'ON' : 'OFF'); for (const id of VEC_IDS) { try { LayerRegistry.setVisible(id, st45n.vectors); wardVecApply(id, st45n.vectors); } catch (e) { /* 未登録は無視 */ } } scene.requestRender(); });
     try { new PerformanceObserver((l) => { if (st45n.measuring) for (const e of l.getEntries()) st45n.long.push(e.duration); }).observe({ entryTypes: ['longtask'] }); } catch (e) { /* 非対応 */ }
+    // 45R: 同じ視点で A/B するための視点の保存・復元。メモリ上のみ（URL・localStorage・Git・外部送信には出さない。リロードで消える）。
+    let savedView = null;
+    mkBtn('視点を保存', (b) => { const c = viewer.camera; savedView = { dest: c.positionWC.clone(), heading: c.heading, pitch: c.pitch, roll: c.roll }; b.textContent = '視点を保存 (済)'; });
+    mkBtn('視点を復元', (b) => { if (!savedView) { b.textContent = '視点を復元 (未保存)'; return; } viewer.camera.setView({ destination: savedView.dest, orientation: { heading: savedView.heading, pitch: savedView.pitch, roll: savedView.roll } }); scene.requestRender(); b.textContent = '視点を復元'; });
+    // 45R: フレーム内訳。upd = preUpdate→postUpdate（tileset 選択・タイル更新の JS）、rnd = preRender→postRender（描画コマンド発行の JS。GPU 完了待ちは含まない）。
+    //   dt に対して upd+rnd が小さい = JS 外（GPU / present / vsync 待ち）が支配的、という目安。
+    const fb = { upd: [], rnd: [], dt: [], sel: [], cmd: [], tu: 0, tr: 0, last: 0, on: false };
+    scene.preUpdate.addEventListener(() => { if (fb.on) fb.tu = performance.now(); });
+    scene.postUpdate.addEventListener(() => { if (fb.on) fb.upd.push(performance.now() - fb.tu); });
+    scene.preRender.addEventListener(() => { if (fb.on) fb.tr = performance.now(); });
+    scene.postRender.addEventListener(() => {
+      if (!fb.on) return; const n = performance.now(); fb.rnd.push(n - fb.tr); if (fb.last) fb.dt.push(n - fb.last); fb.last = n;
+      let sel = 0; for (const t of allTilesetsNow().concat(lod0Live())) { const st = t.statistics; if (st) sel += (st.selected | 0); }
+      fb.sel.push(sel); const cl = scene.frameState && scene.frameState.commandList; fb.cmd.push(cl ? cl.length : 0);
+    });
+    const pq = (a, f) => { if (!a.length) return null; const t = a.slice().sort((x, y) => x - y); return Math.round(t[Math.min(t.length - 1, Math.floor(f * t.length))] * 10) / 10; };
+    const avg = (a) => (a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length * 10) / 10 : null);
     mkBtn('10秒測定', (b) => {
       if (st45n.measuring) return;
       st45n.measuring = true; st45n.long.length = 0; window.__mission45m.reset(); b.textContent = '測定中… 10秒ドラッグ/ホイール';
-      const cfg = { buildings: st45n.buildings, vectors: st45n.vectors, rr: RR, preset: RES_PRESET };
+      for (const k of ['upd', 'rnd', 'dt', 'sel', 'cmd']) fb[k].length = 0; fb.last = 0; fb.on = true;
+      const hud0 = { u: hud45r.updates, ms: hud45r.msTotal, sk: hud45r.skippedWhileGesture };
+      const cfg = { buildings: st45n.buildings, vectors: st45n.vectors, rr: RR, preset: RES_PRESET, vcdefer: q.get('vcdefer') === '1', hudmove: HUD_MOVE, sseMove: SSE_MOVE };
       setTimeout(() => {
+        fb.on = false;
         const m = window.__mission45m.snapshot(), lt = st45n.long.slice();
-        st45n.runs.push({ cfg, gestureFrameMs: m.gestureFrameMs, inputToRenderMs: m.inputToRenderMs, longTasks: { n: lt.length, over100ms: lt.filter((v) => v > 100).length, maxMs: lt.length ? Math.round(Math.max(...lt)) : 0 }, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null });
+        const sn = perfSnapshot();
+        const brk = { frames: fb.dt.length, updMs: { avg: avg(fb.upd), p95: pq(fb.upd, 0.95) }, rndMs: { avg: avg(fb.rnd), p95: pq(fb.rnd, 0.95) }, dtMs: { avg: avg(fb.dt), p95: pq(fb.dt, 0.95) },
+          selectedTiles: { p50: pq(fb.sel, 0.5), max: pq(fb.sel, 1) }, drawCommands: { p50: pq(fb.cmd, 0.5), max: pq(fb.cmd, 1) },
+          hud: { updates: hud45r.updates - hud0.u, msAvg: hud45r.updates > hud0.u ? Math.round((hud45r.msTotal - hud0.ms) / (hud45r.updates - hud0.u) * 100) / 100 : null, skipped: hud45r.skippedWhileGesture - hud0.sk } };
+        st45n.runs.push({ cfg, visibleTiles: sn.visibleTiles, tilesets: sn.tilesets, breakdown: brk,
+          jsShareHint: brk.dtMs.avg ? Math.round(((brk.updMs.avg || 0) + (brk.rndMs.avg || 0)) / brk.dtMs.avg * 100) + '%' : null, gestureFrameMs: m.gestureFrameMs, inputToRenderMs: m.inputToRenderMs, longTasks: { n: lt.length, over100ms: lt.filter((v) => v > 100).length, maxMs: lt.length ? Math.round(Math.max(...lt)) : 0 }, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null });
         st45n.measuring = false; b.textContent = '10秒測定 (' + st45n.runs.length + '回)';
       }, 10000);
     });
@@ -1616,10 +1651,16 @@
     };
     const oneLine45p = (r, i) => '#' + (i + 1) + ' b' + (r.cfg.buildings ? 1 : 0) + ' v' + (r.cfg.vectors ? 1 : 0) + ' rr' + (r.cfg.rr ? 1 : 0) + ' res=' + r.cfg.preset +
       ' gestureP95=' + ((r.gestureFrameMs || {}).p95 != null ? r.gestureFrameMs.p95 : '-') + 'ms over50=' + ((r.gestureFrameMs || {}).over50ms != null ? r.gestureFrameMs.over50ms : '-') +
-      ' longTasks=' + (r.longTasks ? r.longTasks.n + '/>100ms:' + r.longTasks.over100ms + '/max' + r.longTasks.maxMs : '-') + ' heapMB=' + r.heapMB + ' hint=' + hint45p(r);
+      ' longTasks=' + (r.longTasks ? r.longTasks.n + '/>100ms:' + r.longTasks.over100ms + '/max' + r.longTasks.maxMs : '-') + ' heapMB=' + r.heapMB + ' hint=' + hint45p(r) + ' vcdefer=' + (r.cfg.vcdefer ? 1 : 0) + ' hudmove=' + (r.cfg.hudmove ? 1 : 0) + ' sseMove=' + (r.cfg.sseMove || 0) +
+      ' tilesVis=' + r.visibleTiles + ' sets=' + r.tilesets + (r.breakdown ? ' upd=' + r.breakdown.updMs.avg + '/' + r.breakdown.updMs.p95 + 'ms rnd=' + r.breakdown.rndMs.avg + '/' + r.breakdown.rndMs.p95 + 'ms dt=' + r.breakdown.dtMs.avg + 'ms jsShare=' + r.jsShareHint + ' selTiles=' + r.breakdown.selectedTiles.max + ' cmds=' + r.breakdown.drawCommands.max + ' hudMs=' + r.breakdown.hud.msAvg + ' hudSkip=' + r.breakdown.hud.skipped : '');
     window.__mission45n = { state: st45n, get runs() { return st45n.runs; }, summary() { return st45n.runs.map(oneLine45p).join('\n'); }, vec45p: () => JSON.stringify(stats.vec45p) };
     mkBtn('結果を1行表示', () => { console.log(window.__mission45n.summary() + '\n' + window.__mission45n.vec45p()); });
-    setInterval(() => { const s = perfSnapshot(), f = s.frames || {}; el.textContent = 'RR ' + (RR ? 'on' : 'off') + ' | res x' + s.resolutionScale + ' (dpr ' + s.devicePixelRatio + ')\nrender ' + (f.avgFps || '-') + ' fps(描画時) p95 ' + (f.p95Ms || '-') + 'ms\ntiles vis ' + s.visibleTiles + ' / sets ' + s.tilesets + ' / GPU ' + (s.tilesetMemoryMB == null ? '?' : s.tilesetMemoryMB) + 'MB\nwards d' + s.detailWards + ' c' + s.coarseWards + ' lod0 ' + s.lod0.shown + '\nnet ' + s.net.requests + ' req / ' + (s.net.bytes / 1048576).toFixed(1) + 'MB\nsettle ' + (s.settleMs == null ? '-' : s.settleMs + 'ms'); }, 1000);
+    // 45R: HUD 自身の負荷を測る。getEntriesByType('resource') の全走査と tileset 集計が 1 秒ごとに走る。
+    //   既定: 操作中は HUD 更新を見送る（?hudmove=1 で従来どおり操作中も更新＝A/B 用）。更新 1 回の所要 ms を hud45r に残す。
+    const hud45r = { updates: 0, skippedWhileGesture: 0, msTotal: 0, msMax: 0 };
+    const HUD_MOVE = q.get('hudmove') === '1';
+    window.__mission45r_hud = hud45r;
+    setInterval(() => { if (!HUD_MOVE && IX.isActive(performance.now())) { hud45r.skippedWhileGesture++; return; } const th = performance.now(); const s = perfSnapshot(), f = s.frames || {}; el.textContent = 'RR ' + (RR ? 'on' : 'off') + ' | res x' + s.resolutionScale + ' (dpr ' + s.devicePixelRatio + ')\nrender ' + (f.avgFps || '-') + ' fps(描画時) p95 ' + (f.p95Ms || '-') + 'ms\ntiles vis ' + s.visibleTiles + ' / sets ' + s.tilesets + ' / GPU ' + (s.tilesetMemoryMB == null ? '?' : s.tilesetMemoryMB) + 'MB\nwards d' + s.detailWards + ' c' + s.coarseWards + ' lod0 ' + s.lod0.shown + '\nnet ' + s.net.requests + ' req / ' + (s.net.bytes / 1048576).toFixed(1) + 'MB\nsettle ' + (s.settleMs == null ? '-' : s.settleMs + 'ms'); const dh = performance.now() - th; hud45r.updates++; hud45r.msTotal += dh; if (dh > hud45r.msMax) hud45r.msMax = dh; }, 1000);
   }
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
 
