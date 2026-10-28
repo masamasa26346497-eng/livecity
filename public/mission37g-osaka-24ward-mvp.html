@@ -2456,6 +2456,32 @@
     LayerRegistry.sync(rec);
   }
 
+  // 45W: 道路・河川・公園・鉄道の「件数」は住吉区 9tile 束のものであり、他区の描画を意味しない。視線中心の下にどのデータがあるかを明示する。
+  const vecNote = document.createElement('div');
+  vecNote.id = 'lc-vec-coverage';
+  vecNote.style.cssText = 'font:11px/1.5 var(--lc-mono);color:var(--lc-text-mute);padding:6px 4px 0';
+  $('lc-layers').appendChild(vecNote);
+  stats.vecCoverage = { source: 'unknown', ward: null, text: '' };
+  let bundleBox;
+  async function updateVecCoverage() {
+    try {
+      if (bundleBox === undefined) { try { bundleBox = ((await fetchLayerJson('manifest.json')).bboxLocal) || null; } catch (e) { bundleBox = null; } }
+      const ctr = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      if (!ctr) return;
+      const c = cartToLocal(ctr), w = WardUI.hit(c.x, c.z);
+      const inBundle = !!bundleBox && c.x >= bundleBox.minX && c.x <= bundleBox.maxX && c.z >= bundleBox.minZ && c.z <= bundleBox.maxZ;
+      let src, text;
+      if (inBundle) { src = 'sumiyoshi-bundle'; text = '道路・河川・公園・鉄道: 住吉区9tile束（約2.1km四方）を表示中'; }
+      else if (w && stats.vec45i && Object.keys(stats.vec45i.mounted || {}).includes(String(w.wardCode))) { src = 'ward-vector'; text = '道路・河川・公園・鉄道: ' + w.wardName + ' の区ベクタ（45I）を表示中'; }
+      else if (w && stats.wardVec && stats.wardVec.ward === w.wardCode && stats.wardVec.state === 'ready') { src = 'ward-layers'; text = '道路・河川・公園・鉄道: ' + w.wardName + ' の区別レイヤーを表示中'; }
+      else { src = 'none'; text = 'この付近（' + (w ? w.wardName : '区外') + '）は道路・河川・公園・鉄道の描画データ未配信。上の件数は住吉区の束のものです'; }
+      stats.vecCoverage = { source: src, ward: w ? w.wardCode : null, text };
+      if (vecNote.textContent !== text) vecNote.textContent = text;
+    } catch (e) { /* 表示補助のみ */ }
+  }
+  viewer.camera.moveEnd.addEventListener(updateVecCoverage);
+  setTimeout(updateVecCoverage, 3000);
+
   // ══════════════════════════════════════════════════════════════
   // 計測（37B の HUD と同じ指標を Live City パネルの中に移植）
   // ══════════════════════════════════════════════════════════════
