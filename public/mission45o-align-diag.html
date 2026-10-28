@@ -116,17 +116,46 @@ pre{white-space:pre-wrap;font-size:11px}
     else verdict = '向き・大きさが揃っていません(ばらつき ' + spread.toFixed(1) + ' m > 許容 ' + tol.toFixed(1) + ' m)。一様な平行移動では説明できません。';
     return { meanE: me, meanN: mn, meanDist: len, spread: spread, tol: tol, verdict: verdict };
   }
-  function nearestRoadPoint(x, z, maxM) {
-    var best = null, bd = maxM;
-    D.roads.forEach(function (l) { for (var i = 0; i < l.length; i++) { var d = Math.hypot(l[i][0] - x, l[i][1] - z); if (d < bd) { bd = d; best = [l[i][0], l[i][1]]; } } });
+  // Mission 45S-2: 道路スナップ。頂点ではなく線分上の点へ。優先順: ①近傍2線分の交点(交差点) ②線分への最近点投影。
+  // maxM 超過は拒否(null)。kind: 'intersection' | 'segment'。snapM = クリック点からスナップ点までの局所距離(m)。
+  function snapRoad(roads, x, z, maxM) {
+    var segs = [], bd, i, j, k;
+    for (i = 0; i < roads.length; i++) { var l = roads[i]; for (j = 0; j + 1 < l.length; j++) {
+      var ax = l[j][0], az = l[j][1], bx = l[j + 1][0], bz = l[j + 1][1];
+      if (Math.max(ax, bx) < x - maxM || Math.min(ax, bx) > x + maxM || Math.max(az, bz) < z - maxM || Math.min(az, bz) > z + maxM) continue;
+      segs.push({ l: i, j: j, ax: ax, az: az, bx: bx, bz: bz });
+    } }
+    var best = null; bd = maxM;
+    for (i = 0; i < segs.length; i++) for (k = i + 1; k < segs.length; k++) {
+      var p = segs[i], q = segs[k];
+      if (p.l === q.l && Math.abs(p.j - q.j) <= 1) continue;
+      var rx = p.bx - p.ax, rz = p.bz - p.az, sx = q.bx - q.ax, sz = q.bz - q.az, den = rx * sz - rz * sx;
+      var lp = Math.hypot(rx, rz), lq = Math.hypot(sx, sz);
+      if (lp < 1e-9 || lq < 1e-9 || Math.abs(den) / (lp * lq) < 0.26) continue; // ほぼ平行(約15°未満)は交点が不定
+      var t = ((q.ax - p.ax) * sz - (q.az - p.az) * sx) / den, u = ((q.ax - p.ax) * rz - (q.az - p.az) * rx) / den, e = 1e-9;
+      if (t < -e || t > 1 + e || u < -e || u > 1 + e) continue;
+      var ix = p.ax + t * rx, iz = p.az + t * rz, d = Math.hypot(ix - x, iz - z);
+      if (d < bd) { bd = d; best = { pt: [ix, iz], kind: 'intersection', snapM: d }; }
+    }
+    if (best) return best;
+    bd = maxM;
+    for (i = 0; i < segs.length; i++) {
+      var s0 = segs[i], dx = s0.bx - s0.ax, dz = s0.bz - s0.az, L2 = dx * dx + dz * dz;
+      var tt = L2 > 0 ? Math.max(0, Math.min(1, ((x - s0.ax) * dx + (z - s0.az) * dz) / L2)) : 0;
+      var px = s0.ax + tt * dx, pz = s0.az + tt * dz, dd = Math.hypot(px - x, pz - z);
+      if (dd < bd) { bd = dd; best = { pt: [px, pz], kind: 'segment', snapM: dd }; }
+    }
     return best;
   }
   function cpRender() {
     var pxM = 1 / sc, lines = [];
     var ds = cp.pairs.map(function (p) { return pairDelta(p.road, p.gsi, D.meta); });
-    ds.forEach(function (d, i) { lines.push('C' + (i + 1) + ' 東+' + d.e.toFixed(1) + ' m / 北+' + d.n.toFixed(1) + ' m  距離 ' + d.dist.toFixed(1) + ' m  方向 ' + d.dir + ' (' + d.bearing.toFixed(0) + '°)'); });
+    ds.forEach(function (d, i) { lines.push('C' + (i + 1) + ' 東+' + d.e.toFixed(1) + ' m / 北+' + d.n.toFixed(1) + ' m  距離 ' + d.dist.toFixed(1) + ' m  方向 ' + d.dir + ' (' + d.bearing.toFixed(0) + '°)  [' + (cp.pairs[i].kind === 'intersection' ? '道路線分の交点にスナップ' : '線上最近点(交差点ではない)') + ' / スナップ移動 ' + (cp.pairs[i].snapM || 0).toFixed(1) + ' m]'); });
     var sm = summarize(ds, pxM);
     if (sm) { lines.push('平均 東+' + sm.meanE.toFixed(1) + ' / 北+' + sm.meanN.toFixed(1) + ' m (距離 ' + sm.meanDist.toFixed(1) + ' m)'); lines.push(sm.verdict); }
+    lines.push('緑線の意味: 目視で指定した背景地点と、スナップした道路点の差。測地精度の保証ではありません。同じ交差点を道路側・背景側で選んでください。');
+    if (ds.length === 1) lines.push('C1のみでは共通オフセットを判断できません。適用不可(離れた別地点で2〜4組)。');
+    if (cp.pairs.some(function (p) { return p.kind !== 'intersection'; })) lines.push('注意: 交点にスナップできなかった組は線上の最近点で、線に沿った方向の差は意味を持ちません。');
     lines.push('目視誤差の目安: 1画素 ≈ ' + pxM.toFixed(2) + ' m（拡大してから取る）');
     $('cpout').textContent = lines.join('\n');
     $('cpstate').textContent = cp.mode === 1 ? '② 青い道路線の交差点をクリック' : cp.mode === 2 ? '③ 地理院の同じ交差点の中心をクリック' : (cp.pairs.length >= 4 ? '最大4組。クリアしてやり直せます' : '');
@@ -141,13 +170,13 @@ pre{white-space:pre-wrap;font-size:11px}
   // クリックを対応点として処理した場合 true（ピンは打たない）
   function cpClick(s) {
     if (cp.mode === 1) {
-      var rp = nearestRoadPoint(s[0], s[1], 20 / sc + 5);
-      if (!rp) { $('cpstate').textContent = '道路の頂点が近くにありません。青線の交差点付近をもう一度'; return true; }
-      cp.road = rp; cp.mode = 2; draw(); cpRender(); return true;
+      var snapPx = 24, rp = snapRoad(D.roads, s[0], s[1], snapPx / sc);
+      if (!rp) { $('cpstate').textContent = '青線から ' + snapPx + ' 画素(約 ' + (snapPx / sc).toFixed(1) + ' m)以内にありません。拒否しました。拡大して青線の交差点をクリックし直してください'; return true; }
+      cp.road = rp.pt; cp.kind = rp.kind; cp.snapM = rp.snapM; cp.mode = 2; draw(); cpRender(); return true;
     }
     if (cp.mode === 2) {
       var rxo = +$('rx').value || 0, rzo = +$('rz').value || 0;
-      cp.pairs.push({ road: cp.road, gsi: [s[0] - rxo, s[1] - rzo] }); cp.mode = 0; cp.road = null; draw(); cpRender(); return true;
+      cp.pairs.push({ road: cp.road, gsi: [s[0] - rxo, s[1] - rzo], kind: cp.kind, snapM: cp.snapM }); cp.mode = 0; cp.road = null; draw(); cpRender(); return true;
     }
     return false;
   }
@@ -205,7 +234,7 @@ pre{white-space:pre-wrap;font-size:11px}
     return null;
   }
   function parallax(h, deg) { return h * Math.tan(deg * Math.PI / 180); }
-  window.__diag45 = { validate: validate, parallax: parallax, pairDelta: pairDelta, summarize: summarize, trueMeters: trueMeters, cpPairs: function () { return cp.pairs.length; }, cpMode: function () { return cp.mode; }, cpOut: function () { return $('cpout').textContent; }, toScreen: function (x, z) { return S2P(x, z); }, state: function () { return { loaded: !!D, footprints: D ? D.footprints.length : 0, roads: D ? D.roads.length : 0, pins: pins.length, gsi: $('lg').checked, canvas: [cv.width, cv.height], sideWidth: $('side').getBoundingClientRect().width }; } };
+  window.__diag45 = { validate: validate, parallax: parallax, pairDelta: pairDelta, snapRoad: snapRoad, summarize: summarize, trueMeters: trueMeters, cpPairs: function () { return cp.pairs.length; }, cpMode: function () { return cp.mode; }, cpOut: function () { return $('cpout').textContent; }, toScreen: function (x, z) { return S2P(x, z); }, state: function () { return { loaded: !!D, footprints: D ? D.footprints.length : 0, roads: D ? D.roads.length : 0, pins: pins.length, gsi: $('lg').checked, canvas: [cv.width, cv.height], sideWidth: $('side').getBoundingClientRect().width }; } };
   function loadText(txt) {
     var j; try { j = JSON.parse(txt); } catch (e) { info.textContent = '読み込み失敗: JSON として解釈できません (' + e.message + ')'; return; }
     var err = validate(j); if (err) { info.textContent = '読み込み失敗: ' + err; return; }

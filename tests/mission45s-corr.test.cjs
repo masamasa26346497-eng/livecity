@@ -7,10 +7,10 @@ const path = require('path');
 const vm = require('node:vm');
 const ROOT = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(ROOT, 'public/mission45o-align-diag.html'), 'utf8');
-const start = html.indexOf('function trueMeters'), end = html.indexOf('function nearestRoadPoint');
+const start = html.indexOf('function trueMeters'), end = html.indexOf('function cpRender');
 assert.ok(start > 0 && end > start);
 const sb = {}; vm.createContext(sb);
-vm.runInContext(html.slice(start, end) + ';this.pairDelta=pairDelta;this.summarize=summarize;this.trueMeters=trueMeters;', sb);
+vm.runInContext(html.slice(start, end) + ';this.pairDelta=pairDelta;this.snapRoad=snapRoad;this.summarize=summarize;this.trueMeters=trueMeters;', sb);
 const meta = { origin: { lat: 34.604208, lon: 135.52502 }, mpd: 111320 };
 
 test('pairDelta: gsi east of road -> east+ ; north is z negative', () => {
@@ -36,4 +36,31 @@ test('page: privacy default on, no network/export in correspondence code, offset
   const seg = html.slice(html.indexOf('Mission 45S: 対応点'), html.indexOf('function draw()'));
   assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage|download|Blob/.test(seg));
   assert.ok(!/\$\('r[xz]'\)\.value\s*=|\$\('d[xz]'\)\.value\s*=/.test(seg));
+});
+
+// ---- 45S-2: 線分スナップ（合成fixture） ----
+test('snapRoad: crossing with no vertex at the crossing -> intersection point', () => {
+  const roads = [[[-100, 0], [100, 0]], [[0, -100], [0, 100]]];
+  const r = sb.snapRoad(roads, 6, 4, 20);
+  assert.strictEqual(r.kind, 'intersection');
+  assert.ok(Math.hypot(r.pt[0], r.pt[1]) < 1e-9);
+  assert.ok(Math.abs(r.snapM - Math.hypot(6, 4)) < 1e-9);
+});
+test('snapRoad: straight road -> perpendicular projection, not the vertex 100 m away', () => {
+  const r = sb.snapRoad([[[-100, 0], [100, 0]]], 30, 5, 20);
+  assert.strictEqual(r.kind, 'segment');
+  assert.ok(Math.abs(r.pt[0] - 30) < 1e-9 && Math.abs(r.pt[1]) < 1e-9);
+});
+test('snapRoad: beyond radius rejected; near-parallel gives no intersection', () => {
+  assert.strictEqual(sb.snapRoad([[[-100, 0], [100, 0]]], 0, 50, 20), null);
+  const r = sb.snapRoad([[[-100, 0], [100, 0]], [[-100, 1], [100, 3]]], 0, 0, 20);
+  assert.strictEqual(r.kind, 'segment');
+});
+test('snapRoad: shared junction vertex of separate polylines counts; a bend in one polyline does not', () => {
+  assert.strictEqual(sb.snapRoad([[[-50, 0], [0, 0]], [[0, 0], [0, 50]]], 3, 3, 20).kind, 'intersection');
+  assert.strictEqual(sb.snapRoad([[[-50, 0], [0, 0], [0, 50]]], 3, 3, 20).kind, 'segment');
+});
+test('page: vertex snap removed; radius rejection, meaning disclaimer, C1-only caveat present', () => {
+  assert.ok(!/nearestRoadPoint/.test(html));
+  assert.ok(/拒否しました/.test(html) && /測地精度の保証ではありません/.test(html) && /C1のみでは共通オフセットを判断できません/.test(html));
 });
