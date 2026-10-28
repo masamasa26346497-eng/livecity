@@ -811,7 +811,7 @@
     }
   }
   const cullLayers = new Set();
-  let lastView = null, cullRetryT = 0;
+  let lastView = null, cullRetryT = 0, scheduleSingleCull = () => {}, vecCovHook = null;
   const root45kOn = () => typeof LC45K !== 'undefined' && q.get('vcull') !== '0';
   // 45K: カメラ足元の矩形（max(1200m, 高度×1.8)×余白1.5）に触れるセルだけを GPU へ載せ、hysteresis 1.5 倍の外へ出たセルを外す。
   function vecViewSync(c, height) {
@@ -825,7 +825,7 @@
     const ms = performance.now() - t;
     K.syncs++; K.syncMsTotal = Math.round((K.syncMsTotal + ms) * 10) / 10; K.syncMsMax = Math.max(K.syncMsMax, Math.round(ms * 10) / 10);
     K.pendingCells = pending; K.lastRectRadius = Math.round(rect.r);
-    if (pending || moving) { clearTimeout(cullRetryT); cullRetryT = setTimeout(() => { if (allMode) scheduleAll(); }, moving ? 450 : 120); }   // 予算超過/移動中に見送った分は止まってから段階的に
+    if (pending || moving) { clearTimeout(cullRetryT); cullRetryT = setTimeout(() => { if (allMode) scheduleAll(); else scheduleSingleCull(); }, moving ? 450 : 120); }   // 予算超過/移動中に見送った分は止まってから段階的に
     scene.requestRender();
   }
 
@@ -1019,6 +1019,7 @@
   function vecSync() {
     stats.vec45i.available = vecWards.size;
     stats.vec45i.mounted = {}; for (const [k, r] of vecAll) stats.vec45i.mounted[k] = { level: r.level, layers: r.layers.map((l) => (l.key || l.id) + ':' + l.count) };
+    if (vecCovHook) vecCovHook();   // 45X: マウント/破棄のたびに coverage 表示を更新（以前は moveEnd と 3 秒後だけで、描画後も「未配信」のまま残った）
   }
   function wardVecApply(id, on) {
     for (const w of wardVec) if (w.id === id) w.layer.applyVisible(on);
@@ -1170,6 +1171,9 @@
     if (!m) return;
     const base = m.base + 'layers/';
     const wc = m.source.wardCode;
+    // 45X: 45E の index.json が layersWards を持つとき、載っていない区は問い合わせない（無駄な 404 を出さず「未配信」と確定できる）
+    const wid = String(m.id || '').replace(/^ext-/, '');
+    if (vecWards.size && !vecWards.has(wid)) { if (gen === bldgGen) stats.wardVec = { ward: wc, state: 'no-layers', layers: {} }; return; }
     try {
       const probe = await fetch(base + 'layers-report.json');
       if (!probe.ok) { if (gen === bldgGen) stats.wardVec = { ward: wc, state: 'no-layers', layers: {} }; return; }   // 未生成: 道路・河川は出さない
@@ -1182,6 +1186,7 @@
     stats.wardVec.clip = set.clipKind;
     for (const l of set.layers) stats.wardVec.layers[l.id] = l.count;
     wardVec = set.layers; wardVecRelease = set.release; stats.wardVec.state = 'ready'; scene.requestRender();
+    scheduleSingleCull(); if (vecCovHook) vecCovHook();   // 45X: 視野カリングのセルを今の視点で構築 / coverage 更新
   }
   function unmountBuildings() {
     unmountWardVec();
@@ -1441,7 +1446,18 @@
   $('btn-home').onclick = resetCamera;
   $('sel-sse').value = String(SSE0);
   $('sel-sse').onchange = (e) => { stats.sse = +e.target.value; if (tileset) tileset.maximumScreenSpaceError = stats.sse; for (const x of extraSets) x.tileset.maximumScreenSpaceError = x.level === 'coarse' ? LC45F.DEFAULTS.coarseSse : stats.sse; };
-  viewer.camera.moveEnd.addEventListener(() => { if (allMode) scheduleAll(); });   // 45F: 全域3Dは移動終了後 200ms の debounce で区を再計画（定期ポーリングはしない）
+  // 45X: 単一区モード（allMode でない）でも、視野カリング付きの区ベクタ（mountCulled）のセルを視点に合わせて載せる。
+  //   45K 以降 vecViewSync は allTick からしか呼ばれず、単一区モードではセルが一度も構築されず「件数は ready なのに何も描かれない」状態だった。
+  let singleCullT = 0;
+  function singleCullSync() {
+    if (allMode || !cullLayers.size) return;
+    const cam = viewer.camera;
+    const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+    const pos = cartToLocal(cam.positionWC);
+    vecViewSync(ctr ? cartToLocal(ctr) : pos, pos.h);
+  }
+  scheduleSingleCull = () => { clearTimeout(singleCullT); singleCullT = setTimeout(singleCullSync, 120); };
+  viewer.camera.moveEnd.addEventListener(() => { if (allMode) scheduleAll(); else scheduleSingleCull(); });   // 45F: 全域3Dは移動終了後 200ms の debounce で区を再計画（定期ポーリングはしない）
 
   // ── 45G: 高速化（requestRenderMode / 解像度の自動調整 / キャッシュ予算 / 計測 / 遠景 LOD0） ──────────────────────
   //   すべて localhost の ?ext45=1 のときだけ既定 ON（?rr=0 ?res=fixed ?cache=0 ?cull=0 ?lod0=0 で個別に無効化＝A/B 比較用）。公開ページの挙動は変えない。
@@ -2480,6 +2496,7 @@
     } catch (e) { /* 表示補助のみ */ }
   }
   viewer.camera.moveEnd.addEventListener(updateVecCoverage);
+  vecCovHook = () => setTimeout(updateVecCoverage, 0);
   setTimeout(updateVecCoverage, 3000);
 
   // ══════════════════════════════════════════════════════════════
