@@ -25,6 +25,14 @@ pre{white-space:pre-wrap;font-size:11px}
   <label>地理院タイル オフセット 南+ rz(m) <input id="rz" type="number" value="0" step="1" style="width:60px"></label>
   <label>緯度,経度へ移動 <input id="ll" placeholder="34.6934,135.4829" style="width:150px"></label><button id="llgo">移動してピン</button>
   <label>視差の目安: 建物高さ(m) <input id="ph" type="number" value="30" style="width:50px"> 鉛直からの傾き(°) <input id="pa" type="number" value="30" style="width:46px"></label><button id="pgo">計算</button> <span id="pout" style="font-size:11px"></span>
+  <label><input type="checkbox" id="priv" checked> 座標を隠す（スクショ用: 緯度経度・格子の数値を出さない）</label>
+  <fieldset style="border:1px solid #3d506a;margin:8px 0;padding:6px"><legend>Mission 45S 対応点（2〜4組）</legend>
+    <div style="font-size:11px">手順: ①「対応点を追加」(地理院が自動ON) ② <b>青い道路線の交差点</b>をクリック ③ 地理院の地図上で<b>同じ交差点の中心</b>をクリック。差だけ表示し、緯度経度・IDは出しません。</div>
+    <button id="cpadd">対応点を追加</button> <button id="cpclr">クリア</button>
+    <div id="cpstate" style="font-size:11px;color:#f5d98a"></div>
+    <pre id="cpout" style="font-size:11px">(未計測)</pre>
+    <div style="font-size:11px">注意: 地理院ラスタは地図表現で、道路の線は測量位置そのものではありません。目視で選んだ点の差は目視誤差（1画素 ≈ 下に表示）を含みます。自動推定ではありません。差の向きは<b>道路中心線 → 地理院上の対応点</b>です。</div>
+  </fieldset>
   <p>※ オフセットは「見た目の確認用」のみ。データにも変換にも反映されません。</p>
   <p>クリック=ピン固定(最大8点)。ピンは緯度経度と、最寄りの footprint / 道路までの距離を並べて表示します。同じ地物(交差点・大きな建物)に複数レイヤーのずれ方向が揃うかを見てください。</p>
   <p id="warn" style="color:#f5d98a">この画面は原因を断定しません。ずれが GSI タイルにだけ出るなら、タイル側/投影の差の可能性。footprint と道路の間だけなら元データ同士の差(時期・品質)の可能性。どちらも画面上の目視と複数地点の一貫性で判断してください。</p>
@@ -67,8 +75,8 @@ pre{white-space:pre-wrap;font-size:11px}
   function drawGrid() {
     var a = P2S(0, 0), b = P2S(cv.width, cv.height), st = sc > 0.05 ? 100 : 500;
     g.strokeStyle = "rgba(0,0,0,.18)"; g.lineWidth = 1; g.fillStyle = "#333"; g.font = "10px sans-serif";
-    for (var x = Math.floor(a[0] / st) * st; x <= b[0]; x += st) { var p = S2P(x, a[1]); g.beginPath(); g.moveTo(p[0], 0); g.lineTo(p[0], cv.height); g.stroke(); g.fillText(x, p[0] + 2, 10); }
-    for (var z = Math.floor(a[1] / st) * st; z <= b[1]; z += st) { var q = S2P(a[0], z); g.beginPath(); g.moveTo(0, q[1]); g.lineTo(cv.width, q[1]); g.stroke(); g.fillText(z, 2, q[1] - 2); }
+    for (var x = Math.floor(a[0] / st) * st; x <= b[0]; x += st) { var p = S2P(x, a[1]); g.beginPath(); g.moveTo(p[0], 0); g.lineTo(p[0], cv.height); g.stroke(); if (!$('priv').checked) g.fillText(x, p[0] + 2, 10); }
+    for (var z = Math.floor(a[1] / st) * st; z <= b[1]; z += st) { var q = S2P(a[0], z); g.beginPath(); g.moveTo(0, q[1]); g.lineTo(cv.width, q[1]); g.stroke(); if (!$('priv').checked) g.fillText(z, 2, q[1] - 2); }
   }
   function distTo(x, z) {
     var bf = Infinity, br = Infinity, dx = +$("dx").value || 0, dz = +$("dz").value || 0;
@@ -79,8 +87,78 @@ pre{white-space:pre-wrap;font-size:11px}
   function addPin(s) {
     var ll = lonlat(s[0], s[1]), d = distTo(s[0], s[1]);
     pins.push(s); if (pins.length > 8) pins.shift();
-    info.textContent += "\n\npin#" + pins.length + " x=" + s[0].toFixed(1) + " z=" + s[1].toFixed(1) + "\nlat=" + ll[1].toFixed(6) + " lon=" + ll[0].toFixed(6) + "\nnearest footprint vertex " + (d[0] === Infinity ? "-" : d[0].toFixed(1)) + " m / nearest road vertex " + (d[1] === Infinity ? "-" : d[1].toFixed(1)) + " m (頂点間の近似。線上の距離ではない)";
+    info.textContent += "\n\npin#" + pins.length + ($('priv').checked ? "" : " x=" + s[0].toFixed(1) + " z=" + s[1].toFixed(1) + "\nlat=" + ll[1].toFixed(6) + " lon=" + ll[0].toFixed(6)) + "\nnearest footprint vertex " + (d[0] === Infinity ? "-" : d[0].toFixed(1)) + " m / nearest road vertex " + (d[1] === Infinity ? "-" : d[1].toFixed(1)) + " m (頂点間の近似。線上の距離ではない)";
     draw();
+  }
+  // ---- Mission 45S: 対応点（道路中心線の点 → 地理院上の目視対応点）。差のみ。ローカル表示のみ。 ----
+  var cp = { pairs: [], mode: 0, road: null };   // mode 0:待機 1:道路点待ち 2:地理院点待ち
+  function trueMeters(latDeg) {
+    var f = latDeg * Math.PI / 180;
+    return { e: 111412.84 * Math.cos(f) - 93.5 * Math.cos(3 * f), n: 111132.92 - 559.82 * Math.cos(2 * f) + 1.175 * Math.cos(4 * f) };
+  }
+  // 局所座標(x東+, z南+)の差を、その緯度の実距離(m)の 東+/北+ に換算。入力は生の道路座標と生の地理院ラスタ座標（表示オフセット適用前）。
+  // 局所系の mpd=111320 は緯度1度の実距離(約110,9xx m)より約0.3%大きいので、ここでは実距離で出す。
+  function pairDelta(road, gsi, meta) {
+    var lat0 = meta.origin.lat - road[1] / meta.mpd, tm = trueMeters(lat0);
+    var dLon = (gsi[0] - road[0]) / (Math.cos(meta.origin.lat * Math.PI / 180) * meta.mpd), dLat = -(gsi[1] - road[1]) / meta.mpd;
+    var e = dLon * tm.e, n = dLat * tm.n, brg = (Math.atan2(e, n) * 180 / Math.PI + 360) % 360;
+    return { e: e, n: n, dist: Math.hypot(e, n), bearing: brg, dir: compass(brg) };
+  }
+  function compass(b) { var N = ['北', '北北東', '北東', '東北東', '東', '東南東', '南東', '南南東', '南', '南南西', '南西', '西南西', '西', '西北西', '北西', '北北西']; return N[Math.round(b / 22.5) % 16]; }
+  function summarize(ds, pxM) {
+    if (!ds.length) return null;
+    var me = 0, mn = 0; ds.forEach(function (d) { me += d.e; mn += d.n; }); me /= ds.length; mn /= ds.length;
+    var spread = 0; ds.forEach(function (d) { spread = Math.max(spread, Math.hypot(d.e - me, d.n - mn)); });
+    var len = Math.hypot(me, mn), tol = Math.max(3, pxM * 3), verdict;
+    if (ds.length < 2) verdict = '1組のみ: 一様か判断できません（2〜4組で）。';
+    else if (len <= tol) verdict = '平均差は目視誤差内(' + tol.toFixed(1) + ' m 以内)。有意なずれは検出できません。';
+    else if (spread <= tol) verdict = '向き・大きさが揃っています(ばらつき ' + spread.toFixed(1) + ' m ≤ 許容 ' + tol.toFixed(1) + ' m)。局所的な一様差の可能性はありますが、目視誤差を含むため別の場所でも再確認してください。何も適用しません。';
+    else verdict = '向き・大きさが揃っていません(ばらつき ' + spread.toFixed(1) + ' m > 許容 ' + tol.toFixed(1) + ' m)。一様な平行移動では説明できません。';
+    return { meanE: me, meanN: mn, meanDist: len, spread: spread, tol: tol, verdict: verdict };
+  }
+  function nearestRoadPoint(x, z, maxM) {
+    var best = null, bd = maxM;
+    D.roads.forEach(function (l) { for (var i = 0; i < l.length; i++) { var d = Math.hypot(l[i][0] - x, l[i][1] - z); if (d < bd) { bd = d; best = [l[i][0], l[i][1]]; } } });
+    return best;
+  }
+  function cpRender() {
+    var pxM = 1 / sc, lines = [];
+    var ds = cp.pairs.map(function (p) { return pairDelta(p.road, p.gsi, D.meta); });
+    ds.forEach(function (d, i) { lines.push('C' + (i + 1) + ' 東+' + d.e.toFixed(1) + ' m / 北+' + d.n.toFixed(1) + ' m  距離 ' + d.dist.toFixed(1) + ' m  方向 ' + d.dir + ' (' + d.bearing.toFixed(0) + '°)'); });
+    var sm = summarize(ds, pxM);
+    if (sm) { lines.push('平均 東+' + sm.meanE.toFixed(1) + ' / 北+' + sm.meanN.toFixed(1) + ' m (距離 ' + sm.meanDist.toFixed(1) + ' m)'); lines.push(sm.verdict); }
+    lines.push('目視誤差の目安: 1画素 ≈ ' + pxM.toFixed(2) + ' m（拡大してから取る）');
+    $('cpout').textContent = lines.join('\n');
+    $('cpstate').textContent = cp.mode === 1 ? '② 青い道路線の交差点をクリック' : cp.mode === 2 ? '③ 地理院の同じ交差点の中心をクリック' : (cp.pairs.length >= 4 ? '最大4組。クリアしてやり直せます' : '');
+    return sm;
+  }
+  $('cpadd').addEventListener('click', function () {
+    if (!D) { $('cpstate').textContent = '先に diag.json を読み込んでください'; return; }
+    if (cp.pairs.length >= 4) { cpRender(); return; }
+    $('lg').checked = true; cp.mode = 1; cp.road = null; draw(); cpRender();
+  });
+  $('cpclr').addEventListener('click', function () { cp.pairs = []; cp.mode = 0; cp.road = null; if (D) draw(); $('cpout').textContent = '(未計測)'; $('cpstate').textContent = ''; });
+  // クリックを対応点として処理した場合 true（ピンは打たない）
+  function cpClick(s) {
+    if (cp.mode === 1) {
+      var rp = nearestRoadPoint(s[0], s[1], 20 / sc + 5);
+      if (!rp) { $('cpstate').textContent = '道路の頂点が近くにありません。青線の交差点付近をもう一度'; return true; }
+      cp.road = rp; cp.mode = 2; draw(); cpRender(); return true;
+    }
+    if (cp.mode === 2) {
+      var rxo = +$('rx').value || 0, rzo = +$('rz').value || 0;
+      cp.pairs.push({ road: cp.road, gsi: [s[0] - rxo, s[1] - rzo] }); cp.mode = 0; cp.road = null; draw(); cpRender(); return true;
+    }
+    return false;
+  }
+  function cpDraw() {
+    var dx = +$('dx').value || 0, dz = +$('dz').value || 0, rxo = +$('rx').value || 0, rzo = +$('rz').value || 0;
+    cp.pairs.forEach(function (p, i) {
+      var a = S2P(p.road[0] + dx, p.road[1] + dz), b = S2P(p.gsi[0] + rxo, p.gsi[1] + rzo);
+      g.strokeStyle = '#0a0'; g.lineWidth = 2; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke();
+      g.fillStyle = '#0a0'; g.fillRect(a[0] - 3, a[1] - 3, 6, 6); g.beginPath(); g.arc(b[0], b[1], 4, 0, 7); g.fill(); g.font = '11px sans-serif'; g.fillText('C' + (i + 1), b[0] + 6, b[1] - 6);
+    });
+    if (cp.road) { var q = S2P(cp.road[0] + dx, cp.road[1] + dz); g.strokeStyle = '#0a0'; g.lineWidth = 2; g.strokeRect(q[0] - 5, q[1] - 5, 10, 10); }
   }
   function draw() {
     g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
@@ -104,9 +182,10 @@ pre{white-space:pre-wrap;font-size:11px}
       g.strokeStyle = 'rgba(20,90,230,.9)'; g.lineWidth = 1.5;
       D.roads.forEach(function (l) { g.beginPath(); l.forEach(function (q, i) { var p = S2P(q[0] + dx, q[1] + dz); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); });
     }
+    cpDraw();
     pins.forEach(function (pk, i) { var pp = S2P(pk[0], pk[1]); g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(pp[0], pp[1], 6, 0, 7); g.stroke(); g.fillStyle = '#000'; g.fillText('#' + (i + 1), pp[0] + 8, pp[1] - 8); });
   }
-  ['lf', 'lr', 'lg', 'lgrid', 'dx', 'dz', 'rx', 'rz'].forEach(function (i) { $(i).addEventListener('input', draw); });
+  ['lf', 'lr', 'lg', 'lgrid', 'priv', 'dx', 'dz', 'rx', 'rz'].forEach(function (i) { $(i).addEventListener('input', draw); });
   $('file').addEventListener('change', function (e) {
     var f = e.target.files[0]; if (!f) return;
     var rd = new FileReader(); rd.onload = function () { loadText(rd.result); }; rd.onerror = function () { info.textContent = '読み込み失敗: ファイルを読めません'; }; rd.readAsText(f);
@@ -126,7 +205,7 @@ pre{white-space:pre-wrap;font-size:11px}
     return null;
   }
   function parallax(h, deg) { return h * Math.tan(deg * Math.PI / 180); }
-  window.__diag45 = { validate: validate, parallax: parallax, state: function () { return { loaded: !!D, footprints: D ? D.footprints.length : 0, roads: D ? D.roads.length : 0, pins: pins.length, gsi: $('lg').checked, canvas: [cv.width, cv.height], sideWidth: $('side').getBoundingClientRect().width }; } };
+  window.__diag45 = { validate: validate, parallax: parallax, pairDelta: pairDelta, summarize: summarize, trueMeters: trueMeters, cpPairs: function () { return cp.pairs.length; }, cpMode: function () { return cp.mode; }, cpOut: function () { return $('cpout').textContent; }, toScreen: function (x, z) { return S2P(x, z); }, state: function () { return { loaded: !!D, footprints: D ? D.footprints.length : 0, roads: D ? D.roads.length : 0, pins: pins.length, gsi: $('lg').checked, canvas: [cv.width, cv.height], sideWidth: $('side').getBoundingClientRect().width }; } };
   function loadText(txt) {
     var j; try { j = JSON.parse(txt); } catch (e) { info.textContent = '読み込み失敗: JSON として解釈できません (' + e.message + ')'; return; }
     var err = validate(j); if (err) { info.textContent = '読み込み失敗: ' + err; return; }
@@ -142,7 +221,7 @@ pre{white-space:pre-wrap;font-size:11px}
   window.addEventListener('mouseup', function (e) {
     if (drag && !moved && D) {
       var r = cv.getBoundingClientRect(), s = P2S(e.clientX - r.left, e.clientY - r.top);
-      addPin(s);
+      if (!cpClick(s)) addPin(s);
     }
     drag = null;
   });
