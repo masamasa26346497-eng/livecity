@@ -454,6 +454,7 @@
 <script src="mission45g-perf.js"></script>
 <script src="mission45i-vec.js"></script>
 <script src="mission45k-viewcull.js"></script>
+<script src="mission45l-interaction.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -814,6 +815,7 @@
   // 45K: カメラ足元の矩形（max(1200m, 高度×1.8)×余白1.5）に触れるセルだけを GPU へ載せ、hysteresis 1.5 倍の外へ出たセルを外す。
   function vecViewSync(c, height) {
     lastView = { x: c.x, z: c.z, h: height };
+    IX.noteSync(performance.now());
     if (!cullLayers.size) return;
     const rect = LC45K.viewRect(c.x, c.z, height), moving = isMoving(), K = stats.vec45k;
     const t = performance.now();
@@ -1429,7 +1431,10 @@
   const lod0Sets = new Map();   // wardCode → Cesium3DTileset（遠景用の概略形状。実棟ではない）。読み込み中は null
   const lod0Pending = new Set();   // 45H: fromUrl 実行中の区（並行 reload 防止）
   const lod0Live = () => [...lod0Sets.values()].filter((t) => t && !t.isDestroyed());   // 45H: null プレースホルダを除く
-  const isMoving = () => performance.now() - lastCamMove < 400;
+  // 45L: 操作中判定の単一の源（pointer 押下中 / wheel 220ms / カメラ移動 400ms）。?smooth=0 で 45K 以前の判定へ戻す（A/B 用）。
+  const SMOOTH = q.get('smooth') !== '0';
+  const IX = LC45L.create();
+  const isMoving = () => { const n = performance.now(); return SMOOTH ? IX.isActive(n) : n - lastCamMove < 400; };
   const allTilesetsNow = () => [tileset, ...extraSets.map((e) => e.tileset)].filter((t) => t && !t.isDestroyed());
   let lastBudgetN = -1;
   function applyCacheBudget() {
@@ -1445,21 +1450,38 @@
   const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'fixed' || q.get('res') === 'quality') ? 'quality' : 'balanced';
   perf.preset = RES_PRESET;
   const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
-  function applyRes(s) { if (s === null) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
+  function applyRes(s) { if (s === null) return; if (SMOOTH && !IX.allowResChange(performance.now(), s >= viewer.resolutionScale)) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
   let resT = 0;
   viewer.camera.moveEnd.addEventListener(() => { clearTimeout(resT); resT = setTimeout(() => applyRes(resCtl.tick(performance.now(), false)), LC45G.DEFAULTS.restoreMs + 50); });
   // ext45 の既定は「画質優先」ではなく自動。useBrowserRecommendedResolution=true（Cesium 既定）は DPR を無視した 1.0 倍の解像度で描く。
   //   ?dpr=1 で devicePixelRatio をそのまま使う（高 DPI で鮮明だが重い）。
   if (EXT45 && q.get('dpr') === '1') viewer.useBrowserRecommendedResolution = false;
-  viewer.camera.changed.addEventListener(() => { lastCamMove = performance.now(); if (!moveStartedAt) moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
+  viewer.camera.changed.addEventListener(() => { lastCamMove = performance.now(); IX.cameraMoved(lastCamMove); if (!moveStartedAt) moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
   viewer.camera.percentageChanged = Math.min(viewer.camera.percentageChanged, 0.02);
-  viewer.camera.moveStart.addEventListener(() => { lastCamMove = performance.now(); moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
+  viewer.camera.moveStart.addEventListener(() => { lastCamMove = performance.now(); IX.cameraMoved(lastCamMove); moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
   scene.postRender.addEventListener(() => {
     const now = performance.now(), dt = now - lastRenderAt; lastRenderAt = now;
     perf.renders++;
+    IX.frame(now, dt);
     if (dt < 2000) { frameLog.push(dt); if (frameLog.length > 300) frameLog.shift(); }
     applyRes(resCtl.frame(dt, isMoving(), now));
   });
+  // 45L: 入力イベントを直接見る（camera.changed は percentageChanged 未満の細かい入力では発火しない）。
+  //   操作中は RR でも毎フレーム描画を要求し（rAF）、止まったら要求をやめる。
+  {
+    const cv = viewer.canvas, opt = { passive: true, capture: true };
+    cv.addEventListener('pointerdown', () => { IX.pointerDown(performance.now()); if (RR) scene.requestRender(); }, opt);
+    window.addEventListener('pointerup', () => IX.pointerUp(performance.now()), opt);
+    window.addEventListener('pointercancel', () => IX.pointerUp(performance.now()), opt);
+    cv.addEventListener('wheel', () => { IX.wheel(performance.now()); if (RR) scene.requestRender(); }, opt);
+    if (RR && SMOOTH) { const loop = () => { if (IX.isActive(performance.now())) scene.requestRender(); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+    try { new PerformanceObserver((l) => { for (const e of l.getEntries()) IX.noteLongTask(e.duration, performance.now()); }).observe({ entryTypes: ['longtask'] }); } catch (e) { /* 非対応ブラウザ */ }
+    window.__mission45l = {
+      smooth: SMOOTH, rr: RR,
+      snapshot: () => Object.assign({ smooth: SMOOTH, requestRenderMode: RR, resolutionScale: perf.resolutionScale, resolutionChangesTotal: perf.resolutionChanges }, IX.snapshot(performance.now())),
+      reset: () => IX.reset(),
+    };
+  }
   // 読み込み中は描画を止めない。tileset が全 tile を読み終えるまで 250ms ごとに 1 回描画を要求する（RR のとき）。
   function anyLoading() {
     for (const t of allTilesetsNow()) if (!t.tilesLoaded) return true;
@@ -1469,6 +1491,7 @@
   let hb = 0;
   setInterval(() => {
     if (document.hidden) return;
+    if (SMOOTH && isMoving()) { IX.noteDeferred(); return; }   // 45L: 操作中は定期処理を延期（止まった次の周期で実行）
     applyCacheBudget();
     applyRes(resCtl.tick(performance.now(), isMoving()));   // 45H: 保険（moveEnd が来なくても静止 700ms 後に最高画質へ）
     const loading = anyLoading();
@@ -1989,8 +2012,15 @@
       if (stats.towns) { stats.towns.labelTier = tier; stats.towns.labelsShown = n; }
       scene.requestRender();
     }
-    function scheduleLabels() { if (!pending) { pending = true; requestAnimationFrame(updateLabels); } }
-    viewer.camera.percentageChanged = 0.05;
+    // 45L: 操作中はラベル再選択を延期し、止まってから 1 回だけ実行する（表示中のラベルはそのまま）。
+    let lblDefer = 0;
+    function scheduleLabels() {
+      if (pending) return;
+      if (SMOOTH && isMoving()) { IX.noteDeferred(); clearTimeout(lblDefer); lblDefer = setTimeout(scheduleLabels, 160); return; }
+      pending = true; requestAnimationFrame(updateLabels);
+    }
+    // 45L: 45G の 0.02 を 0.05 に上書きしない（細かい入力でも changed を出す）
+    viewer.camera.percentageChanged = Math.min(viewer.camera.percentageChanged, 0.02);
     viewer.camera.changed.addEventListener(scheduleLabels);
     viewer.camera.moveEnd.addEventListener(scheduleLabels);
 
@@ -2954,13 +2984,13 @@
   }
   // 37K: 定期処理はカメラが動いたときだけ実処理を行う（停止中は比較のみ）。POI の生成/破棄も同じゲートで同期する。
   const mmGate = makeCamGate(), facGate = makeCamGate();
-  setInterval(() => { if (mmGate()) mmDraw(); }, 500);
+  setInterval(() => { if (SMOOTH && isMoving()) { IX.noteDeferred(); return; } if (mmGate()) mmDraw(); }, 500);
   function facTick() {
     facRetry = false;
     for (const l of poiLayers) { try { l.sync(); } catch (e) { fail('poi:sync', e); } }
     updateFacilitiesNear().catch((e) => fail('facilities:near', e));   // 37J
   }
-  setInterval(() => { if (facGate() || facRetry) facTick(); }, 1500);
+  setInterval(() => { if (SMOOTH && isMoving()) { IX.noteDeferred(); return; } if (facGate() || facRetry) facTick(); }, 1500);
   let moveEndT = 0;   // カメラ移動の終了直後に即時同期（定期処理の待ちで近景の点が遅れないように。debounce 150ms）
   viewer.camera.moveEnd.addEventListener(() => { clearTimeout(moveEndT); moveEndT = setTimeout(facTick, 150); });
 
