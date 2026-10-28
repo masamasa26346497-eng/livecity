@@ -5,8 +5,12 @@
 //   → ECEF → (Bowring 反復で) 測地座標 → geoToThree と同じ順変換で local(x,z) → 元 tile JSON の fp / z0 / top と比較。
 //   ビルダー(mission37b-build-3dtiles.cjs)の関数は一切 import しない（独立実装）。入力は読み取り専用、何も書かない。
 // 使い方:
-//   node tools/mission45m-verify-glb-geometry.cjs --tileset <dir> --src <buildings dataset dir> [--max-tiles N] [--tol 1] [--json out.json]
+//   (推奨) node tools/mission45m-verify-glb-geometry.cjs --out-root <45D root> --src-root <legacy buildings root> --ward <id> [--sample 5]
+//       45D root の実レイアウト(pc23/<ward>-aN, sumiyoshi-aN/sumiyoshi)は mission45e-preview.cjs の plan() で証拠を再検査して解決する。
+//       src は <src-root>/osaka-<ward>。どちらも read-only。解決できなければ必ず非0終了（黙って成功しない）。
+//   (互換) node tools/mission45m-verify-glb-geometry.cjs --tileset <dir> --src <buildings dataset dir> [--max-tiles N] [--tol 1] [--json out.json]
 //   既定: tracked の osaka-sumiyoshi-9tile と public/map-data/osaka-city/buildings/osaka-sumiyoshi
+// pass:true の意味は「GLB 頂点 → 元 tile JSON の footprint が一致する」ことだけ。元 footprint と OSM 道路/背景の位置関係は検証しない。
 // 出力は集計値のみ（建物ID・座標・パスは出さない）。--json は集計のみ書く。
 const fs = require('fs');
 const path = require('path');
@@ -78,7 +82,26 @@ function collectLeaves(node, anc, out) {
   (node.children || []).forEach(c => collectLeaves(c, a, out));
 }
 
+const cerr = (msg, code) => Object.assign(new Error(msg), { code });
+const WARD_RE = /^[a-z][a-z0-9-]*$/;
+// 45D root + legacy buildings root + ward id -> { tileset, src }。plan() が 45D の証明を src に対して再計算する。パスは出力しない。
+function resolveOutRoot(o) {
+  if (!o.ward || !WARD_RE.test(o.ward)) throw cerr('--ward <id> required (e.g. fukushima)', 2);
+  if (!o.srcRoot) throw cerr('--src-root (legacy buildings root) required', 2);
+  const src = path.join(path.resolve(o.srcRoot), 'osaka-' + o.ward);
+  if (!fs.existsSync(path.join(src, 'manifest.json'))) throw cerr('source dataset osaka-' + o.ward + '/manifest.json not found under --src-root', 3);
+  let p;
+  try { p = require('./mission45e-preview.cjs').plan({ src: path.resolve(o.srcRoot), outRoot: o.outRoot, allowSynthetic: !!o.allowSynthetic, sumiyoshiRun: o.sumiyoshiRun }); }
+  catch (e) { throw cerr('45D root not verified: ' + (Number.isInteger(e.code) ? e.message : 'operation failed (details suppressed)'), Number.isInteger(e.code) ? e.code : 3); }
+  const s = p.servable.find((x) => x.ward === o.ward);
+  if (!s) throw cerr('ward ' + o.ward + ' is not a verified ward in the 45D root', 3);
+  if (!fs.existsSync(path.join(s.dir, 'tileset.json'))) throw cerr('verified ward dir has no tileset.json', 3);
+  return { tileset: s.dir, src, verifiedBuildings: s.buildings };
+}
+
 function verify(opts) {
+  if (!fs.existsSync(path.join(opts.tileset, 'tileset.json'))) throw cerr('tileset.json not found in --tileset (use --out-root/--ward for a 45D root)', 2);
+  if (!fs.existsSync(path.join(opts.src, 'manifest.json'))) throw cerr('manifest.json not found in --src', 2);
   const tilesetPath = path.join(opts.tileset, 'tileset.json');
   const ts = JSON.parse(fs.readFileSync(tilesetPath, 'utf8'));
   const manifest = JSON.parse(fs.readFileSync(path.join(opts.src, 'manifest.json'), 'utf8'));
@@ -86,7 +109,7 @@ function verify(opts) {
   const leaves = []; collectLeaves(ts.root, [], leaves);
   const picked = opts.maxTiles ? leaves.slice(0, opts.maxTiles) : leaves;
   const R = { tilesChecked: 0, buildingsChecked: 0, buildingsMissingInGlb: 0, vertexNoMatch: 0, nodeMatrixPresent: false, nodeTRSPresent: false,
-    errXY: [], errH: [], regionViolations: 0, fitAngle: [], fitScale: [], mirrorSuspect: 0, idsMismatch: 0 };
+    errXY: [], errH: [], regionViolations: 0, fitAngle: [], fitScale: [], mirrorSuspect: 0, idsMismatch: 0, attrsMissing: 0, idsNotCanonical: 0, idsTotal: 0 };
   const eXs = [], eYs = [];
   for (const { node, chain } of picked) {
     const { tx, tz } = node.extras;
@@ -94,6 +117,8 @@ function verify(opts) {
     const srcTile = JSON.parse(fs.readFileSync(path.join(opts.src, file), 'utf8'));
     const ids = JSON.parse(fs.readFileSync(path.join(opts.tileset, node.extras.idsUri), 'utf8'));
     const glb = readGlb(fs.readFileSync(path.join(opts.tileset, node.content.uri)));
+    if (!fs.existsSync(path.join(opts.tileset, 'attrs', 't_' + tx + '_' + tz + '.json'))) R.attrsMissing++;
+    for (const id of ids) { R.idsTotal++; if (typeof id !== 'string' || !/^bldg_/.test(id)) R.idsNotCanonical++; }
     if (glb.nodeM !== I4) R.nodeMatrixPresent = true;
     if (glb.hasTRS) R.nodeTRSPresent = true;
     const M = mul(leafTransform(chain), mul(YUP_TO_ZUP, glb.nodeM));
@@ -147,10 +172,13 @@ function verify(opts) {
     meanOffsetEastM: eXs.length ? eXs.reduce((a, b) => a + b, 0) / eXs.length : null,
     meanOffsetSouthM: eYs.length ? eYs.reduce((a, b) => a + b, 0) / eYs.length : null, // local z は南が正
     fitRotationDegAbs: stat(R.fitAngle), fitScaleErrAbs: stat(R.fitScale),
+    attrsMissingTiles: R.attrsMissing, idsNotCanonical: R.idsNotCanonical, idsTotal: R.idsTotal,
     mirrorSuspectBuildings: R.mirrorSuspect, vertexNoMatchOver5m: R.vertexNoMatch, regionViolations: R.regionViolations,
   };
   res.pass = res.buildingsChecked > 0 && res.horizontalErrM.max < tol && (res.heightErrM.max === null || res.heightErrM.max < tol) &&
-    res.mirrorSuspectBuildings === 0 && res.regionViolations === 0 && res.idsMismatch === 0 && res.vertexNoMatchOver5m === 0;
+    res.mirrorSuspectBuildings === 0 && res.regionViolations === 0 && res.idsMismatch === 0 && res.vertexNoMatchOver5m === 0 &&
+    res.idsNotCanonical === 0 && (!opts.requireAttrs || res.attrsMissingTiles === 0);
+  res.scope = 'GLB vertices vs SOURCE footprint only. Says NOTHING about source-footprint vs OSM road / base-map alignment (see mission45j-align-check).';
   return res;
 }
 
@@ -167,16 +195,26 @@ function roundtripLocal(samples) {
 function main() {
   const a = process.argv.slice(2); const opt = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
   const root = path.join(__dirname, '..');
-  const o = {
-    tileset: path.resolve(opt('tileset', path.join(root, 'public', 'mission37b-3dtiles', 'osaka-sumiyoshi-9tile'))),
-    src: path.resolve(opt('src', path.join(root, 'public', 'map-data', 'osaka-city', 'buildings', 'osaka-sumiyoshi'))),
-    maxTiles: +opt('max-tiles', 0), tol: +opt('tol', 1), sample: +opt('sample', 0),
-  };
-  const r = verify(o);
-  r.localRoundtripMaxM = roundtripLocal([[-3441, -2303], [0, 0], [1865, 5000], [15000, -15000], [-20000, 20000]]);
-  console.log(JSON.stringify(r, null, 1));
-  const j = opt('json', null); if (j) fs.writeFileSync(path.resolve(j), JSON.stringify(r, null, 1));
-  process.exit(r.pass ? 0 : 1);
+  const fail = (e) => { console.error(Number.isInteger(e.code) ? 'error: ' + e.message : 'error: operation failed (details suppressed)'); process.exit(Number.isInteger(e.code) ? e.code : 1); };
+  try {
+    const o = { maxTiles: +opt('max-tiles', 0), tol: +opt('tol', 1), sample: +opt('sample', 0) };
+    let used = 'direct';
+    if (opt('out-root', null) !== null || opt('ward', null) !== null || opt('src-root', null) !== null) {
+      if (opt('tileset', null) !== null || opt('src', null) !== null) throw cerr('use either --out-root/--src-root/--ward or --tileset/--src, not both', 2);
+      if (opt('out-root', null) === null) throw cerr('--out-root <45D root> required with --ward', 2);
+      Object.assign(o, resolveOutRoot({ outRoot: opt('out-root'), srcRoot: opt('src-root'), ward: opt('ward') }), { requireAttrs: true });
+      used = 'out-root';
+    } else {
+      o.tileset = path.resolve(opt('tileset', path.join(root, 'public', 'mission37b-3dtiles', 'osaka-sumiyoshi-9tile')));
+      o.src = path.resolve(opt('src', path.join(root, 'public', 'map-data', 'osaka-city', 'buildings', 'osaka-sumiyoshi')));
+    }
+    const r = verify(o);
+    r.resolvedVia = used; if (used === 'out-root') r.ward = opt('ward');
+    r.localRoundtripMaxM = roundtripLocal([[-3441, -2303], [0, 0], [1865, 5000], [15000, -15000], [-20000, 20000]]);
+    console.log(JSON.stringify(r, null, 1));
+    const jp = opt('json', null); if (jp) fs.writeFileSync(path.resolve(jp), JSON.stringify(r, null, 1));
+    process.exit(r.pass ? 0 : 1);
+  } catch (e) { fail(e); }
 }
-module.exports = { verify, readGlb, ecefToGeodetic, geoToLocal, roundtripLocal, YUP_TO_ZUP, mul, apply };
+module.exports = { verify, resolveOutRoot, readGlb, ecefToGeodetic, geoToLocal, roundtripLocal, YUP_TO_ZUP, mul, apply };
 if (require.main === module) main();

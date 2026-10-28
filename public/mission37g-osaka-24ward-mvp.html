@@ -1562,6 +1562,28 @@
     const el = document.createElement('pre');
     el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:50;margin:0;padding:6px 8px;background:rgba(10,18,32,.82);color:#cfe3ff;font:11px/1.35 monospace;pointer-events:none;max-width:44vw;white-space:pre-wrap';
     document.body.appendChild(el);
+    // 45N: 実 UI で A/B する操作（建物 / 道路・面レイヤー GPU 負荷の切替）と 10 秒の操作中計測。数値は件数・ms のみ（ID・パスは出さない）。
+    //   使い方: 構成を選ぶ → 「10秒測定」→ その間に同じようにドラッグ/ホイール → 結果が __mission45n.runs に溜まる。
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;left:8px;bottom:150px;z-index:51;display:flex;gap:6px;flex-wrap:wrap;max-width:44vw';
+    document.body.appendChild(bar);
+    const VEC_IDS = ['roads', 'waterways', 'parks', 'railways'];
+    const st45n = { buildings: true, vectors: true, runs: [], measuring: false, long: [] };
+    const mkBtn = (t, fn) => { const b = document.createElement('button'); b.textContent = t; b.style.cssText = 'font:11px monospace;padding:3px 6px;background:#14325a;color:#fff;border:1px solid #3a6ab0;border-radius:3px;cursor:pointer'; b.onclick = () => fn(b); bar.appendChild(b); return b; };
+    mkBtn('建物 ON', (b) => { st45n.buildings = !st45n.buildings; b.textContent = '建物 ' + (st45n.buildings ? 'ON' : 'OFF'); for (const t of allTilesetsNow().concat(lod0Live())) t.show = st45n.buildings; scene.requestRender(); });
+    mkBtn('道路/面 ON', (b) => { st45n.vectors = !st45n.vectors; b.textContent = '道路/面 ' + (st45n.vectors ? 'ON' : 'OFF'); for (const id of VEC_IDS) { try { LayerRegistry.setVisible(id, st45n.vectors); wardVecApply(id, st45n.vectors); } catch (e) { /* 未登録は無視 */ } } scene.requestRender(); });
+    try { new PerformanceObserver((l) => { if (st45n.measuring) for (const e of l.getEntries()) st45n.long.push(e.duration); }).observe({ entryTypes: ['longtask'] }); } catch (e) { /* 非対応 */ }
+    mkBtn('10秒測定', (b) => {
+      if (st45n.measuring) return;
+      st45n.measuring = true; st45n.long.length = 0; window.__mission45m.reset(); b.textContent = '測定中… 10秒ドラッグ/ホイール';
+      const cfg = { buildings: st45n.buildings, vectors: st45n.vectors, rr: RR, preset: RES_PRESET };
+      setTimeout(() => {
+        const m = window.__mission45m.snapshot(), lt = st45n.long.slice();
+        st45n.runs.push({ cfg, gestureFrameMs: m.gestureFrameMs, inputToRenderMs: m.inputToRenderMs, longTasks: { n: lt.length, over100ms: lt.filter((v) => v > 100).length, maxMs: lt.length ? Math.round(Math.max(...lt)) : 0 }, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null });
+        st45n.measuring = false; b.textContent = '10秒測定 (' + st45n.runs.length + '回)';
+      }, 10000);
+    });
+    window.__mission45n = { state: st45n, get runs() { return st45n.runs; } };
     setInterval(() => { const s = perfSnapshot(), f = s.frames || {}; el.textContent = 'RR ' + (RR ? 'on' : 'off') + ' | res x' + s.resolutionScale + ' (dpr ' + s.devicePixelRatio + ')\nrender ' + (f.avgFps || '-') + ' fps(描画時) p95 ' + (f.p95Ms || '-') + 'ms\ntiles vis ' + s.visibleTiles + ' / sets ' + s.tilesets + ' / GPU ' + (s.tilesetMemoryMB == null ? '?' : s.tilesetMemoryMB) + 'MB\nwards d' + s.detailWards + ' c' + s.coarseWards + ' lod0 ' + s.lod0.shown + '\nnet ' + s.net.requests + ' req / ' + (s.net.bytes / 1048576).toFixed(1) + 'MB\nsettle ' + (s.settleMs == null ? '-' : s.settleMs + 'ms'); }, 1000);
   }
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };
