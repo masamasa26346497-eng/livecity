@@ -456,6 +456,7 @@
 <script src="mission45k-viewcull.js"></script>
 <script src="mission45p-areacull.js"></script>
 <script src="mission45l-interaction.js"></script>
+<script src="mission45y-gfp.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -1458,6 +1459,51 @@
   }
   scheduleSingleCull = () => { clearTimeout(singleCullT); singleCullT = setTimeout(singleCullSync, 120); };
   viewer.camera.moveEnd.addEventListener(() => { if (allMode) scheduleAll(); else scheduleSingleCull(); });   // 45F: 全域3Dは移動終了後 200ms の debounce で区を再計画（定期ポーリングはしない）
+
+  // ── 45Y: 建物の地上輪郭（ground footprint）診断オーバーレイ。?gfp=1 かつ localhost / 127.0.0.1 のときだけ有効（既定 OFF）──
+  //   道路中心線（LAYER_H.roads）と同じ toCart・同じ高さで赤い輪郭を描き、屋根の視差に左右されず道路との相対位置を見る。
+  //   データは既に公開配信されている旧建物タイル（map-data/osaka-city/buildings/osaka-<区>/tile_*.json の fp）だけ。404 の区は「未対応」と表示し、何も作らない。
+  const GFP_ON = typeof LC45Y !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('gfp') === '1';
+  stats.gfp = { enabled: GFP_ON, state: GFP_ON ? 'idle' : 'off', ward: null, tiles: 0, loops: 0, unsupported: null };
+  if (GFP_ON) {
+    const GFP_R = 700, GFP_MAX = 12000, gfpTiles = new Map();   // key -> { coll, n } / { missing }
+    let gfpGen = 0, gfpT = 0, gfpMat = null;
+    const gfpDrop = (k) => { const t = gfpTiles.get(k); if (t && t.coll) { try { scene.primitives.remove(t.coll); } catch (e) { /* noop */ } } gfpTiles.delete(k); };
+    async function gfpSync() {
+      const gen = ++gfpGen, cam = viewer.camera;
+      const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      if (!ctr) return;
+      if (cartToLocal(cam.positionWC).h > 6000) { stats.gfp.state = 'too-high'; return; }   // 広域では輪郭を取りに行かない（診断は近景用）
+      const c = cartToLocal(ctr), w = WardUI.hit(c.x, c.z);
+      if (!w) { stats.gfp.state = 'no-ward'; return; }
+      stats.gfp.ward = w.wardId;
+      gfpMat = gfpMat || Cesium.Material.fromType('Color', { color: Cesium.Color.fromCssColorString('#ff2a2a') });
+      const want = new Set();
+      for (const [tx, tz] of LC45Y.tilesNear(c.x, c.z, GFP_R)) want.add(w.wardId + '/' + LC45Y.tileName(tx, tz));
+      for (const k of [...gfpTiles.keys()]) if (!want.has(k)) gfpDrop(k);
+      for (const k of want) {
+        if (gfpTiles.has(k)) continue;
+        gfpTiles.set(k, { coll: null, n: 0, pending: true });
+        let r; try { r = await fetch('map-data/osaka-city/buildings/osaka-' + k); } catch (e) { r = null; }
+        if (gen !== gfpGen || !gfpTiles.has(k)) { const t = gfpTiles.get(k); if (t && t.pending) gfpTiles.delete(k); continue; }
+        if (!r || !r.ok) { gfpTiles.set(k, { coll: null, n: 0, missing: true }); continue; }   // 未配信（private 元データは配信しない）
+        const lp = LC45Y.loops((await r.json()).buildings, GFP_MAX);
+        if (gen !== gfpGen) { gfpTiles.delete(k); continue; }
+        const coll = scene.primitives.add(new Cesium.PolylineCollection());
+        for (const l of lp) coll.add({ positions: l.ring.map((p) => toCart(p[0], p[1], LAYER_H.roads)), width: 2, material: gfpMat, depthFailMaterial: gfpMat, id: { layer: 'gfp45y' } });
+        gfpTiles.set(k, { coll, n: lp.length });
+      }
+      let loopsN = 0, miss = 0, tilesN = 0;
+      for (const t of gfpTiles.values()) { if (t.coll) { tilesN++; loopsN += t.n; } else if (t.missing) miss++; }
+      Object.assign(stats.gfp, { tiles: tilesN, loops: loopsN, state: tilesN ? 'ready' : (miss ? 'unsupported' : 'idle'),
+        unsupported: !tilesN && miss ? '地上輪郭の元タイルがこのサーバーで未配信の区（' + w.wardId + '）。公開対象のみ対応' : null });
+      scene.requestRender();
+    }
+    const gfpSched = () => { clearTimeout(gfpT); gfpT = setTimeout(() => { gfpSync().catch((e) => { stats.gfp.state = 'error'; stats.errors.push('gfp: ' + e.message); }); }, 200); };
+    viewer.camera.moveEnd.addEventListener(gfpSched);
+    window.__mission45yGfp = { sync: gfpSync, tiles: () => [...gfpTiles.entries()].map(([k, t]) => ({ k, n: t.n, missing: !!t.missing })) };
+    gfpSched();
+  }
 
   // ── 45G: 高速化（requestRenderMode / 解像度の自動調整 / キャッシュ予算 / 計測 / 遠景 LOD0） ──────────────────────
   //   すべて localhost の ?ext45=1 のときだけ既定 ON（?rr=0 ?res=fixed ?cache=0 ?cull=0 ?lod0=0 で個別に無効化＝A/B 比較用）。公開ページの挙動は変えない。
