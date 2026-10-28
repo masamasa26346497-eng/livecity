@@ -21,9 +21,10 @@ const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'm45g-'));
 // vm 内で作られたオブジェクトは realm が違うので deepStrictEqual が構造一致でも失敗する。JSON で比較する。
 const same = (a, b, m) => assert.strictEqual(JSON.stringify(a), JSON.stringify(b), m);
 
-test('requestRenderMode: ext45 既定 ON / ?rr=0 で OFF / 非 ext45 は ?rr=1 のときだけ ON', () => {
-  assert.strictEqual(P.useRequestRender(true, null), true);
+test('requestRenderMode: 45M 以降は ?rr=1 のときだけ ON（ext45 でも既定 OFF）', () => {
+  assert.strictEqual(P.useRequestRender(true, null), false);
   assert.strictEqual(P.useRequestRender(true, '0'), false);
+  assert.strictEqual(P.useRequestRender(true, '1'), true);
   assert.strictEqual(P.useRequestRender(false, null), false);
   assert.strictEqual(P.useRequestRender(false, '1'), true);
 });

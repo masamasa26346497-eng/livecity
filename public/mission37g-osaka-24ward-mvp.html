@@ -1447,7 +1447,8 @@
     perf.cachePerTilesetMB = b.perMB;
   }
   // 45H: プリセット。balanced(既定: 下限 0.8) / speed(下限 0.6) / quality(?res=fixed|quality: 常に 1.0)。いずれも静止後 700ms で必ず 1.0 に戻す。
-  const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'fixed' || q.get('res') === 'quality') ? 'quality' : 'balanced';
+  // 45M: ext45 の既定は固定解像度（実 PC で rr=0&res=fixed が軽かったため）。動的解像度は ?res=auto|balanced で opt-in。
+  const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'auto' || q.get('res') === 'balanced') ? 'balanced' : (q.get('res') === 'fixed' || q.get('res') === 'quality' || EXT45) ? 'quality' : 'balanced';
   perf.preset = RES_PRESET;
   const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
   function applyRes(s) { if (s === null) return; if (SMOOTH && !IX.allowResChange(performance.now(), s >= viewer.resolutionScale)) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
@@ -1459,10 +1460,19 @@
   viewer.camera.changed.addEventListener(() => { lastCamMove = performance.now(); IX.cameraMoved(lastCamMove); if (!moveStartedAt) moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
   viewer.camera.percentageChanged = Math.min(viewer.camera.percentageChanged, 0.02);
   viewer.camera.moveStart.addEventListener(() => { lastCamMove = performance.now(); IX.cameraMoved(lastCamMove); moveStartedAt = lastCamMove; settleArmed = true; if (RR) scene.requestRender(); });
+  // 45M: 入力イベント→次の描画までの遅延と、操作中だけのフレーム間隔（60Hz で 25ms 超 = 落ちたフレーム）。
+  const M45 = { pendingInput: null, latency: [], gestureFrames: [] };
+  const noteInput = () => { if (M45.pendingInput === null) M45.pendingInput = performance.now(); };
+  const q45 = (a, f) => { if (!a.length) return null; const t = a.slice().sort((x, y) => x - y); return Math.round(t[Math.min(t.length - 1, Math.floor(f * t.length))] * 10) / 10; };
+  window.__mission45m = { snapshot: () => ({ rr: RR, preset: RES_PRESET, inputToRenderMs: { n: M45.latency.length, p50: q45(M45.latency, 0.5), p95: q45(M45.latency, 0.95) },
+    gestureFrameMs: { n: M45.gestureFrames.length, p50: q45(M45.gestureFrames, 0.5), p95: q45(M45.gestureFrames, 0.95), over25ms: M45.gestureFrames.filter(v => v > 25).length, over50ms: M45.gestureFrames.filter(v => v > 50).length } }),
+    reset: () => { M45.latency.length = 0; M45.gestureFrames.length = 0; } };
   scene.postRender.addEventListener(() => {
     const now = performance.now(), dt = now - lastRenderAt; lastRenderAt = now;
     perf.renders++;
     IX.frame(now, dt);
+    if (M45.pendingInput !== null) { M45.latency.push(now - M45.pendingInput); if (M45.latency.length > 200) M45.latency.shift(); M45.pendingInput = null; }
+    if (IX.isActive(now) && dt < 2000) { M45.gestureFrames.push(dt); if (M45.gestureFrames.length > 600) M45.gestureFrames.shift(); }
     if (dt < 2000) { frameLog.push(dt); if (frameLog.length > 300) frameLog.shift(); }
     applyRes(resCtl.frame(dt, isMoving(), now));
   });
@@ -1470,10 +1480,10 @@
   //   操作中は RR でも毎フレーム描画を要求し（rAF）、止まったら要求をやめる。
   {
     const cv = viewer.canvas, opt = { passive: true, capture: true };
-    cv.addEventListener('pointerdown', () => { IX.pointerDown(performance.now()); if (RR) scene.requestRender(); }, opt);
+    cv.addEventListener('pointerdown', () => { noteInput(); IX.pointerDown(performance.now()); if (RR) scene.requestRender(); }, opt);
     window.addEventListener('pointerup', () => IX.pointerUp(performance.now()), opt);
     window.addEventListener('pointercancel', () => IX.pointerUp(performance.now()), opt);
-    cv.addEventListener('wheel', () => { IX.wheel(performance.now()); if (RR) scene.requestRender(); }, opt);
+    cv.addEventListener('wheel', () => { noteInput(); IX.wheel(performance.now()); if (RR) scene.requestRender(); }, opt);
     if (RR && SMOOTH) { const loop = () => { if (IX.isActive(performance.now())) scene.requestRender(); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
     try { new PerformanceObserver((l) => { for (const e of l.getEntries()) IX.noteLongTask(e.duration, performance.now()); }).observe({ entryTypes: ['longtask'] }); } catch (e) { /* 非対応ブラウザ */ }
     window.__mission45l = {

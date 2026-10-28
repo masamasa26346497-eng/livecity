@@ -16,11 +16,11 @@
     viewMarginDeg: 12, nearKeepM: 3500, tiltCullMaxPitchDeg: -65,
   };
 
-  /* requestRenderMode: ext45 では既定 ON（?rr=0 で無効）、それ以外のページ状態では ?rr=1 のときだけ ON。 */
+  /* requestRenderMode: 45M 以降は ?rr=1 を明示したときだけ ON。
+   * 理由: 実 PC 計測で rr=0（常時描画）+ res=fixed のほうが操作中の引っ掛かりが少なかったため、ext45 の既定も OFF にした。
+   * （RR はジェスチャーに追従する保証がなく、静止中の GPU 負荷削減と引き換えに操作の滑らかさを損なう場合がある。） */
   function useRequestRender(ext45, rrParam) {
-    if (rrParam === '0') return false;
-    if (rrParam === '1') return true;
-    return !!ext45;
+    return rrParam === '1';
   }
 
   /* 解像度コントローラ。frame(ms, moving) を毎フレーム渡す → 変更が必要なときだけ新しい scale を返す（なければ null）。
