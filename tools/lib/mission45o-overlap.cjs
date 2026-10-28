@@ -79,13 +79,20 @@ function scan(polys, lines, opt) {
   return { buildings: idx.count, samples: pts.length, zero, best, grid };
 }
 /** 判定。範囲を分割した結果が同じ向きを示すときだけ「一貫した移動候補」。適用はしない。 */
-function verdict(whole, parts) {
+function verdict(whole, parts, opt) {
   if (!whole.samples || !whole.buildings) return { verdict: 'no-data' };
   const gain = whole.zero > 0 ? (whole.zero - whole.best.f) / whole.zero : 0;
   const mag = Math.hypot(whole.best.dx, whole.best.dz);
   const g = Math.round(gain * 1000) / 1000;
   if (mag === 0 || gain < 0.15) {
-    return { verdict: 'aligned-at-zero', relativeGainAtBest: g, note: 'no offset reduces road-through-building overlap by >=15%; building and road geometry are not relatively shifted' };
+    // 45P: 旧名 'aligned-at-zero' は「ずれ無し」と読めるため改名。意味は「探索半径内に、重なりを 15% 以上減らす平行移動が無い」だけ。
+    //   ゼロ位置での重なりが大きいときは、橋・高架・時期差・中心線/ポリゴン品質など平行移動以外の理由が残る。位置ずれ無しの証明ではない。
+    const zf = Math.round((whole.zero || 0) * 10000) / 10000;
+    return {
+      verdict: 'no-consistent-translation-detected' + (opt && opt.radius ? '-within-' + opt.radius + 'm' : ''), legacyVerdict: 'aligned-at-zero',
+      relativeGainAtBest: g, zeroIsMinimum: mag === 0, zeroOffsetFraction: zf,
+      note: 'No translation in the searched radius reduces road-through-building overlap by >=15%. This does NOT prove the layers are aligned: zero-offset overlap is ' + (zf * 100).toFixed(1) + '% (bridges, elevated roads, data vintage, centerline/polygon quality can cause it). Rotation, scale and non-uniform error are not tested.'
+    };
   }
   const usable = (parts || []).filter((p) => p.samples > 200 && p.best);
   const same = usable.filter((p) => Math.hypot(p.best.dx - whole.best.dx, p.best.dz - whole.best.dz) <= 3.75);

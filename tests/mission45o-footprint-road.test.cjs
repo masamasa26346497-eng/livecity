@@ -22,7 +22,10 @@ function city(shiftX) {
 test('aligned roads: zero offset has no overlap and verdict is aligned-at-zero', () => {
   const c = city(0), w = O.scan(c.polys, c.lines, { radius: 15 });
   assert.strictEqual(w.zero, 0);
-  assert.strictEqual(O.verdict(w, []).verdict, 'aligned-at-zero');
+  const v0 = O.verdict(w, []);
+  assert.strictEqual(v0.verdict, 'no-consistent-translation-detected');
+  assert.strictEqual(v0.legacyVerdict, 'aligned-at-zero');   // 45O 互換フィールド
+  assert.ok(/does NOT prove/.test(v0.note));
 });
 test('roads shifted 25m east through buildings: best offset recovers -25 only if within radius, else inconclusive/aligned (no false shift)', () => {
   const c = city(25), w = O.scan(c.polys, c.lines, { radius: 30 });
@@ -57,7 +60,8 @@ test('CLI run: reads source read-only, aggregate-only output, --dump refuses ove
   const before = fs.readFileSync(bp, 'utf8');
   const dump = path.join(src, 'out');
   const out = T.run({ src, ward: 'fukushima', radius: 10, dump });
-  assert.strictEqual(out.verdict, 'aligned-at-zero');
+  assert.strictEqual(out.verdict, 'no-consistent-translation-detected-within-10m');
+  assert.strictEqual(out.legacyVerdict, 'aligned-at-zero');
   assert.ok(!JSON.stringify(out).includes('bldg_x'));
   assert.strictEqual(fs.readFileSync(bp, 'utf8'), before);
   assert.ok(fs.existsSync(path.join(dump, 'diag.json')));

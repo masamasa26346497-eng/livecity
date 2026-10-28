@@ -17,18 +17,26 @@ pre{white-space:pre-wrap;font-size:11px}
   <label><input type="checkbox" id="lg"> 地理院 淡色タイル (外部へタイル座標のみ要求。データは送らない)</label>
   <label>道路 オフセット 東+ dx(m) <input id="dx" type="number" value="0" step="1" style="width:60px"></label>
   <label>道路 オフセット 南+ dz(m) <input id="dz" type="number" value="0" step="1" style="width:60px"></label>
+  <label><input type="checkbox" id="lgrid" checked> 100m 格子 (local x/z)</label>
+  <label>地理院タイル オフセット 東+ rx(m) <input id="rx" type="number" value="0" step="1" style="width:60px"></label>
+  <label>地理院タイル オフセット 南+ rz(m) <input id="rz" type="number" value="0" step="1" style="width:60px"></label>
+  <label>緯度,経度へ移動 <input id="ll" placeholder="34.6934,135.4829" style="width:150px"></label><button id="llgo">移動してピン</button>
   <p>※ オフセットは「見た目の確認用」のみ。データにも変換にも反映されません。</p>
+  <p>クリック=ピン固定(最大8点)。ピンは緯度経度と、最寄りの footprint / 道路までの距離を並べて表示します。同じ地物(交差点・大きな建物)に複数レイヤーのずれ方向が揃うかを見てください。</p>
+  <p id="warn" style="color:#f5d98a">この画面は原因を断定しません。ずれが GSI タイルにだけ出るなら、タイル側/投影の差の可能性。footprint と道路の間だけなら元データ同士の差(時期・品質)の可能性。どちらも画面上の目視と複数地点の一貫性で判断してください。</p>
+  <p style="font-size:11px">地理院タイル: 出典 <a style="color:#9cf" href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>（淡色地図）。チェックを入れたときだけ取得します。</p>
   <p>ホイール: 拡大縮小 / ドラッグ: 移動 / クリック: 座標表示。</p>
   <pre id="info">(未読込)</pre>
 </div>
 <canvas id="cv"></canvas>
+<div id="attr" style="position:fixed;right:4px;bottom:2px;font-size:11px;background:rgba(255,255,255,.8);padding:1px 4px;display:none">地理院タイル（淡色地図）© 国土地理院</div>
 <script>
 (function () {
   'use strict';
   var gate = document.getElementById('gate'), info = document.getElementById('info');
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { gate.textContent = 'localhost / 127.0.0.1 以外では無効です。'; document.getElementById('file').disabled = true; return; }
   gate.textContent = 'localhost: 有効';
-  var cv = document.getElementById('cv'), g = cv.getContext('2d'), D = null, sc = 0.2, ox = 0, oz = 0, pick = null, tiles = {};
+  var cv = document.getElementById('cv'), g = cv.getContext('2d'), D = null, sc = 0.2, ox = 0, oz = 0, pick = null, tiles = {}, pins = [];
   var $ = function (i) { return document.getElementById(i); };
   function size() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; draw(); }
   window.addEventListener('resize', size);
@@ -48,14 +56,34 @@ pre{white-space:pre-wrap;font-size:11px}
       if (!im) { im = tiles[k] = new Image(); im.onload = draw; im.src = 'https://cyberjapandata.gsi.go.jp/xyz/pale/' + k + '.png'; }
       if (!im.complete || !im.naturalWidth) continue;
       var nw = tileLonLat(tx, ty, zoom), se = tileLonLat(tx + 1, ty + 1, zoom), p = localOf(nw[0], nw[1]), q = localOf(se[0], se[1]);
-      var pp = S2P(p[0], p[1]), qq = S2P(q[0], q[1]);
+      var rxo = +$('rx').value || 0, rzo = +$('rz').value || 0, pp = S2P(p[0] + rxo, p[1] + rzo), qq = S2P(q[0] + rxo, q[1] + rzo);
       g.drawImage(im, pp[0], pp[1], qq[0] - pp[0], qq[1] - pp[1]);
     }
+  }
+  function drawGrid() {
+    var a = P2S(0, 0), b = P2S(cv.width, cv.height), st = sc > 0.05 ? 100 : 500;
+    g.strokeStyle = "rgba(0,0,0,.18)"; g.lineWidth = 1; g.fillStyle = "#333"; g.font = "10px sans-serif";
+    for (var x = Math.floor(a[0] / st) * st; x <= b[0]; x += st) { var p = S2P(x, a[1]); g.beginPath(); g.moveTo(p[0], 0); g.lineTo(p[0], cv.height); g.stroke(); g.fillText(x, p[0] + 2, 10); }
+    for (var z = Math.floor(a[1] / st) * st; z <= b[1]; z += st) { var q = S2P(a[0], z); g.beginPath(); g.moveTo(0, q[1]); g.lineTo(cv.width, q[1]); g.stroke(); g.fillText(z, 2, q[1] - 2); }
+  }
+  function distTo(x, z) {
+    var bf = Infinity, br = Infinity, dx = +$("dx").value || 0, dz = +$("dz").value || 0;
+    D.footprints.forEach(function (r) { for (var i = 0; i < r.length; i++) { var d = Math.hypot(r[i][0] - x, r[i][1] - z); if (d < bf) bf = d; } });
+    D.roads.forEach(function (l) { for (var i = 0; i < l.length; i++) { var d = Math.hypot(l[i][0] + dx - x, l[i][1] + dz - z); if (d < br) br = d; } });
+    return [bf, br];
+  }
+  function addPin(s) {
+    var ll = lonlat(s[0], s[1]), d = distTo(s[0], s[1]);
+    pins.push(s); if (pins.length > 8) pins.shift();
+    info.textContent += "\n\npin#" + pins.length + " x=" + s[0].toFixed(1) + " z=" + s[1].toFixed(1) + "\nlat=" + ll[1].toFixed(6) + " lon=" + ll[0].toFixed(6) + "\nnearest footprint vertex " + (d[0] === Infinity ? "-" : d[0].toFixed(1)) + " m / nearest road vertex " + (d[1] === Infinity ? "-" : d[1].toFixed(1)) + " m (頂点間の近似。線上の距離ではない)";
+    draw();
   }
   function draw() {
     g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
     if (!D) return;
+    $('attr').style.display = $('lg').checked ? 'block' : 'none';
     if ($('lg').checked) drawTiles();
+    if ($('lgrid').checked) drawGrid();
     if ($('lf').checked) {
       g.strokeStyle = 'rgba(220,40,40,.9)'; g.fillStyle = 'rgba(220,40,40,.18)'; g.lineWidth = 1;
       D.footprints.forEach(function (r) { g.beginPath(); r.forEach(function (q, i) { var p = S2P(q[0], q[1]); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.fill(); g.stroke(); });
@@ -65,9 +93,9 @@ pre{white-space:pre-wrap;font-size:11px}
       g.strokeStyle = 'rgba(20,90,230,.9)'; g.lineWidth = 1.5;
       D.roads.forEach(function (l) { g.beginPath(); l.forEach(function (q, i) { var p = S2P(q[0] + dx, q[1] + dz); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); });
     }
-    if (pick) { var pp = S2P(pick[0], pick[1]); g.strokeStyle = '#000'; g.beginPath(); g.arc(pp[0], pp[1], 6, 0, 7); g.stroke(); }
+    pins.forEach(function (pk, i) { var pp = S2P(pk[0], pk[1]); g.strokeStyle = '#000'; g.lineWidth = 2; g.beginPath(); g.arc(pp[0], pp[1], 6, 0, 7); g.stroke(); g.fillStyle = '#000'; g.fillText('#' + (i + 1), pp[0] + 8, pp[1] - 8); });
   }
-  ['lf', 'lr', 'lg', 'dx', 'dz'].forEach(function (i) { $(i).addEventListener('input', draw); });
+  ['lf', 'lr', 'lg', 'lgrid', 'dx', 'dz', 'rx', 'rz'].forEach(function (i) { $(i).addEventListener('input', draw); });
   $('file').addEventListener('change', function (e) {
     var f = e.target.files[0]; if (!f) return;
     var rd = new FileReader();
@@ -82,14 +110,17 @@ pre{white-space:pre-wrap;font-size:11px}
   cv.addEventListener('mousedown', function (e) { drag = [e.clientX, e.clientY, ox, oz]; moved = false; });
   window.addEventListener('mouseup', function (e) {
     if (drag && !moved && D) {
-      var r = cv.getBoundingClientRect(), s = P2S(e.clientX - r.left, e.clientY - r.top), ll = lonlat(s[0], s[1]);
-      pick = s; info.textContent += '\n\nclick local x=' + s[0].toFixed(1) + ' z=' + s[1].toFixed(1) + '\nlat=' + ll[1].toFixed(6) + ' lon=' + ll[0].toFixed(6);
-      draw();
+      var r = cv.getBoundingClientRect(), s = P2S(e.clientX - r.left, e.clientY - r.top);
+      addPin(s);
     }
     drag = null;
   });
   window.addEventListener('mousemove', function (e) { if (!drag) return; if (Math.abs(e.clientX - drag[0]) + Math.abs(e.clientY - drag[1]) > 3) moved = true; ox = drag[2] - (e.clientX - drag[0]) / sc; oz = drag[3] - (e.clientY - drag[1]) / sc; draw(); });
   cv.addEventListener('wheel', function (e) { e.preventDefault(); sc *= e.deltaY < 0 ? 1.2 : 1 / 1.2; draw(); }, { passive: false });
+  $('llgo').addEventListener('click', function () {
+    if (!D) return; var m = /^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/.exec($('ll').value); if (!m) { info.textContent += '\n(緯度,経度の形式が不正)'; return; }
+    var l = localOf(+m[2], +m[1]); ox = l[0]; oz = l[1]; sc = Math.max(sc, 1); addPin(l);
+  });
   size();
 })();
 </script></body></html>

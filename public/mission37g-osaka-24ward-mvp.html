@@ -454,6 +454,7 @@
 <script src="mission45g-perf.js"></script>
 <script src="mission45i-vec.js"></script>
 <script src="mission45k-viewcull.js"></script>
+<script src="mission45p-areacull.js"></script>
 <script src="mission45l-interaction.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
@@ -858,36 +859,58 @@
     return f.kind === 'line' ? { width: f.waterClass === 'canal' ? 6 : 4.5, casing: 0, material: solidMat(C.waterLine), height: LAYER_H.waterways } : null;
   }
   // ── 面レイヤー: 1 レイヤー = 1 Primitive（37B の建物 Primitive と同じ作り）──
-  function makeAreaLayer(file, opts, base) {
-    let prim = null;
+  function makeAreaLayer(file, opts, base, wardOpt) {
+    let prim = null, cullRec = null, visible = true;
+    const instOf = (f) => new Cesium.GeometryInstance({
+      geometry: new Cesium.PolygonGeometry({
+        polygonHierarchy: new Cesium.PolygonHierarchy(f.p.map((pt) => toCart(pt[0], pt[1], 0))),
+        height: opts.height, perPositionHeight: false,
+        vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      }),
+      attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.fromCssColorString(opts.colorOf ? opts.colorOf(f) : opts.color).withAlpha(opts.alpha != null ? opts.alpha : 0.85)) },
+      id: { layer: file, featureId: f.id, name: f.name || null },
+    });
+    const mkPrim = (instances) => new Cesium.Primitive({
+      geometryInstances: instances,
+      appearance: new Cesium.PerInstanceColorAppearance({ flat: true, translucent: true }),
+      releaseGeometryInstances: true, asynchronous: true,
+    });
+    // 45P: 区単位の面（公園・水面）は視野付近のユニットだけを小さな Primitive として載せる（?vcull=0 で従来の一括）
+    function mountCulled(feats) {
+      const P = stats.vec45p, t0 = performance.now();
+      const idx = LC45P.buildIndex(feats, {});
+      const build = (unit) => {
+        const t = performance.now();
+        const h = scene.primitives.add(mkPrim(unit.feats.map(instOf))); h.show = visible;
+        const d = performance.now() - t;
+        P.unitsBuilt++; P.buildMsTotal = Math.round((P.buildMsTotal + d) * 10) / 10; P.buildMsMax = Math.max(P.buildMsMax, Math.round(d * 10) / 10);
+        return h;
+      };
+      const destroyH = (h) => { try { scene.primitives.remove(h); } catch (e) { /* noop */ } };
+      const res = LC45P.makeResidency(idx, build, destroyH, {});
+      cullRec = { res, idx, file, sync: (rect, canBuild) => res.sync(rect, canBuild) };
+      cullLayers.add(cullRec);
+      P.indexedFeatures += idx.stats.features; P.indexedUnits += idx.units.length; P.bigUnits += idx.stats.big;
+      P.indexMs = Math.round((P.indexMs + performance.now() - t0) * 10) / 10;
+      if (lastView) cullRec.sync(LC45K.viewRect(lastView.x, lastView.z, lastView.h), !isMoving());
+      return { count: idx.stats.features };
+    }
     return {
       async mount() {
         const data = await fetchLayerJson(file, base);
-        const instances = [];
-        for (const f of data.features || []) {
-          if (f.kind !== 'area' || !Array.isArray(f.p) || f.p.length < 3) continue;
-          const color = Cesium.Color.fromCssColorString(opts.colorOf ? opts.colorOf(f) : opts.color)
-            .withAlpha(opts.alpha != null ? opts.alpha : 0.85);
-          instances.push(new Cesium.GeometryInstance({
-            geometry: new Cesium.PolygonGeometry({
-              polygonHierarchy: new Cesium.PolygonHierarchy(f.p.map((pt) => toCart(pt[0], pt[1], 0))),
-              height: opts.height, perPositionHeight: false,
-              vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
-            }),
-            attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(color) },
-            id: { layer: file, featureId: f.id, name: f.name || null },
-          }));
-        }
+        if (wardOpt && wardOpt.isStale && wardOpt.isStale()) return { count: 0 };
+        const feats = (data.features || []).filter((f) => f.kind === 'area' && Array.isArray(f.p) && f.p.length >= 3);
+        if (wardOpt && wardOpt.viewCull && typeof LC45P !== 'undefined' && root45kOn()) return mountCulled(feats);
+        const instances = feats.map(instOf);
         if (!instances.length) return { count: 0 };
-        prim = scene.primitives.add(new Cesium.Primitive({
-          geometryInstances: instances,
-          appearance: new Cesium.PerInstanceColorAppearance({ flat: true, translucent: true }),
-          releaseGeometryInstances: true, asynchronous: true,
-        }));
+        prim = scene.primitives.add(mkPrim(instances));
         return { count: instances.length };
       },
-      applyVisible(on) { if (prim) prim.show = on; },
-      destroy() { if (prim) { try { scene.primitives.remove(prim); } catch (e) { /* noop */ } prim = null; } },
+      applyVisible(on) { visible = on; if (prim) prim.show = on; if (cullRec) for (const h of cullRec.res.handles()) h.show = on; },
+      destroy() {
+        if (cullRec) { cullLayers.delete(cullRec); try { cullRec.res.clear(); } catch (e) { /* noop */ } cullRec = null; }
+        if (prim) { try { scene.primitives.remove(prim); } catch (e) { /* noop */ } prim = null; }
+      },
     };
   }
 
@@ -974,11 +997,11 @@
     roads: (b, o, lv) => makeLineLayer('roads.json', lv ? (f) => (LC45I.tierAllows(lv, f.tier) ? roadStyleWard(f) : null) : roadStyleWard, b, o),
     waterways: (b, o) => {
       const l = makeLineLayer('waterways.json', waterLineStyle, b, o);
-      const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b);
+      const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b, o);
       return { async mount() { const x = await l.mount(); const y = await a.mount(); return { count: x.count + y.count }; },
                applyVisible(on) { l.applyVisible(on); a.applyVisible(on); }, destroy() { l.destroy(); a.destroy(); } };
     },
-    parks: (b) => makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks }, b),
+    parks: (b, o) => makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks }, b, o),
     railways: (b, o) => makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }), b, o),
   };
   let wardVec = [];   // { id, layer, count }
@@ -991,6 +1014,7 @@
   var vecWards = new Set(); // レイヤーを配信できる wardId（index.json の layersWards）
   let vecBusy = false, vecDirty = false;
   stats.vec45k = { enabled: true, indexedSegments: 0, indexedFeatures: 0, indexMs: 0, polylinesBuilt: 0, verticesBuilt: 0, syncs: 0, syncMsTotal: 0, syncMsMax: 0, pendingCells: 0, lastRectRadius: 0 };
+  stats.vec45p = { enabled: true, indexedFeatures: 0, indexedUnits: 0, bigUnits: 0, indexMs: 0, unitsBuilt: 0, buildMsTotal: 0, buildMsMax: 0 };
   stats.vec45i = { clipMs: 0, convertMs: 0, polylines: 0, vertices: 0, yields: 0, layerFetches: 0, layerFetchMs: 0, available: 0, mounted: {}, ticks: 0, mountsTotal: 0, dropsTotal: 0, lastPlan: null, lastError: null, sumiyoshiBundleExcluded: null };
   function vecSync() {
     stats.vec45i.available = vecWards.size;
@@ -1583,7 +1607,18 @@
         st45n.measuring = false; b.textContent = '10秒測定 (' + st45n.runs.length + '回)';
       }, 10000);
     });
-    window.__mission45n = { state: st45n, get runs() { return st45n.runs; } };
+    // 45P: runs を 1 行ずつの数値だけにまとめる（ID・パス・位置は含まない）。cpuGpuHint は経験則であり判定ではない:
+    //   100ms 超の long task が有る → main thread（JS）側の寄与あり / long task が無いのにフレームが長い → GPU・合成側の可能性（JS 側の長時間処理は無い）。
+    const hint45p = (r) => {
+      const lt = r.longTasks || {}, g = r.gestureFrameMs || {};
+      if (lt.over100ms > 0) return 'main-thread-long-tasks';
+      return (g.p95 || 0) > 50 ? 'frames-long-without-long-tasks(GPU/present?)' : 'no-obvious-stall';
+    };
+    const oneLine45p = (r, i) => '#' + (i + 1) + ' b' + (r.cfg.buildings ? 1 : 0) + ' v' + (r.cfg.vectors ? 1 : 0) + ' rr' + (r.cfg.rr ? 1 : 0) + ' res=' + r.cfg.preset +
+      ' gestureP95=' + ((r.gestureFrameMs || {}).p95 != null ? r.gestureFrameMs.p95 : '-') + 'ms over50=' + ((r.gestureFrameMs || {}).over50ms != null ? r.gestureFrameMs.over50ms : '-') +
+      ' longTasks=' + (r.longTasks ? r.longTasks.n + '/>100ms:' + r.longTasks.over100ms + '/max' + r.longTasks.maxMs : '-') + ' heapMB=' + r.heapMB + ' hint=' + hint45p(r);
+    window.__mission45n = { state: st45n, get runs() { return st45n.runs; }, summary() { return st45n.runs.map(oneLine45p).join('\n'); }, vec45p: () => JSON.stringify(stats.vec45p) };
+    mkBtn('結果を1行表示', () => { console.log(window.__mission45n.summary() + '\n' + window.__mission45n.vec45p()); });
     setInterval(() => { const s = perfSnapshot(), f = s.frames || {}; el.textContent = 'RR ' + (RR ? 'on' : 'off') + ' | res x' + s.resolutionScale + ' (dpr ' + s.devicePixelRatio + ')\nrender ' + (f.avgFps || '-') + ' fps(描画時) p95 ' + (f.p95Ms || '-') + 'ms\ntiles vis ' + s.visibleTiles + ' / sets ' + s.tilesets + ' / GPU ' + (s.tilesetMemoryMB == null ? '?' : s.tilesetMemoryMB) + 'MB\nwards d' + s.detailWards + ' c' + s.coarseWards + ' lod0 ' + s.lod0.shown + '\nnet ' + s.net.requests + ' req / ' + (s.net.bytes / 1048576).toFixed(1) + 'MB\nsettle ' + (s.settleMs == null ? '-' : s.settleMs + 'ms'); }, 1000);
   }
   $('sel-tone').onchange = (e) => { applyTone(e.target.value); scene.requestRender(); };

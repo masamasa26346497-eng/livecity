@@ -39,7 +39,7 @@ function run(opts) {
     return ls.length && ps.length ? O.scan(ps, ls, so) : { samples: 0 };
   };
   const parts = [half(0, true), half(0, false), half(1, true), half(1, false)];
-  const v = O.verdict(whole, parts);
+  const v = O.verdict(whole, parts, { radius: opts.radius });
   const strip = (s) => ({ buildings: s.buildings, samples: s.samples, zeroOffsetFraction: s.zero, best: s.best ? { dx: s.best.dx, dz: s.best.dz, fraction: s.best.f } : null });
   const out = Object.assign({ mission: '45O', ward: opts.ward, readOnly: true, footprints: polys.length, roadLines: lines.length, radiusM: opts.radius, whole: strip(whole), halves: parts.map(strip) }, v,
     { axes: 'dx: east+, dz: south+ (Live City local, znorth-neg-v1). Offsets are applied to roads only.' });
