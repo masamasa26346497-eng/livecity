@@ -97,7 +97,7 @@ function loadFootprints(src, wardId) {
 const groundPerPx = (range) => (2 * range * Math.tan((FOV_DEG / 2) * Math.PI / 180)) / SCREEN_PX;
 
 /** Core: road lines + footprints -> aggregate numbers. Pure; used by tests with synthetic data. */
-function analyze(blds, lines, step) {
+function analyze(blds, lines, step, opts) {
   const idx = buildIndex(blds);
   const gaps = { major: [], mid: [], local: [] };
   const R = { samples: 0, insideFootprint: 0, capped: 0 };
@@ -127,6 +127,16 @@ function analyze(blds, lines, step) {
     return { rangeM: range, groundMetresPerPixel: r2(mpp), drawnHalfWidthM: { major: r2(DRAWN_PX.major * mpp / 2), mid: r2(DRAWN_PX.mid * mpp / 2), local: r2(DRAWN_PX.local * mpp / 2) },
       pctOutsideSamplesTouchedByDrawnWidthAlone: pct(hit, n) };
   });
+  // 46C: same metric with widths shrunk per range (opts.scaleAtRange). Comparison only; default output unchanged.
+  let widthArtefactScaled;
+  if (opts && typeof opts.scaleAtRange === 'function') {
+    widthArtefactScaled = RANGES.map((range) => {
+      const mpp = groundPerPx(range), sc = opts.scaleAtRange(range);
+      let hit = 0, n = 0;
+      for (const t of Object.keys(gaps)) { const px = Math.max(t === 'major' ? 2 : 1, DRAWN_PX[t] * sc); const half = (px * mpp) / 2; for (const d of gaps[t]) { n++; if (d < half) hit++; } }
+      return { rangeM: range, scale: sc, pctOutsideSamplesTouchedByDrawnWidthAlone: pct(hit, n) };
+    });
+  }
   // (3) roof parallax vs. road gap
   const hs = blds.map((b) => b.h).filter((h) => h != null);
   const parallax = PITCHES.map((pitch) => {
@@ -136,7 +146,7 @@ function analyze(blds, lines, step) {
     return { pitchDeg: pitch, roofShiftM: { p50: quant(shifts, 0.5), p90: quant(shifts, 0.9), max: quant(shifts, 1) },
       pctBuildingsRoofShiftExceedsMedianRoadGap: med == null ? null : pct(shifts.filter((s) => s > med).length, shifts.length) };
   });
-  return { roadSamples: R.samples, pctSamplesInsideFootprint: pct(R.insideFootprint, R.samples), pctSamplesFartherThanCap: pct(R.capped, R.samples), edgeGapM, widthArtefact, parallax };
+  return { widthArtefactScaled, roadSamples: R.samples, pctSamplesInsideFootprint: pct(R.insideFootprint, R.samples), pctSamplesFartherThanCap: pct(R.capped, R.samples), edgeGapM, widthArtefact, parallax };
 }
 function verdictOf(a) {
   const notes = [];
@@ -173,7 +183,7 @@ function parse(a) {
   if (!o.src) throw Object.assign(new Error('usage: --src <legacy osaka-city dir> [--wards a,b] [--step 8] [--out <new report.json>] [--serve]'), { code: 2 });
   return o;
 }
-module.exports = { analyze, buildIndex, run, parse, groundPerPx, SCHEMA, LIMITS, DRAWN_PX };
+module.exports = { loadFootprints, analyze, buildIndex, run, parse, groundPerPx, SCHEMA, LIMITS, DRAWN_PX };
 if (require.main === module) {
   try {
     const o = parse(process.argv.slice(2));

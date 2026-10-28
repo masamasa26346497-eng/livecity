@@ -734,13 +734,34 @@
     if (!matCache.has(key)) matCache.set(key, Cesium.Material.fromType('Color', { color: Cesium.Color.fromCssColorString(css).withAlpha(a) }));
     return matCache.get(key);
   }
+  // 46C: 道路の線幅は固定 px のため、遠景では実寸より太く見え建物に被さる（46B: far3000m で建物接触 31.6%）。
+  //   カメラ高度の帯ごとに線幅を縮める（道路は消さない。major は最低 2px、他は最低 1px）。座標・データは動かさない。?rw=0 で従来。
+  const ROAD_BANDS = [[800, 1], [1800, 0.8], [3000, 0.6], [Infinity, 0.45]];
+  const roadColls = new Set();
+  let roadScale = 1;
+  function roadScaleFor(h) { for (const [mx, sc] of ROAD_BANDS) if (h <= mx) return sc; return 0.45; }
+  function roadW(base) { const w = base * roadScale; return Math.max(base >= 4.5 ? 2 : 1, Math.round(w * 10) / 10); }
+  function addRoadPl(coll, file, opts, baseW) {
+    if (file !== 'roads.json') return coll.add(opts);
+    opts.width = roadW(baseW);
+    const pl = coll.add(opts); pl._lcW = baseW; return pl;
+  }
+  function roadScaleSync() {
+    if (q.get('rw') === '0') return;
+    const h = viewer.camera.positionCartographic.height, sc = roadScaleFor(h);
+    stats.road46c = { height: Math.round(h), scale: sc };
+    if (sc === roadScale) return;
+    roadScale = sc;
+    for (const c of roadColls) for (let i = 0; i < c.length; i++) { const pl = c.get(i); if (pl._lcW) pl.width = roadW(pl._lcW); }
+    scene.requestRender();
+  }
   function makeLineLayer(file, styleOf, base, opt) {
     let coll = null, cullRec = null;
     return {
       async mount() {
         const data = await fetchLayerJson(file, base);
         if (opt && opt.viewCull && root45kOn()) return mountCulled(data);
-        coll = scene.primitives.add(new Cesium.PolylineCollection());
+        coll = scene.primitives.add(new Cesium.PolylineCollection()); roadColls.add(coll);
         let n = 0, seen = 0, lastY = performance.now();
         const V = stats.vec45i, t0 = performance.now();
         for (const f of data.features || []) {
@@ -763,10 +784,10 @@
             V.polylines = (V.polylines | 0) + 1; V.vertices = (V.vertices | 0) + run.length;
             // 太い道路は外側に暗い線を重ねて、地図らしい縁取りにする（major/mid のみ）
             if (st.casing) {
-              coll.add({ positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing),
-                         distanceDisplayCondition: ddc, id: { layer: file, casing: true } });
+              addRoadPl(coll, file, { positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing),
+                         distanceDisplayCondition: ddc, id: { layer: file, casing: true } }, st.width + st.casing);
             }
-            coll.add({ positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: f.id, name: f.name || null } });
+            addRoadPl(coll, file, { positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: f.id, name: f.name || null } }, st.width);
             used = true;
           }
           if (used) n++;
@@ -775,12 +796,12 @@
         return { count: n };
       },
       applyVisible(on) { if (coll) coll.show = on; },
-      destroy() { if (cullRec) { cullLayers.delete(cullRec); try { cullRec.res.clear(); } catch (e) { /* noop */ } cullRec = null; } if (coll) { try { scene.primitives.remove(coll); } catch (e) { /* noop */ } coll = null; } },
+      destroy() { if (cullRec) { cullLayers.delete(cullRec); try { cullRec.res.clear(); } catch (e) { /* noop */ } cullRec = null; } if (coll) { roadColls.delete(coll); try { scene.primitives.remove(coll); } catch (e) { /* noop */ } coll = null; } },
     };
     // 45K: 視野付近のセルだけを PolylineCollection に載せる。索引（線分→400m セル）は mount 時に 1 回だけ作り、
     //   Cartesian3 生成・区 clip・Polyline 作成は、そのセルが視野に入ったときだけ行う。
     async function mountCulled(data) {
-      coll = scene.primitives.add(new Cesium.PolylineCollection());
+      coll = scene.primitives.add(new Cesium.PolylineCollection()); roadColls.add(coll);
       const K = stats.vec45k, t0 = performance.now();
       const idx = LC45K.buildIndex(data.features || [], styleOf, 400);
       const prebuilt = data.clipped === 'ward-polygon';
@@ -794,8 +815,8 @@
           for (const r of runs) {
             if (r.length < 2) continue;
             const positions = r.map((pt) => toCart(pt[0], pt[1], st.height));
-            if (st.casing) made.push(coll.add({ positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing), distanceDisplayCondition: ddc, id: { layer: file, casing: true } }));
-            made.push(coll.add({ positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: run.f.id, name: run.f.name || null } }));
+            if (st.casing) made.push(addRoadPl(coll, file, { positions, width: st.width + st.casing, material: st.casingMaterial || solidMat(C.roadCasing), distanceDisplayCondition: ddc, id: { layer: file, casing: true } }, st.width + st.casing));
+            made.push(addRoadPl(coll, file, { positions, width: st.width, material: st.material, distanceDisplayCondition: ddc, id: { layer: file, featureId: run.f.id, name: run.f.name || null } }, st.width));
             K.polylinesBuilt += 1; K.verticesBuilt += r.length;
           }
         }
@@ -1644,6 +1665,8 @@
   let lod0Wards = [];
   fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
   viewer.camera.moveEnd.addEventListener(() => { lod0Sync(); });
+  viewer.camera.moveEnd.addEventListener(roadScaleSync);   // 46C
+  setTimeout(roadScaleSync, 0);
   // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
   //   既定では建物の品質・表示範囲を変えない。操作中は粗くなる（画質トレードオフ）ため、測ってから採否を決める。
   const SSE_MOVE = Math.max(0, +q.get('sseMove') || 0);
