@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Mission 45O 位置ずれ診断 (localhost 専用)</title>
+<style>
+body{margin:0;font:13px sans-serif;display:flex;height:100vh}
+#side{width:300px;padding:8px;overflow:auto;background:#101a2b;color:#dfe8f5}
+#cv{flex:1;cursor:crosshair}
+label{display:block;margin:3px 0}
+pre{white-space:pre-wrap;font-size:11px}
+</style></head><body>
+<div id="side">
+  <b>Mission 45O: 建物 footprint / 道路 / 地理院タイル</b>
+  <p id="gate"></p>
+  <p>tools\mission45o-footprint-vs-road.cjs --dump で作った <code>diag.json</code> を選択（ブラウザ内で読むだけ。送信しません）。</p>
+  <input type="file" id="file" accept=".json">
+  <label><input type="checkbox" id="lf" checked> 建物 footprint (赤)</label>
+  <label><input type="checkbox" id="lr" checked> 道路 中心線 (青)</label>
+  <label><input type="checkbox" id="lg"> 地理院 淡色タイル (外部へタイル座標のみ要求。データは送らない)</label>
+  <label>道路 オフセット 東+ dx(m) <input id="dx" type="number" value="0" step="1" style="width:60px"></label>
+  <label>道路 オフセット 南+ dz(m) <input id="dz" type="number" value="0" step="1" style="width:60px"></label>
+  <p>※ オフセットは「見た目の確認用」のみ。データにも変換にも反映されません。</p>
+  <p>ホイール: 拡大縮小 / ドラッグ: 移動 / クリック: 座標表示。</p>
+  <pre id="info">(未読込)</pre>
+</div>
+<canvas id="cv"></canvas>
+<script>
+(function () {
+  'use strict';
+  var gate = document.getElementById('gate'), info = document.getElementById('info');
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { gate.textContent = 'localhost / 127.0.0.1 以外では無効です。'; document.getElementById('file').disabled = true; return; }
+  gate.textContent = 'localhost: 有効';
+  var cv = document.getElementById('cv'), g = cv.getContext('2d'), D = null, sc = 0.2, ox = 0, oz = 0, pick = null, tiles = {};
+  var $ = function (i) { return document.getElementById(i); };
+  function size() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; draw(); }
+  window.addEventListener('resize', size);
+  var S2P = function (x, z) { return [cv.width / 2 + (x - ox) * sc, cv.height / 2 + (z - oz) * sc]; };
+  var P2S = function (px, py) { return [(px - cv.width / 2) / sc + ox, (py - cv.height / 2) / sc + oz]; };
+  function lonlat(x, z) { var m = D.meta; return [m.origin.lon + x / (Math.cos(m.origin.lat * Math.PI / 180) * m.mpd), m.origin.lat - z / m.mpd]; }
+  function tileFor(lon, lat, zoom) { var n = Math.pow(2, zoom); return [Math.floor((lon + 180) / 360 * n), Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n)]; }
+  function tileLonLat(x, y, zoom) { var n = Math.pow(2, zoom); var lon = x / n * 360 - 180; var lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI; return [lon, lat]; }
+  function localOf(lon, lat) { var m = D.meta; return [(lon - m.origin.lon) * Math.cos(m.origin.lat * Math.PI / 180) * m.mpd, -((lat - m.origin.lat) * m.mpd)]; }
+  function drawTiles() {
+    var zoom = sc > 0.5 ? 17 : sc > 0.15 ? 16 : 15;
+    var a = P2S(0, 0), b = P2S(cv.width, cv.height), l1 = lonlat(a[0], a[1]), l2 = lonlat(b[0], b[1]);
+    var t1 = tileFor(l1[0], l1[1], zoom), t2 = tileFor(l2[0], l2[1], zoom);
+    if ((t2[0] - t1[0] + 1) * (t2[1] - t1[1] + 1) > 40) return;   // 要求しすぎない
+    for (var tx = t1[0]; tx <= t2[0]; tx++) for (var ty = t1[1]; ty <= t2[1]; ty++) {
+      var k = zoom + '/' + tx + '/' + ty, im = tiles[k];
+      if (!im) { im = tiles[k] = new Image(); im.onload = draw; im.src = 'https://cyberjapandata.gsi.go.jp/xyz/pale/' + k + '.png'; }
+      if (!im.complete || !im.naturalWidth) continue;
+      var nw = tileLonLat(tx, ty, zoom), se = tileLonLat(tx + 1, ty + 1, zoom), p = localOf(nw[0], nw[1]), q = localOf(se[0], se[1]);
+      var pp = S2P(p[0], p[1]), qq = S2P(q[0], q[1]);
+      g.drawImage(im, pp[0], pp[1], qq[0] - pp[0], qq[1] - pp[1]);
+    }
+  }
+  function draw() {
+    g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+    if (!D) return;
+    if ($('lg').checked) drawTiles();
+    if ($('lf').checked) {
+      g.strokeStyle = 'rgba(220,40,40,.9)'; g.fillStyle = 'rgba(220,40,40,.18)'; g.lineWidth = 1;
+      D.footprints.forEach(function (r) { g.beginPath(); r.forEach(function (q, i) { var p = S2P(q[0], q[1]); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.fill(); g.stroke(); });
+    }
+    if ($('lr').checked) {
+      var dx = +$('dx').value || 0, dz = +$('dz').value || 0;
+      g.strokeStyle = 'rgba(20,90,230,.9)'; g.lineWidth = 1.5;
+      D.roads.forEach(function (l) { g.beginPath(); l.forEach(function (q, i) { var p = S2P(q[0] + dx, q[1] + dz); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); });
+    }
+    if (pick) { var pp = S2P(pick[0], pick[1]); g.strokeStyle = '#000'; g.beginPath(); g.arc(pp[0], pp[1], 6, 0, 7); g.stroke(); }
+  }
+  ['lf', 'lr', 'lg', 'dx', 'dz'].forEach(function (i) { $(i).addEventListener('input', draw); });
+  $('file').addEventListener('change', function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      D = JSON.parse(rd.result); var b = D.meta.bbox; ox = (b.minX + b.maxX) / 2; oz = (b.minZ + b.maxZ) / 2; sc = Math.min(cv.width / (b.maxX - b.minX), cv.height / (b.maxZ - b.minZ));
+      var m = D.meta; info.textContent = 'ward: ' + m.ward + '\nfootprints: ' + D.footprints.length + '\nroad lines: ' + D.roads.length + '\norigin: ' + m.origin.lat + ', ' + m.origin.lon + '\naxes: ' + m.axes + '\nunit: ' + m.unit + '\nroads generated: ' + (m.source.roadsGenerated || '(not recorded)') + '\nroads convention: ' + (m.source.roadsConvention || '(not recorded)') + '\nbuildings: ' + m.source.buildings;
+      draw();
+    };
+    rd.readAsText(f);
+  });
+  var drag = null, moved = false;
+  cv.addEventListener('mousedown', function (e) { drag = [e.clientX, e.clientY, ox, oz]; moved = false; });
+  window.addEventListener('mouseup', function (e) {
+    if (drag && !moved && D) {
+      var r = cv.getBoundingClientRect(), s = P2S(e.clientX - r.left, e.clientY - r.top), ll = lonlat(s[0], s[1]);
+      pick = s; info.textContent += '\n\nclick local x=' + s[0].toFixed(1) + ' z=' + s[1].toFixed(1) + '\nlat=' + ll[1].toFixed(6) + ' lon=' + ll[0].toFixed(6);
+      draw();
+    }
+    drag = null;
+  });
+  window.addEventListener('mousemove', function (e) { if (!drag) return; if (Math.abs(e.clientX - drag[0]) + Math.abs(e.clientY - drag[1]) > 3) moved = true; ox = drag[2] - (e.clientX - drag[0]) / sc; oz = drag[3] - (e.clientY - drag[1]) / sc; draw(); });
+  cv.addEventListener('wheel', function (e) { e.preventDefault(); sc *= e.deltaY < 0 ? 1.2 : 1 / 1.2; draw(); }, { passive: false });
+  size();
+})();
+</script></body></html>
