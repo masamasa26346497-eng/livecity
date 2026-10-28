@@ -1,16 +1,19 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><title>Mission 45O 位置ずれ診断 (localhost 専用)</title>
 <style>
-body{margin:0;font:13px sans-serif;display:flex;height:100vh}
-#side{width:300px;padding:8px;overflow:auto;background:#101a2b;color:#dfe8f5}
-#cv{flex:1;cursor:crosshair}
+body{margin:0;font:13px sans-serif;display:flex;height:100vh;min-width:0;overflow:hidden}
+/* canvas の intrinsic width が flex 計算に戻り、左ペインを80px前後まで縮める不具合を防ぐ */
+#side{box-sizing:border-box;flex:0 0 310px;width:310px;min-width:0;padding:12px;overflow-y:auto;overflow-x:hidden;background:#101a2b;color:#dfe8f5}
+#side input[type=file]{display:block;max-width:100%;font-size:12px}
+#cv{flex:1 1 0;min-width:0;min-height:0;display:block;cursor:crosshair}
+@media(max-width:620px){#side{flex-basis:230px;width:230px;padding:8px}}
 label{display:block;margin:3px 0}
 pre{white-space:pre-wrap;font-size:11px}
 </style></head><body>
 <div id="side">
   <b>Mission 45O: 建物 footprint / 道路 / 地理院タイル</b>
   <p id="gate"></p>
-  <p>tools\mission45o-footprint-vs-road.cjs --dump で作った <code>diag.json</code> を選択（ブラウザ内で読むだけ。送信しません）。</p>
+  <p>まず下の「ファイルを選択」から <code>diag.json</code> を読み込んでください。未選択の間は右側に地図は出ません。データはブラウザ内で読むだけで、送信しません。</p>
   <input type="file" id="file" accept=".json">
   <label><input type="checkbox" id="lf" checked> 建物 footprint (赤)</label>
   <label><input type="checkbox" id="lr" checked> 道路 中心線 (青)</label>
@@ -38,7 +41,7 @@ pre{white-space:pre-wrap;font-size:11px}
   gate.textContent = 'localhost: 有効';
   var cv = document.getElementById('cv'), g = cv.getContext('2d'), D = null, sc = 0.2, ox = 0, oz = 0, pick = null, tiles = {}, pins = [];
   var $ = function (i) { return document.getElementById(i); };
-  function size() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; draw(); }
+  function size() { cv.width = Math.max(1, Math.round(cv.clientWidth)); cv.height = Math.max(1, Math.round(cv.clientHeight)); draw(); }
   window.addEventListener('resize', size);
   var S2P = function (x, z) { return [cv.width / 2 + (x - ox) * sc, cv.height / 2 + (z - oz) * sc]; };
   var P2S = function (px, py) { return [(px - cv.width / 2) / sc + ox, (py - cv.height / 2) / sc + oz]; };
@@ -80,7 +83,14 @@ pre{white-space:pre-wrap;font-size:11px}
   }
   function draw() {
     g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
-    if (!D) return;
+    if (!D) {
+      g.fillStyle = '#3d506a'; g.font = '600 20px sans-serif';
+      g.fillText('位置ずれ診断：データ未読込', 28, 54);
+      g.font = '14px sans-serif';
+      g.fillText('左側の「ファイルを選択」で diag.json を読み込んでください。', 28, 84);
+      g.fillText('データは外部送信されません。', 28, 108);
+      return;
+    }
     $('attr').style.display = $('lg').checked ? 'block' : 'none';
     if ($('lg').checked) drawTiles();
     if ($('lgrid').checked) drawGrid();
