@@ -154,19 +154,23 @@ function proof(o, src, audit, opts) {
 
 // ---- main driver
 function run(opts) {
+  const stage = typeof opts.onStage === 'function' ? opts.onStage : () => {}; // 45U: stage names only (no paths / ids)
   const execute = !!opts.execute, approved = !!opts.approved;
   if (opts.sumiyoshiRun) opts = Object.assign({}, opts, { synthetic: true }); // the test seam can never produce a "real" proof
   if (execute && !approved) throw err('--execute requires --approved (explicit owner approval). Nothing was done.', 2);
   if (opts.approved && !execute && !opts.verifyOnly) throw err('--approved without --execute does nothing; refusing', 2);
+  stage('45d:source-check');
   const src = C.checkSource(opts.src);
+  stage('45d:source-audit');
   const audit = B.audit(src); // auditReady re-checked in THIS run
   if (!audit.ready) {
     return B.assertAnonymous({ schema: SCHEMA, mode: 'refused', auditReady: false, fatal: audit.fatal || null, readyWards: audit.readyWards || 0, rootProblemKinds: audit.rootProblemKinds || [],
       wardIssues: Object.fromEntries(Object.entries(audit.wards || {}).filter(([, w]) => !w.ready).map(([k, w]) => [k, w.issues])), converted: 0, complete: false, uploadAllowed: 0 });
   }
   const reg = registry();
+  stage('45d:out-root-check');
   const dest = checkRoot(opts.outRoot, src, { mustExist: !!opts.verifyOnly });
-  if (opts.verifyOnly) return proof(dest.out, src, audit, opts);
+  if (opts.verifyOnly) { stage('45d:proof'); return proof(dest.out, src, audit, opts); }
 
   const prev = dest.resume ? readState(dest.out) : null;
   // done = recorded ok AND the output on disk re-verifies now. A pure source mismatch is not retried (deterministic); damage is (new attempt dir).

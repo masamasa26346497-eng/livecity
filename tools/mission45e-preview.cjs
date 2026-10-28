@@ -43,6 +43,8 @@ function underSync(p) {
 
 // Recompute the 45D proof and map every ward to its on-disk tileset dir. Throws a coded, path-free error on any doubt.
 function plan(opts) {
+  const stage = typeof opts.onStage === 'function' ? opts.onStage : () => {};
+  stage('plan:args');
   const outRoot = opts.outRoot || defaultRoot();
   if (!outRoot) throw err('--out-root required (no default outside Windows)', 2);
   if (!opts.src) throw err('--src (legacy buildings dir) required: the proof is recomputed against the source', 2);
@@ -50,13 +52,15 @@ function plan(opts) {
   const o = path.resolve(outRoot);
   const st = lst(o);
   if (!st || !st.isDirectory() || st.isSymbolicLink()) throw err('45D root missing or not a real directory', 4);
+  stage('plan:marker');
   let marker = null; try { marker = JSON.parse(fs.readFileSync(path.join(o, D.MARKER), 'utf8')); } catch (e) { /* foreign */ }
   if (!marker || marker.schema !== D.SCHEMA) throw err('45D root marker missing or foreign', 4);
   // 45D verify-only: re-proves everything from disk (also enforces root outside repo / separate from source / no links)
-  const proof = D.run({ src: opts.src, outRoot: o, verifyOnly: true, synthetic: false, sumiyoshiRun: opts.sumiyoshiRun });
+  const proof = D.run({ src: opts.src, outRoot: o, verifyOnly: true, synthetic: false, sumiyoshiRun: opts.sumiyoshiRun, onStage: opts.onStage });
   const synthetic = proof.kind === 'synthetic';
   if (proof.mode === 'refused') throw err('source audit not ready', 3);
   if (synthetic && !opts.allowSynthetic) throw err('synthetic proof refused', 3);
+  stage('plan:registry');
   const reg = registry();
   if (proof.complete !== true || proof.verifiedWards !== 24 || proof.totalWards !== 24 || proof.sourceBuildings !== proof.convertedBuildings || proof.failures !== 0) {
     const e = err('45D proof not complete (' + proof.verifiedWards + '/24 wards); nothing is served', 3); e.proof = proof; throw e;
@@ -64,9 +68,11 @@ function plan(opts) {
   const dirs = {};
   // 23 PC wards: 43G re-verification of pc23/ (marker + per-ward disk checks) -> pc23/<ward>-aN
   const pcRoot = path.join(o, 'pc23');
+  stage('plan:pc23-verify');
   const pcV = G.verifyRoot({ outRoot: pcRoot, src: require('./mission43f-pc-convert.cjs').checkSource(opts.src) });
   for (const w of pcV.wards) if (w.state === 'verified') dirs[w.ward] = { dir: path.join(pcRoot, w.ward + '-a' + w.attempt), buildings: w.buildings };
   // Sumiyoshi: state.json gives the attempt number only; the tileset dir is what is actually on disk (nested preferred)
+  stage('plan:sumiyoshi-map');
   const state = D.readState(o);
   const sEntry = state && state.sumiyoshi;
   if (sEntry && sEntry.state === 'ok' && Number.isInteger(sEntry.attempt)) {
@@ -167,11 +173,40 @@ function makeServer(servable, getPort, synthetic, lod0, layers) {
 async function serve(opts) {
   const p = plan(opts);
   let port = Number.isInteger(opts.port) ? opts.port : 8137;
-  const server = makeServer(p.servable, () => port, p.synthetic, lod0Plan(opts.lod0), layersPlan(opts.layersRoot));
+  const stage = typeof opts.onStage === 'function' ? opts.onStage : () => {};
+  stage('serve:lod0-plan');
+  const lod0 = lod0Plan(opts.lod0);
+  stage('serve:layers-plan');
+  const layers = layersPlan(opts.layersRoot);
+  stage('serve:make-server');
+  const server = makeServer(p.servable, () => port, p.synthetic, lod0, layers);
+  stage('serve:listen');
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', () => { port = server.address().port; resolve({ server, port, plan: p }); });
   });
+}
+// 45U: a non-coded exception used to be printed as "details suppressed", which made the cause unclassifiable.
+// diagnose() returns ONLY a stage name, an Error class from a fixed list, a Node errno code from a fixed list and a repairability hint.
+// It never includes e.message, e.stack, a path, an id or a coordinate.
+const ERR_CLASSES = ['Error', 'TypeError', 'RangeError', 'SyntaxError', 'ReferenceError'];
+const ERRNO = { ENOENT: ['missing file/folder', 'owner'], EACCES: ['access denied', 'owner'], EPERM: ['operation not permitted', 'owner'], EBUSY: ['file busy/locked (sync or antivirus?)', 'retry'],
+  EMFILE: ['too many open files', 'retry'], ENOTDIR: ['not a directory', 'owner'], EISDIR: ['is a directory', 'owner'], ELOOP: ['link loop', 'owner'], ENAMETOOLONG: ['path too long', 'owner'],
+  EIO: ['I/O error', 'retry'], EINVAL: ['invalid argument', 'code'], EADDRINUSE: ['port already in use', 'owner'] };
+const STAGE_HELP = {
+  'start': 'before any check', 'plan:args': 'argument check', 'plan:marker': '45D root marker read', '45d:source-check': 'legacy source folder check', '45d:source-audit': 'legacy source audit (reads every tile)',
+  '45d:out-root-check': '45D output root layout check', '45d:proof': '45D verify-only proof (reads state + every ward output)', 'plan:registry': 'ward registry read',
+  'plan:pc23-verify': '43G re-verification of pc23/', 'plan:sumiyoshi-map': 'Sumiyoshi state/attempt mapping', 'serve:lod0-plan': '--lod0 folder', 'serve:layers-plan': '--layers-root folder',
+  'serve:make-server': 'server construction', 'serve:listen': 'port bind' };
+const GUARD_MSG = 'refusing: output would contain a path or an id';
+function diagnose(e, stage) {
+  const cls = e && e.constructor && ERR_CLASSES.includes(e.constructor.name) ? e.constructor.name : 'Error';
+  const errno = e && typeof e.code === 'string' && ERRNO[e.code] ? e.code : null;
+  const guard = !errno && cls === 'Error' && !!e && typeof e.message === 'string' && e.message.indexOf(GUARD_MSG) === 0;
+  const kind = errno ? ERRNO[errno][1] : (guard || cls !== 'Error' ? 'code' : 'unknown');
+  const repairable = { owner: 'yes (owner side: check the folder this stage reads)', retry: 'maybe (retry; close sync / antivirus / other readers)', code: 'no (code defect: report this block)', unknown: 'unknown (report this block)' }[kind];
+  return { stage: stage || 'unknown', stageMeaning: STAGE_HELP[stage] || 'unknown', errorClass: cls, errno, errnoMeaning: errno ? ERRNO[errno][0] : null,
+    anonymityGuardTripped: guard, repairable };
 }
 function summary(p) {
   return { schema: SCHEMA, readOnly: true, uploaded: 0, uploadAllowed: 0, published: false, gates: G.GATES, kind: p.synthetic ? 'synthetic' : 'real',
@@ -182,7 +217,14 @@ function main() {
   const a = process.argv.slice(2);
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
   const opts = { src: opt('src'), outRoot: opt('out-root'), port: opt('port') ? parseInt(opt('port'), 10) : undefined, lod0: opt('lod0'), layersRoot: opt('layers-root') };
-  const fail = (e) => { console.error(Number.isInteger(e.code) ? e.message : 'error: operation failed (details suppressed)'); process.exit(Number.isInteger(e.code) ? e.code : 1); };
+  let cur = 'start';
+  opts.onStage = (s) => { cur = s; };
+  const fail = (e) => {
+    if (e && Number.isInteger(e.code)) { console.error(e.message); console.error('diagnostic: ' + JSON.stringify({ stage: cur, coded: true, exitCode: e.code })); process.exit(e.code); }
+    console.error('error: unexpected failure (message withheld so no path or id is printed)');
+    console.error('diagnostic: ' + JSON.stringify(diagnose(e, cur)));
+    process.exit(1);
+  };
   try {
     if (!a.includes('--serve')) { console.log(JSON.stringify(Object.assign({ mode: 'plan', serving: false }, summary(plan(opts))), null, 1)); process.exit(0); }
     serve(opts).then((r) => {
@@ -193,5 +235,5 @@ function main() {
     }, fail);
   } catch (e) { fail(e); }
 }
-module.exports = { plan, serve, makeServer, resolveExt, lod0Plan, resolveLod0, layersPlan, resolveLayers, LAYERS_MARKER, indexJson, underSync, SCHEMA, PREFIX };
+module.exports = { diagnose, plan, serve, makeServer, resolveExt, lod0Plan, resolveLod0, layersPlan, resolveLayers, LAYERS_MARKER, indexJson, underSync, SCHEMA, PREFIX };
 if (require.main === module) main();

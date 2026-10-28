@@ -34,5 +34,5 @@ if ($LayersRoot -ne '') { $nodeArgs += @('--layers-root', (Resolve-AbsPath $Laye
 if (-not $Plan) { $nodeArgs += '--serve' }
 & node @nodeArgs
 $code = $LASTEXITCODE
-if ($code -ne 0) { Write-Host ('RESULT: NOT OK (exit ' + $code + '). Nothing was served. Source and output were not modified.'); exit $code }
+if ($code -ne 0) { Write-Host ('RESULT: NOT OK (exit ' + $code + '). Nothing was served. Source and output were not modified.'); Write-Host 'If a line starting with "diagnostic:" was printed above, it holds only a stage name and an error class (no paths or ids). It is safe to paste.'; exit $code }
 exit 0
