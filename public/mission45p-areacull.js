@@ -7,7 +7,7 @@
  * 座標は Live City 局所座標（x=東, z=南が正, m）。入力は変更しない。 */
 (function (root) {
   'use strict';
-  const DEFAULTS = { cell: 400, bigSpan: 600, hysteresis: 1.5, maxBuildVertices: 4000, maxResidentVertices: 150000 };
+  const DEFAULTS = { cell: 400, bigSpan: 600, hysteresis: 1.5, maxBuildVertices: 4000, maxResidentVertices: 150000, deferDropWhileMoving: false };
 
   function bboxOf(ring) {
     let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
@@ -62,7 +62,8 @@
       st.syncs++; st.lastBuilt = 0; st.lastDropped = 0;
       const want = selectUnits(index, rect), wantKeys = new Set(want.map((w) => w.unit.key));
       const hr = { minX: rect.cx - rect.r * o.hysteresis, maxX: rect.cx + rect.r * o.hysteresis, minZ: rect.cz - rect.r * o.hysteresis, maxZ: rect.cz + rect.r * o.hysteresis };
-      for (const [k, r] of [...res.entries()]) if (!wantKeys.has(k) && !touches(r.unit.bbox, hr)) drop(k);
+      // A/B（?vcdefer=1）: 操作中（canBuild=false）は破棄も見送り、止まってから外す。既定は従来どおり。
+      if (canBuild || !o.deferDropWhileMoving) for (const [k, r] of [...res.entries()]) if (!wantKeys.has(k) && !touches(r.unit.bbox, hr)) drop(k);
       let built = 0, bv = 0, pending = 0;
       if (canBuild) {
         const maxBV = (budget && budget.vertices) || o.maxBuildVertices;

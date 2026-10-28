@@ -24,6 +24,7 @@ pre{white-space:pre-wrap;font-size:11px}
   <label>地理院タイル オフセット 東+ rx(m) <input id="rx" type="number" value="0" step="1" style="width:60px"></label>
   <label>地理院タイル オフセット 南+ rz(m) <input id="rz" type="number" value="0" step="1" style="width:60px"></label>
   <label>緯度,経度へ移動 <input id="ll" placeholder="34.6934,135.4829" style="width:150px"></label><button id="llgo">移動してピン</button>
+  <label>視差の目安: 建物高さ(m) <input id="ph" type="number" value="30" style="width:50px"> 鉛直からの傾き(°) <input id="pa" type="number" value="30" style="width:46px"></label><button id="pgo">計算</button> <span id="pout" style="font-size:11px"></span>
   <p>※ オフセットは「見た目の確認用」のみ。データにも変換にも反映されません。</p>
   <p>クリック=ピン固定(最大8点)。ピンは緯度経度と、最寄りの footprint / 道路までの距離を並べて表示します。同じ地物(交差点・大きな建物)に複数レイヤーのずれ方向が揃うかを見てください。</p>
   <p id="warn" style="color:#f5d98a">この画面は原因を断定しません。ずれが GSI タイルにだけ出るなら、タイル側/投影の差の可能性。footprint と道路の間だけなら元データ同士の差(時期・品質)の可能性。どちらも画面上の目視と複数地点の一貫性で判断してください。</p>
@@ -108,14 +109,34 @@ pre{white-space:pre-wrap;font-size:11px}
   ['lf', 'lr', 'lg', 'lgrid', 'dx', 'dz', 'rx', 'rz'].forEach(function (i) { $(i).addEventListener('input', draw); });
   $('file').addEventListener('change', function (e) {
     var f = e.target.files[0]; if (!f) return;
-    var rd = new FileReader();
-    rd.onload = function () {
-      D = JSON.parse(rd.result); var b = D.meta.bbox; ox = (b.minX + b.maxX) / 2; oz = (b.minZ + b.maxZ) / 2; sc = Math.min(cv.width / (b.maxX - b.minX), cv.height / (b.maxZ - b.minZ));
-      var m = D.meta; info.textContent = 'ward: ' + m.ward + '\nfootprints: ' + D.footprints.length + '\nroad lines: ' + D.roads.length + '\norigin: ' + m.origin.lat + ', ' + m.origin.lon + '\naxes: ' + m.axes + '\nunit: ' + m.unit + '\nroads generated: ' + (m.source.roadsGenerated || '(not recorded)') + '\nroads convention: ' + (m.source.roadsConvention || '(not recorded)') + '\nbuildings: ' + m.source.buildings;
-      draw();
-    };
-    rd.readAsText(f);
+    var rd = new FileReader(); rd.onload = function () { loadText(rd.result); }; rd.onerror = function () { info.textContent = '読み込み失敗: ファイルを読めません'; }; rd.readAsText(f);
   });
+  $('pgo').addEventListener('click', function () {
+    var h = +$('ph').value, a = +$('pa').value;
+    $('pout').textContent = (isFinite(h) && isFinite(a) && a >= 0 && a < 89) ? '屋根の見かけのずれ ≈ ' + parallax(h, a).toFixed(1) + ' m（高さ×tan(傾き)。3D 屋根と 2D footprint の差にはこの視差が含まれる）' : '入力が不正です';
+  });
+  // diag.json の形を検査する（不正ファイルで例外を出さず理由を画面に出す）。window.__diag45.validate で単体テスト可能。
+  function validate(j) {
+    if (!j || typeof j !== 'object') return 'JSON のトップが object ではありません';
+    var m = j.meta;
+    if (!m || !m.bbox || !m.origin || typeof m.mpd !== 'number') return 'meta(bbox/origin/mpd) がありません';
+    var b = m.bbox; if (!['minX', 'maxX', 'minZ', 'maxZ'].every(function (k) { return isFinite(b[k]); }) || !(b.maxX > b.minX) || !(b.maxZ > b.minZ)) return 'meta.bbox が不正です';
+    if (!isFinite(m.origin.lat) || !isFinite(m.origin.lon)) return 'meta.origin が不正です';
+    if (!Array.isArray(j.footprints) || !Array.isArray(j.roads)) return 'footprints / roads が配列ではありません';
+    return null;
+  }
+  function parallax(h, deg) { return h * Math.tan(deg * Math.PI / 180); }
+  window.__diag45 = { validate: validate, parallax: parallax, state: function () { return { loaded: !!D, footprints: D ? D.footprints.length : 0, roads: D ? D.roads.length : 0, pins: pins.length, gsi: $('lg').checked, canvas: [cv.width, cv.height], sideWidth: $('side').getBoundingClientRect().width }; } };
+  function loadText(txt) {
+    var j; try { j = JSON.parse(txt); } catch (e) { info.textContent = '読み込み失敗: JSON として解釈できません (' + e.message + ')'; return; }
+    var err = validate(j); if (err) { info.textContent = '読み込み失敗: ' + err; return; }
+    D = j; pins = []; var b = D.meta.bbox; ox = (b.minX + b.maxX) / 2; oz = (b.minZ + b.maxZ) / 2; sc = Math.min(cv.width / (b.maxX - b.minX), cv.height / (b.maxZ - b.minZ));
+    var m = D.meta, s = m.source || {};
+    info.textContent = 'ward: ' + m.ward + '\nfootprints: ' + D.footprints.length + '\nroad lines: ' + D.roads.length + '\norigin: ' + m.origin.lat + ', ' + m.origin.lon + '\naxes: ' + m.axes + '\nunit: ' + m.unit +
+      '\n--- 出所（3D と 2D 元データの突き合わせ用）---\nbuildings: ' + s.buildings + '\nbuilding tile files mtime: ' + (s.buildingsMtime || '(未記録: --dump を再実行)') +
+      '\nroads generated: ' + (s.roadsGenerated || '(not recorded)') + '\nroads convention: ' + (s.roadsConvention || '(not recorded)') + '\nroads manifest mtime: ' + (s.roadsManifestMtime || '(未記録)');
+    draw();
+  }
   var drag = null, moved = false;
   cv.addEventListener('mousedown', function (e) { drag = [e.clientX, e.clientY, ox, oz]; moved = false; });
   window.addEventListener('mouseup', function (e) {

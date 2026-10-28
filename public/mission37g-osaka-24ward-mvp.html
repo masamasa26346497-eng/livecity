@@ -887,7 +887,7 @@
         return h;
       };
       const destroyH = (h) => { try { scene.primitives.remove(h); } catch (e) { /* noop */ } };
-      const res = LC45P.makeResidency(idx, build, destroyH, {});
+      const res = LC45P.makeResidency(idx, build, destroyH, { deferDropWhileMoving: q.get('vcdefer') === '1' });
       cullRec = { res, idx, file, sync: (rect, canBuild) => res.sync(rect, canBuild) };
       cullLayers.add(cullRec);
       P.indexedFeatures += idx.stats.features; P.indexedUnits += idx.units.length; P.bigUnits += idx.stats.big;

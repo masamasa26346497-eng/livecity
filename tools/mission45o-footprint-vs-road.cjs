@@ -21,6 +21,12 @@ function readFootprints(src, wardId) {
   }
   return polys;
 }
+const readdirTiles = (d) => fs.readdirSync(d).filter((f) => /^tile_-?\d+_-?\d+\.json$/.test(f)).map((f) => path.join(d, f));
+// 出所の鮮度（ファイル更新日の最小〜最大。内容・座標は含まない）。生成日の目安であり、撮影日・測量日ではない。
+function mtimeRange(files) {
+  const t = files.map((f) => { try { return fs.statSync(f).mtime.toISOString().slice(0, 10); } catch (e) { return null; } }).filter(Boolean).sort();
+  return t.length ? t[0] + ' .. ' + t[t.length - 1] : null;
+}
 function run(opts) {
   const ward = readJson(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json')).wards.find((w) => w.wardId === opts.ward);
   if (!ward) throw new Error('unknown ward');
@@ -50,7 +56,9 @@ function run(opts) {
     const meta = {
       origin: { lat: CLAT, lon: CLON }, mpd: MPD, unit: 'm',
       axes: 'x=(lon-CLON)*cos(CLAT)*MPD (east+), z=-(lat-CLAT)*MPD (south+)',
-      source: { roadsGenerated: rm.generated || rm.generatedAt || null, roadsConvention: rm.coordinateConvention || null, roadsTileSize: rm.tileSize || null, buildings: 'legacy tile JSON fp (PLATEAU LOD1)' },
+      source: { roadsGenerated: rm.generated || rm.generatedAt || null, roadsConvention: rm.coordinateConvention || null, roadsTileSize: rm.tileSize || null,
+        buildingsMtime: mtimeRange(readdirTiles(path.join(opts.src, 'buildings', 'osaka-' + opts.ward))),
+        roadsManifestMtime: mtimeRange([path.join(opts.src, 'roads', 'manifest.json')]), buildings: 'legacy tile JSON fp (PLATEAU LOD1)' },
       ward: opts.ward, bbox: box
     };
     const r1 = (q) => [Math.round(q[0] * 10) / 10, Math.round(q[1] * 10) / 10];
