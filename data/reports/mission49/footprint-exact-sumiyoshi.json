@@ -1,0 +1,29 @@
+{
+ "generated": "2026-10-29T12:32:13.059Z",
+ "tileset": "public/mission37b-3dtiles/osaka-sumiyoshi-9tile",
+ "source": "public/map-data/osaka-city/buildings/osaka-sumiyoshi",
+ "glbBuildings": 10546,
+ "matchedToSource": 10546,
+ "missingInSource": 0,
+ "maxVertexDeviationM": {
+  "median": 0,
+  "p95": 0,
+  "p99": 0,
+  "max": 0
+ },
+ "over0_5m": 0,
+ "over1m": 0,
+ "over2m": 0,
+ "areaRatio": {
+  "min": 1,
+  "p01": 1,
+  "median": 1,
+  "p99": 1,
+  "max": 1
+ },
+ "worst": {
+  "id": "bldg_955e779e-f150-4076-a547-c4501d2ba1c7",
+  "maxVertexDevM": 0
+ },
+ "note": "Float32 GLB + ECEF round trip gives ~cm noise. Old FIX24 symptom (tolM=2 simplification) would show >1 m deviations and area-ratio drift for ~12% of buildings."
+}

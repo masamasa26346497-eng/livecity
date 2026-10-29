@@ -1825,6 +1825,47 @@
   }, makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks })));
   LayerRegistry.register(labelLayer);
 
+  // 49: GSI 道路縁（RdEdg）。旧 Three.js 版 31G ALIGNMENT-RESET が「道路境界の正本」にした実測の道路縁を、Cesium 版へ戻した参考レイヤー。
+  //   既定 OFF・初回 ON のときだけ取得（起動コスト 0）。データは tools/mission49-build-roadedge.cjs が GSI 公開タイルから切り出した小さな窓
+  //   （住吉区 9 tile 範囲 / 北区サンプル範囲）だけ。窓の外には何も描かない。OSM 中心線・建物輪郭とは定義が違う（SOURCE_SEMANTICS_DIFFERENCE）。
+  const GSI_EDGE_SETS = ['gsi-roadedge-sumiyoshi-9tile.json', 'gsi-roadedge-kita-sample.json'];
+  stats.gsiRoadEdge = { state: 'off', sets: {}, lines: 0, points: 0 };
+  (function () {
+    let coll = null, loading = null, shown = false;
+    async function load() {
+      if (coll || loading) return loading;
+      stats.gsiRoadEdge.state = 'loading';
+      loading = (async () => {
+        const c = scene.primitives.add(new Cesium.PolylineCollection());
+        const mat = solidMat('#c8801a');
+        for (const f of GSI_EDGE_SETS) {
+          const r = await fetch('mission49-data/' + f, { cache: 'force-cache' });
+          if (!r.ok) throw new Error('GSI road edge ' + f + ' HTTP ' + r.status);
+          const d = await r.json();
+          if (d.kind !== 'gsi-road-edge' || !Array.isArray(d.lines)) throw new Error('GSI road edge: unexpected format ' + f);
+          for (const ln of d.lines) {
+            c.add({ positions: ln.map((p) => toCart(p[0], p[1], LAYER_H.roads + 0.2)), width: 1.6, material: mat,
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 6000), id: { layer: 'gsiroadedge' } });
+            stats.gsiRoadEdge.points += ln.length;
+          }
+          stats.gsiRoadEdge.sets[f] = { lines: d.lines.length, bboxLocal: d.bboxLocal };
+          stats.gsiRoadEdge.lines += d.lines.length;
+        }
+        coll = c; coll.show = shown; stats.gsiRoadEdge.state = 'ready'; scene.requestRender();
+      })().catch((e) => { stats.gsiRoadEdge.state = 'error'; stats.gsiRoadEdge.error = String(e && e.message || e); loading = null; throw e; });
+      return loading;
+    }
+    LayerRegistry.register({
+      id: 'gsiroadedge', label: '道路縁（GSI・参考）', swatch: '#c8801a', defaultOn: false,
+      hint: '国土地理院の実測道路縁（RdEdg）。住吉区9tile範囲と北区サンプル範囲のみ。OSM中心線・建物輪郭とは定義が異なる参考表示',
+      async mount() { return { count: 0 }; },
+      applyVisible(on) {
+        shown = !!on; if (coll) { coll.show = shown; scene.requestRender(); return; }
+        if (shown) load().then(() => { const rec = LayerRegistry.get('gsiroadedge'); rec.count = stats.gsiRoadEdge.lines; LayerRegistry.sync(rec); }).catch(() => { /* stats に記録済み */ });
+      },
+    });
+  })();
+
   // ── 未接続レイヤー: UI 状態（visible）だけを持つダミー ──
   // 接続するときは、同じ id で mount()/applyVisible() を実装した descriptor に差し替えるだけ。
   // UI 行・トグル・診断（__mission37c.layers）はそのまま使える。
