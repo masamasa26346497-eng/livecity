@@ -67,8 +67,10 @@ try {
   await ev('window.__mission37dQA.lookAtLocal(' + VIEW.x + ',' + VIEW.z + ',0,' + VIEW.range + ',' + VIEW.pitch + ',0)');
   await sleep(5000);
   const res = {};
-  for (const state of ['off', 'on']) {
-    await ev("window.__mission37dQA.setLayer('gsiwater', " + (state === 'on') + ')');
+  for (const state of ['off', 'on', 'on-noedge']) {
+    // 52: 道路縁（既定 ON）の線が水面画素に重なる影響を 'on-noedge' で分離する
+    await ev("window.__mission37dQA.setLayer('gsiroadedge', " + (state !== 'on-noedge') + ')');
+    await ev("window.__mission37dQA.setLayer('gsiwater', " + (state !== 'off') + ')');
     await sleep(2500);
     const png = await shot(state);
     const w = await measure(png, water), l = await measure(png, land);

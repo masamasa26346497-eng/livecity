@@ -450,6 +450,7 @@
 <script src="mission37f-photo-select.js"></script>
 <script src="mission37k-poi-select.js"></script>
 <script src="mission51-seg-dedupe.js"></script>
+<script src="mission52-water-dedupe.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
 <script src="mission45f-streaming.js"></script>
 <script src="mission45g-perf.js"></script>
@@ -1874,8 +1875,8 @@
       return loading;
     }
     LayerRegistry.register({
-      id: 'gsiroadedge', label: '道路縁（GSI・参考）', swatch: '#c8801a', defaultOn: false,
-      hint: '国土地理院の実測道路縁（RdEdg）。住吉区9tile範囲と北区サンプル範囲のみ。OSM中心線・建物輪郭とは定義が異なる参考表示',
+      id: 'gsiroadedge', label: '道路縁（GSI実測）', swatch: '#c8801a', defaultOn: true,
+      hint: '国土地理院の実測道路縁（RdEdg）＝旧版31Gで道路境界の正本としていたもの。住吉区9tile・北区サンプル・大川/中之島の窓のみ（窓の外は描かない）。OSM中心線は別レイヤーとして残す。路幅は推測しない',
       async mount() { return { count: 0 }; },
       applyVisible(on) {
         shown = !!on; if (coll) { coll.show = shown; scene.requestRender(); return; }
@@ -1898,7 +1899,9 @@
         if (!r.ok) throw new Error('GSI water HTTP ' + r.status);
         const d = await r.json();
         if (d.kind !== 'gsi-water-roadedge' || !Array.isArray(d.water)) throw new Error('GSI water: unexpected format');
-        const inst = d.water.filter((w) => w.outer && w.outer.length >= 3).map((w) => new Cesium.GeometryInstance({
+        const wd = LiveCityWaterDedupe.dedupeWater(d.water.filter((w) => w.outer && w.outer.length >= 3)); // 52: タイル境界で他ポリゴンに完全に覆われる重複片だけ除く（座標不変）
+        stats.gsiWater.dedupe = { inPolys: d.water.length, dropped: wd.droppedIndexes.length, droppedAreaM2: wd.droppedAreaM2 };
+        const inst = wd.polys.map((w) => new Cesium.GeometryInstance({
           geometry: new Cesium.PolygonGeometry({
             polygonHierarchy: new Cesium.PolygonHierarchy(w.outer.map((pt) => toCart(pt[0], pt[1], 0)),
               (w.holes || []).map((h) => new Cesium.PolygonHierarchy(h.map((pt) => toCart(pt[0], pt[1], 0))))),

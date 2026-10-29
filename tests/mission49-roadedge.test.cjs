@@ -51,9 +51,9 @@ test('GSI road-edge data files: format, window, coordinates', () => {
   }
 });
 
-test('viewer: GSI road-edge layer is default OFF, lazy, same-origin, and adds no Google reference', () => {
+test('viewer: GSI road-edge layer is default ON (Mission 52, as old 31G), window-limited, same-origin, and adds no Google reference', () => {
   const h = fs.readFileSync(R('public/mission37g-osaka-24ward-mvp.html'), 'utf8');
-  assert.match(h, /id: 'gsiroadedge'[\s\S]{0,200}defaultOn: false/);
+  assert.match(h, /id: 'gsiroadedge'[\s\S]{0,200}defaultOn: true/);
   assert.match(h, /mission49-data\//);
   const blk = h.slice(h.indexOf('GSI_EDGE_SETS'), h.indexOf('未接続レイヤー'));
   assert.ok(!/google|maps\.googleapis/i.test(blk));
