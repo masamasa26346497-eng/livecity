@@ -449,6 +449,7 @@
 <script src="mission37d-data/town-normalize.js"></script>
 <script src="mission37f-photo-select.js"></script>
 <script src="mission37k-poi-select.js"></script>
+<script src="mission51-seg-dedupe.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
 <script src="mission45f-streaming.js"></script>
 <script src="mission45g-perf.js"></script>
@@ -1839,12 +1840,15 @@
       loading = (async () => {
         const c = scene.primitives.add(new Cesium.PolylineCollection());
         const mat = solidMat('#c8801a');
+        const seen = new Set(); // 51: 窓の重なり・タイル境界クリップ余白による同一線分の多重描画を除く（座標は不変）
+        stats.gsiRoadEdge.dedupe = { inSegs: 0, keptSegs: 0, droppedSegs: 0 };
+        const dd = (lines) => { const r = LiveCitySegDedupe.dedupeLines(lines, seen); const t = stats.gsiRoadEdge.dedupe; t.inSegs += r.inSegs; t.keptSegs += r.keptSegs; t.droppedSegs += r.droppedSegs; return r.lines; };
         for (const f of GSI_EDGE_SETS) {
           const r = await fetch('mission49-data/' + f, { cache: 'force-cache' });
           if (!r.ok) throw new Error('GSI road edge ' + f + ' HTTP ' + r.status);
           const d = await r.json();
           if (d.kind !== 'gsi-road-edge' || !Array.isArray(d.lines)) throw new Error('GSI road edge: unexpected format ' + f);
-          for (const ln of d.lines) {
+          for (const ln of dd(d.lines)) {
             c.add({ positions: ln.map((p) => toCart(p[0], p[1], LAYER_H.roads + 0.2)), width: 1.6, material: mat,
                     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 6000), id: { layer: 'gsiroadedge' } });
             stats.gsiRoadEdge.points += ln.length;
@@ -1857,7 +1861,7 @@
           if (!r.ok) throw new Error('GSI okawa ' + GSI_OKAWA + ' HTTP ' + r.status);
           const d = await r.json();
           if (d.kind !== 'gsi-water-roadedge' || !Array.isArray(d.lines)) throw new Error('GSI okawa: unexpected format');
-          for (const ln of d.lines) {
+          for (const ln of dd(d.lines)) {
             c.add({ positions: ln.map((p) => toCart(p[0], p[1], LAYER_H.roads + 0.2)), width: 1.6, material: mat,
                     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 6000), id: { layer: 'gsiroadedge' } });
             stats.gsiRoadEdge.points += ln.length;

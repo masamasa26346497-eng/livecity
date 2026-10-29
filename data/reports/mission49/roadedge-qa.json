@@ -20,7 +20,7 @@
         "error": null,
         "dummy": false
       },
-      "diffPx": 59719,
+      "diffPx": 59819,
       "gsiRoadEdge": {
         "state": "ready",
         "sets": {
@@ -41,19 +41,33 @@
               "minZ": -12520,
               "maxZ": -10650
             }
+          },
+          "gsi-okawa-nakanoshima.json": {
+            "lines": 2944,
+            "bboxLocal": {
+              "minX": -3310.3,
+              "maxX": -1297,
+              "minZ": -11275.1,
+              "maxZ": -8761.2
+            }
           }
         },
-        "lines": 4240,
-        "points": 26753
+        "lines": 7184,
+        "points": 41475,
+        "dedupe": {
+          "inSegs": 37338,
+          "keptSegs": 34261,
+          "droppedSegs": 3077
+        }
       },
       "layersAfter": {
         "state": "ready",
-        "count": 0,
+        "count": 7184,
         "visible": true,
         "error": null,
         "dummy": false
       },
-      "diffOffAgainVsOff": 94
+      "diffOffAgainVsOff": 119
     },
     {
       "case": "sumiyoshi",
@@ -74,7 +88,7 @@
         "error": null,
         "dummy": false
       },
-      "diffPx": 82464,
+      "diffPx": 82614,
       "gsiRoadEdge": {
         "state": "ready",
         "sets": {
@@ -95,19 +109,33 @@
               "minZ": -12520,
               "maxZ": -10650
             }
+          },
+          "gsi-okawa-nakanoshima.json": {
+            "lines": 2944,
+            "bboxLocal": {
+              "minX": -3310.3,
+              "maxX": -1297,
+              "minZ": -11275.1,
+              "maxZ": -8761.2
+            }
           }
         },
-        "lines": 4240,
-        "points": 26753
+        "lines": 7184,
+        "points": 41475,
+        "dedupe": {
+          "inSegs": 37338,
+          "keptSegs": 34261,
+          "droppedSegs": 3077
+        }
       },
       "layersAfter": {
         "state": "ready",
-        "count": 0,
+        "count": 7184,
         "visible": true,
         "error": null,
         "dummy": false
       },
-      "diffOffAgainVsOff": 92
+      "diffOffAgainVsOff": 121
     }
   ],
   "jsErrors": [],
