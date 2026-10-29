@@ -1,17 +1,23 @@
-# Mission 46D-R1: independent accuracy check (GSI vector tiles vs Live City)
+# Mission 46D: independent accuracy check (GSI vector tiles vs Live City)
 
-Core tool only. **No real 24-ward data has been collected or verified yet**; tests use synthetic fixture tiles.
-
+## Tools
 ```
-node tools/mission46d-independent-accuracy.cjs --src <legacy osaka-city dir> --ref-dir <dir>/<wardId>/<z>_<x>_<y>.pbf [--wards a,b] [--out report.json]
-node --test tests/mission46d-independent-accuracy.test.cjs
+# 1. fetch GSI tiles (free, no key, sequential, capped; cache must be git-ignored: temp/ or data/cache/ or outside repo)
+node tools/mission46d-fetch-gsi-tiles.cjs --out temp/gsi46d --wards sumiyoshi --sample 12   # SAMPLE of tiles inside the ward polygon
+node tools/mission46d-fetch-gsi-tiles.cjs --out temp/gsi46d --plan                           # count only, no requests
+# 2. check
+node tools/mission46d-independent-accuracy.cjs --src <legacy osaka-city dir> --ref-dir temp/gsi46d --out report.json
+node --test tests/mission46d-independent-accuracy.test.cjs tests/mission46d-fetch-gsi-tiles.test.cjs
 ```
+- Fetcher: `https://cyberjapandata.gsi.go.jp/xyz/optimal_bvmap-v1/{z}/{x}/{y}.pbf` -> `<out>/<wardId>/<z>_<x>_<y>.pbf`. Defaults: zoom 16, <=40 tiles/ward, <=200 requests, 15 s timeout, 3 retries with backoff (429/5xx), 404 = no tile, responses size-checked and MVT-decoded, atomic writes, existing tiles skipped. Source: GSI (cite when publishing). GSI data changes over time; `fetch-manifest.json` records fetch time.
+- Full z16 coverage of all 24 wards is ~2,000+ tiles; `--sample N` is NOT full coverage and the report shows evaluated coverage per ward.
 
-- Reference: GSI `optimal_bvmap-v1` layers `BldA` (building outlines) and `RdEdg` (road edges), decoded by `tools/lib/mission46d-mvt.cjs` (dependency-free MVT reader, gzip aware, web-mercator -> Live City local metres with the existing CLAT/CLON/MPD constants).
-- Buildings: Live City footprint centroid must fall inside a GSI building; vertex-to-GSI-outline distance median/p95 and centroid offset are reported. Offsets are reported, never applied.
-- Roads: centerline samples (10 m) must lie within a band of a GSI road edge (corridor containment). A centerline is NOT expected to coincide with an edge; `onEdgePct` is reported.
-- Status per ward: `PASS` / `FAIL` / `INSUFFICIENT_DATA`. Missing reference tiles, low coverage, or too few samples is always `INSUFFICIENT_DATA`. `summary.allWardsPass` is true only if all 24 wards PASS.
-- Schema: `livecity.mission46d.independent-accuracy/1` (thresholds and limits are embedded in the report).
-- Read-only: no network, no writes besides `--out`, never touches `--src` / `--ref-dir`.
+## Judgement rules
+- Buildings: centroid must fall in a GSI building (holes respected, malformed rings excluded); vertex-to-outline distance median/p95.
+- Shared lineage guard: centimetre-level agreement over many vertices => `suspectedSharedLineage` => `INSUFFICIENT_DATA` (agreement with the source the data came from is not independent evidence).
+- Roads: a centerline sample counts only if a GSI edge exists within the band on BOTH sides (bracketed). One-sided proximity never gives PASS. Thresholds (60% / 50 samples) are provisional and not calibrated.
+- Missing reference tiles, missing Live City source, low coverage => `INSUFFICIENT_DATA`. `allWardsPass` only if all 24 PASS.
+- GSI vs PLATEAU/OSM differ in survey date and outline definition; no claim better than GSI nominal accuracy.
 
-Next (separate short jobs): fetch GSI tiles for 24 wards into `<ref-dir>/<wardId>/`, run the tool, publish the per-ward result.
+## R2 result (data/reports/mission46d-r2/)
+Aggregate only. Only `sumiyoshi` has Live City building tiles tracked in Git; 12 sample GSI tiles were fetched. All other wards and all roads: INSUFFICIENT_DATA (source not in Git). Result: PASS 0 / FAIL 0 / INSUFFICIENT_DATA 24.
