@@ -2910,6 +2910,13 @@
         const f = scene.pick(new Cesium.Cartesian2(px - r.left, py - r.top));
         return f && f.id && f.id.poi ? f.id.poi.id : (f ? 'other:' + Object.prototype.toString.call(f.id) : null);
       },
+      // 47: 画面点の描画面（屋根など）の実位置を depth から読み戻し、局所座標 {x,z,h} で返す（位置ずれ E2E 用。読み取りのみ）
+      pickLocal(px, py) {
+        const r = rect();
+        if (!scene.pickPositionSupported) return null;
+        const c = scene.pickPosition(new Cesium.Cartesian2(px - r.left, py - r.top));
+        return c ? cartToLocal(c) : null;
+      },
       pickId(px, py) {
         const r = rect();
         const f = scene.pick(new Cesium.Cartesian2(px - r.left, py - r.top));
