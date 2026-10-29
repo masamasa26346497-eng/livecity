@@ -143,7 +143,13 @@ async function main() {
     retries: 3, backoffMs: 1000, timeoutMs: 15000, delayMs: 300, plan: a.includes('--plan'), insideOnly: a.includes('--inside-only') || !!get('--sample'), sample: +get('--sample', 0) };
   if (!(opts.zoom >= 14 && opts.zoom <= 16)) { console.error('zoom must be 14..16 (optimal_bvmap-v1 max is 16)'); process.exit(2); }
   const only = get('--wards') ? get('--wards').split(',') : null;
-  const wards = require(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json')).wards.filter((w) => !only || only.includes(w.wardId));
+  let wards = require(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json')).wards.filter((w) => !only || only.includes(w.wardId));
+  // R3: --bbox minX,maxX,minZ,maxZ (local metres) --label <id> fetches only the tiles covering that box (e.g. a tracked road bundle's bboxLocal)
+  if (get('--bbox')) {
+    const [minX, maxX, minZ, maxZ] = get('--bbox').split(',').map(Number);
+    if (![minX, maxX, minZ, maxZ].every(Number.isFinite) || !(minX < maxX && minZ < maxZ)) { console.error('bad --bbox'); process.exit(2); }
+    wards = [{ wardId: get('--label', 'bbox-area'), bbox: { minX, maxX, minZ, maxZ } }];
+  }
   const r = await run(opts, wards);
   console.error('planned ' + r.manifest.plannedTiles + ' tiles, requests ' + r.requests + ', skipped wards ' + r.manifest.skippedWards.length);
   console.log(JSON.stringify(r.manifest, null, 2));

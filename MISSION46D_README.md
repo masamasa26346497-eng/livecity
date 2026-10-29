@@ -21,3 +21,13 @@ node --test tests/mission46d-independent-accuracy.test.cjs tests/mission46d-fetc
 
 ## R2 result (data/reports/mission46d-r2/)
 Aggregate only. Only `sumiyoshi` has Live City building tiles tracked in Git; 12 sample GSI tiles were fetched. All other wards and all roads: INSUFFICIENT_DATA (source not in Git). Result: PASS 0 / FAIL 0 / INSUFFICIENT_DATA 24.
+
+## R3: tracked 37C road bundle (969 OSM centrelines) vs GSI RdEdg (data/reports/mission46d-r3/)
+```
+node tools/mission46d-fetch-gsi-tiles.cjs --out temp/gsi46d-r3 --bbox -3300,-1200,-1800,300 --label sumiyoshi-bundle --margin 100   # 36 requests
+node tools/mission46d-road-bundle-check.cjs --bundle public/mission37c-layers/osaka-sumiyoshi-9tile/roads.json --ref-dir temp/gsi46d-r3/sumiyoshi-bundle --ward sumiyoshi --out data/reports/mission46d-r3/road-bundle-sumiyoshi.json
+```
+- Ground only: 957 of 969 (8 bridge, 2 tunnel, 2 underground-layer excluded). Samples every 10 m, clipped to the N03 ward polygon (1,666 outside) -> 17,886 samples.
+- Supported = GSI edge on both sides, roughly perpendicular, edge-to-edge <= 40 m. Result 88.83% (major 95.8 / mid 93.9 / local 87.7); no edge in band 2.33% (suspect only: GSI omits narrow lanes). Centreline-to-nearest-edge median 2.66 m, p95 7.64, p99 11.39; edge-to-edge width median 6.36, p95 23.97.
+- Control: same lines displaced 10/20/40 m drop to 42.7/42.6/33.0% supported.
+- Area verdict PASS covers the bundle area only (42.87% of ward area); ward status stays INSUFFICIENT_DATA; 24-ward status unchanged (PASS 0 / FAIL 0 / INSUFFICIENT_DATA 24). Other 23 wards have no tracked road/building data; owner-PC GLB data not accessed. Buildings stay non-independent (shared lineage suspected).
