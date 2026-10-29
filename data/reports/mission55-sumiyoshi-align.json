@@ -1,0 +1,64 @@
+{
+ "mission": 55,
+ "area": "osaka-sumiyoshi 9 tile",
+ "frame": {
+  "CLAT": 34.604208,
+  "CLON": 135.52502,
+  "MPD": 111320,
+  "axes": "x east, z south, metres"
+ },
+ "sources": {
+  "buildings": "PLATEAU Osaka-shi 2024 CityGML LOD1 footprints (same tiles as the committed 3D Tiles)",
+  "roadEdge": "GSI optimal_bvmap-v1 RdEdg outline lines (public/mission49-data); no polygon surface",
+  "roadCentre": "OSM road centrelines (public/mission37c-layers); width is cosmetic",
+  "water": "OSM waterways (public/mission37c-layers); no GSI WA polygon in this window"
+ },
+ "buildings": 10546,
+ "tiles": 9,
+ "gsiRoadEdge": {
+  "lines": 2982,
+  "lengthM": 284615,
+  "insideBuildingM": 2247.7,
+  "pctInside": 0.79,
+  "buildingsTouched": 392
+ },
+ "osmCentreline": {
+  "lines": 969,
+  "lengthM": 135646,
+  "insideBuildingM": 69.8,
+  "pctInside": 0.05,
+  "buildingsTouched": 11
+ },
+ "osmWaterways": {
+  "features": 20,
+  "lengthM": 3964,
+  "insideBuildingM": 14.5,
+  "buildingsTouched": 2
+ },
+ "gsiShiftSweep": {
+  "atZero": 2247.7,
+  "best3": [
+   {
+    "dx": 0,
+    "dz": 0,
+    "insideM": 2247.7
+   },
+   {
+    "dx": 2,
+    "dz": 0,
+    "insideM": 19927.2
+   },
+   {
+    "dx": -2,
+    "dz": 0,
+    "insideM": 21290.9
+   }
+  ],
+  "worst": {
+   "dx": -8,
+   "dz": 8,
+   "insideM": 62824.9
+  }
+ },
+ "note": "Edge-in-building length is a conflict metric. Elevated roads, culverts and data-year differences are not classified. Source differences are not assumed to be a rigid shift."
+}
