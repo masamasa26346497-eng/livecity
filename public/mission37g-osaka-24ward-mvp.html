@@ -2993,6 +2993,13 @@
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
       setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
+      // 58: 地表（Globe）と背景 imagery の ON/OFF、および描画参照系の診断（読み取り/表示切替のみ。データ・座標は触らない）
+      setGlobe(on) { scene.globe.show = !!on; },
+      renderInfo() {
+        const g = scene.globe;
+        return { globeShow: g.show, depthTestAgainstTerrain: g.depthTestAgainstTerrain, terrainProvider: g.terrainProvider && g.terrainProvider.constructor.name,
+          imageryLayers: viewer.imageryLayers.length, baseColor: g.baseColor.toCssColorString(), logDepth: scene.logarithmicDepthBuffer, ellipsoidA: g.ellipsoid.maximumRadius };
+      },
       tilesReady: () => stats.buildingState !== 'loading' && (!tileset || tileset.tilesLoaded) && extraSets.every((e) => e.tileset.tilesLoaded),
       setBuildingWard,
       // 44A: カメラと mount 中 tileset 境界球の中心との距離 / 半径（区を選んだ後に建物へ寄れているかの診断。読み取りのみ）
