@@ -1806,14 +1806,14 @@
   // ══════════════════════════════════════════════════════════════
   LayerRegistry.register(buildingLayer);
   LayerRegistry.register(Object.assign({
-    id: 'roads', label: '道路', swatch: C.roadMajor, defaultOn: true,
+    id: 'roads', label: '道路中心線（OSM・線）', swatch: C.roadMajor, defaultOn: true,
     hint: 'OSM 由来。tier (major/mid/local) で太さと色を分ける。配信範囲は住吉区の一部（約2.1km四方）のみ',
   }, makeLineLayer('roads.json', roadStyle)));
   LayerRegistry.register(Object.assign({
     id: 'railways', label: '鉄道・駅', swatch: C.rail, defaultOn: true, hint: 'OSM 由来。破線で描く',
   }, makeLineLayer('railways.json', () => ({ width: 3.2, casing: 0, material: dashMat(C.rail, 20), height: LAYER_H.railways }))));
   LayerRegistry.register(Object.assign({
-    id: 'waterways', label: '河川・水域', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）。配信範囲は住吉区の一部（約2.1km四方）のみ',
+    id: 'waterways', label: '河川・水路（OSM・線/面）', swatch: C.waterLine, defaultOn: true, hint: 'OSM 由来。線（河川）と面（池・貯水池）。配信範囲は住吉区の一部（約2.1km四方）のみ',
   }, (function () {
     const lines = makeLineLayer('waterways.json', waterLineStyle);
     const areas = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways });
@@ -1823,7 +1823,7 @@
     };
   })()));
   LayerRegistry.register(Object.assign({
-    id: 'parks', label: '公園・緑地', swatch: C.park, defaultOn: true, hint: 'OSM 由来の面',
+    id: 'parks', label: '公園・緑地（OSM・面）', swatch: C.park, defaultOn: true, hint: 'OSM 由来の面',
   }, makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks })));
   LayerRegistry.register(labelLayer);
 
@@ -1875,7 +1875,7 @@
       return loading;
     }
     LayerRegistry.register({
-      id: 'gsiroadedge', label: '道路縁（GSI実測）', swatch: '#c8801a', defaultOn: true,
+      id: 'gsiroadedge', label: '道路縁（GSI実測・線）', swatch: '#c8801a', defaultOn: true,
       hint: '国土地理院の実測道路縁（RdEdg）＝旧版31Gで道路境界の正本としていたもの。住吉区9tile・北区サンプル・大川/中之島の窓のみ（窓の外は描かない）。OSM中心線は別レイヤーとして残す。路幅は推測しない',
       async mount() { return { count: 0 }; },
       applyVisible(on) {
@@ -1919,7 +1919,7 @@
       return loading;
     }
     LayerRegistry.register({
-      id: 'gsiwater', label: '水域面（GSI実測）', swatch: C.waterArea, defaultOn: true,
+      id: 'gsiwater', label: '水域面（GSI実測・面／大川・中之島のみ）', swatch: C.waterArea, defaultOn: true,
       hint: '国土地理院の実測水域面（WA）。大川・中之島の窓のみ。窓の外は面を作らない（OSM 水域は別レイヤー）',
       async mount() { return load(); },
       applyVisible(on) { shown = !!on; if (prim) { prim.show = shown; scene.requestRender(); } },
