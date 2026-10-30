@@ -56,37 +56,58 @@ function auditWard(dir) {
     }
   } catch (e) { broken++; }
   // ids sidecar <-> attrs consistency: same tile set, same count of ids (no id values are emitted)
-  let idMismatch = 0, idTiles = 0;
+  // Mission 71: LOD group tiles (ids/g_*.json + lod/g_*.glb) are a legitimate part of the 3D Tiles layout and have
+  // NO attrs counterpart; they used to be counted as idMismatch. idMismatch now counts only true problems
+  // (leaf ids/attrs mismatch, duplicate leaf ids, LOD ids absent from leaves). The old count stays as idMismatchLegacy.
+  const lod = new Set();
+  for (const f of files) if (/^lod\//.test(f.r) && /\.glb$/i.test(f.r)) lod.add(f.r.slice(4).replace(/\.[^.]+$/, ''));
+  const readJson = (rel) => { try { return JSON.parse(fs.readFileSync(path.join(dir, rel), 'utf8')); } catch (e) { return null; } };
+  const idList = (x) => Array.isArray(x) ? x : (x && Array.isArray(x.ids) ? x.ids : null);
+  let idMismatch = 0, idMismatchLegacy = 0, lodGroupTiles = 0, lodGroupsWithoutGlb = 0, lodIdsNotInLeaves = 0;
+  let attrsWithoutIds = 0, duplicateLeafIds = 0, leafIdTotal = 0, lodIdTotal = 0;
+  const leafSet = new Set(), groupLists = [];
   for (const t of ids) {
-    idTiles++;
-    if (!attrs.has(t)) { idMismatch++; continue; }
-    try {
-      const a = JSON.parse(fs.readFileSync(path.join(dir, 'ids', t + '.json'), 'utf8'));
-      const b = JSON.parse(fs.readFileSync(path.join(dir, 'attrs', t + '.json'), 'utf8'));
-      const n = Array.isArray(a) ? a.length : Array.isArray(a.ids) ? a.ids.length : -1;
-      const m = b && b.byId ? Object.keys(b.byId).length : Array.isArray(b.ids) ? b.ids.length : -1;
-      if (n < 0 || (m >= 0 && n !== m)) idMismatch++;
-    } catch (e) { idMismatch++; }
+    const l = idList(readJson('ids/' + t + '.json'));
+    if (!attrs.has(t)) {
+      idMismatchLegacy++;
+      if (lod.has(t) || /^g_/.test(t)) {
+        lodGroupTiles++;
+        if (!lod.has(t)) lodGroupsWithoutGlb++;
+        if (l) { lodIdTotal += l.length; groupLists.push(l); } else idMismatch++;
+      } else idMismatch++; // leaf ids without attrs: a true problem
+      continue;
+    }
+    const b = readJson('attrs/' + t + '.json');
+    const n = l ? l.length : -1;
+    const m = b && b.byId ? Object.keys(b.byId).length : (b && Array.isArray(b.ids) ? b.ids.length : -1);
+    if (n < 0 || (m >= 0 && n !== m)) { idMismatch++; idMismatchLegacy++; }
+    if (l) for (const id of l) { leafIdTotal++; if (leafSet.has(id)) duplicateLeafIds++; else leafSet.add(id); }
   }
+  for (const t of attrs) if (!ids.has(t)) { attrsWithoutIds++; idMismatch++; idMismatchLegacy++; }
+  for (const g of groupLists) for (const id of g) if (!leafSet.has(id)) lodIdsNotInLeaves++;
+  idMismatch += duplicateLeafIds + lodIdsNotInLeaves;
   let source = null;
   try { const s = JSON.parse(fs.readFileSync(path.join(dir, 'source.json'), 'utf8')); source = { hasSource: true, hasLicence: !!(s.license || s.licence), hasAttribution: !!(s.attribution || s.credit || s.source) }; } catch (e) { source = { hasSource: false, hasLicence: false, hasAttribution: false }; }
-  return { files: files.length, bytes, dist, ext, topDirs: kinds, unknownExt, suspectFiles, secretHits, symlinksSkipped: flags.links, glb: glb.size, idsTiles: ids.size, attrsTiles: attrs.size, tilesetRefs: refs, brokenRefs: broken, absoluteRefs, idMismatch, source };
+  return { files: files.length, bytes, dist, ext, topDirs: kinds, unknownExt, suspectFiles, secretHits, symlinksSkipped: flags.links, glb: glb.size, idsTiles: ids.size, attrsTiles: attrs.size, tilesetRefs: refs, brokenRefs: broken, absoluteRefs, idMismatch, idMismatchLegacy, structural: { lodGroupTiles, lodGroupsWithoutGlb, lodIdTotal, leafIdTotal }, integrity: { attrsWithoutIds, duplicateLeafIds, lodIdsNotInLeaves }, source };
 }
 
 function run(opts) {
   const E = require('./mission45e-preview.cjs'); // read-only plan(): recomputes the 45D proof from disk
   const pl = E.plan({ src: opts.src, outRoot: opts.outRoot });
   const wards = pl.servable.map((s, i) => ({ n: i + 1, buildings: s.buildings, ...auditWard(s.dir) }));
-  const tot = { wards: wards.length, buildings: 0, files: 0, bytes: 0, glb: 0, brokenRefs: 0, absoluteRefs: 0, idMismatch: 0, suspectFiles: 0, secretHits: 0, unknownExt: 0, noLicenceInfo: 0 };
+  const tot = { wards: wards.length, buildings: 0, files: 0, bytes: 0, glb: 0, brokenRefs: 0, absoluteRefs: 0, idMismatch: 0, idMismatchLegacy: 0, lodGroupTiles: 0, lodGroupsWithoutGlb: 0, duplicateLeafIds: 0, lodIdsNotInLeaves: 0, suspectFiles: 0, secretHits: 0, unknownExt: 0, noLicenceInfo: 0 };
   for (const w of wards) {
-    tot.buildings += w.buildings; for (const k of ['files', 'bytes', 'glb', 'brokenRefs', 'absoluteRefs', 'idMismatch', 'suspectFiles', 'secretHits', 'unknownExt']) tot[k] += w[k];
+    tot.lodGroupTiles += w.structural.lodGroupTiles; tot.lodGroupsWithoutGlb += w.structural.lodGroupsWithoutGlb;
+    tot.duplicateLeafIds += w.integrity.duplicateLeafIds; tot.lodIdsNotInLeaves += w.integrity.lodIdsNotInLeaves;
+    tot.buildings += w.buildings; for (const k of ['files', 'bytes', 'glb', 'brokenRefs', 'absoluteRefs', 'idMismatch', 'idMismatchLegacy', 'suspectFiles', 'secretHits', 'unknownExt']) tot[k] += w[k];
     if (!w.source.hasLicence) tot.noLicenceInfo++;
   }
   const blockers = [];
   if (tot.wards !== 24) blockers.push('wards!=24');
   if (tot.brokenRefs) blockers.push('broken tileset references');
   if (tot.absoluteRefs) blockers.push('absolute/external tileset references');
-  if (tot.idMismatch) blockers.push('ids/attrs mismatch');
+  if (tot.idMismatch) blockers.push('ids/attrs mismatch (leaf tiles, duplicate leaf ids, or LOD ids missing from leaves)');
+  if (tot.lodGroupsWithoutGlb) blockers.push('LOD group ids without lod glb');
   if (tot.secretHits) blockers.push('secret/private-path pattern in json');
   if (tot.suspectFiles || tot.unknownExt) blockers.push('non-whitelisted file kinds present');
   // Gates are NEVER derived from this audit: licence/PII/secrets review is a human decision.

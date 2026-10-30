@@ -102,6 +102,34 @@ test('audit: synthetic ward dir, anonymous output, no writes', () => {
   assert.strictEqual(fs.readdirSync(d).sort().join(), before);
   fs.rmSync(d, { recursive: true, force: true });
 });
+test('Mission71: LOD group ids without attrs are structural, not idMismatch; true problems still counted', () => {
+  const mk = (extra) => {
+    const d = fs.mkdtempSync(path.join(os.tmpdir(), 'm71-'));
+    for (const s of ['tiles', 'ids', 'attrs', 'lod']) fs.mkdirSync(path.join(d, s));
+    fs.writeFileSync(path.join(d, 'tileset.json'), JSON.stringify({ root: { content: { uri: 'tiles/t_1_1.glb' } } }));
+    fs.writeFileSync(path.join(d, 'tiles/t_1_1.glb'), 'x');
+    fs.writeFileSync(path.join(d, 'ids/t_1_1.json'), '["a","b"]'); fs.writeFileSync(path.join(d, 'attrs/t_1_1.json'), '{"byId":{"a":[],"b":[]}}');
+    fs.writeFileSync(path.join(d, 'ids/g_0_0.json'), '["a","b"]'); fs.writeFileSync(path.join(d, 'lod/g_0_0.glb'), 'x');
+    if (extra) extra(d);
+    return d;
+  };
+  const ok = mk(); const r = A.auditWard(ok);
+  assert.strictEqual(r.idMismatchLegacy, 1); assert.strictEqual(r.idMismatch, 0);
+  assert.strictEqual(r.structural.lodGroupTiles, 1); assert.strictEqual(r.structural.lodGroupsWithoutGlb, 0);
+  const bad = mk((d) => { fs.writeFileSync(path.join(d, 'ids/g_0_0.json'), '["a","zzz"]'); fs.writeFileSync(path.join(d, 'ids/t_2_2.json'), '["a"]'); });
+  const rb = A.auditWard(bad);
+  assert.strictEqual(rb.integrity.lodIdsNotInLeaves, 1); assert.strictEqual(rb.integrity.duplicateLeafIds, 0);
+  assert.ok(rb.idMismatch >= 2); // leaf ids without attrs + LOD id absent from leaves
+  const noGlb = mk((d) => fs.writeFileSync(path.join(d, 'ids/g_9_9.json'), '["a"]'));
+  assert.strictEqual(A.auditWard(noGlb).structural.lodGroupsWithoutGlb, 1);
+  for (const d of [ok, bad, noGlb]) fs.rmSync(d, { recursive: true, force: true });
+});
+test('Mission71: real repo tileset sample has only structural LOD diffs (no true idMismatch)', () => {
+  const dir = path.join(__dirname, '../public/mission37h-3dtiles/tennoji-sample');
+  const r = A.auditWard(dir);
+  assert.ok(r.idMismatchLegacy > 0 && r.idMismatchLegacy === r.structural.lodGroupTiles);
+  assert.strictEqual(r.idMismatch, 0);
+});
 test('new tools contain no network, credential or destructive code; no storage URLs', () => {
   for (const n of ['mission70-audit-offline', 'mission70-cloud-contract', 'mission70-upload-gate']) {
     const s = fs.readFileSync(path.join(__dirname, '../tools', n + '.cjs'), 'utf8');
