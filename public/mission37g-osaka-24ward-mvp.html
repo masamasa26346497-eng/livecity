@@ -2987,6 +2987,8 @@
   // 実クリック(CDP Input)の座標を Cesium の投影 API で求めるためのもので、選択処理そのものは呼ばない。
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('qa') === '1') {
     const rect = () => scene.canvas.getBoundingClientRect();
+    window.__qaRenderErrors = [];
+    scene.renderError.addEventListener((s, err) => { window.__qaRenderErrors.push(String(err && err.stack || err).slice(0, 400)); });   // 64: Cesium の描画停止を QA JSON に残す（診断のみ）
     window.__mission37dQA = {
       lookAtLocal(x, z, h, range, pitchDeg, headingDeg) {
         viewer.camera.lookAt(toCart(x, z, h), new Cesium.HeadingPitchRange(Cesium.Math.toRadians(headingDeg || 0), Cesium.Math.toRadians(pitchDeg), range));
@@ -3042,6 +3044,57 @@
         const r = rect();
         const f = scene.pick(new Cesium.Cartesian2(px - r.left, py - r.top));
         return f && typeof f.getProperty === 'function' ? f.getProperty('canonicalId') : null;
+      },
+      // 64: 建物 tileset の高さスライス（表示のみ）。maxH: 地表からこの高さ以下だけ表示＝「足元」、minH: この高さ以上だけ＝「屋根側」。
+      //   tileset の clippingPlanes は tileset ローカル(ENU, 原点=境界球中心)なので、境界球中心の楕円体高 cH を引いて地表基準にする。
+      //   null/null で解除。データ・座標・tileset の transform は変更しない。
+      setBuildingSlice(minH, maxH) {
+        // collection は tileset ごとに 1 回だけ作り、以後は plane.distance を書き換える（collection の差し替え/undefined 化は描画中に壊れうるため避ける）
+        let n = 0;
+        for (let i = 0; i < scene.primitives.length; i++) {
+          const p = scene.primitives.get(i);
+          if (!(p instanceof Cesium.Cesium3DTileset) || p.isDestroyed()) continue;
+          // 平面の原点は clippingPlanesOriginMatrix（tileset root の ENU）。境界球中心ではないので、その行列の平行移動の楕円体高を使う
+          const om = p.clippingPlanesOriginMatrix;
+          const cH = Cesium.Cartographic.fromCartesian(Cesium.Matrix4.getTranslation(om, new Cesium.Cartesian3())).height;
+          p._qaSliceOriginH = cH;
+          if (!p._qaSlice) {
+            p._qaSlice = [new Cesium.ClippingPlane(new Cesium.Cartesian3(0, 0, -1), 1e6), new Cesium.ClippingPlane(new Cesium.Cartesian3(0, 0, 1), 1e6)];
+            p.clippingPlanes = new Cesium.ClippingPlaneCollection({ planes: p._qaSlice, unionClippingRegions: true });
+          }
+          p._qaSlice[0].distance = maxH != null ? maxH - cH : 1e6;      // z <= maxH-cH を残す
+          p._qaSlice[1].distance = minH != null ? -(minH - cH) : 1e6;  // z >= minH-cH を残す
+          n++;
+        }
+        return { tilesets: n, minH, maxH };
+      },
+      renderErrors() { return window.__qaRenderErrors || []; },
+      // 64: 建物を単色（既定マゼンタ）にして背景との境界を見やすくする。null で解除。
+      setBuildingColor(css) {
+        for (let i = 0; i < scene.primitives.length; i++) {
+          const p = scene.primitives.get(i);
+          if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) p.style = css ? new Cesium.Cesium3DTileStyle({ color: "color('" + css + "', 0.85)" }) : undefined;
+        }
+      },
+      // 64: 再現用スナップショット（読み取りのみ）。カメラ・FOV・レイヤー ON/OFF・Globe・背景 LOD・tileset ready・各レイヤー高さを 1 つにまとめる。
+      snapshot() {
+        const cam = viewer.camera, c = Cesium.Cartographic.fromCartesian(cam.positionWC);
+        const tilesets = [];
+        for (let i = 0; i < scene.primitives.length; i++) {
+          const p = scene.primitives.get(i);
+          if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) tilesets.push({ ready: p.ready, tilesLoaded: p.tilesLoaded, base: p._lcBase || null, centerEllipsoidH: +Cesium.Cartographic.fromCartesian(p.boundingSphere.center).height.toFixed(2), clipOriginEllipsoidH: p._qaSliceOriginH == null ? null : +p._qaSliceOriginH.toFixed(2), clipping: !!p.clippingPlanes, styled: !!p.style });
+        }
+        const lv = {};
+        try { for (const t of scene.globe._surface._tilesToRender) lv[t.level] = (lv[t.level] || 0) + 1; } catch (e) { lv.error = String(e); }
+        const layers = {};
+        try { for (const id of ['roads', 'waterways', 'parks', 'railways', 'gsiroadedge', 'gsiwater']) { const r = LayerRegistry.get(id); layers[id] = r ? { visible: !!r.visible, count: r.count } : null; } } catch (e) { layers.error = String(e); }
+        return {
+          camera: { lon: +Cesium.Math.toDegrees(c.longitude).toFixed(7), lat: +Cesium.Math.toDegrees(c.latitude).toFixed(7), heightM: +c.height.toFixed(1),
+            headingDeg: +Cesium.Math.toDegrees(cam.heading).toFixed(2), pitchDeg: +Cesium.Math.toDegrees(cam.pitch).toFixed(2),
+            fovDeg: cam.frustum && 'fov' in cam.frustum ? +Cesium.Math.toDegrees(cam.frustum.fov).toFixed(2) : null, canvas: [scene.canvas.width, scene.canvas.height], dpr: window.devicePixelRatio },
+          globe: { show: scene.globe.show, tilesLoaded: scene.globe.tilesLoaded, depthTestAgainstTerrain: scene.globe.depthTestAgainstTerrain, tilesToRenderByLevel: lv },
+          layers, layerHeightsM: LAYER_H, tilesets, buildingState: stats.buildingState,
+        };
       },
     };
   }

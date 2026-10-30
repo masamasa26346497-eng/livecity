@@ -1,0 +1,860 @@
+{
+  "mission": "64",
+  "jsErrors": [],
+  "spots": [
+    {
+      "name": "hanwa-hospital",
+      "localXZ": [
+        -1825.2,
+        -21.4
+      ],
+      "views": {
+        "top": {
+          "range": 450,
+          "pitch": -90,
+          "metersPerPixel": 0.371,
+          "snapshot": {
+            "camera": {
+              "lon": 135.5051,
+              "lat": 34.6044,
+              "heightM": 450,
+              "headingDeg": 360,
+              "pitchDeg": -90,
+              "fovDeg": 60,
+              "canvas": [
+                1400,
+                848
+              ],
+              "dpr": 1
+            },
+            "globe": {
+              "show": true,
+              "tilesLoaded": true,
+              "depthTestAgainstTerrain": false,
+              "tilesToRenderByLevel": {
+                "17": 15
+              }
+            },
+            "layers": {
+              "roads": {
+                "visible": true,
+                "count": 969
+              },
+              "waterways": {
+                "visible": true,
+                "count": 20
+              },
+              "parks": {
+                "visible": true,
+                "count": 26
+              },
+              "railways": {
+                "visible": true,
+                "count": 67
+              },
+              "gsiroadedge": {
+                "visible": true,
+                "count": 7184
+              },
+              "gsiwater": {
+                "visible": true,
+                "count": 121
+              }
+            },
+            "layerHeightsM": {
+              "waterways": 0.5,
+              "parks": 0.9,
+              "roadsCasing": 1.3,
+              "roads": 1.4,
+              "railways": 2
+            },
+            "tilesets": [
+              {
+                "tilesLoaded": true,
+                "base": "mission37b-3dtiles/osaka-sumiyoshi-9tile/",
+                "centerEllipsoidH": 31.95,
+                "clipOriginEllipsoidH": 31.95,
+                "clipping": true,
+                "styled": false
+              }
+            ],
+            "buildingState": "ready"
+          },
+          "states": {
+            "01-bg-only": {
+              "vsAll": {
+                "changedPx": 446153,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "02-bg+osm-vectors": {
+              "vsAll": {
+                "changedPx": 348222,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "03-bg+gsi-edge": {
+              "vsAll": {
+                "changedPx": 388205,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "04-bg+foot(0-2m)": {
+              "vsAll": {
+                "changedPx": 446149,
+                "bbox": [
+                  0,
+                  52,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "05-bg+roof(>=12m)": {
+              "vsAll": {
+                "changedPx": 446252,
+                "bbox": [
+                  0,
+                  20,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "06-nobg(globe-off)+all": {
+              "vsAll": {
+                "changedPx": 822734,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "07-bg-only+gsi-edge-vs-water": {
+              "vsAll": {
+                "changedPx": 401737,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            }
+          },
+          "footVsRoof": {
+            "changedPx": 129876,
+            "bbox": [
+              0,
+              20,
+              1399,
+              542
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          },
+          "bgVsFoot": {
+            "changedPx": 33945,
+            "bbox": [
+              0,
+              15,
+              1399,
+              542
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          }
+        },
+        "oblique45": {
+          "range": 450,
+          "pitch": -45,
+          "metersPerPixel": 0.371,
+          "snapshot": {
+            "camera": {
+              "lon": 135.5051,
+              "lat": 34.6015318,
+              "heightM": 318.2,
+              "headingDeg": 0,
+              "pitchDeg": -45,
+              "fovDeg": 60,
+              "canvas": [
+                1400,
+                848
+              ],
+              "dpr": 1
+            },
+            "globe": {
+              "show": true,
+              "tilesLoaded": true,
+              "depthTestAgainstTerrain": false,
+              "tilesToRenderByLevel": {
+                "16": 2,
+                "17": 22,
+                "18": 8
+              }
+            },
+            "layers": {
+              "roads": {
+                "visible": true,
+                "count": 969
+              },
+              "waterways": {
+                "visible": true,
+                "count": 20
+              },
+              "parks": {
+                "visible": true,
+                "count": 26
+              },
+              "railways": {
+                "visible": true,
+                "count": 67
+              },
+              "gsiroadedge": {
+                "visible": true,
+                "count": 7184
+              },
+              "gsiwater": {
+                "visible": true,
+                "count": 121
+              }
+            },
+            "layerHeightsM": {
+              "waterways": 0.5,
+              "parks": 0.9,
+              "roadsCasing": 1.3,
+              "roads": 1.4,
+              "railways": 2
+            },
+            "tilesets": [
+              {
+                "tilesLoaded": true,
+                "base": "mission37b-3dtiles/osaka-sumiyoshi-9tile/",
+                "centerEllipsoidH": 31.95,
+                "clipOriginEllipsoidH": 31.95,
+                "clipping": true,
+                "styled": false
+              }
+            ],
+            "buildingState": "ready"
+          },
+          "states": {
+            "01-bg-only": {
+              "vsAll": {
+                "changedPx": 538925,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "02-bg+osm-vectors": {
+              "vsAll": {
+                "changedPx": 460385,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "03-bg+gsi-edge": {
+              "vsAll": {
+                "changedPx": 483343,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "04-bg+foot(0-2m)": {
+              "vsAll": {
+                "changedPx": 539065,
+                "bbox": [
+                  0,
+                  52,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "05-bg+roof(>=12m)": {
+              "vsAll": {
+                "changedPx": 539271,
+                "bbox": [
+                  0,
+                  52,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "06-nobg(globe-off)+all": {
+              "vsAll": {
+                "changedPx": 703297,
+                "bbox": [
+                  0,
+                  20,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "07-bg-only+gsi-edge-vs-water": {
+              "vsAll": {
+                "changedPx": 515949,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            }
+          },
+          "footVsRoof": {
+            "changedPx": 220169,
+            "bbox": [
+              0,
+              52,
+              1399,
+              524
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          },
+          "bgVsFoot": {
+            "changedPx": 129220,
+            "bbox": [
+              0,
+              15,
+              1399,
+              524
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "sumiyoshi-pond",
+      "localXZ": [
+        -2366.9,
+        -1465
+      ],
+      "views": {
+        "top": {
+          "range": 450,
+          "pitch": -90,
+          "metersPerPixel": 0.371,
+          "snapshot": {
+            "camera": {
+              "lon": 135.4991885,
+              "lat": 34.6173686,
+              "heightM": 450,
+              "headingDeg": 360,
+              "pitchDeg": -90,
+              "fovDeg": 60,
+              "canvas": [
+                1400,
+                848
+              ],
+              "dpr": 1
+            },
+            "globe": {
+              "show": true,
+              "tilesLoaded": true,
+              "depthTestAgainstTerrain": false,
+              "tilesToRenderByLevel": {
+                "17": 15
+              }
+            },
+            "layers": {
+              "roads": {
+                "visible": true,
+                "count": 969
+              },
+              "waterways": {
+                "visible": true,
+                "count": 20
+              },
+              "parks": {
+                "visible": true,
+                "count": 26
+              },
+              "railways": {
+                "visible": true,
+                "count": 67
+              },
+              "gsiroadedge": {
+                "visible": true,
+                "count": 7184
+              },
+              "gsiwater": {
+                "visible": true,
+                "count": 121
+              }
+            },
+            "layerHeightsM": {
+              "waterways": 0.5,
+              "parks": 0.9,
+              "roadsCasing": 1.3,
+              "roads": 1.4,
+              "railways": 2
+            },
+            "tilesets": [
+              {
+                "tilesLoaded": true,
+                "base": "mission37b-3dtiles/osaka-sumiyoshi-9tile/",
+                "centerEllipsoidH": 31.95,
+                "clipOriginEllipsoidH": 31.95,
+                "clipping": true,
+                "styled": false
+              }
+            ],
+            "buildingState": "ready"
+          },
+          "states": {
+            "01-bg-only": {
+              "vsAll": {
+                "changedPx": 535944,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "02-bg+osm-vectors": {
+              "vsAll": {
+                "changedPx": 476908,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "03-bg+gsi-edge": {
+              "vsAll": {
+                "changedPx": 466262,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "04-bg+foot(0-2m)": {
+              "vsAll": {
+                "changedPx": 537317,
+                "bbox": [
+                  0,
+                  20,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "05-bg+roof(>=12m)": {
+              "vsAll": {
+                "changedPx": 535886,
+                "bbox": [
+                  0,
+                  52,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "06-nobg(globe-off)+all": {
+              "vsAll": {
+                "changedPx": 700687,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "07-bg-only+gsi-edge-vs-water": {
+              "vsAll": {
+                "changedPx": 531624,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            }
+          },
+          "footVsRoof": {
+            "changedPx": 80122,
+            "bbox": [
+              0,
+              20,
+              1399,
+              899
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          },
+          "bgVsFoot": {
+            "changedPx": 58167,
+            "bbox": [
+              0,
+              15,
+              1399,
+              899
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          }
+        },
+        "oblique45": {
+          "range": 450,
+          "pitch": -45,
+          "metersPerPixel": 0.371,
+          "snapshot": {
+            "camera": {
+              "lon": 135.4991885,
+              "lat": 34.6145004,
+              "heightM": 318.2,
+              "headingDeg": 360,
+              "pitchDeg": -45,
+              "fovDeg": 60,
+              "canvas": [
+                1400,
+                848
+              ],
+              "dpr": 1
+            },
+            "globe": {
+              "show": true,
+              "tilesLoaded": true,
+              "depthTestAgainstTerrain": false,
+              "tilesToRenderByLevel": {
+                "17": 21,
+                "18": 6
+              }
+            },
+            "layers": {
+              "roads": {
+                "visible": true,
+                "count": 969
+              },
+              "waterways": {
+                "visible": true,
+                "count": 20
+              },
+              "parks": {
+                "visible": true,
+                "count": 26
+              },
+              "railways": {
+                "visible": true,
+                "count": 67
+              },
+              "gsiroadedge": {
+                "visible": true,
+                "count": 7184
+              },
+              "gsiwater": {
+                "visible": true,
+                "count": 121
+              }
+            },
+            "layerHeightsM": {
+              "waterways": 0.5,
+              "parks": 0.9,
+              "roadsCasing": 1.3,
+              "roads": 1.4,
+              "railways": 2
+            },
+            "tilesets": [
+              {
+                "tilesLoaded": true,
+                "base": "mission37b-3dtiles/osaka-sumiyoshi-9tile/",
+                "centerEllipsoidH": 31.95,
+                "clipOriginEllipsoidH": 31.95,
+                "clipping": true,
+                "styled": false
+              }
+            ],
+            "buildingState": "ready"
+          },
+          "states": {
+            "01-bg-only": {
+              "vsAll": {
+                "changedPx": 632017,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "02-bg+osm-vectors": {
+              "vsAll": {
+                "changedPx": 527096,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "03-bg+gsi-edge": {
+              "vsAll": {
+                "changedPx": 552417,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "04-bg+foot(0-2m)": {
+              "vsAll": {
+                "changedPx": 633552,
+                "bbox": [
+                  0,
+                  52,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "05-bg+roof(>=12m)": {
+              "vsAll": {
+                "changedPx": 631960,
+                "bbox": [
+                  0,
+                  20,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "06-nobg(globe-off)+all": {
+              "vsAll": {
+                "changedPx": 599178,
+                "bbox": [
+                  0,
+                  20,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            },
+            "07-bg-only+gsi-edge-vs-water": {
+              "vsAll": {
+                "changedPx": 573863,
+                "bbox": [
+                  0,
+                  15,
+                  1399,
+                  899
+                ],
+                "size": [
+                  1400,
+                  900
+                ]
+              }
+            }
+          },
+          "footVsRoof": {
+            "changedPx": 150828,
+            "bbox": [
+              0,
+              20,
+              1399,
+              899
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          },
+          "bgVsFoot": {
+            "changedPx": 126906,
+            "bbox": [
+              0,
+              15,
+              1399,
+              899
+            ],
+            "size": [
+              1400,
+              900
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "net": {
+    "gets": 0,
+    "bytes": 0,
+    "cached": 150,
+    "stubbed": 156,
+    "blocked": 0,
+    "stop": null,
+    "statuses": {},
+    "maxGsiZ": 18,
+    "gsiTiles": [],
+    "urls": []
+  },
+  "noBg": true
+}
