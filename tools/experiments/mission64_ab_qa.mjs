@@ -121,7 +121,7 @@ try {
         '02-bg+osm-vectors': 'for(const id of ["roads","waterways","parks","railways"]) Q.setLayer(id,true); for(const id of ["gsiroadedge","gsiwater"]) Q.setLayer(id,false); Q.setTilesetShow(false)',
         '03-bg+gsi-edge':    'for(const id of L) Q.setLayer(id,false); Q.setLayer("gsiroadedge",true); Q.setLayer("gsiwater",true); Q.setTilesetShow(false)',
         '04-bg+foot(0-2m)':  'for(const id of L) Q.setLayer(id,false); Q.setTilesetShow(true); Q.setBuildingColor("#ff00ff"); Q.setBuildingSlice(null,2)',
-        '05-bg+roof(>=12m)': 'for(const id of L) Q.setLayer(id,false); Q.setTilesetShow(true); Q.setBuildingColor("#ff00ff"); Q.setBuildingSlice(12,null)',
+        '05-bg+roof(ge12m)': 'for(const id of L) Q.setLayer(id,false); Q.setTilesetShow(true); Q.setBuildingColor("#ff00ff"); Q.setBuildingSlice(12,null)',
         '06-nobg(globe-off)+all': 'for(const id of L) Q.setLayer(id,true); Q.setBuildingSlice(null,null); Q.setBuildingColor(null); Q.setTilesetShow(true); Q.setGlobe(false)',
         '07-bg-only+gsi-edge-vs-water': 'for(const id of L) Q.setLayer(id,false); Q.setLayer("waterways",true); Q.setLayer("parks",true); Q.setTilesetShow(false)',
       };
@@ -135,7 +135,7 @@ try {
         rec.views[v.k].states[name] = { vsAll: await ev(`(${DIFF})(${JSON.stringify(base)},${JSON.stringify(shots[name])})`) };
       }
       // 対比: 足元 vs 屋根 vs 背景のみ → 足元スライスと背景のみの差分 = 足元が占める画素
-      rec.views[v.k].footVsRoof = await ev(`(${DIFF})(${JSON.stringify(shots['04-bg+foot(0-2m)'])},${JSON.stringify(shots['05-bg+roof(>=12m)'])})`);
+      rec.views[v.k].footVsRoof = await ev(`(${DIFF})(${JSON.stringify(shots['04-bg+foot(0-2m)'])},${JSON.stringify(shots['05-bg+roof(ge12m)'])})`);
       rec.views[v.k].bgVsFoot = await ev(`(${DIFF})(${JSON.stringify(shots['01-bg-only'])},${JSON.stringify(shots['04-bg+foot(0-2m)'])})`);
       await ev(`(()=>{for(const id of ${JSON.stringify(LAYERS)}) ${Q}.setLayer(id,true); ${Q}.setGlobe(true); ${Q}.setBuildingSlice(null,null); ${Q}.setBuildingColor(null); ${Q}.setTilesetShow(true)})()`);
       console.log(sp.n, v.k, 'gets', net.gets, 'bytes', net.bytes, 'lv', JSON.stringify(snap.globe.tilesToRenderByLevel));
