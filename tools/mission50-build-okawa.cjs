@@ -49,5 +49,5 @@ fs.mkdirSync(OUT, { recursive: true });
 const file = path.join(OUT, 'gsi-' + LABEL + '.json'); fs.writeFileSync(file, JSON.stringify(doc));
 const audit = { file, bytes: fs.statSync(file).size, tiles, waterPolygons: water.length, waterHoles: water.reduce((s, p) => s + p.holes.length, 0), waterAreaM2: Math.round(waterAreaM2), roadEdgeLines: lines.length, roadEdgeLengthM: Math.round(edgeLenM), gsiBldA: bld.length, gsiBldAVertsInWaterPct: r1(100 * bInWater / Math.max(1, bVerts)), gsiBldAWithAnyVertexInWater: bInWaterBuildings, bboxLocal: doc.bboxLocal };
 fs.mkdirSync('data/reports/mission50', { recursive: true });
-fs.writeFileSync('data/reports/mission50/okawa-audit.json', JSON.stringify(audit, null, 1));
+fs.writeFileSync(arg('--audit', 'data/reports/mission50/okawa-audit.json'), JSON.stringify(audit, null, 1));
 console.log(JSON.stringify(audit));

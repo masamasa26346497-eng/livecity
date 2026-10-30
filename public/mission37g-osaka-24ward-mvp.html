@@ -1831,6 +1831,7 @@
   //   既定 OFF・初回 ON のときだけ取得（起動コスト 0）。データは tools/mission49-build-roadedge.cjs が GSI 公開タイルから切り出した小さな窓
   //   （住吉区 9 tile 範囲 / 北区サンプル範囲）だけ。窓の外には何も描かない。OSM 中心線・建物輪郭とは定義が違う（SOURCE_SEMANTICS_DIFFERENCE）。
   const GSI_EDGE_SETS = ['gsi-roadedge-sumiyoshi-9tile.json', 'gsi-roadedge-kita-sample.json'];
+  const GSI_SUMIYOSHI = 'gsi-sumiyoshi-9tile.json'; // 57: 住吉区9tile窓の水域面（WA）
   const GSI_OKAWA = 'gsi-okawa-nakanoshima.json'; // 50: 大川・中之島窓（水域面 WA + 道路縁 RdEdg）
   stats.gsiRoadEdge = { state: 'off', sets: {}, lines: 0, points: 0 };
   (function () {
@@ -1895,10 +1896,18 @@
       if (loading) return loading;
       stats.gsiWater.state = 'loading';
       loading = (async () => {
-        const r = await fetch('mission50-data/' + GSI_OKAWA, { cache: 'force-cache' });
-        if (!r.ok) throw new Error('GSI water HTTP ' + r.status);
-        const d = await r.json();
-        if (d.kind !== 'gsi-water-roadedge' || !Array.isArray(d.water)) throw new Error('GSI water: unexpected format');
+        // 57: 大川・中之島窓に加え、住吉区 9tile 窓の GSI WA（mission57-data）も同じ面レイヤーで描く。窓の外は描かない
+        const water = []; const wins = {};
+        for (const u of ['mission50-data/' + GSI_OKAWA, 'mission57-data/' + GSI_SUMIYOSHI]) {
+          const r = await fetch(u, { cache: 'force-cache' });
+          if (!r.ok) throw new Error('GSI water HTTP ' + r.status + ' ' + u);
+          const dd0 = await r.json();
+          if (dd0.kind !== 'gsi-water-roadedge' || !Array.isArray(dd0.water)) throw new Error('GSI water: unexpected format ' + u);
+          for (const w of dd0.water) water.push(w);
+          wins[u] = { polygons: dd0.water.length, bboxLocal: dd0.bboxLocal };
+        }
+        const d = { water, bboxLocal: wins };
+        stats.gsiWater.windows = wins;
         const wd = LiveCityWaterDedupe.dedupeWater(d.water.filter((w) => w.outer && w.outer.length >= 3)); // 52: タイル境界で他ポリゴンに完全に覆われる重複片だけ除く（座標不変）
         stats.gsiWater.dedupe = { inPolys: d.water.length, dropped: wd.droppedIndexes.length, droppedAreaM2: wd.droppedAreaM2 };
         const inst = wd.polys.map((w) => new Cesium.GeometryInstance({
@@ -1919,7 +1928,7 @@
       return loading;
     }
     LayerRegistry.register({
-      id: 'gsiwater', label: '水域面（GSI実測・面／大川・中之島のみ）', swatch: C.waterArea, defaultOn: true,
+      id: 'gsiwater', label: '水域面（GSI実測・面／大川・中之島・住吉区9tile窓のみ）', swatch: C.waterArea, defaultOn: true,
       hint: '国土地理院の実測水域面（WA）。大川・中之島の窓のみ。窓の外は面を作らない（OSM 水域は別レイヤー）',
       async mount() { return load(); },
       applyVisible(on) { shown = !!on; if (prim) { prim.show = shown; scene.requestRender(); } },

@@ -13,7 +13,7 @@ const tile = (lon, lat) => { const s = Math.sin(lat * Math.PI / 180); return { x
 const a = ll(bb[0], bb[2]), b = ll(bb[1], bb[3]);
 const t0 = tile(Math.min(a.lon, b.lon), Math.max(a.lat, b.lat)), t1 = tile(Math.max(a.lon, b.lon), Math.min(a.lat, b.lat));
 const list = []; for (let x = t0.x; x <= t1.x; x++) for (let y = t0.y; y <= t1.y; y++) list.push({ x, y });
-if (list.length > 20) { console.error('too many tiles ' + list.length); process.exit(2); }
+const MAXT = Number(arg('--max', 20)); if (list.length > MAXT) { console.error('too many tiles ' + list.length); process.exit(2); }
 fs.mkdirSync(out, { recursive: true });
 const get = (t) => new Promise((res, rej) => https.get({ host: 'cyberjapandata.gsi.go.jp', path: '/xyz/optimal_bvmap-v1/' + z + '/' + t.x + '/' + t.y + '.pbf', timeout: 20000, headers: { 'User-Agent': 'livecity-mission50 (read-only research; github masamasa26346497-eng/livecity)' } }, (r) => { const c = []; r.on('data', (d) => c.push(d)); r.on('end', () => res({ s: r.statusCode, b: Buffer.concat(c) })); }).on('error', rej));
 (async () => {

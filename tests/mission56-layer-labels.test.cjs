@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const html = fs.readFileSync('public/mission37g-osaka-24ward-mvp.html', 'utf8');
 
 test('layer labels state source and line/area kind', () => {
-  for (const l of ['道路中心線（OSM・線）', '道路縁（GSI実測・線）', '河川・水路（OSM・線/面）', '水域面（GSI実測・面／大川・中之島のみ）', '公園・緑地（OSM・面）']) {
+  for (const l of ['道路中心線（OSM・線）', '道路縁（GSI実測・線）', '河川・水路（OSM・線/面）', '水域面（GSI実測・面／大川・中之島・住吉区9tile窓のみ）', '公園・緑地（OSM・面）']) {
     assert.ok(html.includes("label: '" + l + "'"), l);
   }
 });
