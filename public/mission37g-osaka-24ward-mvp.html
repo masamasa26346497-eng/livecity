@@ -2995,6 +2995,8 @@
       setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
       // 58: 地表（Globe）と背景 imagery の ON/OFF、および描画参照系の診断（読み取り/表示切替のみ。データ・座標は触らない）
       setGlobe(on) { scene.globe.show = !!on; },
+      // 59: 建物 tileset だけの表示切替（背景 vs 建物の画像差分用。読み取り専用の表示切替で、データ・座標は触らない）
+      setTilesetShow(on) { for (let i = 0; i < scene.primitives.length; i++) { const p = scene.primitives.get(i); if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) p.show = !!on; } },
       renderInfo() {
         const g = scene.globe;
         return { globeShow: g.show, depthTestAgainstTerrain: g.depthTestAgainstTerrain, terrainProvider: g.terrainProvider && g.terrainProvider.constructor.name,
