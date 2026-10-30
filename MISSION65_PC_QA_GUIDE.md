@@ -115,3 +115,28 @@ Cause is **not determined**. With the screenshots + snapshot JSON, compare in th
 5. Same spot with `basemap=gsi-blank` vs `gsi-pale` vs `none`.
 
 No uniform shift should be applied to buildings or roads before this comparison.
+
+## 8. Mission 66: point probe for the seam (3 minutes, localhost + `?qa=1` only)
+
+**Send first:** (1) a screenshot where the anomaly is visible, (2) the full URL, (3) the probe JSON of the spot (below). Nothing else is needed; do not copy tokens, cookies or unrelated DevTools data.
+
+What `probe(px, py)` returns (read-only; `px,py` = clientX/clientY of the pixel in the screenshot viewport):
+- `hit` / `hitId`: what `scene.pick` found: `building` (canonicalId), `poi`, `other-primitive` (e.g. PolylineCollection = OSM centre line), or `none` (background raster/globe).
+- `depthLocal`: the surface last drawn at that pixel (roof, wall, line or background). **Not** a road-edge coordinate.
+- `groundLocal`: the pixel's view ray vs the Globe (ellipsoid, no terrain). It is where the *background raster* pixel sits, not the true coordinate of the real road edge or shoreline.
+- `reprojectPx`: round-trip check only (should be ~0).
+- `visibleLayers`, `tilesReady`, `globeLevels` (background LOD), `camera`, `tilesets`.
+
+Console (same camera, do not move between the two clicks):
+```js
+const A = __mission37dQA.probe(X1, Y1);   // e.g. building foot
+const B = __mission37dQA.probe(X2, Y2);   // e.g. adjacent road edge in the background
+copy(JSON.stringify({ A: A, B: B, pair: __mission37dQA.probePair(A, B) }, null, 2));
+```
+Combine with the A/B states in section 3: probe the same pixel under (a1) foot only, (b1) OSM centre lines only, (b2) GSI edges only, (d1) background only, (d2) Globe OFF.
+
+**Measurable:** pixel positions, and the local x/z/h difference between the points *you* clicked, at a fixed camera; which layer is under the pixel; background LOD.
+
+**Not measurable:** a true horizontal error between a vector feature and the real-world road edge/shoreline. The raster has no feature coordinates, and the clicked pair is only a pair of clicks. `probePair` reports `groundDelta`/`depthDelta` and `sameCamera`; do not read them as an error unless you know both clicks mean the same real-world point. No layer here is a "road surface": OSM roads are centre lines.
+
+The cause of the seam stays **undetermined** until your screenshot + JSON arrive.

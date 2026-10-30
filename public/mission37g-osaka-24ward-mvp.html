@@ -3069,6 +3069,44 @@
         return { tilesets: n, minH, maxH };
       },
       renderErrors() { return window.__qaRenderErrors || []; },
+      // 66: 1 画素の点対照プローブ（読み取りのみ。データ・座標は触らない）。px,py は clientX/clientY（スクリーンショット上のクリック位置）。
+      //   depthLocal : scene.pickPosition＝depth buffer が示す「その画素に最後に描かれた面」。建物の屋根・壁、線、背景のいずれもあり得る。道路縁の座標とは限らない。
+      //   groundLocal: その画素のカメラ視線と Globe（楕円体。terrain なし）の交点＝画素直下の地表。背景ラスタ(GSI)上の画素位置に対応するが、ラスタの真の地物座標ではない。
+      //   reprojectPx: depthLocal を同カメラで再投影した画素と、クリック画素との差（往復整合の確認のみ。地物の位置誤差ではない）。
+      probe(px, py) {
+        const r = rect(), win = new Cesium.Cartesian2(px - r.left, py - r.top);
+        const f = scene.pick(win);
+        let hit = 'none', hitId = null;
+        if (f) {
+          if (typeof f.getProperty === 'function') { hit = 'building'; hitId = f.getProperty('canonicalId'); }
+          else if (f.id && f.id.poi) { hit = 'poi'; hitId = f.id.poi.id; }
+          else { hit = 'other-primitive'; hitId = (f.primitive && f.primitive.constructor && f.primitive.constructor.name) || Object.prototype.toString.call(f.id); }
+        }
+        const rd = (o) => o && { x: +o.x.toFixed(2), z: +o.z.toFixed(2), h: +o.h.toFixed(2) };
+        let depthLocal = null, groundLocal = null, reprojectPx = null;
+        try { if (scene.pickPositionSupported) { const c = scene.pickPosition(win); if (c) depthLocal = rd(cartToLocal(c)); } } catch (e) { /* ignore */ }
+        try { const g = scene.globe.pick(viewer.camera.getPickRay(win), scene); if (g) groundLocal = rd(cartToLocal(g)); } catch (e) { /* ignore */ }
+        if (depthLocal) {
+          const p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(depthLocal.x, depthLocal.z, depthLocal.h));
+          if (p) reprojectPx = { dx: +(p.x - win.x).toFixed(2), dy: +(p.y - win.y).toFixed(2) };
+        }
+        const vis = {};
+        try { for (const id of ['buildings', 'roads', 'waterways', 'parks', 'railways', 'gsiroadedge', 'gsiwater']) { const l = LayerRegistry.get(id); if (l) vis[id] = !!l.visible; } } catch (e) { /* ignore */ }
+        const s = this.snapshot();
+        return { click: { clientX: px, clientY: py, canvasX: +win.x.toFixed(1), canvasY: +win.y.toFixed(1) }, hit, hitId, depthLocal, groundLocal, reprojectPx,
+          visibleLayers: vis, tilesReady: this.tilesReady(), globeTilesLoaded: s.globe.tilesLoaded, globeLevels: s.globe.tilesToRenderByLevel, globeShow: s.globe.show,
+          camera: s.camera, tilesets: s.tilesets.map((t) => ({ base: t.base, tilesLoaded: t.tilesLoaded, styled: t.styled, clipping: t.clipping })),
+          note: 'depthLocal=最後に描かれた面(屋根/壁/線/背景のいずれか)。groundLocal=画素直下の楕円体交点。どちらも「道路縁/水際の真の座標」ではない。' };
+      },
+      // 66: 同一カメラで取った 2 つの probe の差。ローカル m 差と画素差を出すだけで、「水平誤差」とは名付けない。
+      //   2 点が同じ実世界の点に対応する保証はクリックした人にしかない。対応が取れていない場合は使わない。
+      probePair(a, b) {
+        const d = (u, v) => (u && v ? { dx: +(v.x - u.x).toFixed(2), dz: +(v.z - u.z).toFixed(2), dh: +(v.h - u.h).toFixed(2), distXZ: +Math.hypot(v.x - u.x, v.z - u.z).toFixed(2) } : null);
+        return { screenPx: { dx: +(b.click.clientX - a.click.clientX).toFixed(1), dy: +(b.click.clientY - a.click.clientY).toFixed(1) },
+          groundDelta: d(a.groundLocal, b.groundLocal), depthDelta: d(a.depthLocal, b.depthLocal),
+          sameCamera: JSON.stringify(a.camera) === JSON.stringify(b.camera),
+          note: '二点の「クリックした位置の差」。地物同士の水平誤差ではない。sameCamera=false なら比較不可。' };
+      },
       // 64: 建物を単色（既定マゼンタ）にして背景との境界を見やすくする。null で解除。
       setBuildingColor(css) {
         for (let i = 0; i < scene.primitives.length; i++) {
