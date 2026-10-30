@@ -1,0 +1,228 @@
+{
+  "mission": "62",
+  "network": {
+    "externalGets": 0,
+    "note": "fs 読み取りのみ"
+  },
+  "mission58": {
+    "none": {
+      "sampleCount": 44,
+      "jsErrors": 0,
+      "googleRequests": 0,
+      "horizontalMaxM": 0.000001007999941048642,
+      "roofHit": 31,
+      "groundHit": 3,
+      "byKind": {
+        "building|globe=true": 10,
+        "road|globe=true": 7,
+        "water-osm|globe=true": 5,
+        "water-gsi|globe=true": 5,
+        "building|globe=false": 10,
+        "road|globe=false": 7
+      }
+    },
+    "gsipale": {
+      "sampleCount": 44,
+      "jsErrors": 0,
+      "googleRequests": 0,
+      "horizontalMaxM": 0.0000018323757572037903,
+      "roofHit": 32,
+      "groundHit": 0,
+      "byKind": {
+        "building|globe=true": 10,
+        "road|globe=true": 7,
+        "water-osm|globe=true": 5,
+        "water-gsi|globe=true": 5,
+        "building|globe=false": 10,
+        "road|globe=false": 7
+      }
+    }
+  },
+  "mission59": [
+    {
+      "name": "hanwa-hospital",
+      "lat": 34.6044,
+      "lon": 135.5051,
+      "localXZ": [
+        -1825.2,
+        -21.4
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": -0.04,
+        "dySouth": -0.03,
+        "horiz": 0.05
+      },
+      "peakOverMean": 3.3438468058278312,
+      "maskPx": 125548
+    },
+    {
+      "name": "sumiyoshi-taisha",
+      "lat": 34.6114,
+      "lon": 135.493,
+      "localXZ": [
+        -2933.9,
+        -800.6
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": 0.06,
+        "dySouth": -0.09,
+        "horiz": 0.11
+      },
+      "peakOverMean": 1.4162019982106953,
+      "maskPx": 24214
+    },
+    {
+      "name": "sumiyoshi-park-ne",
+      "lat": 34.605,
+      "lon": 135.499,
+      "localXZ": [
+        -2384.1,
+        -88.2
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": 0.02,
+        "dySouth": -0.01,
+        "horiz": 0.02
+      },
+      "peakOverMean": 1.6258736942364016,
+      "maskPx": 40852
+    },
+    {
+      "name": "hosoigawa",
+      "lat": 34.5984,
+      "lon": 135.5139,
+      "localXZ": [
+        -1018.9,
+        646.5
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": -13.84,
+        "dySouth": -13.84,
+        "horiz": 19.57
+      },
+      "peakOverMean": null,
+      "maskPx": 0
+    },
+    {
+      "name": "north-block",
+      "lat": 34.609,
+      "lon": 135.502,
+      "localXZ": [
+        -2109.3,
+        -533.4
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": 0.01,
+        "dySouth": -0.03,
+        "horiz": 0.04
+      },
+      "peakOverMean": 1.754383409288665,
+      "maskPx": 65984
+    },
+    {
+      "name": "south-block",
+      "lat": 34.599,
+      "lon": 135.495,
+      "localXZ": [
+        -2750.6,
+        579.8
+      ],
+      "metersPerPixel": 0.288,
+      "shiftMeters": {
+        "dxEast": -13.84,
+        "dySouth": -13.84,
+        "horiz": 19.57
+      },
+      "peakOverMean": null,
+      "maskPx": 818
+    }
+  ],
+  "mission61Keys": [
+    "mission",
+    "network",
+    "inputs",
+    "parallaxTheory",
+    "layerHeightApparentShift",
+    "roadCenterlineVsGsiEdge",
+    "osmWaterAreaVsGsiWater",
+    "buildingFootVsGsiEdgeSweep",
+    "buildingRepPointInGsiWater",
+    "hanwaHospitalFootprint"
+  ],
+  "layerApparentShiftM": {
+    "waterways": {
+      "elev90": 0,
+      "elev60": 0.29,
+      "elev45": 0.5,
+      "elev30": 0.87,
+      "elev15": 1.87
+    },
+    "parks": {
+      "elev90": 0,
+      "elev60": 0.52,
+      "elev45": 0.9,
+      "elev30": 1.56,
+      "elev15": 3.36
+    },
+    "roadsCasing": {
+      "elev90": 0,
+      "elev60": 0.75,
+      "elev45": 1.3,
+      "elev30": 2.25,
+      "elev15": 4.85
+    },
+    "roads": {
+      "elev90": 0,
+      "elev60": 0.81,
+      "elev45": 1.4,
+      "elev30": 2.42,
+      "elev15": 5.22
+    },
+    "railways": {
+      "elev90": 0,
+      "elev60": 1.15,
+      "elev45": 2,
+      "elev30": 3.46,
+      "elev15": 7.46
+    }
+  },
+  "codeLines": {
+    "depthTestAgainstTerrain": [
+      536
+    ],
+    "LAYER_H": [
+      488
+    ],
+    "toCart": [
+      484
+    ],
+    "areaPolygonHeight": [
+      891
+    ],
+    "translucentAppearance": [
+      899,
+      1922,
+      2245
+    ],
+    "groundPrimitiveOrClassification": [],
+    "primitivesAddOrder": [
+      766,
+      806,
+      908,
+      930,
+      1008,
+      1515,
+      1660,
+      1775,
+      1843,
+      1922,
+      2134,
+      2135
+    ]
+  }
+}
