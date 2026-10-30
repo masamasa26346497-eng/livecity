@@ -41,11 +41,12 @@ if (require.main === module) {
   const a = process.argv.slice(2), get = (k) => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : null; };
   const ext = get('--ext'), port = +(get('--port') || 8137);
   const pub = path.join(__dirname, '..', 'public');
-  if (!ext || !fs.existsSync(ext)) { console.error('usage: --ext <dir containing <ward>/tileset.json>'); process.exit(2); }
-  const names = fs.readdirSync(ext, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(path.join(ext, d.name, 'tileset.json'))).map((d) => d.name);
-  if (!names.length) { console.error('no <ward>/tileset.json under ' + ext); process.exit(2); }
+  // Mission 65: --ext is optional (public/ only; /ext-3dtiles/ then answers 404).
+  if (ext && !fs.existsSync(ext)) { console.error('--ext not found: ' + ext); process.exit(2); }
+  const names = ext ? fs.readdirSync(ext, { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(path.join(ext, d.name, 'tileset.json'))).map((d) => d.name) : [];
+  if (ext && !names.length) { console.error('no <ward>/tileset.json under ' + ext); process.exit(2); }
   makeServer({ publicDir: pub, extDir: ext }).listen(port, '127.0.0.1', () => {
-    console.log('serving public/ + ' + ext + ' (read-only) on http://127.0.0.1:' + port);
-    console.log('open: http://127.0.0.1:' + port + '/mission37g-osaka-24ward-mvp.html?ext=' + names.join(','));
+    console.log('serving public/' + (ext ? ' + ' + ext : '') + ' (read-only) on http://127.0.0.1:' + port);
+    console.log('open: http://127.0.0.1:' + port + '/mission37g-osaka-24ward-mvp.html' + (names.length ? '?ext=' + names.join(',') : '?qa=1&basemap=gsi-pale&extra=0&fac=0&bw=27120'));
   });
 }
