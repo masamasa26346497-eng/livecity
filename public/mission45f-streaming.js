@@ -10,7 +10,9 @@
     detailHeight: 20000, // カメラ高度がこの値以下のときだけ詳細（区全域 fit の高度を含む。細部は SSE が間引く）
     coarseHeight: 90000, // 〃 粗い LOD はこの高度以下のときだけ
     hysteresis: 1.3,     // mount 済みは条件を 1.3 倍まで緩めて維持（ちらつき・再取得防止）
-    coarseSse: 128,
+    // Mission 76: 128 だと geometricError 40 の親(100㎡未満の建物を省略)が約290mまで居座り、遠景で小建物が消えた。
+    // 32 なら親→leaf の切替が約1.2km(1080px高, fov60°)まで広がる。遠方は従来どおり親のまま。
+    coarseSse: 32,
   };
   function distToBBox(x, z, b) {
     const dx = Math.max(b.minX - x, 0, x - b.maxX), dz = Math.max(b.minZ - z, 0, z - b.maxZ);
@@ -62,6 +64,8 @@
     const r = (d + br + sphere.r) / 2, t = (r - br) / d;
     return { x: bx + (sphere.x - bx) * t, z: bz + (sphere.z - bz) * t, r };
   }
-  const api = { DEFAULTS, distToBBox, plan, coverageState, fitRange, unionCircle };
+  /* 親 tile(geometricError=ge m) が leaf に置き換わる（SSE > maxSse になる）カメラ距離(m)。Cesium の SSE 式: ge*viewH/(2*d*tan(fovY/2)) */
+  function refineDistance(ge, maxSse, fovY, viewH) { return (ge * viewH) / (2 * Math.tan(fovY / 2) * maxSse); }
+  const api = { refineDistance, DEFAULTS, distToBBox, plan, coverageState, fitRange, unionCircle };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.LC45F = api;
 })(typeof window !== 'undefined' ? window : globalThis);
