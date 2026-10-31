@@ -3195,6 +3195,66 @@
         };
       },
     };
+
+    // 75: 真上(pitch -90)⇄元の斜め視点の QA 切替（カメラのみ。建物・道路・LOD・建物 ID・表示モードには触れない）。
+    //   topDown75: 画面中央の地表点の真上へ、高度は現在のカメラ高度のまま pitch=-90 にする。切替前の position/heading/pitch/roll は 1 回だけ保存（真上のまま再実行しても上書きしない）。
+    //   restoreView75: 保存した視点へ復元。parallaxPair75: 斜め→真上→斜めの順に parallax74 を取り、元に戻して匿名統計のみ返す。
+    let saved75 = null;
+    const frames75 = (n) => new Promise((res) => { let k = 0; const f = () => { if (++k >= n) { scene.postRender.removeEventListener(f); res(); } }; scene.postRender.addEventListener(f); });
+    const settle75 = async () => { await frames75(4); const t0 = performance.now(); while (performance.now() - t0 < 8000 && !(window.__mission37dQA.tilesReady() && scene.globe.tilesLoaded)) await frames75(3); await frames75(2); };
+    const Q = window.__mission37dQA;
+    Q.topDown75 = function () {
+      const cam = viewer.camera;
+      if (!saved75) saved75 = { pos: Cesium.Cartesian3.clone(cam.positionWC), heading: cam.heading, pitch: cam.pitch, roll: cam.roll };
+      const r = rect();
+      const g = scene.globe.pick(cam.getPickRay(new Cesium.Cartesian2(r.width / 2, r.height / 2)), scene);
+      const c = Cesium.Cartographic.fromCartesian(g || cam.positionWC);
+      const h = Cesium.Cartographic.fromCartesian(cam.positionWC).height;   // 高度は維持
+      cam.setView({ destination: Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, h), orientation: { heading: cam.heading, pitch: Cesium.Math.toRadians(-90), roll: 0 } });
+      return { heightM: +h.toFixed(1), pitchDeg: +Cesium.Math.toDegrees(cam.pitch).toFixed(1), saved: true };
+    };
+    Q.restoreView75 = function () {
+      if (!saved75) return { restored: false, reason: '保存された視点がありません' };
+      viewer.camera.setView({ destination: saved75.pos, orientation: { heading: saved75.heading, pitch: saved75.pitch, roll: saved75.roll } });
+      saved75 = null;
+      return { restored: true };
+    };
+    Q.parallaxPair75 = async function (cols, rows) {
+      const wasTop = !!saved75;
+      await settle75();
+      const oblique = wasTop ? null : Q.parallax74(cols || 12, rows || 8);
+      if (!wasTop) { Q.topDown75(); await settle75(); }
+      const top = Q.parallax74(cols || 12, rows || 8);
+      if (!wasTop) Q.restoreView75();
+      const pick = (p) => p && { samples: p.samples, noDepth: p.noDepth, roundTripMax: p.roundTripM.max, roofP50: p.roofAboveGroundM.p50, roofP95: p.roofAboveGroundM.p95, offNadirP50: p.offNadirDeg.p50, offNadirP95: p.offNadirDeg.p95, predShiftP50: p.predictedApparentShiftM.p50, predShiftP95: p.predictedApparentShiftM.p95, cameraHeightM: p.cameraHeightM, pitchDeg: p.pitchDeg };
+      return { oblique: pick(oblique), topDown: pick(top),
+        note: '匿名統計のみ（ID・座標なし）。predShift は視差の目安であり、実際の座標誤差ではない。真上で predShift が小さく、斜めで大きければ「見かけのずれ」は視差で説明できる。roundTripMax が mm 級なら変換経路は無罪。' };
+    };
+
+    // 75: 小型 QA パネル（?qa=1 かつ localhost のときだけ生成。通常画面には出ない）
+    (function () {
+      const box = document.createElement('div');
+      box.id = 'qa75-panel';
+      box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:rgba(10,24,48,.88);color:#fff;font:12px/1.4 sans-serif;padding:6px 8px;border-radius:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:420px';
+      const mk = (label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.style.cssText = 'font:12px sans-serif;padding:3px 8px;cursor:pointer'; b.addEventListener('pointerdown', (e) => e.stopPropagation()); b.onclick = fn; box.appendChild(b); return b; };
+      const msg = document.createElement('span');
+      const say = (t) => { msg.textContent = t; };
+      mk('真上にする', () => { const r = Q.topDown75(); say('真上: 高度' + r.heightM + 'm / pitch ' + r.pitchDeg + '°'); });
+      mk('元に戻す', () => { const r = Q.restoreView75(); say(r.restored ? '元の視点に戻しました' : r.reason); });
+      const copyBtn = mk('視差を測ってコピー', async () => {
+        copyBtn.disabled = true; say('測定中…（斜め→真上→元に戻す）');
+        try {
+          const out = JSON.stringify(await Q.parallaxPair75(12, 8), null, 2);
+          window.__qa75Last = out;
+          let ok = false; try { await navigator.clipboard.writeText(out); ok = true; } catch (e) { /* フォールバック */ }
+          if (!ok) { const ta = document.createElement('textarea'); ta.value = out; document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ } ta.remove(); }
+          say(ok ? 'コピーしました。貼り付けて報告してください' : 'コピー失敗: コンソールで copy(__qa75Last)');
+        } catch (e) { say('失敗: ' + String(e && e.message || e)); }
+        copyBtn.disabled = false;
+      });
+      box.appendChild(msg);
+      document.body.appendChild(box);
+    })();
   }
 
   const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
