@@ -1,0 +1,21 @@
+{
+ "mission": "38E-A",
+ "kind": "existing-test-real-footprints-partial-3d",
+ "plateauOriginalMatch": "unverified",
+ "note": "既存テスト用実形状（public/__test__/ward-poc）の部分3D可視化。PLATEAU原典との一致は未証明のため PLATEAU 100% とは主張しない。",
+ "wardJudgement": "N03 polygon point-in-polygon on footprint vertex mean; building.ward label ignored",
+ "wardId": "hirano",
+ "dataset": "osaka-hirano",
+ "sourceBuildings": 4695,
+ "keptInWard": 4695,
+ "droppedOutsideWard": 0,
+ "labelsInSource": {
+  "東住吉区": 4695
+ },
+ "tiles": [
+  "5_-3",
+  "5_-4",
+  "6_-3",
+  "6_-4"
+ ]
+}
