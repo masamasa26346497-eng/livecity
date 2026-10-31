@@ -1,0 +1,88 @@
+{
+ "files": [
+  "bldg_52350339_prefix.part",
+  "bldg_52350430_prefix.part"
+ ],
+ "completeBuildingsParsed": 909,
+ "uniqueIds": 909,
+ "inWindow": 680,
+ "perMesh": {
+  "52350339": 285,
+  "52350430": 395
+ },
+ "baseline": {
+  "centroidInWater": 2,
+  "halfVertsInWater": 2,
+  "vertsInWater": 14,
+  "vertsTotal": 5037,
+  "pctVertsInWater": 0.28
+ },
+ "flagged": [
+  {
+   "id": "bldg_afd30554-e5ca-4c70-9d2f-413e1a42eac1",
+   "mesh": "52350430",
+   "h": 3.3,
+   "usage": "461",
+   "area": 9,
+   "centroidInWater": true,
+   "vertsInWaterPct": 100,
+   "x": -1841,
+   "z": -10068
+  },
+  {
+   "id": "bldg_b29c10d7-8081-40ce-a8fa-b94a0fc7b672",
+   "mesh": "52350430",
+   "h": -9999,
+   "usage": "461",
+   "area": 85,
+   "centroidInWater": true,
+   "vertsInWaterPct": 100,
+   "x": -2158,
+   "z": -9859
+  }
+ ],
+ "vertexToRoadEdgeM": {
+  "n": 5037,
+  "p10": 0.26,
+  "p50": 6.34,
+  "p90": 20.24
+ },
+ "shiftSweepBest5": [
+  {
+   "dx": -8,
+   "dz": 0,
+   "centroidInWater": 2,
+   "vertsInWater": 11
+  },
+  {
+   "dx": -6,
+   "dz": 2,
+   "centroidInWater": 2,
+   "vertsInWater": 11
+  },
+  {
+   "dx": -4,
+   "dz": 2,
+   "centroidInWater": 2,
+   "vertsInWater": 11
+  },
+  {
+   "dx": -2,
+   "dz": 2,
+   "centroidInWater": 2,
+   "vertsInWater": 11
+  },
+  {
+   "dx": -8,
+   "dz": 2,
+   "centroidInWater": 2,
+   "vertsInWater": 12
+  }
+ ],
+ "shiftSweepAtZero": {
+  "dx": 0,
+  "dz": 0,
+  "centroidInWater": 2,
+  "vertsInWater": 14
+ }
+}

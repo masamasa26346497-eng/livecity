@@ -1,0 +1,367 @@
+{
+  "mission": "39A perf/stability",
+  "generatedAt": "2026-10-14T12:17:20.435Z",
+  "note": "headless ソフトウェア描画。絶対値は実機値ではなく、fac=0/1 の相対比較のみ有効",
+  "results": [
+    {
+      "label": "desktop-fac0",
+      "query": "&fac=0",
+      "viewport": {
+        "width": 1500,
+        "height": 940
+      },
+      "browser": "Chrome/154.0.8037.97",
+      "googleRequests": [],
+      "failed404": [],
+      "jsErrors": [],
+      "checks": {
+        "ready": true,
+        "googleZero": true,
+        "jsErrorsZero": true,
+        "no404": true,
+        "clickSelected": true,
+        "photoShown": true
+      },
+      "startup": {
+        "ready": true,
+        "readyMs": 7532,
+        "heapMB": 35.4
+      },
+      "firstDisplayMs": null,
+      "status": "loading tiles…",
+      "afterSettle": {
+        "heapMB": 52,
+        "poi": {
+          "culling": true,
+          "created": 35,
+          "removed": 0,
+          "total": 144,
+          "candidates": 144,
+          "livePoints": 21,
+          "liveLabels": 14,
+          "budget": {
+            "points": 80,
+            "labels": 14,
+            "cell": 26
+          },
+          "syncMs": {
+            "n": 12,
+            "avg": 0.8500000000058208,
+            "p95": 1.7999999999301508,
+            "max": 1.7999999999301508
+          },
+          "facilities": {
+            "total": 140,
+            "points": 21,
+            "labels": 14
+          },
+          "spots": {
+            "total": 4,
+            "points": 0,
+            "labels": 0
+          }
+        },
+        "cachedWards": null
+      },
+      "zoom": {
+        "n": 8,
+        "mean": 847.9,
+        "p50": 850,
+        "p95": 1099.9,
+        "max": 1099.9,
+        "longFramesOver100ms": 8
+      },
+      "rotate360": {
+        "n": 13,
+        "mean": 758.9,
+        "p50": 749.9,
+        "p95": 866.7,
+        "max": 866.7,
+        "longFramesOver100ms": 13
+      },
+      "afterMotion": {
+        "heapMB": 74.6,
+        "jsErrors": 0
+      },
+      "click": {
+        "found": true,
+        "selectedMs": 2791,
+        "photoShownMs": 8332,
+        "selected": true,
+        "photoDisplayed": true
+      },
+      "finalHeapMB": 80.1
+    },
+    {
+      "label": "desktop-fac1",
+      "query": "",
+      "viewport": {
+        "width": 1500,
+        "height": 940
+      },
+      "browser": "Chrome/154.0.8037.97",
+      "googleRequests": [],
+      "failed404": [],
+      "jsErrors": [],
+      "checks": {
+        "ready": true,
+        "googleZero": true,
+        "jsErrorsZero": true,
+        "no404": true,
+        "clickSelected": true,
+        "photoShown": true
+      },
+      "startup": {
+        "ready": true,
+        "readyMs": 6639,
+        "heapMB": 65
+      },
+      "firstDisplayMs": null,
+      "status": "loading tiles…",
+      "afterSettle": {
+        "heapMB": 52.7,
+        "poi": {
+          "culling": true,
+          "created": 35,
+          "removed": 0,
+          "total": 144,
+          "candidates": 144,
+          "livePoints": 21,
+          "liveLabels": 14,
+          "budget": {
+            "points": 80,
+            "labels": 14,
+            "cell": 26
+          },
+          "syncMs": {
+            "n": 12,
+            "avg": 0.9333333333391541,
+            "p95": 2.699999999953434,
+            "max": 2.699999999953434
+          },
+          "facilities": {
+            "total": 140,
+            "points": 21,
+            "labels": 14
+          },
+          "spots": {
+            "total": 4,
+            "points": 0,
+            "labels": 0
+          }
+        },
+        "cachedWards": null
+      },
+      "zoom": {
+        "n": 8,
+        "mean": 804.1,
+        "p50": 816.7,
+        "p95": 983.3,
+        "max": 983.3,
+        "longFramesOver100ms": 8
+      },
+      "rotate360": {
+        "n": 13,
+        "mean": 773,
+        "p50": 766.6,
+        "p95": 833.3,
+        "max": 833.3,
+        "longFramesOver100ms": 13
+      },
+      "afterMotion": {
+        "heapMB": 53.2,
+        "jsErrors": 0
+      },
+      "click": {
+        "found": true,
+        "selectedMs": 2785,
+        "photoShownMs": 8329,
+        "selected": true,
+        "photoDisplayed": true
+      },
+      "finalHeapMB": 86.4
+    },
+    {
+      "label": "mobile-fac0",
+      "query": "&fac=0",
+      "viewport": {
+        "width": 390,
+        "height": 780,
+        "mobile": true
+      },
+      "browser": "Chrome/154.0.8037.97",
+      "googleRequests": [],
+      "failed404": [],
+      "jsErrors": [],
+      "checks": {
+        "ready": true,
+        "googleZero": true,
+        "jsErrorsZero": true,
+        "no404": true,
+        "clickSelected": true,
+        "photoShown": true
+      },
+      "startup": {
+        "ready": true,
+        "readyMs": 3333,
+        "heapMB": 52.2
+      },
+      "firstDisplayMs": null,
+      "status": "ready",
+      "afterSettle": {
+        "heapMB": 70.8,
+        "poi": {
+          "culling": true,
+          "created": 24,
+          "removed": 0,
+          "facilities": {
+            "total": 140,
+            "points": 18,
+            "labels": 6
+          },
+          "total": 144,
+          "candidates": 144,
+          "livePoints": 18,
+          "liveLabels": 6,
+          "budget": {
+            "points": 30,
+            "labels": 6,
+            "cell": 34
+          },
+          "syncMs": {
+            "n": 12,
+            "avg": 1.066666666660846,
+            "p95": 4.599999999976717,
+            "max": 4.599999999976717
+          },
+          "spots": {
+            "total": 4,
+            "points": 0,
+            "labels": 0
+          }
+        },
+        "cachedWards": null
+      },
+      "zoom": {
+        "n": 13,
+        "mean": 320.5,
+        "p50": 300.1,
+        "p95": 566.7,
+        "max": 566.7,
+        "longFramesOver100ms": 13
+      },
+      "rotate360": {
+        "n": 16,
+        "mean": 266.7,
+        "p50": 266.5,
+        "p95": 333.3,
+        "max": 333.3,
+        "longFramesOver100ms": 16
+      },
+      "afterMotion": {
+        "heapMB": 54.8,
+        "jsErrors": 0
+      },
+      "click": {
+        "found": true,
+        "selectedMs": 1022,
+        "photoShownMs": 2945,
+        "selected": true,
+        "photoDisplayed": true
+      },
+      "finalHeapMB": 83.5
+    },
+    {
+      "label": "mobile-fac1",
+      "query": "",
+      "viewport": {
+        "width": 390,
+        "height": 780,
+        "mobile": true
+      },
+      "browser": "Chrome/154.0.8037.97",
+      "googleRequests": [],
+      "failed404": [],
+      "jsErrors": [],
+      "checks": {
+        "ready": true,
+        "googleZero": true,
+        "jsErrorsZero": true,
+        "no404": true,
+        "clickSelected": true,
+        "photoShown": true
+      },
+      "startup": {
+        "ready": true,
+        "readyMs": 4408,
+        "heapMB": 53.6
+      },
+      "firstDisplayMs": null,
+      "status": "ready",
+      "afterSettle": {
+        "heapMB": 73.5,
+        "poi": {
+          "culling": true,
+          "created": 40,
+          "removed": 4,
+          "facilities": {
+            "total": 758,
+            "points": 28,
+            "labels": 6
+          },
+          "total": 977,
+          "candidates": 600,
+          "livePoints": 30,
+          "liveLabels": 6,
+          "budget": {
+            "points": 30,
+            "labels": 6,
+            "cell": 34
+          },
+          "syncMs": {
+            "n": 14,
+            "avg": 1.1214285714252452,
+            "p95": 2.900000000023283,
+            "max": 2.900000000023283
+          },
+          "spots": {
+            "total": 219,
+            "points": 2,
+            "labels": 0
+          }
+        },
+        "cachedWards": [
+          "sumiyoshi"
+        ]
+      },
+      "zoom": {
+        "n": 14,
+        "mean": 320.2,
+        "p50": 316.7,
+        "p95": 583.4,
+        "max": 583.4,
+        "longFramesOver100ms": 14
+      },
+      "rotate360": {
+        "n": 16,
+        "mean": 276,
+        "p50": 266.7,
+        "p95": 399.9,
+        "max": 399.9,
+        "longFramesOver100ms": 16
+      },
+      "afterMotion": {
+        "heapMB": 77.4,
+        "jsErrors": 0
+      },
+      "click": {
+        "found": true,
+        "selectedMs": 1006,
+        "photoShownMs": 2922,
+        "selected": true,
+        "photoDisplayed": true
+      },
+      "finalHeapMB": 74.3
+    }
+  ]
+}

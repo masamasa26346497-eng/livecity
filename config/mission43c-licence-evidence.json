@@ -1,0 +1,18 @@
+{
+  "schema": "livecity.mission43.licence-evidence/1",
+  "fetchedInThisRun": false,
+  "note": "Recorded from the owner's Mission 43C/43D request text. Not fetched or read by this tool/run. Nothing here approves any licence.",
+  "datasetSpecificLicenseVerified": false,
+  "osmDatasetSpecificVerified": false,
+  "licenceApproved": false,
+  "noSecretsReviewed": false,
+  "noPersonalDataReviewed": false,
+  "uploadAllowed": 0,
+  "evidence": [
+    { "id": "plateau-site-policy", "url": "https://www.mlit.go.jp/plateau/site-policy/", "status": "owner-read primary source (2026-10-25), not fetched here", "claim": "General terms: G-space public 3D models follow PDL1.0 unless a specific notice says otherwise; source credit and a statement that the data was processed are required (CC BY compatible). General policy, not dataset-specific." },
+    { "id": "plateau-faq", "url": "https://www.mlit.go.jp/plateau/faq/", "status": "owner-read primary source (2026-10-25), not fetched here", "claim": "Commercial use is allowed in principle." },
+    { "id": "plateau-osaka-2024", "url": "https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024", "status": "NOT read: owner got HTTP 403 on 2026-10-25", "claim": "README and per-resource terms of the distributed ZIP must be read by a human before any redistribution." },
+    { "id": "third-party-gitbucket-readme", "url": "https://surveyor.mydns.jp/gitbucket/osm/osm-data/blob/master/27100_osaka-shi_2024/README.md", "status": "THIRD-PARTY, NOT authoritative; page could not be opened", "claim": "A search snippet shows README-like text for Osaka 2024 listing four open licences. This is NOT the distributor's README and must not be used as evidence of the dataset's terms." },
+    { "id": "osm-odbl", "url": "https://www.openstreetmap.org/copyright", "status": "NOT checked for the specific extracts", "claim": "ODbL 1.0; attribution: (c) OpenStreetMap contributors; derived databases carry share-alike." }
+  ]
+}

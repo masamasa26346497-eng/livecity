@@ -1,0 +1,377 @@
+{
+  "mission": "47",
+  "runs": {
+    "before-rw0": {
+      "url": "http://localhost:8147/mission37g-osaka-24ward-mvp.html?qa=1&imagery=0&fac=0&bw=27120&rw=0",
+      "browser": "Chrome/156.0.8078.47",
+      "jsErrors": [],
+      "failed": [
+        "404 http://localhost:8147/ext-3dtiles/index.json",
+        "404 http://localhost:8147/favicon.ico"
+      ],
+      "views": [
+        {
+          "view": "top-near",
+          "range": 700,
+          "pitch": -90,
+          "road46c": null,
+          "roadPixels": 73017
+        },
+        {
+          "view": "oblique-near",
+          "range": 700,
+          "pitch": -45,
+          "road46c": null,
+          "roadPixels": 58479
+        },
+        {
+          "view": "top-mid",
+          "range": 1500,
+          "pitch": -90,
+          "road46c": null,
+          "roadPixels": 130004
+        },
+        {
+          "view": "oblique-mid",
+          "range": 1500,
+          "pitch": -45,
+          "road46c": null,
+          "roadPixels": 114696
+        },
+        {
+          "view": "top-far",
+          "range": 3500,
+          "pitch": -90,
+          "road46c": null,
+          "roadPixels": 172834
+        },
+        {
+          "view": "oblique-far",
+          "range": 3500,
+          "pitch": -45,
+          "road46c": null,
+          "roadPixels": 137783
+        }
+      ],
+      "layers": {
+        "buildings": {
+          "state": "ready",
+          "count": 0,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "roads": {
+          "state": "ready",
+          "count": 969,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "railways": {
+          "state": "ready",
+          "count": 67,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "waterways": {
+          "state": "ready",
+          "count": 20,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "parks": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "labels": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "facilities": {
+          "state": "ready",
+          "count": 140,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "spots": {
+          "state": "ready",
+          "count": 4,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "towns": {
+          "state": "ready",
+          "count": 101,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "townlabels": {
+          "state": "ready",
+          "count": 101,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "wards": {
+          "state": "ready",
+          "count": 24,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "wardlabels": {
+          "state": "ready",
+          "count": 24,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        }
+      },
+      "wardSwitch": [
+        {
+          "code": "27127",
+          "tilesets": {
+            "n": 1,
+            "bases": [
+              "mission37h-3dtiles/kita-sample/"
+            ],
+            "heapMB": 95
+          }
+        },
+        {
+          "code": "27120",
+          "tilesets": {
+            "n": 1,
+            "bases": [
+              "mission37b-3dtiles/osaka-sumiyoshi-9tile/"
+            ],
+            "heapMB": 118
+          }
+        }
+      ]
+    },
+    "after": {
+      "url": "http://localhost:8147/mission37g-osaka-24ward-mvp.html?qa=1&imagery=0&fac=0&bw=27120",
+      "browser": "Chrome/156.0.8078.47",
+      "jsErrors": [],
+      "failed": [
+        "404 http://localhost:8147/ext-3dtiles/index.json",
+        "404 http://localhost:8147/favicon.ico"
+      ],
+      "views": [
+        {
+          "view": "top-near",
+          "range": 700,
+          "pitch": -90,
+          "road46c": {
+            "height": 700,
+            "scale": 1
+          },
+          "roadPixels": 73017
+        },
+        {
+          "view": "oblique-near",
+          "range": 700,
+          "pitch": -45,
+          "road46c": {
+            "height": 495,
+            "scale": 1
+          },
+          "roadPixels": 58432
+        },
+        {
+          "view": "top-mid",
+          "range": 1500,
+          "pitch": -90,
+          "road46c": {
+            "height": 1500,
+            "scale": 0.8
+          },
+          "roadPixels": 112281
+        },
+        {
+          "view": "oblique-mid",
+          "range": 1500,
+          "pitch": -45,
+          "road46c": {
+            "height": 1061,
+            "scale": 0.8
+          },
+          "roadPixels": 98198
+        },
+        {
+          "view": "top-far",
+          "range": 3500,
+          "pitch": -90,
+          "road46c": {
+            "height": 3500,
+            "scale": 0.45
+          },
+          "roadPixels": 109314
+        },
+        {
+          "view": "oblique-far",
+          "range": 3500,
+          "pitch": -45,
+          "road46c": {
+            "height": 2475,
+            "scale": 0.6
+          },
+          "roadPixels": 101590
+        }
+      ],
+      "layers": {
+        "buildings": {
+          "state": "ready",
+          "count": 0,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "roads": {
+          "state": "ready",
+          "count": 969,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "railways": {
+          "state": "ready",
+          "count": 67,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "waterways": {
+          "state": "ready",
+          "count": 20,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "parks": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "labels": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "facilities": {
+          "state": "ready",
+          "count": 140,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "spots": {
+          "state": "ready",
+          "count": 4,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "towns": {
+          "state": "ready",
+          "count": 101,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "townlabels": {
+          "state": "ready",
+          "count": 101,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "wards": {
+          "state": "ready",
+          "count": 24,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        },
+        "wardlabels": {
+          "state": "ready",
+          "count": 24,
+          "visible": true,
+          "error": null,
+          "dummy": false
+        }
+      },
+      "wardSwitch": [
+        {
+          "code": "27127",
+          "tilesets": {
+            "n": 1,
+            "bases": [
+              "mission37h-3dtiles/kita-sample/"
+            ],
+            "heapMB": 94
+          }
+        },
+        {
+          "code": "27120",
+          "tilesets": {
+            "n": 1,
+            "bases": [
+              "mission37b-3dtiles/osaka-sumiyoshi-9tile/"
+            ],
+            "heapMB": 77
+          }
+        }
+      ]
+    }
+  },
+  "summary": [
+    {
+      "view": "top-near",
+      "roadPixelsBefore": 73017,
+      "roadPixelsAfter": 73017
+    },
+    {
+      "view": "oblique-near",
+      "roadPixelsBefore": 58479,
+      "roadPixelsAfter": 58432
+    },
+    {
+      "view": "top-mid",
+      "roadPixelsBefore": 130004,
+      "roadPixelsAfter": 112281
+    },
+    {
+      "view": "oblique-mid",
+      "roadPixelsBefore": 114696,
+      "roadPixelsAfter": 98198
+    },
+    {
+      "view": "top-far",
+      "roadPixelsBefore": 172834,
+      "roadPixelsAfter": 109314
+    },
+    {
+      "view": "oblique-far",
+      "roadPixelsBefore": 137783,
+      "roadPixelsAfter": 101590
+    }
+  ]
+}

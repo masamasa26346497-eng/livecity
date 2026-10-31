@@ -1,0 +1,32 @@
+# Mission 43: per-ward rebuild, fail-closed (offline)
+
+`tools/mission43-ward-rebuild.cjs`
+
+| command | what it does |
+|---|---|
+| `manifest [--write]` | per-ward migration manifest (24 wards) -> `data/reports/mission43/ward-migration-manifest.json` |
+| `rebuild --ward <id> --out <NEW dir>` | legacy tiles -> 3D Tiles (40B converter) -> verify. Fail-closed (exit 3) unless every source tile is Git-tracked. Refuses non-empty/tracked output. |
+| `verify --dir <tileset>` | tileset.json -> every uri exists, GLB header/length valid, ids == build-report == attrs, no dup ids, wardCode, size cap 60MB |
+| `preflight --src <buildings dir> [--gates g.json]` | owner-PC pre-check: per-ward file/byte counts, other-folder aggregate, archive counts. No names/paths/values. `eligibleForUpload` and `uploadAllowed` are always 0. |
+| `sources [--online] [--write]` | HEAD-only reachability of PLATEAU policy / OSM copyright / Osaka 2024 dataset page. Reachability is not licence approval. |
+
+Gates (`licenceApproved`, `noSecretsReviewed`, `noPersonalDataReviewed`) stay false; this tool never opens them, uploads, packs or deletes.
+
+Licence notes: general PLATEAU site policy and OSM ODbL (attribution "© OpenStreetMap contributors") are general terms. The Osaka 2024 dataset page terms must be read per dataset by a human (other Osaka datasets, e.g. Expo 2025 site, can differ). Until recorded, no third-party data is committed.
+
+Owner-PC (only if public re-fetch is not approved): `tools/mission40c-run-local.ps1 -Mode validate|convert -Wards <id>`, then `preflight`.
+
+## Mission 43D: batch orchestration (`tools/mission43d-ward-batch.cjs`)
+
+- `audit --src <dir>`: read-only 24-ward completeness/quality check (reuses `inspect`); ward ids, counts and issue kinds only. Unreadable/cloud-only = not ready.
+- `batch-plan [--inspect f] [--audit f]`: tracked-legacy-rebuildable / pc-only / not-ready per ward with estimated output size (1,164 B/building, Sumiyoshi measured). Nothing is approved for transfer.
+- `run --wards <ids|all-tracked> --out-root <NEW dir outside repo> [--execute]`: dry-run by default; Git-tracked tiles only (PC-only wards fail closed); Sumiyoshi also regresses against the committed 37B 9 tiles.
+
+Owner PC, one command: `node tools/mission43d-ward-batch.cjs audit --src <legacy buildings dir>` (prints counts only).
+
+## Mission 43E: hardening
+
+- `inspect`/`audit` now also count `badGeometry` (footprint < 3 finite points or non-finite height) and flag `no-tiles-listed`; cross-ward duplicate ids are reported as `warnings` only (never alter data).
+- `batch-plan`: pc-only requires a schema-valid, non-fatal, **overall-ready** audit (or a clean `ok` inspect); tracked status is counted from tile files in Git. Everything else is `not-ready`/unknown. Gates stay false, uploadAllowed 0.
+- CLI never prints system error text (paths). New `audit-plan --src` chains audit -> batch-plan in one process, writes nothing.
+- Owner PC, one command (PS 5.1, read-only): `powershell -NoProfile -ExecutionPolicy Bypass -File tools\mission43e-audit.ps1` (default folder `..\livecity-data-pipeline\public\map-data\osaka-city\buildings`).

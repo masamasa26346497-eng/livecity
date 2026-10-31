@@ -1,0 +1,111 @@
+{
+  "schema": "livecity.mission46d.road-bundle-check/1",
+  "generatedBy": "tools/mission46d-road-bundle-check.cjs",
+  "wardId": "sumiyoshi",
+  "thresholds": {
+    "bandM": 25,
+    "maxWidthM": 40,
+    "minSideM": 0.5,
+    "maxAlongCos": 0.5,
+    "stepM": 10,
+    "bracketedPctMin": 60,
+    "minBracketedSamples": 50,
+    "minSamples": 100,
+    "minWardAreaCoveragePct": 95
+  },
+  "inputs": {
+    "bundleSource": "public/map-data/osaka-city/roads",
+    "bundleGeneratedAt": "2026-09-23T04:46:57.524Z",
+    "bundleFeatureCount": 969,
+    "bundleDeclaredCount": 969,
+    "referenceTiles": 36,
+    "referenceTileErrors": 0,
+    "referenceRoadEdgeLines": 5550
+  },
+  "independence": "Live City roads: OSM-derived centrelines (37C bundle). Reference: GSI optimal_bvmap-v1 RdEdg. Different producers; GSI building layer is NOT used here.",
+  "featureClasses": {
+    "ground": 957,
+    "bridge": 8,
+    "tunnel": 2,
+    "underground-layer": 2
+  },
+  "groundFeatures": 957,
+  "samples": {
+    "evaluated": 17886,
+    "outsideWardPolygon": 1666,
+    "outsideReferenceCoverage": 0,
+    "stepM": 10
+  },
+  "areaCoverage": {
+    "wardCells": 3781,
+    "coveredCells": 1621,
+    "coveragePct": 42.87,
+    "cellM": 50
+  },
+  "result": {
+    "bracketed": 15888,
+    "bracketedPct": 88.83,
+    "oneSidedOnlyPct": 8.84,
+    "noEdgeInBandPct": 2.33,
+    "centerlineToNearestEdgeM": {
+      "median": 2.66,
+      "p95": 7.64,
+      "p99": 11.39
+    },
+    "edgeToEdgeWidthM": {
+      "median": 6.36,
+      "p95": 23.97,
+      "p99": 30.87
+    },
+    "byTier": {
+      "local": {
+        "samples": 14941,
+        "bracketed": 13108,
+        "oneSided": 1460,
+        "none": 373,
+        "bracketedPct": 87.73
+      },
+      "major": {
+        "samples": 782,
+        "bracketed": 749,
+        "oneSided": 29,
+        "none": 4,
+        "bracketedPct": 95.78
+      },
+      "mid": {
+        "samples": 2163,
+        "bracketed": 2031,
+        "oneSided": 93,
+        "none": 39,
+        "bracketedPct": 93.9
+      }
+    }
+  },
+  "displacementControl": {
+    "note": "same centrelines displaced diagonally by the stated distance (no ward clip); a useful metric must drop clearly",
+    "shift10m": {
+      "samples": 19552,
+      "bracketedPct": 42.73
+    },
+    "shift20m": {
+      "samples": 19552,
+      "bracketedPct": 42.55
+    },
+    "shift40m": {
+      "samples": 19552,
+      "bracketedPct": 32.96
+    }
+  },
+  "areaVerdict": "PASS",
+  "wardStatus": "INSUFFICIENT_DATA",
+  "reasons": [
+    "verdict covers only 42.87% of the ward area; ward-level PASS is not allowed"
+  ],
+  "limits": [
+    "Only the bundle area (about 2.1 km square, 9 building tiles) is measured; the rest of the ward and the other 23 wards have no tracked road data.",
+    "GSI RdEdg omits many narrow lanes, so noEdgeInBand is NOT proof that a road is off-road; it is a suspect indicator only.",
+    "Centrelines are not expected to coincide with edges; support means a plausible corridor on both sides. Not a survey-grade accuracy claim.",
+    "Thresholds are provisional and uncalibrated. Offsets are reported, never applied.",
+    "Owner-PC GLB data (574,213 buildings) was not accessible; nothing here concerns buildings."
+  ]
+}

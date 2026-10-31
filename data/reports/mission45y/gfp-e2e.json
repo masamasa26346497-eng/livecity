@@ -1,0 +1,49 @@
+{
+ "mission": "45Y",
+ "scope": "sumiyoshi tracked public data; headless Linux; not Windows Chrome",
+ "views": {
+  "oblique": {
+   "gfp": {
+    "enabled": true,
+    "state": "ready",
+    "ward": "sumiyoshi",
+    "tiles": 9,
+    "loops": 10546,
+    "unsupported": null
+   },
+   "screenshotBytes": 361717
+  },
+  "topdown": {
+   "gfp": {
+    "enabled": true,
+    "state": "ready",
+    "ward": "sumiyoshi",
+    "tiles": 9,
+    "loops": 10546,
+    "unsupported": null
+   },
+   "screenshotBytes": 290706
+  }
+ },
+ "errors": [],
+ "notFound": [
+  "ext-3dtiles/index.json",
+  "favicon.ico",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/1/1/0.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/1/0/0.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/1/0/1.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/1/1/1.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/0/0/0.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/2/3/0.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/2/3/1.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/3/7/3.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/3/6/3.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/3/7/2.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/3/6/2.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/4/14/6.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/4/13/6.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/4/13/5.png",
+  "https://cyberjapandata.gsi.go.jp/xyz/blank/4/14/5.png"
+ ],
+ "pass": true
+}

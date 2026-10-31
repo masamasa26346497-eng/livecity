@@ -1,0 +1,156 @@
+{
+ "generated": "2026-10-29T12:33:01.351Z",
+ "source": "PLATEAU 3D Tiles (tracked, footprints recovered from GLB) vs GSI optimal_bvmap-v1 z16 (WA, RdEdg, BldA)",
+ "window": {
+  "x": [
+   -3508,
+   -2193
+  ],
+  "z": [
+   -12562,
+   -10559
+  ]
+ },
+ "tiles": 20,
+ "counts": {
+  "plateauBuildings": 2698,
+  "gsiBldA": 8730,
+  "gsiWaterPolygons": 30,
+  "gsiRdEdgSegments": 13145,
+  "waterCells": 259317,
+  "waterAreaM2": 259317
+ },
+ "plateau": {
+  "water": {
+   "samples": 70963,
+   "wetSamples": 62,
+   "wetPct": 0.087,
+   "buildingsWithAnyWater": 2,
+   "buildingsOver20pctWater": 1,
+   "wetIds": [
+    {
+     "id": "bldg_19d0efd3-2fdb-4da2-b40c-590b8da3a972",
+     "frac": 0.33
+    }
+   ]
+  },
+  "roadEdge": {
+   "buildings": 2698,
+   "buildingsCrossingRoadEdge": 251,
+   "crossPct": 9.3,
+   "crossings": 531,
+   "ids": [
+    "bldg_6755878f-c7d4-4d93-aafa-548f8bd36106",
+    "bldg_13d9abd2-24a9-4d02-b862-e348cfd30084",
+    "bldg_da4022ec-8ba4-4561-939a-f0f9f3b3a845",
+    "bldg_033d309b-0f77-4be2-bf86-6156cf4ac777",
+    "bldg_a17a16ae-2359-4c42-9e76-f392e7033327",
+    "bldg_b0d85b5f-a116-4125-b188-cedff7c5d36f",
+    "bldg_85e8a5ac-6409-4e6b-b930-1abb7090c481",
+    "bldg_407a3e20-59db-4c5c-a663-e49bbeac39c8",
+    "bldg_78070ea1-64b1-44f6-bcd5-212a8fd25291",
+    "bldg_2d94c36e-d514-499e-b547-ca763c4e5692",
+    "bldg_014f5805-1924-46ad-b942-69801c3d19ee",
+    "bldg_403ebd0b-d87b-4fec-b35f-7695440174f8",
+    "bldg_bccbdb94-dec7-4934-b7dd-f24d6968db18",
+    "bldg_5e5ca7ac-07ab-4230-8b78-90d32c225217",
+    "bldg_84673e6a-242d-4832-8a38-adc8c643326a"
+   ]
+  }
+ },
+ "gsiBldAControl": {
+  "water": {
+   "samples": 175411,
+   "wetSamples": 134,
+   "wetPct": 0.076,
+   "buildingsWithAnyWater": 5,
+   "buildingsOver20pctWater": 3,
+   "wetIds": [
+    {
+     "id": "gsi2892",
+     "frac": 0.32
+    },
+    {
+     "id": "gsi3758",
+     "frac": 0.24
+    },
+    {
+     "id": "gsi5821",
+     "frac": 0.32
+    }
+   ]
+  },
+  "roadEdge": {
+   "buildings": 8611,
+   "buildingsCrossingRoadEdge": 413,
+   "crossPct": 4.8,
+   "crossings": 784,
+   "ids": []
+  }
+ },
+ "shiftSearch": {
+  "stepM": 4,
+  "rangeM": 24,
+  "atZero": {
+   "dx": 0,
+   "dz": 0,
+   "wetSamples": 62,
+   "crossingBuildings": 251,
+   "score": 9.391
+  },
+  "best": {
+   "dx": 0,
+   "dz": 0,
+   "wetSamples": 62,
+   "crossingBuildings": 251,
+   "score": 9.391
+  },
+  "minAtZero": true,
+  "fine": {
+   "rangeM": 6,
+   "stepM": 1,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "wetSamples": 62,
+    "crossingBuildings": 251,
+    "score": 9.391
+   },
+   "minAtZero": true
+  },
+  "quadrants": [
+   {
+    "quadrant": "NW",
+    "dx": 0,
+    "dz": 0,
+    "s": 6.061,
+    "crossPct": 6.06,
+    "n": 561
+   },
+   {
+    "quadrant": "NE",
+    "dx": 0,
+    "dz": 0,
+    "s": 12.185,
+    "crossPct": 11.93,
+    "n": 788
+   },
+   {
+    "quadrant": "SW",
+    "dx": 0,
+    "dz": 0,
+    "s": 6.371,
+    "crossPct": 6.22,
+    "n": 788
+   },
+   {
+    "quadrant": "SE",
+    "dx": 0,
+    "dz": 0,
+    "s": 13.191,
+    "crossPct": 13.19,
+    "n": 561
+   }
+  ]
+ }
+}
