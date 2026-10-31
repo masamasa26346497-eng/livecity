@@ -90,5 +90,8 @@ test('page keeps wardCode namespace, per-tileset _lcBase and Google lock', () =>
 test('45E index.json carries verified only for non-synthetic proof', () => {
   const src = fs.readFileSync(path.join(ROOT, 'tools/mission45e-preview.cjs'), 'utf8');
   assert.match(src, /verified: synthetic === false/);
-  assert.match(src, /makeServer\(p\.servable, \(\) => port, p\.synthetic(, lod0Plan\(opts\.lod0\)(, layersPlan\(opts\.layersRoot\))?)?\)/);
+  // 45U moved lod0Plan/layersPlan into local consts (for stage reporting); accept either form
+  assert.match(src, /makeServer\(p\.servable, \(\) => port, p\.synthetic(, lod0Plan\(opts\.lod0\)(, layersPlan\(opts\.layersRoot\))?|, lod0, layers)?\)/);
+  assert.match(src, /const lod0 = lod0Plan\(opts\.lod0\)/);
+  assert.match(src, /const layers = layersPlan\(opts\.layersRoot\)/);
 });

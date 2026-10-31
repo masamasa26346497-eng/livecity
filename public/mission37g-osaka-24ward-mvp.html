@@ -453,6 +453,7 @@
 <script src="mission52-water-dedupe.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
 <script src="mission45f-streaming.js"></script>
+<script src="mission78-view.js"></script>
 <script src="mission45g-perf.js"></script>
 <script src="mission45i-vec.js"></script>
 <script src="mission45k-viewcull.js"></script>
@@ -1392,7 +1393,7 @@
     const sp = sphere ? (() => { const l = cartToLocal(sphere.center); return { x: l.x, z: l.z, r: sphere.radius }; })() : null;
     const u = LC45F.unionCircle(w.bbox, sp);
     const fr = viewer.camera.frustum, fov = fr.fovy || fr.fov;
-    const pitch = Cesium.Math.toRadians(-55);
+    const pitch = Cesium.Math.toRadians(LC78.DEFAULT_PITCH_DEG);   // M78: steeper default keeps roof/road parallax small (no coordinate change)
     const ins = viewInsets();
     const range = Math.max(2500, LC45F.fitRange(u.r, fov, { w: viewer.canvas.clientWidth, h: viewer.canvas.clientHeight }, ins, pitch));
     stats.lastFit = { ward: w.wardCode, circle: { x: Math.round(u.x), z: Math.round(u.z), r: Math.round(u.r) }, rangeM: Math.round(range), insets: ins };
@@ -2527,7 +2528,7 @@
             minZ: Math.min(a.minZ, w.bbox.minZ), maxZ: Math.max(a.maxZ, w.bbox.maxZ) }),
             { minX: 1e9, maxX: -1e9, minZ: 1e9, maxZ: -1e9 });
           const diag = Math.hypot(wb.maxX - wb.minX, wb.maxZ - wb.minZ);
-          cityHome = { center: toCart((wb.minX + wb.maxX) / 2, (wb.minZ + wb.maxZ) / 2, 0), range: diag * 1.05, pitch: Cesium.Math.toRadians(-62) };
+          cityHome = { center: toCart((wb.minX + wb.maxX) / 2, (wb.minZ + wb.maxZ) / 2, 0), range: diag * 1.05, pitch: Cesium.Math.toRadians(LC78.DEFAULT_PITCH_DEG) };
           stats.cityBounds = wb;
           buildList(d);
           return { count: d.wards.length };
@@ -2598,7 +2599,7 @@
         if (!sets.length) return;
         const sphere = sets.length === 1 ? sets[0].boundingSphere : Cesium.BoundingSphere.fromBoundingSpheres(sets.map((t) => t.boundingSphere));
         if (w.cover.state === 'full') { fitWard(w, sphere); return; }
-        viewer.camera.flyToBoundingSphere(sphere, { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), Math.max(600, sphere.radius * 2.2)) });
+        viewer.camera.flyToBoundingSphere(sphere, { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(LC78.SELECT_PITCH_DEG), Math.max(600, sphere.radius * 2.2)) });
       });
       stats.selectedWard = { wardCode: w.wardCode, wardName: w.wardName, coverage: w.cover.state };
       selLines = scene.primitives.add(new Cesium.PolylineCollection());
@@ -2614,7 +2615,7 @@
       if (fly) {
         if (w.cover.state === 'full' || allMode) fitWard(w, null);   // 45F: パネル幅・キャンバス比を考慮した区全域 fit
         else viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(toCart(w.cx, w.cz, 0), w.radius),
-          { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-55), Math.max(2500, w.radius * 2.6)) });
+          { duration: 1.6, offset: new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(LC78.SELECT_PITCH_DEG), Math.max(2500, w.radius * 2.6)) });
       }
       scene.requestRender();
     }
