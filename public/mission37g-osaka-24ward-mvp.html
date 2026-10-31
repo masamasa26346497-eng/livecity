@@ -3144,6 +3144,36 @@
           tilesets: ts, camera: this.snapshot().camera, ward,
           note: 'selected.coarse が多い＋ SSE 大 → 遠景 LOD による棟の脱落が優勢（座標ずれではない）。projCheck は往復整合のみ。grid は pick の有無で、道路線は other に入る。' };
       },
+      // 74: 近景の視差切り分け（読み取りのみ。fetch・選択・カメラ操作なし。ID・座標は出さず集計のみ）。
+      //   画面格子で建物を pickPosition し、(a) 往復誤差(local<->Cartesian, m) (b) 屋根の地表上高さ (c) 視線の鉛直からの傾き
+      //   (d) 予測される見かけの水平ずれ = 高さ * tan(傾き) を集計する。これは座標ずれではなく視差の大きさの目安。
+      //   同じ地点を真上(pitch -90)と斜めで 1 回ずつ実行して比較する。道路中心線と建物外形が一致すべきとは仮定しない。
+      parallax74(cols, rows) {
+        cols = Math.max(2, Math.min(30, cols | 0 || 12)); rows = Math.max(2, Math.min(30, rows | 0 || 8));
+        const r = rect(), hs = [], shifts = [], rt = [], off = [];
+        let samples = 0, noDepth = 0;
+        for (let cx = 0; cx < cols; cx++) for (let cy = 0; cy < rows; cy++) {
+          const pos = new Cesium.Cartesian2(((cx + 0.5) / cols) * r.width, ((cy + 0.5) / rows) * r.height);
+          const f = scene.pick(pos);
+          if (!f || typeof f.getProperty !== 'function') continue;
+          samples++;
+          let w = null; try { w = scene.pickPosition(pos); } catch (e) { /* ignore */ }
+          if (!w) { noDepth++; continue; }
+          const l = cartToLocal(w), back = cartToLocal(toCart(l.x, l.z, l.h));
+          rt.push(Math.hypot(back.x - l.x, back.z - l.z, back.h - l.h));
+          const g = scene.globe.getHeight(Cesium.Cartographic.fromCartesian(w)) || 0, roof = l.h - g;
+          const ray = viewer.camera.getPickRay(pos), up = Cesium.Cartesian3.normalize(w, new Cesium.Cartesian3());
+          const cosT = Math.abs(Cesium.Cartesian3.dot(Cesium.Cartesian3.normalize(ray.direction, new Cesium.Cartesian3()), up)), ang = Math.acos(Math.min(1, cosT)) * 180 / Math.PI;
+          hs.push(roof); off.push(ang); shifts.push(roof * Math.tan(ang * Math.PI / 180));
+        }
+        const q = (a, p) => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y); return +b[Math.min(b.length - 1, Math.floor(p * b.length))].toFixed(2); };
+        const cam = viewer.camera, gh = (() => { try { return scene.globe.getHeight(cam.positionCartographic); } catch (e) { return null; } })();
+        return { samples, noDepth, roundTripM: { max: rt.length ? +Math.max(...rt).toFixed(6) : null }, roofAboveGroundM: { p50: q(hs, 0.5), p95: q(hs, 0.95) },
+          offNadirDeg: { p50: q(off, 0.5), p95: q(off, 0.95) }, predictedApparentShiftM: { p50: q(shifts, 0.5), p95: q(shifts, 0.95), max: q(shifts, 0.999) },
+          cameraHeightM: +cam.positionCartographic.height.toFixed(1), pitchDeg: +Cesium.Math.toDegrees(cam.pitch).toFixed(1),
+          globeGroundHeightM: gh, roadLayerHeightM: LAYER_H.roads, buildingBaseHeightM: 0, depthTestAgainstTerrain: scene.globe.depthTestAgainstTerrain,
+          note: 'predictedApparentShiftM は屋根を斜めから見たときの視差の目安で、座標ずれではない。真上(pitch -90)で同じ地点を測ると offNadir が小さくなり予測ずれも小さくなる。roundTripM が mm 級なら変換経路は無罪。' };
+      },
       // 64: 再現用スナップショット（読み取りのみ）。カメラ・FOV・レイヤー ON/OFF・Globe・背景 LOD・tileset ready・各レイヤー高さを 1 つにまとめる。
       snapshot() {
         const cam = viewer.camera, c = Cesium.Cartographic.fromCartesian(cam.positionWC);
