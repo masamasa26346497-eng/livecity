@@ -3114,6 +3114,36 @@
           if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) p.style = css ? new Cesium.Cesium3DTileStyle({ color: "color('" + css + "', 0.85)" }) : undefined;
         }
       },
+      // 73: 「道路はあるのに建物が見えない」の切り分け用（読み取りのみ。fetch・選択・カメラ操作なし。座標・ID は出さず集計だけ）。
+      //   selected: 今フレームで描画対象の tile を geometricError で leaf(=0, 実 footprint) / coarse(>0, bbox 簡略・小棟脱落) に分けた数。
+      //   grid: 画面を cols×rows に分け、各セル中心の scene.pick が 建物 / 他(道路線・POI 等) / 無 のどれかを数える。
+      //   projCheck: 画面中央の地表点を local→Cartesian→画面へ往復した画素差（往復整合のみ。地物の位置誤差ではない）。
+      coverage73(cols, rows) {
+        cols = Math.max(2, Math.min(40, cols | 0 || 16)); rows = Math.max(2, Math.min(40, rows | 0 || 10));
+        const sel = { leaf: 0, coarse: 0, unknown: 0 }, ts = [];
+        for (let i = 0; i < scene.primitives.length; i++) {
+          const p = scene.primitives.get(i);
+          if (!(p instanceof Cesium.Cesium3DTileset) || p.isDestroyed()) continue;
+          let st = null;
+          try { st = p.statistics ? { visited: p.statistics.visited, selected: p.statistics.selected, contentReady: p.statistics.numberOfTilesWithContentReady, pending: p.statistics.numberOfPendingRequests } : null; } catch (e) { /* ignore */ }
+          try { for (const t of p._selectedTiles || []) { const ge = t.geometricError; if (ge === 0) sel.leaf++; else if (ge > 0) sel.coarse++; else sel.unknown++; } } catch (e) { sel.unknown++; }
+          ts.push({ base: p._lcBase || null, sse: p.maximumScreenSpaceError, tilesLoaded: p.tilesLoaded, stats: st });
+        }
+        const r = rect(), g = { building: 0, other: 0, none: 0 };
+        for (let cx = 0; cx < cols; cx++) for (let cy = 0; cy < rows; cy++) {
+          const f = scene.pick(new Cesium.Cartesian2(((cx + 0.5) / cols) * r.width, ((cy + 0.5) / rows) * r.height));
+          if (!f) g.none++; else if (typeof f.getProperty === 'function') g.building++; else g.other++;
+        }
+        let projCheck = null;
+        try {
+          const c = scene.globe.pick(viewer.camera.getPickRay(new Cesium.Cartesian2(r.width / 2, r.height / 2)), scene);
+          if (c) { const l = cartToLocal(c), p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(l.x, l.z, l.h)); if (p) projCheck = { dxPx: +(p.x - r.width / 2).toFixed(3), dyPx: +(p.y - r.height / 2).toFixed(3) }; }
+        } catch (e) { /* ignore */ }
+        const ward = (typeof WardUI !== 'undefined' && stats.wardVec && stats.wardVec.ward) || null;
+        return { selected: sel, grid: { cols, rows, cells: cols * rows, ...g, buildingPct: +((g.building / (cols * rows)) * 100).toFixed(1) }, projCheck,
+          tilesets: ts, camera: this.snapshot().camera, ward,
+          note: 'selected.coarse が多い＋ SSE 大 → 遠景 LOD による棟の脱落が優勢（座標ずれではない）。projCheck は往復整合のみ。grid は pick の有無で、道路線は other に入る。' };
+      },
       // 64: 再現用スナップショット（読み取りのみ）。カメラ・FOV・レイヤー ON/OFF・Globe・背景 LOD・tileset ready・各レイヤー高さを 1 つにまとめる。
       snapshot() {
         const cam = viewer.camera, c = Cesium.Cartographic.fromCartesian(cam.positionWC);
