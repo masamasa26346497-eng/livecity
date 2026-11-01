@@ -1,0 +1,116 @@
+# Mission 96: INSTALL BY OWNER as .github/workflows/mission95-persist-ward.yml on the default branch
+# (replaces the Mission95 version; Claude's GitHub App cannot write .github/workflows).
+# GENERATED from persist-ward.pinned.workflow.template.yml by `node tools/mission96/pin-audit.mjs render`. Do not hand-edit hashes.
+#
+# Why this exists: the default branch lacks tools/mission80-batch.mjs, tools/mission95-persist-ward.mjs, etc.
+# This workflow therefore checks out ONE audited commit by full SHA (never a branch tip) and refuses to run unless
+# (a) HEAD == pinned SHA, (b) the tree is clean, (c) every executed file matches the sha256 embedded below IN THIS
+# (trusted, main-resident) workflow file. The token is exposed only to the read-only connect check (curl, no repo code)
+# and the single persist step, which re-verifies hashes right before it runs.
+# Owner-only: workflow_dispatch, actor == repository owner, run on the default branch. Initial scope: ward nishi only.
+name: Mission95 persist ward to private repo
+on:
+  workflow_dispatch:
+    inputs:
+      ward:
+        description: ward id (initial run is nishi only)
+        required: true
+        type: choice
+        default: nishi
+        options:
+          - nishi
+permissions:
+  contents: read
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    env:
+      PIN_SHA: "530446ea243b042f43bea0265a23d3b5211307dc"
+      DATA_REPO: masamasa26346497-eng/livecity-3d-data
+      WARD: ${{ inputs.ward }}
+    steps:
+      - name: Checkout pinned audited commit
+        uses: actions/checkout@v4
+        with:
+          ref: "530446ea243b042f43bea0265a23d3b5211307dc"
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Write trusted hash list (from this workflow file)
+        run: |
+          cat > "$RUNNER_TEMP/pin.sha256" <<'HASHES'
+          2cecaf79b421cd05eaaa601491987bfcf8246716415d5adf1f0845513e3bc8df  config/areas/osaka-city.json
+          ba3d6d64f23a8084808d67aacc331d3dd540e8d46d226e21c1c35371e7944d58  data/processed/osaka-city/boundaries/ward-classification-polygons.json
+          e0b85f229994f39e2cf331e87dccf63db81752ba68a903982afce4b2816f3fbf  data/reports/mission79/source-lock.json
+          b5dd30c9d186e105a9e9b17a8950f7042f4bb6d61d42f40b4a5473c8d4721d23  tools/mission36k-convert-citygml-runtime.mjs
+          bb2ea0322837f635fa7fa0787954520a6506b135d5fb2bd86e3774be6bcbfacc  tools/mission37b-build-3dtiles.cjs
+          a2e0e5923250d603ed4bfcc6acf144e85c98bc6f41e40a4f7a45108305dd5aed  tools/mission79-build-ward-2025.cjs
+          c40a418700c5c73afc834e30f51741003f9f679fa8f53eb77d94e27f095eb602  tools/mission79-plateau2025-fetch.mjs
+          48e1af17784a1a0b749a121fcf8e01da9cfeb6f5469b5be858bf57f0183c330d  tools/mission79-plateau2025-source.mjs
+          c95c1be46c49514e9c67a0845e52b65e221f0522fa6c62325a0bc04a5eff5657  tools/mission79-run.mjs
+          fe1e4a1ee5e6aa64ed67826c9a5a69de41cd1ee988e4aea675850ec34cf04ae2  tools/mission80-batch.mjs
+          2d734f70103ee468f7e00ad17c5c52b4fa685da79d2585adee988b4c2ea5c89d  tools/mission87-persist.mjs
+          a5617b54f962ef91fc7d8aeca48b92c0652d01b5464664b4ac1e406a08e97a4f  tools/mission95-check-output.mjs
+          4bd6d14ebfc600466be77b51d87198c8a94c0fe8303ebd9b71c8febdfcb286d2  tools/mission95-persist-ward.mjs
+          HASHES
+          sed -i 's/^ *//' "$RUNNER_TEMP/pin.sha256"
+          wc -l "$RUNNER_TEMP/pin.sha256"
+      - name: Verify pinned SHA, clean tree, file hashes (no token)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD is not the pinned SHA"; exit 1; }
+          [ -z "$(git status --porcelain)" ] || { echo "FAIL: tree not clean"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          echo "OK: pinned code verified"
+      - name: Preflight (no token, no network)
+        run: |
+          set -eu
+          [ "$WARD" = "nishi" ] || { echo "FAIL: only nishi is allowed in the initial run"; exit 1; }
+          [ "$DATA_REPO" = "masamasa26346497-eng/livecity-3d-data" ] || { echo "FAIL: unexpected data repo"; exit 1; }
+          node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const polys=JSON.parse(fs.readFileSync("data/processed/osaka-city/boundaries/ward-classification-polygons.json","utf8"));
+            const hit=polys.wards.find(x=>x.wardId===w);
+            if(!hit) throw new Error("ward not in N03 polygons: "+w);
+            if(String(hit.wardCode).startsWith("27999")) throw new Error("expo (27999) excluded");
+            const lock=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8"));
+            if(!/plateau-27100-osaka-shi-2025/.test(JSON.stringify(lock.package))) throw new Error("source lock is not 27100/2025");
+            if(!lock.license||!lock.attribution) throw new Error("license/attribution missing in source lock");
+            const codes=new Set(polys.wards.map(x=>String(x.wardCode))); if(codes.size!==polys.wards.length) throw new Error("duplicate ward codes");
+            console.log("preflight ok ward="+w+" code="+hit.wardCode+" cost=0 (public CDN range reads, free runner minutes, private repo release)");
+          '
+      - name: Connect check (read-only, curl only, no repo code)
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -u
+          if [ -z "$DATA_TOKEN" ]; then echo "FAIL: secret empty or missing"; exit 1; fi
+          echo "::add-mask::$DATA_TOKEN"
+          code=$(curl -sS -o /tmp/repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          [ "$code" = "200" ] || { echo "FAIL: repo GET HTTP $code"; exit 1; }
+          vis=$(jq -r '.visibility' /tmp/repo.json); push=$(jq -r '.permissions.push // false' /tmp/repo.json)
+          echo "repo=$DATA_REPO visibility=$vis token_push=$push"
+          [ "$vis" = "private" ] && [ "$push" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
+          echo "OK: private connection verified (read-only)"
+      - name: Convert ward (PLATEAU 2025, NO token)
+        run: node tools/mission80-batch.mjs --wards "$WARD" --max-wards 1 --ward-timeout-min 60
+      - name: Strict output check (no token)
+        run: node tools/mission95-check-output.mjs "$WARD"
+      - name: Re-verify code hashes before token use (no token)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD changed"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' || true)
+          [ -z "$bad" ] || { echo "FAIL: unexpected changes: $bad"; exit 1; }
+      - name: Persist to private repo (token only here) and verify sha256
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute
+          node tools/mission87-persist.mjs status
