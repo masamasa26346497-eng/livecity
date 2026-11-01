@@ -3,7 +3,7 @@
 //   node tools/mission85-preflight.mjs [--root temp/mission80] [--json] [--out <file>] [--free-gb N]
 // 入力は既存の source-lock / N03 区ポリゴン / area 設定 / batch-manifest / ローカル出力の有無のみ。
 // ネットワーク・子プロセス・削除・書き込み(--out 指定時の JSON 1 ファイルを除く)は行わない。
-// 区が "accepted" になる条件: manifest が ok かつ <root>/out/<ward>-2025/tileset.json が存在。どちらか欠ければ未達として表示する。
+// 区が artifactReady（変換物の準備状態。ブラウザ受入ではない）になる条件: manifest が ok かつ <root>/out/<ward>-2025/tileset.json が存在。どちらか欠ければ未達として表示する。
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,13 +35,14 @@ export function classify(plan, man, root, fsx = fs) {
   const tileset = path.join(root, 'out', plan.wardId + '-2025', 'tileset.json');
   const hasLocal = fsx.existsSync(tileset);
   const manifestStatus = mw ? mw.status : 'none';
-  const accepted = manifestStatus === 'ok' && hasLocal;
+  // artifactReady = 変換物の準備状態のみ（manifest ok ＋ tileset 存在）。実ブラウザ描画の受入ではない。
+  const artifactReady = manifestStatus === 'ok' && hasLocal;
   const reasons = [];
   if (!hasLocal) reasons.push('local output missing');
   if (manifestStatus !== 'ok') reasons.push('manifest=' + manifestStatus);
-  if (manifestStatus === 'ok' && !hasLocal) reasons.push('manifest ok but output not on this PC (not accepted)');
+  if (manifestStatus === 'ok' && !hasLocal) reasons.push('manifest ok but output not on this PC (not artifact-ready)');
   if (plan.noBldgMeshes.length) reasons.push('BLOCKER: bldg missing in lock for ' + plan.noBldgMeshes.join(','));
-  return { manifestStatus, hasLocal, accepted, reasons, buildings: mw && mw.buildings || null };
+  return { manifestStatus, hasLocal, artifactReady, reasons, buildings: mw && mw.buildings || null };
 }
 
 export function buildReport({ lock, polys, area, man, root, freeGb = null, fsx = fs }) {
@@ -52,12 +53,13 @@ export function buildReport({ lock, polys, area, man, root, freeGb = null, fsx =
   const uniq = new Set(rows.flatMap((r) => r.meshList));
   const uniqIn = lock.entries.filter((e) => uniq.has(e.mesh) && (e.kind === 'bldg' || e.kind === 'tran')).reduce((n, e) => n + e.uncompressedBytes, 0) / 1048576;
   const overCap = rows.filter((r) => r.inflatedMB > BATCH_DEFAULT_MAX_MB).map((r) => ({ ward: r.wardId, inflatedMB: r.inflatedMB, note: '既定 --max-mb ' + BATCH_DEFAULT_MAX_MB + ' を超える。--max-mb を上げないと失敗する' }));
-  const accepted = rows.filter((r) => r.accepted).length;
+  const ready = rows.filter((r) => r.artifactReady).length;
   const peak = Math.max(...rows.map((r) => r.inflatedMB));
   const outEst = +(rows.reduce((n, r) => n + r.inflatedMB, 0) * 0.035).toFixed(0);
   const report = {
     mission: '85-preflight', network: false, vintage: 2025, lockEtag: lock.http && lock.http.etag, expoExcluded: EXPO,
-    wardsPlanned: rows.length, wardsAccepted: accepted, complete: rows.length === WARD_COUNT && accepted === WARD_COUNT,
+    wardsPlanned: rows.length, wardsArtifactReady: ready, artifactsReady: rows.length === WARD_COUNT && ready === WARD_COUNT,
+    browserAccepted: false, browserAcceptanceNote: 'preflight never judges browser acceptance; use tools/mission86-acceptance.mjs',
     totals: { meshesSumPerWard: rows.reduce((n, r) => n + r.meshes, 0), meshesUnique: uniq.size, compressedMBPerWardSum: total('compressedMB'),
       inflatedMBPerWardSum: total('inflatedMB'), inflatedMBUniqueMeshes: +uniqIn.toFixed(1) },
     disk: { peakWorkMBPerWard: peak, note: 'work GML は区ごとに成功後削除。必要な空きの目安 = 最大区の展開量 x 1.5 + 出力。出力はmanifest 実績(都島 27MB/911MB 等 約3%)に余裕を見た概算 3.5%。未確定', outputEstimateMB: outEst,
@@ -74,9 +76,9 @@ export function buildReport({ lock, polys, area, man, root, freeGb = null, fsx =
 
 export function formatText(r) {
   const L = [];
-  L.push('[85] preflight (no network) wards=' + r.wardsPlanned + ' accepted=' + r.wardsAccepted + '/' + WARD_COUNT + ' complete=' + r.complete);
-  L.push('ward code ward          meshes noTran infl(MB) comp(MB) manifest local accepted');
-  for (const w of r.wards) L.push([w.wardCode, w.wardId.padEnd(14), String(w.meshes).padStart(6), String(w.noTranMeshes.length).padStart(6), String(w.inflatedMB).padStart(8), String(w.compressedMB).padStart(8), w.manifestStatus.padEnd(8), (w.hasLocal ? 'yes' : 'NO').padEnd(5), w.accepted ? 'ACCEPTED' : 'not-accepted'].join(' '));
+  L.push('[85] preflight (no network) wards=' + r.wardsPlanned + ' artifactReady=' + r.wardsArtifactReady + '/' + WARD_COUNT + ' artifactsReady=' + r.artifactsReady + ' browserAccepted=false (not judged here)');
+  L.push('ward code ward          meshes noTran infl(MB) comp(MB) manifest local artifact');
+  for (const w of r.wards) L.push([w.wardCode, w.wardId.padEnd(14), String(w.meshes).padStart(6), String(w.noTranMeshes.length).padStart(6), String(w.inflatedMB).padStart(8), String(w.compressedMB).padStart(8), w.manifestStatus.padEnd(8), (w.hasLocal ? 'yes' : 'NO').padEnd(5), w.artifactReady ? 'ARTIFACT-READY(not browser-accepted)' : 'not-ready'].join(' '));
   L.push('total meshes(per-ward sum)=' + r.totals.meshesSumPerWard + ' unique=' + r.totals.meshesUnique + ' inflated(per-ward sum)=' + r.totals.inflatedMBPerWardSum + 'MB unique=' + r.totals.inflatedMBUniqueMeshes + 'MB');
   L.push('disk: peak work/ward=' + r.disk.peakWorkMBPerWard + 'MB recommended free>=' + r.disk.recommendedFreeMB + 'MB (estimate)');
   for (const n of r.noTranWarnings) L.push('WARN no tran: ' + n.ward + ' mesh ' + n.meshes.join(',') + ' (bldg present; tran absent in official package)');
@@ -84,7 +86,8 @@ export function formatText(r) {
   for (const t of r.tranOnlyWarnings) L.push('WARN tran-only (no bldg, not fetched): ' + t.ward + ' ' + t.meshes.join(','));
   for (const b of r.blockers) L.push('BLOCKER ' + b.ward + ': ' + b.note + ' ' + b.meshes.join(','));
   if (r.diskInsufficient) L.push('BLOCKER disk: free ' + r.disk.freeGb + 'GB < recommended');
-  if (!r.complete) L.push('NOT complete: 24-ward acceptance needs every ward converted AND present locally; real-browser acceptance is separate and not done here.');
+  if (!r.artifactsReady) L.push('NOT artifact-ready for all 24 wards.');
+  L.push('NOTE: artifact-ready is NOT acceptance. Real-browser acceptance: node tools/mission86-acceptance.mjs');
   return L.join('\n');
 }
 

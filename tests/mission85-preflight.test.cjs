@@ -33,14 +33,17 @@ test('wards without local output are never accepted, even if manifest says ok; c
   const m = await P(); const i = inputs();
   const man = { wards: { kita: { status: 'ok', buildings: 5 } } };
   const none = m.buildReport({ ...i, man, root: '/nonexistent-m85' });
-  assert.strictEqual(none.wardsAccepted, 0); assert.strictEqual(none.complete, false);
-  assert.ok(none.wards.find((w) => w.wardId === 'kita').reasons.some((x) => /not accepted/.test(x)));
+  assert.strictEqual(none.wardsArtifactReady, 0); assert.strictEqual(none.artifactsReady, false);
+  assert.strictEqual(none.browserAccepted, false);
+  assert.ok(none.wards.find((w) => w.wardId === 'kita').reasons.some((x) => /not artifact-ready/.test(x)));
   const fake = { existsSync: () => true };
   const all = Object.fromEntries(i.polys.wards.map((w) => [w.wardId, { status: 'ok', buildings: 1 }]));
   const full = m.buildReport({ ...i, man: { wards: all }, root: 'x', fsx: fake });
-  assert.strictEqual(full.complete, true);
+  assert.strictEqual(full.artifactsReady, true);
+  assert.strictEqual(full.browserAccepted, false); // artifact-ready は受入ではない
+  assert.ok(!('complete' in full) && !('wardsAccepted' in full));
   delete all.kita; const part = m.buildReport({ ...i, man: { wards: all }, root: 'x', fsx: fake });
-  assert.strictEqual(part.complete, false);
+  assert.strictEqual(part.artifactsReady, false);
 });
 test('wards above the batch default --max-mb are flagged', async () => {
   const m = await P(); const r = m.buildReport({ ...inputs(), man: null, root: '/nonexistent-m85' });
