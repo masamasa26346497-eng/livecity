@@ -30,7 +30,7 @@ export function inspectOut(dir) {
   if (!fs.existsSync(path.join(dir, 'tileset.json'))) throw new Error('tileset.json not found: ' + dir);
   const src = JSON.parse(fs.readFileSync(path.join(dir, 'source.json'), 'utf8'));
   if (String(src.wardCode).startsWith('27999')) throw new Error('expo (27999) is excluded');
-  if (src.vintage && String(src.vintage) !== '2025') throw new Error('vintage is not 2025: ' + src.vintage);
+  if (String(src.vintage) !== '2025') throw new Error('vintage is not 2025: ' + src.vintage);
   const files = []; let bytes = 0;
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     if (DENY.test(e.name)) throw new Error('denied name: ' + e.name);
@@ -66,39 +66,56 @@ export function pack(ward, root) {
   saveManifest(m); return m.wards[ward];
 }
 
-function gh(args) { const r = spawnSync('gh', args, { encoding: 'utf8' }); return { code: r.status === null ? 1 : r.status, out: (r.stdout || '') + (r.stderr || '') }; }
+export const TOKEN_ENV = 'LIVECITY_3D_DATA_TOKEN';
+export function validRepo(r) { return typeof r === 'string' && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(r); }
+// 明示 repo のときは専用 token (fine-grained PAT) だけを gh に渡す。token 値はログに出さない。
+function gh(args, repo) {
+  const env = Object.assign({}, process.env);
+  if (repo) {
+    if (!process.env[TOKEN_ENV]) throw new Error(TOKEN_ENV + ' is not set: refusing (no fallback to other credentials)');
+    env.GH_TOKEN = process.env[TOKEN_ENV]; delete env.GITHUB_TOKEN;
+  }
+  const r = spawnSync('gh', args, { encoding: 'utf8', env });
+  const scrub = (t) => (repo ? String(t || '').split(env.GH_TOKEN).join('***') : String(t || ''));
+  return { code: r.status === null ? 1 : r.status, out: scrub(r.stdout) + scrub(r.stderr) };
+}
 
-export function upload(ward, { execute = false, allowPublic = false } = {}) {
+export function upload(ward, { execute = false, allowPublic = false, repo = null } = {}) {
+  if (repo !== null && !validRepo(repo)) throw new Error('invalid --repo (owner/name)');
+  if (repo && allowPublic) throw new Error('--allow-public cannot be combined with an explicit --repo: private is mandatory');
   const m = loadManifest(); const e = m.wards[ward];
   if (!e || !fs.existsSync(path.join(ARCHIVE_DIR, e.asset))) throw new Error('pack first: ' + ward);
   const f = path.join(ARCHIVE_DIR, e.asset);
   if (sha256File(f) !== e.sha256) throw new Error('local archive hash changed since pack');
   if (!execute) { console.log('[87] dry-run: would upload ' + e.asset + ' (' + e.archiveBytes + ' bytes) to release ' + TAG); return { dryRun: true }; }
-  const vis = gh(['repo', 'view', '--json', 'visibility']);
+  const R = repo ? ['--repo', repo] : [];
+  const vis = gh(['repo', 'view'].concat(repo ? [repo] : [], ['--json', 'visibility']), repo);
   if (vis.code !== 0) throw new Error('gh repo view failed: ' + vis.out.slice(0, 200));
   const visibility = JSON.parse(vis.out).visibility;
   if (visibility !== 'PRIVATE' && !allowPublic) throw new Error('repository visibility is ' + visibility + ': upload would publish data. Owner approval required (--allow-public).');
-  const rel = gh(['release', 'view', TAG, '--json', 'assets']);
+  const rel = gh(['release', 'view', TAG, '--json', 'assets'].concat(R), repo);
   if (rel.code !== 0) {
-    const c = gh(['release', 'create', TAG, '--prerelease', '--title', 'PLATEAU 2025 converted building artifacts', '--notes', 'Official Osaka City (27100) PLATEAU 2025 converted 3D Tiles. Not browser-accepted. Source: MLIT Project PLATEAU.']);
+    const c = gh(['release', 'create', TAG, '--prerelease', '--title', 'PLATEAU 2025 converted building artifacts', '--notes', 'Official Osaka City (27100) PLATEAU 2025 converted 3D Tiles. Not browser-accepted. Source: MLIT Project PLATEAU.'].concat(R), repo);
     if (c.code !== 0) throw new Error('release create failed: ' + c.out.slice(0, 200));
   } else {
     const a = (JSON.parse(rel.out).assets || []).find((x) => x.name === e.asset);
     if (a && a.size === e.archiveBytes) { console.log('[87] already uploaded (same size), skip; run verify'); e.status = 'uploaded'; saveManifest(m); return { skipped: true }; }
   }
-  const u = gh(['release', 'upload', TAG, f, '--clobber']);
+  const u = gh(['release', 'upload', TAG, f, '--clobber'].concat(R), repo);
   if (u.code !== 0) throw new Error('upload failed: ' + u.out.slice(0, 200));
-  e.status = 'uploaded'; e.visibility = visibility; e.uploadedAt = new Date().toISOString(); saveManifest(m);
+  e.status = 'uploaded'; e.visibility = visibility; e.repo = repo || null; e.uploadedAt = new Date().toISOString(); saveManifest(m);
   return { uploaded: true };
 }
 
-export function verify(ward) {
+export function verify(ward, { repo = null } = {}) {
+  if (repo !== null && !validRepo(repo)) throw new Error('invalid --repo (owner/name)');
+  if (repo) { const v = gh(['repo', 'view', repo, '--json', 'visibility'], repo); if (v.code !== 0 || JSON.parse(v.out).visibility !== 'PRIVATE') throw new Error('target repo is not verified PRIVATE'); }
   const m = loadManifest(); const e = m.wards[ward];
   if (!e) throw new Error('not in manifest: ' + ward);
   const d = path.join('temp/mission87/verify', ward); fs.mkdirSync(d, { recursive: true });
   const f = path.join(d, e.asset);
   if (fs.existsSync(f)) throw new Error('verify dir not empty, remove it first: ' + d);
-  const g = gh(['release', 'download', TAG, '--pattern', e.asset, '--dir', d]);
+  const g = gh(['release', 'download', TAG, '--pattern', e.asset, '--dir', d].concat(repo ? ['--repo', repo] : []), repo);
   if (g.code !== 0) throw new Error('download failed: ' + g.out.slice(0, 200));
   const h = sha256File(f); if (h !== e.sha256) throw new Error('sha256 mismatch: ' + h);
   const t = spawnSync('tar', ['-tzf', f], { encoding: 'utf8' }); if (t.status !== 0 || !/tileset\.json/.test(t.stdout)) throw new Error('archive content check failed');
@@ -116,8 +133,8 @@ function main() {
   const root = opt('root', 'temp/mission80'); const ward = opt('ward');
   if (cmd === 'status') console.log(JSON.stringify(status()));
   else if (cmd === 'pack') console.log(JSON.stringify(pack(ward, root)));
-  else if (cmd === 'upload') console.log(JSON.stringify(upload(ward, { execute: a.includes('--execute'), allowPublic: a.includes('--allow-public') })));
-  else if (cmd === 'verify') console.log(JSON.stringify(verify(ward)));
+  else if (cmd === 'upload') console.log(JSON.stringify(upload(ward, { execute: a.includes('--execute'), allowPublic: a.includes('--allow-public'), repo: opt('repo') })));
+  else if (cmd === 'verify') console.log(JSON.stringify(verify(ward, { repo: opt('repo') })));
   else { console.error('usage: status|pack|upload|verify --ward <id>'); process.exit(2); }
 }
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

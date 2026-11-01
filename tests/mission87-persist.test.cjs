@@ -38,3 +38,13 @@ test('tool stays out of git: archives under temp/, no merge/delete of sources, p
 test('status never reports browser acceptance', async () => {
   const m = await P(); assert.strictEqual(m.status().browserAccepted, 0);
 });
+
+test('mission92: explicit private repo targeting, token required, no public bypass', async () => {
+  const m = await P();
+  const s = fs.readFileSync(path.join(ROOT, 'tools/mission87-persist.mjs'), 'utf8');
+  assert.ok(m.validRepo('masamasa26346497-eng/livecity-3d-data'));
+  assert.ok(!m.validRepo('bad repo;x') && !m.validRepo('a/b/c'));
+  assert.throws(() => m.upload('x', { repo: 'bad repo' }), /invalid --repo/);
+  assert.throws(() => m.upload('x', { repo: 'a/b', allowPublic: true }), /private is mandatory/);
+  assert.ok(/LIVECITY_3D_DATA_TOKEN/.test(s) && /delete env.GITHUB_TOKEN/.test(s) && /not verified PRIVATE/.test(s));
+});
