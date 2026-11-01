@@ -107,8 +107,19 @@ jobs:
             if(b.mission!==a.mission||String(b.vintage)!==String(a.vintage)) throw new Error("manifest header changed");
             for(const k of Object.keys(a.wards||{})){ if(k!==w && !same(a.wards[k],b.wards[k])) throw new Error("other ward entry modified: "+k); }
             for(const k of Object.keys(b.wards||{})){ if(k!==w && !(k in a.wards)) throw new Error("unexpected new ward entry: "+k); }
-            const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!same(a[k],b[k]));
+            // Mission99: mission80-batch also rewrites totals/lastRun/source/crossWardDuplicateIds. Allowed only if each is validated.
+            const DERIVED=["totals","lastRun","source","crossWardDuplicateIds"];
+            const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!DERIVED.includes(k)&&!same(a[k],b[k]));
             if(extra.length) throw new Error("unexpected top-level keys changed: "+extra);
+            const ok=Object.values(b.wards).filter(x=>x&&x.status==="ok"), fl=Object.values(b.wards).filter(x=>x&&x.status==="failed");
+            if(b.totals!==undefined){ const t=b.totals, e={wardsOk:ok.length,wardsFailed:fl.length,buildings:ok.reduce((n,x)=>n+x.buildings,0),outBytes:ok.reduce((n,x)=>n+x.outBytes,0)};
+              if(!same(t,e)) throw new Error("totals inconsistent with wards: "+JSON.stringify(t)+" vs "+JSON.stringify(e)); }
+            if(b.lastRun!==undefined){ const r=b.lastRun;
+              if(!r||typeof r!=="object"||!Number.isInteger(r.processed)||r.processed>1||r.failedNow!==0||typeof r.at!=="string"||Object.keys(r).some(k=>!["processed","failedNow","stoppedBy","at"].includes(k))) throw new Error("lastRun invalid: "+JSON.stringify(r)); }
+            if(b.source!==undefined){ const L=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8")), s=b.source;
+              if(s.url!==(L.resource&&L.resource.url)||s.etag!==(L.http&&L.http.etag)||s.bytes!==(L.http&&L.http.contentLength)||s.lastModified!==(L.http&&L.http.lastModified)) throw new Error("manifest source differs from hash-verified source-lock"); }
+            if(b.crossWardDuplicateIds!==undefined){ const d=b.crossWardDuplicateIds;
+              if(!d||typeof d!=="object"||Array.isArray(d)||Object.values(d).some(v=>!Number.isInteger(v))) throw new Error("crossWardDuplicateIds invalid"); }
             if(!b.wards[w]) throw new Error("target ward entry missing");
             console.log("manifest diff ok: only wards."+w+" and updatedAt may differ");
           '
