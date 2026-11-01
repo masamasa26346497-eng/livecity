@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+// Mission 87: 24 区 PLATEAU 2025 変換済み建物成果物の GitHub Releases 永続保管（pack / upload / verify / status）。
+//   node tools/mission87-persist.mjs status
+//   node tools/mission87-persist.mjs pack   --ward fukushima [--root temp/mission80]
+//   node tools/mission87-persist.mjs upload --ward fukushima --execute [--allow-public]   (既定は dry-run。公開リポジトリは --allow-public が無いと拒否)
+//   node tools/mission87-persist.mjs verify --ward fukushima        (Release から再取得して sha256 と tar 内容を検証)
+// 通常 Git には一切追加しない（アーカイブは temp/mission87、gitignore 済み）。区別 manifest のみ data/reports/mission87/ に残す。
+// 対象は公式大阪市 27100 / 2025 の建物変換物（tileset/glb/ids/attrs/source/build-report）のみ。万博 27999・写真・秘密情報は拒否。
+// 変換済みであることの記録であり、実ブラウザ受入（Mission86）ではない。
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+export const TAG = 'plateau2025-converted';
+export const MANIFEST = 'data/reports/mission87/storage-manifest.json';
+export const ARCHIVE_DIR = 'temp/mission87/archives';
+export const MAX_ASSET_BYTES = 2 * 1024 * 1024 * 1024 - 1; // GitHub release asset 上限 2GiB 未満
+export const ALLOWED_TOP = new Set(['tileset.json', 'source.json', 'build-report.json']);
+export const ALLOWED_DIRS = new Set(['ids', 'attrs']);
+export const DENY = /(\.env|secret|token|apikey|api_key|photo|google|\.pem|\.key)/i;
+
+export function validWard(w) { return typeof w === 'string' && /^[a-z]+$/.test(w); }
+export function assetName(ward) { return 'plateau2025-' + ward + '.tar.gz'; }
+export function sha256File(f) { const h = crypto.createHash('sha256'); h.update(fs.readFileSync(f)); return h.digest('hex'); }
+
+// 成果物ディレクトリの内容を検査し、同梱ファイル一覧を返す。違反は throw（黙って除外しない）。
+export function inspectOut(dir) {
+  if (!fs.existsSync(path.join(dir, 'tileset.json'))) throw new Error('tileset.json not found: ' + dir);
+  const src = JSON.parse(fs.readFileSync(path.join(dir, 'source.json'), 'utf8'));
+  if (String(src.wardCode).startsWith('27999')) throw new Error('expo (27999) is excluded');
+  if (src.vintage && String(src.vintage) !== '2025') throw new Error('vintage is not 2025: ' + src.vintage);
+  const files = []; let bytes = 0;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (DENY.test(e.name)) throw new Error('denied name: ' + e.name);
+    if (e.isDirectory()) {
+      if (!ALLOWED_DIRS.has(e.name) && !/^(glb|tiles|lod|content)$/.test(e.name)) throw new Error('unexpected dir: ' + e.name);
+      const walk = (d) => { for (const x of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, x.name); if (DENY.test(x.name)) throw new Error('denied name: ' + p); if (x.isDirectory()) walk(p); else { files.push(path.relative(dir, p)); bytes += fs.statSync(p).size; } } };
+      walk(path.join(dir, e.name));
+    } else if (ALLOWED_TOP.has(e.name) || /\.glb$/.test(e.name)) { files.push(e.name); bytes += fs.statSync(path.join(dir, e.name)).size; }
+    else throw new Error('unexpected file: ' + e.name);
+  }
+  return { wardCode: String(src.wardCode), vintage: src.vintage || null, files: files.length, bytes };
+}
+
+export function loadManifest() { return fs.existsSync(MANIFEST) ? JSON.parse(fs.readFileSync(MANIFEST, 'utf8')) : { tag: TAG, wards: {} }; }
+export function saveManifest(m) {
+  fs.mkdirSync(path.dirname(MANIFEST), { recursive: true });
+  const tmp = MANIFEST + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(m, null, 2)); fs.renameSync(tmp, MANIFEST); // atomic
+}
+
+export function pack(ward, root) {
+  if (!validWard(ward)) throw new Error('invalid ward');
+  const dir = path.join(root, 'out', ward + '-2025');
+  const info = inspectOut(dir);
+  fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
+  const out = path.join(ARCHIVE_DIR, assetName(ward));
+  if (fs.existsSync(out)) throw new Error('archive exists, not overwriting: ' + out);
+  const r = spawnSync('tar', ['-czf', out, '-C', dir, '.'], { stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('tar failed');
+  const bytes = fs.statSync(out).size;
+  if (bytes > MAX_ASSET_BYTES) throw new Error('archive exceeds release asset limit: ' + bytes);
+  const m = loadManifest();
+  m.wards[ward] = { ...(m.wards[ward] || {}), ward, wardCode: info.wardCode, vintage: info.vintage, files: info.files, srcBytes: info.bytes, asset: assetName(ward), archiveBytes: bytes, sha256: sha256File(out), status: 'packed', browserAccepted: false };
+  saveManifest(m); return m.wards[ward];
+}
+
+function gh(args) { const r = spawnSync('gh', args, { encoding: 'utf8' }); return { code: r.status === null ? 1 : r.status, out: (r.stdout || '') + (r.stderr || '') }; }
+
+export function upload(ward, { execute = false, allowPublic = false } = {}) {
+  const m = loadManifest(); const e = m.wards[ward];
+  if (!e || !fs.existsSync(path.join(ARCHIVE_DIR, e.asset))) throw new Error('pack first: ' + ward);
+  const f = path.join(ARCHIVE_DIR, e.asset);
+  if (sha256File(f) !== e.sha256) throw new Error('local archive hash changed since pack');
+  if (!execute) { console.log('[87] dry-run: would upload ' + e.asset + ' (' + e.archiveBytes + ' bytes) to release ' + TAG); return { dryRun: true }; }
+  const vis = gh(['repo', 'view', '--json', 'visibility']);
+  if (vis.code !== 0) throw new Error('gh repo view failed: ' + vis.out.slice(0, 200));
+  const visibility = JSON.parse(vis.out).visibility;
+  if (visibility !== 'PRIVATE' && !allowPublic) throw new Error('repository visibility is ' + visibility + ': upload would publish data. Owner approval required (--allow-public).');
+  const rel = gh(['release', 'view', TAG, '--json', 'assets']);
+  if (rel.code !== 0) {
+    const c = gh(['release', 'create', TAG, '--prerelease', '--title', 'PLATEAU 2025 converted building artifacts', '--notes', 'Official Osaka City (27100) PLATEAU 2025 converted 3D Tiles. Not browser-accepted. Source: MLIT Project PLATEAU.']);
+    if (c.code !== 0) throw new Error('release create failed: ' + c.out.slice(0, 200));
+  } else {
+    const a = (JSON.parse(rel.out).assets || []).find((x) => x.name === e.asset);
+    if (a && a.size === e.archiveBytes) { console.log('[87] already uploaded (same size), skip; run verify'); e.status = 'uploaded'; saveManifest(m); return { skipped: true }; }
+  }
+  const u = gh(['release', 'upload', TAG, f, '--clobber']);
+  if (u.code !== 0) throw new Error('upload failed: ' + u.out.slice(0, 200));
+  e.status = 'uploaded'; e.visibility = visibility; e.uploadedAt = new Date().toISOString(); saveManifest(m);
+  return { uploaded: true };
+}
+
+export function verify(ward) {
+  const m = loadManifest(); const e = m.wards[ward];
+  if (!e) throw new Error('not in manifest: ' + ward);
+  const d = path.join('temp/mission87/verify', ward); fs.mkdirSync(d, { recursive: true });
+  const f = path.join(d, e.asset);
+  if (fs.existsSync(f)) throw new Error('verify dir not empty, remove it first: ' + d);
+  const g = gh(['release', 'download', TAG, '--pattern', e.asset, '--dir', d]);
+  if (g.code !== 0) throw new Error('download failed: ' + g.out.slice(0, 200));
+  const h = sha256File(f); if (h !== e.sha256) throw new Error('sha256 mismatch: ' + h);
+  const t = spawnSync('tar', ['-tzf', f], { encoding: 'utf8' }); if (t.status !== 0 || !/tileset\.json/.test(t.stdout)) throw new Error('archive content check failed');
+  e.status = 'verified'; e.verifiedAt = new Date().toISOString(); saveManifest(m); return { ward, sha256: h };
+}
+
+export function status() {
+  const m = loadManifest(); const w = Object.values(m.wards);
+  return { stored: w.filter((x) => x.status === 'verified').length, uploaded: w.filter((x) => x.status === 'uploaded' || x.status === 'verified').length, packed: w.length, of: 24, browserAccepted: 0 };
+}
+
+function main() {
+  const a = process.argv.slice(2); const cmd = a[0];
+  const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
+  const root = opt('root', 'temp/mission80'); const ward = opt('ward');
+  if (cmd === 'status') console.log(JSON.stringify(status()));
+  else if (cmd === 'pack') console.log(JSON.stringify(pack(ward, root)));
+  else if (cmd === 'upload') console.log(JSON.stringify(upload(ward, { execute: a.includes('--execute'), allowPublic: a.includes('--allow-public') })));
+  else if (cmd === 'verify') console.log(JSON.stringify(verify(ward)));
+  else { console.error('usage: status|pack|upload|verify --ward <id>'); process.exit(2); }
+}
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  try { main(); } catch (e) { console.error('FAILED', e.message); process.exit(1); }
+}
