@@ -17,7 +17,7 @@ export const WARD_COUNT = 24;
 export function parseArgs(a) {
   const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 && a[i + 1] !== undefined ? a[i + 1] : d; };
   const has = (k) => a.includes('--' + k);
-  const o = { wards: opt('wards'), port: opt('port', '8137'), maxWards: opt('max-wards'), deadlineMin: opt('deadline-min'),
+  const o = { wards: opt('wards'), port: opt('port', '8137'), maxWards: opt('max-wards'), deadlineMin: opt('deadline-min'), maxMb: opt('max-mb'),
     noConvert: has('no-convert') || has('serve-only'), dryRun: has('dry-run') };
   if (!/^\d+$/.test(String(o.port)) || Number(o.port) < 1024 || Number(o.port) > 65535) throw new Error('invalid --port');
   if (o.wards && !/^[a-z]+(,[a-z]+)*$/.test(o.wards)) throw new Error('invalid --wards');
@@ -28,6 +28,7 @@ export function batchArgs(o) {
   const args = ['tools/mission80-batch.mjs'];
   if (o.wards) args.push('--wards', o.wards);
   if (o.maxWards) args.push('--max-wards', String(Number(o.maxWards)));
+  if (o.maxMb) { if (!/^\d+$/.test(String(o.maxMb))) throw new Error('invalid --max-mb'); args.push('--max-mb', String(Number(o.maxMb))); }
   if (o.deadlineMin) args.push('--deadline-min', String(Number(o.deadlineMin)));
   return args;
 }
