@@ -43,6 +43,34 @@
    "wardId": "fukushima",
    "ms": 41188,
    "finishedAt": "2026-11-01T01:11:54.448Z"
+  },
+  "konohana": {
+   "status": "failed",
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "error": "Command failed: /usr/local/bin/node tools/mission79-run.mjs --ward konohana --max-mb 1200 --work /home/runner/work/livecity/livecity/temp/mission80/work/konohana --final /home/runner/work/livecity/livecity/temp/mission80/out/konohana-2025",
+   "ms": 46838
+  },
+  "minato": {
+   "status": "ok",
+   "wardCode": "27107",
+   "vintage": 2025,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "sourceBytes": 1580421888,
+   "meshes": 16,
+   "buildings": 17200,
+   "sourceBuildings": 17200,
+   "skipped": 0,
+   "fallbacks": 0,
+   "uniqueIds": 17200,
+   "idCount": 17200,
+   "idsUnique": true,
+   "glbBytes": 22933280,
+   "outBytes": 25755990,
+   "tilesetSha256": "42e6d7db60b7dc3b2500a4a756867559bb113998cc98c8374726d93409cea72b",
+   "wardId": "minato",
+   "ms": 22504,
+   "finishedAt": "2026-11-01T04:45:22.299Z"
   }
  },
  "source": {
@@ -51,5 +79,18 @@
   "bytes": 1580421888,
   "lastModified": "Tue, 03 Mar 2026 00:15:56 GMT"
  },
- "updatedAt": "2026-11-01T01:11:54.480Z"
+ "updatedAt": "2026-11-01T04:45:22.341Z",
+ "crossWardDuplicateIds": {},
+ "totals": {
+  "wardsOk": 3,
+  "wardsFailed": 1,
+  "buildings": 48263,
+  "outBytes": 73465781
+ },
+ "lastRun": {
+  "processed": 2,
+  "failedNow": 1,
+  "stoppedBy": null,
+  "at": "2026-11-01T04:45:22.341Z"
+ }
 }

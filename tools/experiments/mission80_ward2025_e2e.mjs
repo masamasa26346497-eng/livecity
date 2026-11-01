@@ -13,7 +13,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const GOOGLE = /(^|\.)(googleapis\.com|google\.com|gstatic\.com|googletagmanager\.com|google-analytics\.com)$/i;
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.jpg': 'image/jpeg', '.png': 'image/png' };
 const pub = path.resolve('public');
-const extDir = (name) => path.resolve('temp/mission79', name.replace(/25$/, '') + '-2025');
+// 入力は mission79 出力、なければ mission80 バッチ出力（Mission 83B）。いずれも temp/ 配下・読み取り専用。
+const extDir = (name) => {
+  const base = name.replace(/25$/, '') + '-2025';
+  const c = [path.resolve('temp/mission79', base), path.resolve('temp/mission80/out', base)];
+  return c.find((d) => fs.existsSync(path.join(d, 'source.json'))) || c[0];
+};
 const srv = http.createServer((req, res) => {
   const u = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   let p;

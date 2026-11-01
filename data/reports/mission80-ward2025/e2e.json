@@ -1,156 +1,84 @@
 {
  "mission": "80",
  "browser": "Chrome/156.0.8078.47",
- "generatedAt": "2026-11-01T01:06:41.425Z",
+ "generatedAt": "2026-11-01T04:45:43.144Z",
  "headless": true,
  "note": "software rendering; timings are not device values",
  "googleRequests": [],
  "httpErrors": [
   "404 http://127.0.0.1:8180/ext-3dtiles/index.json",
-  "404 http://127.0.0.1:8180/ext-3dtiles/nishi25/layers/layers-report.json",
-  "404 http://127.0.0.1:8180/ext-3dtiles/index.json",
-  "404 http://127.0.0.1:8180/ext-3dtiles/fukushima25/layers/layers-report.json"
+  "404 http://127.0.0.1:8180/ext-3dtiles/minato25/layers/layers-report.json"
  ],
- "http200": 146,
+ "http200": 96,
  "jsErrors": [],
  "wards": [
   {
-   "ward": "nishi",
-   "wardCode": "27106",
+   "ward": "minato",
+   "wardCode": "27107",
    "vintage": 2025,
-   "expectedBuildings": 12603,
-   "url": "http://127.0.0.1:8180/mission37g-osaka-24ward-mvp.html?qa=1&fac=0&nobuiltin=1&ext=nishi25",
+   "expectedBuildings": 17200,
+   "url": "http://127.0.0.1:8180/mission37g-osaka-24ward-mvp.html?qa=1&fac=0&nobuiltin=1&ext=minato25",
    "steps": {},
-   "startupMs": 11953,
-   "mountMs": 3006,
+   "startupMs": 8921,
+   "mountMs": 2553,
    "tilesets": {
     "n": 1,
     "bases": [
-     "ext-3dtiles/nishi25/"
+     "ext-3dtiles/minato25/"
     ],
-    "heapMB": 91
+    "heapMB": 68
    },
    "buildingState": "ready",
-   "hudBuildings": "12,603",
+   "hudBuildings": "17,200",
    "coverageNote": "3D建物を表示中（この区のみ）",
    "tilesetStats": null,
    "far": {
-    "shot": "nishi-far.jpg",
+    "shot": "minato-far.jpg",
     "tilesets": {
      "n": 1,
      "bases": [
-      "ext-3dtiles/nishi25/"
+      "ext-3dtiles/minato25/"
      ],
-     "heapMB": 97
+     "heapMB": 76
     },
     "camera": [
      {
-      "distM": 9395,
-      "radiusM": 2158
+      "distM": 9033,
+      "radiusM": 2835
      }
     ]
    },
    "mid": {
-    "shot": "nishi-mid.jpg"
+    "shot": "minato-mid.jpg"
    },
    "clicks": [
     {
-     "id": "bldg_a4492901-0a7f-4beb-946e-67f6d5595d9b",
-     "height": 111.1,
+     "id": "bldg_1ca74993-cf35-478b-bec2-79855d558538",
+     "height": 67.2,
      "realMouseClick": true,
      "selected": true,
-     "shot": "nishi-click-a4492901.jpg",
+     "shot": "minato-click-1ca74993.jpg",
      "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
     },
     {
-     "id": "bldg_f88b12f4-cfcd-44a0-aeac-f0003754d382",
-     "height": 108.2,
+     "id": "bldg_efd0147a-85da-43d8-9e33-e2f2163fa70d",
+     "height": 66.3,
      "realMouseClick": true,
      "selected": true,
-     "shot": "nishi-click-f88b12f4.jpg",
+     "shot": "minato-click-efd0147a.jpg",
      "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
     },
     {
-     "id": "bldg_cdccb570-a9e4-4472-85f6-9071649d3020",
-     "height": 106.5,
+     "id": "bldg_196a1dba-a307-4794-b28a-48e82fea8f29",
+     "height": 64.9,
      "realMouseClick": true,
      "selected": true,
-     "shot": "nishi-click-cdccb570.jpg",
+     "shot": "minato-click-196a1dba.jpg",
      "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
     }
    ],
    "near": {
-    "shot": "nishi-near.jpg"
-   },
-   "pass": true
-  },
-  {
-   "ward": "fukushima",
-   "wardCode": "27103",
-   "vintage": 2025,
-   "expectedBuildings": 13412,
-   "url": "http://127.0.0.1:8180/mission37g-osaka-24ward-mvp.html?qa=1&fac=0&nobuiltin=1&ext=fukushima25",
-   "steps": {},
-   "startupMs": 10039,
-   "mountMs": 2400,
-   "tilesets": {
-    "n": 1,
-    "bases": [
-     "ext-3dtiles/fukushima25/"
-    ],
-    "heapMB": 129
-   },
-   "buildingState": "ready",
-   "hudBuildings": "13,412",
-   "coverageNote": "3D建物を表示中（この区のみ）",
-   "tilesetStats": null,
-   "far": {
-    "shot": "fukushima-far.jpg",
-    "tilesets": {
-     "n": 1,
-     "bases": [
-      "ext-3dtiles/fukushima25/"
-     ],
-     "heapMB": 139
-    },
-    "camera": [
-     {
-      "distM": 8728,
-      "radiusM": 1826
-     }
-    ]
-   },
-   "mid": {
-    "shot": "fukushima-mid.jpg"
-   },
-   "clicks": [
-    {
-     "id": "bldg_0f58aac4-807b-418c-a5be-90acbad15cde",
-     "height": 119.5,
-     "realMouseClick": true,
-     "selected": true,
-     "shot": "fukushima-click-0f58aac4.jpg",
-     "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
-    },
-    {
-     "id": "bldg_5bec4a71-3b18-459b-b65b-1e53a7ef28c0",
-     "height": 115.1,
-     "realMouseClick": true,
-     "selected": true,
-     "shot": "fukushima-click-5bec4a71.jpg",
-     "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
-    },
-    {
-     "id": "bldg_a4f27984-3fc4-4d19-a8e2-3f055a84e1db",
-     "height": 113.1,
-     "realMouseClick": true,
-     "selected": true,
-     "shot": "fukushima-click-a4f27984.jpg",
-     "panel": "\n\n\n  \n  \n    LIVE CITY\n    大阪市24区 · 地図ビュー\n  \n  \n    \n    \n  \n  \n    観光・施設\n    不動"
-    }
-   ],
-   "near": {
-    "shot": "fukushima-near.jpg"
+    "shot": "minato-near.jpg"
    },
    "pass": true
   }
