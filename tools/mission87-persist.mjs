@@ -99,7 +99,13 @@ export function upload(ward, { execute = false, allowPublic = false, repo = null
     if (c.code !== 0) throw new Error('release create failed: ' + c.out.slice(0, 200));
   } else {
     const a = (JSON.parse(rel.out).assets || []).find((x) => x.name === e.asset);
-    if (a && a.size === e.archiveBytes) { console.log('[87] already uploaded (same size), skip; run verify'); e.status = 'uploaded'; saveManifest(m); return { skipped: true }; }
+    // Mission 95: 同サイズ一致だけでは再開済みと判定しない。再取得した実体の sha256 が一致した場合だけスキップ。
+    if (a) {
+      fs.mkdirSync('temp/mission87/resume', { recursive: true }); const rd = fs.mkdtempSync(path.join('temp/mission87/resume', ward + '-'));
+      const dl = gh(['release', 'download', TAG, '--pattern', e.asset, '--dir', rd].concat(R), repo);
+      if (dl.code === 0 && fs.existsSync(path.join(rd, e.asset)) && sha256File(path.join(rd, e.asset)) === e.sha256) { console.log('[87] already uploaded (sha256 matches), skip; run verify'); e.status = 'uploaded'; saveManifest(m); return { skipped: true, by: 'sha256' }; }
+      console.log('[87] remote asset exists but sha256 differs or is unreadable: re-uploading');
+    }
   }
   const u = gh(['release', 'upload', TAG, f, '--clobber'].concat(R), repo);
   if (u.code !== 0) throw new Error('upload failed: ' + u.out.slice(0, 200));
