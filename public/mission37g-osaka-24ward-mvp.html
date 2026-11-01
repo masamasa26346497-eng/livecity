@@ -3013,6 +3013,8 @@
       },
       tilesReady: () => stats.buildingState !== 'loading' && (!tileset || tileset.tilesLoaded) && extraSets.every((e) => e.tileset.tilesLoaded),
       setBuildingWard,
+      // 88: 実 WebGL canvas の読み戻し。scene.render() 直後の同一タスクで toDataURL する（preserveDrawingBuffer 無しでも有効）。読み取りのみ。
+      readbackCanvas() { scene.render(); return scene.canvas.toDataURL('image/png'); },
       // 44A: カメラと mount 中 tileset 境界球の中心との距離 / 半径（区を選んだ後に建物へ寄れているかの診断。読み取りのみ）
       cameraVsTilesets() {
         const out = [];

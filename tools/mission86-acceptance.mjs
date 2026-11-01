@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { planWard } from './mission85-preflight.mjs';
+import { bodyDigest } from './mission88-collect-evidence.mjs';
 
 export const WARD_COUNT = 24;
 export const VINTAGE = 2025;
@@ -36,6 +37,11 @@ export function checkEvidenceEnvelope(ev, wardId) {
   if (!ev.executedAt || Number.isNaN(Date.parse(ev.executedAt))) bad.push('executedAt missing');
   if (!(ev.googleRequests && Array.isArray(ev.googleRequests) && ev.googleRequests.length === 0)) bad.push('googleRequests must be an empty array');
   if (Array.isArray(ev.jsErrors) ? ev.jsErrors.length > 0 : true) bad.push('jsErrors must be an empty array');
+  // Mission88 収集器の証拠（collector/integrity を持つもの）は、ダイジェスト一致と collection.status=ok を要求する（改ざん・取り違えの検出。署名ではない）。
+  if (ev.integrity || ev.collector) {
+    if (!ev.integrity || ev.integrity.digest !== bodyDigest(ev)) bad.push('integrity digest mismatch (evidence edited after collection)');
+    if (!ev.collection || ev.collection.status !== 'ok') bad.push('collection.status must be ok (got ' + (ev.collection && ev.collection.status) + ')');
+  }
   return bad;
 }
 
