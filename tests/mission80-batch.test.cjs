@@ -105,3 +105,13 @@ test('real 2025 outputs: building representative points lie in the ward lat/lon 
     assert.ok(n > 0);
   }
 });
+
+// Mission 82B: synchronous per-ward execution and guards (static)
+test('mission80-batch: sync execution with guards', () => {
+  const s = read('tools/mission80-batch.mjs');
+  assert.match(s, /execFileSync\(process\.execPath/);
+  assert.doesNotMatch(s, /detached|\.unref\(|spawn\(/);
+  assert.match(s, /max-wards/); assert.match(s, /deadline-min/); assert.match(s, /timeout: wardTimeout/);
+  assert.match(s, /renameSync\(tmp, MANIFEST\)/);
+  assert.match(s, /process\.exitCode = 1/);
+});
