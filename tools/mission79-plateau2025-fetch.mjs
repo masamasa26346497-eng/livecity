@@ -40,8 +40,15 @@ async function main() {
   if (!o.meshes.length || !o.meshes.every((m) => /^\d{8}$/.test(m))) throw new Error('--meshes required (8-digit mesh codes)');
   const lock = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
   const sel = lock.entries.filter((e) => o.meshes.includes(e.mesh) && o.kinds.includes(e.kind));
-  const missing = o.meshes.filter((m) => !sel.some((e) => e.mesh === m));
+  const missing = o.meshes.filter((m) => !lock.entries.some((e) => e.mesh === m));
   if (missing.length) throw new Error('meshes not in 2025 lock: ' + missing.join(','));
+  // Mission 84: a mesh may exist in the lock for some kinds only (e.g. 51357341 has bldg but no tran in the official
+  // package). tran is auxiliary, so it may be absent for a mesh; every other kind (bldg) stays strictly required.
+  // Nothing is excluded silently: absent meshes are logged and recorded in fetch-manifest.json.
+  const noKind = o.meshes.filter((m) => !sel.some((e) => e.mesh === m));
+  const strict = o.kinds.every((k) => k === 'tran') ? [] : noKind;
+  if (strict.length) throw new Error('meshes have no ' + o.kinds.join('/') + ' entry in 2025 lock: ' + strict.join(','));
+  if (noKind.length) console.log('[79 fetch] WARN no ' + o.kinds.join('/') + ' entry in lock (official package has none) for meshes: ' + noKind.join(','));
   const totalMb = sel.reduce((n, e) => n + e.uncompressedBytes, 0) / 1048576;
   const compMb = sel.reduce((n, e) => n + e.compressedBytes, 0) / 1048576;
   console.log('[79 fetch] files=' + sel.length + ' compressed=' + compMb.toFixed(1) + 'MB inflated=' + totalMb.toFixed(1) + 'MB cap=' + o.maxMb + 'MB');
@@ -57,7 +64,7 @@ async function main() {
   // ETag drift check against the locked manifest (HEAD only)
   const head = await fetch(lock.resource.url, { method: 'HEAD' });
   if (head.headers.get('etag') !== lock.http.etag) throw new Error('remote ETag changed since lock; re-run source lock and review');
-  const manifest = { mission: '79-plateau2025-fetch', source: lock.resource.url, etag: lock.http.etag, attribution: lock.attribution, license: lock.license.url, files: prev.files };
+  const manifest = { mission: '79-plateau2025-fetch', source: lock.resource.url, etag: lock.http.etag, attribution: lock.attribution, license: lock.license.url, files: prev.files, lockHasNoEntryForKind: { kinds: o.kinds, meshes: noKind } };
   for (const e of sel) {
     const dest = path.join(out, path.basename(e.name));
     const done = manifest.files[path.basename(e.name)];

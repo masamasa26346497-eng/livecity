@@ -122,3 +122,15 @@ test('recorded Nishi 2025 run: orientation identity, IDs unique, no legacy offse
   assert.equal(j.buildings, j.uniqueIds);
   assert.equal(j.crosswalk.exactIdOffsetM.max, 0);
 });
+
+// Mission 84: Konohana mesh 51357341 has a bldg entry but no tran entry in the official 2025 lock.
+test('mission84: fetch tolerates a missing tran entry but never a missing bldg or unknown mesh', () => {
+  const lock = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission79/source-lock.json'), 'utf8'));
+  const has = (m, k) => lock.entries.some((e) => e.mesh === m && e.kind === k);
+  assert.equal(has('51357341', 'bldg'), true);
+  assert.equal(has('51357341', 'tran'), false);
+  const src = fs.readFileSync(path.join(ROOT, 'tools/mission79-plateau2025-fetch.mjs'), 'utf8');
+  assert.match(src, /lockHasNoEntryForKind/);
+  assert.match(src, /meshes not in 2025 lock/);
+  assert.match(src, /every\(\(k\) => k === 'tran'\)/);
+});
