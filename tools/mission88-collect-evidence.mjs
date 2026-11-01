@@ -219,9 +219,16 @@ export async function collect({ ward, root, evidenceDir, port, flags, env = proc
   if (!flags.checkOnly && clicks.length >= 3) {
     try { await collectInBrowser({ ward, outDir: chk.outDir, mw: chk.mw, w: chk.w, out: ev, port, qaClicks: clicks }); } catch (e) { failedItems.push({ item: 'browser', status: 'failed', why: String(e && e.message || e).slice(0, 300) }); }
   } else if (flags.checkOnly) failedItems.push({ item: 'browser', status: 'missing', why: '--check-only: browser steps not run' });
+  // Mission89: 独立検査器の報告(--roadwater)は、local-pc・年版・tileset sha256・lock etag・閾値根拠・ダイジェストが全て揃う場合だけ roadWater に採用する。
+  if (flags.roadwater) {
+    try {
+      const rw = await import('./mission89-roadwater-verify.mjs');
+      ev.roadWater = rw.toEvidence(JSON.parse(fs.readFileSync(flags.roadwater, 'utf8')), { ward, tilesetSha256: ev.tilesetSha256, lockEtag: lock.http.etag });
+    } catch (e) { ev.roadWater = { status: 'unverified', reason: 'road/water report unreadable: ' + String(e && e.message || e).slice(0, 200) }; }
+  }
   delete ev.__idSet;
   for (const why of selfCheck(ev)) failedItems.push({ item: 'self-check', status: 'failed', why });
-  ev.collection = { status: failedItems.length ? 'failed' : 'ok', failedItems, unverifiedItems: ['roadWater'] };
+  ev.collection = { status: failedItems.length ? 'failed' : 'ok', failedItems, unverifiedItems: ev.roadWater && ev.roadWater.status === 'verified' ? [] : ['roadWater'] };
   ev.integrity = { alg: 'sha256-canonical-json', digest: bodyDigest(ev), note: 'tamper-evidence only; not a signature' };
   return { ev, exit: failedItems.length === 0 ? 0 : 1, dest: evidenceDestination({ evidenceDir, ward, origin: o.origin, failed: failedItems.length > 0 }) };
 }
@@ -230,8 +237,8 @@ async function main() {
   const a = process.argv.slice(2);
   const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 && a[i + 1] !== undefined ? a[i + 1] : d; };
   const ward = opt('ward');
-  if (!ward) { console.error('usage: node tools/mission88-collect-evidence.mjs --ward <wardId> [--root temp/mission80] [--evidence dir] [--port 8188] [--check-only] [--fixture]'); process.exit(64); }
-  const flags = { checkOnly: a.includes('--check-only'), fixture: a.includes('--fixture') };
+  if (!ward) { console.error('usage: node tools/mission88-collect-evidence.mjs --ward <wardId> [--root temp/mission80] [--evidence dir] [--port 8188] [--check-only] [--fixture] [--roadwater <mission89 report>]'); process.exit(64); }
+  const flags = { checkOnly: a.includes('--check-only'), fixture: a.includes('--fixture'), roadwater: opt('roadwater') ? path.resolve(opt('roadwater')) : null };
   const r = await collect({ ward, root: path.resolve(opt('root', 'temp/mission80')), evidenceDir: path.resolve(opt('evidence', 'data/reports/mission86/evidence')), port: Number(opt('port', 8188)), flags });
   fs.mkdirSync(path.dirname(r.dest), { recursive: true });
   if (fs.existsSync(r.dest)) { const old = r.dest; r.dest = old.replace(/\.json$/, '.' + Date.now() + '.json'); }   // 既存の証拠は上書きしない

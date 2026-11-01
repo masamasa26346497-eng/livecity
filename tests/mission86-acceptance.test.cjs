@@ -21,7 +21,7 @@ function goodSetup(wardId = 'nishi') {
       tilesetSha256: 'abc', buildings: 100, googleRequests: [], jsErrors: [], http: { tileset200: 1, glb200: 10, wardAssetErrors: [] },
       pixel: { method: 'webgl-readback-on-off', topDown: { diffPx: 5, totalPx: 10 }, oblique: { diffPx: 5, totalPx: 10 } },
       clicks: [1, 2, 3].map((n) => ({ id: 'bldg_' + n, realMouseClick: true, selected: true, idInOutput: true })),
-      coverage: { method: 'n03-polygon', insideWardPolygonPct: 99 }, roadWater: { status: 'verified', roadsChecked: 10, maxOffsetM: 3 } };
+      coverage: { method: 'n03-polygon', insideWardPolygonPct: 99 }, roadWater: { status: 'verified', method: 'roadwater-independent-v1', vintage: 2025, scope: 'horizontal-only', verticalChecked: false, roadsChecked: 10, waterChecked: 4, samples: 500, maxOffsetM: 3, thresholds: { basis: 'test basis string long enough', approvedBy: 'owner' }, reportDigest: 'a'.repeat(64) } };
     return { a, plan, mw, ev, lock: i.lock };
   });
 }

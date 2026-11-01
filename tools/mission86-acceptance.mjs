@@ -111,7 +111,17 @@ export function evaluateWard({ plan, lock, mw, ev, hasLocalTileset }) {
     const r = ev.roadWater;
     if (!r || r.status === 'unverified' || r.status === undefined) return missing('road/water alignment not verified (stays unverified)');
     if (r.status !== 'verified') return fail('roadWater.status=' + r.status);
-    return isNum(r.roadsChecked) && r.roadsChecked > 0 && isNum(r.maxOffsetM) ? pass('roads=' + r.roadsChecked + ' maxOffsetM=' + r.maxOffsetM) : fail('roadWater verified without roadsChecked/maxOffsetM');
+    // Mission89: 方法・年版・独立報告ダイジェスト・閾値根拠・水平のみの明示が揃わない "verified" は受け付けない。
+    const miss = [];
+    if (r.method !== 'roadwater-independent-v1') miss.push('method');
+    if (r.vintage !== VINTAGE) miss.push('vintage');
+    if (r.scope !== 'horizontal-only' || r.verticalChecked !== false) miss.push('scope/verticalChecked');
+    if (!r.thresholds || !r.thresholds.basis || !r.thresholds.approvedBy) miss.push('thresholds.basis/approvedBy');
+    if (typeof r.reportDigest !== 'string' || r.reportDigest.length !== 64) miss.push('reportDigest');
+    if (!isNum(r.samples) || r.samples <= 0) miss.push('samples');
+    if (!isNum(r.waterChecked) || r.waterChecked <= 0) miss.push('waterChecked');
+    if (miss.length) return fail('roadWater verified lacks independent-verification fields: ' + miss.join(','));
+    return isNum(r.roadsChecked) && r.roadsChecked > 0 && isNum(r.maxOffsetM) ? pass('roads=' + r.roadsChecked + ' water=' + r.waterChecked + ' maxOffsetM=' + r.maxOffsetM + ' (horizontal-only)') : fail('roadWater verified without roadsChecked/maxOffsetM');
   });
 
   const unmet = ITEMS.filter((k) => it[k].status !== 'pass');
