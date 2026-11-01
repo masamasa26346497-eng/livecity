@@ -93,8 +93,25 @@ jobs:
           set -eu
           [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD changed"; exit 1; }
           sha256sum -c "$RUNNER_TEMP/pin.sha256"
-          bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' || true)
+          # batch-manifest.json is TRACKED and rewritten by the convert step (Mission98 root cause: " M" was rejected).
+          # Allow exactly: untracked temp/ + data/reports/mission80/, and a modification of that ONE manifest file
+          # whose content is verified below against the committed version. Anything else fails.
+          M=data/reports/mission80/batch-manifest.json
+          bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' | grep -vE "^ M $M\$" || true)
           [ -z "$bad" ] || { echo "FAIL: unexpected changes: $bad"; exit 1; }
+          git show "HEAD:$M" > "$RUNNER_TEMP/manifest.head.json"
+          MANIFEST_BASE="$RUNNER_TEMP/manifest.head.json" MANIFEST_NEW="$M" node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const a=JSON.parse(fs.readFileSync(process.env.MANIFEST_BASE,"utf8")), b=JSON.parse(fs.readFileSync(process.env.MANIFEST_NEW,"utf8"));
+            const same=(x,y)=>JSON.stringify(x)===JSON.stringify(y);
+            if(b.mission!==a.mission||String(b.vintage)!==String(a.vintage)) throw new Error("manifest header changed");
+            for(const k of Object.keys(a.wards||{})){ if(k!==w && !same(a.wards[k],b.wards[k])) throw new Error("other ward entry modified: "+k); }
+            for(const k of Object.keys(b.wards||{})){ if(k!==w && !(k in a.wards)) throw new Error("unexpected new ward entry: "+k); }
+            const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!same(a[k],b[k]));
+            if(extra.length) throw new Error("unexpected top-level keys changed: "+extra);
+            if(!b.wards[w]) throw new Error("target ward entry missing");
+            console.log("manifest diff ok: only wards."+w+" and updatedAt may differ");
+          '
       - name: Persist to private repo (token only here) and verify sha256
         env:
           LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
