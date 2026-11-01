@@ -70,16 +70,21 @@ export function validateOutput(dir, ward) {
 }
 
 // Tile prefix /ext-3dtiles/<name>/... -> <outDir>/..., everything else -> public/. Read-only, loopback.
-export function makeServer({ publicDir, outDir, name }) {
-  const pub = path.resolve(publicDir), out = path.resolve(outDir), prefix = '/ext-3dtiles/' + name + '/';
+// Mission 82: `wards` = { <name>: <outDir> } serves many wards (/ext-3dtiles/<name>/...) plus a generated /ext-3dtiles/index.json (used by ?ext45=1).
+export function makeServer({ publicDir, outDir, name, wards }) {
+  const pub = path.resolve(publicDir);
+  const map = wards ? Object.fromEntries(Object.entries(wards).map(([k, v]) => [k, path.resolve(v)])) : { [name]: path.resolve(outDir) };
+  const indexBody = JSON.stringify({ verified: false, vintage: 2025, wards: Object.keys(map).sort().map((k) => ({ ward: k })) });
   const stats = { req: 0, ok: 0, nf: 0, glb200: 0, tileset200: 0 };
   const srv = http.createServer((req, res) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('method not allowed'); }
     stats.req++;
     const u = (req.url || '/').split('?')[0];
     let file;
-    if (u.startsWith(prefix)) file = resolveUnder(out, u.slice(prefix.length));
-    else if (u.startsWith('/ext-3dtiles/')) file = null; // only the one ward is served
+    if (u === '/ext-3dtiles/index.json') { stats.ok++; res.writeHead(200, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' }); return res.end(req.method === 'HEAD' ? undefined : indexBody); }
+    const m = /^\/ext-3dtiles\/([a-z0-9-]+)\/(.*)$/.exec(u);
+    if (m && Object.prototype.hasOwnProperty.call(map, m[1])) file = resolveUnder(map[m[1]], m[2]);
+    else if (u.startsWith('/ext-3dtiles/')) file = null; // only registered wards are served
     else file = resolveUnder(pub, u === '/' ? '/mission37g-osaka-24ward-mvp.html' : u);
     if (!file) { stats.nf++; res.writeHead(404); return res.end('not found'); }
     fs.stat(file, (err, st) => {
@@ -99,10 +104,38 @@ function freeBytes(dir) {
   try { fs.mkdirSync(dir, { recursive: true }); const s = fs.statfsSync(dir); return Number(s.bavail) * Number(s.bsize); } catch { return null; }
 }
 
+// Mission 82: --ward all -> serve every already-converted, validated 2025 ward found under temp/ (never downloads; convert with tools/mission80-batch.mjs).
+async function mainAll(a, opt) {
+  const port = Number(opt('port', 8137));
+  const polys = JSON.parse(fs.readFileSync('data/processed/osaka-city/boundaries/ward-classification-polygons.json', 'utf8'));
+  const wards = {}; const rows = [];
+  for (const w of polys.wards) {
+    if (String(w.wardCode) === EXPO_CODE) continue;
+    let found = null;
+    for (const d of candidateDirs(w.wardId)) {
+      if (!fs.existsSync(path.join(d, 'tileset.json'))) continue;
+      const v = validateOutput(d, w);
+      if (v.ok) { found = { d, v }; break; }
+    }
+    if (found) { wards[w.wardId + '25'] = found.d; rows.push(w.wardCode + ' ' + w.wardId + ' ' + found.v.buildings); } else rows.push(w.wardCode + ' ' + w.wardId + ' (not converted)');
+  }
+  console.log('[82] wards available: ' + Object.keys(wards).length + '/' + polys.wards.length + '\n' + rows.join('\n'));
+  if (!Object.keys(wards).length) throw new Error('no converted wards. Run: node tools/mission80-batch.mjs');
+  if (a.includes('--check-only')) return;
+  const srv = makeServer({ publicDir: path.join(ROOT, 'public'), wards });
+  srv.on('error', (e) => { console.error('FAILED server: ' + e.message); process.exit(1); });
+  srv.listen(port, HOST, () => {
+    console.log('[82] serving read-only on loopback only. Ctrl+C to stop.');
+    console.log('[82] open: http://' + HOST + ':' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1   (pick a ward in the 3D ward selector)');
+  });
+  process.on('SIGINT', () => { srv.close(); process.exit(0); });
+}
+
 async function main() {
   const a = process.argv.slice(2);
   const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
   const wardId = opt('ward', 'nishi');
+  if (wardId === 'all') return mainAll(a, opt);
   const port = Number(opt('port', 8137)), maxMb = Number(opt('max-mb', 800)), minFreeGb = Number(opt('min-free-gb', 3));
   if (a.includes('--host') || a.includes('--bind')) throw new Error('binding is fixed to 127.0.0.1; --host/--bind are not supported');
   if (!/^[a-z0-9-]+$/.test(wardId)) throw new Error('bad --ward');
