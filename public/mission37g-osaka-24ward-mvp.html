@@ -962,6 +962,10 @@
       if (/^[a-z0-9-]+$/.test(n)) EXTRA_SET_DEFS.push({ id: 'ext-' + n, base: 'ext-3dtiles/' + n + '/', external: true });
     }
   }
+  // 80: ?nobuiltin=1（localhost 限定）。同じ区コードの既存サンプル(2024)と ext(2025)を二重に mount しない E2E 用。公開ページには影響しない。
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('nobuiltin') === '1') {
+    for (let i = EXTRA_SET_DEFS.length - 1; i >= 0; i--) if (!EXTRA_SET_DEFS[i].external) EXTRA_SET_DEFS.splice(i, 1);
+  }
   // 45E: ?ext45=1（localhost 限定）。tools/mission45e-preview.cjs が検証済みの 24 区を /ext-3dtiles/<区>/ で読み取り専用配信し、
   //   /ext-3dtiles/index.json に区の一覧を出す。ここで全区を ext 定義として登録する（URL に 24 区を並べない）。無ければ何もしない。
   async function loadExt45Defs() {
