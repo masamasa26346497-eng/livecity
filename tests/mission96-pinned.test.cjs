@@ -1,7 +1,7 @@
 const test = require('node:test'); const assert = require('node:assert'); const fs = require('fs'); const crypto = require('crypto');
 const r = (p) => fs.readFileSync(__dirname + '/../' + p, 'utf8');
 const w = r('tools/mission96/persist-ward.pinned.workflow.yml');
-const PIN = '530446ea243b042f43bea0265a23d3b5211307dc';
+const PIN = 'c4b79150067bba5acd37fbbf05c1e5af8b0af5b0';
 test('pinned: full-SHA checkout, no branch refs, no token-bearing event triggers', () => {
   assert.match(w, new RegExp('ref: "' + PIN + '"'));
   assert.match(w, /on:\s*\n\s*workflow_dispatch:/);

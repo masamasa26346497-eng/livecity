@@ -27,7 +27,7 @@ test('Mission99: invalid derived values are still rejected', () => {
   assert.notEqual(run(base, { ...good, surprise: 1 }, 'nishi').status, 0);
 });
 test('Mission99: pinned SHA and nishi-only guard unchanged, no token in re-verify', () => {
-  assert.match(w, /PIN_SHA: "530446ea243b042f43bea0265a23d3b5211307dc"/);
+  assert.match(w, /PIN_SHA: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"/);
   assert.match(w, /only nishi is allowed/);
   assert.doesNotMatch(seg, /TOKEN/);
 });

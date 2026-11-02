@@ -9,7 +9,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
-export const PIN_SHA = '530446ea243b042f43bea0265a23d3b5211307dc';
+export const PIN_SHA = 'c4b79150067bba5acd37fbbf05c1e5af8b0af5b0';
 export const ENTRY = ['tools/mission80-batch.mjs', 'tools/mission95-check-output.mjs', 'tools/mission95-persist-ward.mjs', 'tools/mission87-persist.mjs'];
 // Written by the tools at run time, not code: excluded from the hash set.
 const RUNTIME_OUTPUTS = new Set(['data/reports/mission87/storage-manifest.json', 'data/reports/mission80/batch-manifest.json']);
