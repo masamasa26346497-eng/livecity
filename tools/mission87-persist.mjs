@@ -19,6 +19,28 @@ export const ARCHIVE_DIR = 'temp/mission87/archives';
 export const MAX_ASSET_BYTES = 2 * 1024 * 1024 * 1024 - 1; // GitHub release asset 上限 2GiB 未満
 export const ALLOWED_TOP = new Set(['tileset.json', 'source.json', 'build-report.json']);
 export const ALLOWED_DIRS = new Set(['ids', 'attrs']);
+// Mission 100: alignment.json is written by tools/mission79-build-ward-2025.cjs (road-vs-building orientation scan; numbers only).
+// Exact-name, schema-validated optional file (NOT a wildcard). crosswalk.* / legacy-only-ids.json stay "unexpected".
+export const VALIDATED_TOP = new Set(['alignment.json']);
+const ALIGN_KEYS = new Set(['roadPolygons', 'buildingPoints', 'skipped', 'candidates', 'bestTransform', 'orientationOk', 'margin']);
+const ALIGN_TRANSFORMS = ['identity', 'flipX', 'flipZ', 'rot180', 'swapXZ'];
+export function validateAlignment(file) {
+  const st = fs.statSync(file);
+  if (!st.isFile() || st.size > 65536) throw new Error('alignment.json invalid size');
+  const j = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (!j || typeof j !== 'object' || Array.isArray(j)) throw new Error('alignment.json not an object');
+  for (const k of Object.keys(j)) if (!ALIGN_KEYS.has(k)) throw new Error('alignment.json unexpected key: ' + k);
+  if (j.skipped !== undefined && typeof j.skipped !== 'string') throw new Error('alignment.json skipped invalid');
+  for (const k of ['roadPolygons', 'buildingPoints', 'margin']) if (j[k] !== undefined && !Number.isFinite(j[k])) throw new Error('alignment.json ' + k + ' invalid');
+  if (j.skipped === undefined) {
+    if (!j.candidates || typeof j.candidates !== 'object') throw new Error('alignment.json candidates missing');
+    for (const [n, c] of Object.entries(j.candidates)) {
+      if (!ALIGN_TRANSFORMS.includes(n) || !c || !Number.isFinite(c.hits) || !Number.isFinite(c.hitRatePct) || Object.keys(c).length !== 2) throw new Error('alignment.json candidate invalid: ' + n);
+    }
+    if (!ALIGN_TRANSFORMS.includes(j.bestTransform) || typeof j.orientationOk !== 'boolean') throw new Error('alignment.json result invalid');
+  }
+  return j;
+}
 export const DENY = /(\.env|secret|token|apikey|api_key|photo|google|\.pem|\.key)/i;
 
 export function validWard(w) { return typeof w === 'string' && /^[a-z]+$/.test(w); }
@@ -38,7 +60,8 @@ export function inspectOut(dir) {
       if (!ALLOWED_DIRS.has(e.name) && !/^(glb|tiles|lod|content)$/.test(e.name)) throw new Error('unexpected dir: ' + e.name);
       const walk = (d) => { for (const x of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, x.name); if (DENY.test(x.name)) throw new Error('denied name: ' + p); if (x.isDirectory()) walk(p); else { files.push(path.relative(dir, p)); bytes += fs.statSync(p).size; } } };
       walk(path.join(dir, e.name));
-    } else if (ALLOWED_TOP.has(e.name) || /\.glb$/.test(e.name)) { files.push(e.name); bytes += fs.statSync(path.join(dir, e.name)).size; }
+    } else if (VALIDATED_TOP.has(e.name) && e.isFile()) { validateAlignment(path.join(dir, e.name)); files.push(e.name); bytes += fs.statSync(path.join(dir, e.name)).size; }
+    else if (ALLOWED_TOP.has(e.name) || /\.glb$/.test(e.name)) { files.push(e.name); bytes += fs.statSync(path.join(dir, e.name)).size; }
     else throw new Error('unexpected file: ' + e.name);
   }
   return { wardCode: String(src.wardCode), vintage: src.vintage || null, files: files.length, bytes };
