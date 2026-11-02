@@ -27,14 +27,14 @@ jobs:
     timeout-minutes: 90
     if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     env:
-      PIN_SHA: "530446ea243b042f43bea0265a23d3b5211307dc"
+      PIN_SHA: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
       DATA_REPO: masamasa26346497-eng/livecity-3d-data
       WARD: ${{ inputs.ward }}
     steps:
       - name: Checkout pinned audited commit
         uses: actions/checkout@v4
         with:
-          ref: "530446ea243b042f43bea0265a23d3b5211307dc"
+          ref: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
           persist-credentials: false
           fetch-depth: 1
       - uses: actions/setup-node@v4
@@ -53,7 +53,7 @@ jobs:
           48e1af17784a1a0b749a121fcf8e01da9cfeb6f5469b5be858bf57f0183c330d  tools/mission79-plateau2025-source.mjs
           c95c1be46c49514e9c67a0845e52b65e221f0522fa6c62325a0bc04a5eff5657  tools/mission79-run.mjs
           fe1e4a1ee5e6aa64ed67826c9a5a69de41cd1ee988e4aea675850ec34cf04ae2  tools/mission80-batch.mjs
-          2d734f70103ee468f7e00ad17c5c52b4fa685da79d2585adee988b4c2ea5c89d  tools/mission87-persist.mjs
+          b5ff6847a105fbbb50756472865db7898265be41e26a1400073728fa4840dc43  tools/mission87-persist.mjs
           a5617b54f962ef91fc7d8aeca48b92c0652d01b5464664b4ac1e406a08e97a4f  tools/mission95-check-output.mjs
           4bd6d14ebfc600466be77b51d87198c8a94c0fe8303ebd9b71c8febdfcb286d2  tools/mission95-persist-ward.mjs
           HASHES
