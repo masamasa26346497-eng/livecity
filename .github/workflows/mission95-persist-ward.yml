@@ -1,35 +1,113 @@
-# Mission 96: INSTALL BY OWNER as .github/workflows/mission95-persist-ward.yml on the default branch
-# (replaces the Mission95 version; Claude's GitHub App cannot write .github/workflows).
-# GENERATED from persist-ward.pinned.workflow.template.yml by `node tools/mission96/pin-audit.mjs render`. Do not hand-edit hashes.
+# Mission 103: INSTALL BY OWNER as .github/workflows/mission95-persist-ward.yml on the default branch (replaces the Mission101/102 version).
+# GENERATED from all-wards.pinned.workflow.template.yml + steps.part.yml by `node tools/mission103/render.mjs`. Do not hand-edit hashes.
 #
-# Why this exists: the default branch lacks tools/mission80-batch.mjs, tools/mission95-persist-ward.mjs, etc.
-# This workflow therefore checks out ONE audited commit by full SHA (never a branch tip) and refuses to run unless
-# (a) HEAD == pinned SHA, (b) the tree is clean, (c) every executed file matches the sha256 embedded below IN THIS
-# (trusted, main-resident) workflow file. The token is exposed only to the read-only connect check (curl, no repo code)
-# and the single persist step, which re-verifies hashes right before it runs.
-# Owner-only: workflow_dispatch, actor == repository owner, run on the default branch. Initial scope: ward nishi only.
+# One owner dispatch processes ALL 24 official Osaka City (27100) wards: plan -> pilot (fukushima) -> rest (matrix, one ward at a time,
+# each on its own fresh runner) -> summary. The per-ward code path is exactly the Mission101/102 audited path (pinned SHA, 13 sha256).
+# - Wards already stored in the private release are re-downloaded, sha256 recomputed (nishi vs recorded hash) and skipped.
+# - The rest wave runs only if the pilot succeeded (or was already stored). A failed ward never touches stored wards; fail-fast is off,
+#   so other wards continue. No automatic retry. To resume, dispatch again (stored wards skip; failed ones are retried once per dispatch).
+# - Failure classes are recorded per ward: generate-failed (convert/strict check) vs persist-failed (re-verify/upload/sha256 check).
+# - Concurrency group prevents two overlapping runs. The token appears only in plan, connect check and persist steps.
+# - Result is STORAGE ONLY. Browser/Cesium acceptance is a separate step (browserAccepted stays 0).
 name: Mission95 persist ward to private repo
 on:
   workflow_dispatch:
     inputs:
-      ward:
-        description: ward id (initial run is nishi only)
+      wards:
+        description: "ALL (default: every official ward, fukushima pilot first) or comma-separated ward ids to resume a subset. Expo 27999 is never allowed"
         required: true
-        type: choice
-        default: nishi
-        options:
-          - nishi
+        type: string
+        default: "ALL"
 permissions:
   contents: read
+concurrency:
+  group: mission103-persist-all-wards
+  cancel-in-progress: false
+env:
+  PIN_SHA: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
+  DATA_REPO: masamasa26346497-eng/livecity-3d-data
+  TAG: plateau2025-converted
+  # sha256 recorded by the successful Mission95 run 41544102363 (nishi, 12603 buildings). Stored nishi is re-verified against it.
+  EXPECTED_SHA_NISHI: "0232c89f0a5beeb2a03333b6ac8d0ca6366004ac85a0f3b221170dbc91a078c4"
 jobs:
-  persist:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    outputs:
+      pilot_matrix: ${{ steps.plan.outputs.pilot_matrix }}
+      pilot_count: ${{ steps.plan.outputs.pilot_count }}
+      rest_matrix: ${{ steps.plan.outputs.rest_matrix }}
+      rest_count: ${{ steps.plan.outputs.rest_count }}
+      stored: ${{ steps.plan.outputs.stored }}
+    steps:
+      - name: Plan (validate input, re-verify stored wards; curl only, no repo code)
+        id: plan
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+          IN_WARDS: ${{ inputs.wards }}
+        run: |
+          set -eu
+          [ -n "$DATA_TOKEN" ] || { echo "FAIL: secret empty or missing"; exit 1; }
+          echo "::add-mask::$DATA_TOKEN"
+          ALL="fukushima miyakojima konohana nishi minato taisho tennoji naniwa nishiyodogawa higashiyodogawa higashinari ikuno asahi joto abeno sumiyoshi higashisumiyoshi nishinari yodogawa tsurumi suminoe hirano kita chuo"
+          [ "$(printf '%s\n' $ALL | wc -l)" = "24" ] && [ "$(printf '%s\n' $ALL | sort -u | wc -l)" = "24" ] || { echo "FAIL: ward list is not 24 unique"; exit 1; }
+          raw=$(printf '%s' "$IN_WARDS" | tr -d ' \n\r')
+          if [ "$raw" = "ALL" ]; then want="$ALL"; else
+            want=$(printf '%s' "$raw" | tr ',' ' ')
+            [ -n "$want" ] || { echo "FAIL: no wards"; exit 1; }
+            seen=" "
+            for w in $want; do
+              printf '%s' "$w" | grep -Eq '^[a-z]+$' || { echo "FAIL: invalid ward token"; exit 1; }
+              case " $ALL " in *" $w "*) ;; *) echo "FAIL: not one of the 24 official wards: $w"; exit 1;; esac
+              case "$seen" in *" $w "*) echo "FAIL: duplicate ward: $w"; exit 1;; esac
+              seen="$seen$w "
+            done
+          fi
+          code=$(curl -sS -o repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          [ "$code" = "200" ] || { echo "FAIL: repo GET HTTP $code"; exit 1; }
+          [ "$(jq -r .visibility repo.json)" = "private" ] && [ "$(jq -r '.permissions.push // false' repo.json)" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
+          code=$(curl -sS -o rel.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO/releases/tags/$TAG")
+          if [ "$code" = "404" ]; then echo '{"assets":[]}' > rel.json; elif [ "$code" != "200" ]; then echo "FAIL: release GET HTTP $code"; exit 1; fi
+          todo=""; stored=""; : > summary.md
+          echo "### Plan (stored = permanent private storage, NOT browser accepted)" >> summary.md
+          for w in $want; do
+            id=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.id' rel.json | head -n1)
+            if [ -n "$id" ]; then
+              curl -sSL --fail -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/octet-stream' -o "chk-$w.tgz" "https://api.github.com/repos/$DATA_REPO/releases/assets/$id"
+              tar -tzf "chk-$w.tgz" | grep -q 'tileset.json' || { echo "FAIL: stored $w archive has no tileset.json"; exit 1; }
+              sha=$(sha256sum "chk-$w.tgz" | cut -d' ' -f1); rm -f "chk-$w.tgz"
+              if [ "$w" = "nishi" ] && [ "$sha" != "$EXPECTED_SHA_NISHI" ]; then echo "FAIL: stored nishi sha256 $sha != recorded"; exit 1; fi
+              echo "stored-skip $w sha256=$sha"; echo "- $w: already stored, re-downloaded sha256 \`$sha\` (skipped, not reconverted)" >> summary.md
+              stored="$stored $w"
+            else
+              todo="$todo $w"; echo "- $w: will convert + persist" >> summary.md
+            fi
+          done
+          cat summary.md >> "$GITHUB_STEP_SUMMARY"
+          pilot=""; rest=""
+          for w in $todo; do
+            if [ "$w" = "fukushima" ]; then pilot="$w"; else rest="$rest $w"; fi
+          done
+          mk() { l=$(for w in $1; do printf '"%s",' "$w"; done); echo "[${l%,}]"; }
+          pl=$(mk "$pilot"); rl=$(mk "$rest")
+          echo "pilot_matrix={\"ward\":$pl}" >> "$GITHUB_OUTPUT"; echo "pilot_count=$(echo "$pl" | jq length)" >> "$GITHUB_OUTPUT"
+          echo "rest_matrix={\"ward\":$rl}" >> "$GITHUB_OUTPUT"; echo "rest_count=$(echo "$rl" | jq length)" >> "$GITHUB_OUTPUT"
+          echo "stored=$(echo $stored)" >> "$GITHUB_OUTPUT"
+          echo "pilot: $pl  rest: $rl"
+  pilot:
+    needs: plan
+    if: needs.plan.outputs.pilot_count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.pilot_matrix) }}
     env:
+      WARD: ${{ matrix.ward }}
       PIN_SHA: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
       DATA_REPO: masamasa26346497-eng/livecity-3d-data
-      WARD: ${{ inputs.ward }}
     steps:
       - name: Checkout pinned audited commit
         uses: actions/checkout@v4
@@ -69,7 +147,7 @@ jobs:
       - name: Preflight (no token, no network)
         run: |
           set -eu
-          [ "$WARD" = "nishi" ] || { echo "FAIL: only nishi is allowed in the initial run"; exit 1; }
+          printf '%s' "$WARD" | grep -Eq '^[a-z]+$' || { echo "FAIL: invalid ward"; exit 1; }
           [ "$DATA_REPO" = "masamasa26346497-eng/livecity-3d-data" ] || { echo "FAIL: unexpected data repo"; exit 1; }
           node -e '
             const fs=require("fs"); const w=process.env.WARD;
@@ -77,6 +155,7 @@ jobs:
             const hit=polys.wards.find(x=>x.wardId===w);
             if(!hit) throw new Error("ward not in N03 polygons: "+w);
             if(String(hit.wardCode).startsWith("27999")) throw new Error("expo (27999) excluded");
+            if(!/^271[0-2]\d$/.test(String(hit.wardCode))) throw new Error("not an official Osaka City ward code: "+hit.wardCode);
             const lock=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8"));
             if(!/plateau-27100-osaka-shi-2025/.test(JSON.stringify(lock.package))) throw new Error("source lock is not 27100/2025");
             if(!lock.license||!lock.attribution) throw new Error("license/attribution missing in source lock");
@@ -97,17 +176,17 @@ jobs:
           [ "$vis" = "private" ] && [ "$push" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
           echo "OK: private connection verified (read-only)"
       - name: Convert ward (PLATEAU 2025, NO token)
+        id: convert
         run: node tools/mission80-batch.mjs --wards "$WARD" --max-wards 1 --ward-timeout-min 60
       - name: Strict output check (no token)
-        run: node tools/mission95-check-output.mjs "$WARD"
+        id: strict
+        run: node tools/mission95-check-output.mjs "$WARD" | tee "$RUNNER_TEMP/strict.json"
       - name: Re-verify code hashes before token use (no token)
+        id: reverify
         run: |
           set -eu
           [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD changed"; exit 1; }
           sha256sum -c "$RUNNER_TEMP/pin.sha256"
-          # batch-manifest.json is TRACKED and rewritten by the convert step (Mission98 root cause: " M" was rejected).
-          # Allow exactly: untracked temp/ + data/reports/mission80/, and a modification of that ONE manifest file
-          # whose content is verified below against the committed version. Anything else fails.
           M=data/reports/mission80/batch-manifest.json
           bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' | grep -vE "^ M $M\$" || true)
           [ -z "$bad" ] || { echo "FAIL: unexpected changes: $bad"; exit 1; }
@@ -119,7 +198,6 @@ jobs:
             if(b.mission!==a.mission||String(b.vintage)!==String(a.vintage)) throw new Error("manifest header changed");
             for(const k of Object.keys(a.wards||{})){ if(k!==w && !same(a.wards[k],b.wards[k])) throw new Error("other ward entry modified: "+k); }
             for(const k of Object.keys(b.wards||{})){ if(k!==w && !(k in a.wards)) throw new Error("unexpected new ward entry: "+k); }
-            // Mission99: mission80-batch also rewrites totals/lastRun/source/crossWardDuplicateIds. Allowed only if each is validated.
             const DERIVED=["totals","lastRun","source","crossWardDuplicateIds"];
             const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!DERIVED.includes(k)&&!same(a[k],b[k]));
             if(extra.length) throw new Error("unexpected top-level keys changed: "+extra);
@@ -136,9 +214,231 @@ jobs:
             console.log("manifest diff ok: only wards."+w+" and updatedAt may differ");
           '
       - name: Persist to private repo (token only here) and verify sha256
+        id: persist
         env:
           LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
         run: |
           echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
-          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute
+          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute | tee "$RUNNER_TEMP/persist.json"
           node tools/mission87-persist.mjs status
+          {
+            echo "### $WARD"
+            echo "- strict: \`$(cat "$RUNNER_TEMP/strict.json")\`"
+            echo "- persist: \`$(tail -n1 "$RUNNER_TEMP/persist.json")\`"
+            echo "- browserAccepted: 0 (storage only; Cesium acceptance NOT done)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Write per-ward result (no token; separates generate failure from persist failure)
+        if: always()
+        env:
+          O_CONVERT: ${{ steps.convert.outcome }}
+          O_STRICT: ${{ steps.strict.outcome }}
+          O_REVERIFY: ${{ steps.reverify.outcome }}
+          O_PERSIST: ${{ steps.persist.outcome }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/res"
+          if [ "$O_PERSIST" = "success" ]; then st=stored
+          elif [ "$O_CONVERT" = "failure" ] || [ "$O_STRICT" = "failure" ]; then st=generate-failed
+          elif [ "$O_REVERIFY" = "failure" ] || [ "$O_PERSIST" = "failure" ]; then st=persist-failed
+          else st=incomplete; fi
+          jq -n --arg ward "$WARD" --arg st "$st" --arg c "$O_CONVERT" --arg s "$O_STRICT" --arg r "$O_REVERIFY" --arg p "$O_PERSIST" '{ward:$ward,status:$st,convert:$c,strict:$s,reverify:$r,persist:$p}' > "$RUNNER_TEMP/res/result-$WARD.json"
+          cat "$RUNNER_TEMP/res/result-$WARD.json"
+      - name: Upload per-ward result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ env.WARD }}
+          path: ${{ runner.temp }}/res/result-${{ env.WARD }}.json
+          retention-days: 30
+  rest:
+    needs: [plan, pilot]
+    if: ${{ always() && needs.plan.result == 'success' && needs.plan.outputs.rest_count != '0' && (needs.pilot.result == 'success' || needs.pilot.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.rest_matrix) }}
+    env:
+      WARD: ${{ matrix.ward }}
+      PIN_SHA: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
+      DATA_REPO: masamasa26346497-eng/livecity-3d-data
+    steps:
+      - name: Checkout pinned audited commit
+        uses: actions/checkout@v4
+        with:
+          ref: "c4b79150067bba5acd37fbbf05c1e5af8b0af5b0"
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Write trusted hash list (from this workflow file)
+        run: |
+          cat > "$RUNNER_TEMP/pin.sha256" <<'HASHES'
+          2cecaf79b421cd05eaaa601491987bfcf8246716415d5adf1f0845513e3bc8df  config/areas/osaka-city.json
+          ba3d6d64f23a8084808d67aacc331d3dd540e8d46d226e21c1c35371e7944d58  data/processed/osaka-city/boundaries/ward-classification-polygons.json
+          e0b85f229994f39e2cf331e87dccf63db81752ba68a903982afce4b2816f3fbf  data/reports/mission79/source-lock.json
+          b5dd30c9d186e105a9e9b17a8950f7042f4bb6d61d42f40b4a5473c8d4721d23  tools/mission36k-convert-citygml-runtime.mjs
+          bb2ea0322837f635fa7fa0787954520a6506b135d5fb2bd86e3774be6bcbfacc  tools/mission37b-build-3dtiles.cjs
+          a2e0e5923250d603ed4bfcc6acf144e85c98bc6f41e40a4f7a45108305dd5aed  tools/mission79-build-ward-2025.cjs
+          c40a418700c5c73afc834e30f51741003f9f679fa8f53eb77d94e27f095eb602  tools/mission79-plateau2025-fetch.mjs
+          48e1af17784a1a0b749a121fcf8e01da9cfeb6f5469b5be858bf57f0183c330d  tools/mission79-plateau2025-source.mjs
+          c95c1be46c49514e9c67a0845e52b65e221f0522fa6c62325a0bc04a5eff5657  tools/mission79-run.mjs
+          fe1e4a1ee5e6aa64ed67826c9a5a69de41cd1ee988e4aea675850ec34cf04ae2  tools/mission80-batch.mjs
+          b5ff6847a105fbbb50756472865db7898265be41e26a1400073728fa4840dc43  tools/mission87-persist.mjs
+          a5617b54f962ef91fc7d8aeca48b92c0652d01b5464664b4ac1e406a08e97a4f  tools/mission95-check-output.mjs
+          4bd6d14ebfc600466be77b51d87198c8a94c0fe8303ebd9b71c8febdfcb286d2  tools/mission95-persist-ward.mjs
+          HASHES
+          sed -i 's/^ *//' "$RUNNER_TEMP/pin.sha256"
+          wc -l "$RUNNER_TEMP/pin.sha256"
+      - name: Verify pinned SHA, clean tree, file hashes (no token)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD is not the pinned SHA"; exit 1; }
+          [ -z "$(git status --porcelain)" ] || { echo "FAIL: tree not clean"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          echo "OK: pinned code verified"
+      - name: Preflight (no token, no network)
+        run: |
+          set -eu
+          printf '%s' "$WARD" | grep -Eq '^[a-z]+$' || { echo "FAIL: invalid ward"; exit 1; }
+          [ "$DATA_REPO" = "masamasa26346497-eng/livecity-3d-data" ] || { echo "FAIL: unexpected data repo"; exit 1; }
+          node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const polys=JSON.parse(fs.readFileSync("data/processed/osaka-city/boundaries/ward-classification-polygons.json","utf8"));
+            const hit=polys.wards.find(x=>x.wardId===w);
+            if(!hit) throw new Error("ward not in N03 polygons: "+w);
+            if(String(hit.wardCode).startsWith("27999")) throw new Error("expo (27999) excluded");
+            if(!/^271[0-2]\d$/.test(String(hit.wardCode))) throw new Error("not an official Osaka City ward code: "+hit.wardCode);
+            const lock=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8"));
+            if(!/plateau-27100-osaka-shi-2025/.test(JSON.stringify(lock.package))) throw new Error("source lock is not 27100/2025");
+            if(!lock.license||!lock.attribution) throw new Error("license/attribution missing in source lock");
+            const codes=new Set(polys.wards.map(x=>String(x.wardCode))); if(codes.size!==polys.wards.length) throw new Error("duplicate ward codes");
+            console.log("preflight ok ward="+w+" code="+hit.wardCode+" cost=0 (public CDN range reads, free runner minutes, private repo release)");
+          '
+      - name: Connect check (read-only, curl only, no repo code)
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -u
+          if [ -z "$DATA_TOKEN" ]; then echo "FAIL: secret empty or missing"; exit 1; fi
+          echo "::add-mask::$DATA_TOKEN"
+          code=$(curl -sS -o /tmp/repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          [ "$code" = "200" ] || { echo "FAIL: repo GET HTTP $code"; exit 1; }
+          vis=$(jq -r '.visibility' /tmp/repo.json); push=$(jq -r '.permissions.push // false' /tmp/repo.json)
+          echo "repo=$DATA_REPO visibility=$vis token_push=$push"
+          [ "$vis" = "private" ] && [ "$push" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
+          echo "OK: private connection verified (read-only)"
+      - name: Convert ward (PLATEAU 2025, NO token)
+        id: convert
+        run: node tools/mission80-batch.mjs --wards "$WARD" --max-wards 1 --ward-timeout-min 60
+      - name: Strict output check (no token)
+        id: strict
+        run: node tools/mission95-check-output.mjs "$WARD" | tee "$RUNNER_TEMP/strict.json"
+      - name: Re-verify code hashes before token use (no token)
+        id: reverify
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD changed"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          M=data/reports/mission80/batch-manifest.json
+          bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' | grep -vE "^ M $M\$" || true)
+          [ -z "$bad" ] || { echo "FAIL: unexpected changes: $bad"; exit 1; }
+          git show "HEAD:$M" > "$RUNNER_TEMP/manifest.head.json"
+          MANIFEST_BASE="$RUNNER_TEMP/manifest.head.json" MANIFEST_NEW="$M" node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const a=JSON.parse(fs.readFileSync(process.env.MANIFEST_BASE,"utf8")), b=JSON.parse(fs.readFileSync(process.env.MANIFEST_NEW,"utf8"));
+            const same=(x,y)=>JSON.stringify(x)===JSON.stringify(y);
+            if(b.mission!==a.mission||String(b.vintage)!==String(a.vintage)) throw new Error("manifest header changed");
+            for(const k of Object.keys(a.wards||{})){ if(k!==w && !same(a.wards[k],b.wards[k])) throw new Error("other ward entry modified: "+k); }
+            for(const k of Object.keys(b.wards||{})){ if(k!==w && !(k in a.wards)) throw new Error("unexpected new ward entry: "+k); }
+            const DERIVED=["totals","lastRun","source","crossWardDuplicateIds"];
+            const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!DERIVED.includes(k)&&!same(a[k],b[k]));
+            if(extra.length) throw new Error("unexpected top-level keys changed: "+extra);
+            const ok=Object.values(b.wards).filter(x=>x&&x.status==="ok"), fl=Object.values(b.wards).filter(x=>x&&x.status==="failed");
+            if(b.totals!==undefined){ const t=b.totals, e={wardsOk:ok.length,wardsFailed:fl.length,buildings:ok.reduce((n,x)=>n+x.buildings,0),outBytes:ok.reduce((n,x)=>n+x.outBytes,0)};
+              if(!same(t,e)) throw new Error("totals inconsistent with wards: "+JSON.stringify(t)+" vs "+JSON.stringify(e)); }
+            if(b.lastRun!==undefined){ const r=b.lastRun;
+              if(!r||typeof r!=="object"||!Number.isInteger(r.processed)||r.processed>1||r.failedNow!==0||typeof r.at!=="string"||Object.keys(r).some(k=>!["processed","failedNow","stoppedBy","at"].includes(k))) throw new Error("lastRun invalid: "+JSON.stringify(r)); }
+            if(b.source!==undefined){ const L=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8")), s=b.source;
+              if(s.url!==(L.resource&&L.resource.url)||s.etag!==(L.http&&L.http.etag)||s.bytes!==(L.http&&L.http.contentLength)||s.lastModified!==(L.http&&L.http.lastModified)) throw new Error("manifest source differs from hash-verified source-lock"); }
+            if(b.crossWardDuplicateIds!==undefined){ const d=b.crossWardDuplicateIds;
+              if(!d||typeof d!=="object"||Array.isArray(d)||Object.values(d).some(v=>!Number.isInteger(v))) throw new Error("crossWardDuplicateIds invalid"); }
+            if(!b.wards[w]) throw new Error("target ward entry missing");
+            console.log("manifest diff ok: only wards."+w+" and updatedAt may differ");
+          '
+      - name: Persist to private repo (token only here) and verify sha256
+        id: persist
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute | tee "$RUNNER_TEMP/persist.json"
+          node tools/mission87-persist.mjs status
+          {
+            echo "### $WARD"
+            echo "- strict: \`$(cat "$RUNNER_TEMP/strict.json")\`"
+            echo "- persist: \`$(tail -n1 "$RUNNER_TEMP/persist.json")\`"
+            echo "- browserAccepted: 0 (storage only; Cesium acceptance NOT done)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Write per-ward result (no token; separates generate failure from persist failure)
+        if: always()
+        env:
+          O_CONVERT: ${{ steps.convert.outcome }}
+          O_STRICT: ${{ steps.strict.outcome }}
+          O_REVERIFY: ${{ steps.reverify.outcome }}
+          O_PERSIST: ${{ steps.persist.outcome }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/res"
+          if [ "$O_PERSIST" = "success" ]; then st=stored
+          elif [ "$O_CONVERT" = "failure" ] || [ "$O_STRICT" = "failure" ]; then st=generate-failed
+          elif [ "$O_REVERIFY" = "failure" ] || [ "$O_PERSIST" = "failure" ]; then st=persist-failed
+          else st=incomplete; fi
+          jq -n --arg ward "$WARD" --arg st "$st" --arg c "$O_CONVERT" --arg s "$O_STRICT" --arg r "$O_REVERIFY" --arg p "$O_PERSIST" '{ward:$ward,status:$st,convert:$c,strict:$s,reverify:$r,persist:$p}' > "$RUNNER_TEMP/res/result-$WARD.json"
+          cat "$RUNNER_TEMP/res/result-$WARD.json"
+      - name: Upload per-ward result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ env.WARD }}
+          path: ${{ runner.temp }}/res/result-${{ env.WARD }}.json
+          retention-days: 30
+  summary:
+    needs: [plan, pilot, rest]
+    if: ${{ always() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download per-ward results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: result-*
+          path: results
+          merge-multiple: true
+      - name: Aggregate (no token)
+        env:
+          STORED_BEFORE: ${{ needs.plan.outputs.stored }}
+          PILOT_RESULT: ${{ needs.pilot.result }}
+          REST_RESULT: ${{ needs.rest.result }}
+        run: |
+          set -u
+          mkdir -p results
+          n_stored_before=$(echo $STORED_BEFORE | wc -w)
+          n_new=0; gen=""; per=""; inc=""
+          for f in results/result-*.json; do
+            [ -f "$f" ] || continue
+            w=$(jq -r .ward "$f"); st=$(jq -r .status "$f")
+            case "$st" in stored) n_new=$((n_new+1));; generate-failed) gen="$gen $w";; persist-failed) per="$per $w";; *) inc="$inc $w";; esac
+          done
+          {
+            echo "### Mission103 all-ward run (STORAGE ONLY - browser acceptance 0)"
+            echo "- already stored and sha256 re-verified before this run: $n_stored_before ($STORED_BEFORE)"
+            echo "- newly generated and stored this run: $n_new"
+            echo "- generate-failed (convert/strict check; nothing uploaded):${gen:- none}"
+            echo "- persist-failed (re-verify/upload/sha256 check):${per:- none}"
+            echo "- incomplete (cancelled/skipped mid-way):${inc:- none}"
+            echo "- pilot job result: $PILOT_RESULT / rest job result: $REST_RESULT"
+            echo "- HTTP fetch, CI browser render and device acceptance are NOT done by this workflow"
+            echo "- Resume: dispatch again with wards=ALL (stored wards are re-verified and skipped, failed wards retried once)"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ -n "$gen$per$inc" ] || [ "$PILOT_RESULT" = "failure" ] || [ "$REST_RESULT" = "failure" ]; then exit 1; fi
