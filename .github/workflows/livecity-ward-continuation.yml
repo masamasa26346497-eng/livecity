@@ -1,0 +1,66 @@
+name: Live City ward continuation (review required)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: livecity-ward-continuation
+  cancel-in-progress: false
+
+jobs:
+  request-next-ward-step:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check guardrails and request one bounded Claude job
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = 41;
+            const pr = (await github.rest.pulls.get({ owner, repo, pull_number: prNumber })).data;
+            if (pr.state !== 'open' || !pr.draft || pr.head.repo.full_name !== `${owner}/${repo}`) {
+              core.notice('PR #41 is not an open draft in this repository; skipping.');
+              return;
+            }
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({ owner, repo, per_page: 30 });
+            const busy = runs.data.workflow_runs.some(r =>
+              r.name === 'Claude Code' &&
+              ['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(r.status)
+            );
+            if (busy) {
+              core.notice('Claude Code is already running; skipping this cycle.');
+              return;
+            }
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: prNumber, per_page: 100
+            });
+            const today = new Date().toISOString().slice(0, 10);
+            const marker = `<!-- livecity-ward-continuation:${today} -->`;
+            if (comments.some(c => c.body && c.body.includes(marker))) {
+              core.notice('Continuation already requested today.');
+              return;
+            }
+            const body = [
+              marker,
+              '@claude Live City ward continuation: perform ONE bounded, safe data-only development step on PR #41.',
+              'First inspect current branch HEAD, existing meshes, latest report and other running work.',
+              'Prioritize completing Naniwa ward from official PLATEAU CityGML; only after a documented ward-completion audit, select the next unfinished Osaka ward.',
+              'Use only existing approved Node-based retrieval and conversion tools. Validate N03 boundary, coordinate sanity, canonicalId uniqueness, duplicate exclusion, tile and sidecar references, and tests.',
+              'Commit and push ONLY validated changes to PR #41 branch. Report real counts, SHA, remaining meshes, blockers and next task.',
+              'Never alter main, PR #24/#42, existing correct buildings, photos or 37G production viewer. Never merge, deploy production, change permissions, use paid APIs, or add charges.',
+              'If tool authorization or runtime prevents work, report it accurately and stop. Do not bypass restrictions. Do not claim a ward complete without full audit.',
+              'Do not post another @claude instruction or attempt to self-trigger.'
+            ].join('\n');
+            await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
+            core.notice('Posted one bounded continuation request on draft PR #41.');
