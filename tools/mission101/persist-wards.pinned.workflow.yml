@@ -17,11 +17,6 @@ on:
         required: true
         type: string
         default: "fukushima"
-      overwrite:
-        description: "re-convert and re-upload wards that are already stored (default false = skip stored wards)"
-        required: false
-        type: boolean
-        default: false
 permissions:
   contents: read
 env:
@@ -35,7 +30,7 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       count: ${{ steps.plan.outputs.count }}
@@ -45,7 +40,6 @@ jobs:
         env:
           DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
           IN_WARDS: ${{ inputs.wards }}
-          IN_OVERWRITE: ${{ inputs.overwrite }}
         run: |
           set -eu
           [ -n "$DATA_TOKEN" ] || { echo "FAIL: secret empty or missing"; exit 1; }
@@ -70,7 +64,7 @@ jobs:
           echo "### Plan (stored = permanent private storage, NOT browser accepted)" >> summary.md
           for w in $want; do
             id=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.id' rel.json | head -n1)
-            if [ -n "$id" ] && [ "$IN_OVERWRITE" != "true" ]; then
+            if [ -n "$id" ]; then
               curl -sSL --fail -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/octet-stream' -o "chk-$w.tgz" "https://api.github.com/repos/$DATA_REPO/releases/assets/$id"
               tar -tzf "chk-$w.tgz" | grep -q 'tileset.json' || { echo "FAIL: stored $w archive has no tileset.json"; exit 1; }
               sha=$(sha256sum "chk-$w.tgz" | cut -d' ' -f1); rm -f "chk-$w.tgz"
