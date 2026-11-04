@@ -33,7 +33,7 @@ test('local-run works from a non-ASCII/space/% dir, propagates child exit code',
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'lc110-'));
   const dir = path.join(base, 'ドキュメント 100%', 'tools', 'mission108');
   fs.mkdirSync(dir, { recursive: true });
-  for (const f of ['local-run.mjs', 'lib.mjs']) fs.copyFileSync(path.join(repo, 'tools/mission108', f), path.join(dir, f));
+  for (const f of ['local-run.mjs', 'lib.mjs', 'tar-reader.mjs']) fs.copyFileSync(path.join(repo, 'tools/mission108', f), path.join(dir, f));
   const serve = path.join(dir, '..', 'mission40f-serve-local.cjs');
   fs.writeFileSync(serve, 'process.exit(7)');
   const root = path.join(base, 'r');

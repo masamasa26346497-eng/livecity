@@ -2661,6 +2661,11 @@
   vecNote.id = 'lc-vec-coverage';
   vecNote.style.cssText = 'font:11px/1.5 var(--lc-mono);color:var(--lc-text-mute);padding:6px 4px 0';
   $('lc-layers').appendChild(vecNote);
+  // 114: 窓の範囲（znorth-neg-v1 メートル）。値は public/mission49-data, mission50-data, mission57-data の bboxLocal と同一（tests/mission114 が照合）。
+  const GSI_WINDOWS_114 = {
+    road: [{ minX: -3300, maxX: -1200, minZ: -1800, maxZ: 300 }, { minX: -3450, maxX: -2280, minZ: -12520, maxZ: -10650 }, { minX: -3310.3, maxX: -1297, minZ: -11275.1, maxZ: -8761.2 }],
+    water: [{ minX: -3310.3, maxX: -1297, minZ: -11275.1, maxZ: -8761.2 }, { minX: -3813.7, maxX: -793.7, minZ: -2221.9, maxZ: 797.8 }],
+  };
   stats.vecCoverage = { source: 'unknown', ward: null, text: '' };
   let bundleBox;
   async function updateVecCoverage() {
@@ -2675,7 +2680,11 @@
       else if (w && stats.vec45i && Object.keys(stats.vec45i.mounted || {}).includes(String(w.wardCode))) { src = 'ward-vector'; text = '道路・河川・公園・鉄道: ' + w.wardName + ' の区ベクタ（45I）を表示中'; }
       else if (w && stats.wardVec && stats.wardVec.ward === w.wardCode && stats.wardVec.state === 'ready') { src = 'ward-layers'; text = '道路・河川・公園・鉄道: ' + w.wardName + ' の区別レイヤーを表示中'; }
       else { src = 'none'; text = 'この付近（' + (w ? w.wardName : '区外') + '）は道路・河川・公園・鉄道の描画データ未配信。上の件数は住吉区の束のものです'; }
-      stats.vecCoverage = { source: src, ward: w ? w.wardCode : null, text };
+      // 114: GSI の道路縁（橙）と水域面（青）は固定の窓の中にしか無い。窓の外では描かず、その旨を明示する（推測で補わない）。
+      const inWin = (b) => c.x >= b.minX && c.x <= b.maxX && c.z >= b.minZ && c.z <= b.maxZ;
+      const gsiRoad = GSI_WINDOWS_114.road.some(inWin), gsiWater = GSI_WINDOWS_114.water.some(inWin);
+      if (!gsiRoad || !gsiWater) text += '。GSI実測の' + [!gsiRoad ? '道路縁(橙)' : '', !gsiWater ? '水域面(青)' : ''].filter(Boolean).join('・') + 'はこの付近では窓の外のため未配信（2025建物アーカイブに道路・河川は含まれません）';
+      stats.vecCoverage = { source: src, ward: w ? w.wardCode : null, text, gsiRoadEdgeInWindow: gsiRoad, gsiWaterInWindow: gsiWater };
       if (vecNote.textContent !== text) vecNote.textContent = text;
     } catch (e) { /* 表示補助のみ */ }
   }
