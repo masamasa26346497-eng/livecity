@@ -15,7 +15,7 @@ param(
   [string]$SupplementalLayersRoot = '',
   [ValidateSet('','primary','supplemental')][string]$LayersPrefer = '',
   [string]$Wards = 'nishi,fukushima,yodogawa',
-  [ValidateSet('audit','build','verify','diagnose','serve','all')][string]$Mode = 'all',
+  [ValidateSet('audit','build','verify','diagnose','readiness','serve','all')][string]$Mode = 'all',
   [int]$Port = 8137
 )
 $ErrorActionPreference = 'Stop'
@@ -51,6 +51,14 @@ try {
   }
   if ($Mode -eq 'diagnose') {
     & node tools\mission115\layers-run.cjs diagnose --layers-root $layers --wards $Wards
+    exit $LASTEXITCODE
+  }
+  if ($Mode -eq 'readiness') {
+    # Mission 119: read-only 24-ward matrix + loopback HTTP check. Writes nothing.
+    $rArgs = @('tools\mission119\readiness.cjs', '--buildings-root', (Resolve-AbsPath $BuildingsRoot), '--layers-root', $layers, '--http')
+    if ($SupplementalLayersRoot -ne '') { $rArgs += @('--supplemental-layers-root', (Resolve-AbsPath $SupplementalLayersRoot)) }
+    if ($LayersPrefer -ne '') { $rArgs += @('--layers-prefer', $LayersPrefer) }
+    & node @rArgs
     exit $LASTEXITCODE
   }
   if ($Mode -eq 'verify') {
