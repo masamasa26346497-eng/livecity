@@ -23,6 +23,7 @@ fs.mkdirSync(dest, { recursive: true });
 const arch = path.join(dest, '.archives');
 fs.mkdirSync(arch);
 const summary = { mission: 108, kind: 'private-archive-verify', source: fromDir ? 'local-archive-dir' : 'private-release', wards: {}, containsData: false };
+const safeMsg = (e) => String(e && e.message || e).replace(/Bearer\s+\S+/g, 'Bearer ***').replace(/\b(?:gh[pousr]_|github_pat_)\w+/g, '***').slice(0, 200);
 let exit = 0;
 try {
   const release = fromDir ? null : await L.getRelease(token);
@@ -35,7 +36,7 @@ try {
       if (fromDir) fs.copyFileSync(path.join(path.resolve(fromDir), name), file, fs.constants.COPYFILE_EXCL);
       else {
         const m = (release.assets || []).filter((x) => x.name === name);
-        if (m.length !== 1) throw new Error('expected exactly 1 asset named ' + name + ', found ' + m.length);
+        if (m.length !== 1) throw new L.FetchDiag('asset-not-found', 'release', null, 'found ' + m.length);
         r.assetSize = await L.downloadAsset(token, m[0], file);
       }
       r.archiveSha256 = L.sha256File(file);
@@ -48,12 +49,14 @@ try {
       r.tilesetSha256 = L.sha256File(path.join(wardDir, 'tileset.json'));
       Object.assign(r, { tilesets: v.tilesets, glbs: v.glbs, glbBytes: v.glbBytes, sourceWardCode: v.sourceWardCode, integrityErrors: v.errors });
       r.status = v.ok ? 'verified' : 'failed';
-    } catch (e) { r.error = String(e && e.message || e).replace(/Bearer\s+\S+/g, 'Bearer ***').slice(0, 200); }
+    } catch (e) { r.error = safeMsg(e); r.diagnostic = L.diagnose(e); console.error('FAIL(' + w + '): ' + r.diagnostic.message + '\n  対処: ' + r.diagnostic.remediation); }
     if (r.status !== 'verified') exit = 1;
     summary.wards[w] = r;
   }
 } catch (e) {
-  summary.error = String(e && e.message || e).replace(/Bearer\s+\S+/g, 'Bearer ***').slice(0, 200);
+  summary.error = safeMsg(e);
+  summary.diagnostic = L.diagnose(e);
+  console.error('FAIL: ' + summary.diagnostic.message + '\n  対処: ' + summary.diagnostic.remediation + '\n  詳細(秘密情報・応答本文は含まれません): ' + summaryPath);
   exit = 1;
 } finally {
   fs.rmSync(arch, { recursive: true, force: true });
@@ -61,4 +64,5 @@ try {
 summary.allVerified = exit === 0;
 fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 1));
 console.log(JSON.stringify({ allVerified: summary.allVerified, wards: Object.fromEntries(Object.entries(summary.wards).map(([k, v]) => [k, v.status])) }));
-process.exit(exit);
+// No process.exit(): on Windows Node 24 it can tear down live undici/libuv handles (UV_HANDLE_CLOSING assertion). Let the loop drain.
+process.exitCode = exit;

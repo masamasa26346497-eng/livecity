@@ -21,7 +21,10 @@ if (!a.includes('--reuse')) {
   const wards = L.validateWards((opt('wards', 'nishi,fukushima,yodogawa')).split(',').filter(Boolean));
   if (fs.existsSync(root) && fs.readdirSync(root).length) { console.error('FAIL: ' + root + ' is not empty. Use --reuse, or pass a new --root. (Nothing is overwritten or deleted.)'); process.exit(2); }
   const r = spawnSync(process.execPath, [path.join(here, 'fetch-verify.mjs'), '--wards', wards.join(','), '--dest', root, '--summary', path.join(path.dirname(root), 'fetch-summary.json')], { stdio: 'inherit', env: process.env });
-  if (r.status !== 0) { console.error('FAIL: fetch/verify did not pass; nothing is served.'); process.exit(r.status || 1); }
+  if (r.status !== 0) {
+    console.error('FAIL: fetch/verify did not pass; nothing is served.' + (r.error ? ' (child: ' + r.error.message + ')' : '') + '\n  summary (secrets and data not included): ' + path.join(path.dirname(root), 'fetch-summary.json') + '\n  Partial data under ' + root + ' is left untouched; re-run with a new --root.');
+    process.exit(r.status || 1); // parent holds no live network handles here (spawnSync child already ended)
+  }
 }
 if (a.includes('--reuse')) {
   // Read-only presence check; never creates, deletes or overwrites anything.

@@ -148,31 +148,66 @@ export function verifyTilesetDir(root) {
 }
 
 // ---- GitHub release access (read-only GET). The token only goes to api.github.com in an Authorization header. ----
-export async function ghGet(url, token, accept = 'application/vnd.github+json') {
+// Error carrying only non-secret diagnostics: step, http status, short kind. Never a response body, never the token.
+export class FetchDiag extends Error {
+  constructor(kind, step, http, detail) { super('[' + step + '] ' + kind + (http ? ' HTTP ' + http : '') + (detail ? ' (' + detail + ')' : '')); this.kind = kind; this.step = step; this.http = http || null; }
+}
+// Release the connection of a response we do not read (avoids dangling undici streams, notably on Windows Node 24).
+export async function drain(res) { try { if (res && res.body && !res.body.locked) await res.body.cancel(); } catch { /* ignore */ } }
+const netDetail = (e) => String((e && e.cause && (e.cause.code || e.cause.name)) || (e && e.name) || 'error').replace(/[^A-Za-z0-9_.-]/g, '').slice(0, 40);
+export async function ghGet(url, token, accept = 'application/vnd.github+json', step = 'request') {
   if (!/^https:\/\/api\.github\.com\//.test(url)) throw new Error('refusing non-api URL');
-  return fetch(url, { headers: { Authorization: 'Bearer ' + token, Accept: accept, 'User-Agent': 'livecity-mission108' }, redirect: 'manual' });
+  try {
+    return await fetch(url, { headers: { Authorization: 'Bearer ' + token, Accept: accept, 'User-Agent': 'livecity-mission108' }, redirect: 'manual', signal: AbortSignal.timeout(60000) });
+  } catch (e) { throw new FetchDiag('network', step, null, netDetail(e)); }
+}
+// Japanese message + remediation. Built only from kind/step/http: safe to print (no body, no token).
+export function diagnose(err) {
+  const kind = err && err.kind, step = err && err.step, http = err && err.http;
+  const D = (message, remediation) => ({ kind: kind || 'unknown', step: step || null, http: http || null, message, remediation });
+  if (kind === 'network') return D('GitHub API に接続できませんでした (' + step + ')。', 'ネット接続・プロキシ・VPN・セキュリティソフトを確認して再実行してください。');
+  if (kind === 'not-private') return D('データ用リポジトリが private ではありません。', '安全のため中断しました。リポジトリの公開設定を確認してください。');
+  if (kind === 'http' && step === 'repo') {
+    if (http === 401) return D('リポジトリ取得が 401 (認証失敗)。', 'トークンが無効・期限切れ・コピー不備の可能性があります。fine-grained token を作り直してください。');
+    if (http === 403) return D('リポジトリ取得が 403 (権限不足またはレート制限)。', 'トークンの Contents: Read-only と組織の承認要否を確認してください。時間を置く再試行も有効です。');
+    if (http === 404) return D('リポジトリ取得が 404。', 'トークンの Resource owner、選択した repository (livecity-3d-data)、Repository permissions の Contents が Read-only かを確認してください。private repo は権限不足でも 404 になります。');
+    return D('リポジトリ取得が HTTP ' + http + '。', '時間を置いて再実行してください。');
+  }
+  if (kind === 'http' && step === 'release') {
+    if (http === 404) return D('リリースタグが 404。', 'タグ ' + TAG + ' のリリースが存在し、draft でないか確認してください。');
+    if (http === 401 || http === 403) return D('リリース取得が ' + http + '。', 'トークンの Contents: Read 権限とアクセス権を確認してください。');
+    return D('リリース取得が HTTP ' + http + '。', '時間を置いて再実行してください。');
+  }
+  if (kind === 'asset-not-found') return D('期待するアセットがリリースに見つかりません。', 'plateau2025-<区>.tar.gz がリリースに 1 つだけ存在するか確認してください。');
+  if (kind === 'http' && step === 'asset') return D('アセットのダウンロードが HTTP ' + http + '。', '再実行してください。401/403 ならトークン権限を確認してください。');
+  if (kind === 'asset-size') return D('ダウンロードサイズが一致しません。', '通信が途切れた可能性があります。再実行してください (部分ファイルは残しません)。');
+  return D('取得または検証に失敗しました。', 'temp/mission108/fetch-summary.json の error 欄を共有してください。');
 }
 export async function getRelease(token, repo = DATA_REPO, tag = TAG) {
-  const rr = await ghGet('https://api.github.com/repos/' + repo, token);
-  if (rr.status !== 200) throw new Error('repo GET HTTP ' + rr.status);
+  const rr = await ghGet('https://api.github.com/repos/' + repo, token, undefined, 'repo');
+  if (rr.status !== 200) { await drain(rr); throw new FetchDiag('http', 'repo', rr.status); }
   const rj = await rr.json();
-  if (rj.visibility !== 'private') throw new Error('data repo is not private');
-  const r = await ghGet('https://api.github.com/repos/' + repo + '/releases/tags/' + tag, token);
-  if (r.status !== 200) throw new Error('release GET HTTP ' + r.status);
+  if (rj.visibility !== 'private') throw new FetchDiag('not-private', 'repo');
+  const r = await ghGet('https://api.github.com/repos/' + repo + '/releases/tags/' + tag, token, undefined, 'release');
+  if (r.status !== 200) { await drain(r); throw new FetchDiag('http', 'release', r.status); }
   return r.json();
 }
 // Download one asset to file. The redirect target (signed URL on another host) is fetched WITHOUT the Authorization header.
 export async function downloadAsset(token, asset, file, repo = DATA_REPO) {
   if (asset.size > MAX_ARCHIVE_BYTES) throw new Error('asset too large');
-  let res = await ghGet('https://api.github.com/repos/' + repo + '/releases/assets/' + asset.id, token, 'application/octet-stream');
+  let res = await ghGet('https://api.github.com/repos/' + repo + '/releases/assets/' + asset.id, token, 'application/octet-stream', 'asset');
   if (res.status >= 300 && res.status < 400) {
     const loc = res.headers.get('location');
+    await drain(res);
     if (!loc || !/^https:\/\//.test(loc)) throw new Error('bad redirect');
-    res = await fetch(loc, { headers: { 'User-Agent': 'livecity-mission108' } });
+    try { res = await fetch(loc, { headers: { 'User-Agent': 'livecity-mission108' }, signal: AbortSignal.timeout(600000) }); }
+    catch (e) { throw new FetchDiag('network', 'asset', null, netDetail(e)); }
   }
-  if (res.status !== 200) throw new Error('asset GET HTTP ' + res.status);
-  const buf = Buffer.from(await res.arrayBuffer());
-  if (buf.length !== asset.size) throw new Error('asset size mismatch');
+  if (res.status !== 200) { await drain(res); throw new FetchDiag('http', 'asset', res.status); }
+  // File is written ('wx') only after the whole body arrived and the size matched: a failed download leaves nothing at `file`.
+  let buf;
+  try { buf = Buffer.from(await res.arrayBuffer()); } catch (e) { throw new FetchDiag('network', 'asset', null, netDetail(e)); }
+  if (buf.length !== asset.size) throw new FetchDiag('asset-size', 'asset');
   fs.writeFileSync(file, buf, { flag: 'wx', mode: 0o600 });
   return buf.length;
 }
