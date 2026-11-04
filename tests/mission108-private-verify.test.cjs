@@ -36,7 +36,7 @@ test('entry names: traversal / absolute / backslash refused', async () => {
 
 test('tar listing: symlink and hardlink entries are refused', async () => {
   const L = await lib();
-  assert.throws(() => L.parseTarListing('lrwxrwxrwx root/root 0 2025-01-01 00:00 evil -> /etc/passwd'), /link/);
+  assert.throws(() => L.parseTarListing('lrwxrwxrwx root/root 0 2025-01-01 00:00 evil -> /etc/passwd', 'evil'), /link/);
   assert.throws(() => L.checkEntries([{ type: 'c', size: 0, name: 'dev' }]), /special/);
   assert.throws(() => L.checkEntries([{ type: '-', size: 1, name: '../../x' }]), /unsafe/);
 });

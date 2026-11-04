@@ -49,3 +49,11 @@ No coordinate shift or ground switch is applied anywhere. A shift may only be pr
 
 ## Not proven
 Real archive layout (assumed `tileset.json` at root or under one folder), real tar listing format on the runner (GNU tar), real render of 2025 tiles, workflow acceptance by GitHub's validator.
+
+## Mission 112: Windows bsdtar / PowerShell 5.1
+- Tar listing: names come from `tar -tzf`; type/size from `tar -tzvf` (GNU or bsdtar layout). Every verbose line must end with the plain name; mismatch, unknown layout, links, or odd names fail closed. Extraction retries without `--no-same-owner/--no-same-permissions` only if this tar rejects them before writing anything (empty dest, post-extract symlink/escape walk unchanged).
+- `fetch-summary.json` is now ASCII-safe JSON (non-ASCII as `\uXXXX`). For summaries written by older versions use:
+  `Get-Content .\temp\mission108\fetch-summary.json -Raw -Encoding UTF8 | ConvertFrom-Json`
+- A failed run leaves its `--root` untouched. Retry with a NEW root (read-only fetch from the private Release; no deletes):
+  `node tools\mission108\local-run.mjs --wards nishi,fukushima,yodogawa --root temp\mission108\root4`
+- Fetching and sha256 matching of the 2025 assets is confirmed by the owner's run; rendering is NOT yet verified. Never use the old pc23 data.

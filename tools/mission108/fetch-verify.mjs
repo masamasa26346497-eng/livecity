@@ -62,7 +62,8 @@ try {
   fs.rmSync(arch, { recursive: true, force: true });
 }
 summary.allVerified = exit === 0;
-fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 1));
+// ASCII-safe JSON (non-ASCII escaped as \uXXXX) so Windows PowerShell 5.1 parses it regardless of BOM/codepage.
+fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 1).replace(/[\u0080-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')));
 console.log(JSON.stringify({ allVerified: summary.allVerified, wards: Object.fromEntries(Object.entries(summary.wards).map(([k, v]) => [k, v.status])) }));
 // No process.exit(): on Windows Node 24 it can tear down live undici/libuv handles (UV_HANDLE_CLOSING assertion). Let the loop drain.
 process.exitCode = exit;

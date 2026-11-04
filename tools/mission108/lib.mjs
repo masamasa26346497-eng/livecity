@@ -45,15 +45,21 @@ export function unsafeName(name) {
 }
 
 // Parse `tar -tzvf` (GNU) verbose lines. Only regular files and directories are accepted: symlinks, hardlinks, devices, fifos are refused.
-export function parseTarListing(text) {
+// Names are AUTHORITATIVE from `tar -tzf` (plain); type/size come from `tar -tzvf` in GNU ("-rw-r--r-- u/g 123 2025-01-01 12:00 name")
+// or bsdtar ("-rw-r--r--  0 u g 123 Jan  1 12:00 name") layout. Each verbose line must END with exactly the plain name at the same
+// index; line-count difference (e.g. newline in a name), unknown layout or name mismatch fails closed. Links/devices refused.
+const VERBOSE_RE = /^([-dlhcbps])[rwxsStT-]{9}[.+@]?\s+.*?\s(\d+)\s+(?:\d{4}-\d{2}-\d{2}|[A-Z][a-z]{2}\s+\d{1,2})\s+(?:\d{1,2}:\d{2}(?::\d{2})?|\d{4})\s/;
+export function parseTarListing(verbose, plain) {
+  const strip = (t) => String(t).split('\n').map((l) => l.replace(/\r$/, '')).filter((l) => l.length);
+  const vl = strip(verbose), pl = strip(plain);
+  if (vl.length !== pl.length) throw new Error('tar listing mismatch (verbose vs plain line count)');
   const entries = [];
-  for (const line of text.split('\n')) {
-    if (!line.trim()) continue;
-    const m = line.match(/^([-dlhcbps])[rwxsStT-]{9}\s+\S+\s+(\d+)\s+\S+\s+\S+\s+(.*)$/);
-    if (!m) throw new Error('unparseable tar listing line');
-    const name = m[3];
-    if (m[1] === 'l' || m[1] === 'h' || / -> | link to /.test(name)) throw new Error('link entry refused');
-    entries.push({ type: m[1], size: Number(m[2]), name });
+  for (let i = 0; i < vl.length; i++) {
+    const m = vl[i].match(VERBOSE_RE);
+    if (!m) throw new Error('unparseable tar listing line (unknown verbose format)');
+    if (m[1] === 'l' || m[1] === 'h') throw new Error('link entry refused');
+    if (vl[i].slice(m[0].length) !== pl[i]) throw new Error('tar listing name mismatch (link suffix or odd name)');
+    entries.push({ type: m[1], size: Number(m[2]), name: pl[i] });
   }
   return entries;
 }
@@ -71,16 +77,23 @@ export function checkEntries(entries) {
   return { count: entries.length, bytes: total };
 }
 export function tarList(file) {
-  const r = spawnSync('tar', ['-tzvf', file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  if (r.status !== 0) throw new Error('tar listing failed');
-  return r.stdout;
+  const run = (args) => {
+    const r = spawnSync('tar', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    if (r.status !== 0) throw new Error('tar listing failed');
+    return r.stdout;
+  };
+  return { verbose: run(['-tzvf', file]), plain: run(['-tzf', file]) };
 }
 // Extract into an EMPTY directory only. After extraction, re-walk and reject any symlink / escape.
 export function safeExtract(file, dest) {
   fs.mkdirSync(dest, { recursive: true });
   if (fs.readdirSync(dest).length) throw new Error('destination not empty');
-  const info = checkEntries(parseTarListing(tarList(file)));
-  const r = spawnSync('tar', ['-xzf', file, '-C', dest, '--no-same-owner', '--no-same-permissions'], { encoding: 'utf8' });
+  const l = tarList(file);
+  const info = checkEntries(parseTarListing(l.verbose, l.plain));
+  // GNU-only flags first; if this tar (e.g. Windows bsdtar) rejects them before extracting anything, retry without them
+  // (same empty dest, same post-extract walk; bsdtar refuses absolute/".." paths by default without -P).
+  let r = spawnSync('tar', ['-xzf', file, '-C', dest, '--no-same-owner', '--no-same-permissions'], { encoding: 'utf8' });
+  if (r.status !== 0 && fs.readdirSync(dest).length === 0) r = spawnSync('tar', ['-xzf', file, '-C', dest], { encoding: 'utf8' });
   if (r.status !== 0) throw new Error('tar extract failed');
   const root = fs.realpathSync(dest);
   const walk = (d) => {
