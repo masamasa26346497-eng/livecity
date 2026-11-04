@@ -137,6 +137,15 @@ function audit(src, wards) {
     }
     rep.wards.push(e);
   }
+  // Mission 116: readiness per ward. "ready" = roads AND waterways have source features; never confused with generated/accepted.
+  const has = (e, l) => e.layers[l].features > 0;
+  rep.summary = {
+    requested: rep.wards.length,
+    ready: rep.wards.filter((e) => has(e, 'roads') && has(e, 'waterways')).map((e) => e.ward),
+    roadsOnly: rep.wards.filter((e) => has(e, 'roads') && !has(e, 'waterways')).map((e) => e.ward),
+    noSource: rep.wards.filter((e) => !has(e, 'roads')).map((e) => ({ ward: e.ward, reason: e.layers.roads.status })),
+    note: 'ready = source features exist; not generated, not verified, not rendered',
+  };
   return rep;
 }
 function main() {
