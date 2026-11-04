@@ -57,3 +57,11 @@ Real archive layout (assumed `tileset.json` at root or under one folder), real t
 - A failed run leaves its `--root` untouched. Retry with a NEW root (read-only fetch from the private Release; no deletes):
   `node tools\mission108\local-run.mjs --wards nishi,fukushima,yodogawa --root temp\mission108\root4`
 - Fetching and sha256 matching of the 2025 assets is confirmed by the owner's run; rendering is NOT yet verified. Never use the old pc23 data.
+
+## Mission 113: tar handling (no external `tar`, no listing text parsing)
+Archives are read by `tar-reader.mjs` straight from the 512-byte headers (USTAR prefix, PAX, GNU long names, checksum, typeflag),
+streamed through `node:zlib`, with limits (entries, unpacked bytes, decompressed bytes, meta size) and fail-closed checks
+(links/devices, `..`, absolute/drive/UNC, backslash, NUL, Windows-unsafe names, duplicates/case collisions).
+Errors are coded (`tar:bad-checksum (entry 0 offset 0 stored .. computed .. magic .. type ..)`) and never contain entry names.
+On a failed fetch the downloaded archives are KEPT in `<root>\.archives`; audit offline (name-free output, safe to paste):
+`node tools\mission108\tar-audit.mjs "<root>\.archives\plateau2025-nishi.tar.gz"`

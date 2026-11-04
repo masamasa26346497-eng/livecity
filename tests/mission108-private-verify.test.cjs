@@ -36,7 +36,6 @@ test('entry names: traversal / absolute / backslash refused', async () => {
 
 test('tar listing: symlink and hardlink entries are refused', async () => {
   const L = await lib();
-  assert.throws(() => L.parseTarListing('lrwxrwxrwx root/root 0 2025-01-01 00:00 evil -> /etc/passwd', 'evil'), /link/);
   assert.throws(() => L.checkEntries([{ type: 'c', size: 0, name: 'dev' }]), /special/);
   assert.throws(() => L.checkEntries([{ type: '-', size: 1, name: '../../x' }]), /unsafe/);
 });
@@ -45,14 +44,14 @@ test('safeExtract: a real archive containing a symlink is refused before extract
   const L = await lib(); const t = tmp(); const src = path.join(t, 'src'); makeWard(src);
   fs.symlinkSync('/etc/passwd', path.join(src, 'evil'));
   pack(src, path.join(t, 'a.tgz'));
-  assert.throws(() => L.safeExtract(path.join(t, 'a.tgz'), path.join(t, 'dest')), /link/);
+  await assert.rejects(() => L.safeExtract(path.join(t, 'a.tgz'), path.join(t, 'dest')), /unsupported-entry-type/);
   assert.ok(!fs.existsSync(path.join(t, 'dest', 'tileset.json')));
 });
 
 test('safeExtract: non-empty destination refused (no overwrite)', async () => {
   const L = await lib(); const t = tmp(); const src = path.join(t, 'src'); makeWard(src); pack(src, path.join(t, 'a.tgz'));
   fs.mkdirSync(path.join(t, 'dest')); fs.writeFileSync(path.join(t, 'dest', 'keep'), 'x');
-  assert.throws(() => L.safeExtract(path.join(t, 'a.tgz'), path.join(t, 'dest')), /not empty/);
+  await assert.rejects(() => L.safeExtract(path.join(t, 'a.tgz'), path.join(t, 'dest')), /not empty/);
   assert.strictEqual(fs.readFileSync(path.join(t, 'dest', 'keep'), 'utf8'), 'x');
 });
 

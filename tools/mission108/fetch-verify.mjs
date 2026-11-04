@@ -40,9 +40,10 @@ try {
         r.assetSize = await L.downloadAsset(token, m[0], file);
       }
       r.archiveSha256 = L.sha256File(file);
+      r.audit = await L.auditTarGz(file); // name-free counts; throws a coded TarError before anything is written
       const wardDir = path.join(dest, w + '25');
       const tmp = path.join(dest, '.x-' + w);
-      r.extract = L.safeExtract(file, tmp);
+      r.extract = await L.safeExtract(file, tmp);
       fs.renameSync(L.findTilesetRoot(tmp), wardDir);
       fs.rmSync(tmp, { recursive: true, force: true });
       const v = L.verifyTilesetDir(wardDir);
@@ -59,7 +60,10 @@ try {
   console.error('FAIL: ' + summary.diagnostic.message + '\n  対処: ' + summary.diagnostic.remediation + '\n  詳細(秘密情報・応答本文は含まれません): ' + summaryPath);
   exit = 1;
 } finally {
-  fs.rmSync(arch, { recursive: true, force: true });
+  // Mission 113: on failure KEEP the downloaded archives so they can be audited offline (no re-download):
+  //   node tools/mission108/tar-audit.mjs <dest>/.archives/plateau2025-<ward>.tar.gz
+  if (exit === 0) fs.rmSync(arch, { recursive: true, force: true });
+  else console.error('Archives kept for offline audit (no re-download needed): ' + arch);
 }
 summary.allVerified = exit === 0;
 // ASCII-safe JSON (non-ASCII escaped as \uXXXX) so Windows PowerShell 5.1 parses it regardless of BOM/codepage.

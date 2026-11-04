@@ -46,7 +46,7 @@ try {
       if (pv && pv.status === 'verified' && pv.archiveSha256 === r.archiveSha256) r.previouslyVerifiedSameSha = true;
       const wardDir = path.join(dest, w + '25');
       const tmp = path.join(dest, '.x-' + w);
-      r.extract = L.safeExtract(file, tmp);
+      r.extract = await L.safeExtract(file, tmp);
       fs.renameSync(L.findTilesetRoot(tmp), wardDir);
       fs.rmSync(tmp, { recursive: true, force: true });
       fs.rmSync(file, { force: true }); // free disk early

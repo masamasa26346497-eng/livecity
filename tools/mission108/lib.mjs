@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { spawnSync } from 'node:child_process';
+import { extractTarGz, auditTarGz, TarError } from './tar-reader.mjs';
 
 export const DATA_REPO = 'masamasa26346497-eng/livecity-3d-data';
 export const TAG = 'plateau2025-converted';
@@ -44,25 +44,7 @@ export function unsafeName(name) {
   return null;
 }
 
-// Parse `tar -tzvf` (GNU) verbose lines. Only regular files and directories are accepted: symlinks, hardlinks, devices, fifos are refused.
-// Names are AUTHORITATIVE from `tar -tzf` (plain); type/size come from `tar -tzvf` in GNU ("-rw-r--r-- u/g 123 2025-01-01 12:00 name")
-// or bsdtar ("-rw-r--r--  0 u g 123 Jan  1 12:00 name") layout. Each verbose line must END with exactly the plain name at the same
-// index; line-count difference (e.g. newline in a name), unknown layout or name mismatch fails closed. Links/devices refused.
-const VERBOSE_RE = /^([-dlhcbps])[rwxsStT-]{9}[.+@]?\s+.*?\s(\d+)\s+(?:\d{4}-\d{2}-\d{2}|[A-Z][a-z]{2}\s+\d{1,2})\s+(?:\d{1,2}:\d{2}(?::\d{2})?|\d{4})\s/;
-export function parseTarListing(verbose, plain) {
-  const strip = (t) => String(t).split('\n').map((l) => l.replace(/\r$/, '')).filter((l) => l.length);
-  const vl = strip(verbose), pl = strip(plain);
-  if (vl.length !== pl.length) throw new Error('tar listing mismatch (verbose vs plain line count)');
-  const entries = [];
-  for (let i = 0; i < vl.length; i++) {
-    const m = vl[i].match(VERBOSE_RE);
-    if (!m) throw new Error('unparseable tar listing line (unknown verbose format)');
-    if (m[1] === 'l' || m[1] === 'h') throw new Error('link entry refused');
-    if (vl[i].slice(m[0].length) !== pl[i]) throw new Error('tar listing name mismatch (link suffix or odd name)');
-    entries.push({ type: m[1], size: Number(m[2]), name: pl[i] });
-  }
-  return entries;
-}
+// Mission 113: archives are read by ./tar-reader.mjs (direct tar header parsing; no external `tar`, no text-listing parsing).
 export function checkEntries(entries) {
   if (entries.length === 0) throw new Error('empty archive');
   if (entries.length > MAX_ENTRIES) throw new Error('too many entries');
@@ -76,25 +58,10 @@ export function checkEntries(entries) {
   if (total > MAX_UNPACKED_BYTES) throw new Error('unpacked size too large');
   return { count: entries.length, bytes: total };
 }
-export function tarList(file) {
-  const run = (args) => {
-    const r = spawnSync('tar', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-    if (r.status !== 0) throw new Error('tar listing failed');
-    return r.stdout;
-  };
-  return { verbose: run(['-tzvf', file]), plain: run(['-tzf', file]) };
-}
-// Extract into an EMPTY directory only. After extraction, re-walk and reject any symlink / escape.
-export function safeExtract(file, dest) {
-  fs.mkdirSync(dest, { recursive: true });
-  if (fs.readdirSync(dest).length) throw new Error('destination not empty');
-  const l = tarList(file);
-  const info = checkEntries(parseTarListing(l.verbose, l.plain));
-  // GNU-only flags first; if this tar (e.g. Windows bsdtar) rejects them before extracting anything, retry without them
-  // (same empty dest, same post-extract walk; bsdtar refuses absolute/".." paths by default without -P).
-  let r = spawnSync('tar', ['-xzf', file, '-C', dest, '--no-same-owner', '--no-same-permissions'], { encoding: 'utf8' });
-  if (r.status !== 0 && fs.readdirSync(dest).length === 0) r = spawnSync('tar', ['-xzf', file, '-C', dest], { encoding: 'utf8' });
-  if (r.status !== 0) throw new Error('tar extract failed');
+export { auditTarGz, TarError };
+// Extract into an EMPTY directory only (async, streaming). After extraction, re-walk and reject any symlink / escape.
+export async function safeExtract(file, dest) {
+  const info = await extractTarGz(file, dest);
   const root = fs.realpathSync(dest);
   const walk = (d) => {
     for (const e of fs.readdirSync(d, { withFileTypes: true })) {
@@ -193,6 +160,7 @@ export function diagnose(err) {
   }
   if (kind === 'asset-not-found') return D('期待するアセットがリリースに見つかりません。', 'plateau2025-<区>.tar.gz がリリースに 1 つだけ存在するか確認してください。');
   if (kind === 'http' && step === 'asset') return D('アセットのダウンロードが HTTP ' + http + '。', '再実行してください。401/403 ならトークン権限を確認してください。');
+  if (kind === 'tar') return D('アーカイブの検査で拒否されました: ' + (err.code || 'unknown') + '。', '詳細コード: ' + String(err.message).slice(0, 200) + ' (ファイル名・データは含まれません)。node tools/mission108/tar-audit.mjs <archive> の出力を共有してください。');
   if (kind === 'asset-size') return D('ダウンロードサイズが一致しません。', '通信が途切れた可能性があります。再実行してください (部分ファイルは残しません)。');
   return D('取得または検証に失敗しました。', 'temp/mission108/fetch-summary.json の error 欄を共有してください。');
 }
