@@ -23,6 +23,18 @@ Reuse later without a token: `node tools\mission108\local-run.mjs --reuse`. Head
 `node tools\mission108\qa.mjs --root temp\mission108\root --wards nishi,fukushima,yodogawa --summary qa-summary.json`.
 Token scope: fine-grained PAT, repository `livecity-3d-data` only, **Contents: read** only. Close the shell afterwards.
 
+### Windows notes (Mission 110)
+`local-run.mjs` resolves its own location with `fileURLToPath`, so Japanese folders (e.g. `ドキュメント`), spaces and `%` work. `--reuse` first checks `<root>\<ward>25\tileset.json` and stops with exit code 2 (nothing deleted or overwritten) if it is missing. A failing server child propagates its exit code.
+Recommended:
+```powershell
+node tools\mission108\local-run.mjs --reuse
+```
+Direct start (workaround; same server, 127.0.0.1 only):
+```powershell
+node tools\mission40f-serve-local.cjs --ext temp\mission108\root --port 8137
+# http://127.0.0.1:8137/mission37g-osaka-24ward-mvp.html?ext=nishi25,fukushima25,yodogawa25
+```
+
 ## CI (owner installs once)
 1. Copy `tools/mission108/qa-private-2025.workflow.yml` to `.github/workflows/mission108-private-2025-qa.yml` on `main` (the GitHub App cannot write workflows; owner auth is not bypassed).
 2. Actions -> "Mission108 private 2025 QA" -> Run workflow, `wards` = `nishi,fukushima,yodogawa` (or a subset).
