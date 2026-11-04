@@ -10,7 +10,7 @@ param(
   [string]$BuildingsRoot = 'temp\mission114\root',
   [string]$LayersRoot = '',
   [string]$Wards = 'nishi,fukushima,yodogawa',
-  [ValidateSet('audit','build','verify','serve','all')][string]$Mode = 'all',
+  [ValidateSet('audit','build','verify','diagnose','serve','all')][string]$Mode = 'all',
   [int]$Port = 8137
 )
 $ErrorActionPreference = 'Stop'
@@ -43,6 +43,10 @@ try {
     & node tools\mission115\layers-run.cjs build --src $srcAbs --layers-root $layers --wards $Wards
     $b = $LASTEXITCODE
     if ($b -ne 0) { Write-Host ('build/verify reported problems (exit ' + $b + '). Wards that passed can still be viewed; see the list above.') }
+  }
+  if ($Mode -eq 'diagnose') {
+    & node tools\mission115\layers-run.cjs diagnose --layers-root $layers --wards $Wards
+    exit $LASTEXITCODE
   }
   if ($Mode -eq 'verify') {
     & node tools\mission115\layers-run.cjs verify --layers-root $layers --wards $Wards

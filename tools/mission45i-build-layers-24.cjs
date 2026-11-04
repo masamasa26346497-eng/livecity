@@ -15,6 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const L = require('./mission40g-build-ward-layers.cjs');
 const A = require('./lib/mission45j-align.cjs');
+const C = require('./lib/mission117-clip.cjs');
 const VEC = (() => { const m = require('../public/mission45i-vec.js'); return m && m.makeInsideTester ? m : globalThis.LC45I; })();   // package.json が type:module のため .js は ESM 扱い → globalThis.LC45I
 
 const ROOT = path.resolve(__dirname, '..');
@@ -109,20 +110,27 @@ function buildWard(ward, src, layersRoot, margin, planOnly) {
   if (problems.length) { res.stage = 'convention-mismatch'; res.note = problems.join(' | '); return res; }
   const convention = (manifests.roads || manifests[Object.keys(manifests)[0]] || {}).coordinateConvention;
   // 45J: 区ポリゴンでの切り出しをビルド時に 1 回だけ行う（ビューアは clipped:'ward-polygon' を見て再 clip しない）
+  // Mission 117 (clipVersion 2): lines end exactly at the ward boundary (no kept outside neighbour vertex) and area rings
+  // (water / parks) are clipped to the ward clip box, so no vertex lies outside the box.
   let clippedKind = 'bbox';
-  if (ward.polygons) {
-    const inside = VEC.makeInsideTester(ward.polygons, 64);
-    for (const l of ['roads', 'railways', 'waterways']) {
-      const out = [];
-      for (const f of data[l]) {
-        if (f.kind === 'area') { out.push(f); continue; }
-        const runs = VEC.clipRuns(f.p, inside);
-        runs.forEach((run, i) => { if (run.length >= 2) out.push(Object.assign({}, f, { id: runs.length > 1 ? f.id + '~' + i : f.id, p: run })); });
+  const inside = ward.polygons ? VEC.makeInsideTester(ward.polygons, 64) : null;
+  for (const l of LAYERS) {
+    const out = [];
+    for (const f of data[l]) {
+      if (f.kind === 'area') {
+        const ring = C.clipRingToBox(f.p, box);
+        if (ring) out.push(Object.assign({}, f, { p: ring }));
+        continue;
       }
-      data[l] = out; if (res.layers[l] && res.layers[l].status === 'ok') { res.layers[l].features = out.length; res.layers[l].vertices = out.reduce((a, f) => a + f.p.length, 0); }
+      if (!inside) { out.push(f); continue; }
+      if (l === 'parks') { out.push(f); continue; }
+      const runs = C.clipLineExact(f.p, inside);
+      runs.forEach((run, i) => out.push(Object.assign({}, f, { id: runs.length > 1 ? f.id + '~' + i : f.id, p: run })));
     }
-    clippedKind = 'ward-polygon';
+    data[l] = out;
+    if (res.layers[l] && res.layers[l].status === 'ok') { res.layers[l].features = out.length; res.layers[l].vertices = out.reduce((a, f) => a + f.p.length, 0); }
   }
+  if (inside) clippedKind = 'ward-polygon';
   const items = [].concat(namedItems('road', data.roads), namedItems('rail', data.railways));
   res.labels = { roads: items.filter((i) => i.kind === 'road').length, rails: items.filter((i) => i.kind === 'rail').length };
   if (planOnly) return res;
@@ -130,11 +138,11 @@ function buildWard(ward, src, layersRoot, margin, planOnly) {
   for (const l of LAYERS) {
     if (res.layers[l].status !== 'ok') continue;
     const file = path.join(outDir, l + '.json');
-    fs.writeFileSync(file, JSON.stringify({ layer: l, mission: '45I', ward: ward.wardId, coordinateConvention: convention, coordinateSystem: 'local-meters', clipped: clippedKind, bboxLocal: box, count: data[l].length, features: data[l] }), { flag: 'wx' });
+    fs.writeFileSync(file, JSON.stringify({ layer: l, mission: '45I', ward: ward.wardId, coordinateConvention: convention, coordinateSystem: 'local-meters', clipped: clippedKind, clipVersion: 2, bboxLocal: box, count: data[l].length, features: data[l] }), { flag: 'wx' });
     res.layers[l].bytes = fs.statSync(file).size;
   }
   fs.writeFileSync(path.join(outDir, 'labels.json'), JSON.stringify({ schema: SCHEMA, ward: ward.wardId, wardCode: ward.wardCode, source: 'OSM names carried by the old Live City road / railway tiles', items }), { flag: 'wx' });
-  fs.writeFileSync(path.join(outDir, 'layers-report.json'), JSON.stringify({ schema: SCHEMA, mission: '45I', ward: ward.wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(), marginM: margin, clipBoxLocal: box, layers: res.layers, labels: res.labels, license: 'OpenStreetMap contributors (ODbL) via the old Live City tiles', alignment: res.alignment, alignmentEvidence: evidence, clipped: clippedKind }, null, 1), { flag: 'wx' });
+  fs.writeFileSync(path.join(outDir, 'layers-report.json'), JSON.stringify({ schema: SCHEMA, mission: '45I', ward: ward.wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(), marginM: margin, clipBoxLocal: box, layers: res.layers, labels: res.labels, license: 'OpenStreetMap contributors (ODbL) via the old Live City tiles', alignment: res.alignment, alignmentEvidence: evidence, clipped: clippedKind, clipVersion: 2 }, null, 1), { flag: 'wx' });
   res.stage = 'generated';
   return res;
 }

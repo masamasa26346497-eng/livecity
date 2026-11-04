@@ -59,7 +59,7 @@ function polyInRing(ring, x, z) {
 const inWard = (w, x, z) => (w.polygons || []).some((p) => polyInRing(p.outer, x, z) && !(p.holes || []).some((h) => polyInRing(h, x, z)));
 
 /** Per-ward numeric verification of a generated layers/ dir. cell = grid size in metres. */
-function verifyWard(ward, layersRoot, cell) {
+function verifyWard(ward, layersRoot, cell, ctx) {
   cell = cell || 100;
   const dir = path.join(layersRoot, ward.wardId, 'layers');
   const res = { ward: ward.wardId, wardCode: ward.wardCode, state: 'missing', layers: {}, checks: {} };
@@ -69,7 +69,7 @@ function verifyWard(ward, layersRoot, cell) {
     try {
       const j = readJson(path.join(dir, l + '.json'));
       data[l] = j;
-      res.layers[l] = { count: j.count, features: (j.features || []).length, convention: j.coordinateConvention, clipped: j.clipped };
+      res.layers[l] = { count: j.count, features: (j.features || []).length, convention: j.coordinateConvention, clipped: j.clipped, clipVersion: j.clipVersion || 1 };
     } catch (e) { res.layers[l] = { status: 'absent' }; }
   }
   const conv = Object.values(res.layers).map((v) => v.convention).filter(Boolean);
@@ -78,15 +78,35 @@ function verifyWard(ward, layersRoot, cell) {
   const key = (x, z) => Math.floor((x - b.minX) / cell) + ',' + Math.floor((z - b.minZ) / cell);
   const touched = { roads: new Set(), waterways: new Set() };
   let outside = 0, total = 0;
+  const dg = { byLayerKind: {}, maxOffsetM: 0, sides: { west: 0, east: 0, north: 0, south: 0 }, adjacentKeepVertex: 0, wholeFeaturesOutside: 0, crossWard: {} };
   for (const l of ['roads', 'waterways']) {
     for (const f of ((data[l] || {}).features || [])) {
-      for (const p of (f.p || [])) {
-        if (!Number.isFinite(p[0]) || !Number.isFinite(p[1])) { res.checks.nonFinite = true; continue; }
-        touched[l].add(key(p[0], p[1])); total++;
-        if (p[0] < b.minX - 1 || p[0] > b.maxX + 1 || p[1] < b.minZ - 1 || p[1] > b.maxZ + 1) outside++;
-      }
+      const pts = f.p || [], kind = f.kind === 'area' ? 'area' : 'line';
+      const bk = dg.byLayerKind[l + ':' + kind] = dg.byLayerKind[l + ':' + kind] || { vertices: 0, outside: 0 };
+      let fo = 0;
+      const isOut = (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]) && (p[0] < b.minX - 1 || p[0] > b.maxX + 1 || p[1] < b.minZ - 1 || p[1] > b.maxZ + 1);
+      pts.forEach((p, i) => {
+        if (!Number.isFinite(p[0]) || !Number.isFinite(p[1])) { res.checks.nonFinite = true; return; }
+        touched[l].add(key(p[0], p[1])); total++; bk.vertices++;
+        if (isOut(p)) {
+          outside++; bk.outside++; fo++;
+          const dx = Math.max(b.minX - p[0], p[0] - b.maxX, 0), dz = Math.max(b.minZ - p[1], p[1] - b.maxZ, 0);
+          dg.maxOffsetM = Math.max(dg.maxOffsetM, Math.hypot(dx, dz));
+          if (p[0] < b.minX - 1) dg.sides.west++; if (p[0] > b.maxX + 1) dg.sides.east++;
+          if (p[1] < b.minZ - 1) dg.sides.north++; if (p[1] > b.maxZ + 1) dg.sides.south++;
+          if (kind === 'line' && ((i > 0 && !isOut(pts[i - 1])) || (i + 1 < pts.length && !isOut(pts[i + 1])))) dg.adjacentKeepVertex++;
+          if (ctx && ctx.allWards) {
+            const o = ctx.allWards.find((w) => w.wardId !== ward.wardId && inWard(w, p[0], p[1]));
+            const k = o ? o.wardId : 'none-of-24';
+            dg.crossWard[k] = (dg.crossWard[k] || 0) + 1;
+          }
+        }
+      });
+      if (fo && fo === pts.length) dg.wholeFeaturesOutside++;
     }
   }
+  dg.maxOffsetM = Math.round(dg.maxOffsetM * 10) / 10;
+  res.diagnostics = dg;
   let cells = 0;
   const covered = { roads: 0, waterways: 0 };
   for (let x = b.minX + cell / 2; x < b.maxX; x += cell) {
@@ -107,15 +127,21 @@ function verifyWard(ward, layersRoot, cell) {
   res.checks.wardCentreLonLat = { lon: Math.round(ll.lon * 1e5) / 1e5, lat: Math.round(ll.lat * 1e5) / 1e5 };
   res.checks.wardCentreInOsaka = ll.lon > 135.3 && ll.lon < 135.7 && ll.lat > 34.4 && ll.lat < 34.9;
   const roads = (res.layers.roads || {}).features || 0;
+  // Thresholds are NOT relaxed. Legacy output (no clipVersion) keeps the 5% rule; Mission 117 output (clipVersion 2, exact boundary
+  // clipping) must have zero vertices outside the ward bbox (1 m tolerance).
+  const v2 = Object.values(res.layers).filter((v) => v.features).length > 0 && Object.values(res.layers).filter((v) => v.features).every((v) => v.clipVersion >= 2);
+  res.checks.clipVersion = v2 ? 2 : 1;
+  res.checks.allowedOutsidePct = v2 ? 0 : 5;
   if (!roads) res.state = 'no-roads';
-  else if (!res.checks.conventionOk || res.checks.nonFinite || res.checks.outsideBBoxPct > 5 || !res.checks.wardCentreInOsaka) res.state = 'check-failed';
+  else if (!res.checks.conventionOk || res.checks.nonFinite || (v2 ? outside > 0 : res.checks.outsideBBoxPct > res.checks.allowedOutsidePct) || !res.checks.wardCentreInOsaka) res.state = 'check-failed';
   else res.state = 'generated-unverified-visually';
   return res;
 }
 function verify(layersRoot, wards, cell) {
+  const allWards = wardList('ALL');
   const rep = {
     schema: 'livecity.mission115.verify/1', generatedAt: new Date().toISOString(), projection: PROJ, convention: CONVENTION, constants: constantsReport(),
-    wards: wards.map((w) => verifyWard(w, layersRoot, cell)),
+    wards: wards.map((w) => verifyWard(w, layersRoot, cell, { allWards })),
     acceptance: { servedByPreview: false, browserRendered: false, ownerDeviceAccepted: 0, note: 'Static numeric checks only. Visual match of roads/water against the 2025 buildings must be observed on the owner PC (stats.vec45i + screenshot).' },
   };
   rep.summary = {
@@ -160,6 +186,13 @@ function main() {
     } else if (cmd === 'build') {
       const cov = B.run({ src: opt('src'), layersRoot: opt('layers-root'), wards: wards.map((w) => w.wardId), margin: 0 });
       out = { build: { generated: cov.stages.generated, wards: cov.wards.map((w) => ({ ward: w.ward, stage: w.stage, note: w.note })) }, verify: verify(path.resolve(opt('layers-root')), wards) };
+    } else if (cmd === 'diagnose') {
+      // Mission 117: read-only, anonymous aggregates (no ids / names / coordinates of features): where do out-of-bbox vertices come from?
+      if (!opt('layers-root')) throw Object.assign(new Error('--layers-root required'), { code: 2 });
+      const rep = verify(path.resolve(opt('layers-root')), wards);
+      out = { schema: 'livecity.mission117.diagnose/1', wards: rep.wards.filter((w) => w.state !== 'missing').map((w) => ({ ward: w.ward, state: w.state, clipVersion: w.checks.clipVersion, vertices: w.checks.vertices, outside: w.checks.verticesOutsideWardBBox, outsidePct: w.checks.outsideBBoxPct, diagnostics: w.diagnostics })),
+        reading: 'adjacentKeepVertex = outside vertex of a LINE next to an inside vertex (legacy keep-one-neighbour rule); byLayerKind ":area" = whole water/park rings not clipped; crossWard = which neighbouring ward polygon the outside vertex falls in. Re-generate into a NEW layers root with this version (clipVersion 2) to remove both.' };
+      out.summary = { failed: 0 };
     } else if (cmd === 'verify') {
       if (!opt('layers-root')) throw Object.assign(new Error('--layers-root required'), { code: 2 });
       out = verify(path.resolve(opt('layers-root')), wards);
