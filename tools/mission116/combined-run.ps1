@@ -4,11 +4,16 @@
 #   -Mode build  : audit + generate layers into -LayersRoot (new files only; existing ward layers are skipped) + numeric verify
 #   -Mode verify : numeric verify of -LayersRoot only
 #   -Mode serve  : serve -BuildingsRoot (<ward>25 dirs) + -LayersRoot on 127.0.0.1 (loopback only)
+#   -SupplementalLayersRoot : optional 2nd read-only layers root (e.g. the -v2 root holding a clipVersion 2 ward). A ward in both roots is served
+#                  from the supplemental root only if it is clipVersion 2 and the primary copy is older; otherwise the server stops.
+#                  -LayersPrefer primary|supplemental decides explicitly.
 #   -Mode all    : audit, build, verify, serve (default)
 param(
   [string]$Src = '..\livecity-data-pipeline\public\map-data\osaka-city',
   [string]$BuildingsRoot = 'temp\mission114\root',
   [string]$LayersRoot = '',
+  [string]$SupplementalLayersRoot = '',
+  [ValidateSet('','primary','supplemental')][string]$LayersPrefer = '',
   [string]$Wards = 'nishi,fukushima,yodogawa',
   [ValidateSet('audit','build','verify','diagnose','serve','all')][string]$Mode = 'all',
   [int]$Port = 8137
@@ -56,7 +61,10 @@ try {
     Write-Host '== 4. combined preview (2025 buildings + layers) =='
     $bld = Resolve-AbsPath $BuildingsRoot
     if (-not (Test-Path -LiteralPath $bld)) { Write-Host 'BUILDINGS ROOT NOT FOUND: fetch the 2025 buildings first (tools\mission114\local-run.mjs). Nothing served.'; exit 2 }
-    & node tools\mission116\combined-server.cjs --buildings-root $bld --layers-root $layers --port ([string]$Port)
+    $srvArgs = @('tools\mission116\combined-server.cjs', '--buildings-root', $bld, '--layers-root', $layers, '--port', ([string]$Port))
+    if ($SupplementalLayersRoot -ne '') { $srvArgs += @('--supplemental-layers-root', (Resolve-AbsPath $SupplementalLayersRoot)) }
+    if ($LayersPrefer -ne '') { $srvArgs += @('--layers-prefer', $LayersPrefer) }
+    & node @srvArgs
     exit $LASTEXITCODE
   }
 } finally { Pop-Location }

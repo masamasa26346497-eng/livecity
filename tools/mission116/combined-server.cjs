@@ -5,7 +5,7 @@
 //   (b) the per-ward road/water/park/rail layers    <layers-root>/<ward>/layers/*.json                                          (Mission45I/115 layout)
 // Both appear under /ext-3dtiles/<ward>25/ ; layers are mapped  <ward>25/layers/X  ->  <layers-root>/<ward>/layers/X.
 // Mission45E's preview cannot do this: it needs a 45D (legacy pc23) proof and would drop the 2025 buildings.
-//   node tools/mission116/combined-server.cjs --buildings-root <dir> --layers-root <dir> [--port 8137] [--suffix 25] [--plan]
+//   node tools/mission116/combined-server.cjs --buildings-root <dir> --layers-root <dir> [--supplemental-layers-root <dir> [--layers-prefer primary|supplemental]] [--port 8137] [--suffix 25] [--plan]
 // Guards: 127.0.0.1 only, GET/HEAD only, Host/Origin loopback, whitelisted file kinds, regular files only, realpath stays inside, no links followed,
 // both roots must be OUTSIDE the repository and outside OneDrive. Nothing is written, copied, deleted or uploaded.
 const http = require('http');
@@ -42,23 +42,60 @@ function checkRoot(dir, what, kind) {
   if (!st || !st.isDirectory() || st.isSymbolicLink()) throw err(what + ' missing or not a real directory', 4);
   return d;
 }
-/** Maps building dirs (<ward><suffix>/tileset.json) and layer dirs; reports wards that have only one of the two. */
+/** Validates one layers root (45I marker, not a 45D root) and lists the wards that have layers-report.json with their clipVersion. */
+function scanLayers(dir, what) {
+  const l = checkRoot(dir, what, 'layers');
+  let m = null; try { m = JSON.parse(fs.readFileSync(path.join(l, '.livecity-45i-layers.json'), 'utf8')); } catch (e) { /* none */ }
+  if (!m || m.schema !== 'livecity.mission45i.layers/1') throw err(what + ' has no 45I marker; not served', 3);
+  if (lst(path.join(l, '.livecity-45d-root.json'))) throw err(what + ' is a 45D root', 4);
+  const wards = {};
+  for (const e of fs.readdirSync(l, { withFileTypes: true })) {
+    if (!e.isDirectory() || !NAME.test(e.name)) continue;
+    const rep = path.join(l, e.name, 'layers', 'layers-report.json');
+    if (!lst(rep)) continue;
+    let cv = 1; try { const r = JSON.parse(fs.readFileSync(rep, 'utf8')); if (r && r.clipVersion >= 2) cv = r.clipVersion; } catch (x) { /* unreadable report: treated as v1 */ }
+    wards[e.name] = { dir: path.join(l, e.name, 'layers'), clipVersion: cv };
+  }
+  return { root: l, wards };
+}
+/**
+ * Layers come from the primary root and, optionally, a read-only supplemental root (e.g. a ward regenerated with clipVersion 2).
+ * A ward present in only one root is served from it. A ward present in BOTH is never silently resolved:
+ *   - o.layersPrefer 'primary' | 'supplemental' picks explicitly, or
+ *   - without it the supplemental copy wins ONLY if it is clipVersion >= 2 and the primary copy is older (the documented 117 upgrade); otherwise fail closed (code 5).
+ * Nothing is merged: a ward is served entirely from one root, so v1 and v2 files are never mixed inside a ward.
+ */
 function plan(o) {
   const suffix = o.suffix == null ? '25' : o.suffix;
   const b = checkRoot(o.buildingsRoot, '--buildings-root', 'buildings');
-  let l = null, layerWards = [];
-  if (o.layersRoot) {
-    l = checkRoot(o.layersRoot, '--layers-root', 'layers');
-    if (inside(l, b) || inside(b, l)) throw err('buildings root and layers root must be separate folders', 4);
-    let m = null; try { m = JSON.parse(fs.readFileSync(path.join(l, '.livecity-45i-layers.json'), 'utf8')); } catch (e) { /* none */ }
-    if (!m || m.schema !== 'livecity.mission45i.layers/1') throw err('--layers-root has no 45I marker; not served', 3);
-    if (lst(path.join(l, '.livecity-45d-root.json'))) throw err('--layers-root is a 45D root', 4);
-    layerWards = fs.readdirSync(l, { withFileTypes: true }).filter((e) => e.isDirectory() && NAME.test(e.name) && lst(path.join(l, e.name, 'layers', 'layers-report.json'))).map((e) => e.name).sort();
+  let l = null, sup = null, layerSrc = {}, overridden = [];
+  if (o.layersPrefer && o.layersPrefer !== 'primary' && o.layersPrefer !== 'supplemental') throw err('--layers-prefer must be primary or supplemental', 2);
+  if (o.supplementalLayersRoot && !o.layersRoot) throw err('--supplemental-layers-root needs --layers-root', 2);
+  for (const r of [o.layersRoot, o.supplementalLayersRoot]) if (r && (inside(path.resolve(r), b) || inside(b, path.resolve(r)))) throw err('buildings root and layers root must be separate folders', 4);
+  const prim = o.layersRoot ? scanLayers(o.layersRoot, '--layers-root') : null;
+  const supp = o.supplementalLayersRoot ? scanLayers(o.supplementalLayersRoot, '--supplemental-layers-root') : null;
+  for (const r of [prim, supp]) if (r && (inside(r.root, b) || inside(b, r.root))) throw err('buildings root and layers root must be separate folders', 4);
+  if (prim && supp && (inside(prim.root, supp.root) || inside(supp.root, prim.root))) throw err('layers root and supplemental layers root must be separate folders', 4);
+  if (prim) { l = prim.root; for (const w of Object.keys(prim.wards)) layerSrc[w] = Object.assign({ role: 'primary', root: prim.root }, prim.wards[w]); }
+  if (supp) {
+    sup = supp.root;
+    for (const w of Object.keys(supp.wards)) {
+      const s = Object.assign({ role: 'supplemental', root: supp.root }, supp.wards[w]);
+      const p = layerSrc[w];
+      if (!p) { layerSrc[w] = s; continue; }
+      let useSupp;
+      if (o.layersPrefer) useSupp = o.layersPrefer === 'supplemental';
+      else if (s.clipVersion >= 2 && p.clipVersion < 2) useSupp = true;
+      else throw err('ward ' + w + ' exists in both layers roots (primary clipVersion ' + p.clipVersion + ', supplemental clipVersion ' + s.clipVersion + '); refusing to guess. Pass --layers-prefer primary|supplemental', 5);
+      overridden.push({ ward: w, used: useSupp ? 'supplemental' : 'primary', primaryClipVersion: p.clipVersion, supplementalClipVersion: s.clipVersion });
+      if (useSupp) layerSrc[w] = s;
+    }
   }
+  const layerWards = Object.keys(layerSrc).sort();
   const bw = fs.readdirSync(b, { withFileTypes: true }).filter((e) => e.isDirectory() && NAME.test(e.name) && e.name.endsWith(suffix) && lst(path.join(b, e.name, 'tileset.json')))
     .map((e) => e.name.slice(0, e.name.length - suffix.length)).filter(Boolean).sort();
   if (!bw.length) throw err('no <ward>' + suffix + '/tileset.json under the buildings root; nothing to serve', 2);
-  return { suffix, buildingsRoot: b, layersRoot: l, buildingWards: bw, layerWards, both: bw.filter((w) => layerWards.includes(w)),
+  return { suffix, buildingsRoot: b, layersRoot: l, supplementalLayersRoot: sup, layerSrc, overridden, buildingWards: bw, layerWards, both: bw.filter((w) => layerWards.includes(w)),
     buildingsOnly: bw.filter((w) => !layerWards.includes(w)), layersOnly: layerWards.filter((w) => !bw.includes(w)) };
 }
 function safeFile(base, parts) {
@@ -78,16 +115,22 @@ function resolveExt(p, rest) {
   const ward = s[0].slice(0, s[0].length - p.suffix.length);
   if (!p.buildingWards.includes(ward)) return null;
   if (s[1] === 'layers') {   // layers come ONLY from the layers root, never from the building archive
-    if (!p.layersRoot || s.length !== 3 || !LAYER_FILES.test(s[2]) || !p.layerWards.includes(ward)) return null;
-    return safeFile(path.join(p.layersRoot, ward, 'layers'), [s[2]]);
+    if (s.length !== 3 || !LAYER_FILES.test(s[2]) || !p.layerSrc[ward]) return null;
+    return safeFile(p.layerSrc[ward].dir, [s[2]]);
   }
   const rel = s.slice(1).join('/');
   if (!P.ALLOWED.some((re) => re.test(rel))) return null;
   return safeFile(path.join(p.buildingsRoot, s[0]), s.slice(1));
 }
 function indexJson(p) {
-  return JSON.stringify({ schema: 'livecity.mission116.index/1', kind: 'local-only', verified: false, lod0Wards: [],
-    layersWards: p.both.map((w) => ({ ward: w + p.suffix })), wards: p.buildingWards.map((w) => ({ ward: w + p.suffix, wardCode: null, buildings: null })) });
+  const src = (w) => ({ ward: w + p.suffix, source: p.layerSrc[w].role, clipVersion: p.layerSrc[w].clipVersion });
+  return JSON.stringify({ schema: 'livecity.mission116.index/2', kind: 'local-only', verified: false, lod0Wards: [],
+    layersWards: p.both.map((w) => ({ ward: w + p.suffix })),
+    layerSources: p.both.map(src),
+    layersOnlyWards: p.layersOnly,   // layers exist but no 2025 building: NOT served, never counted as rendered
+    layersOverridden: p.overridden,
+    layersReadyWardCount: p.layerWards.length,
+    wards: p.buildingWards.map((w) => ({ ward: w + p.suffix, wardCode: null, buildings: null })) });
 }
 function makeServer(p, getPort) {
   const idx = Buffer.from(indexJson(p));
@@ -123,22 +166,22 @@ function listen(p, port, tries) {
   });
 }
 function urlFor(p, port, wards) {
-  const w = (wards && wards.length ? wards : p.buildingWards.slice(0, 3)).map((x) => x + p.suffix).join(',');
+  const w = (wards && wards.length ? wards : p.buildingWards).map((x) => x + p.suffix).join(',');
   return 'http://127.0.0.1:' + port + PAGE + '?ext=' + w;
 }
 function main() {
   const a = process.argv.slice(2), opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
   try {
-    const p = plan({ buildingsRoot: opt('buildings-root'), layersRoot: opt('layers-root'), suffix: opt('suffix') });
-    const summary = { buildingWards: p.buildingWards.length, layerWards: p.layerWards.length, both: p.both, buildingsOnly: p.buildingsOnly, layersOnly: p.layersOnly };
+    const p = plan({ buildingsRoot: opt('buildings-root'), layersRoot: opt('layers-root'), supplementalLayersRoot: opt('supplemental-layers-root'), layersPrefer: opt('layers-prefer'), suffix: opt('suffix') });
+    const summary = { buildingWards: p.buildingWards.length, layerWards: p.layerWards.length, layerSources: p.both.map((w) => w + ':' + p.layerSrc[w].role + ':v' + p.layerSrc[w].clipVersion), overridden: p.overridden, both: p.both, buildingsOnly: p.buildingsOnly, layersOnly: p.layersOnly };
     if (a.includes('--plan')) { console.log(JSON.stringify(summary, null, 1)); return; }
     listen(p, opt('port') ? parseInt(opt('port'), 10) : 8137).then((r) => {
       console.log(JSON.stringify(summary));
       console.log('serving read-only on http://127.0.0.1:' + r.port + ' (loopback only)');
-      console.log('open: ' + urlFor(p, r.port, p.both));
+      console.log('open: ' + urlFor(p, r.port));
       console.log('a ward without layers shows buildings only; layers need <layers-root>/<ward>/layers/layers-report.json');
     }, (e) => { console.error('ERROR: ' + (e.code === 'EADDRINUSE' ? 'no free port near ' + (opt('port') || 8137) : e.message)); process.exit(1); });
   } catch (e) { console.error('ERROR: ' + e.message); process.exit(Number.isInteger(e.code) ? e.code : 1); }
 }
-module.exports = { plan, makeServer, listen, resolveExt, indexJson, urlFor, checkRoot };
+module.exports = { scanLayers, plan, makeServer, listen, resolveExt, indexJson, urlFor, checkRoot };
 if (require.main === module) main();
