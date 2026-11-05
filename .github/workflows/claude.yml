@@ -1,6 +1,5 @@
 name: Claude Code
-        env:
-          GH_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+
 on:
   issue_comment:
     types: [created]
@@ -36,11 +35,15 @@ jobs:
         with:
           fetch-depth: 1
 
+
       - name: Run Claude Code
         id: claude
+        env:
+          GH_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
 
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
