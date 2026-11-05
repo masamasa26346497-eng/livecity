@@ -1,5 +1,6 @@
 name: Claude Code
-
+        env:
+          GH_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
 on:
   issue_comment:
     types: [created]
