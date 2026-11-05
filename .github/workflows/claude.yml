@@ -55,5 +55,5 @@ jobs:
           # offline test runner, local preview server, and read-only repository inspection.
           # No unrestricted shell, API keys, paid APIs, or production deploy commands.
           claude_args: |
-            --allowedTools "Bash(node:*),Bash(python3 -m http.server:*),Bash(git status:*),Bash(git rev-parse:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(du:*),Bash(ls:*),Bash(unzip -l:*)"
+            --allowedTools "Bash(node:*),Bash(python3 -m http.server:*),Bash(git status:*),Bash(git rev-parse:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(git fetch:*),Bash(git ls-files:*),Bash(du:*),Bash(ls:*),Bash(unzip -l:*),Bash(gh release list:*),Bash(gh release view:*)"
 
