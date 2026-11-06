@@ -9,6 +9,7 @@
 // using the existing geoToThree constants (CLAT/CLON/MPD are NOT changed). Writes only the optional --out (refuses to overwrite). No network.
 const fs = require('fs');
 const path = require('path');
+const LAYOUT = require('../mission131/layout.cjs');
 const ROOT = path.resolve(__dirname, '..', '..');
 const OBSERVED = ['nishi', 'fukushima', 'yodogawa'];
 const CLAT = 34.604208, CLON = 135.525020, MPD = 111320;
@@ -31,18 +32,26 @@ function ecefToLonLat(x, y, z) {
 function toLocal(lat, lon) {
   return { x: (lon - CLON) * Math.cos(CLAT * Math.PI / 180) * MPD, z: -((lat - CLAT) * MPD) };
 }
-function checkWard(root, w) {
-  const dir = path.join(root, w.wardId + '25');
+function checkWard(root, w, dirs) {
   const r = { ward: w.wardId, wardCode: w.wardCode, problems: [], browserAccepted: false };
+  // Mission131: discover the real layout instead of assuming <ward>25/ (run 42240020830: 21 extracted, 0 found).
+  const d0 = LAYOUT.discoverWard(root, w.wardId, dirs);
+  if (!d0 || !d0.dir) {
+    r.verdict = 'missing'; r.layout = d0 ? d0.layout : 'none';
+    r.problems.push(d0 ? 'ambiguous layout (' + d0.candidates + ' candidates)' : 'no tileset.json attributable to this ward under the root');
+    return r;
+  }
+  const dir = d0.dir; r.layout = d0.layout; r.rel = d0.rel;
   let ts;
   try { ts = JSON.parse(fs.readFileSync(path.join(dir, 'tileset.json'), 'utf8')); } catch (e) {
-    r.verdict = 'missing'; r.problems.push('tileset.json missing/unparseable'); return r;
+    r.verdict = 'data-problem'; r.problems.push('tileset.json unparseable'); return r;
   }
   const ls = (d, re) => { try { return fs.readdirSync(path.join(dir, d)).filter((n) => re.test(n)).sort(); } catch (e) { return []; } };
-  const glbs = ls('tiles', /\.glb$/);
+  const uris = (LAYOUT.contentUris(dir) || []).filter((u) => /\.glb$/i.test(u));
+  const glbs = uris.length ? uris : ls('tiles', /\.glb$/).map((n) => 'tiles/' + n);
   let bad = 0;
   for (const g of glbs) {
-    const b = fs.readFileSync(path.join(dir, 'tiles', g));
+    let b; try { b = fs.readFileSync(path.join(dir, ...g.split('/'))); } catch (e) { bad++; continue; }
     if (b.length < 20 || b.toString('latin1', 0, 4) !== 'glTF' || b.readUInt32LE(4) !== 2 || b.readUInt32LE(8) !== b.length) bad++;
   }
   const seen = new Set();
@@ -76,7 +85,8 @@ function checkWard(root, w) {
 }
 function check(root, only, out) {
   const want = target21().filter((w) => !only || only.includes(w.wardId));
-  const rows = want.map((w) => checkWard(root, w));
+  const dirs = LAYOUT.findTilesetDirs(root);
+  const rows = want.map((w) => checkWard(root, w, dirs));
   const sum = {
     schema: 'livecity.mission129.data-check/1', targetWards: want.length,
     dataOk: rows.filter((r) => /^data-ok/.test(r.verdict)).length,
@@ -84,6 +94,9 @@ function check(root, only, out) {
     problems: rows.filter((r) => r.verdict === 'data-problem').map((r) => r.ward),
     browserAcceptedWards: 0, rows
   };
+  // Mission131: missing or problem wards are a FAILURE (run 42240020830 was green with missing = all 21).
+  sum.strictOk = sum.dataOk === sum.targetWards && !sum.missing.length && !sum.problems.length;
+  if (!sum.strictOk) sum.probe = LAYOUT.probeTree(root);
   if (out) {
     if (fs.existsSync(out)) throw new Error('refusing to overwrite ' + out);
     fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
@@ -100,6 +113,7 @@ if (require.main === module) {
   } else if (opt('check')) {
     const s = check(opt('check'), opt('wards') ? opt('wards').split(',') : null, opt('out'));
     console.log(JSON.stringify({ ...s, rows: undefined }));
-    process.exit(s.problems.length ? 1 : 0);
+    for (const r of s.rows) console.log('| ' + r.ward + ' | ' + (r.layout || '-') + ' | ' + r.verdict + ' | ' + (r.tiles != null ? r.tiles + ' glb, ' + r.ids + ' ids' : '-') + ' | ' + r.problems.join('; ') + ' |');
+    process.exit(s.strictOk ? 0 : 1);
   } else { console.error('usage: --list | --check <buildings-root> [--wards a,b] [--out file]'); process.exit(2); }
 }

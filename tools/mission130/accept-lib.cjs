@@ -11,7 +11,11 @@ const NAME = /^[a-z0-9-]+$/;
 const lst = (p) => { try { return fs.lstatSync(p); } catch (e) { return null; } };
 
 /** Finds the directory holding tileset.json for a ward, without assuming the layout. Real dirs only (no links), depth <= 3. */
-function discoverWard(root, ward) {
+const LAYOUT = require('../mission131/layout.cjs');
+// Mission131: the shared discovery (exact segment match, any depth <= 4) replaces the old depth-limited search below.
+const discoverWard = (root, ward) => LAYOUT.discoverWard(root, ward);
+// eslint-disable-next-line no-unused-vars
+function discoverWardLegacy(root, ward) {
   const tryDir = (d) => { const s = lst(path.join(d, 'tileset.json')); return s && s.isFile() && !s.isSymbolicLink(); };
   for (const n of [ward + '25', ward, 'plateau2025-' + ward, '_x_' + ward]) {
     const d = path.join(root, n);
@@ -93,7 +97,7 @@ function summarize(rows, extra) {
   }, extra || {});
 }
 /** Loopback-only read-only server: public/ statics + /ext-3dtiles/<ward>25/<allowed file> from the DISCOVERED dir. Logs tileset/glb responses. */
-function makeServer(map, hits, getPort) {
+function makeServer(map, hits, getPort, uris) {
   return http.createServer((req, res) => {
     const deny = (c) => { res.writeHead(c, { 'Content-Type': 'text/plain' }); res.end('x'); };
     if (req.method !== 'GET' && req.method !== 'HEAD') return deny(405);
@@ -103,7 +107,7 @@ function makeServer(map, hits, getPort) {
     if (u.startsWith(pre)) {
       let dec; try { dec = decodeURIComponent(u.slice(pre.length)); } catch (e) { return deny(404); }
       const i = dec.indexOf('/'), name = dec.slice(0, i), rel = dec.slice(i + 1), ward = name.slice(0, -2);
-      if (i > 0 && !dec.includes('..') && !dec.includes('\\') && NAME.test(name) && name.endsWith('25') && map[ward] && P.ALLOWED.some((re) => re.test(rel))) {
+      if (i > 0 && !dec.includes('..') && !dec.includes('\\') && NAME.test(name) && name.endsWith('25') && map[ward] && (P.ALLOWED.some((re) => re.test(rel)) || (uris && uris[ward] && uris[ward].has(rel)))) {
         const base = map[ward], f = path.join(base, ...rel.split('/')), st = lst(f);
         if (st && st.isFile() && !st.isSymbolicLink() && fs.realpathSync(f).startsWith(fs.realpathSync(base) + path.sep)) file = f;
       }
@@ -116,4 +120,4 @@ function makeServer(map, hits, getPort) {
     fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
   });
 }
-module.exports = { ROOT, discoverWard, describeRoot, loadWardData, insideWard, coverage, verdict, summarize, makeServer, target21: W.target21 };
+module.exports = { LAYOUT, ROOT, discoverWard, describeRoot, loadWardData, insideWard, coverage, verdict, summarize, makeServer, target21: W.target21 };

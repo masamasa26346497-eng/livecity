@@ -17,11 +17,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const wards = L.target21().filter((w) => !only || only.includes(w.wardId));
 const rows = wards.map((w) => ({ ward: w.wardId, wardCode: w.wardCode, source: null, verdict: null }));
 console.log('root:', JSON.stringify(L.describeRoot(root)));
-const map = {};
+const map = {}, uris = {};
 wards.forEach((w, i) => {
   const d = L.discoverWard(root, w.wardId);
   rows[i].source = d ? { found: !!d.dir, layout: d.layout, rel: d.rel } : { found: false, layout: 'none' };
-  if (d && d.dir) map[w.wardId] = d.dir;
+  if (d && d.dir) { map[w.wardId] = d.dir; uris[w.wardId] = new Set(L.LAYOUT.contentUris(d.dir) || []); }
 });
 console.log('discovered:', Object.keys(map).length + '/' + wards.length, JSON.stringify(rows.map((r) => r.ward + '=' + r.source.layout)));
 const finish = (extra) => {
@@ -42,7 +42,7 @@ if (a.includes('--discover-only') || !Object.keys(map).length) {
   finish({ browser: null, mode: a.includes('--discover-only') ? 'discover-only' : 'no-data' });
 }
 const hits = []; let port = 0;
-const srv = L.makeServer(map, hits, () => port);
+const srv = L.makeServer(map, hits, () => port, uris);
 await new Promise((r) => srv.listen(0, '127.0.0.1', r)); port = srv.address().port;
 const GOOGLE = /(^|\.)(googleapis\.com|google\.com|gstatic\.com|googletagmanager\.com|google-analytics\.com)$/i;
 const meta = { browser: null, jsErrors: [], googleRequests: 0, failedRequests: [], webgl: null };
