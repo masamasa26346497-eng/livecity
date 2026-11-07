@@ -16,6 +16,7 @@ import { readFile, stat } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { validateDataRoot, resolveDataRootFile, DEFAULT_MOUNT } from './lib/safe-static-root.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -24,12 +25,14 @@ const DEV_UI_HTML = 'osaka_3d_buildings.ward-ux-v1.html';
 const DEV_UI_SCRIPTS = [
   '/livecity-dev-ui-coordinator.js',
   '/livecity-building-click-performance.js',
+  '/livecity-ward-layer-status.js', // Mission 116: 区切替時の建物/河川データ欠落を画面通知（HTML本体は無改変）
 ];
 
 function parseArgs(argv) {
-  const args = { port: 8000, area: 'osaka-sumiyoshi' };
+  const args = { port: 8000, area: 'osaka-sumiyoshi', dataRoot: process.env.LIVECITY_DATA_ROOT || null };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--port') args.port = parseInt(argv[++i], 10) || 8000;
+    else if (argv[i] === '--data-root') args.dataRoot = argv[++i];
     else if (argv[i] === '--area') args.area = argv[++i];
   }
   return args;
@@ -101,9 +104,30 @@ async function main() {
   }
   checkMapData(args.area);
 
+  // Mission 116: --data-root <dir> でローカル出力（public/map-data/osaka-city 相当）を読み取り専用で重ね配信する。
+  //   /map-data/osaka-city/**/*.json のみが対象。コピー・アップロード不要。サーバーは 127.0.0.1 にのみバインド。
+  let dataRootReal = null;
+  if (args.dataRoot) {
+    try { dataRootReal = validateDataRoot(args.dataRoot); }
+    catch (e) { console.error(`--data-root エラー: ${e.message}`); process.exit(1); }
+  }
+
   const server = http.createServer(async (req, res) => {
     let urlPath = req.url || '/';
     if (urlPath.split('?')[0] === '/') urlPath = '/' + DEV_UI_HTML;
+    if (dataRootReal) {
+      const r = resolveDataRootFile(dataRootReal, urlPath);
+      if (r.ok) {
+        try {
+          const body = await readFile(r.file);
+          res.writeHead(200, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
+          res.end(body); return;
+        } catch { /* public/ へフォールバック */ }
+      } else if (r.reason === 'forbidden') {
+        res.writeHead(403); res.end('Forbidden'); return;
+      }
+      // not-found / not-mounted は従来どおり public/ を参照（無ければ 404）
+    }
     const abs = resolveSafe(urlPath);
     if (!abs) {
       res.writeHead(403); res.end('Forbidden'); return;
@@ -136,8 +160,9 @@ async function main() {
     process.exit(1);
   });
 
-  server.listen(args.port, () => {
-    const url = `http://localhost:${args.port}/${DEV_UI_HTML}`;
+  server.listen(args.port, '127.0.0.1', () => {
+    const url = `http://127.0.0.1:${args.port}/${DEV_UI_HTML}`;
+    if (dataRootReal) console.log(`  ローカルデータ: ${DEFAULT_MOUNT} ← ${dataRootReal} （読み取り専用・.jsonのみ）`);
     console.log('\n==================================================');
     console.log('Live City プレビューサーバーを起動しました。');
     console.log(`  ${url}`);
