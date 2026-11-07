@@ -1,0 +1,14 @@
+{
+  "schema": "livecity.mission73.coarse-lod-loss/1",
+  "tiles": 52,
+  "minAreaM2": 100,
+  "cellM": 100,
+  "buildings": 35031,
+  "keptInCoarse": 13821,
+  "droppedPct": 60.55,
+  "cellsWithBuildings": 956,
+  "cellsEmptyInCoarse": 20,
+  "cellsEmptyInCoarsePct": 2.09,
+  "cellsUnderHalfInCoarsePct": 62.24,
+  "note": "coarse LOD(group) は bbox<minArea の棟を捨てる。leaf は geometricError 0 のため、SSE が大きい/遠いと group が選ばれ小棟が消える。座標ずれの証拠ではない。"
+}

@@ -1,0 +1,22 @@
+{
+ "mission": "37H",
+ "ward": "中央区",
+ "wardId": "chuo",
+ "wardCode": "27128",
+ "generatedAt": "2026-10-12T22:53:52.880Z",
+ "source": "PLATEAU 3D都市モデル 大阪市 2024（国土交通省）CityGML bldg LOD1 / 27100_osaka-shi_city_2024_citygml_1_op",
+ "sourceMeshes": [
+  "52350400",
+  "52350410"
+ ],
+ "canonicalId": "CityGML gml:id (bldg_<uuid>) をそのまま使用。新規採番なし",
+ "wardClassification": "N03 区ポリゴンの点内判定（代表点=footprint 重心）。ポリゴン外は除外",
+ "counts": {
+  "read": 5629,
+  "inWard": 5629,
+  "outsideWard": 0,
+  "duplicate": 0
+ },
+ "note": "メッシュ単位の限定取得。区全体ではない（sourceMeshes のみ）。",
+ "licenseNote": "出典: 国土交通省 Project PLATEAU。利用条件の最終確認はリポジトリ内に記録なし（公開前に要確認）。"
+}
