@@ -1,0 +1,26 @@
+| 区 | 宣言棟数 | 建物 | 河川(waterways) | 水域種別 | rivers-v2 | water-surface | 区内率 | 地表高 | 建物×水面 | HTTP200 | 実ブラウザ |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 北区 | 15779 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 都島区 | 13199 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 福島区 | 11159 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 此花区 | 13437 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 中央区 | 18279 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 西区 | 12098 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 港区 | 15489 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 大正区 | 17363 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 天王寺区 | 14244 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 浪速区 | 10133 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 西淀川区 | 23242 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 淀川区 | 34289 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 東淀川区 | 34685 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 東成区 | 21976 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 生野区 | 46212 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 旭区 | 22424 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 城東区 | 32447 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 鶴見区 | 22068 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 阿倍野区 | 26924 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 住之江区 | 21608 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 住吉区 | 35031 | OK | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 100.0% | OK | 未検証 | 未実施 | 未検証 |
+| 東住吉区 | 38489 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 平野区 | 44434 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
+| 西成区 | 29204 | なし(missing-file) | なし(missing-file) | unknown | なし(missing-file) | なし(missing-file) | 未検証 | 未検証 | 未検証 | 未実施 | 未検証 |
