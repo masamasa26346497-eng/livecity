@@ -30,3 +30,24 @@ npm run wards:e2e:synthetic -- --out data/reports/mission135/synthetic-e2e.json
 ## 現状
 - 合成3区の実 Chrome/WebGL 検証は通過（`data/reports/mission135/synthetic-e2e.json`）。**実データ24区は 0/24 検証済**。
 - rivers-v2 は出力規約が未解析で変換対象外。建物の canonicalId クリック検証は合成 fixture では未実施。
+
+## Mission 136: 実データ段階（建物フットプリント / 海面）
+| 段階 | 内容 | 結果レポート |
+|---|---|---|
+| 実建物のみ | 住吉区 `public/map-data/osaka-city/buildings/osaka-sumiyoshi/`（52タイル/35,031棟）を Cesium で押し出し表示。HTTP200・ON/OFF画素差・canonicalId クリック | `data/reports/mission136/real-buildings-e2e.json` |
+| 実建物＋合成レイヤー | 上＋合成の道路/河川（**合成混在のため実データ達成に数えない**） | `real-buildings-synthetic-layers-e2e.json` |
+| 実の海面のみ | 公開ポリゴンから決定的に再生成した海面（此花区）。建物等は未取得のまま | `real-water-surface-konohana-e2e.json` |
+
+```bash
+# 実建物（フットプリント）を 127.0.0.1 で表示・検証
+npm run wards:viewer -- --footprints-root public/map-data/osaka-city/buildings --layers-root <layers-root>
+npm run wards:e2e:real-buildings -- --ward sumiyoshi --out <新規.json>
+# 実の海面（ネットワーク不要）: 生成 → 区別変換 → 検証
+npm run wards:gen-water-surface -- --out <新規dir>/map
+npm run wards:build-layers -- --map-root <新規dir>/map --out <新規dir>/layers
+npm run wards:e2e:real-water -- --layers-root <新規dir>/layers --ward konohana --out <新規.json>
+```
+- 建物は区ごとに 3D Tiles（`<ward>25/` または restore-release-assets.js の展開結果 `_x_<ward>/`、サーバーが規約差を吸収）→ 無ければ map-data のフットプリント → 無ければ「未取得」（404を成功扱いしない）。
+- 道路・河川(線)の実データはこのリポジトリに無い（`roads/` `waterways/` `rivers-v2/` の出力物なし）。入力は Mission115 の `build-city-layer-tiles.js` が `public/map-data/osaka-city/{roads,waterways}/tile_*.json` に出力する形式（znorth-neg-v1）で、Windows ローカルにある場合は `wards:build-layers --map-root` に渡す。
+- 位置づけ: 本ビューア（`mission135-ward-viewer`）が将来の正式 24 区ビューアの候補。PR #24 の `mission37g-osaka-24ward-mvp.html`（3592行）とは統合せず、座標・高さ定数と canonicalId の契約のみ共有する。
+- 状態: 実データで WebGL 検証済は「住吉区の建物のみ」「此花区の海面のみ」。3レイヤー実データ検証は 0 区、24 区は 0/24。

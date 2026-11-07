@@ -100,13 +100,58 @@
       const url = base + '25/tileset.json';
       const head = await fetch(url, { signal: ctrl.signal, cache: 'no-store' });
       http.tileset = head.status;
-      if (head.status === 404) { if (!stale()) setStatus('buildings', 'missing', '未取得（tileset HTTP 404）'); return; }
+      if (head.status === 404) return loadFootprints(); // 3D Tiles が無い区は実フットプリント（map-data）を試す。それも無ければ「未取得」
       if (!head.ok) throw new Error('tileset HTTP ' + head.status);
       const ts = await Cesium.Cesium3DTileset.fromUrl(url, { maximumScreenSpaceError: 8 });
       if (stale()) { ts.destroy(); S.staleDiscards++; return; }
       scene.primitives.add(ts); ts.show = visible.buildings; rec.groups.buildings.push(ts); rec.tileset = ts;
+      S.buildingSource = '3d-tiles';
       setStatus('buildings', 'ready', '表示中（3D Tiles）');
     });
+    async function loadFootprints() {
+      const m = await getJson(base + '/footprints/manifest.json', ctrl.signal); http.footprintManifest = m.status;
+      if (stale()) { S.staleDiscards++; return; }
+      if (m.status === 404) { setStatus('buildings', 'missing', '未取得（tileset / footprints とも HTTP 404）'); return; }
+      if (!m.json || !Array.isArray(m.json.tiles)) throw new Error('footprint manifest HTTP ' + m.status);
+      if (m.json.coordinateConvention !== 'znorth-neg-v1') throw new Error('footprint coordinateConvention mismatch: ' + m.json.coordinateConvention);
+      const tiles = m.json.tiles, tileStatus = []; http.footprintTiles = tileStatus;
+      rec.footprint = { declared: m.json.totalBuildings, tiles: tiles.length, loaded: 0, buildings: 0, skipped: 0, byId: new Map(), bounds: m.json.bounds };
+      let next = 0, done = 0;
+      const worker = async () => {
+        while (next < tiles.length && !stale()) {
+          const t = tiles[next++];
+          const r = await getJson(base + '/footprints/' + t.file, ctrl.signal); tileStatus.push(r.status);
+          if (stale()) return;
+          if (!r.json) { rec.footprint.failedTiles = (rec.footprint.failedTiles || 0) + 1; continue; }
+          const inst = [];
+          for (const b of r.json.buildings || []) {
+            let fp = (b.fp || []).filter((p, i, a) => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]) && (i === 0 || p[0] !== a[i - 1][0] || p[1] !== a[i - 1][1]));
+            if (fp.length > 1 && fp[0][0] === fp[fp.length - 1][0] && fp[0][1] === fp[fp.length - 1][1]) fp = fp.slice(0, -1);
+            let ar = 0; for (let i = 0; i < fp.length; i++) { const p = fp[i], q = fp[(i + 1) % fp.length]; ar += p[0] * q[1] - q[0] * p[1]; }
+            if (fp.length < 3 || Math.abs(ar) < 1 || !(b.h > 0) || !b.id) { rec.footprint.skipped++; continue; }
+            const z0 = Number.isFinite(b.z0) ? b.z0 : 0;
+            inst.push(new Cesium.GeometryInstance({
+              id: b.id,
+              geometry: new Cesium.PolygonGeometry({ polygonHierarchy: new Cesium.PolygonHierarchy(fp.map((p) => toCart(p[0], p[1], 0))), height: z0, extrudedHeight: z0 + Math.max(b.h, 1), vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT }),
+              attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.fromCssColorString(b.h > 30 ? '#dfe8f3' : '#c3cfdd')) },
+            }));
+            rec.footprint.byId.set(b.id, { x: b.repX, z: b.repZ, h: b.h, z0 });
+          }
+          rec.footprint.loaded++; rec.footprint.buildings += inst.length; done++;
+          if (inst.length) {
+            const prim = new Cesium.Primitive({ geometryInstances: inst, appearance: new Cesium.PerInstanceColorAppearance({ flat: false, translucent: false }), asynchronous: true, allowPicking: true });
+            scene.primitives.add(prim); prim.show = visible.buildings; rec.groups.buildings.push(prim);
+          }
+          setStatus('buildings', 'loading', '読み込み中（実フットプリント ' + done + '/' + tiles.length + 'タイル）');
+        }
+      };
+      await Promise.all([worker(), worker(), worker(), worker()]);
+      if (stale()) { S.staleDiscards++; return; }
+      S.buildingSource = 'footprints';
+      const f = rec.footprint;
+      if (f.failedTiles || f.loaded !== f.tiles) throw new Error('footprint tiles incomplete: ' + f.loaded + '/' + f.tiles);
+      setStatus('buildings', 'ready', '表示中（実フットプリント ' + f.buildings + '棟 / 宣言' + f.declared + '）');
+    }
     const roads = guard('roads', async () => {
       const r = await getJson(base + '/layers/roads.json', ctrl.signal); http.roads = r.status;
       if (stale()) { S.staleDiscards++; return; }
@@ -161,7 +206,24 @@
 
   window.__m135 = {
     state: S, selectWard, setLayer, lookAt, KEYS,
-    tilesReady() { const ts = cur && cur.tileset; return !!ts && ts.tilesLoaded && ts.ready; },
+    tilesReady() {
+      if (cur && cur.footprint) { const g = cur.groups.buildings; return !!(S.layers.buildings && S.layers.buildings.cls === 'ready') && g.length > 0 && g.every((p) => p.isDestroyed() || p.ready); }
+      const ts = cur && cur.tileset; return !!ts && ts.tilesLoaded && ts.ready;
+    },
+    footprintStats() { const f = cur && cur.footprint; return f ? { declared: f.declared, tiles: f.tiles, loadedTiles: f.loaded, buildings: f.buildings, skipped: f.skipped, failedTiles: f.failedTiles || 0, bounds: f.bounds } : null; },
+    /** 建物の屋根中心を画面座標へ→ pick して同じ canonicalId が返るか。画面内の建物を等間隔に最大 n 件。 */
+    clickCheck(n) {
+      const f = cur && cur.footprint; if (!f) return null;
+      const ids = [...f.byId.keys()], out = [], cv = scene.canvas, W = cv.clientWidth, H = cv.clientHeight, step = Math.max(1, Math.floor(ids.length / (n * 60)));
+      for (let i = 0; i < ids.length && out.length < n; i += step) {
+        const id = ids[i], b = f.byId.get(id);
+        const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(b.x, b.z, b.z0 + b.h));
+        if (!w || w.x < 4 || w.y < 4 || w.x > W - 4 || w.y > H - 4) continue;
+        const p = scene.pick(new Cesium.Cartesian2(w.x, w.y));
+        out.push({ id, picked: p && typeof p.id === 'string' ? p.id : null, x: Math.round(w.x), y: Math.round(w.y) });
+      }
+      return out;
+    },
     resources() { return { tilesets: count(Cesium.Cesium3DTileset), polylineCollections: count(Cesium.PolylineCollection), areaPrimitives: count(Cesium.Primitive), total: scene.primitives.length }; },
     shown(key) { return !!cur && cur.groups[key].some((p) => !p.isDestroyed() && p.show); },
     tilesetCenter() {
@@ -181,6 +243,7 @@
       for (const w of S.wards) {
         const o = document.createElement('option'); o.value = w.wardId;
         const have = Object.entries(w.available).filter(([, v]) => v).map(([k]) => k).join('+') || '未取得';
+        // 注: buildingFootprints = map-data の実フットプリント（3D Tiles が無い区のフォールバック）
         o.textContent = w.wardName + '（' + have + '）'; sel.appendChild(o);
       }
       sel.addEventListener('change', () => selectWard(sel.value));

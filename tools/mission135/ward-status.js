@@ -19,10 +19,24 @@ export function verifiedLayersFromReport(report) {
   return out;
 }
 
-export function wardStates({ buildingsRoot, layersRoot, polygons, realReport }) {
-  const verified = verifiedLayersFromReport(realReport);
-  return wardIndex({ buildingsRoot, layersRoot, polygons }).map((w) => {
-    const v = verified.get(w.wardId) || {};
+/** Mission136 の実データ E2E レポート（real-buildings-only / real-water-surface-only）から区別の検証済みレイヤーを得る。合成混在は数えない。 */
+export function verifiedFromMission136(reports) {
+  const out = new Map();
+  for (const r of reports || []) {
+    if (!r || !r.allPassed || !r.ward) continue;
+    const v = out.get(r.ward) || {};
+    if (r.dataKind === 'real-buildings-only' && r.realBuildingsVerified === true) v.buildings = true;
+    if (r.dataKind === 'real-water-surface-only') v.waterArea = true;
+    out.set(r.ward, v);
+  }
+  return out;
+}
+
+export function wardStates({ buildingsRoot, layersRoot, footprintsRoot, polygons, realReport, mission136Reports }) {
+  const verified = verifiedLayersFromReport(realReport), v136 = verifiedFromMission136(mission136Reports);
+  return wardIndex({ buildingsRoot, layersRoot, footprintsRoot, polygons }).map((w) => {
+    const v = { ...(verified.get(w.wardId) || {}), ...(v136.get(w.wardId) || {}) };
+    w = { ...w, available: { ...w.available, buildings: w.available.buildings || w.available.buildingFootprints } };
     const st = (have, vk) => (have ? (v[vk] ? 'webgl-verified' : 'generated') : 'not-acquired');
     const layers = { buildings: st(w.available.buildings, 'buildings'), roads: st(w.available.roads, 'roads'), waterLine: st(w.available.waterways, 'waterLine'), waterArea: st(w.available.waterways || w.available.waterSurface, 'waterArea') };
     return { wardId: w.wardId, wardName: w.wardName, layers, allWebglVerified: Object.values(layers).every((s) => s === 'webgl-verified') };
@@ -32,7 +46,8 @@ export function wardStates({ buildingsRoot, layersRoot, polygons, realReport }) 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const a = process.argv.slice(2), opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
   const rr = opt('real-report') ? JSON.parse(fs.readFileSync(opt('real-report'), 'utf8')) : null;
-  const rows = wardStates({ buildingsRoot: path.resolve(opt('buildings-root') || '.'), layersRoot: path.resolve(opt('layers-root') || '.'), realReport: rr });
+  const m136 = (opt('m136-reports') || '').split(',').filter(Boolean).map((f) => JSON.parse(fs.readFileSync(f, 'utf8')));
+  const rows = wardStates({ buildingsRoot: path.resolve(opt('buildings-root') || '.'), layersRoot: path.resolve(opt('layers-root') || '.'), footprintsRoot: opt('footprints-root') ? path.resolve(opt('footprints-root')) : null, realReport: rr, mission136Reports: m136 });
   console.log('| 区 | 建物 | 道路 | 河川(線) | 河川(面) |\n|---|---|---|---|---|');
   for (const r of rows) console.log(`| ${r.wardName} | ${['buildings', 'roads', 'waterLine', 'waterArea'].map((k) => LABEL[r.layers[k]]).join(' | ')} |`);
   console.log(`\nWebGL検証済（4レイヤー全て）: ${rows.filter((r) => r.allWebglVerified).length}/${rows.length}`);

@@ -16,6 +16,7 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const STATIC = new Map([['/', 'mission135-ward-viewer.html'], ['/mission135-ward-viewer.html', 'mission135-ward-viewer.html'], ['/mission135-ward-viewer.js', 'mission135-ward-viewer.js']]);
 const NAME = /^[a-z0-9-]+$/;
 const BUILDING_FILE = /^(tileset\.json|[A-Za-z0-9_.-]+\.glb|ids\/[A-Za-z0-9_.-]+\.json|attrs\/[A-Za-z0-9_.-]+\.json)$/;
+const FOOTPRINT_FILE = /^(manifest\.json|tile_-?\d+_-?\d+\.json)$/;
 const LAYER_FILE = /^(roads|waterways|water-surface)\.json$/;
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.glb': 'model/gltf-binary' };
 
@@ -31,12 +32,34 @@ export function safeFile(root, rel) {
   try { const rr = fs.realpathSync(root); return fs.realpathSync(f).startsWith(rr + path.sep) ? f : null; } catch { return null; }
 }
 
+/**
+ * 建物 3D Tiles の置き場の規約差を吸収する。tileset.json を含む次のいずれかの相対ディレクトリを返す:
+ *   <ward>25 / _x_<ward> / _x_<ward>/<ward>25 / _x_<ward>/<単一サブディレクトリ>（restore-release-assets.js の展開結果）
+ * 見つからなければ null（空ディレクトリへの偽成功を返さない）。tileset.json は通常ファイル必須（safeFile）。
+ */
+export function resolveBuildingDir(root, ward) {
+  if (!root || !NAME.test(ward || '')) return null;
+  const cands = [`${ward}25`, `_x_${ward}`, `_x_${ward}/${ward}25`];
+  try {
+    const sub = fs.readdirSync(path.join(root, `_x_${ward}`), { withFileTypes: true }).filter((d) => d.isDirectory() && NAME.test(d.name));
+    if (sub.length === 1) cands.push(`_x_${ward}/${sub[0].name}`);
+  } catch { /* none */ }
+  for (const c of cands) if (safeFile(root, `${c}/tileset.json`)) return c;
+  return null;
+}
+/** 実フットプリント（public/map-data/osaka-city/buildings/osaka-<ward>/）の有無と宣言棟数。 */
+export function footprintInfo(root, ward) {
+  const f = safeFile(root, `osaka-${ward}/manifest.json`); if (!f) return null;
+  try { const m = JSON.parse(fs.readFileSync(f, 'utf8')); return { totalBuildings: m.totalBuildings, tileCount: m.tileCount }; } catch { return null; }
+}
+
 /** 区一覧 + 各区のデータ有無（存在確認のみ。内容は読まない）。 */
-export function wardIndex({ buildingsRoot, layersRoot, polygons = DEFAULT_POLYGONS }) {
+export function wardIndex({ buildingsRoot, layersRoot, footprintsRoot, polygons = DEFAULT_POLYGONS }) {
   return loadWards(polygons).map((w) => ({
     wardId: w.wardId, wardCode: w.wardCode, wardName: w.wardName, bbox: w.bbox,
     available: {
-      buildings: !!safeFile(buildingsRoot, `${w.wardId}25/tileset.json`),
+      buildings: !!resolveBuildingDir(buildingsRoot, w.wardId),
+      buildingFootprints: !!footprintInfo(footprintsRoot, w.wardId),
       roads: !!safeFile(layersRoot, `${w.wardId}/layers/roads.json`),
       waterways: !!safeFile(layersRoot, `${w.wardId}/layers/waterways.json`),
       waterSurface: !!safeFile(layersRoot, `${w.wardId}/layers/water-surface.json`),
@@ -44,7 +67,7 @@ export function wardIndex({ buildingsRoot, layersRoot, polygons = DEFAULT_POLYGO
   }));
 }
 
-export function createServer({ buildingsRoot, layersRoot, polygons, getPort, log }) {
+export function createServer({ buildingsRoot, layersRoot, footprintsRoot, polygons, getPort, log }) {
   return http.createServer((req, res) => {
     const send = (code, body, type = 'text/plain') => { res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store' }); res.end(body); };
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(405, 'method');
@@ -54,11 +77,12 @@ export function createServer({ buildingsRoot, layersRoot, polygons, getPort, log
     if (STATIC.has(u)) file = safeFile(PUBLIC_DIR, STATIC.get(u));
     else if (u === '/index.json') {
       status = 200; if (log) log({ u, s: 200 });
-      return send(200, JSON.stringify({ wards: wardIndex({ buildingsRoot, layersRoot, polygons }) }), MIME['.json']);
+      return send(200, JSON.stringify({ wards: wardIndex({ buildingsRoot, layersRoot, footprintsRoot, polygons }) }), MIME['.json']);
     } else if (u.startsWith('/ext-3dtiles/')) {
       const parts = u.slice('/ext-3dtiles/'.length).split('/'), name = parts.shift(), rel = parts.join('/');
       if (NAME.test(name || '')) {
-        if (name.endsWith('25') && BUILDING_FILE.test(rel)) file = safeFile(buildingsRoot, `${name}/${rel}`);
+        if (name.endsWith('25') && BUILDING_FILE.test(rel)) { const dir = resolveBuildingDir(buildingsRoot, name.slice(0, -2)); if (dir) file = safeFile(buildingsRoot, `${dir}/${rel}`); }
+        else if (!name.endsWith('25') && rel.startsWith('footprints/') && FOOTPRINT_FILE.test(rel.slice(11))) file = safeFile(footprintsRoot, `osaka-${name}/${rel.slice(11)}`);
         else if (!name.endsWith('25') && rel.startsWith('layers/') && LAYER_FILE.test(rel.slice(7))) file = safeFile(layersRoot, `${name}/${rel}`);
       }
     }
@@ -80,7 +104,7 @@ export async function listen(opts, port = 0) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const a = process.argv.slice(2), opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
-  if (!opt('buildings-root') || !opt('layers-root')) { console.error('usage: --buildings-root <dir> --layers-root <dir> [--port 8135]'); process.exit(2); }
-  const s = await listen({ buildingsRoot: path.resolve(opt('buildings-root')), layersRoot: path.resolve(opt('layers-root')) }, Number(opt('port') || 8135));
+  if (!opt('layers-root') || !(opt('buildings-root') || opt('footprints-root'))) { console.error('usage: --layers-root <dir> [--buildings-root <dir>] [--footprints-root <public/map-data/osaka-city/buildings>] [--port 8135]'); process.exit(2); }
+  const s = await listen({ buildingsRoot: opt('buildings-root') ? path.resolve(opt('buildings-root')) : null, layersRoot: path.resolve(opt('layers-root')), footprintsRoot: opt('footprints-root') ? path.resolve(opt('footprints-root')) : null }, Number(opt('port') || 8135));
   console.log(`Mission135 viewer (127.0.0.1 only, read-only): ${s.url}`);
 }
