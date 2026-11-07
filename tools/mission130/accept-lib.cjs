@@ -47,7 +47,7 @@ function readJson(f) { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } ca
 function loadWardData(dir) {
   const ids = new Set(); let dup = 0;
   const li = (d) => { try { return fs.readdirSync(path.join(dir, d)).filter((n) => n.endsWith('.json')).sort(); } catch (e) { return []; } };
-  for (const f of li('ids')) { const a = readJson(path.join(dir, 'ids', f)); if (Array.isArray(a)) for (const id of a) { if (ids.has(id)) dup++; else ids.add(id); } }
+  for (const f of li('ids')) { if (/^g_/.test(f)) continue; /* Mission132: LOD-group sidecars repeat child ids */ const a = readJson(path.join(dir, 'ids', f)); if (Array.isArray(a)) for (const id of a) { if (ids.has(id)) dup++; else ids.add(id); } }
   const byId = {};
   for (const f of li('attrs')) { const j = readJson(path.join(dir, 'attrs', f)); if (j && j.byId) Object.assign(byId, j.byId); }
   return { ids, dup, byId, source: readJson(path.join(dir, 'source.json')) };

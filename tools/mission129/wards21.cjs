@@ -56,7 +56,9 @@ function checkWard(root, w, dirs) {
   }
   const seen = new Set();
   let ids = 0, dup = 0, badId = 0;
+  // Mission132: ids/g_*.json are LOD-group sidecars (they repeat their children's ids); skipping them avoids a false "duplicate ids" on every ward
   for (const f of ls('ids', /\.json$/)) {
+    if (/^g_/.test(f)) continue;
     let a;
     try { a = JSON.parse(fs.readFileSync(path.join(dir, 'ids', f), 'utf8')); } catch (e) { badId++; continue; }
     if (!Array.isArray(a)) { badId++; continue; }

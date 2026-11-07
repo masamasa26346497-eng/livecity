@@ -96,8 +96,8 @@ try {
       r.click = { target: best.id, attempted: !!pt, selected: null, idInSidecar: data.ids.has(best.id), insideWardPolygon: L.insideWard(w, best.x, best.z) };
       if (pt) {
         for (const t of ['mouseMoved', 'mousePressed', 'mouseReleased']) await page.send('Input.dispatchMouseEvent', { type: t, x: pt.x, y: pt.y, button: t === 'mouseMoved' ? 'none' : 'left', clickCount: t === 'mouseMoved' ? 0 : 1 });
-        for (let i = 0; i < 20 && r.click.selected !== best.id; i++) { await sleep(500); r.click.selected = await ev('window.__mission37g.stats.selectedCanonicalId'); }
-        r.click.selectedKey = await ev('window.__mission37g.stats.selectedKey');
+        for (let i = 0; i < 20 && r.click.selected !== best.id; i++) { await sleep(500); r.click.selected = await ev('window.__mission37g.selectedCanonicalId'); }
+        r.click.selectedKey = await ev('window.__mission37g.selectedKey');
       }
       console.log(JSON.stringify({ ward: r.ward, http: r.http, mounted: r.tilesets, state: r.state, px: r.pixels.pct, clickOk: r.click.selected === best.id }));
     } catch (e) { r.error = String(e.message || e).slice(0, 200); }
