@@ -54,7 +54,30 @@ async function probeHttp(port, list) {
   return res;
 }
 
-const mark = (l) => (!l ? '-' : l.status === 'ok' ? 'OK' : l.status === 'partial' ? `部分(${l.code})` : `なし(${l.code})`);
+/** レイヤー別のHTTP検査対象。道路(manifest+tiles)と水面polygon(water-surface)を独立に扱う。 */
+export function httpGroups(plan) {
+  return {
+    buildings: [plan.buildingManifestUrl],
+    roads: [urls.cityManifest('roads'), ...plan.cityTileUrls.roads],
+    waterways: [urls.cityManifest('waterways'), ...plan.cityTileUrls.waterways],
+    riversV2: [urls.riversV2()],
+    waterSurface: [urls.waterSurface()],
+  };
+}
+/** 全体の ok200/checked に加え byLayer で内訳を返す。missing(404)は notOk に明示される。 */
+export function summarizeHttp(groups, status) {
+  const byLayer = {};
+  let checked = 0, ok200 = 0; const notOk = [];
+  for (const [layer, list] of Object.entries(groups)) {
+    const ok = list.filter((u) => status[u] === 200).length;
+    byLayer[layer] = { checked: list.length, ok200: ok, missing: list.filter((u) => status[u] === 404).length, allOk: list.length > 0 && ok === list.length };
+    checked += list.length; ok200 += ok;
+    for (const u of list) if (status[u] !== 200) notOk.push(`${status[u]} ${u}`);
+  }
+  return { checked, ok200, byLayer, notOk: notOk.slice(0, 20) };
+}
+
+const mark =(l) => (!l ? '-' : l.status === 'ok' ? 'OK' : l.status === 'partial' ? `部分(${l.code})` : `なし(${l.code})`);
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -73,10 +96,9 @@ async function main() {
       for (const r of results) {
         if (!r.datasetId) continue;
         const plan = planWard(rootManifest, r.wardKey);
-        const list = [plan.buildingManifestUrl, urls.cityManifest('waterways'), urls.riversV2(), urls.waterSurface(), ...plan.cityTileUrls.waterways];
-        const st = await probeHttp(port, list);
-        const vals = Object.values(st);
-        r.http = { checked: vals.length, ok200: vals.filter((v) => v === 200).length, notOk: Object.entries(st).filter(([, v]) => v !== 200).map(([u, v]) => `${v} ${u}`).slice(0, 10) };
+        const groups = httpGroups(plan);
+        const st = await probeHttp(port, Object.values(groups).flat());
+        r.http = summarizeHttp(groups, st);
       }
     } finally { server.close(); }
   }
@@ -94,4 +116,4 @@ async function main() {
   console.log(`\nローカルデータ完備: ${complete}/${results.length} 区（描画成功ではない。実ブラウザ検証は別工程）`);
   if (args.strict && complete !== results.length) process.exit(1);
 }
-main().catch((e) => { console.error(e); process.exit(1); });
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => { console.error(e); process.exit(1); });

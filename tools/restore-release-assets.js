@@ -5,14 +5,17 @@
 //       絶対パス・".." を含むアーカイブは拒否 / アップロード・artifact・cache なし / 既定は --dry-run 相当の一覧のみ(--fetch で取得)。
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { extractTarGzSafe, isUnsafeTarMember } from './lib/safe-tar.js';
 
 export const DATA_REPO = 'masamasa26346497-eng/livecity-3d-data';
 export const TAG = 'plateau2025-converted';
 
-export function isUnsafeTarMember(name) {
-  const n = String(name).replace(/\\/g, '/');
-  return n.startsWith('/') || /^[A-Za-z]:/.test(n) || n.split('/').includes('..');
+export { isUnsafeTarMember };
+/** CLI 起動判定。URL の pathname ではなく fileURLToPath を使う（Windows の /C:/ 形式・%20 に依存しない）。 */
+export function isMainModule(metaUrl, argv1) {
+  if (!argv1) return false;
+  return path.resolve(argv1) === path.resolve(fileURLToPath(metaUrl));
 }
 export function assetNameFor(ward) { return `plateau2025-${ward}.tar.gz`; }
 export function validWardKey(w) { return /^[a-z0-9-]+$/.test(w); }
@@ -48,21 +51,18 @@ async function main() {
     console.log(`[${name}] ${as.size} bytes${doFetch ? '' : ' (一覧のみ。--fetch で取得)'}`);
     if (!doFetch) continue;
     const ward = name.replace(/^plateau2025-/, '').replace(/\.tar\.gz$/, '');
-    const tgz = path.join(outAbs, `${ward}.tgz`);
     const res = await api(as.url, token, 'application/octet-stream');
     if (!res.ok) { console.log(`[${ward}] download failed HTTP ${res.status}`); continue; }
     const buf = Buffer.from(await res.arrayBuffer());
     if (as.size && buf.length !== as.size) { console.log(`[${ward}] size mismatch ${buf.length}/${as.size}`); continue; }
-    fs.writeFileSync(tgz, buf);
-    const list = spawnSync('tar', ['-tzf', tgz], { encoding: 'utf8', maxBuffer: 1 << 28 });
-    const members = (list.stdout || '').split('\n').filter(Boolean);
-    if (list.status !== 0 || members.some(isUnsafeTarMember)) { console.log(`[${ward}] REFUSED: unreadable or unsafe members`); fs.rmSync(tgz); continue; }
     const dest = path.join(outAbs, `_x_${ward}`);
-    fs.mkdirSync(dest);
-    const ex = spawnSync('tar', ['-xzf', tgz, '--no-same-owner', '-C', dest]);
-    fs.rmSync(tgz);
-    console.log(`[${ward}] members=${members.length} extract=${ex.status === 0 ? 'ok' : 'FAILED'} tileset.json=${members.filter((m) => m.endsWith('tileset.json')).length}`);
+    try {
+      const r = extractTarGzSafe(buf, dest);
+      console.log(`[${ward}] files=${r.files} dirs=${r.dirs} tileset.json=${r.tilesets} extract=ok`);
+    } catch (e) {
+      console.log(`[${ward}] REFUSED (fail-closed・部分展開なし): ${String(e.message).slice(0, 120)}`);
+    }
   }
   console.log(`\n展開先(ローカルのみ・未公開): ${outAbs}`);
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) main().catch((e) => { console.error(e.message); process.exit(1); });
+if (isMainModule(import.meta.url, process.argv[1])) main().catch((e) => { console.error(e.message); process.exit(1); });

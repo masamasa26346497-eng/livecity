@@ -16,6 +16,37 @@ export function layerBrowserOk(b) {
   return !!b && Number.isFinite(b.pixelDiff) && b.pixelDiff > 0 && b.pass === true;
 }
 
+/** 区内カバレッジの下限（insideWard.ratio）。これ未満/未検証は完成扱いにしない。 */
+export const MIN_INSIDE_WARD_RATIO = 0.9;
+
+/** HTTP: 建物・道路・河川(waterways)・水面(water-surface)の全URLが200であること（byLayer で独立判定）。 */
+export function httpComplete(http) {
+  if (!http || !http.byLayer) return false;
+  return ['buildings', 'roads', 'waterways', 'waterSurface'].every((l) => http.byLayer[l] && http.byLayer[l].allOk === true);
+}
+
+/** 追加ゲート。各ゲートは独立に失敗理由を返す（空配列=全合格）。 */
+export function gateFailures(r, browser, row) {
+  const f = [];
+  const L = r.layers || {};
+  for (const l of LAYERS) if (!layerBrowserOk(browser[l])) f.push(`pixel:${l}`);
+  if (!(browser.alignment && browser.alignment.pass === true)) f.push('alignment');
+  if (!httpComplete(r.http)) f.push('http200');
+  const c = browser.click;
+  if (!(c && typeof c.canonicalId === 'string' && c.canonicalId && c.canonicalId === c.expectedId)) f.push('clickCanonicalId');
+  const ratio = r.checks && r.checks.insideWard ? r.checks.insideWard.ratio : null;
+  if (!(Number.isFinite(ratio) && ratio >= MIN_INSIDE_WARD_RATIO)) f.push('wardCoverage');
+  // 河川: データに線/面がある側は、その側の画素証拠を独立に要求
+  if (row.waterLine && !layerBrowserOk(browser.waterLine)) f.push('pixel:waterLine');
+  if (row.waterPolygon && !layerBrowserOk(browser.waterPolygon)) f.push('pixel:waterPolygon');
+  if (!row.waterLine && !row.waterPolygon) f.push('water:no-features');
+  // 道路: 線は必須。面(surface)証拠は roads.surface===true の区のみ必須
+  if (row.roadKind === 'none') f.push('roads:no-features');
+  else if (!layerBrowserOk(browser.roadLine)) f.push('pixel:roadLine');
+  if (L.roads && L.roads.surface === true && !layerBrowserOk(browser.roadSurface)) f.push('pixel:roadSurface');
+  return f;
+}
+
 export function roadKind(roadsLayer) {
   if (!roadsLayer || roadsLayer.status === 'missing') return 'none';
   return roadsLayer.features > 0 ? 'lines' : 'none'; // 現行 roads タイルは中心線。面(ribbon)描画の証拠は browser 側でのみ確認する
@@ -56,13 +87,10 @@ export function buildAcceptanceRow(verifyResult, browser) {
       }
       : null,
   };
-  row.verdict = browser && LAYERS.every((l) => row.browser[l]) && row.browser.alignment === true ? 'browser-verified' : 'not-verified';
-  row.reasonNotRun = row.verdict === 'browser-verified' ? '' : reasonNotRun(r, browser);
-  if (browser && row.verdict !== 'browser-verified') {
-    const bad = LAYERS.filter((l) => !row.browser[l]);
-    if (row.browser.alignment !== true) bad.push('alignment');
-    row.reasonNotRun = `ブラウザ検証で不合格/不足: ${bad.join(', ')}`;
-  }
+  const fails = browser ? gateFailures(r, browser, row) : ['no-browser-result'];
+  row.gateFailures = fails;
+  row.verdict = fails.length === 0 ? 'browser-verified' : 'not-verified';
+  row.reasonNotRun = row.verdict === 'browser-verified' ? '' : (browser ? `ブラウザ検証で不合格/不足: ${fails.join(', ')}` : reasonNotRun(r, browser));
   return row;
 }
 
@@ -82,5 +110,4 @@ export function renderMarkdown(table) {
     h.push(`| ${r.ward} | ${r.buildingSource} | ${r.roads} | ${r.roadKind} | ${r.waterLine ? 'あり' : 'なし'} | ${r.waterPolygon ? 'あり' : 'なし'} | ${r.http200} | ${r.insideWard} | ${r.groundBase} | ${b ? yn(b.buildings) : '未実施'} | ${b ? yn(b.roads) : '未実施'} | ${b ? yn(b.water) : '未実施'} | ${b && b.clickId ? b.clickId : '-'} | ${b && b.fps != null ? b.fps : '-'} | ${b ? yn(b.alignment) : '未実施'} | ${r.verdict} | ${r.reasonNotRun} |`);
   }
   h.push('', `実ブラウザで建物・道路・河川が個別に証明された区: **${table.browserVerified}/${table.total}**。` + (table.allVerified ? ' 24/24 達成。' : ' 24区完成ではない。'));
-  return h.join('\n') + '\n';
-}
+  return h.join('\n') + '\n';}
