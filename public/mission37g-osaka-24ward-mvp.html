@@ -180,6 +180,11 @@
   #lc-ward-card #wc-src { color: var(--lc-text-mute); font-size: 10px; margin-top: 4px; }
   #lc-ward-card #wc-close { position: absolute; top: 6px; right: 8px; background: none; border: 0; color: var(--lc-text-mute); font-size: 16px; cursor: pointer; }
   .lc-note { font-size: 10px; color: var(--lc-text-mute); line-height: 1.6; margin-top: 8px; }
+  #lc-diag154 { position: absolute; z-index: 16; left: 14px; bottom: 28px; max-width: 330px; padding: 6px 9px; border-radius: 6px; font: 10.5px/1.5 var(--lc-mono, monospace); color: #e8eef7; background: rgba(15,30,58,.82); white-space: pre-wrap; pointer-events: auto; }
+  #lc-diag154.warn { background: rgba(120,40,20,.9); }
+  #lc-diag154.min .body { display: none; }
+  #lc-diag154 .hd { cursor: pointer; font-weight: 600; }
+  @media (max-width: 720px) { #lc-diag154 { bottom: 60px; max-width: 220px; } }
   #lc-err { color: var(--lc-amber); font-size: 11px; white-space: pre-wrap; line-height: 1.6; }
   #lc-left::-webkit-scrollbar, #lc-right::-webkit-scrollbar { width: 6px; }
   #lc-left::-webkit-scrollbar-thumb, #lc-right::-webkit-scrollbar-thumb { background: #22314c; border-radius: 3px; }
@@ -445,6 +450,7 @@
   </div>
 </aside>
 
+<div id="lc-diag154" class="min"><div class="hd" id="lc-diag154-hd">build —</div><div class="body" id="lc-diag154-body"></div></div>
 <div id="lc-minimap" title="ミニマップ（簡易）"><span class="cap">MINIMAP</span><canvas id="lc-mm" width="300" height="224"></canvas></div>
 
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
@@ -2034,6 +2040,7 @@
   //   カメラ真下の区（最大 3 区）のラベルだけを生成し、離れた区は破棄する。高度で 区名 → 町名 → 町丁目名 に出し分け、重なりは画面空間で回避する。
   //   ラベルは pick 対象にしない（建物 canonicalId・施設のクリックと競合しない）。
   // ══════════════════════════════════════════════════════════════
+  const BUILD_ID = 'm154-20261108';
   const TW = window.LiveCityTowns145;
   const towns24 = { data: null, byWard: new Map(), live: new Map(), order: [], wardNames: new Map(), shown: { base: 0, full: 0 } };
   const townLayer24 = {
@@ -2041,10 +2048,20 @@
     hint: 'e-Stat 小地域の公式名称。遠景=区名のみ / 中景=町名 / 近景=町丁目名。住吉区は町丁目レイヤー（境界つき）を使用',
     async mount() {
       // 147: localhost は towns-24.local.json（ランチャーが e-Stat ZIP から生成）を優先。
-      let r = null;
-      if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { try { r = await fetch('mission145-data/towns-24.local.json', { cache: 'no-store' }); } catch (e) { r = null; } }
-      if (!r || !r.ok) r = await fetch('mission145-data/towns-24.json', { cache: 'no-store' });
-      if (!r.ok) throw new Error('towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）');
+      // 154: committed towns-24.json（e-Stat 公式・CC BY 4.0）を必ず読む。localhost の .local.json は件数が多い場合だけ採用（古い/空の生成物で上書きされない）。
+      const diag = stats.townsDiag = { committed: null, local: null, used: null, error: null };
+      const get = async (u) => { try { const x = await fetch(u + '?b=' + BUILD_ID, { cache: 'no-store' }); if (!x.ok) return { status: x.status }; const jj = await x.json(); return { status: 200, j: jj, n: Array.isArray(jj.towns) ? jj.towns.length : 0 }; } catch (e) { return { status: 0 }; } };
+      const c = await get('mission145-data/towns-24.json');
+      diag.committed = { status: c.status, n: c.n || 0 };
+      let pick = c.status === 200 ? c : null;
+      if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+        const l = await get('mission145-data/towns-24.local.json');
+        diag.local = { status: l.status, n: l.n || 0 };
+        if (l.status === 200 && l.n > ((pick && pick.n) || 0)) pick = l;
+      }
+      if (!pick) { diag.error = 'towns-24.json HTTP ' + c.status; throw new Error('towns-24.json 未接続（HTTP ' + c.status + '）。町名ラベルは出ません。git pull で public/mission145-data/towns-24.json を取得してください'); }
+      diag.used = pick === c ? 'committed' : 'local';
+      const r = { json: async () => pick.j };
       const j = await r.json();
       if (!j || !Array.isArray(j.towns)) throw new Error('towns-24.json の形式が不正です');
       towns24.data = j;
@@ -2128,8 +2145,32 @@
     const shownTexts = [];
     for (const L of towns24.live.values()) for (const it of (tier === 'base' ? L.bi : L.fi)) if (it.lb.show && shownTexts.length < 60) shownTexts.push(it.text);
     if (stats.towns145) Object.assign(stats.towns145, { tier, live: Array.from(towns24.live.keys()), cap: TW.CAP, shownTexts, altitudeM: Math.round(h) });
+    try { diag154Update(h, tier, on); } catch (e) { /* 診断のみ */ }
     scene.requestRender();
   }
+  // 154: build 識別子と町丁目ラベル診断（画面左下。見出しタップで開閉）。旧コード・データ未接続・駅/地名の独立 ON/OFF を画面上で判別できる。
+  function diag154Update(h, tier, townsOn) {
+    const el = $('lc-diag154'); if (!el) return;
+    const t = stats.towns145, d = stats.townsDiag || {};
+    const sl = LayerRegistry.get('stations');
+    let shown = 0, minA = null;
+    for (const L of towns24.live.values()) for (const it of [].concat(L.bi, L.fi)) if (it.lb.show) { shown++; const al = it.lb.fillColor.alpha; if (minA == null || al < minA) minA = al; }
+    const warn = !towns24.data ? 'データ未接続: ' + (d.error || 'towns-24.json 未読込') : (towns24.byWard.size < 20 ? '警告: 区数が少ない(' + towns24.byWard.size + ')' : '');
+    const lines = [
+      'data: ' + (towns24.data ? towns24.data.towns.length + '件/' + (towns24.byWard.size + 1) + '区 (' + (d.used || '?') + ')' : 'なし') + ' committed=' + (d.committed ? d.committed.status : '-') + ' local=' + (d.local ? d.local.status + '/' + d.local.n : '-'),
+      '対象区: ' + (t ? ((t.live || []).join(',') || '—') : '—') + '  選択: ' + (stats.buildingWard || '—'),
+      '駅名: ' + (sl && sl.visible ? 'ON' : 'OFF') + '  地名: ' + (townsOn ? 'ON' : 'OFF') + '(独立)',
+      '高度 ' + Math.round(h) + 'm 階層 ' + tier + ' 描画ラベル ' + shown + ' 最小alpha ' + (minA == null ? '-' : minA.toFixed(2)),
+      '例: ' + ((t && t.shownTexts) || []).slice(0, 4).join(' / '),
+    ];
+    if (warn) lines.unshift(warn);
+    $('lc-diag154-body').textContent = lines.join('\n');
+    $('lc-diag154-hd').textContent = 'build ' + BUILD_ID + (warn ? ' ⚠' : '');
+    el.classList.toggle('warn', !!warn);
+    stats.diag154 = { build: BUILD_ID, warn, shown, minAlpha: minA, tier, altitudeM: Math.round(h) };
+  }
+  $('lc-diag154-hd').onclick = () => $('lc-diag154').classList.toggle('min');
+  stats.build = BUILD_ID;
   async function towns24Hits(raw) {
     if (!towns24.data || !TN) return [];
     const tk = TN.normalizeTownName(raw); if (!tk) return [];
