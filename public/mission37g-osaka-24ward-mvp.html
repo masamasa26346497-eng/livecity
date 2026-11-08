@@ -2053,17 +2053,19 @@
         if (!towns24.byWard.has(t.w)) towns24.byWard.set(t.w, []);
         towns24.byWard.get(t.w).push(t);
       }
+      setTimeout(() => { try { townTick(); } catch (e) { /* 次の facTick で再試行 */ } }, 0);   // 151: 初回表示を 1.5 秒の定期処理に待たせない
       stats.towns145 = { total: j.towns.length, wardsWithTowns: towns24.byWard.size, source: j.source, license: j.license, live: [], shown: towns24.shown };
       searchIndex = null;
       return { count: j.towns.length };
     },
-    applyVisible(on) { for (const L of towns24.live.values()) { L.base.show = on; L.full.show = on; } },
+    applyVisible(on) { for (const L of towns24.live.values()) { L.base.show = on; L.full.show = on; } setTimeout(() => { try { townTick(); } catch (e) { /* 次回 */ } }, 0); },
   };
   LayerRegistry.register(townLayer24);
+  // 151: 住吉区（37D の lblStyle）と同じ見た目: 濃紺 #16305a 文字 + 明るい縁取り 3px、背景ボックスなし、町名 15px / 丁目 13px、高さ 8m。
+  //   駅ラベルとは別の LabelCollection・別レイヤー（towns24）で、駅の ON/OFF とは独立。
   function townLabelOpts(text, x, z, big) {
-    return { position: toCart(x, z, 10), text, font: (big ? '600 14px' : '500 12px') + ' sans-serif', fillColor: Cesium.Color.fromCssColorString('#eef1f3'),
-      outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-      showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.55)'), backgroundPadding: new Cesium.Cartesian2(5, 2),
+    return { position: toCart(x, z, 8), text, font: '600 ' + (big ? 15 : 13) + 'px sans-serif', fillColor: Cesium.Color.fromCssColorString('#16305a'),
+      outlineColor: Cesium.Color.fromCssColorString('#f4f7fb'), outlineWidth: 3, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM, horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
       disableDepthTestDistance: Number.POSITIVE_INFINITY, show: false };
   }
@@ -2086,12 +2088,16 @@
     const h = viewer.camera.positionCartographic.height, tier = TW.tierOf(h);
     towns24.shown.base = 0; towns24.shown.full = 0;
     if (on && tier !== 'ward') {
-      const g = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2), scene.globe.ellipsoid);
-      if (g) {
+      // 151: 画面中心だけでなく左右上下寄りの点も判定し、画面内の複数区（最大 3）に町名を出す。
+      const cw = scene.canvas.clientWidth, ch = scene.canvas.clientHeight, seen = [];
+      for (const [fx, fy] of [[0.5, 0.5], [0.25, 0.5], [0.75, 0.5], [0.5, 0.25], [0.5, 0.75]]) {
+        const g = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(cw * fx, ch * fy), scene.globe.ellipsoid);
+        if (!g) continue;
         const gc = Cesium.Cartographic.fromCartesian(g);
         const w = WardUI.hit((Cesium.Math.toDegrees(gc.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd, -((Cesium.Math.toDegrees(gc.latitude) - PROJ.clat) * PROJ.mpd));
-        if (w && towns24.byWard.has(w.wardId)) { townEnsureWard(w.wardId); for (const d of TW.touchWard(towns24.order, w.wardId)) townRelease(d); }
+        if (w && towns24.byWard.has(w.wardId) && !seen.includes(w.wardId)) seen.push(w.wardId);
       }
+      for (const id of seen.reverse()) { townEnsureWard(id); for (const d of TW.touchWard(towns24.order, id)) townRelease(d); }
     }
     const W = scene.canvas.clientWidth, H = scene.canvas.clientHeight, win = new Cesium.Cartesian2();
     const items = [];
@@ -2101,11 +2107,20 @@
         it.lb.show = false;
         if (!on || tier === 'ward') continue;
         const p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, it.lb.position, win);
-        if (p) items.push({ x: p.x, y: p.y, text: it.text, pri: Math.min(1000, Math.round(it.t.a / 1000)), it });
+        if (p) items.push({ x: p.x, y: p.y, text: it.text, fs: tier === 'base' ? 15 : 13, pri: Math.min(1000, Math.round((it.t.a || 0) / 1000)), it });
       }
     }
     if (items.length) {
-      const keep = TW.declutter(items, tier === 'base' ? TW.CAP.base : TW.CAP.full, { w: W, h: H });
+      // 151: 表示中の駅ラベルの矩形を先に占有済みにする（町名は駅名に重ならず、駅名も隠さない）
+      const blockers = [], sl = LayerRegistry.get('stations');
+      if (sl && sl.visible && stationData.list.length && stationLayer.labels && stationLayer.labels.show) {
+        const sp = new Cesium.Cartesian2();
+        for (const s of stationData.list) {
+          const q = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(s.x, s.z, 8), sp);
+          if (q && q.x > -80 && q.y > -40 && q.x < W + 80 && q.y < H + 40) blockers.push([q.x - 60, q.y - 36, q.x + 60, q.y + 4]);
+        }
+      }
+      const keep = TW.declutter(items, tier === 'base' ? TW.CAP.base : TW.CAP.full, { w: W, h: H, blockers });
       keep.forEach((i) => { items[i].it.lb.show = true; });
       towns24.shown[tier === 'base' ? 'base' : 'full'] = keep.size;
     }

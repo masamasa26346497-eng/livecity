@@ -28,10 +28,11 @@
     const cx = view.w / 2, cy = view.h / 2;
     const order = items.map((it, i) => ({ it, i, d: (it.x - cx) * (it.x - cx) + (it.y - cy) * (it.y - cy) }))
       .sort((a, b) => (b.it.pri || 0) - (a.it.pri || 0) || a.d - b.d);
-    const boxes = [], keep = new Set();
+    // 151: view.blockers（表示中の駅ラベルなどの矩形 [x0,y0,x1,y1]）を最初から占有済みにする。町名は駅名に重ならない。
+    const boxes = (view.blockers || []).slice(), keep = new Set();
     for (const o of order) {
       if (keep.size >= cap) break;
-      const it = o.it, w = String(it.text).length * 13 + 12, h = 20;
+      const it = o.it, w = String(it.text).length * (it.fs || 13) + 12, h = (it.fs || 13) + 8;
       const x0 = it.x - w / 2, y0 = it.y - h, x1 = it.x + w / 2, y1 = it.y;
       if (x1 < 0 || y1 < 0 || x0 > view.w || y0 > view.h) continue;
       let ok = true;
