@@ -80,7 +80,7 @@ function verdict(r) {
     if (r.http && r.http.notFound > 0) why.push('http-404');
     if (!(r.tilesets >= 1) || r.state !== 'ready') why.push('not-mounted');
     if (!r.pixels || !(r.pixels.pct >= 1.0)) why.push('no-pixel-diff');
-    if (!r.click || r.click.selected !== r.click.target) why.push('click-id-mismatch');
+    if (!r.click || r.click.selected !== r.click.target) why.push('click-id-mismatch' + (r.click && r.click.reason ? '(' + r.click.reason + ')' : ''));
     else if (!r.click.idInSidecar) why.push('click-id-not-in-sidecar');
     else if (!r.click.insideWardPolygon) why.push('click-outside-ward');
     if (r.dupIds) why.push('duplicate-ids');

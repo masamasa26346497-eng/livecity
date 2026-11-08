@@ -77,27 +77,38 @@ try {
       r.coverage = L.coverage(data.ids.size, w.sourceBuildings);
       const cands = Object.entries(data.byId).filter(([id, v]) => data.ids.has(id) && v[0] >= 20 && v[0] <= 120 && L.insideWard(w, v[2], v[3]));
       if (!cands.length) { r.note = 'no tall in-ward building in attrs'; continue; }
-      let best = null;
+      // Mission 140: a single densest-cluster candidate with a +-50px scan left konohana/nishinari with attempted=false (=> click-id-mismatch).
+      // Now: rank several candidates, scan a wider window per candidate, and record WHY a click was or was not made.
+      const ranked = [];
       for (const c of cands.sort((p, q) => q[1][0] - p[1][0]).slice(0, 300)) {
         let n = 0; for (const o of cands) if (Math.hypot(c[1][2] - o[1][2], c[1][3] - o[1][3]) < 200) n++;
-        if (!best || n > best.n) best = { id: c[0], h: c[1][0], x: c[1][2], z: c[1][3], n };
+        ranked.push({ id: c[0], h: c[1][0], x: c[1][2], z: c[1][3], n });
       }
-      const code = r.wardCodeInSource || w.wardCode, look = () => ev(`window.__mission37dQA.lookAtLocal(${best.x}, ${best.z}, ${best.h / 2}, 500, -50, 0)`);
-      await ev('window.__mission37dQA.setBuildingWard(null)'); await sleep(800); await look(); const A = await grab();
+      ranked.sort((p, q) => q.n - p.n || q.h - p.h);
+      let best = ranked[0];
+      const code = r.wardCodeInSource || w.wardCode, look = (t) => ev(`window.__mission37dQA.lookAtLocal(${t.x}, ${t.z}, ${t.h / 2}, 500, -50, 0)`);
+      await ev('window.__mission37dQA.setBuildingWard(null)'); await sleep(800); await look(best); const A = await grab();
       const h0 = hits.length;
-      await ev(`window.__mission37dQA.setBuildingWard('${code}')`); await waitReady(); await look(); await waitReady(); const B = await grab();
+      await ev(`window.__mission37dQA.setBuildingWard('${code}')`); await waitReady(); await look(best); await waitReady(); const B = await grab();
       const mine = hits.slice(h0).filter((h) => h.ward === w.wardId);
       r.http = { tileset200: mine.filter((h) => /tileset\.json$/.test(h.u) && h.s === 200).length, glb200: mine.filter((h) => /\.glb$/.test(h.u) && h.s === 200).length, notFound: mine.filter((h) => h.s === 404).length };
       r.tilesets = (await J('window.__mission37dQA.tilesetCount()')).n; r.state = await ev('window.__mission37g.buildingState');
       r.pixels = await diff(A, B);
       // real mouse click: find a screen point whose scene.pick is the target, then click with CDP input events
-      let pt = null; const p0 = await J(`window.__mission37dQA.project(${best.x}, ${best.z}, ${best.h})`);
-      if (p0) for (let dy = -60; dy <= 40 && !pt; dy += 8) for (let dx = -50; dx <= 50 && !pt; dx += 8) { const x = p0.x + dx, y = p0.y + dy; if ((await ev(`window.__mission37dQA.pickId(${x}, ${y})`)) === best.id) pt = { x, y }; }
-      r.click = { target: best.id, attempted: !!pt, selected: null, idInSidecar: data.ids.has(best.id), insideWardPolygon: L.insideWard(w, best.x, best.z) };
+      let pt = null, tried = 0;
+      for (const t of ranked.slice(0, 8)) {
+        tried++; best = t; await look(t); await waitReady();
+        const p0 = await J(`window.__mission37dQA.project(${t.x}, ${t.z}, ${t.h})`);
+        if (!p0) continue;
+        for (let dy = -120; dy <= 80 && !pt; dy += 6) for (let dx = -120; dx <= 120 && !pt; dx += 6) { const x = p0.x + dx, y = p0.y + dy; if ((await ev(`window.__mission37dQA.pickId(${x}, ${y})`)) === t.id) pt = { x, y }; }
+        if (pt) break;
+      }
+      r.click = { target: best.id, attempted: !!pt, selected: null, candidatesTried: tried, reason: pt ? null : 'no-screen-point-picks-target', idInSidecar: data.ids.has(best.id), insideWardPolygon: L.insideWard(w, best.x, best.z) };
       if (pt) {
         for (const t of ['mouseMoved', 'mousePressed', 'mouseReleased']) await page.send('Input.dispatchMouseEvent', { type: t, x: pt.x, y: pt.y, button: t === 'mouseMoved' ? 'none' : 'left', clickCount: t === 'mouseMoved' ? 0 : 1 });
         for (let i = 0; i < 20 && r.click.selected !== best.id; i++) { await sleep(500); r.click.selected = await ev('window.__mission37g.selectedCanonicalId'); }
         r.click.selectedKey = await ev('window.__mission37g.selectedKey');
+        if (r.click.selected !== best.id) r.click.reason = r.click.selected ? 'selected-other-id' : 'click-did-not-select';
       }
       console.log(JSON.stringify({ ward: r.ward, http: r.http, mounted: r.tilesets, state: r.state, px: r.pixels.pct, clickOk: r.click.selected === best.id }));
     } catch (e) { r.error = String(e.message || e).slice(0, 200); }
