@@ -62,3 +62,36 @@ export function summarize(progress, planned) {
 export function shouldSkip(p, etag, outExists) {
   return !!(p && !p.error && p.sourceEtag === etag && p.meshesFetched === p.meshesPlanned && p.convertedBuildings > 0 && outExists);
 }
+
+// Retry with exponential backoff for transient failures. fn may be sync or async; sleep is injectable for tests.
+export async function withRetry(fn, opts = {}) {
+  const attempts = opts.attempts || 3, baseMs = opts.baseMs || 2000;
+  const sleep = opts.sleep || ((ms) => new Promise((r) => setTimeout(r, ms)));
+  const onRetry = opts.onRetry || (() => {});
+  let last;
+  for (let i = 1; i <= attempts; i++) {
+    try { return await fn(i); } catch (e) { last = e; if (i < attempts) { onRetry(i, e); await sleep(baseMs * 2 ** (i - 1)); } }
+  }
+  throw last;
+}
+
+// Delivery manifest: lists only wards that reached 'served' or 'complete' (HTTP 200 verified). Small; contains no raw data.
+export function buildDeliveryManifest(progress, etag, baseUrl = '') {
+  const wards = [];
+  for (const [ward, p] of Object.entries(progress || {})) {
+    const st = wardStatus(p);
+    if (st !== 'served' && st !== 'complete') continue;
+    wards.push({ ward, wardCode: p.wardCode, status: st, buildings: p.convertedBuildings, tiles: p.tiles, bytes: p.outputBytes,
+      tileset: baseUrl + ward + '/tiles/tileset.json', lod: 1, idScheme: 'gml:id' });
+  }
+  return { schema: 'livecity-mission156-delivery/1', sourceEtag: etag, license: 'plateau', attribution: '国土交通省 Project PLATEAU', published: false, wards };
+}
+
+// Integrity of a persisted/restored ward dir: returns tile content URIs referenced by the tileset but absent from the file list.
+export function missingTilesetFiles(listFiles, tilesetJson) {
+  const have = new Set(listFiles);
+  const refs = [];
+  const walk = (t) => { if (!t) return; if (t.content && (t.content.uri || t.content.url)) refs.push(t.content.uri || t.content.url); (t.children || []).forEach(walk); };
+  walk(tilesetJson && tilesetJson.root);
+  return refs.filter((r) => !have.has(r));
+}

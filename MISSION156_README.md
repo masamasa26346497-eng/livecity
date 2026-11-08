@@ -29,3 +29,8 @@ pending → partial → converted → served（HTTP200＋bounds）→ complete�
 3. 道路・河川との重ね比較は tran 向き検査（mission79 流用）のみ。ビューア上の目視比較は未実施。
 4. LOD2: PR #50 と衝突するため未編集。ID は gml:id 無変更なので、将来 LOD2 を同 ID で結合可能。LOD2 が無い建物は LOD1 のまま。
 5. 非公開保存先: PLATEAU は公開データのため権利上は問題ないが、配信先（Vercel/Git）への公開は承認待ち。現状は temp + 短期 artifact のみ。
+
+## Mission 157 (continuation)
+- Real fresh fetch from official PLATEAU on an empty runner (no PC data): chuo 18,655 bldgs/52 tiles/27.7MB/57s, kita 19,601 bldgs/52 tiles/30.0MB/74s, IDs unique within and across sumiyoshi+chuo+kita (0 duplicates). All 117-ish URIs HTTP 200; Chrome+Cesium: 0 JS errors, tilesLoaded. Kita reported drawCommands=0 at the sample frame (chuo: 1) – tileset loaded but not yet confirmed drawn; needs a longer-wait re-check.
+- Storage: runner temp is lost at job end. This job's token is scoped to this repo only; access to any other private repo (e.g. livecity-data-pipeline) was NOT verified and not attempted. Persistence candidates and limits are in the PR comment. Nothing was uploaded anywhere.
+- Added: retry/backoff + per-ward timeout in run-all, `delivery-manifest.json` (HTTP200-verified wards only, `published:false`), `missingTilesetFiles` restore-integrity check, independent `tools/mission156/viewer-adapter.mjs` (no HTML edited), tests in `tests/mission156-persist.test.cjs`.

@@ -1,0 +1,42 @@
+{
+ "schema": "livecity-mission156-delivery/1",
+ "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+ "license": "plateau",
+ "attribution": "国土交通省 Project PLATEAU",
+ "published": false,
+ "wards": [
+  {
+   "ward": "sumiyoshi",
+   "wardCode": "27120",
+   "status": "complete",
+   "buildings": 35032,
+   "tiles": 52,
+   "bytes": 53615211,
+   "tileset": "sumiyoshi/tiles/tileset.json",
+   "lod": 1,
+   "idScheme": "gml:id"
+  },
+  {
+   "ward": "chuo",
+   "wardCode": "27128",
+   "status": "complete",
+   "buildings": 18655,
+   "tiles": 52,
+   "bytes": 29084771,
+   "tileset": "chuo/tiles/tileset.json",
+   "lod": 1,
+   "idScheme": "gml:id"
+  },
+  {
+   "ward": "kita",
+   "wardCode": "27127",
+   "status": "complete",
+   "buildings": 19601,
+   "tiles": 52,
+   "bytes": 31422643,
+   "tileset": "kita/tiles/tileset.json",
+   "lod": 1,
+   "idScheme": "gml:id"
+  }
+ ]
+}

@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { selectMeshes } from './mission79-run.mjs';
-import { rightsGate, findDuplicateIds, summarize, shouldSkip } from './mission156/lib.mjs';
+import { rightsGate, findDuplicateIds, summarize, shouldSkip, withRetry, buildDeliveryManifest } from './mission156/lib.mjs';
 
 const ROOT = process.cwd();
 const a = process.argv.slice(2);
@@ -72,7 +72,11 @@ for (const w of wards) {
   const t0 = Date.now();
   const rec = { wardCode: pl.wardCode, meshesPlanned: pl.meshes.length, meshesFetched: 0, sourceEtag: lock.http.etag, compressedMB: pl.compressedMB, inflatedMB: pl.inflatedMB };
   try {
-    execFileSync(process.execPath, ['tools/mission79-run.mjs', '--ward', w, '--work', work, '--final', final, '--max-mb', String(maxMb)], { stdio: 'inherit', cwd: ROOT, maxBuffer: 1 << 28 });
+    // transient failure => retry (mission79 fetch resumes via its sha256 manifest); final dir must be empty per attempt
+    await withRetry(() => {
+      fs.rmSync(final, { recursive: true, force: true });
+      execFileSync(process.execPath, ['tools/mission79-run.mjs', '--ward', w, '--work', work, '--final', final, '--max-mb', String(maxMb)], { stdio: 'inherit', cwd: ROOT, maxBuffer: 1 << 28, timeout: Number(opt('ward-timeout-min', 18)) * 60000 });
+    }, { attempts: Number(opt('retries', 3)), onRetry: (i, e) => console.error('[156] retry', w, 'after attempt', i, String(e.message).slice(0, 120)) });
     const src = readJson(path.join(final, 'source.json')), al = readJson(path.join(final, 'alignment.json')), ts = readJson(path.join(final, 'tileset.json'));
     rec.meshesFetched = pl.meshes.length; // run succeeded => every planned mesh was fetched
     rec.meshesContributing = src.sourceMeshes.length; // meshes holding >=1 in-ward building (edge meshes may hold none)
@@ -99,6 +103,7 @@ for (const [w, p] of Object.entries(progress)) {
 const dups = findDuplicateIds(idsByWard);
 fs.writeFileSync(path.join(REP, 'id-duplicates.json'), JSON.stringify({ checkedWards: Object.keys(idsByWard), duplicateCount: dups.length, sample: dups.slice(0, 50) }, null, 1));
 save();
+fs.writeFileSync(path.join(REP, 'delivery-manifest.json'), JSON.stringify(buildDeliveryManifest(progress, lock.http.etag), null, 1));
 const s = summarize(progress, plan);
 console.log('[156] summary', JSON.stringify({ byStatus: s.byStatus, converted: s.convertedBuildingsTotal, vsDeclaredPct: s.measuredVsDeclaredPct, crossWardDuplicateIds: dups.length }));
 process.exit(failed || dups.length ? 1 : 0);

@@ -3,7 +3,7 @@
  "source": "plateau-27100-osaka-shi-2025",
  "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
  "license": "plateau",
- "generatedAt": "2026-11-08T15:29:17.118Z",
+ "generatedAt": "2026-11-08T16:42:15.782Z",
  "wards": {
   "sumiyoshi": {
    "wardCode": "27120",
@@ -24,17 +24,57 @@
    "http200Verified": true,
    "browserVerified": true,
    "ms": 57881
+  },
+  "chuo": {
+   "wardCode": "27128",
+   "meshesPlanned": 20,
+   "meshesFetched": 20,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "compressedMB": 44.7,
+   "inflatedMB": 792.5,
+   "meshesContributing": 18,
+   "sourceBuildings": 51288,
+   "convertedBuildings": 18655,
+   "outsideWard": 32633,
+   "duplicateIds": 0,
+   "tiles": 52,
+   "orientationOk": true,
+   "bestTransform": "identity",
+   "outputBytes": 29084771,
+   "http200Verified": true,
+   "browserVerified": true,
+   "ms": 56699
+  },
+  "kita": {
+   "wardCode": "27127",
+   "meshesPlanned": 25,
+   "meshesFetched": 25,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "compressedMB": 54.6,
+   "inflatedMB": 958.3,
+   "meshesContributing": 17,
+   "sourceBuildings": 58596,
+   "convertedBuildings": 19601,
+   "outsideWard": 38995,
+   "duplicateIds": 0,
+   "tiles": 52,
+   "orientationOk": true,
+   "bestTransform": "identity",
+   "outputBytes": 31422643,
+   "http200Verified": true,
+   "browserVerified": true,
+   "ms": 73869
   }
  },
  "summary": {
   "wardsTotal": 24,
   "byStatus": {
-   "pending": 23,
-   "converted": 1
+   "pending": 21,
+   "complete": 3
   },
-  "convertedBuildingsTotal": 35032,
+  "convertedBuildingsTotal": 73288,
   "declaredPast": 574213,
-  "measuredVsDeclaredPct": 6.1,
+  "measuredVsDeclaredPct": 12.76,
   "allComplete": false,
   "rows": [
    {
@@ -99,7 +139,7 @@
    },
    {
     "ward": "sumiyoshi",
-    "status": "converted",
+    "status": "complete",
     "wardCode": "27120",
     "meshesPlanned": 19,
     "meshesFetched": 19,
@@ -115,8 +155,8 @@
     "orientationOk": true,
     "bestTransform": "identity",
     "outputBytes": 53615211,
-    "http200Verified": false,
-    "browserVerified": false,
+    "http200Verified": true,
+    "browserVerified": true,
     "ms": 57881
    },
    {
@@ -145,11 +185,47 @@
    },
    {
     "ward": "kita",
-    "status": "pending"
+    "status": "complete",
+    "wardCode": "27127",
+    "meshesPlanned": 25,
+    "meshesFetched": 25,
+    "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+    "compressedMB": 54.6,
+    "inflatedMB": 958.3,
+    "meshesContributing": 17,
+    "sourceBuildings": 58596,
+    "convertedBuildings": 19601,
+    "outsideWard": 38995,
+    "duplicateIds": 0,
+    "tiles": 52,
+    "orientationOk": true,
+    "bestTransform": "identity",
+    "outputBytes": 31422643,
+    "http200Verified": true,
+    "browserVerified": true,
+    "ms": 73869
    },
    {
     "ward": "chuo",
-    "status": "pending"
+    "status": "complete",
+    "wardCode": "27128",
+    "meshesPlanned": 20,
+    "meshesFetched": 20,
+    "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+    "compressedMB": 44.7,
+    "inflatedMB": 792.5,
+    "meshesContributing": 18,
+    "sourceBuildings": 51288,
+    "convertedBuildings": 18655,
+    "outsideWard": 32633,
+    "duplicateIds": 0,
+    "tiles": 52,
+    "orientationOk": true,
+    "bestTransform": "identity",
+    "outputBytes": 29084771,
+    "http200Verified": true,
+    "browserVerified": true,
+    "ms": 56699
    }
   ]
  }
