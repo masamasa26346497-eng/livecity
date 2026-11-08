@@ -531,6 +531,12 @@
     scene3DOnly: true, shouldAnimate: false,
   });
   const scene = viewer.scene;
+  // Mission 161 (PR#50): LOD2 オーバーレイ opt-in。localhost かつ ?lod2=1 のときだけ /lod2-preview/overlay.js を読む。公開ホストでは何もしない。
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('lod2') === '1') {
+    const s152 = document.createElement('script'); s152.src = '/lod2-preview/overlay.js';
+    s152.onload = () => window.LC152 && window.LC152.attach({ Cesium, viewer });
+    document.body.appendChild(s152);
+  }
   scene.skyAtmosphere.show = false;
   scene.sun.show = false;
   scene.moon.show = false;

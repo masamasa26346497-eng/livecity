@@ -15,6 +15,12 @@ export function auditGml(xml, name = '') {
   const r = { name, buildings: 0, lod1Solid: 0, lod2Solid: 0, lod2MultiSurface: 0, lod2Any: 0, lod3: 0,
     roofSurface: 0, wallSurface: 0, groundSurface: 0, appearance: 0, textured: 0, lod2Ids: [], dupIds: 0 };
   const seen = new Set();
+  // ParameterizedTexture は建物の外側(appearanceMember)にあり、<app:target uri="#<polygon gml:id>"> で面を参照する。
+  // よって建物本体内の検索では常に0になる(Mission159の textured:0 は誤り)。target の id 集合と建物内ポリゴン id の交差で数える。
+  const texTargets = new Set(), x3dTargets = new Set();
+  for (const t of xml.matchAll(/<app:ParameterizedTexture\b[\s\S]*?<\/app:ParameterizedTexture>/g)) for (const u of t[0].matchAll(/<app:target\s+uri="#([^"]+)"/g)) texTargets.add(u[1]);
+  for (const t of xml.matchAll(/<app:X3DMaterial\b[\s\S]*?<\/app:X3DMaterial>/g)) for (const u of t[0].matchAll(/<app:target>#?([^<]+)<\/app:target>/g)) x3dTargets.add(u[1].replace(/^#/, ''));
+  r.textureTargets = texTargets.size; r.x3dMaterialTargets = x3dTargets.size; r.texturedLod2 = 0; r.x3dMaterialLod2 = 0;
   const re = /<bldg:Building\b[^>]*gml:id="([^"]+)"[^>]*>([\s\S]*?)<\/bldg:Building>/g;
   let m;
   while ((m = re.exec(xml))) {
@@ -32,13 +38,18 @@ export function auditGml(xml, name = '') {
     if (/<bldg:WallSurface\b/.test(body)) r.wallSurface++;
     if (/<bldg:GroundSurface\b/.test(body)) r.groundSurface++;
     if (/<app:(Parameterized|Georeferenced)Texture\b/.test(body)) r.textured++;
+    if (s || ms || bounded) {
+      const pids = [...body.matchAll(/<gml:Polygon\b[^>]*gml:id="([^"]+)"/g)].map((q) => q[1]);
+      if (pids.some((q) => texTargets.has(q))) r.texturedLod2++;
+      if (pids.some((q) => x3dTargets.has(q))) r.x3dMaterialLod2++;
+    }
   }
   r.appearance = (xml.match(/<app:appearanceMember\b/g) || []).length;
   r.lod1FallbackCount = r.buildings - r.lod2Any;
   return r;
 }
 
-async function fetchEntry(url, e) {
+export async function fetchEntry(url, e) {
   const h = await rangeFetch(url, e.localOffset, e.localOffset + 29);
   if (h.readUInt32LE(0) !== 0x04034b50) throw new Error('bad local header ' + e.name);
   const start = e.localOffset + 30 + h.readUInt16LE(26) + h.readUInt16LE(28);
@@ -77,7 +88,7 @@ async function main() {
     source: { package: lock.package?.name, license: lock.license?.title, attribution: lock.attribution, etag: lock.http?.etag },
     meshesAudited: results.length, errors,
     totals: { buildings: sum('buildings'), lod1Solid: sum('lod1Solid'), lod2Solid: sum('lod2Solid'), lod2MultiSurface: sum('lod2MultiSurface'),
-      lod2Any: sum('lod2Any'), lod3: sum('lod3'), roofSurface: sum('roofSurface'), wallSurface: sum('wallSurface'), textured: sum('textured'),
+      lod2Any: sum('lod2Any'), lod3: sum('lod3'), roofSurface: sum('roofSurface'), wallSurface: sum('wallSurface'), textured: sum('textured'), texturedLod2: sum('texturedLod2'), x3dMaterialLod2: sum('x3dMaterialLod2'), textureTargets: sum('textureTargets'),
       appearanceMembers: sum('appearance'), lod1Fallback: sum('lod1FallbackCount') },
     lod2Ratio: sum('buildings') ? sum('lod2Any') / sum('buildings') : 0,
     classification: sum('lod2Any') === 0 ? 'source-has-no-lod2-in-audited-meshes' : 'lod2-present',

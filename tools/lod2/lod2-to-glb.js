@@ -85,14 +85,32 @@ export function triangulate(pts) {
  * 建物群 → メッシュ。triangulation失敗の面を含む建物は failed に入れ(= LOD1へフォールバックすべき)、メッシュに含めない。
  * @param {Map<string,string>} bldgXmlById
  */
-export function buildLod2Mesh(bldgXmlById, org) {
-  const pos = [], col = [], ok = [], failed = [];
+export function convexHull(points) {
+  const p = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (p.length < 3) return p;
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for (const q of [...p].reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+
+/**
+ * opts.groundToZero: true なら建物ごとに最低点を z=0 に置く(垂直方向のみ。水平は一切動かさない)。
+ *   Live City の Cesium は地形なし・楕円体 h=0 の平面基準で道路等を描くため、PLATEAU の標高(ジオイド基準)を
+ *   そのまま楕円体高に使うと浮く。元の最低標高は ok[].groundH に残す。
+ * 戻り値 footprints: 建物ごとの凸包(lon,lat)。LOD1 側の重複除外(クリップ)に使う。
+ */
+export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
+  const pos = [], col = [], ok = [], failed = [], footprints = [];
   let minH = Infinity, maxH = -Infinity, bx = [Infinity, -Infinity], by = [Infinity, -Infinity];
   for (const [id, xml] of bldgXmlById) {
     const surfs = extractLod2Surfaces(xml);
     const bp = [], bc = []; let bad = !surfs.length;
+    const gH = surfs.length ? Math.min(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) : 0;
+    const dz = opts.groundToZero ? toEnu(org.lat, org.lon, gH, org)[2] : 0;
     for (const s of surfs) {
-      const e = s.ring.map((r) => toEnu(r[0], r[1], r[2], org));
+      const e = s.ring.map((r) => { const q = toEnu(r[0], r[1], r[2], org); q[2] -= dz; return q; });
       const tr = triangulate(e);
       if (!tr.length) { bad = true; break; }
       for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(COLOR[s.type]); }
@@ -100,9 +118,10 @@ export function buildLod2Mesh(bldgXmlById, org) {
     if (bad) { failed.push(id); continue; }
     for (const p of bp) { pos.push(p); minH = Math.min(minH, p[2]); maxH = Math.max(maxH, p[2]); bx = [Math.min(bx[0], p[0]), Math.max(bx[1], p[0])]; by = [Math.min(by[0], p[1]), Math.max(by[1], p[1])]; }
     for (const c of bc) col.push(c);
-    ok.push({ id, triangles: bp.length / 3 });
+    ok.push({ id, triangles: bp.length / 3, groundH: gH });
+    footprints.push({ id, hull: convexHull(surfs.flatMap((s) => s.ring.map((r) => [r[1], r[0]]))) });
   }
-  return { positions: pos, colors: col, ok, failed, extentEnu: { x: bx, y: by, z: [minH, maxH] } };
+  return { positions: pos, colors: col, ok, failed, footprints, extentEnu: { x: bx, y: by, z: [minH, maxH] } };
 }
 
 /** ENU(x東,y北,z上) → glTF(Y-up: x東, y上, z=-北) で最小GLB。 */
