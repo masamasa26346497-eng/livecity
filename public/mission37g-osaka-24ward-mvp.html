@@ -2109,7 +2109,10 @@
       keep.forEach((i) => { items[i].it.lb.show = true; });
       towns24.shown[tier === 'base' ? 'base' : 'full'] = keep.size;
     }
-    if (stats.towns145) Object.assign(stats.towns145, { tier, live: Array.from(towns24.live.keys()), cap: TW.CAP });
+    // 150: 実際に show されているラベルの文字列（診断・E2E 用。描画は変えない）
+    const shownTexts = [];
+    for (const L of towns24.live.values()) for (const it of (tier === 'base' ? L.bi : L.fi)) if (it.lb.show && shownTexts.length < 60) shownTexts.push(it.text);
+    if (stats.towns145) Object.assign(stats.towns145, { tier, live: Array.from(towns24.live.keys()), cap: TW.CAP, shownTexts, altitudeM: Math.round(h) });
     scene.requestRender();
   }
   async function towns24Hits(raw) {
