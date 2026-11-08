@@ -1,0 +1,156 @@
+{
+ "mission": "156",
+ "source": "plateau-27100-osaka-shi-2025",
+ "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+ "license": "plateau",
+ "generatedAt": "2026-11-08T15:29:17.118Z",
+ "wards": {
+  "sumiyoshi": {
+   "wardCode": "27120",
+   "meshesPlanned": 19,
+   "meshesFetched": 19,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "compressedMB": 34.4,
+   "inflatedMB": 812.2,
+   "meshesContributing": 15,
+   "sourceBuildings": 62553,
+   "convertedBuildings": 35032,
+   "outsideWard": 27521,
+   "duplicateIds": 0,
+   "tiles": 52,
+   "orientationOk": true,
+   "bestTransform": "identity",
+   "outputBytes": 53615211,
+   "http200Verified": true,
+   "browserVerified": true,
+   "ms": 57881
+  }
+ },
+ "summary": {
+  "wardsTotal": 24,
+  "byStatus": {
+   "pending": 23,
+   "converted": 1
+  },
+  "convertedBuildingsTotal": 35032,
+  "declaredPast": 574213,
+  "measuredVsDeclaredPct": 6.1,
+  "allComplete": false,
+  "rows": [
+   {
+    "ward": "miyakojima",
+    "status": "pending"
+   },
+   {
+    "ward": "fukushima",
+    "status": "pending"
+   },
+   {
+    "ward": "konohana",
+    "status": "pending"
+   },
+   {
+    "ward": "nishi",
+    "status": "pending"
+   },
+   {
+    "ward": "minato",
+    "status": "pending"
+   },
+   {
+    "ward": "taisho",
+    "status": "pending"
+   },
+   {
+    "ward": "tennoji",
+    "status": "pending"
+   },
+   {
+    "ward": "naniwa",
+    "status": "pending"
+   },
+   {
+    "ward": "nishiyodogawa",
+    "status": "pending"
+   },
+   {
+    "ward": "higashiyodogawa",
+    "status": "pending"
+   },
+   {
+    "ward": "higashinari",
+    "status": "pending"
+   },
+   {
+    "ward": "ikuno",
+    "status": "pending"
+   },
+   {
+    "ward": "asahi",
+    "status": "pending"
+   },
+   {
+    "ward": "joto",
+    "status": "pending"
+   },
+   {
+    "ward": "abeno",
+    "status": "pending"
+   },
+   {
+    "ward": "sumiyoshi",
+    "status": "converted",
+    "wardCode": "27120",
+    "meshesPlanned": 19,
+    "meshesFetched": 19,
+    "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+    "compressedMB": 34.4,
+    "inflatedMB": 812.2,
+    "meshesContributing": 15,
+    "sourceBuildings": 62553,
+    "convertedBuildings": 35032,
+    "outsideWard": 27521,
+    "duplicateIds": 0,
+    "tiles": 52,
+    "orientationOk": true,
+    "bestTransform": "identity",
+    "outputBytes": 53615211,
+    "http200Verified": false,
+    "browserVerified": false,
+    "ms": 57881
+   },
+   {
+    "ward": "higashisumiyoshi",
+    "status": "pending"
+   },
+   {
+    "ward": "nishinari",
+    "status": "pending"
+   },
+   {
+    "ward": "yodogawa",
+    "status": "pending"
+   },
+   {
+    "ward": "tsurumi",
+    "status": "pending"
+   },
+   {
+    "ward": "suminoe",
+    "status": "pending"
+   },
+   {
+    "ward": "hirano",
+    "status": "pending"
+   },
+   {
+    "ward": "kita",
+    "status": "pending"
+   },
+   {
+    "ward": "chuo",
+    "status": "pending"
+   }
+  ]
+ }
+}
