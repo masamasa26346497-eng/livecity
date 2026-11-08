@@ -150,6 +150,29 @@ export function oldSourceCandidates(env = process.env, home = env.USERPROFILE ||
   if (home) c.push(path.join(home, 'livecity-data-pipeline', rel), path.join(home, 'Documents', 'livecity-data-pipeline', rel));
   return [...new Set(c.map((x) => path.resolve(x)))];
 }
+// Mission 149: locate the e-Stat small-area (town / chome) boundary source without asking the user for a path.
+//   Looks (read-only) in this repo and next to the old pipeline (<pipeline>/data/raw|processed/**/boundaries) for the official ZIP or a GeoJSON.
+//   Returns { kind: 'zip'|'geojson', file } or null. Nothing is written or moved.
+export function townSourceCandidates({ root = ROOT, env = process.env, home = env.USERPROFILE || env.HOME || '', extra = [] } = {}) {
+  const bases = [root, path.join(root, 'livecity-data-pipeline'), path.join(path.dirname(root), 'livecity-data-pipeline')];
+  if (home) bases.push(path.join(home, 'livecity-data-pipeline'), path.join(home, 'Documents', 'livecity-data-pipeline'));
+  if (env.LIVECITY_OLD_MAPDATA) bases.push(path.resolve(env.LIVECITY_OLD_MAPDATA, '..', '..', '..'));
+  const dirs = [];
+  for (const b of new Set(bases.map((x) => path.resolve(x)))) {
+    for (const sub of [['data', 'raw', 'osaka-city', 'boundaries'], ['data', 'raw', 'boundaries'], ['data', 'processed', 'osaka-city', 'boundaries']]) dirs.push(path.join(b, ...sub));
+  }
+  const out = extra.filter(Boolean).map((f) => ({ file: path.resolve(f), kind: /\.zip$/i.test(f) ? 'zip' : 'geojson' }));
+  for (const d of dirs) {
+    let names = [];
+    try { names = fs.readdirSync(d); } catch (e) { continue; }
+    for (const n of names.sort()) {
+      if (/town|chocho|small|r2ka|shochiiki|estat/i.test(n) && /\.zip$/i.test(n)) out.push({ kind: 'zip', file: path.join(d, n) });
+      else if (/town|chocho|small|r2ka|shochiiki/i.test(n) && /\.(geo)?json$/i.test(n) && !/\.meta\.json$/i.test(n)) out.push({ kind: 'geojson', file: path.join(d, n) });
+    }
+  }
+  return out.filter((c) => { try { return fs.statSync(c.file).isFile(); } catch (e) { return false; } });
+}
+export const discoverTownSource = (opts = {}) => townSourceCandidates(opts)[0] || null;
 export const discoverLayersRoot = (opts = {}) => layersRootCandidates(opts.env, opts.home).find((d) => fs.existsSync(d) && hasWardLayers(d)) || null;
 export const discoverOldSource = (opts = {}) => oldSourceCandidates(opts.env, opts.home).find((d) => fs.existsSync(path.join(d, 'roads')) || fs.existsSync(path.join(d, 'waterways'))) || null;
 // Build through the Mission115 builder: new files only (existing ward layers/ are skipped); it refuses output inside the repo or OneDrive.
@@ -280,25 +303,26 @@ async function main() {
   //   (public e-Stat URL, no key). --no-towns skips. Nothing is invented: wards missing from the ZIP are listed.
   if (!a.includes('--no-towns') && !a.includes('--check-only')) {
     try {
-      const ZIPN = path.join('data', 'raw', 'osaka-city', 'boundaries', 'estat-2020-town-boundaries-osaka.zip');
       const outTw = path.join(ROOT, 'public', 'mission145-data', 'towns-24.local.json');
-      const srcTw = opt('src') ? path.resolve(opt('src')) : discoverOldSource();
-      const cands = [path.join(ROOT, ZIPN), opt('towns-zip') && path.resolve(opt('towns-zip')), srcTw && path.resolve(srcTw, '..', '..', '..', ZIPN)].filter(Boolean);
-      let zip = cands.find((p) => fs.existsSync(p));
-      if (fs.existsSync(outTw) && !a.includes('--force-towns')) console.log('[147] towns-24.local.json already present (use --force-towns to rebuild)');
+      const find = () => discoverTownSource({ extra: [opt('towns-zip'), opt('towns-input')] });
+      let srcT = find();
+      // stale = unreadable, built with zero towns, or older than its source file
+      let stale = false;
+      if (fs.existsSync(outTw) && srcT) { try { const cur = JSON.parse(fs.readFileSync(outTw, 'utf8')); stale = !(cur.towns && cur.towns.length) || fs.statSync(outTw).mtimeMs < fs.statSync(srcT.file).mtimeMs; } catch (e) { stale = true; } }
+      if (fs.existsSync(outTw) && !stale && !a.includes('--force-towns')) console.log('[149] towns-24.local.json already present and newer than its source (use --force-towns to rebuild)');
       else {
-        if (!zip && a.includes('--fetch-towns')) {
-          console.log('[147] downloading the official e-Stat boundary ZIP (public, free)...');
+        if (!srcT && a.includes('--fetch-towns')) {
+          console.log('[149] downloading the official e-Stat boundary ZIP (public, free, CC BY 4.0)...');
           execFileSync(process.execPath, [path.join(ROOT, 'tools', 'download', 'estat-town-boundaries.js')], { encoding: 'utf8', stdio: 'inherit' });
-          zip = cands.find((p) => fs.existsSync(p));
+          srcT = find();
         }
-        if (!zip) console.log('[147] e-Stat town-boundary ZIP not found: only Sumiyoshi town labels are available. Add --fetch-towns (downloads it) or --towns-zip "<path>".');
+        if (!srcT) console.log('[149] no town-boundary source found in this repo or next to livecity-data-pipeline: only Sumiyoshi town labels are available. Add --fetch-towns (official free download) or --towns-zip / --towns-input "<path>".');
         else {
-          const args = [path.join(ROOT, 'tools', 'mission145-build-towns.cjs'), '--zip', zip, '--out', outTw]; if (fs.existsSync(outTw)) args.push('--force');
+          const args = [path.join(ROOT, 'tools', 'mission145-build-towns.cjs'), srcT.kind === 'zip' ? '--zip' : '--input', srcT.file, '--out', outTw]; if (fs.existsSync(outTw)) args.push('--force');
           const txt = execFileSync(process.execPath, args, { encoding: 'utf8', maxBuffer: 1 << 26 });
           const o = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
-          console.log('[147] towns: ' + o.towns + ' units in ' + o.wardsWithTowns + ' wards (' + zip + ')');
-          const miss = txt.split('\n').find((l) => l.startsWith('wards with NO towns')); if (miss) console.log('[147] ' + miss);
+          console.log('[149] towns: ' + o.towns + ' units in ' + o.wardsWithTowns + '/24 wards (' + srcT.kind + ': ' + srcT.file + '; source is read-only)');
+          const miss = txt.split('\n').find((l) => l.startsWith('wards with NO towns')); if (miss) console.log('[149] ' + miss);
         }
       }
     } catch (e) { console.warn('[147] town build skipped: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 200)); }
