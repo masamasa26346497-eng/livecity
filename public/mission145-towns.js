@@ -5,7 +5,7 @@
   else root.LiveCityTowns145 = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
-  const TIER = { ward: 4500, base: 1800 };   // カメラ高度 (m): ward 超 → 区名のみ / base 超 → 町名 / 以下 → 町丁目名
+  const TIER = { ward: 14000, base: 1800 };   // カメラ高度 (m): ward 超 → 区名のみ / base 超 → 町名 / 以下 → 町丁目名
   const CAP = { base: 40, full: 48 };         // 同時表示ラベル数の上限
   const MAX_WARDS = 3;                        // 同時に保持する区（超えたら最も古い区を破棄）
 

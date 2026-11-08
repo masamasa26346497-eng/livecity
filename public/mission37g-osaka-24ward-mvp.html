@@ -1843,7 +1843,7 @@
   // importance で「主役」を絞る。local は近づいたときだけ出す。
   const PLACE_BY_IMPORTANCE = {
     major:  { font: '600 15px sans-serif', fill: '#ffffff', far: 16000, h: 52 },
-    medium: { font: '500 13px sans-serif', fill: '#dceaff', far: 7000, h: 42 },
+    medium: { font: '500 13px sans-serif', fill: '#dceaff', far: 16000, h: 42 },
     local:  { font: '400 11px sans-serif', fill: '#9cb8d8', far: 1800, h: 32 },
   };
   const labelLayer = {
@@ -1871,7 +1871,7 @@
           // 建物に隠れず浮く（Three.js 版のラベルと同じふるまい）
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
           distanceDisplayCondition: new Cesium.DistanceDisplayCondition(o.near || 0, o.far),
-          translucencyByDistance: new Cesium.NearFarScalar(o.far * 0.75, 1.0, o.far, 0.25),
+          translucencyByDistance: new Cesium.NearFarScalar(o.far * 0.92, 1.0, o.far, 0.6),   // 146: 区選択直後の距離でも薄くならない
           id: { layer: 'labels', kind: it.kind, name: it.name },
         });
         n++;
@@ -2398,7 +2398,7 @@
   // ══════════════════════════════════════════════════════════════
   const TN = window.LiveCityTownNormalize;
   const TOWNS_URL = 'mission37d-data/sumiyoshi-towns.json';
-  const TOWN_TIER = { ward: 4500, base: 1800 };   // カメラ高度 (m): これより高い→区名のみ / base 超→町名 / 以下→町丁目名
+  const TOWN_TIER = { ward: 14000, base: 1800 };   // カメラ高度 (m): これより高い→区名のみ / base 超→町名 / 以下→町丁目名
   const TOWN_CAP = { base: 40, full: 48 };         // 同時表示ラベル数の上限（FPS 維持）
   let townsPromise = null;
   function loadTowns() {

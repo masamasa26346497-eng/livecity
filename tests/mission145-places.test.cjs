@@ -108,7 +108,8 @@ test('towns builder: name split, label point inside the polygon (also for an L s
 });
 
 test('label tiers, base split, declutter and ward LRU', () => {
-  assert.strictEqual(TW.tierOf(9000), 'ward');
+  assert.strictEqual(TW.tierOf(20000), 'ward');
+  assert.strictEqual(TW.tierOf(9000), 'base');   // 146: 区選択直後の高度(約7-12km)でも町名が出る
   assert.strictEqual(TW.tierOf(3000), 'base');
   assert.strictEqual(TW.tierOf(900), 'full');
   const parts = TW.splitForWard([{ n: '長居東一丁目', b: '長居東', c: 1, a: 10, x: 0, z: 0, k: 'a' }, { n: '長居東二丁目', b: '長居東', c: 2, a: 30, x: 5, z: 5, k: 'b' }, { n: '長居公園', b: '長居公園', c: null, a: 5, x: 9, z: 9, k: 'c' }]);
@@ -138,8 +139,8 @@ test('viewer wiring: stations layer, town layer, no duplicate station sources, n
   assert.match(HTML, /id: \{ poi: rec \}/);                                 // station click goes through the same POI path as facilities
   assert.match(HTML, /営業状況は未確認/);
   assert.doesNotMatch(HTML.slice(HTML.indexOf('145: 駅（24 区）'), HTML.indexOf('145: 町名・町丁目名')), /googleapis|maps\.google|places\.google/);
-  assert.match(HTML, /TOWN_TIER = \{ ward: 4500, base: 1800 \}/);
-  assert.deepStrictEqual({ ...TW.TIER }, { ward: 4500, base: 1800 });
+  assert.match(HTML, /TOWN_TIER = \{ ward: 14000, base: 1800 \}/);
+  assert.deepStrictEqual({ ...TW.TIER }, { ward: 14000, base: 1800 });
 });
 
 test('facility POIs for all 24 wards are connected (counts by category)', () => {
