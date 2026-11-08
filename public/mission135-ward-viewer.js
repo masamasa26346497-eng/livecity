@@ -105,6 +105,20 @@
       const ts = await Cesium.Cesium3DTileset.fromUrl(url, { maximumScreenSpaceError: 8 });
       if (stale()) { ts.destroy(); S.staleDiscards++; return; }
       scene.primitives.add(ts); ts.show = visible.buildings; rec.groups.buildings.push(ts); rec.tileset = ts;
+      // canonicalId sidecar: <tileset dir>/ids/<glb basename>.json（配列 or {ids:[...]}）。index = EXT_mesh_features の featureId（= batchId）。
+      // sidecar が 404 / 形式不正なら、その GLB の建物 ID は「未解決」として扱い、ID を捏造しない。
+      rec.sidecars = new Map();
+      const ensureSidecar = (name) => {
+        if (rec.sidecars.has(name)) return rec.sidecars.get(name);
+        const p = getJson(base + '25/ids/' + name.replace(/\.[^.]+$/, '') + '.json', ctrl.signal).then((r) => {
+          const ids = r.json && (Array.isArray(r.json) ? r.json : Array.isArray(r.json.ids) ? r.json.ids : null);
+          http.sidecars = http.sidecars || {}; http.sidecars[name] = r.status;
+          return ids && ids.every((x) => typeof x === 'string') ? ids : null;
+        }).catch(() => null);
+        rec.sidecars.set(name, p); return p;
+      };
+      rec.ensureSidecar = ensureSidecar;
+      ts.tileLoad.addEventListener((tile) => { try { const u = tile.content && tile.content.url; if (u) ensureSidecar(String(u).split('?')[0].split('/').pop()); } catch (e) { /* noop */ } });
       S.buildingSource = '3d-tiles';
       setStatus('buildings', 'ready', '表示中（3D Tiles）');
     });
@@ -160,7 +174,13 @@
       const coll = new Cesium.PolylineCollection();
       const styleOf = (f) => (f.kind && f.kind !== 'line' ? null : { width: f.tier === 'major' ? 4.5 : f.tier === 'mid' ? 3 : 1.8, material: polyMat(f.tier === 'major' ? C.roadMajor : f.tier === 'mid' ? C.roadMid : C.roadLocal, 0.9) });
       const n = addLines(coll, r.json.features || [], styleOf, LAYER_H.roads);
-      add('roads', coll); setStatus('roads', n ? 'ready' : 'missing', n ? '表示中（' + n + '本）' : '地物0件');
+      add('roads', coll);
+      // 道路面・交差点（kind:'area'。adapter が --road-surface で導出した場合のみ存在。導出物は derived:true）
+      const surf = (r.json.features || []).filter((f) => f.kind === 'area');
+      let ns = 0;
+      if (surf.length) { const { prim, count } = areaPrimitive(surf, C.roadLocal, 0.85, LAYER_H.roads - 0.4); if (prim) { add('roads', prim); ns = count; } }
+      S.roadsDetail = { lines: n, surfaces: ns };
+      setStatus('roads', n || ns ? 'ready' : 'missing', n || ns ? '表示中（線' + n + '本' + (ns ? ' / 面・交差点' + ns : '') + '）' : '地物0件');
     });
     const water = guard('waterLine', async () => {
       const w = await getJson(base + '/layers/waterways.json', ctrl.signal); http.waterways = w.status;
@@ -223,6 +243,48 @@
         out.push({ id, picked: p && typeof p.id === 'string' ? p.id : null, x: Math.round(w.x), y: Math.round(w.y) });
       }
       return out;
+    },
+    /** カメラのみ移動: 局所座標 (x,z) の真上 height m から真下を見る。データには触れない。 */
+    lookAtLocal(x, z, height) {
+      viewer.camera.setView({ destination: Cesium.Cartesian3.fromDegrees(toLon(x), toLat(z), height || 400), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 } });
+      scene.requestRender(); return true;
+    },
+    /** 画面座標を pick し canonicalId を解決。3D Tiles は sidecar[featureId]、footprint は GeometryInstance.id。解決不能なら id:null（捏造しない）。 */
+    async pickBuildingAt(x, y) {
+      const p = scene.pick(new Cesium.Cartesian2(x, y));
+      if (!p) return { id: null, via: 'none' };
+      if (typeof p.id === 'string') return { id: p.id, via: 'footprint' };
+      // Cesium のバージョンにより pick は Cesium3DTileFeature / ModelFeature。featureId(number) と content を持つものをダックタイプで扱う
+      if (typeof p.featureId === 'number' || p instanceof Cesium.Cesium3DTileFeature) {
+        const name = String(p.content && p.content.url || '').split('?')[0].split('/').pop();
+        const ids = cur && cur.ensureSidecar ? await cur.ensureSidecar(name) : null;
+        const fid = p.featureId;
+        if (!ids) return { id: null, via: '3dtiles', featureId: fid, glb: name, unresolved: 'sidecar-missing' };
+        if (!Number.isInteger(fid) || fid < 0 || fid >= ids.length) return { id: null, via: '3dtiles', featureId: fid, glb: name, unresolved: 'featureId-out-of-range' };
+        return { id: ids[fid], via: '3dtiles-sidecar', featureId: fid, glb: name };
+      }
+      return { id: null, via: 'other', unresolved: 'pick-kind:' + (p.constructor && p.constructor.name) + ':' + Object.keys(p).slice(0, 8).join(',') + (p.primitive ? ':primitive=' + (p.primitive.constructor && p.primitive.constructor.name) : '') };
+    },
+    /** targets=[{id,x,z,h}] の屋根中心を投影→pick→sidecar 解決。3D Tiles 用。 */
+    async clickCheck3d(targets) {
+      const out = [], cv = scene.canvas, W = cv.clientWidth, H = cv.clientHeight;
+      for (const t of targets) {
+        const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(t.x, t.z, t.h));
+        if (!w || w.x < 2 || w.y < 2 || w.x > W - 2 || w.y > H - 2) { out.push({ id: t.id, picked: null, offscreen: true }); continue; }
+        const r = await this.pickBuildingAt(w.x, w.y);
+        out.push({ id: t.id, picked: r.id, via: r.via, featureId: r.featureId, unresolved: r.unresolved, x: Math.round(w.x), y: Math.round(w.y) });
+      }
+      return out;
+    },
+    /** footprint の id を、その建物の真上に寄ったカメラで再 pick（画面端の視差/隣接高層による遮蔽か、ID 取り違えかの切り分け）。 */
+    async recheckCentered(id, camH) {
+      const f = cur && cur.footprint, b = f && f.byId.get(id); if (!b) return null;
+      this.lookAtLocal(b.x, b.z, camH || 300);
+      await new Promise((r) => setTimeout(r, 1500)); scene.render();
+      const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(b.x, b.z, b.z0 + b.h));
+      if (!w) return { id, picked: null };
+      const r = await this.pickBuildingAt(w.x, w.y);
+      return { id, picked: r.id, centered: true, camHeightM: camH || 300 };
     },
     resources() { return { tilesets: count(Cesium.Cesium3DTileset), polylineCollections: count(Cesium.PolylineCollection), areaPrimitives: count(Cesium.Primitive), total: scene.primitives.length }; },
     shown(key) { return !!cur && cur.groups[key].some((p) => !p.isDestroyed() && p.show); },

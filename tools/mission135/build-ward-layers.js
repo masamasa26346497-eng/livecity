@@ -12,15 +12,15 @@ export const DEFAULT_POLYGONS = path.join(ROOT, 'public', 'map-data', 'osaka-cit
 export function run(argv) {
   const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : undefined; };
   const mapRoot = opt('map-root'), out = opt('out');
-  if (!mapRoot || !out) { console.error('usage: --map-root <dir> --out <dir> [--wards a,b] [--buffer 150] [--polygons file]'); return 2; }
+  if (!mapRoot || !out) { console.error('usage: --map-root <dir> --out <dir> [--wards a,b] [--buffer 150] [--polygons file] [--road-surface]'); return 2; }
   const only = opt('wards') ? opt('wards').split(',') : null;
   const wards = loadWards(opt('polygons') || DEFAULT_POLYGONS).filter((w) => !only || only.includes(w.wardId));
   let generated = 0;
   for (const w of wards) {
-    const r = buildWardLayers({ mapRoot: path.resolve(mapRoot), outRoot: path.resolve(out), ward: w, bufferM: Number(opt('buffer') || 150) });
+    const r = buildWardLayers({ mapRoot: path.resolve(mapRoot), outRoot: path.resolve(out), ward: w, bufferM: Number(opt('buffer') || 150), roadSurface: argv.includes('--road-surface') });
     const s = (k) => `${k}=${r.layers[k].state}${r.layers[k].count ? `(${r.layers[k].count})` : ''}`;
-    if (Object.values(r.layers).some((l) => l.state === 'generated')) generated++;
-    console.log(`${w.wardId}: ${s('roads')} ${s('waterways')} ${s('waterSurface')}`);
+    if (['roads', 'waterways', 'waterSurface'].some((k) => r.layers[k].state === 'generated')) generated++;
+    console.log(`${w.wardId}: ${s('roads')} ${s('waterways')} ${s('waterSurface')} ${s('riversV2')}`);
   }
   console.log(`wards with any generated layer: ${generated}/${wards.length}`);
   return 0;

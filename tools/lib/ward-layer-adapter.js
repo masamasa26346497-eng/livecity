@@ -82,6 +82,65 @@ export function collectWaterSurface(mapRoot, bbox, { bufferM = 150 } = {}) {
   return { state: STATES.GENERATED, reason: features.length ? 'ok' : 'no-triangles-in-ward', features };
 }
 
+/**
+ * rivers-v2（tools/build-river-layer.js の出力 {version:2, coordinateConvention, rivers:[{id,name,ok,suppressed,riverClass,centerline,left,right}]}）
+ * → 区 bbox と重なる河川の centerline(line) と ribbon(area = left + reverse(right))。座標は変換しない。
+ * 入力: <mapRoot>/rivers-v2/rivers.json。suppressed / ok=false の河川は出さない。
+ */
+export function collectRiversV2(mapRoot, bbox, { bufferM = 150 } = {}) {
+  const r = readJson(path.join(mapRoot, 'rivers-v2', 'rivers.json'));
+  if (!r.ok) return { state: STATES.NOT_ACQUIRED, reason: r.code, features: [] };
+  const d = r.data;
+  if (d.coordinateConvention !== CONVENTION) return { state: STATES.REJECTED, reason: `convention-mismatch:${d.coordinateConvention}`, features: [] };
+  if (!Array.isArray(d.rivers)) return { state: STATES.REJECTED, reason: 'bad-rivers', features: [] };
+  const window = expandBbox(bbox, bufferM), features = [];
+  for (const v of d.rivers) {
+    if (!v || v.ok === false || v.suppressed) continue;
+    const cls = v.riverClass || 'river';
+    if (validPoints(v.centerline, 2) && bboxOverlaps(pointsBbox(v.centerline), window)) features.push({ id: `rv2-line-${v.id}`, kind: 'line', waterClass: cls === 'major' || cls === 'medium' ? 'river' : cls, name: v.name || '', source: 'rivers-v2', p: v.centerline });
+    if (validPoints(v.left, 2) && validPoints(v.right, 2)) {
+      const ring = [...v.left, ...[...v.right].reverse()];
+      if (bboxOverlaps(pointsBbox(ring), window)) features.push({ id: `rv2-area-${v.id}`, kind: 'area', waterClass: 'river', name: v.name || '', source: 'rivers-v2', derived: 'ribbon(left+right)', p: ring });
+    }
+  }
+  return { state: STATES.GENERATED, reason: features.length ? 'ok' : 'no-rivers-in-ward', features };
+}
+
+/** 道路階級ごとの路面半幅(m)。Live City 側の導出値（公式幅員ではない）。 */
+export const ROAD_HALF_WIDTH_M = Object.freeze({ motorway: 8, trunk: 7, primary: 6, secondary: 5, tertiary: 4, residential: 3, service: 2, default: 2.5 });
+const nodeKey = (p) => `${Math.round(p[0] * 10)}_${Math.round(p[1] * 10)}`;
+
+/**
+ * 道路 line から導出する「路面ポリゴン」と「交差点ディスク」。入力 line の座標だけを使い、位置補正はしない。
+ * すべて derived:true（公式データではない）。出力は roads.json 内の kind:'area'。
+ *  - 路面: 各 line を片側 halfWidth でオフセットした帯（折れ線ごとの法線。鋭角は miter 無しの簡易形）
+ *  - 交差点: 端点/節点座標(0.1m丸め)が 3 本以上の line で共有される点に、最大半幅の 8 角形
+ */
+export function deriveRoadSurface(lines, { maxFeatures = 200000 } = {}) {
+  const out = [], endpoints = new Map();
+  const half = (f) => ROAD_HALF_WIDTH_M[f.highway] ?? ROAD_HALF_WIDTH_M.default;
+  for (const f of lines) {
+    if (f.kind !== 'line' || !validPoints(f.p, 2)) continue;
+    const h = Number.isFinite(f.width) && f.width > 0 ? f.width / 2 : half(f), L = [], R = [];
+    for (let i = 0; i < f.p.length; i++) {
+      const a = f.p[Math.max(0, i - 1)], b = f.p[Math.min(f.p.length - 1, i + 1)];
+      let dx = b[0] - a[0], dz = b[1] - a[1]; const len = Math.hypot(dx, dz); if (!len) continue;
+      dx /= len; dz /= len;
+      L.push([f.p[i][0] - dz * h, f.p[i][1] + dx * h]); R.push([f.p[i][0] + dz * h, f.p[i][1] - dx * h]);
+    }
+    if (L.length >= 2) out.push({ id: `rs-${f.id}`, kind: 'area', roadSurface: true, derived: true, highway: f.highway, p: [...L, ...R.reverse()] });
+    for (const q of f.p) { const k = nodeKey(q); const e = endpoints.get(k) || { p: q, n: new Set(), h: 0 }; e.n.add(f.id); e.h = Math.max(e.h, h); endpoints.set(k, e); }
+    if (out.length >= maxFeatures) break;
+  }
+  let junctions = 0;
+  for (const e of endpoints.values()) {
+    if (e.n.size < 3) continue;
+    const ring = []; for (let i = 0; i < 8; i++) { const t = (i / 8) * Math.PI * 2; ring.push([e.p[0] + Math.cos(t) * e.h, e.p[1] + Math.sin(t) * e.h]); }
+    out.push({ id: `ix-${nodeKey(e.p)}`, kind: 'area', intersection: true, derived: true, p: ring }); junctions++;
+  }
+  return { features: out, surfaces: out.length - junctions, junctions };
+}
+
 function writeAtomic(file, obj) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const tmp = `${file}.tmp-${process.pid}`;
@@ -93,7 +152,7 @@ function writeAtomic(file, obj) {
  * 1区分を生成。入力が無いレイヤーはファイルを作らない（ビューアは HTTP 404 → 「未取得」を表示する）。
  * @returns {{wardId, layers:{roads,waterways,waterSurface}, outDir}}
  */
-export function buildWardLayers({ mapRoot, outRoot, ward, bufferM = 150 }) {
+export function buildWardLayers({ mapRoot, outRoot, ward, bufferM = 150, roadSurface = false }) {
   if (!WARD_ID.test(ward.wardId)) throw new Error(`invalid wardId: ${ward.wardId}`);
   const outDir = path.join(outRoot, ward.wardId, 'layers');
   const header = { version: 1, coordinateConvention: CONVENTION, wardId: ward.wardId, source: 'mission115-city-layer-tiles', clipped: 'none', bufferM };
@@ -101,6 +160,18 @@ export function buildWardLayers({ mapRoot, outRoot, ward, bufferM = 150 }) {
   const roads = collectCityLayer(mapRoot, 'roads', ward.bbox, { bufferM });
   const water = collectCityLayer(mapRoot, 'waterways', ward.bbox, { bufferM });
   const surf = collectWaterSurface(mapRoot, ward.bbox, { bufferM });
+  // rivers-v2 は waterways に合流（line + ribbon area）。両方ある場合は id が違う別地物として追加する
+  const rv2 = collectRiversV2(mapRoot, ward.bbox, { bufferM });
+  result.riversV2 = { state: rv2.state === STATES.GENERATED && !rv2.features.length ? STATES.NOT_ACQUIRED : rv2.state, count: rv2.features.length, reason: rv2.reason };
+  if (rv2.state === STATES.GENERATED && rv2.features.length) {
+    water.features = [...(water.features || []), ...rv2.features];
+    if (water.state !== STATES.GENERATED) { water.state = STATES.GENERATED; water.reason = 'rivers-v2-only'; }
+  }
+  if (roadSurface && roads.state === STATES.GENERATED && roads.features.length) {
+    const d = deriveRoadSurface(roads.features);
+    roads.features = [...roads.features, ...d.features];
+    result.roadSurfaceDerived = { surfaces: d.surfaces, junctions: d.junctions, note: 'Live City導出値（公式幅員ではない）' };
+  }
   for (const [key, file, res] of [['roads', 'roads.json', roads], ['waterways', 'waterways.json', water], ['waterSurface', 'water-surface.json', surf]]) {
     const target = path.join(outDir, file);
     if (res.state === STATES.GENERATED && res.features.length) {
@@ -112,7 +183,7 @@ export function buildWardLayers({ mapRoot, outRoot, ward, bufferM = 150 }) {
       result[key] = { state: res.state === STATES.GENERATED ? STATES.NOT_ACQUIRED : res.state, count: 0, reason: res.state === STATES.GENERATED ? 'no-features-in-ward' : res.reason };
     }
   }
-  writeAtomic(path.join(outDir, 'status.json'), { ...header, layers: result, note: 'rivers-v2 は出力規約が未解析のため今回は変換対象外' });
+  writeAtomic(path.join(outDir, 'status.json'), { ...header, layers: result, note: 'rivers-v2（centerline+left/right ribbon）は waterways へ合流。道路面/交差点は --road-surface 指定時のみ導出（derived:true）' });
   return { wardId: ward.wardId, layers: result, outDir };
 }
 

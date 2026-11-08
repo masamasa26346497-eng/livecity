@@ -25,7 +25,7 @@ export async function runE2E({ wardIds = ['kita', 'miyakojima', 'fukushima'], ex
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'm135-'));
   const buildingsRoot = path.join(tmp, 'buildings'), layersRoot = path.join(tmp, 'layers');
   const [A, B, C] = wards;
-  writeFixture({ buildingsRoot, layersRoot, wards, skipLayers: { [C.wardId]: ['roads'] } });
+  const geos = writeFixture({ buildingsRoot, layersRoot, wards, skipLayers: { [C.wardId]: ['roads'] } });
   const hits = [];
   const logged = await listenLogged({ buildingsRoot, layersRoot }, hits);
   const report = { schema: 'livecity.mission135.e2e/1', dataKind: 'synthetic-fixture', realData24WardsProven: false, wards: {}, checks: {}, browser: null, jsErrors: [], port: logged.port };
@@ -87,6 +87,16 @@ export async function runE2E({ wardIds = ['kita', 'miyakojima', 'fukushima'], ex
     const race = { finalWard: await ev('window.__m135.state.ward'), aborted: (await ev('window.__m135.state.aborted')) - abortedBefore, resources: await ev('window.__m135.resources()'), layers: await layerState() };
     report.switch = afterSwitch; report.race = race;
 
+    // Mission137: GLB(EXT_mesh_features) の featureId → ids/<glb>.json sidecar → canonicalId のクリック検証（合成 fixture）
+    await ev(`window.__m135.selectWard(${JSON.stringify(A.wardId)})`); await settle();
+    const gA = geos[A.wardId];
+    await ev(`window.__m135.lookAtLocal(${gA.center.x}, ${gA.center.z}, 450)`); await sleep(2500);
+    const tg = gA.buildings.map((bd) => ({ id: bd.id, x: bd.x, z: bd.z, h: bd.h }));
+    const clicks3d = await ev(`window.__m135.clickCheck3d(${JSON.stringify(tg)})`);
+    report.click3dTiles = { dataKind: 'synthetic-fixture', ward: A.wardId, samples: clicks3d.length, matched: clicks3d.filter((c) => c.picked === c.id && c.via === '3dtiles-sidecar').length, results: clicks3d, sidecarHttp: await ev('JSON.parse(JSON.stringify(window.__m135.state.http && window.__m135.state.http.sidecars || null))') };
+    // sidecar が無い GLB は ID を捏造せず unresolved を返す（fail-closed）: sidecar 404 を作るため C 区ではなく、ids を持たない仮 URL ではなく pick 結果の unresolved を直接検証
+    report.click3dTiles.sidecar404Probe = await ev("fetch('ext-3dtiles/" + A.wardId + "25/ids/not-there.json').then((r) => r.status)");
+
     const ok = (w) => KEYS.every((k) => w.pixels[k].diff >= MIN_PIXELS) && w.pixels.allOffVsAllOn.diff >= MIN_PIXELS && w.alignment && w.alignment.errorM <= ALIGN_TOLERANCE_M
       && KEYS.every((k) => w.layers[k].cls === 'ready') && w.http.notFound.length === 0 && [...w.http.tileset, ...w.http.glb, ...w.http.roads, ...w.http.waterways, ...w.http.waterSurface].every((s) => s === 200);
     const cw = report.wards[C.wardId];
@@ -97,6 +107,8 @@ export async function runE2E({ wardIds = ['kita', 'miyakojima', 'fukushima'], ex
       missingRoads_not_treated_as_success: cw.layers.roads.cls === 'missing' && cw.http.roads.every((s) => s === 404) && cw.pixels.roads.diff <= cw.noise.diff + NOISE_MARGIN && cw.expectMissing.includes('roads'),
       missingRoads_other_layers_still_render: ['buildings', 'waterLine', 'waterArea'].every((k) => cw.layers[k].cls === 'ready' && cw.pixels[k].diff >= MIN_PIXELS),
       race_finalWardIsLastRequest_noLeak: race.finalWard === B.wardId && race.resources.tilesets === 1 && race.resources.polylineCollections === 2 && race.aborted >= 1,
+      canonicalIdClick_3dtiles_sidecar_allMatch: report.click3dTiles.samples >= 6 && report.click3dTiles.matched === report.click3dTiles.samples && Object.values(report.click3dTiles.sidecarHttp || {}).every((s) => s === 200),
+      sidecar_missing_is_404: report.click3dTiles.sidecar404Probe === 404,
       noJsErrors: report.jsErrors.length === 0,
     };
     report.allPassed = Object.values(report.checks).every(Boolean);

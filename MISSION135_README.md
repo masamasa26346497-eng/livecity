@@ -51,3 +51,17 @@ npm run wards:e2e:real-water -- --layers-root <新規dir>/layers --ward konohana
 - 道路・河川(線)の実データはこのリポジトリに無い（`roads/` `waterways/` `rivers-v2/` の出力物なし）。入力は Mission115 の `build-city-layer-tiles.js` が `public/map-data/osaka-city/{roads,waterways}/tile_*.json` に出力する形式（znorth-neg-v1）で、Windows ローカルにある場合は `wards:build-layers --map-root` に渡す。
 - 位置づけ: 本ビューア（`mission135-ward-viewer`）が将来の正式 24 区ビューアの候補。PR #24 の `mission37g-osaka-24ward-mvp.html`（3592行）とは統合せず、座標・高さ定数と canonicalId の契約のみ共有する。
 - 状態: 実データで WebGL 検証済は「住吉区の建物のみ」「此花区の海面のみ」。3レイヤー実データ検証は 0 区、24 区は 0/24。
+
+## Mission 137: 3D Tiles(GLB)+ID sidecar・復元導線・rivers-v2/道路面
+| 項目 | 内容 |
+|---|---|
+| GLB 契約 | 頂点属性 `_FEATURE_ID_0` + `EXT_mesh_features`(propertyTable:0) + `EXT_structural_metadata`（Cesium は property table 付き featureId だけを feature として pick する）。canonicalId は `<ward>25/ids/<glb basename>.json`（配列 or `{ids:[]}`）の `[featureId]`。sidecar が無い/範囲外は `id:null`+`unresolved`（ID を捏造しない） |
+| 復元済み建物の検査 | `npm run wards:link-buildings -- --root <展開先>`（読み取り専用。区ごとに ready/rejected/not-acquired、GLB ヘッダ・実在・sidecar 有無。copy/symlink なし）。そのまま `wards:viewer --buildings-root <展開先>` に渡せる |
+| rivers-v2 | `rivers-v2/rivers.json` の centerline→line、left+reverse(right)→area として waterways に合流（座標不変、suppressed/ok=false 除外） |
+| 道路面/交差点 | `wards:build-layers ... --road-surface` で roads の line から導出（`derived:true`、公式幅員ではない）。ビューアは roads の kind:'area' を描画 |
+| Windows 既存出力の紐付け | `npm run wards:build-layers -- --map-root <…/public/map-data/osaka-city> --out <layers> --road-surface`（roads/waterways/rivers-v2/water-surface があれば処理、無ければ未取得） |
+| クリック不一致分析 | `npm run wards:click-analysis -- --dir <footprints> --ids a,b`。住吉 1/25 は重なり/重複ではなく、画面端(x=1237)での隣接高層(11.7m、隙間2.2m)による遮蔽。建物真上に寄せた再 pick で同一 ID を返すことを確認（canonicalId は未変更） |
+
+- 実 3D Tiles/GLB は本リポジトリに無く（`tileset.json`/`*.glb` なし）、GLB の E2E は**合成 fixture のみ**。住吉区の footprints 押出は GLB 成功ではない。
+- 海面は区ポリゴン由来の派生物で、実海岸線の精度は未保証（地理的に正確とは認定しない）。
+- PR #24 のツリー閲覧は環境の権限で行えなかったため、sidecar 形式は本契約（README の上記）を定義した。PR #24 の実 sidecar 形式と異なる場合は `ensureSidecar` のみ差し替える。

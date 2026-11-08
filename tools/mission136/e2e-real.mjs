@@ -84,6 +84,11 @@ export async function runReal({ ward = 'sumiyoshi', footprintsRoot = path.join(R
     const matched = clicks.filter((c) => c.picked === c.id);
     report.click = { cameraHeightM: CLICK_CAM_H, samples: clicks.length, matched: matched.length, rate: clicks.length ? +(matched.length / clicks.length).toFixed(3) : 0, examples: clicks.slice(0, 5), mismatches: clicks.filter((c) => c.picked !== c.id).slice(0, 5) };
 
+    // Mission137: 不一致の切り分け。建物の真上にカメラを寄せて再 pick → 一致すれば「画面端の視差/隣接高層による遮蔽」であり ID 取り違えではない
+    report.click.mismatchRecheck = [];
+    for (const m of clicks.filter((c) => c.picked !== c.id).slice(0, 5)) report.click.mismatchRecheck.push(await ev(`window.__m135.recheckCentered(${JSON.stringify(m.id)}, 300)`));
+    report.click.mismatchResolvedWhenCentered = report.click.mismatchRecheck.filter((r) => r && r.picked === r.id).length;
+
     if (mixed) { // 合成の道路/河川は区中心の約500m範囲のみ。近接視点で個別 ON/OFF を測る
       const closeFull = await grab(); const closeNoise = await diff(closeFull, await grab()); const close = { noise: closeNoise };
       for (const k of KEYS) { await ev(`window.__m135.setLayer('${k}', false)`); close[k] = await diff(closeFull, await grab()); await ev(`window.__m135.setLayer('${k}', true)`); }
