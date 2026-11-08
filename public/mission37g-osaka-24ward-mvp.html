@@ -1933,7 +1933,7 @@
   function stationOpColors(s) {
     const seen = new Set(), out = [];
     for (const o of (s.operators || [])) { const k = opKey(o); if (seen.has(k)) continue; seen.add(k); out.push({ key: k, color: OP_COLOR[k], label: k === 'other' ? o.label : o.label }); }
-    if (!out.length) out.push({ key: 'unknown', color: OP_COLOR.unknown, label: stationData.connected ? '不明' : '未取得' });
+    if (!out.length) out.push({ key: 'unknown', color: OP_COLOR.unknown, label: stationData.connected ? '会社名記載なし' : '路線データ未接続' });
     return out;
   }
   function renderStationLegend(list) {
@@ -1960,7 +1960,7 @@
   }
   function stationOperatorText(s) {
     if (s.operators && s.operators.length) return s.operators.map((o) => o.label).join('・');
-    return stationData.connected ? '不明（OSM に運営会社の記載なし）' : '未取得（路線データ未接続）';
+    return stationData.connected ? '不明（OSM タグ・近くの路線名に運営会社の記載なし）' : '未取得（路線データ未接続: ランチャー再実行で自動接続）';
   }
   const stationLayer = {
     id: 'stations', label: '駅（24区・運営会社）', swatch: '#c8b6ff', defaultOn: true,
@@ -1968,8 +1968,17 @@
     pts: null, labels: null,
     async mount() {
       const urls = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? ['mission145-data/stations-24.local.json', 'mission145-data/stations-24.json'] : ['mission145-data/stations-24.json'];
+      // 148: 全候補を no-store で読み、運営会社が接続済み（operatorData.connected）のものを優先する。古いキャッシュ／事業者なしの静的版に負けない。
       let j = null;
-      for (const u of urls) { try { const r = await fetch(u); if (r.ok) { j = await r.json(); stationData.origin = u; break; } } catch (e) { /* 次の候補へ */ } }
+      for (const u of urls) {
+        try {
+          const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) continue;
+          const c = await r.json(); if (!c || !Array.isArray(c.stations)) continue;
+          const conn = !!(c.operatorData && c.operatorData.connected);
+          if (!j || (conn && !(j.operatorData && j.operatorData.connected))) { j = c; stationData.origin = u; }
+          if (conn) break;
+        } catch (e) { /* 次の候補へ */ }
+      }
       if (!j || !Array.isArray(j.stations)) throw new Error('stations-24.json を取得できません（生成: node tools/mission145-build-stations.cjs）');
       stationData.list = j.stations.filter((s) => Number.isFinite(s.x) && Number.isFinite(s.z) && s.name);
       stationData.connected = !!(j.operatorData && j.operatorData.connected);
@@ -1987,14 +1996,25 @@
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far * 1.4), id: { poi: rec } });
         }
         const opText = oc.map((c) => c.label).join('・');
-        this.labels.add({ position: toCart(s.x, s.z, 8), text: '◉ ' + s.name + '\n' + opText, font: '600 13px sans-serif', fillColor: Cesium.Color.fromCssColorString(oc[0].color).brighten(0.45, new Cesium.Color()),
-          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.80)'), backgroundPadding: new Cesium.Cartesian2(6, 3),
-          pixelOffset: new Cesium.Cartesian2(0, -12), verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far), translucencyByDistance: new Cesium.NearFarScalar(far * 0.7, 1.0, far, 0.2), id: { poi: rec } });
+        // 148: 駅名は距離フェードなし・不透明。駅名＝白の太字＋濃い縁取り＋ほぼ不透明の背景、会社名＝別ラベルで運営会社色（駅名の薄さの原因だった translucencyByDistance 0.2 と、無彩色に近い明色を廃止）
+        const dd = new Cesium.DistanceDisplayCondition(0, far);
+        this.labels.add({ position: toCart(s.x, s.z, 8), text: '◉ ' + s.name, font: '700 15px sans-serif', fillColor: Cesium.Color.WHITE,
+          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 4, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.94)'), backgroundPadding: new Cesium.Cartesian2(7, 4),
+          pixelOffset: new Cesium.Cartesian2(0, -26), verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: dd, id: { poi: rec } });
+        this.labels.add({ position: toCart(s.x, s.z, 8), text: opText, font: '700 12px sans-serif', fillColor: Cesium.Color.fromCssColorString(oc[0].color).brighten(0.3, new Cesium.Color()),
+          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 4, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.94)'), backgroundPadding: new Cesium.Cartesian2(6, 2),
+          pixelOffset: new Cesium.Cartesian2(0, -9), verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: dd, id: { poi: rec } });
       }
       stats.stations145 = { total: stationData.list.length, operatorDataConnected: stationData.connected, origin: stationData.origin,
         withOperator: stationData.list.filter((s) => s.operators && s.operators.length).length };
+      // 148: 実際に描画プリミティブへ載った色・不透明度の診断（QA 用。色が operators 解決結果から来ているかを実ブラウザで確認する）
+      { const pc = new Set(); for (let i = 0; i < this.pts.length; i++) pc.add(this.pts.get(i).color.toCssHexString());
+        let minA = 1, fades = 0, white = 0; for (let i = 0; i < this.labels.length; i++) { const l = this.labels.get(i); minA = Math.min(minA, l.fillColor.alpha); if (l.translucencyByDistance) fades++; if (l.fillColor.equals(Cesium.Color.WHITE)) white++; }
+        stats.stations145.render = { pointColors: [...pc], labelCount: this.labels.length, labelMinFillAlpha: minA, labelsWithDistanceFade: fades, whiteNameLabels: white, labelBackgroundAlpha: 0.94 }; }
       const lg = renderStationLegend(stationData.list); this.legend = lg;
       const byKey = {}; for (const s of stationData.list) { const ks = stationOpColors(s).map((c) => c.key); for (const k of ks) byKey[k] = (byKey[k] || 0) + 1; }
       stats.stations145.operatorColors = { byOperator: byKey, transferStations: stationData.list.filter((s) => stationOpColors(s).length >= 2).length,

@@ -255,12 +255,21 @@ async function main() {
     try {
       const outSt = path.join(ROOT, 'public', 'mission145-data', 'stations-24.local.json');
       const srcSt = opt('src') ? path.resolve(opt('src')) : discoverOldSource();
-      if (fs.existsSync(outSt) && !a.includes('--force-stations')) console.log('[145] stations-24.local.json already present (use --force-stations to rebuild)');
-      else if (!srcSt || !fs.existsSync(path.join(srcSt, 'railways'))) console.log('[145] old railway tiles not found: station operators stay unresolved. Add --src "<...>\\public\\map-data\\osaka-city" to resolve them.');
+      // 148: old railway tiles are optional; the converted per-ward layers (LiveCity-MapLayers-Out-24/<ward>/layers/railways.json) carry the same line names.
+      const lrSt = opt('layers-root') ? path.resolve(opt('layers-root')) : discoverLayersRoot();
+      const hasOld = !!(srcSt && fs.existsSync(path.join(srcSt, 'railways')));
+      // a file built earlier without any rail source has no operators at all: rebuild it automatically once a source exists
+      let stale = false;
+      if (fs.existsSync(outSt)) { try { const cur = JSON.parse(fs.readFileSync(outSt, 'utf8')); stale = !(cur.operatorData && cur.operatorData.connected); } catch (e) { stale = true; } }
+      if (fs.existsSync(outSt) && !stale && !a.includes('--force-stations')) console.log('[145] stations-24.local.json already present (use --force-stations to rebuild)');
+      else if (!hasOld && !lrSt) console.log('[145] no rail line source found (old railways tiles / LiveCity-MapLayers-Out-24): station operators stay unresolved. Add --src "<...>\\public\\map-data\\osaka-city" or --layers-root "<...>\\LiveCity-MapLayers-Out-24".');
       else {
-        const args = [path.join(ROOT, 'tools', 'mission145-build-stations.cjs'), '--src', srcSt, '--out', outSt]; if (fs.existsSync(outSt)) args.push('--force');
+        const args = [path.join(ROOT, 'tools', 'mission145-build-stations.cjs'), '--out', outSt];
+        if (hasOld) args.push('--src', srcSt);
+        if (lrSt) args.push('--layers-root', lrSt);
+        if (fs.existsSync(outSt)) args.push('--force');
         const o = JSON.parse(execFileSync(process.execPath, args, { encoding: 'utf8', maxBuffer: 1 << 26 }));
-        console.log('[145] stations: ' + o.markers + ' markers, operator resolved ' + o.withOperator + ', unknown ' + o.operatorUnknown);
+        console.log('[145] stations: ' + o.markers + ' markers, operator resolved ' + o.withOperator + ', unknown ' + o.operatorUnknown + ' (rail source: ' + [hasOld ? srcSt : null, lrSt].filter(Boolean).join(' + ') + ')');
       }
     } catch (e) { console.warn('[145] station build skipped: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 160)); }
   }

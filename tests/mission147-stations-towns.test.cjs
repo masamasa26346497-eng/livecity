@@ -25,7 +25,7 @@ test('every pipeline operator id has a fixed colour in the page; unknown/other a
 test('station layer: ring markers for transfers, legend, operator text under the name, no name-based guessing', () => {
   assert.ok(/stationOpColors\(s\)/.test(page) && /renderStationLegend\(/.test(page) && /lc-st-legend/.test(page));
   assert.ok(/for \(let i = nOp - 1; i >= 0; i--\)/.test(page));
-  assert.ok(/'\\n' \+ opText/.test(page));
+  assert.ok(/text: opText/.test(page));   // 148: operator name is its own label under the (white) station name
   assert.ok(!/OP_COLOR\[s\.name\]/.test(page));
 });
 

@@ -47,6 +47,25 @@ function loadLines(src) {
   }
   return lines;
 }
+/** 148: per-ward converted layers (<root>/<ward>/layers/railways.json, same feature shape: id/name/railway/p). Read-only. */
+function loadLinesFromLayersRoot(root) {
+  if (!root || !fs.existsSync(root)) return null;
+  const seen = new Set(), lines = [];
+  let files = 0;
+  for (const w of fs.readdirSync(root)) {
+    const f = path.join(root, w, 'layers', 'railways.json');
+    if (!fs.existsSync(f)) continue;
+    let j; try { j = readJson(f); } catch (e) { continue; }
+    files++;
+    for (const ft of j.features || []) {
+      if (!ft || typeof ft.name !== 'string' || !ft.name.trim() || !Array.isArray(ft.p) || ft.p.length < 2) continue;
+      if (ft.railway && !RAIL_TAGS.has(ft.railway)) continue;
+      const k = ft.id || (ft.name + ft.p[0]); if (seen.has(k)) continue;
+      seen.add(k); lines.push({ name: ft.name.trim(), p: ft.p });
+    }
+  }
+  return files ? lines : null;
+}
 /** Lines passing within radius of (x,z): Map name -> distance. */
 function nearbyLines(lines, x, z, radius) {
   const m = new Map();
@@ -66,7 +85,9 @@ function loadRawTags(file) {
 async function build(opts) {
   const SI = await import(path.join(ROOT, 'tools/build-station-index.js'));   // OPERATORS / classifyOperator (string patterns, no station names)
   const manifest = readJson(path.join(FAC_DIR, 'ward-manifest.json'));
-  const lines = opts.src ? loadLines(path.resolve(opts.src)) : null;
+  const fromSrc = opts.src ? loadLines(path.resolve(opts.src)) : null;
+  const fromLayers = opts.layersRoot ? loadLinesFromLayersRoot(path.resolve(opts.layersRoot)) : null;
+  const lines = (fromSrc || fromLayers) ? [].concat(fromSrc || [], fromLayers || []) : null;
   const rawTags = opts.osmRaw ? loadRawTags(path.resolve(opts.osmRaw)) : null;
   const nodes = [];
   for (const w of manifest.wards) {
@@ -127,7 +148,7 @@ async function build(opts) {
   return {
     schema: 'livecity.mission145.stations/1', mission: '145', generatedAt: new Date().toISOString(),
     coordinateConvention: 'znorth-neg-v1',
-    operatorData: lines || rawTags ? { connected: true, lineTiles: !!lines, osmRaw: !!rawTags } : { connected: false, note: 'no rail line / OSM tag source was given; operators are not resolved (shown as 未取得)' },
+    operatorData: lines || rawTags ? { connected: true, lineTiles: !!fromSrc, wardLayers: !!fromLayers, lineFeatures: lines ? lines.length : 0, osmRaw: !!rawTags } : { connected: false, note: 'no rail line / OSM tag source was given; operators are not resolved (shown as 未取得)' },
     source: 'OpenStreetMap contributors (ODbL 1.0) via public/map-data/osaka-city/facilities (station nodes)',
     attribution: '© OpenStreetMap contributors',
     counts: Object.assign({}, stat, { byWard }),
@@ -140,10 +161,10 @@ async function main() {
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
   const out = path.resolve(opt('out') || path.join(ROOT, 'public/mission145-data/stations-24.json'));
   if (fs.existsSync(out) && !a.includes('--force')) { console.error('ERROR: ' + out + ' exists; pass --force to regenerate'); process.exit(2); }
-  const j = await build({ src: opt('src'), osmRaw: opt('osm-raw') });
+  const j = await build({ src: opt('src'), layersRoot: opt('layers-root'), osmRaw: opt('osm-raw') });
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, JSON.stringify(j));
   console.log(JSON.stringify(Object.assign({ out }, j.counts, { operatorData: j.operatorData }), null, 1));
 }
-module.exports = { build, normName, nearbyLines, segDist, MERGE_M, LINE_RADIUS_M };
+module.exports = { build, loadLinesFromLayersRoot, normName, nearbyLines, segDist, MERGE_M, LINE_RADIUS_M };
 if (require.main === module) main().catch((e) => { console.error('ERROR: ' + e.message); process.exit(1); });
