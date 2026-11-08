@@ -387,6 +387,8 @@
       <div id="lc-poi-cat">—</div>
       <div id="lc-poi-name" style="font-weight:600;margin:6px 0">—</div>
       <div class="lc-row"><span class="k">種別</span><span class="v" id="lp-sub">—</span></div>
+      <div class="lc-row" id="lp-ops-row" style="display:none"><span class="k">運営会社</span><span class="v" id="lp-ops">—</span></div>
+      <div class="lc-row" id="lp-lines-row" style="display:none"><span class="k">路線</span><span class="v" id="lp-lines">—</span></div>
       <div class="lc-row"><span class="k">住所</span><span class="v" id="lp-addr">—</span></div>
       <div class="lc-row"><span class="k">営業時間</span><span class="v" id="lp-hours">—</span></div>
       <div class="lc-row"><span class="k">電話</span><span class="v" id="lp-tel">—</span></div>
@@ -449,6 +451,7 @@
 <script src="mission37d-data/town-normalize.js"></script>
 <script src="mission37f-photo-select.js"></script>
 <script src="mission37k-poi-select.js"></script>
+<script src="mission145-towns.js"></script>
 <script src="mission51-seg-dedupe.js"></script>
 <script src="mission52-water-dedupe.js"></script>
 <script src="mission38f-facility-fastload.js"></script>
@@ -1853,7 +1856,7 @@
       let n = 0;
       for (const it of data.items || []) {
         const base = LABEL_STYLE[it.kind];
-        if (!base) continue;
+        if (!base || it.kind === 'station') continue;   // 145: 駅は 24 区の専用レイヤー（stations）で表示
         const o = Object.assign({}, base, it.kind === 'place' ? (PLACE_BY_IMPORTANCE[it.importance] || PLACE_BY_IMPORTANCE.local) : {});
         this.coll.add({
           position: toCart(it.x, it.z, o.h),
@@ -1903,6 +1906,150 @@
     id: 'parks', label: '公園・緑地（OSM・面）', swatch: C.park, defaultOn: true, hint: 'OSM 由来の面',
   }, makeAreaLayer('parks.json', { color: C.park, alpha: 0.8, height: LAYER_H.parks })));
   LayerRegistry.register(labelLayer);
+
+  // ══════════════════════════════════════════════════════════════
+  // 145: 駅（24 区）。mission145-data/stations-24.json（OSM 駅 node、ODbL）。localhost では stations-24.local.json（運営会社つき）を優先。
+  //   運営会社は OSM の operator タグ → network タグ → 近くの路線名、の順で根拠つきでのみ決める。決まらなければ「不明」、路線データ未接続なら「未取得」。
+  //   クリックは POI と同じ経路（id.poi）で右パネルへ。建物の canonicalId の pick とは競合しない。
+  // ══════════════════════════════════════════════════════════════
+  const ST_BASIS = { 'osm-operator-tag': 'OSM operator タグ', 'osm-network-tag': 'OSM network タグ（運営会社そのものではない可能性）', 'nearby-line-name': '近くの路線名から判定' };
+  const stationData = { list: [], connected: false, loaded: false, origin: null };
+  function stationRec(s) {
+    return { id: s.id, name: s.name, category: 'transport', subcategory: '駅', localX: s.x, localZ: s.z, latitude: s.lat, longitude: s.lon,
+      address: null, openingHours: null, phone: null, website: null, source: 'OpenStreetMap (Overpass API)', license: 'ODbL 1.0', attribution: '© OpenStreetMap contributors',
+      wardName: s.wardName, wardId: s.wardId, station: s };
+  }
+  function stationOperatorText(s) {
+    if (s.operators && s.operators.length) return s.operators.map((o) => o.label).join('・');
+    return stationData.connected ? '不明（OSM に運営会社の記載なし）' : '未取得（路線データ未接続）';
+  }
+  const stationLayer = {
+    id: 'stations', label: '駅（24区・運営会社）', swatch: '#c8b6ff', defaultOn: true,
+    hint: 'OSM の駅。運営会社は根拠がある場合のみ表示（不明は「不明」）。クリックで会社・路線・出典',
+    pts: null, labels: null,
+    async mount() {
+      const urls = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? ['mission145-data/stations-24.local.json', 'mission145-data/stations-24.json'] : ['mission145-data/stations-24.json'];
+      let j = null;
+      for (const u of urls) { try { const r = await fetch(u); if (r.ok) { j = await r.json(); stationData.origin = u; break; } } catch (e) { /* 次の候補へ */ } }
+      if (!j || !Array.isArray(j.stations)) throw new Error('stations-24.json を取得できません（生成: node tools/mission145-build-stations.cjs）');
+      stationData.list = j.stations.filter((s) => Number.isFinite(s.x) && Number.isFinite(s.z) && s.name);
+      stationData.connected = !!(j.operatorData && j.operatorData.connected);
+      stationData.loaded = true;
+      this.pts = scene.primitives.add(new Cesium.PointPrimitiveCollection());
+      this.labels = scene.primitives.add(new Cesium.LabelCollection());
+      for (const s of stationData.list) {
+        const rec = stationRec(s), transfer = (s.operators || []).length >= 2;
+        const far = transfer ? 14000 : 6500;   // 乗換駅（複数事業者）は遠くから、それ以外は中景から
+        this.pts.add({ position: toCart(s.x, s.z, 8), pixelSize: transfer ? 9 : 7, color: Cesium.Color.fromCssColorString('#c8b6ff'),
+          outlineColor: Cesium.Color.fromCssColorString('#050a18').withAlpha(0.6), outlineWidth: 1, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far * 1.4), id: { poi: rec } });
+        this.labels.add({ position: toCart(s.x, s.z, 8), text: '◉ ' + s.name, font: '600 13px sans-serif', fillColor: Cesium.Color.fromCssColorString('#e6dcff'),
+          outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.80)'), backgroundPadding: new Cesium.Cartesian2(6, 3),
+          pixelOffset: new Cesium.Cartesian2(0, -12), verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far), translucencyByDistance: new Cesium.NearFarScalar(far * 0.7, 1.0, far, 0.2), id: { poi: rec } });
+      }
+      stats.stations145 = { total: stationData.list.length, operatorDataConnected: stationData.connected, origin: stationData.origin,
+        withOperator: stationData.list.filter((s) => s.operators && s.operators.length).length };
+      searchIndex = null;
+      return { count: stationData.list.length };
+    },
+    applyVisible(on) { if (this.pts) this.pts.show = on; if (this.labels) this.labels.show = on; },
+  };
+  LayerRegistry.register(stationLayer);
+
+  // ══════════════════════════════════════════════════════════════
+  // 145: 町名・町丁目名（住吉区以外の 23 区）。mission145-data/towns-24.json（e-Stat 小地域の代表点。tools/mission145-build-towns.cjs が生成）。
+  //   住吉区は 37D の実装（境界つき）をそのまま使い、ここでは重複させない。データが無ければ「未接続」と表示し、他の機能は止めない。
+  //   カメラ真下の区（最大 3 区）のラベルだけを生成し、離れた区は破棄する。高度で 区名 → 町名 → 町丁目名 に出し分け、重なりは画面空間で回避する。
+  //   ラベルは pick 対象にしない（建物 canonicalId・施設のクリックと競合しない）。
+  // ══════════════════════════════════════════════════════════════
+  const TW = window.LiveCityTowns145;
+  const towns24 = { data: null, byWard: new Map(), live: new Map(), order: [], wardNames: new Map(), shown: { base: 0, full: 0 } };
+  const townLayer24 = {
+    id: 'towns24', label: '町名・町丁目名（24区）', swatch: '#eef1f3', defaultOn: true,
+    hint: 'e-Stat 小地域の公式名称。遠景=区名のみ / 中景=町名 / 近景=町丁目名。住吉区は町丁目レイヤー（境界つき）を使用',
+    async mount() {
+      const r = await fetch('mission145-data/towns-24.json');
+      if (!r.ok) throw new Error('towns-24.json 未接続（生成: node tools/mission145-build-towns.cjs --input <小地域GeoJSON>）');
+      const j = await r.json();
+      if (!j || !Array.isArray(j.towns)) throw new Error('towns-24.json の形式が不正です');
+      towns24.data = j;
+      for (const t of j.towns) {
+        if (t.w === 'sumiyoshi' || !Number.isFinite(t.x) || !Number.isFinite(t.z)) continue;   // 住吉区は 37D 側
+        if (!towns24.byWard.has(t.w)) towns24.byWard.set(t.w, []);
+        towns24.byWard.get(t.w).push(t);
+      }
+      stats.towns145 = { total: j.towns.length, wardsWithTowns: towns24.byWard.size, source: j.source, license: j.license, live: [], shown: towns24.shown };
+      searchIndex = null;
+      return { count: j.towns.length };
+    },
+    applyVisible(on) { for (const L of towns24.live.values()) { L.base.show = on; L.full.show = on; } },
+  };
+  LayerRegistry.register(townLayer24);
+  function townLabelOpts(text, x, z, big) {
+    return { position: toCart(x, z, 10), text, font: (big ? '600 14px' : '500 12px') + ' sans-serif', fillColor: Cesium.Color.fromCssColorString('#eef1f3'),
+      outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.55)'), backgroundPadding: new Cesium.Cartesian2(5, 2),
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM, horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY, show: false };
+  }
+  function townEnsureWard(wardId) {
+    if (towns24.live.has(wardId)) return;
+    const parts = TW.splitForWard(towns24.byWard.get(wardId) || []);
+    const base = scene.primitives.add(new Cesium.LabelCollection()), full = scene.primitives.add(new Cesium.LabelCollection());
+    const bi = parts.base.map((t) => ({ t, text: t.n, lb: base.add(townLabelOpts(t.n, t.x, t.z, true)) }));
+    const fi = parts.full.map((t) => ({ t, text: t.n, lb: full.add(townLabelOpts(t.n, t.x, t.z, false)) }));
+    towns24.live.set(wardId, { base, full, bi, fi });
+  }
+  function townRelease(wardId) {
+    const L = towns24.live.get(wardId); if (!L) return;
+    scene.primitives.remove(L.base); scene.primitives.remove(L.full); towns24.live.delete(wardId);
+    const i = towns24.order.indexOf(wardId); if (i >= 0) towns24.order.splice(i, 1);
+  }
+  function townTick() {
+    if (!viewer || !towns24.data || !TW) return;
+    const lv = LayerRegistry.get('towns24'), on = !!(lv && lv.visible);
+    const h = viewer.camera.positionCartographic.height, tier = TW.tierOf(h);
+    towns24.shown.base = 0; towns24.shown.full = 0;
+    if (on && tier !== 'ward') {
+      const g = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      if (g) {
+        const gc = Cesium.Cartographic.fromCartesian(g);
+        const w = WardUI.hit((Cesium.Math.toDegrees(gc.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd, -((Cesium.Math.toDegrees(gc.latitude) - PROJ.clat) * PROJ.mpd));
+        if (w && towns24.byWard.has(w.wardId)) { townEnsureWard(w.wardId); for (const d of TW.touchWard(towns24.order, w.wardId)) townRelease(d); }
+      }
+    }
+    const W = scene.canvas.clientWidth, H = scene.canvas.clientHeight, win = new Cesium.Cartesian2();
+    const items = [];
+    for (const L of towns24.live.values()) {
+      L.base.show = on && tier === 'base'; L.full.show = on && tier === 'full';
+      for (const it of (tier === 'base' ? L.bi : L.fi)) {
+        it.lb.show = false;
+        if (!on || tier === 'ward') continue;
+        const p = Cesium.SceneTransforms.worldToWindowCoordinates(scene, it.lb.position, win);
+        if (p) items.push({ x: p.x, y: p.y, text: it.text, pri: Math.min(1000, Math.round(it.t.a / 1000)), it });
+      }
+    }
+    if (items.length) {
+      const keep = TW.declutter(items, tier === 'base' ? TW.CAP.base : TW.CAP.full, { w: W, h: H });
+      keep.forEach((i) => { items[i].it.lb.show = true; });
+      towns24.shown[tier === 'base' ? 'base' : 'full'] = keep.size;
+    }
+    if (stats.towns145) Object.assign(stats.towns145, { tier, live: Array.from(towns24.live.keys()), cap: TW.CAP });
+    scene.requestRender();
+  }
+  async function towns24Hits(raw) {
+    if (!towns24.data || !TN) return [];
+    const tk = TN.normalizeTownName(raw); if (!tk) return [];
+    if (!towns24.wardNames.size) for (const w of (await WardUI.load()).wards) towns24.wardNames.set(w.wardId, w.wardName);
+    const out = [];
+    for (const list of towns24.byWard.values()) for (const t of list) {
+      const k = TN.normalizeTownName(t.n);
+      if (k.includes(tk)) out.push({ name: (towns24.wardNames.get(t.w) || t.w) + ' ' + t.n, kind: '町丁目', x: t.x, z: t.z, s: k === tk ? 2 : (k.startsWith(tk) ? 1 : 0) });
+    }
+    return out.sort((a, b) => b.s - a.s || a.name.localeCompare(b.name, 'ja', { numeric: true })).slice(0, 6);
+  }
 
   // 49: GSI 道路縁（RdEdg）。旧 Three.js 版 31G ALIGNMENT-RESET が「道路境界の正本」にした実測の道路縁を、Cesium 版へ戻した参考レイヤー。
   //   既定 OFF・初回 ON のときだけ取得（起動コスト 0）。データは tools/mission49-build-roadedge.cjs が GSI 公開タイルから切り出した小さな窓
@@ -2239,7 +2386,7 @@
     return layer;
   }
   poiLayers.push(LayerRegistry.register(makePoiLayer('facilities', '施設（学校・医療・公共・交通・店舗）', '#8fc0ff',
-    'OSM 由来。学校・医療・公共・交通・店舗の POI', (r) => r.category !== 'tourism' && r.category !== 'park')));   // register() は複製を返す。pts を持つのは複製側
+    'OSM 由来。学校・医療・公共・交通・店舗の POI', (r) => r.category !== 'tourism' && r.category !== 'park' && r.subcategory !== 'station')));   // 145: 駅は専用レイヤー（運営会社つき）に一本化   // register() は複製を返す。pts を持つのは複製側
   poiLayers.push(LayerRegistry.register(makePoiLayer('spots', '観光スポット', '#7fcf9a',
     'OSM の tourism タグのみ（件数が少ない。住吉大社などは施設データに無い）', (r) => r.category === 'tourism')));
 
@@ -3021,11 +3168,11 @@
     slot.textContent = '読み込み中…';
     let facs = [], stations = [];
     try { const w0 = WardUI.hit(x, z); if (w0) await ensureWardFacilities(w0); facs = await allFacilities(); } catch (e) { fail('facilities', e); }
-    try { stations = ((await fetchLayerJson('labels.json')).items || []).filter((i) => i.kind === 'station'); } catch (e) { /* ラベル無しでも続行 */ }
+    stations = stationData.list;   // 145: 24 区の駅（stations-24.json）
     if (seq !== selSeq) return;
     const rows = [];
     for (const f of facs) rows.push({ name: f.name || '(名称なし)', cat: (FAC_CAT[f.category] || [f.category])[0], d: Math.hypot(f.localX - x, f.localZ - z), poi: f });
-    for (const s of stations) rows.push({ name: s.name + '駅', cat: '駅', d: Math.hypot(s.x - x, s.z - z), station: s });
+    for (const s of stations) rows.push({ name: s.name + '駅', cat: '駅', d: Math.hypot(s.x - x, s.z - z), poi: stationRec(s) });
     const near = rows.filter((r) => r.d <= 500).sort((a, b) => a.d - b.d).slice(0, 8);
     slot.textContent = '';
     if (!near.length) { slot.textContent = '500m 以内に、データのある施設・駅はありません。'; return; }
@@ -3053,6 +3200,14 @@
     $('lc-poi-cat').textContent = cat[0];
     $('lc-poi-name').textContent = r.name || '(名称なし)';
     $('lp-sub').textContent = nd(r.subcategory);
+    // 145: 駅だけ運営会社・路線・判定根拠を出す（根拠が無ければ「不明」/「未取得」。推測で埋めない）
+    const st = r.station;
+    $('lp-ops-row').style.display = st ? '' : 'none'; $('lp-lines-row').style.display = st ? '' : 'none';
+    if (st) {
+      const basis = Array.from(new Set((st.operators || []).map((o) => ST_BASIS[o.basis] || o.basis)));
+      $('lp-ops').textContent = stationOperatorText(st) + (basis.length ? '（根拠: ' + basis.join(' / ') + '）' : '');
+      $('lp-lines').textContent = (st.lines && st.lines.length) ? st.lines.join(' / ') : 'データなし';
+    }
     $('lp-addr').textContent = nd(r.address);
     $('lp-hours').textContent = nd(r.openingHours);
     $('lp-tel').textContent = nd(r.phone);
@@ -3060,7 +3215,9 @@
     const w = safeUrl(r.website) || (typeof r.website === 'string' && /^http:\/\//.test(r.website) ? r.website : null);
     if (w) web.appendChild(el('a', '公式サイト', { href: w, target: '_blank', rel: 'noopener' })); else web.textContent = 'データなし';
     $('lp-ll').textContent = r.latitude.toFixed(6) + ' / ' + r.longitude.toFixed(6);
-    $('lp-src').textContent = '出典: ' + (r.attribution || r.source || '—') + (r.license ? '（' + r.license + '）' : '');
+    $('lp-src').textContent = '出典: ' + (r.attribution || r.source || '—') + (r.license ? '（' + r.license + '）' : '')
+      + (r.station ? ' / 運営会社は根拠がある場合のみ表示（不明は不明のまま）' : '')
+      + (/^(dining|shopping|lodging)$/.test(r.category) ? ' / 営業状況は未確認（閉業・名称変更の可能性があります）' : '');   // 145
     poiFly = r;
     stats.selectedPoi = { id: r.id, name: r.name, category: r.category, sourceId: r.sourceId };
     try { poiSyncAll(); } catch (e) { fail('poi:select-sync', e); }   // 37K-2: 選択中は点+名前を維持
@@ -3585,7 +3742,7 @@
     } catch (e) { partial = '区'; fail('search:wards', e); }
     try {
       for (const i of (await fetchLayerJson('labels.json')).items || []) {
-        if (i.kind === 'ward') continue;   // 37G: 区は 24 区の正式データから入れる（住吉区のみの重複を避ける）
+        if (i.kind === 'ward' || i.kind === 'station') continue;   // 145: 駅は stationData から入れる / 37G: 区は 24 区の正式データから入れる（住吉区のみの重複を避ける）
         idx.push({ name: i.name, key: norm(i.name), kind: KIND_JA[i.kind] || i.kind, x: i.x, z: i.z, rank: i.importance === 'major' ? 0 : 1 });
       }
     } catch (e) { partial = 'ラベル'; fail('search:labels', e); }
@@ -3599,6 +3756,7 @@
         }
       }).catch(() => {})));
     }
+    for (const s of stationData.list) idx.push({ name: s.name, key: norm(s.name), kind: '駅', x: s.x, z: s.z, poi: stationRec(s), rank: 0 });   // 145
     try {
       for (const f of await allFacilities()) {
         if (!f.name) continue;
@@ -3639,6 +3797,7 @@
         .map((x) => ({ name: x.t.ward + ' ' + x.t.name, kind: '町丁目', town: x.t, x: x.t.cx, z: x.t.cz }));
     } catch (e) { townErr = e; fail('search:towns', e); }
     if (norm($('lc-q').value) !== term) return [];
+    try { for (const h of await towns24Hits($('lc-q').value)) townHits.push(h); } catch (e) { fail('search:towns145', e); }   // 145: 住吉区以外の町丁目
     const exactOther = others.length && others[0].key === term;
     const hits = (exactOther ? others.concat(townHits) : townHits.concat(others)).slice(0, 10);
     resBox.textContent = '';
@@ -3706,6 +3865,7 @@
     facRetry = false;
     for (const l of poiLayers) { try { l.sync(); } catch (e) { fail('poi:sync', e); } }
     updateFacilitiesNear().catch((e) => fail('facilities:near', e));   // 37J
+    try { townTick(); } catch (e) { fail('towns145', e); }   // 145: 町名・町丁目ラベルの出し分け
   }
   setInterval(() => { if (SMOOTH && isMoving()) { IX.noteDeferred(); return; } if (facGate() || facRetry) facTick(); }, 1500);
   let moveEndT = 0;   // カメラ移動の終了直後に即時同期（定期処理の待ちで近景の点が遅れないように。debounce 150ms）

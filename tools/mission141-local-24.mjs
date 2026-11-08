@@ -249,6 +249,22 @@ async function main() {
     }
   }
 
+  // Mission 145: station operators. Builds public/mission145-data/stations-24.local.json (gitignored, new file only) from the old railway tiles when found.
+  //   The committed stations-24.json stays untouched; the page prefers the .local.json on localhost. Skip with --no-stations.
+  if (!a.includes('--no-stations') && !a.includes('--check-only')) {
+    try {
+      const outSt = path.join(ROOT, 'public', 'mission145-data', 'stations-24.local.json');
+      const srcSt = opt('src') ? path.resolve(opt('src')) : discoverOldSource();
+      if (fs.existsSync(outSt) && !a.includes('--force-stations')) console.log('[145] stations-24.local.json already present (use --force-stations to rebuild)');
+      else if (!srcSt || !fs.existsSync(path.join(srcSt, 'railways'))) console.log('[145] old railway tiles not found: station operators stay unresolved. Add --src "<...>\\public\\map-data\\osaka-city" to resolve them.');
+      else {
+        const args = [path.join(ROOT, 'tools', 'mission145-build-stations.cjs'), '--src', srcSt, '--out', outSt]; if (fs.existsSync(outSt)) args.push('--force');
+        const o = JSON.parse(execFileSync(process.execPath, args, { encoding: 'utf8', maxBuffer: 1 << 26 }));
+        console.log('[145] stations: ' + o.markers + ' markers, operator resolved ' + o.withOperator + ', unknown ' + o.operatorUnknown);
+      }
+    } catch (e) { console.warn('[145] station build skipped: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 160)); }
+  }
+
   const { rows, map } = resolveWards({ root: ROOT, dataRoot, wards, only, local });
   const served = rows.filter((r) => r.status === 'served');
   const lay = resolveLayers({ layersRoot, map });
