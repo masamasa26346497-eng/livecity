@@ -25,6 +25,7 @@ const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''
   const result = { chrome: chromeBin, httpResponses: [], console: [] };
   try {
     let targets; for (let i = 0; i < 50; i++) { try { targets = await getJson('http://127.0.0.1:' + cport + '/json'); break; } catch (e) { await sleep(200); } }
+    if (!targets) throw new Error('Chrome のデバッグポート(' + cport + ')に接続できません。Chrome が起動できていません(chrome=' + chromeBin + ')。--chrome でパスを指定、または別ポート --cdp を試してください');
     const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl);
     await new Promise((r) => (ws.onopen = r));
     let id = 0; const pend = new Map();

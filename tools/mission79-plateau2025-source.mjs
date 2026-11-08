@@ -6,7 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = process.cwd();
+// Mission 162: cwd 依存を廃止(リポジトリ外のフォルダから実行しても source-lock を解決できる)。
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const PACKAGE_ID = 'plateau-27100-osaka-shi-2025';
 const CKAN = 'https://www.geospatial.jp/ckan/api/3/action/package_show?id=' + PACKAGE_ID;
 export const LOCK_PATH = path.resolve(ROOT, 'data/reports/mission79/source-lock.json');

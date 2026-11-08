@@ -535,6 +535,7 @@
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('lod2') === '1') {
     const s152 = document.createElement('script'); s152.src = '/lod2-preview/overlay.js';
     s152.onload = () => window.LC152 && window.LC152.attach({ Cesium, viewer });
+    s152.onerror = () => { window.__lc152 = { state: { status: 'error', error: 'overlay.js を読み込めません(LOD2 用サーバ以外で開いています)' } }; const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:#7a1f1f;color:#fff;font:13px/1.5 sans-serif;padding:8px 12px;border-radius:6px;max-width:380px'; d.textContent = 'LOD2 を表示できません: LOD2 用サーバ経由で開いていません。Start-LOD2-Preview.ps1 を実行して表示されたURLを開いてください。'; document.body.appendChild(d); };
     document.body.appendChild(s152);
   }
   scene.skyAtmosphere.show = false;

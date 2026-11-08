@@ -14,6 +14,13 @@
     tileVisible: 0, tileLoad: 0, tileFailed: 0, tilesetReady: false, bbox: null, report: null, textureRendered: false,
   };
   window.__lc152 = { state };
+  // Mission 162: 失敗理由をページにも日本語で出す(秘密情報なし)。
+  function showFailure(msg) {
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:#7a1f1f;color:#fff;font:13px/1.5 sans-serif;padding:8px 12px;border-radius:6px;max-width:400px';
+    d.innerHTML = '<b>LOD2 を表示できません</b><br>' + String(msg).replace(/[<>&]/g, '') + '<br><a style="color:#9cf" href="/__lod2/diag.json" target="_blank">診断情報(diag.json)</a>';
+    document.body.appendChild(d);
+  }
 
   function polygonFor(Cesium, hull) {
     const pos = Cesium.Cartesian3.fromDegreesArray(hull.flatMap((p) => [p[0], p[1]]));
@@ -26,16 +33,18 @@
       if (!Cesium.ClippingPolygonCollection || !Cesium.ClippingPolygon) {
         state.status = 'refused'; state.exclusion = 'unsupported';
         state.error = 'Cesium ' + Cesium.VERSION + ' に ClippingPolygonCollection が無いため、LOD1 との二重描画を避けられず LOD2 を追加しません';
+        showFailure(state.error);
         return;
       }
-      const [report, fp] = await Promise.all([fetch(BASE + 'report.json').then((r) => r.json()), fetch(BASE + 'footprints.json').then((r) => r.json())]);
+      const getJ = (n) => fetch(BASE + n).then((r) => { if (!r.ok) throw new Error(n + ' が HTTP ' + r.status + '(生成物がありません。生成工程が失敗した可能性)'); return r.json(); });
+      const [report, fp] = await Promise.all([getJ('report.json'), getJ('footprints.json')]);
       state.report = { converted: report.converted, lod1Remaining: report.lod1Remaining, glbBytes: report.glbBytes, meshes: report.meshes, source: report.source };
       state.centroid = [fp.footprints.reduce((n, f) => n + f.hull[0][0], 0) / fp.footprints.length, fp.footprints.reduce((n, f) => n + f.hull[0][1], 0) / fp.footprints.length];
       state.bbox = report.bbox; state.lod2Buildings = fp.footprints.length; state.footprints = fp.footprints.length;
       const ts = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json');
       ts.tileVisible.addEventListener(() => { state.tileVisible++; });
       ts.tileLoad.addEventListener(() => { state.tileLoad++; scene.requestRender(); });
-      ts.tileFailed.addEventListener((e) => { state.tileFailed++; state.error = 'tileFailed: ' + (e && e.message); });
+      ts.tileFailed.addEventListener((e) => { state.tileFailed++; state.error = 'tileFailed: ' + (e && e.message); showFailure('タイル読み込み失敗: ' + (e && e.message)); });
       ts.allTilesLoaded.addEventListener(() => scene.requestRender());
 
       const polys = fp.footprints.map((f) => polygonFor(Cesium, f.hull));
@@ -79,7 +88,7 @@
         stats() { const s = ts.statistics; return { numberOfTilesWithContentReady: s.numberOfTilesWithContentReady, numberOfTrianglesSelected: s.numberOfTrianglesSelected, geometryByteLength: s.geometryByteLength, selected: ts._selectedTiles ? ts._selectedTiles.length : null }; },
       });
       if (new URLSearchParams(location.search).get('lod2fly') === '1') fly();
-    } catch (e) { state.status = 'error'; state.error = String(e && e.message || e); }
+    } catch (e) { state.status = 'error'; state.error = String(e && e.message || e); showFailure(state.error); }
   }
   window.LC152 = { attach };
 })();

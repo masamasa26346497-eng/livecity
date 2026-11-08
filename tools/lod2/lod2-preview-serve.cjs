@@ -34,9 +34,27 @@ function resolve(urlPath) {
   return null;
 }
 
+// Mission 162: 診断(ファイル存在・37G HTML の attach フック等)。秘密情報・絶対パスは含めない。
+function diagnose() {
+  const lodDir = mounts[0][1];
+  const f = (n) => { const p = path.join(lodDir, n); return fs.existsSync(p) ? { ok: true, bytes: fs.statSync(p).size } : { ok: false }; };
+  const htmlP = path.join(ROOT, 'public', 'mission37g-osaka-24ward-mvp.html');
+  const html = fs.existsSync(htmlP) ? fs.readFileSync(htmlP, 'utf8') : '';
+  let report = null; try { report = JSON.parse(fs.readFileSync(path.join(lodDir, 'report.json'), 'utf8')); } catch (e) { /* none */ }
+  return {
+    server: 'lod2-preview-serve', port, lod2Dir: path.relative(ROOT, lodDir) || lodDir,
+    files: { 'tileset.json': f('tileset.json'), 'lod2.glb': f('lod2.glb'), 'footprints.json': f('footprints.json'), 'report.json': f('report.json') },
+    overlayJs: fs.existsSync(path.join(__dirname, 'lod2-overlay.js')),
+    html37g: { exists: !!html, hasLod2Hook: html.includes('/lod2-preview/overlay.js') && html.includes('LC152.attach') },
+    extRoot: opt('ext-root') ? { ok: fs.existsSync(path.resolve(opt('ext-root'))) } : null,
+    converted: report ? report.converted : null, lod1Remaining: report ? report.lod1Remaining : null,
+  };
+}
+
 const server = http.createServer((req, res) => {
   try {
     const u = new URL(req.url, 'http://localhost');
+    if (u.pathname === '/__lod2/diag.json') { res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(JSON.stringify(diagnose())); return; }
     let f = resolve(u.pathname);
     if (f && fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
     if (!f || !fs.existsSync(f)) { res.writeHead(404); res.end('not found'); return; }
@@ -44,8 +62,12 @@ const server = http.createServer((req, res) => {
     fs.createReadStream(f).pipe(res);
   } catch (e) { res.writeHead(400); res.end('bad request'); }
 });
-server.listen(port, '127.0.0.1', () => {
+server.on('error', (e) => {
+  console.error(e.code === 'EADDRINUSE' ? '[LOD2] ポート ' + port + ' は既に使用中です。別ポートなら --port 8153 を指定するか、既存のサーバを閉じてください' : '[LOD2] サーバエラー: ' + e.message);
+  process.exit(2);
+});
+if (require.main === module) server.listen(port, '127.0.0.1', () => {
   console.log('LOD2 preview (localhost only): http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2fly=1');
   console.log('lod2 dir: ' + mounts[0][1] + (opt('ext-root') ? '  ext-3dtiles: ' + opt('ext-root') : '  (ext-3dtiles 未指定: 既存の内蔵サンプル区のみ)'));
 });
-module.exports = { server, resolve };
+module.exports = { server, resolve, diagnose };
