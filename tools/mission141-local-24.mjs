@@ -58,13 +58,18 @@ export function checkWardDir(dir, ward) {
 }
 
 // Resolve every ward to a servable dir. Pure over the filesystem; never downloads.
-export function resolveWards({ root, dataRoot, wards, only }) {
+export function resolveWards({ root, dataRoot, wards, only, local }) {
   const rows = [], map = {};
   for (const w of wards) {
     if (String(w.wardCode) === EXPO_CODE) continue;
     if (only && !only.includes(w.wardId)) continue;
     let dir = null, origin = null, note = null;
-    const extracted = LAYOUT.discoverWard(dataRoot, w.wardId);
+    // Mission 142: explicit --local <ward>=<dir> (e.g. an existing fukushima / yodogawa output). Validated like any other; never copied or modified.
+    if (local && local[w.wardId]) {
+      const d = path.resolve(local[w.wardId]);
+      if (fs.existsSync(path.join(d, 'tileset.json'))) { dir = d; origin = 'local-input'; } else note = '--local dir has no tileset.json: ' + d;
+    }
+    const extracted = dir ? null : LAYOUT.discoverWard(dataRoot, w.wardId);
     if (extracted && extracted.dir) { dir = extracted.dir; origin = 'private-release'; }
     if (!dir) {
       for (const d of candidateDirs(w.wardId, root)) {
@@ -81,6 +86,43 @@ export function resolveWards({ root, dataRoot, wards, only }) {
   return { rows, map };
 }
 
+// Mission 142: parse "--local a=DIR,b=DIR". Windows drive letters contain ":" but never "=", and "," separates entries, so a path with "," must be passed alone.
+export function parseLocal(str) {
+  const out = {};
+  if (!str) return out;
+  for (const part of String(str).split(',')) {
+    const i = part.indexOf('=');
+    if (i <= 0 || i === part.length - 1) throw new Error('--local expects ward=dir[,ward=dir]; got "' + part + '"');
+    const k = part.slice(0, i).trim();
+    if (!/^[a-z0-9-]+$/.test(k)) throw new Error('--local: bad ward id "' + k + '"');
+    out[k] = part.slice(i + 1).trim().replace(/^"|"$/g, '');
+  }
+  return out;
+}
+// Mission 142: Mission115/45I road+water output (<layersRoot>/<ward>/layers/*.json) for the wards that are served. Presence is reported; nothing is created.
+export function resolveLayers({ layersRoot, map }) {
+  const layers = {}, rows = [];
+  for (const key of Object.keys(map)) {
+    const ward = key.replace(/25$/, '');
+    const d = layersRoot ? path.join(layersRoot, ward, 'layers') : null;
+    const has = (f) => !!d && fs.existsSync(path.join(d, f));
+    const files = ['roads', 'waterways', 'water-surface', 'parks', 'railways'].filter((f) => has(f + '.json'));
+    const ok = (has('layers-report.json') || has('status.json')) && files.length > 0;
+    if (ok) layers[key] = d;
+    rows.push({ ward, key, status: ok ? 'layers' : 'no-layers', files: ok ? files : [] });
+  }
+  return { layers, rows };
+}
+// Windows file handles (AV / indexer) can briefly block rename/rm right after extraction; retry a few times.
+function retry(fn, tries = 8) {
+  for (let i = 0; ; i++) {
+    try { return fn(); } catch (e) {
+      if (i >= tries || !/^(EPERM|EBUSY|EACCES|ENOTEMPTY)$/.test(e.code || '')) throw e;
+      const t = Date.now() + 150 * (i + 1); while (Date.now() < t) { /* brief spin; no sleep API in sync code */ }
+    }
+  }
+}
+
 function gh(args, opts = {}) { return execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 1 << 26, stdio: ['ignore', 'pipe', 'pipe'], ...opts }); }
 
 function fetchWard(w, dataRoot, assets) {
@@ -89,26 +131,29 @@ function fetchWard(w, dataRoot, assets) {
   const work = path.join(dataRoot, w.wardId + '-work');
   const final = path.join(dataRoot, w.wardId + '25');
   if (fs.existsSync(final) && fs.readdirSync(final).length) return 'already present';
-  if (fs.existsSync(work)) return 'stale work dir (delete ' + path.relative(ROOT, work) + ' yourself and re-run)';
+  // Mission 142: a leftover "<ward>-work" can only be a partial download/extract made by this tool (its name is fixed and it sits directly under the
+  // data root), so it is removed and retried instead of making the Windows user delete it by hand. The finished "<ward>25" dir is never touched.
+  if (fs.existsSync(work)) { try { retry(() => fs.rmSync(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })); } catch (e) { return 'stale work dir cannot be removed (' + e.code + '): close programs using ' + work; } }
   fs.mkdirSync(work, { recursive: true });
   const arc = path.join(work, name);
   try {
     gh(['release', 'download', TAG, '-R', DATA_REPO, '-p', name, '-D', work]);
-    const list = execFileSync('tar', ['-tzf', arc], { encoding: 'utf8', maxBuffer: 1 << 28 }).split(/\r?\n/).filter(Boolean);
+    // tar runs with cwd=work and RELATIVE names: a drive letter in -f ("C:\...") is read as host:path by GNU tar, and long absolute paths hit MAX_PATH sooner.
+    const list = execFileSync('tar', ['-tzf', name], { cwd: work, encoding: 'utf8', maxBuffer: 1 << 28 }).split(/\r?\n/).filter(Boolean);
     const bad = unsafeEntries(list);
     if (bad.length) throw new Error('unsafe archive entries (' + bad.length + ')');
     if (!list.some((n) => /(^|\/)tileset\.json$/.test(n))) throw new Error('no tileset.json in archive');
     const ex = path.join(work, 'x'); fs.mkdirSync(ex);
-    execFileSync('tar', ['-xzf', arc, '-C', ex], { stdio: 'ignore', maxBuffer: 1 << 26 });
+    execFileSync('tar', ['-xzf', '../' + name, '-C', '.'], { cwd: ex, stdio: 'ignore', maxBuffer: 1 << 26 });
     fs.rmSync(arc, { force: true });
     const found = LAYOUT.discoverWard(ex, w.wardId) || (LAYOUT.findTilesetDirs(ex).length === 1 ? { dir: LAYOUT.findTilesetDirs(ex)[0] } : null);
     if (!found || !found.dir) throw new Error('cannot locate the ward tileset inside the archive');
     if (fs.existsSync(final)) fs.rmdirSync(final); // succeeds only when empty; never overwrites content
-    fs.renameSync(found.dir, final);
-    fs.rmSync(work, { recursive: true, force: true });
+    retry(() => fs.renameSync(found.dir, final));
+    retry(() => fs.rmSync(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }));
     return 'fetched';
   } catch (e) {
-    fs.rmSync(work, { recursive: true, force: true });
+    try { fs.rmSync(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* reported by the next run */ }
     return 'failed: ' + String(e.message || e).split('\n')[0].slice(0, 140);
   }
 }
@@ -122,6 +167,12 @@ async function main() {
   if (underSync(dataRoot)) throw new Error('data root is inside a OneDrive sync root; refusing (use the default under temp/)');
   const only = opt('wards') ? opt('wards').split(',') : null;
   const wards = loadWards();
+  if (only) { const bad = only.filter((x) => !wards.some((w) => w.wardId === x)); if (bad.length) throw new Error('unknown ward id in --wards: ' + bad.join(',')); }
+  const local = parseLocal(opt('local'));
+  for (const k of Object.keys(local)) if (!wards.some((w) => w.wardId === k)) throw new Error('unknown ward id in --local: ' + k);
+  const layersRoot = opt('layers-root') ? path.resolve(opt('layers-root')) : null;
+  if (layersRoot && !fs.existsSync(layersRoot)) throw new Error('--layers-root not found: ' + layersRoot);
+  if (dataRoot.length > 120) console.warn('[141] data root path is ' + dataRoot.length + ' chars; Windows MAX_PATH (260) can break extraction. Use a short --root such as C:\\lc141.');
   fs.mkdirSync(dataRoot, { recursive: true });
 
   if (!a.includes('--no-fetch') && !a.includes('--check-only')) {
@@ -140,20 +191,25 @@ async function main() {
     }
   }
 
-  const { rows, map } = resolveWards({ root: ROOT, dataRoot, wards, only });
+  const { rows, map } = resolveWards({ root: ROOT, dataRoot, wards, only, local });
   const served = rows.filter((r) => r.status === 'served');
+  const lay = resolveLayers({ layersRoot, map });
   console.log('[141] 3D delivered (local, private): ' + served.length + '/' + rows.length + ' wards, ' + served.reduce((s, r) => s + r.buildings, 0) + ' buildings');
   for (const r of rows) console.log('  ' + r.wardCode + ' ' + r.ward + ' ' + (r.status === 'served' ? r.buildings + ' (' + r.origin + ')' : 'NOT DELIVERED: ' + r.note));
+  console.log('[141] roads/rivers (Mission115 output, local only): ' + (layersRoot ? Object.keys(lay.layers).length + '/' + lay.rows.length + ' served wards have layers' : 'no --layers-root given -> none') );
+  for (const r of lay.rows) if (layersRoot) console.log('  ' + r.ward + ' ' + (r.status === 'layers' ? r.files.join('+') : 'no road/river data (nothing is drawn, nothing invented)'));
+  const missing = rows.filter((r) => r.status !== 'served').map((r) => r.ward);
+  if (missing.length) console.log('[141] NOT DELIVERED (' + missing.length + '): ' + missing.join(', '));
   console.log('[141] note: coverage is per-ward converted data, not proof of whole-ward completeness; roads/rivers are separate and not implied.');
   if (!served.length) throw new Error('nothing to serve');
   if (a.includes('--check-only')) return;
-  const srv = makeServer({ publicDir: path.join(ROOT, 'public'), wards: map });
+  const srv = makeServer({ publicDir: path.join(ROOT, 'public'), wards: map, layers: lay.layers });
   srv.on('error', (e) => { console.error('FAILED server: ' + e.message + (e.code === 'EADDRINUSE' ? ' (try --port 8138)' : '')); process.exit(1); });
   srv.listen(port, HOST, () => {
     console.log('[141] serving read-only on loopback only. Ctrl+C to stop.');
     console.log('[141] open: http://' + HOST + ':' + port + '/' + PAGE + '?nobuiltin=1&ext45=1   (pick a ward in the left "3D buildings ward" selector)');
   });
-  process.on('SIGINT', () => { srv.close(); process.exit(0); });
+  process.on('SIGINT', () => { console.log('\n[141] stopped. ' + JSON.stringify(srv.lcStats)); srv.close(); process.exit(0); });
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

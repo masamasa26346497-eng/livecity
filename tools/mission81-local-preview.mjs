@@ -71,10 +71,14 @@ export function validateOutput(dir, ward) {
 
 // Tile prefix /ext-3dtiles/<name>/... -> <outDir>/..., everything else -> public/. Read-only, loopback.
 // Mission 82: `wards` = { <name>: <outDir> } serves many wards (/ext-3dtiles/<name>/...) plus a generated /ext-3dtiles/index.json (used by ?ext45=1).
-export function makeServer({ publicDir, outDir, name, wards }) {
+// Mission 142: `layers` = { <name>: <dir> } optional per-ward road/water layer dirs (Mission115/45I output). Served ONLY as /ext-3dtiles/<name>/layers/<known json>,
+//   only for registered names, and listed in index.json layersWards so the page asks just those wards. A missing file is a real 404 (never a fake empty 200).
+const LAYER_FILE = /^(roads|waterways|water-surface|parks|railways|labels|status|layers-report)\.json$/;
+export function makeServer({ publicDir, outDir, name, wards, layers }) {
   const pub = path.resolve(publicDir);
   const map = wards ? Object.fromEntries(Object.entries(wards).map(([k, v]) => [k, path.resolve(v)])) : { [name]: path.resolve(outDir) };
-  const indexBody = JSON.stringify({ verified: false, vintage: 2025, wards: Object.keys(map).sort().map((k) => ({ ward: k })) });
+  const lmap = layers ? Object.fromEntries(Object.entries(layers).filter(([k]) => Object.prototype.hasOwnProperty.call(map, k)).map(([k, v]) => [k, path.resolve(v)])) : {};
+  const indexBody = JSON.stringify({ verified: false, vintage: 2025, wards: Object.keys(map).sort().map((k) => ({ ward: k })), layersWards: Object.keys(lmap).sort().map((k) => ({ ward: k })) });
   const stats = { req: 0, ok: 0, nf: 0, glb200: 0, tileset200: 0 };
   const srv = http.createServer((req, res) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('method not allowed'); }
@@ -83,7 +87,9 @@ export function makeServer({ publicDir, outDir, name, wards }) {
     let file;
     if (u === '/ext-3dtiles/index.json') { stats.ok++; res.writeHead(200, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' }); return res.end(req.method === 'HEAD' ? undefined : indexBody); }
     const m = /^\/ext-3dtiles\/([a-z0-9-]+)\/(.*)$/.exec(u);
-    if (m && Object.prototype.hasOwnProperty.call(map, m[1])) file = resolveUnder(map[m[1]], m[2]);
+    const lm = /^\/ext-3dtiles\/([a-z0-9-]+)\/layers\/([^/]+)$/.exec(u);
+    if (lm && Object.prototype.hasOwnProperty.call(lmap, lm[1])) file = LAYER_FILE.test(lm[2]) ? resolveUnder(lmap[lm[1]], lm[2]) : null;
+    else if (m && Object.prototype.hasOwnProperty.call(map, m[1])) file = resolveUnder(map[m[1]], m[2]);
     else if (u.startsWith('/ext-3dtiles/')) file = null; // only registered wards are served
     else file = resolveUnder(pub, u === '/' ? '/mission37g-osaka-24ward-mvp.html' : u);
     if (!file) { stats.nf++; res.writeHead(404); return res.end('not found'); }
