@@ -106,7 +106,9 @@ export const LAYER_NAMES = ['roads', 'waterways', 'water-surface', 'parks', 'rai
 export function countLayerFile(file) {
   try {
     const j = JSON.parse(fs.readFileSync(file, 'utf8'));
-    return { parsed: true, features: Array.isArray(j.features) ? j.features.length : 0 };
+    const fe = Array.isArray(j.features) ? j.features : [];
+    const areas = fe.filter((f) => f && f.kind === 'area').length;   // Mission 144: real water/park polygons travel inside waterways/parks as kind:'area'
+    return { parsed: true, features: fe.length, areas, lines: fe.length - areas };
   } catch (e) { return { parsed: false, features: 0 }; }
 }
 export function resolveLayers({ layersRoot, map }) {
@@ -126,7 +128,7 @@ export function resolveLayers({ layersRoot, map }) {
     let note = ok ? '' : !d ? 'no layers root' : Object.keys(counts).length ? 'layer files empty or unparseable' : 'no road/river data for this ward';
     if (bad.length) note += (note ? '; ' : '') + 'unparseable: ' + bad.join(',');
     const has = (f) => !!counts[f] && counts[f].features > 0;
-    rows.push({ ward, key, status: ok ? 'layers' : 'no-layers', files, counts, note, roads: has('roads'), waterways: has('waterways'), waterSurface: has('water-surface') });
+    rows.push({ ward, key, status: ok ? 'layers' : 'no-layers', files, counts, note, roads: has('roads'), waterways: has('waterways'), waterSurface: has('water-surface'), waterAreas: has('waterways') ? counts.waterways.areas : 0 });
   }
   return { layers, rows };
 }
@@ -256,6 +258,8 @@ async function main() {
   if (layersRoot) {
     const n = (k) => lay.rows.filter((r) => r[k]).length;
     console.log('[143] data present: roads ' + n('roads') + ' wards / waterways ' + n('waterways') + ' wards / water-surface ' + n('waterSurface') + ' wards (browser rendering NOT verified by this tool)');
+    console.log('[144] water polygons inside waterways.json (drawn by the waterways layer; separate from the sea file): ' + lay.rows.filter((r) => r.waterAreas > 0).length + ' wards. water-surface.json is a separate citywide sea layer: see `node tools/mission144-water-surface.cjs --layers-root <dir>`');
+    for (const r of lay.rows) console.log('  [144] ' + r.ward + ': ' + (r.roads ? 'roads ready' : 'roads absent') + ' / ' + (r.waterways ? 'waterways ready' : 'waterways absent') + ' / ' + (r.waterSurface ? 'water-surface ready' : 'water-surface absent') + ' / browser rendered unverified');
     for (const r of lay.rows) console.log('  ' + r.ward + ' ' + (r.status === 'layers' ? LAYER_NAMES.filter((f) => r.counts[f]).map((f) => f + '=' + r.counts[f].features).join(' ') : 'NO LAYERS (' + r.note + '; nothing drawn, nothing invented)'));
   }
   const missing = rows.filter((r) => r.status !== 'served').map((r) => r.ward);

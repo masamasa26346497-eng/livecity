@@ -3082,6 +3082,15 @@
         viewer.camera.lookAt(toCart(x, z, h), new Cesium.HeadingPitchRange(Cesium.Math.toRadians(headingDeg || 0), Cesium.Math.toRadians(pitchDeg), range));
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
+      // 144: 読み取り専用。ローカル点(x,z)の経緯度・地表高・画面座標・pickPosition と、区別ベクトルレイヤーの Primitive 数。座標も描画も変えない。
+      probe144(x, z) {
+        const cg = Cesium.Cartographic.fromCartesian(toCart(x, z, 0)), w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(x, z, 0));
+        let ground = null; try { ground = scene.globe.getHeight(cg); } catch (e) { /* noop */ }
+        let rt = null; if (w) { try { const pp = scene.pickPosition(w); if (pp) { const g2 = Cesium.Cartographic.fromCartesian(pp); rt = { lon: Cesium.Math.toDegrees(g2.longitude), lat: Cesium.Math.toDegrees(g2.latitude), h: g2.height }; } } catch (e) { /* noop */ } }
+        return { lon: Cesium.Math.toDegrees(cg.longitude), lat: Cesium.Math.toDegrees(cg.latitude), ellipsoidH: cg.height, globeGroundH: ground, screen: w ? { x: w.x, y: w.y } : null, pickPosition: rt,
+          layerHeightsM: LAYER_H, depthTestAgainstTerrain: scene.globe.depthTestAgainstTerrain, terrainProvider: scene.globe.terrainProvider && scene.globe.terrainProvider.constructor.name,
+          scenePrimitives: scene.primitives.length, wardVecLayers: wardVec.map((v) => ({ id: v.id, count: v.count })), wardVecState: stats.wardVec && stats.wardVec.state };
+      },
       setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
       // 138: 実フットプリント建物（?fp=1）の実クリック候補。屋根中心を Cesium の投影 API で画面座標にし、scene.pick が同じ ID を返す点だけを返す（選択処理は呼ばない）。
       fpInfo() { return { prims: fpCur ? fpCur.layer.primitives.length : 0, shown: fpCur ? fpCur.layer.primitives.filter((p) => !p.isDestroyed() && p.show).length : 0, scenePrims: scene.primitives.length, ward: fpCur ? fpCur.wardId : null }; },
