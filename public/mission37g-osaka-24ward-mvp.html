@@ -1919,6 +1919,45 @@
       address: null, openingHours: null, phone: null, website: null, source: 'OpenStreetMap (Overpass API)', license: 'ODbL 1.0', attribution: '© OpenStreetMap contributors',
       wardName: s.wardName, wardId: s.wardId, station: s };
   }
+  // 147: 運営会社ごとの固定色。キーは tools/build-station-index.js の OPERATORS.id と一致させる（駅名からは決めない）。
+  //   判定できなかった駅は灰色「不明」、OSM に会社名はあるが上記以外は「その他」。複数事業者の駅は同心リング（外側＝2社目以降）で表す。
+  const OP_COLOR = {
+    metro: '#1f8ecd', newtram: '#5cc3ea', jr: '#2e9e5b', shinkansen: '#146b3a', 'jr-freight': '#7d8a95',
+    hankyu: '#a8432f', hanshin: '#f0a020', kintetsu: '#d93a55', nankai: '#2a4fb8', keihan: '#13a7b5',
+    hankai: '#a9783f', monorail: '#8e63c9', kitakyu: '#e86aa6', other: '#c6a24a', unknown: '#8a949e',
+  };
+  const OP_ORDER = ['metro', 'newtram', 'jr', 'shinkansen', 'hankyu', 'hanshin', 'kintetsu', 'nankai', 'keihan', 'hankai', 'monorail', 'kitakyu', 'other', 'unknown'];
+  const OP_LABEL = { other: 'その他の事業者', unknown: '不明／未取得' };
+  const opKey = (o) => (OP_COLOR[o.id] ? o.id : 'other');
+  /** 駅の事業者→[{key,color,label}]（根拠のあるものだけ。無ければ unknown 1 件）。 */
+  function stationOpColors(s) {
+    const seen = new Set(), out = [];
+    for (const o of (s.operators || [])) { const k = opKey(o); if (seen.has(k)) continue; seen.add(k); out.push({ key: k, color: OP_COLOR[k], label: k === 'other' ? o.label : o.label }); }
+    if (!out.length) out.push({ key: 'unknown', color: OP_COLOR.unknown, label: stationData.connected ? '不明' : '未取得' });
+    return out;
+  }
+  function renderStationLegend(list) {
+    let box = document.getElementById('lc-st-legend');
+    if (!box) {
+      box = document.createElement('div'); box.id = 'lc-st-legend';
+      box.style.cssText = 'position:absolute;z-index:15;right:14px;bottom:152px;max-width:210px;padding:7px 9px;border-radius:8px;background:rgba(10,20,36,.88);color:#dbe8ff;font:11px/1.5 sans-serif;border:1px solid rgba(80,160,255,.25)';
+      document.body.appendChild(box);
+    }
+    const cnt = {}; for (const s of list) for (const c of stationOpColors(s)) cnt[c.key] = (cnt[c.key] || 0) + 1;
+    box.textContent = '';
+    const h = document.createElement('div'); h.textContent = '駅の運営会社（色）'; h.style.cssText = 'font-weight:700;margin-bottom:3px'; box.appendChild(h);
+    for (const k of OP_ORDER) {
+      if (!cnt[k]) continue;
+      const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:6px';
+      const sw = document.createElement('span'); sw.style.cssText = 'width:10px;height:10px;border-radius:50%;flex:none;background:' + OP_COLOR[k];
+      const lb = (list.find((s) => (s.operators || []).some((o) => opKey(o) === k && OP_COLOR[o.id])) || {}).operators;
+      const name = OP_LABEL[k] || ((lb || []).find((o) => o.id === k) || {}).label || k;
+      const t = document.createElement('span'); t.textContent = name + ' ' + cnt[k]; row.append(sw, t); box.appendChild(row);
+    }
+    const note = document.createElement('div'); note.style.cssText = 'margin-top:3px;color:#9fb3d1;font-size:10px';
+    note.textContent = '二重リング＝複数社の乗換駅。色だけでなく駅名の下に会社名を併記'; box.appendChild(note);
+    return box;
+  }
   function stationOperatorText(s) {
     if (s.operators && s.operators.length) return s.operators.map((o) => o.label).join('・');
     return stationData.connected ? '不明（OSM に運営会社の記載なし）' : '未取得（路線データ未接続）';
@@ -1940,10 +1979,15 @@
       for (const s of stationData.list) {
         const rec = stationRec(s), transfer = (s.operators || []).length >= 2;
         const far = transfer ? 14000 : 6500;   // 乗換駅（複数事業者）は遠くから、それ以外は中景から
-        this.pts.add({ position: toCart(s.x, s.z, 8), pixelSize: transfer ? 9 : 7, color: Cesium.Color.fromCssColorString('#c8b6ff'),
-          outlineColor: Cesium.Color.fromCssColorString('#050a18').withAlpha(0.6), outlineWidth: 1, disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far * 1.4), id: { poi: rec } });
-        this.labels.add({ position: toCart(s.x, s.z, 8), text: '◉ ' + s.name, font: '600 13px sans-serif', fillColor: Cesium.Color.fromCssColorString('#e6dcff'),
+        const oc = stationOpColors(s), nOp = oc.length;
+        // 外側のリングから先に積む（最後に足した 1 社目が最前面の中心円）。単一事業者は 1 点のみ。
+        for (let i = nOp - 1; i >= 0; i--) {
+          this.pts.add({ position: toCart(s.x, s.z, 8), pixelSize: (transfer ? 9 : 8) + i * 5, color: Cesium.Color.fromCssColorString(oc[i].color),
+            outlineColor: Cesium.Color.fromCssColorString('#050a18').withAlpha(0.7), outlineWidth: 1, disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, far * 1.4), id: { poi: rec } });
+        }
+        const opText = oc.map((c) => c.label).join('・');
+        this.labels.add({ position: toCart(s.x, s.z, 8), text: '◉ ' + s.name + '\n' + opText, font: '600 13px sans-serif', fillColor: Cesium.Color.fromCssColorString(oc[0].color).brighten(0.45, new Cesium.Color()),
           outlineColor: Cesium.Color.fromCssColorString('#050a18'), outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
           showBackground: true, backgroundColor: Cesium.Color.fromCssColorString('rgba(8,14,26,0.80)'), backgroundPadding: new Cesium.Cartesian2(6, 3),
           pixelOffset: new Cesium.Cartesian2(0, -12), verticalOrigin: Cesium.VerticalOrigin.BOTTOM, disableDepthTestDistance: Number.POSITIVE_INFINITY,
@@ -1951,10 +1995,16 @@
       }
       stats.stations145 = { total: stationData.list.length, operatorDataConnected: stationData.connected, origin: stationData.origin,
         withOperator: stationData.list.filter((s) => s.operators && s.operators.length).length };
+      const lg = renderStationLegend(stationData.list); this.legend = lg;
+      const byKey = {}; for (const s of stationData.list) { const ks = stationOpColors(s).map((c) => c.key); for (const k of ks) byKey[k] = (byKey[k] || 0) + 1; }
+      stats.stations145.operatorColors = { byOperator: byKey, transferStations: stationData.list.filter((s) => stationOpColors(s).length >= 2).length,
+        confirmedByTag: stationData.list.filter((s) => (s.operators || []).some((o) => o.basis === 'osm-operator-tag')).length,
+        inferredFromNetworkOrLine: stationData.list.filter((s) => (s.operators || []).length && !(s.operators || []).some((o) => o.basis === 'osm-operator-tag')).length,
+        unknown: stationData.list.filter((s) => !(s.operators || []).length).length };
       searchIndex = null;
       return { count: stationData.list.length };
     },
-    applyVisible(on) { if (this.pts) this.pts.show = on; if (this.labels) this.labels.show = on; },
+    applyVisible(on) { if (this.pts) this.pts.show = on; if (this.labels) this.labels.show = on; if (this.legend) this.legend.style.display = on ? '' : 'none'; },
   };
   LayerRegistry.register(stationLayer);
 
@@ -1970,8 +2020,11 @@
     id: 'towns24', label: '町名・町丁目名（24区）', swatch: '#eef1f3', defaultOn: true,
     hint: 'e-Stat 小地域の公式名称。遠景=区名のみ / 中景=町名 / 近景=町丁目名。住吉区は町丁目レイヤー（境界つき）を使用',
     async mount() {
-      const r = await fetch('mission145-data/towns-24.json');
-      if (!r.ok) throw new Error('towns-24.json 未接続（生成: node tools/mission145-build-towns.cjs --input <小地域GeoJSON>）');
+      // 147: localhost は towns-24.local.json（ランチャーが e-Stat ZIP から生成）を優先。
+      let r = null;
+      if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { try { r = await fetch('mission145-data/towns-24.local.json'); } catch (e) { r = null; } }
+      if (!r || !r.ok) r = await fetch('mission145-data/towns-24.json');
+      if (!r.ok) throw new Error('towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）');
       const j = await r.json();
       if (!j || !Array.isArray(j.towns)) throw new Error('towns-24.json の形式が不正です');
       towns24.data = j;

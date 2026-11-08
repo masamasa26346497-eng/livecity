@@ -265,6 +265,36 @@ async function main() {
     } catch (e) { console.warn('[145] station build skipped: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 160)); }
   }
 
+  // Mission 147: town / chome labels for all 24 wards -> public/mission145-data/towns-24.local.json (gitignored, new file only).
+  //   Source = official e-Stat 2020 small-area boundary ZIP (free, CC BY 4.0). Looked up in this repo, then next to the old pipeline
+  //   (<pipeline>/data/raw/osaka-city/boundaries). --fetch-towns downloads it with the existing tools/download/estat-town-boundaries.js
+  //   (public e-Stat URL, no key). --no-towns skips. Nothing is invented: wards missing from the ZIP are listed.
+  if (!a.includes('--no-towns') && !a.includes('--check-only')) {
+    try {
+      const ZIPN = path.join('data', 'raw', 'osaka-city', 'boundaries', 'estat-2020-town-boundaries-osaka.zip');
+      const outTw = path.join(ROOT, 'public', 'mission145-data', 'towns-24.local.json');
+      const srcTw = opt('src') ? path.resolve(opt('src')) : discoverOldSource();
+      const cands = [path.join(ROOT, ZIPN), opt('towns-zip') && path.resolve(opt('towns-zip')), srcTw && path.resolve(srcTw, '..', '..', '..', ZIPN)].filter(Boolean);
+      let zip = cands.find((p) => fs.existsSync(p));
+      if (fs.existsSync(outTw) && !a.includes('--force-towns')) console.log('[147] towns-24.local.json already present (use --force-towns to rebuild)');
+      else {
+        if (!zip && a.includes('--fetch-towns')) {
+          console.log('[147] downloading the official e-Stat boundary ZIP (public, free)...');
+          execFileSync(process.execPath, [path.join(ROOT, 'tools', 'download', 'estat-town-boundaries.js')], { encoding: 'utf8', stdio: 'inherit' });
+          zip = cands.find((p) => fs.existsSync(p));
+        }
+        if (!zip) console.log('[147] e-Stat town-boundary ZIP not found: only Sumiyoshi town labels are available. Add --fetch-towns (downloads it) or --towns-zip "<path>".');
+        else {
+          const args = [path.join(ROOT, 'tools', 'mission145-build-towns.cjs'), '--zip', zip, '--out', outTw]; if (fs.existsSync(outTw)) args.push('--force');
+          const txt = execFileSync(process.execPath, args, { encoding: 'utf8', maxBuffer: 1 << 26 });
+          const o = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+          console.log('[147] towns: ' + o.towns + ' units in ' + o.wardsWithTowns + ' wards (' + zip + ')');
+          const miss = txt.split('\n').find((l) => l.startsWith('wards with NO towns')); if (miss) console.log('[147] ' + miss);
+        }
+      }
+    } catch (e) { console.warn('[147] town build skipped: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 200)); }
+  }
+
   const { rows, map } = resolveWards({ root: ROOT, dataRoot, wards, only, local });
   const served = rows.filter((r) => r.status === 'served');
   const lay = resolveLayers({ layersRoot, map });

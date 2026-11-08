@@ -110,11 +110,25 @@ async function build({ geojson, wards, wardPolys }) {
 async function main() {
   const a = process.argv.slice(2);
   const opt = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : undefined; };
-  if (!opt('input')) { console.error('ERROR: --input <小地域GeoJSON> required'); process.exit(2); }
+  // Mission 147: --zip <e-Stat shapefile ZIP> (saved by tools/download/estat-town-boundaries.js) is read directly; no GeoJSON needed.
+  const zipPath = opt('zip') || (!opt('input') ? path.join(ROOT, 'data/raw/osaka-city/boundaries/estat-2020-town-boundaries-osaka.zip') : null);
+  if (!opt('input') && !(zipPath && fs.existsSync(zipPath))) {
+    console.error('ERROR: --input <GeoJSON> or --zip <e-Stat ZIP> required. Official free ZIP (CC BY 4.0): node tools/download/estat-town-boundaries.js'); process.exit(2);
+  }
   const out = path.resolve(opt('out') || path.join(ROOT, 'public/mission145-data/towns-24.json'));
   if (fs.existsSync(out) && !a.includes('--force')) { console.error('ERROR: ' + out + ' exists; pass --force to regenerate'); process.exit(2); }
   const wards = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/mission37g-data/osaka-24-wards.json'), 'utf8')).wards;
-  const j = await build({ geojson: JSON.parse(fs.readFileSync(path.resolve(opt('input')), 'utf8')), wards, wardPolys: true });
+  let geojson;
+  if (opt('input')) geojson = JSON.parse(fs.readFileSync(path.resolve(opt('input')), 'utf8'));
+  else {
+    const Z = await import(path.join(ROOT, 'tools/lib/zip-reader.js')), S = await import(path.join(ROOT, 'tools/lib/shapefile-polygon.js'));
+    const entries = Z.readZipEntries(zipPath);
+    const find = (ext) => { const c = entries.filter((e) => e.name.toLowerCase().endsWith(ext)); return c.find((e) => /(^|\/)r2ka27\./i.test(e.name)) || c[0]; };
+    const shp = find('.shp'), dbf = find('.dbf');
+    if (!shp || !dbf) { console.error('ERROR: no .shp/.dbf in ' + zipPath); process.exit(2); }
+    geojson = S.shapefileToFeatureCollection(Z.extractEntry(zipPath, shp), Z.extractEntry(zipPath, dbf), { encoding: 'shift_jis' });
+  }
+  const j = await build({ geojson, wards, wardPolys: true });
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, JSON.stringify(j));
   console.log(JSON.stringify(Object.assign({ out }, j.counts), null, 1));
