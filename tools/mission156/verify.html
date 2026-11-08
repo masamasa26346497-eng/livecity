@@ -28,7 +28,15 @@
     });
     out.tilesLoaded = ts.tilesLoaded;
     out.tilesetReady = ts.ready;
-    out.drawCommands = viewer.scene.frameState ? viewer.scene.frameState.commandList.length : null;
+    // Mission 158: a single frame's commandList can be empty (Kita, Mission 157). Take the max over ~40 rendered frames,
+    // and also report tileset statistics (commands the tileset itself issued, visible tiles).
+    let maxCmd = 0;
+    const rm = viewer.scene.postRender.addEventListener(() => { const l = viewer.scene.frameState.commandList.length; if (l > maxCmd) maxCmd = l; });
+    for (let i = 0; i < 40; i++) { viewer.scene.render(); await new Promise((r) => setTimeout(r, 50)); }
+    rm();
+    out.drawCommands = Math.max(maxCmd, ts.statistics ? ts.statistics.numberOfCommands : 0);
+    out.numberOfCommands = ts.statistics ? ts.statistics.numberOfCommands : null;
+    out.visibleTiles = ts.statistics ? ts.statistics.selected : null;
     out.gl = !!viewer.scene.context && !!viewer.scene.context._gl;
     out.status = 'ok';
   } catch (e) { out.status = 'error'; out.error = String(e && e.message || e); }

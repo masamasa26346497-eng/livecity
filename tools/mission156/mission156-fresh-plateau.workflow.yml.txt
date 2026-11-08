@@ -11,6 +11,9 @@ on:
       wards:
         description: 'comma separated ward ids, or "all"'
         default: 'sumiyoshi'
+      store_write:
+        description: 'write tiles to the private Release (needs secret LIVECITY_3D_DATA_TOKEN)'
+        default: 'false'
       chrome_verify:
         description: 'run headless Chrome + Cesium check'
         default: 'true'
@@ -61,12 +64,19 @@ jobs:
         run: node tools/mission156-run-all.mjs --wards "${{ matrix.ward }}" --max-mb 1500 --budget-mb 1500
       - name: Serve locally, HTTP 200 + Chrome/Cesium
         run: node tools/mission156-verify-served.mjs --dir "temp/mission156/${{ matrix.ward }}/tiles" --ward "${{ matrix.ward }}" ${{ inputs.chrome_verify == 'true' && '--chrome' || '' }} --record
+      # Mission 158: store in the PRIVATE repo's Release (tag m158-<run_id>), never as an artifact (this repo is public).
+      # Needs repo secret LIVECITY_3D_DATA_TOKEN (fine-grained PAT, only livecity-3d-data, Contents: read+write). Without it: dry-run only.
+      - name: Private store (dry-run unless secret present AND store_write=true)
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          node tools/mission158-private-release.mjs auth-test || true
+          if [ "${{ inputs.store_write }}" = "true" ] && [ -n "$LIVECITY_3D_DATA_TOKEN" ]; then W="--confirm-write"; else W=""; fi
+          node tools/mission158-private-release.mjs put --ward "${{ matrix.ward }}" --dir "temp/mission156/${{ matrix.ward }}/tiles" --tag "m158-${{ github.run_id }}" $W
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mission156-${{ matrix.ward }}
-          path: |
-            temp/mission156/${{ matrix.ward }}/tiles
-            data/reports/mission156
+          name: mission156-${{ matrix.ward }}-reports
+          path: data/reports/mission156   # reports only (small JSON); NO tiles in a public artifact
           retention-days: 3
           if-no-files-found: warn

@@ -9,6 +9,7 @@ import path from 'node:path';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { strictBrowserOk } from './mission158/lib.mjs';
 
 const a = process.argv.slice(2);
 const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
@@ -81,7 +82,8 @@ if (a.includes('--chrome')) {
 }
 server.close();
 const b = result.browser;
-result.browserOk = !!(b && b.status === 'ok' && b.gl && (b.jsErrors || []).length === 0 && b.tilesLoaded);
+// Mission 158: strict — drawCommands must be > 0 (Kita had drawCommands=0 yet was recorded complete in Mission 157)
+result.browserOk = strictBrowserOk(b);
 console.log(JSON.stringify(result, null, 1));
 
 if (a.includes('--record') && ward) {
