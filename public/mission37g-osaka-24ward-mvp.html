@@ -460,6 +460,7 @@
 <script src="mission45p-areacull.js"></script>
 <script src="mission45l-interaction.js"></script>
 <script src="mission45y-gfp.js"></script>
+<script src="mission138-footprints.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
 (function () {
@@ -999,6 +1000,61 @@
       stats.publishedWards = publishedWards.slice();
     } catch (e) { /* published.json が無い/壊れている: 追加しない */ }
   }
+  // 138: ?fp=1（localhost 限定）。3D Tiles が無い（または部分配信だけの）区を、旧 Live City の建物タイル（実フットプリント）の押出しで表示する。
+  //   フットプリントの置き場: 住吉区 = public/map-data/osaka-city/buildings/osaka-sumiyoshi/（Git 管理・52 tile・35,031 棟）、
+  //   他区 = /ext-3dtiles/<wardId>/footprints/（tools/mission138-serve-local.cjs --footprints-root <旧 buildings dir>）。無ければ従来表示のまま。
+  //   外部変換の 3D Tiles がある区はそちらを優先し、フットプリントは使わない（二重表示しない）。公開ホストでは無効。
+  const FP_ON = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('fp') === '1';
+  let fpCur = null;   // { layer, ctrl, wardCode, wardId, ward }
+  const fpBaseOf = (wardId) => (wardId === 'sumiyoshi' ? 'map-data/osaka-city/buildings/osaka-sumiyoshi/' : 'ext-3dtiles/' + wardId + '/footprints/');
+  stats.fp = { enabled: FP_ON, state: 'none', ward: null, wardCode: null, declared: null, tiles: 0, loadedTiles: 0, failedTiles: 0, buildings: 0, skipped: 0, byWard: {}, loadMs: null, mountsTotal: 0, dropsTotal: 0 };
+  function fpUnmount() {
+    if (!fpCur) return;
+    const c = fpCur; fpCur = null;
+    try { c.ctrl.abort(); } catch (e) { /* noop */ }
+    c.layer.destroy(); stats.fp.dropsTotal++; stats.fp.state = 'none'; stats.fp.ward = null; stats.fp.wardCode = null; stats.fp.buildings = 0;
+  }
+  // 戻り値: null = この区にフットプリントは無い（従来の分岐へ）/ true|false = フットプリントで処理した
+  async function mountFootprints(wardCode, gen, metas) {
+    let w = null; try { w = (await WardUI.load()).wards.find((x) => x.wardCode === wardCode); } catch (e) { /* 区一覧なし */ }
+    if (!w || gen !== bldgGen) return gen !== bldgGen ? false : null;
+    const base = fpBaseOf(w.wardId);
+    let man = null;
+    try {
+      const r = await fetch(base + 'manifest.json', { cache: 'no-store' });
+      if (!r.ok) { stats.fp.byWard[w.wardId] = 'missing (HTTP ' + r.status + ')'; return null; }
+      man = await r.json();
+    } catch (e) { stats.fp.byWard[w.wardId] = 'missing (' + String(e && e.message || e) + ')'; return null; }
+    if (gen !== bldgGen) return false;
+    // 既存の部分配信サンプル（中央区など）より少ないフットプリントでは置き換えない（劣化させない）
+    const sampleN = metas.reduce((a, m) => a + (m.report.totals.buildings | 0), 0);
+    if (!(man.totalBuildings > sampleN)) { stats.fp.byWard[w.wardId] = 'not-used (declared ' + man.totalBuildings + ' <= sample ' + sampleN + ')'; return null; }
+    const ctrl = new AbortController();
+    const layer = LC138.create({ Cesium, scene, toCart, base, isStale: () => gen !== bldgGen, signal: ctrl.signal, accent: C.accent,
+      onProgress: (s) => { stats.fp.loadedTiles = s.loadedTiles; stats.fp.buildings = s.buildings; $('hs-bldg').textContent = fmt(s.buildings); scene.requestRender(); } });
+    fpCur = { layer, ctrl, wardCode, wardId: w.wardId, ward: w.wardName };
+    Object.assign(stats.fp, { state: 'loading', ward: w.wardId, wardCode, declared: man.totalBuildings, tiles: (man.tiles || []).length });
+    stats.buildingState = 'loading'; bldgWard = wardCode; stats.buildingWard = wardCode; syncBldgSelect();
+    const t0 = performance.now();
+    try {
+      await layer.load();
+    } catch (e) {
+      if (gen === bldgGen) { stats.buildingState = 'error'; stats.fp.state = 'error'; bldgWard = null; fail('footprints ' + w.wardId, e); syncBldgSelect(); }
+      return false;
+    }
+    if (gen !== bldgGen) { layer.destroy(); if (fpCur && fpCur.layer === layer) fpCur = null; return false; }
+    const s = layer.stats;
+    Object.assign(stats.fp, { state: s.state, loadedTiles: s.loadedTiles, failedTiles: s.failedTiles, buildings: s.buildings, skipped: s.skipped, sentinelHeights: s.sentinelHeights, loadMs: Math.round(performance.now() - t0) });
+    $('hs-bldg').textContent = fmt(s.buildings);
+    if (s.state !== 'ready') { stats.buildingState = 'error'; fail('footprints ' + w.wardId, new Error(s.error || s.state)); syncBldgSelect(); scene.requestRender(); return false; }
+    layer.setShow((LayerRegistry.get('buildings') || { visible: true }).visible !== false);
+    stats.tilesetBuildings = s.buildings; stats.buildingState = 'ready'; stats.buildingFirstMs = stats.fp.loadMs; stats.fp.mountsTotal++;
+    stats.lastBuildingMountMs = stats.fp.loadMs;
+    syncBldgSelect(); scene.requestRender();
+    // 道路・河川: 区別レイヤー（Mission115 出力を tools/mission135 のアダプターで変換したもの、または 40G の出力）。無ければ従来どおり何も描かない
+    mountWardVec([{ external: true, mission115: true, id: 'ext-' + w.wardId, base: 'ext-3dtiles/' + w.wardId + '/', source: { wardCode } }], gen);
+    return true;
+  }
   // 39B: 3D 建物は「選択された区」のぶんだけ mount する。起動時は 0 区（区境界・地名・道路・施設のみ）。
   //   source.json / build-report.json（各 1〜2KB）だけ最初に読み、COVERAGE と区コードを得る。tileset.json と GLB は区選択時に初めて取得する。
   //   区を切り替える・「表示しない」を選ぶと、前の区の tileset は primitives.remove（destroy）で GPU/CPU 資源ごと解放する。
@@ -1204,7 +1260,8 @@
     const wid = String(m.id || '').replace(/^ext-/, '');
     if (vecWards.size && !vecWards.has(wid)) { if (gen === bldgGen) stats.wardVec = { ward: wc, state: 'no-layers', layers: {} }; return; }
     try {
-      const probe = await fetch(base + 'layers-report.json');
+      let probe = await fetch(base + 'layers-report.json');
+      if (!probe.ok && m.mission115) probe = await fetch(base + 'status.json');   // 138: Mission115 アダプター出力は status.json を持つ
       if (!probe.ok) { if (gen === bldgGen) stats.wardVec = { ward: wc, state: 'no-layers', layers: {} }; return; }   // 未生成: 道路・河川は出さない
     } catch (e) { return; }
     if (gen !== bldgGen) return;
@@ -1213,13 +1270,23 @@
     const set = await buildVecSet(wc, base, null, () => gen !== bldgGen);
     if (!set) return;   // 古い要求: 作った分は破棄済み
     stats.wardVec.clip = set.clipKind;
-    for (const l of set.layers) stats.wardVec.layers[l.id] = l.count;
-    wardVec = set.layers; wardVecRelease = set.release; stats.wardVec.state = 'ready'; scene.requestRender();
+    if (m.mission115) {   // 138: 海面など water-surface.json（三角形の area 地物）。無ければ（404）描かない
+      try {
+        const ws = makeAreaLayer('water-surface.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, base, set.ctx.opt);
+        const r = await ws.mount();
+        if (gen !== bldgGen) { ws.destroy(); set.layers.forEach((l) => l.layer.destroy()); set.release(); return; }
+        set.layers.push({ id: 'waterways', key: 'waterways', layer: ws, count: r.count });
+      } catch (e) { if (!/HTTP 404/.test(String(e && e.message))) fail('water-surface', e); }
+    }
+    for (const l of set.layers) stats.wardVec.layers[l.id] = (stats.wardVec.layers[l.id] || 0) + l.count;
+    wardVec = set.layers; wardVecRelease = set.release;
+    stats.wardVec.state = set.layers.length ? 'ready' : 'no-layers'; scene.requestRender();   // 描くレイヤーが 0 のとき ready と偽らない
     scheduleSingleCull(); if (vecCovHook) vecCovHook();   // 45X: 視野カリングのセルを今の視点で構築 / coverage 更新
   }
   function unmountBuildings() {
     unmountWardVec();
     clearBuildingPick();
+    fpUnmount();   // 138: フットプリント層（進行中の fetch は abort、primitive は remove）
     if (tileset) { scene.primitives.remove(tileset); tileset = null; stats.baseUnmountedTotal = (stats.baseUnmountedTotal | 0) + 1; }
     for (const e of extraSets.splice(0)) { scene.primitives.remove(e.tileset); stats.extraUnmountedTotal = (stats.extraUnmountedTotal | 0) + 1; }
     visTiles.clear(); stats.loadedTilesTotal = 0; curTiles = 0; curBldg = 0; stats.extraSets = [];
@@ -1235,7 +1302,11 @@
     let metas = extraMeta.filter((m) => m.source.wardCode === wardCode);   // 40A: 1 区に複数 tileset
     // 45E: 同じ区にローカル変換のフル tileset（external）があれば、Git 管理の部分 tileset（住吉 9 tile・他区サンプル）より優先する
     if (metas.some((m) => m.external)) metas = metas.filter((m) => m.external);
-    else if (wardCode === BASE_WARD) metas = [];
+    else {
+      // 138: 外部変換の 3D Tiles が無い区だけ、実フットプリント押出しを試す（?fp=1・localhost 限定）。無ければ null で従来の分岐へ
+      if (FP_ON) { const fr = await mountFootprints(wardCode, gen, metas); if (fr !== null) return fr; if (gen !== bldgGen) return false; }
+      if (wardCode === BASE_WARD) metas = [];
+    }
     const meta = metas.length > 0;
     if (wardCode !== BASE_WARD && (!meta || q.get('extra') === '0')) { stats.buildingState = 'unavailable'; syncBldgSelect(wardCode); return false; }
     stats.buildingState = 'loading'; bldgWard = wardCode; stats.buildingWard = wardCode; syncBldgSelect();
@@ -1408,7 +1479,8 @@
     if (allMode) { allSync(); return; }
     sel.value = bldgWard || unavailCode || '';
     const note = $('bldg-ward-note');
-    if (note) note.textContent = stats.buildingState === 'ready' ? '3D建物を表示中（この区のみ）' : stats.buildingState === 'loading' ? '3D建物を読み込み中…'
+    if (note && fpCur && stats.buildingState === 'ready') note.textContent = '実フットプリント押出し ' + fmt(stats.fp.buildings) + '棟を表示中（3D Tiles ではありません・この区のみ）';
+    else if (note) note.textContent = stats.buildingState === 'ready' ? '3D建物を表示中（この区のみ）' : stats.buildingState === 'loading' ? '3D建物を読み込み中…'
       : stats.buildingState === 'unavailable' ? '3D建物未整備（区境界・道路・施設は使えます）' : stats.buildingState === 'error' ? '3D建物の読み込みに失敗しました' : '3D建物は非表示（区を選ぶと表示）';
   }
   function ensureExtraMeta() {
@@ -1460,7 +1532,7 @@
       // 39B: 起動時は tileset を読まない（選択された区だけ setBuildingWard が mount する）
       return { count: 0 };
     },
-    applyVisible(on) { if (tileset) tileset.show = on; for (const e of extraSets) e.tileset.show = on; },
+    applyVisible(on) { if (tileset) tileset.show = on; for (const e of extraSets) e.tileset.show = on; if (fpCur) fpCur.layer.setShow(on); },
   };
 
   let cityHome = null, sumiHome = null, wardsSettled = false, extraReady = null;
@@ -2788,6 +2860,7 @@
   let lastFeature = null, flyTarget = null;
   // 39B: 建物 tileset の破棄前に呼ぶ。破棄済み tileset の feature を silhouette が持ち続けると Cesium の描画が止まるため。
   function clearBuildingPick() {
+    if (fpCur) fpCur.layer.unselect();
     if (lastFeature) { try { lastFeature.color = Cesium.Color.WHITE; } catch (e) { /* tile 破棄済み */ } }
     lastFeature = null;
     if (silhouette) silhouette.selected = [];
@@ -2798,6 +2871,7 @@
     }
   }
   function clearSelection() {
+    if (fpCur) fpCur.layer.unselect();
     if (lastFeature) { try { lastFeature.color = Cesium.Color.WHITE; } catch (e) { /* tile 破棄済み */ } }
     lastFeature = null;
     if (silhouette) silhouette.selected = [];
@@ -3009,7 +3083,22 @@
         viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
       },
       setLayer: (id, on) => LayerRegistry.setVisible(id, on),   // 37L: レイヤー ON/OFF の画面差分測定用
-      // 58: 地表（Globe）と背景 imagery の ON/OFF、および描画参照系の診断（読み取り/表示切替のみ。データ・座標は触らない）
+      // 138: 実フットプリント建物（?fp=1）の実クリック候補。屋根中心を Cesium の投影 API で画面座標にし、scene.pick が同じ ID を返す点だけを返す（選択処理は呼ばない）。
+      fpInfo() { return { prims: fpCur ? fpCur.layer.primitives.length : 0, shown: fpCur ? fpCur.layer.primitives.filter((p) => !p.isDestroyed() && p.show).length : 0, scenePrims: scene.primitives.length, ward: fpCur ? fpCur.wardId : null }; },
+      fpReady() { return !!fpCur && stats.fp.state === 'ready' && fpCur.layer.ready(); },
+      fpCandidates(n, minH, maxH) {
+        if (!fpCur) return [];
+        const r = rect(), W = r.width, H = r.height, out = [], ids = [...fpCur.layer.byId.keys()], step = Math.max(1, Math.floor(ids.length / (n * 80)));
+        for (let i = 0; i < ids.length && out.length < n; i += step) {
+          const sp = fpCur.layer.byId.get(ids[i]);
+          if (!Number.isFinite(sp.repX) || sp.h < (minH || 0) || sp.h > (maxH || 1e9)) continue;
+          const w = Cesium.SceneTransforms.worldToWindowCoordinates(scene, toCart(sp.repX, sp.repZ, sp.top));
+          if (!w || w.x < 330 || w.y < 80 || w.x > W - 340 || w.y > H - 40) continue;
+          const p = scene.pick(new Cesium.Cartesian2(w.x, w.y));
+          if (p && p.id === sp.id) out.push({ id: sp.id, h: sp.h, x: Math.round(r.left + w.x), y: Math.round(r.top + w.y) });
+        }
+        return out;
+      },      // 58: 地表（Globe）と背景 imagery の ON/OFF、および描画参照系の診断（読み取り/表示切替のみ。データ・座標は触らない）
       setGlobe(on) { scene.globe.show = !!on; },
       // 59: 建物 tileset だけの表示切替（背景 vs 建物の画像差分用。読み取り専用の表示切替で、データ・座標は触らない）
       setTilesetShow(on) { for (let i = 0; i < scene.primitives.length; i++) { const p = scene.primitives.get(i); if (p instanceof Cesium.Cesium3DTileset && !p.isDestroyed()) p.show = !!on; } },
@@ -3273,10 +3362,54 @@
     })();
   }
 
+  // 138: 実フットプリント建物の選択。属性（高さ・用途・代表点）はタイル自身から読む（sidecar は無い）。住所・築年・階数は元データに無く「データなし」。
+  function selectFootprintBuilding(id) {
+    clearSelection();
+    const rec = fpCur, sp = rec.layer.byId.get(id);
+    if (!sp) return;
+    rec.layer.select(id);
+    $('lc-bldg-empty').style.display = 'none';
+    $('lc-bldg-body').classList.add('on');
+    $('lc-cid').textContent = id;
+    $('lb-ward').textContent = rec.ward || '—';
+    $('lb-side').textContent = '— （実フットプリント直読み）';
+    const hf = LC138.isSentinelHeight(sp.h);
+    const labels = (bundleManifest && bundleManifest.usageLabels && bundleManifest.usageLabels.labels) || {};
+    $('lb-h').textContent = hf ? '高さ不明（原値 ' + sp.h + ' は欠損値の疑い。表示は原値のまま押し出し）' : sp.h.toFixed(1) + ' m';
+    $('lb-usage').textContent = sp.usage == null ? '—' : sp.usage;
+    $('lc-usage').textContent = (sp.usage != null && labels[sp.usage]) ? labels[sp.usage] : '用途不明';
+    $('lb-tile').textContent = '実フットプリント';
+    $('lb-ll').textContent = Number.isFinite(sp.repX) ? toLat(sp.repZ).toFixed(6) + ' / ' + toLon(sp.repX).toFixed(6) : '—';
+    $('lb-xz').textContent = Number.isFinite(sp.repX) ? sp.repX.toFixed(1) + ' / ' + sp.repZ.toFixed(1) : '—';
+    $('lb-note').textContent = '3D Tiles ではなく、旧 Live City の実フットプリントを押し出した表示です。';
+    flyTarget = Number.isFinite(sp.repX) ? toCart(sp.repX, sp.repZ, sp.h / 2) : null;
+    stats.lastPicked = { canonicalId: id, source: 'footprint', ward: rec.ward, heightM: sp.h, usage: sp.usage, sidecar: null, sidecarMatches: null };
+    stats.selectedCanonicalId = id;
+    stats.selectedKey = rec.wardCode + ':' + id;
+    window.dispatchEvent(new CustomEvent('livecity:37d-building-selected', { detail: { canonicalId: id } }));
+    const seq = selSeq;
+    $('bs-addr').textContent = 'データなし'; $('bs-misc').textContent = 'データなし'; $('bs-name').textContent = '確認中…';
+    $('lc-photo-slot').setAttribute('aria-busy', 'true');
+    $('lc-photo-slot').textContent = '写真索引を確認中…（初回のみ約6MBを取得します）';
+    if (Number.isFinite(sp.repX)) renderNearby(sp.repX, sp.repZ, seq); else $('lc-nearby-slot').textContent = '位置属性が無いため周辺情報を出せません。';
+    loadPhotoIndex().then((idx) => {
+      if (seq !== selSeq) return;
+      const entry = renderPhoto(id, idx);
+      $('bs-name').textContent = (entry && entry.buildingName && ['VERY_HIGH', 'HIGH', 'AMBIGUOUS'].includes(entry.matchConfidence)) ? displayName(entry) : 'データなし';
+    }).catch((e) => {
+      if (seq !== selSeq) return;
+      fail('photo-index', e); $('bs-name').textContent = 'データなし';
+      const slot = $('lc-photo-slot'); slot.setAttribute('aria-busy', 'false'); slot.textContent = '写真索引を取得できませんでした（通信エラー）。';
+    });
+    scene.requestRender();
+  }
+
   const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction(async (click) => {
     const picked = scene.pick(click.position);
     if (picked && picked.id && picked.id.poi) { selectPoi(picked.id.poi); return; }
+    const fpId = fpCur ? fpCur.layer.idOfPick(picked) : null;   // 138: 実フットプリント押出し建物（GeometryInstance.id = canonicalId）
+    if (fpId) { selectFootprintBuilding(fpId); return; }
     // 建物以外（道路・公園ラベル等）を押したときは選択を解除するだけ。従来の建物クリックは変えない。
     // 37D: 建物でも POI でもなければ、町丁目（境界レイヤー ON のとき）を地表座標で判定する
     if (!Cesium.defined(picked) || typeof picked.getProperty !== 'function') { clickTown(click.position); return; }
