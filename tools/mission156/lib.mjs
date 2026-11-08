@@ -70,7 +70,7 @@ export async function withRetry(fn, opts = {}) {
   const onRetry = opts.onRetry || (() => {});
   let last;
   for (let i = 1; i <= attempts; i++) {
-    try { return await fn(i); } catch (e) { last = e; if (i < attempts) { onRetry(i, e); await sleep(baseMs * 2 ** (i - 1)); } }
+    try { return await fn(i); } catch (e) { last = e; if (e && e.noRetry) throw e; if (i < attempts) { onRetry(i, e); await sleep(baseMs * 2 ** (i - 1)); } }
   }
   throw last;
 }

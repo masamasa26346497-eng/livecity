@@ -29,6 +29,8 @@ test('mission158 lib', async () => {
   assert.ok(!L.strictBrowserOk({ ...ok, drawCommands: 0 }));
   assert.ok(!L.strictBrowserOk({ ...ok, drawCommands: null }));
   assert.ok(!L.strictBrowserOk({ ...ok, jsErrors: ['x'] }));
+  assert.ok(!L.strictBrowserOk({ ...ok, tilesetCommandsMax: 0, selectedTilesMax: 0 })); // Mission 160: globe-only commands
+  assert.ok(L.strictBrowserOk({ ...ok, tilesetCommandsMax: 20, selectedTilesMax: 4 }));
   // round trip
   const m = L.buildStoreManifest({ ward: 'kita', sourceVersion: 'p', sourceEtag: 'e', buildings: 1, tiles: 1, ids: 1, files: [{ name: 'f', size: 3, sha256: L.sha256(Buffer.from('abc')) }] });
   assert.strictEqual(m.published, false);

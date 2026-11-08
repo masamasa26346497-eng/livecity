@@ -31,9 +31,32 @@ const out = (o) => console.log(JSON.stringify(o, null, 1));
 async function authTest() {
   const r = await api('/repos/' + repo);
   let body = null; try { body = await r.json(); } catch (e) { /* ignore */ }
-  // facts only; token value and source of secrets never printed
-  out({ repo, tokenSource, status: r.status, ...classifyAuth(r.status, body) });
-  return r.status === 200;
+  // facts only; token value never printed. PASS is claimed only if the private repo AND its Release are really readable.
+  const secretConfigured = !!process.env.LIVECITY_3D_DATA_TOKEN; // boolean only
+  const res = { repo, tokenSource, secretConfigured, status: r.status, ...classifyAuth(r.status, body) };
+  if (r.status === 200) {
+    const rr = await api(`/repos/${repo}/releases/tags/plateau2025-converted`);
+    res.releaseReadStatus = rr.status;
+    res.releaseReadable = rr.status === 200;
+    if (rr.status === 200) res.releaseAssets = ((await rr.json()).assets || []).length;
+  }
+  res.verdict = !secretConfigured ? 'NOT-TESTED: LIVECITY_3D_DATA_TOKEN is not set (GITHUB_TOKEN cannot see the private repo). Run: node tools/mission158-private-release.mjs setup'
+    : (res.releaseReadable ? 'READ-OK' : 'READ-FAILED (see status / releaseReadStatus)');
+  out(res);
+  return res.verdict === 'READ-OK';
+}
+
+function setup() {
+  console.log(`LIVECITY_3D_DATA_TOKEN setup (one-time, by the repo owner; these tools never print the value)
+1. GitHub > Settings > Developer settings > Fine-grained tokens > Generate new token.
+2. Resource owner: the account owning ${PRIVATE_REPO}. Repository access: "Only select repositories" -> ${PRIVATE_REPO} ONLY.
+3. Repository permissions: Contents = Read-only (enough for audit/get/preview). Add Read and write only when you want 'put' (new m158-* tags).
+   Metadata (read) is added automatically. Nothing else. Short expiry (e.g. 30 days).
+4. Public repo masamasa26346497-eng/livecity > Settings > Secrets and variables > Actions > New repository secret: LIVECITY_3D_DATA_TOKEN.
+   Never paste the token in a comment, issue, commit, or workflow file.
+5. Verify (read-only): node tools/mission158-private-release.mjs auth-test   -> must print verdict READ-OK.
+   Then: node tools/mission158-private-release.mjs audit --inspect all --out temp/mission158
+Notes: fork PRs do not receive secrets (expected). These tools never overwrite or delete existing releases.`);
 }
 
 async function getRelease(tag) {
@@ -146,9 +169,10 @@ async function get() {
 }
 
 try {
-  if (cmd === 'auth-test') process.exit((await authTest()) ? 0 : 3);
+  if (cmd === 'setup') setup();
+  else if (cmd === 'auth-test') process.exit((await authTest()) ? 0 : 3);
   else if (cmd === 'audit') await audit();
   else if (cmd === 'put') await put();
   else if (cmd === 'get') await get();
-  else { console.error('usage: auth-test | audit | put | get'); process.exit(2); }
+  else { console.error('usage: setup | auth-test | audit | put | get'); process.exit(2); }
 } catch (e) { console.error(JSON.stringify({ error: String(e.message || e).slice(0, 300) })); process.exit(1); }

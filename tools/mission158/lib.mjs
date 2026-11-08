@@ -75,7 +75,9 @@ export function buildStoreManifest({ ward, wardCode, sourceEtag, sourceVersion, 
 
 // Strict browser verdict: the tileset must really draw. drawCommands===0/null is NOT ok (Kita regression from Mission 157).
 export function strictBrowserOk(b) {
-  return !!(b && b.status === 'ok' && b.gl && (b.jsErrors || []).length === 0 && b.tilesLoaded && Number(b.drawCommands) > 0);
+  // Mission 160: when the page reports tileset-only counters they must be > 0 (globe/skybox commands do not prove buildings are drawn)
+  const tsOk = b && b.tilesetCommandsMax !== undefined ? Number(b.tilesetCommandsMax) > 0 && Number(b.selectedTilesMax) > 0 : true;
+  return !!(b && b.status === 'ok' && b.gl && (b.jsErrors || []).length === 0 && b.tilesLoaded && Number(b.drawCommands) > 0 && tsOk);
 }
 
 // Compare re-downloaded asset to the manifest record. Returns list of mismatches (empty = identical).

@@ -3,7 +3,7 @@
  "source": "plateau-27100-osaka-shi-2025",
  "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
  "license": "plateau",
- "generatedAt": "2026-11-08T16:42:15.782Z",
+ "generatedAt": "2026-11-08T19:48:12.168Z",
  "wards": {
   "sumiyoshi": {
    "wardCode": "27120",
@@ -22,7 +22,8 @@
    "bestTransform": "identity",
    "outputBytes": 53615211,
    "http200Verified": true,
-   "browserVerified": true,
+   "browserVerified": false,
+   "browserVerifiedNote": "Mission 160: earlier true came from the lenient check (no tileset-only draw proof). Output is gone from the runner; re-verify with the strict check.",
    "ms": 57881
   },
   "chuo": {
@@ -42,8 +43,8 @@
    "bestTransform": "identity",
    "outputBytes": 29084771,
    "http200Verified": true,
-   "browserVerified": true,
-   "ms": 56699
+   "browserVerified": false,
+   "ms": 55358
   },
   "kita": {
    "wardCode": "27127",
@@ -62,15 +63,16 @@
    "bestTransform": "identity",
    "outputBytes": 31422643,
    "http200Verified": true,
-   "browserVerified": true,
-   "ms": 73869
+   "browserVerified": false,
+   "ms": 52554
   }
  },
  "summary": {
   "wardsTotal": 24,
   "byStatus": {
    "pending": 21,
-   "complete": 3
+   "complete": 1,
+   "converted": 2
   },
   "convertedBuildingsTotal": 73288,
   "declaredPast": 574213,
@@ -156,7 +158,7 @@
     "bestTransform": "identity",
     "outputBytes": 53615211,
     "http200Verified": true,
-    "browserVerified": true,
+    "browserVerified": false,
     "ms": 57881
    },
    {
@@ -185,7 +187,7 @@
    },
    {
     "ward": "kita",
-    "status": "complete",
+    "status": "converted",
     "wardCode": "27127",
     "meshesPlanned": 25,
     "meshesFetched": 25,
@@ -201,13 +203,13 @@
     "orientationOk": true,
     "bestTransform": "identity",
     "outputBytes": 31422643,
-    "http200Verified": true,
-    "browserVerified": true,
-    "ms": 73869
+    "http200Verified": false,
+    "browserVerified": false,
+    "ms": 52554
    },
    {
     "ward": "chuo",
-    "status": "complete",
+    "status": "converted",
     "wardCode": "27128",
     "meshesPlanned": 20,
     "meshesFetched": 20,
@@ -223,9 +225,9 @@
     "orientationOk": true,
     "bestTransform": "identity",
     "outputBytes": 29084771,
-    "http200Verified": true,
-    "browserVerified": true,
-    "ms": 56699
+    "http200Verified": false,
+    "browserVerified": false,
+    "ms": 55358
    }
   ]
  }

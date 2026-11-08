@@ -74,6 +74,8 @@ for (const w of wards) {
   try {
     // transient failure => retry (mission79 fetch resumes via its sha256 manifest); final dir must be empty per attempt
     await withRetry(() => {
+      // Mission 160: a size-guard refusal is deterministic, not transient: fail fast, do not retry (Kita 958MB > 900MB default)
+      if (pl.inflatedMB > maxMb) { const g = new Error(`size guard: ${w} inflated ${pl.inflatedMB}MB exceeds --max-mb ${maxMb}`); g.noRetry = true; throw g; }
       fs.rmSync(final, { recursive: true, force: true });
       execFileSync(process.execPath, ['tools/mission79-run.mjs', '--ward', w, '--work', work, '--final', final, '--max-mb', String(maxMb)], { stdio: 'inherit', cwd: ROOT, maxBuffer: 1 << 28, timeout: Number(opt('ward-timeout-min', 18)) * 60000 });
     }, { attempts: Number(opt('retries', 3)), onRetry: (i, e) => console.error('[156] retry', w, 'after attempt', i, String(e.message).slice(0, 120)) });
