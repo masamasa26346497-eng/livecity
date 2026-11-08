@@ -32,7 +32,7 @@ test('142: layers only for served wards that really have road/river files; no fa
   const { resolveLayers } = await M();
   const lr = fs.mkdtempSync(path.join(os.tmpdir(), 'm142y-'));
   fs.mkdirSync(path.join(lr, 'kita', 'layers'), { recursive: true });
-  fs.writeFileSync(path.join(lr, 'kita', 'layers', 'roads.json'), '{}'); fs.writeFileSync(path.join(lr, 'kita', 'layers', 'layers-report.json'), '{}');
+  fs.writeFileSync(path.join(lr, 'kita', 'layers', 'roads.json'), JSON.stringify({ features: [{ id: 1, p: [[0, 0], [1, 1]] }] })); fs.writeFileSync(path.join(lr, 'kita', 'layers', 'layers-report.json'), '{}');
   fs.mkdirSync(path.join(lr, 'chuo', 'layers'), { recursive: true });
   fs.writeFileSync(path.join(lr, 'chuo', 'layers', 'layers-report.json'), '{}');   // report without any layer file -> not served
   const r = resolveLayers({ layersRoot: lr, map: { kita25: '/x', chuo25: '/y', nishi25: '/z' } });

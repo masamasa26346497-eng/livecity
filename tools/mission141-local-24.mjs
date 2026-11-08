@@ -100,18 +100,59 @@ export function parseLocal(str) {
   return out;
 }
 // Mission 142: Mission115/45I road+water output (<layersRoot>/<ward>/layers/*.json) for the wards that are served. Presence is reported; nothing is created.
+// Mission 143: a ward is "layers" only when a layer file parses AND holds real features; a report/status file alone never makes it ready.
+// roads / waterways / water-surface are counted separately.
+export const LAYER_NAMES = ['roads', 'waterways', 'water-surface', 'parks', 'railways'];
+export function countLayerFile(file) {
+  try {
+    const j = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return { parsed: true, features: Array.isArray(j.features) ? j.features.length : 0 };
+  } catch (e) { return { parsed: false, features: 0 }; }
+}
 export function resolveLayers({ layersRoot, map }) {
   const layers = {}, rows = [];
   for (const key of Object.keys(map)) {
     const ward = key.replace(/25$/, '');
     const d = layersRoot ? path.join(layersRoot, ward, 'layers') : null;
-    const has = (f) => !!d && fs.existsSync(path.join(d, f));
-    const files = ['roads', 'waterways', 'water-surface', 'parks', 'railways'].filter((f) => has(f + '.json'));
-    const ok = (has('layers-report.json') || has('status.json')) && files.length > 0;
+    const counts = {};
+    if (d) for (const f of LAYER_NAMES) {
+      const fp = path.join(d, f + '.json');
+      if (fs.existsSync(fp)) counts[f] = countLayerFile(fp);
+    }
+    const files = Object.keys(counts).filter((f) => counts[f].parsed && counts[f].features > 0);
+    const ok = files.length > 0;
     if (ok) layers[key] = d;
-    rows.push({ ward, key, status: ok ? 'layers' : 'no-layers', files: ok ? files : [] });
+    const bad = Object.keys(counts).filter((f) => !counts[f].parsed);
+    let note = ok ? '' : !d ? 'no layers root' : Object.keys(counts).length ? 'layer files empty or unparseable' : 'no road/river data for this ward';
+    if (bad.length) note += (note ? '; ' : '') + 'unparseable: ' + bad.join(',');
+    const has = (f) => !!counts[f] && counts[f].features > 0;
+    rows.push({ ward, key, status: ok ? 'layers' : 'no-layers', files, counts, note, roads: has('roads'), waterways: has('waterways'), waterSurface: has('water-surface') });
   }
   return { layers, rows };
+}
+// Mission 143: read-only discovery of an existing converted layers root / the old OSM map-data. Only candidates that really exist are returned.
+const hasWardLayers = (root) => { try { return fs.readdirSync(root).some((w) => fs.existsSync(path.join(root, w, 'layers', 'roads.json'))); } catch (e) { return false; } };
+export function layersRootCandidates(env = process.env, home = env.USERPROFILE || env.HOME || '') {
+  const c = [];
+  if (env.LIVECITY_LAYERS_ROOT) c.push(env.LIVECITY_LAYERS_ROOT);
+  if (env.LOCALAPPDATA) c.push(path.join(env.LOCALAPPDATA, 'LiveCity-MapLayers-Out-24'));
+  if (home) c.push(path.join(home, 'LiveCity-MapLayers-Out-24'), path.join(home, 'AppData', 'Local', 'LiveCity-MapLayers-Out-24'));
+  c.push(path.join(path.dirname(ROOT), 'LiveCity-MapLayers-Out-24'));
+  return [...new Set(c.map((x) => path.resolve(x)))];
+}
+export function oldSourceCandidates(env = process.env, home = env.USERPROFILE || env.HOME || '') {
+  const rel = path.join('public', 'map-data', 'osaka-city');
+  const c = [];
+  if (env.LIVECITY_OLD_MAPDATA) c.push(env.LIVECITY_OLD_MAPDATA);
+  c.push(path.join(path.dirname(ROOT), 'livecity-data-pipeline', rel));
+  if (home) c.push(path.join(home, 'livecity-data-pipeline', rel), path.join(home, 'Documents', 'livecity-data-pipeline', rel));
+  return [...new Set(c.map((x) => path.resolve(x)))];
+}
+export const discoverLayersRoot = (opts = {}) => layersRootCandidates(opts.env, opts.home).find((d) => fs.existsSync(d) && hasWardLayers(d)) || null;
+export const discoverOldSource = (opts = {}) => oldSourceCandidates(opts.env, opts.home).find((d) => fs.existsSync(path.join(d, 'roads')) || fs.existsSync(path.join(d, 'waterways'))) || null;
+// Build through the Mission115 builder: new files only (existing ward layers/ are skipped); it refuses output inside the repo or OneDrive.
+export function buildLayers({ src, out }) {
+  return execFileSync(process.execPath, [path.join(ROOT, 'tools', 'mission115', 'layers-run.cjs'), 'build', '--src', src, '--layers-root', out, '--wards', 'ALL'], { encoding: 'utf8', maxBuffer: 1 << 28 });
 }
 // Windows file handles (AV / indexer) can briefly block rename/rm right after extraction; retry a few times.
 function retry(fn, tries = 8) {
@@ -170,8 +211,23 @@ async function main() {
   if (only) { const bad = only.filter((x) => !wards.some((w) => w.wardId === x)); if (bad.length) throw new Error('unknown ward id in --wards: ' + bad.join(',')); }
   const local = parseLocal(opt('local'));
   for (const k of Object.keys(local)) if (!wards.some((w) => w.wardId === k)) throw new Error('unknown ward id in --local: ' + k);
-  const layersRoot = opt('layers-root') ? path.resolve(opt('layers-root')) : null;
+  let layersRoot = opt('layers-root') ? path.resolve(opt('layers-root')) : null;
   if (layersRoot && !fs.existsSync(layersRoot)) throw new Error('--layers-root not found: ' + layersRoot);
+  // Mission 143: no argument needed. An existing converted root is auto-connected; --build-layers makes a missing one from the old OSM data (new files only).
+  let layersOrigin = layersRoot ? 'explicit' : null;
+  if (!layersRoot && !a.includes('--no-layers')) {
+    const found = discoverLayersRoot();
+    if (found) { layersRoot = found; layersOrigin = 'auto-detected'; }
+    else if (a.includes('--build-layers')) {
+      const src = opt('src') ? path.resolve(opt('src')) : discoverOldSource();
+      if (!src || !fs.existsSync(src)) console.warn('[143] --build-layers: old OSM map-data not found. Re-run with: --build-layers --src "<path>\\public\\map-data\\osaka-city"');
+      else {
+        const out = path.resolve(opt('layers-out', process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, 'LiveCity-MapLayers-Out-24') : path.join(ROOT, '..', 'LiveCity-MapLayers-Out-24')));
+        console.log('[143] building road/river layers: ' + src + ' -> ' + out + ' (new files only; source is read-only)');
+        try { buildLayers({ src, out }); layersRoot = out; layersOrigin = 'built'; } catch (e) { console.warn('[143] layer build failed: ' + String(e.stderr || e.message).split('\n')[0].slice(0, 200)); }
+      }
+    } else console.log('[143] no converted road/river layers found. Add --build-layers (auto-finds ..\\livecity-data-pipeline) or --layers-root <dir>.');
+  }
   if (dataRoot.length > 120) console.warn('[141] data root path is ' + dataRoot.length + ' chars; Windows MAX_PATH (260) can break extraction. Use a short --root such as C:\\lc141.');
   fs.mkdirSync(dataRoot, { recursive: true });
 
@@ -196,8 +252,12 @@ async function main() {
   const lay = resolveLayers({ layersRoot, map });
   console.log('[141] 3D delivered (local, private): ' + served.length + '/' + rows.length + ' wards, ' + served.reduce((s, r) => s + r.buildings, 0) + ' buildings');
   for (const r of rows) console.log('  ' + r.wardCode + ' ' + r.ward + ' ' + (r.status === 'served' ? r.buildings + ' (' + r.origin + ')' : 'NOT DELIVERED: ' + r.note));
-  console.log('[141] roads/rivers (Mission115 output, local only): ' + (layersRoot ? Object.keys(lay.layers).length + '/' + lay.rows.length + ' served wards have layers' : 'no --layers-root given -> none') );
-  for (const r of lay.rows) if (layersRoot) console.log('  ' + r.ward + ' ' + (r.status === 'layers' ? r.files.join('+') : 'no road/river data (nothing is drawn, nothing invented)'));
+  console.log('[141] roads/rivers (Mission115 output, local only, ' + (layersOrigin || 'none') + (layersRoot ? ': ' + layersRoot : '') + '): ' + (layersRoot ? Object.keys(lay.layers).length + '/' + lay.rows.length + ' served wards have layers' : 'none'));
+  if (layersRoot) {
+    const n = (k) => lay.rows.filter((r) => r[k]).length;
+    console.log('[143] data present: roads ' + n('roads') + ' wards / waterways ' + n('waterways') + ' wards / water-surface ' + n('waterSurface') + ' wards (browser rendering NOT verified by this tool)');
+    for (const r of lay.rows) console.log('  ' + r.ward + ' ' + (r.status === 'layers' ? LAYER_NAMES.filter((f) => r.counts[f]).map((f) => f + '=' + r.counts[f].features).join(' ') : 'NO LAYERS (' + r.note + '; nothing drawn, nothing invented)'));
+  }
   const missing = rows.filter((r) => r.status !== 'served').map((r) => r.ward);
   if (missing.length) console.log('[141] NOT DELIVERED (' + missing.length + '): ' + missing.join(', '));
   console.log('[141] note: coverage is per-ward converted data, not proof of whole-ward completeness; roads/rivers are separate and not implied.');
