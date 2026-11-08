@@ -467,6 +467,7 @@
 <script src="mission45i-vec.js"></script>
 <script src="mission45k-viewcull.js"></script>
 <script src="mission45p-areacull.js"></script>
+<script src="mission155-diag.js"></script>
 <script src="mission45l-interaction.js"></script>
 <script src="mission45y-gfp.js"></script>
 <script src="mission138-footprints.js"></script>
@@ -1069,6 +1070,9 @@
   //   区を切り替える・「表示しない」を選ぶと、前の区の tileset は primitives.remove（destroy）で GPU/CPU 資源ごと解放する。
   const extraMeta = [];   // { id, base, source, report }
   const extraSets = [];   // 現在 mount 中の追加区: { id, base, tileset, source, report }
+  // 155: ?diag=1 で建物網羅性の診断パネル（読み取りのみ）。通常表示には出さない。
+  if (q.get('diag') === '1' && typeof LC155 !== 'undefined') LC155.mountPanel(() => ({ ward: stats.buildingWard, state: stats.buildingState }));
+  stats.diag155 = () => (typeof LC155 !== 'undefined' ? LC155.snapshot() : null);
   const BASE_WARD = '27120';   // 住吉区: 基本 tileset（TILES_BASE）
   let bldgGen = 0, bldgWard = null;   // generation token / 現在の建物表示区
   async function mountTileset(base, gen) {
@@ -1079,6 +1083,7 @@
     ts.style = new Cesium.Cesium3DTileStyle({ color: "color('" + (TONE[$('sel-tone').value] || TONE.pale) + "')" });
     const bl = LayerRegistry.get('buildings');
     ts.show = bl ? bl.visible !== false : true;
+    if (typeof LC155 !== 'undefined') { const dm = extraMeta.find((x) => x.base === base); LC155.track(ts, { id: dm ? dm.id : 'base', base, wardId: dm ? (dm.source.wardId || String(dm.id).replace(/^(ext|pub)-/, '')) : "sumiyoshi", wardCode: dm ? dm.source.wardCode : BASE_WARD, report: dm ? dm.report : null }); }   // 155: 読込/破棄/失敗の集計（読み取りのみ）
     ts.tileLoad.addEventListener(() => { stats.loadedTilesTotal++; });
     ts.tileUnload.addEventListener(() => { stats.loadedTilesTotal--; });
     ts.tileVisible.addEventListener((tile) => { if (tile.hasRenderableContent !== false) visTiles.add(tile); });
@@ -1299,6 +1304,7 @@
     if (tileset) { scene.primitives.remove(tileset); tileset = null; stats.baseUnmountedTotal = (stats.baseUnmountedTotal | 0) + 1; }
     for (const e of extraSets.splice(0)) { scene.primitives.remove(e.tileset); stats.extraUnmountedTotal = (stats.extraUnmountedTotal | 0) + 1; }
     visTiles.clear(); stats.loadedTilesTotal = 0; curTiles = 0; curBldg = 0; stats.extraSets = [];
+    if (typeof LC155 !== 'undefined') LC155.reset();
   }
   // wardCode: 区コード / null: 建物を表示しない。配信が無い区は何も mount しない（false を返す）。
   async function setBuildingWard(wardCode) {

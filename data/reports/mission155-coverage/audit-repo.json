@@ -1,0 +1,1301 @@
+{
+ "schema": "livecity.mission155.coverage/1",
+ "kind": "audit",
+ "readOnly": true,
+ "uploaded": false,
+ "inputs": {
+  "sourceAccessible": true,
+  "convertedRootAccessible": false,
+  "renderedProvided": false,
+  "autoDetect": false,
+  "candidatesChecked": {
+   "src": 1,
+   "converted": 0
+  }
+ },
+ "manifest": {
+  "wards": 24,
+  "declaredBuildings": 574213,
+  "declaredTiles": 1097,
+  "sumOfWardDeclared": 574213
+ },
+ "totals": {
+  "sourceBuildings": 35031,
+  "sourceWardsAccessible": 1,
+  "convertedLocalBuildings": null,
+  "publishedGitBuildings": 33626,
+  "renderedBuildings": null,
+  "wardsNotDelivered": 18,
+  "wardsWithTileIssues": 1,
+  "droppedIds": 0
+ },
+ "wards": [
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "ward": "北区",
+   "declared": {
+    "buildings": 15779,
+    "tiles": 44
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission37h-3dtiles/kita-sample"
+    ],
+    "buildings": 2698,
+    "tiles": 13
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 17.1,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "ward": "都島区",
+   "declared": {
+    "buildings": 13199,
+    "tiles": 33
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "ward": "福島区",
+   "declared": {
+    "buildings": 11159,
+    "tiles": 25
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "ward": "此花区",
+   "declared": {
+    "buildings": 13437,
+    "tiles": 58
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "ward": "中央区",
+   "declared": {
+    "buildings": 18279,
+    "tiles": 52
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission37h-3dtiles/chuo-sample"
+    ],
+    "buildings": 5629,
+    "tiles": 15
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 30.79,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "ward": "西区",
+   "declared": {
+    "buildings": 12098,
+    "tiles": 29
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission37h-3dtiles/nishi-sample"
+    ],
+    "buildings": 3893,
+    "tiles": 15
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 32.18,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "ward": "港区",
+   "declared": {
+    "buildings": 15489,
+    "tiles": 34
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "ward": "大正区",
+   "declared": {
+    "buildings": 17363,
+    "tiles": 40
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "ward": "天王寺区",
+   "declared": {
+    "buildings": 14244,
+    "tiles": 30
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission37h-3dtiles/tennoji-sample"
+    ],
+    "buildings": 6593,
+    "tiles": 12
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 46.29,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "ward": "浪速区",
+   "declared": {
+    "buildings": 10133,
+    "tiles": 30
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission38e-3dtiles/naniwa-mesh",
+     "public/mission38e-3dtiles/naniwa-mesh2"
+    ],
+    "buildings": 4267,
+    "tiles": 12
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 42.11,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "ward": "西淀川区",
+   "declared": {
+    "buildings": 23242,
+    "tiles": 47
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "ward": "淀川区",
+   "declared": {
+    "buildings": 34289,
+    "tiles": 62
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "ward": "東淀川区",
+   "declared": {
+    "buildings": 34685,
+    "tiles": 66
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "ward": "東成区",
+   "declared": {
+    "buildings": 21976,
+    "tiles": 29
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "ward": "生野区",
+   "declared": {
+    "buildings": 46212,
+    "tiles": 50
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "ward": "旭区",
+   "declared": {
+    "buildings": 22424,
+    "tiles": 35
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "ward": "城東区",
+   "declared": {
+    "buildings": 32447,
+    "tiles": 48
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "ward": "鶴見区",
+   "declared": {
+    "buildings": 22068,
+    "tiles": 46
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "ward": "阿倍野区",
+   "declared": {
+    "buildings": 26924,
+    "tiles": 38
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "ward": "住之江区",
+   "declared": {
+    "buildings": 21608,
+    "tiles": 67
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "ward": "住吉区",
+   "declared": {
+    "buildings": 35031,
+    "tiles": 52
+   },
+   "source": {
+    "accessible": true,
+    "buildings": 35031,
+    "tiles": 52
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [
+     "public/mission37b-3dtiles/osaka-sumiyoshi-9tile"
+    ],
+    "buildings": 10546,
+    "tiles": 9
+   },
+   "rendered": null,
+   "declaredVsSource": 0,
+   "coverage": {
+    "baseline": "source",
+    "convertedPct": null,
+    "publishedGitPct": 30.1,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 43,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": 4,
+   "gapSample": [
+    "t_-7_2",
+    "t_-5_4",
+    "t_-4_4",
+    "t_-2_3"
+   ],
+   "tileIssues": [
+    {
+     "tile": "t_-1_-1",
+     "source": 574,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-1_-2",
+     "source": 90,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-1_0",
+     "source": 383,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-1_1",
+     "source": 749,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-1_2",
+     "source": 48,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_-1",
+     "source": 810,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_-2",
+     "source": 51,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_-3",
+     "source": 23,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_0",
+     "source": 842,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_1",
+     "source": 847,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-2_2",
+     "source": 275,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_-1",
+     "source": 637,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_-2",
+     "source": 979,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_-3",
+     "source": 621,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_-4",
+     "source": 24,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_-5",
+     "source": 1,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_0",
+     "source": 637,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_1",
+     "source": 675,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_2",
+     "source": 531,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-3_3",
+     "source": 50,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_-4",
+     "source": 1121,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_-5",
+     "source": 126,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_0",
+     "source": 822,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_1",
+     "source": 1119,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_2",
+     "source": 374,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-4_3",
+     "source": 125,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_-4",
+     "source": 910,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_-5",
+     "source": 423,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_0",
+     "source": 834,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_1",
+     "source": 950,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_2",
+     "source": 1016,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-5_3",
+     "source": 270,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-6_-4",
+     "source": 1205,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-6_-5",
+     "source": 301,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-6_0",
+     "source": 1483,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-6_1",
+     "source": 1231,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-6_2",
+     "source": 77,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_-1",
+     "source": 807,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_-2",
+     "source": 371,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_-3",
+     "source": 271,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_-4",
+     "source": 79,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_0",
+     "source": 999,
+     "cause": "C5"
+    },
+    {
+     "tile": "t_-7_1",
+     "source": 724,
+     "cause": "C5"
+    }
+   ],
+   "tileIssueCount": 43,
+   "status": "published-partial",
+   "repairPlan": null
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "ward": "東住吉区",
+   "declared": {
+    "buildings": 38489,
+    "tiles": 59
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "ward": "平野区",
+   "declared": {
+    "buildings": 44434,
+    "tiles": 83
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "ward": "西成区",
+   "declared": {
+    "buildings": 29204,
+    "tiles": 40
+   },
+   "source": {
+    "accessible": false,
+    "buildings": null,
+    "tiles": null
+   },
+   "convertedLocal": {
+    "found": false
+   },
+   "publishedGit": {
+    "tilesets": [],
+    "buildings": 0,
+    "tiles": 0
+   },
+   "rendered": null,
+   "declaredVsSource": null,
+   "coverage": {
+    "baseline": "declared(manifest,unverified)",
+    "convertedPct": null,
+    "publishedGitPct": 0,
+    "renderedPct": null
+   },
+   "causes": {
+    "C2_sourceGapSuspect": 0,
+    "C3_droppedIds": 0,
+    "C4_glbOrTilesetMissing": 0,
+    "C5_notDeliveredOrUnreferenced": 0,
+    "C6_viewerSide": 0
+   },
+   "gapCellsNoSourceTile": null,
+   "gapSample": [],
+   "tileIssues": [],
+   "tileIssueCount": 0,
+   "status": "not-delivered",
+   "repairPlan": null
+  }
+ ],
+ "note": "converted(変換済み) と rendered(描画済み) は別。source にアクセスできない場合 source=null で、declared(manifest 記録値)は実体の証拠ではない。"
+}
