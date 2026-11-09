@@ -36,3 +36,15 @@ test('PowerShell ラッパーは $PSScriptRoot 基準で launcher を呼ぶ', ()
   assert.match(ps, /\$PSScriptRoot/);
   assert.match(ps, /lod2-launch\.mjs/);
 });
+
+test('Mission168: .ps1 は ASCII のみ(PS 5.1 の ANSI 解釈で文字化け/ParserError にならない)、括弧・引用符が釣り合う', () => {
+  const buf = fs.readFileSync(path.join(ROOT, 'Start-LOD2-Preview.ps1'));
+  const bad = [...buf].findIndex((b) => b > 0x7e || (b < 0x20 && b !== 0x0a && b !== 0x0d && b !== 0x09));
+  assert.equal(bad, -1, 'non-ASCII byte at ' + bad);
+  const code = buf.toString('ascii').split(/\r?\n/).filter((l) => !/^\s*#/.test(l));
+  for (const l of code) assert.equal((l.match(/"/g) || []).length % 2, 0, 'unbalanced quote: ' + l);
+  const src = code.join('\n');
+  assert.equal((src.match(/\{/g) || []).length, (src.match(/\}/g) || []).length);
+  assert.match(src, /\[switch\]\$All/);
+  assert.match(src, /"--all"/);
+});

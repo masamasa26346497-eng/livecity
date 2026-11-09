@@ -1,7 +1,13 @@
 # LOD2 プレビュー 一発起動(PR #50 / ブランチ `mission152-lod2-parallel`)
 
-## 一発コマンド(Windows PowerShell)
-リポジトリのルートで:
+## 推奨: Node で直接起動(文字コードに依存しない・最も確実)
+```
+node tools/lod2/lod2-launch.mjs          # 41棟
+node tools/lod2/lod2-launch.mjs --all    # 全 10,698 棟
+```
+## 補助: PowerShell ラッパー(Windows PowerShell 5.1 / PowerShell 7 両対応)
+`Start-LOD2-Preview.ps1` は **ASCII のみ**で書かれています(PS 5.1 は BOM なし UTF-8 を ANSI として読み、日本語を含むと文字化け・ParserError になるため。日本語の診断メッセージは Node 側が表示します)。`.ps1` に日本語を足さないでください。
+リポジトリのルートで(`-All` で全LOD2):
 ```powershell
 .\Start-LOD2-Preview.ps1
 # 実行ポリシーで止まる場合:

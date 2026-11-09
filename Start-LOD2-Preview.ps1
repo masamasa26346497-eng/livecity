@@ -1,19 +1,29 @@
-# Mission 162: Windows PowerShell 一発起動。どのフォルダから実行しても、このファイルの場所をリポジトリルートとして使う。
-#   PowerShell で:  .\Start-LOD2-Preview.ps1            (実行ポリシーで止まる場合: powershell -ExecutionPolicy Bypass -File .\Start-LOD2-Preview.ps1)
-#   オプション:      -NoOpen / -Port 8153 / -ExtRoot "C:\path\ext-3dtiles" / -CheckOnly
-# サーバ起動後はこのウィンドウがブロックします(正常)。Ctrl+C で停止。何も削除/上書きしません。
-param([int]$Port = 8152, [switch]$NoOpen, [switch]$CheckOnly, [string]$ExtRoot = "")
+# Mission 168: ASCII-ONLY on purpose. Windows PowerShell 5.1 reads BOM-less files as ANSI (cp932),
+# which garbles UTF-8 Japanese and breaks string quoting (ParserError). Do NOT add non-ASCII characters here.
+# Japanese diagnostics are printed by the Node launcher (tools/lod2/lod2-launch.mjs), which is encoding-safe.
+#
+# Usage:   .\Start-LOD2-Preview.ps1                (41-building preview)
+#          .\Start-LOD2-Preview.ps1 -All           (all 10,698 LOD2 buildings)
+#   If blocked by execution policy:
+#          powershell -ExecutionPolicy Bypass -File .\Start-LOD2-Preview.ps1
+# Options: -NoOpen / -Port 8153 / -ExtRoot "C:\path\ext-3dtiles" / -CheckOnly / -All
+# The window blocks while the server runs (normal). Ctrl+C stops it. Nothing is deleted or overwritten.
+param([int]$Port = 8152, [switch]$NoOpen, [switch]$CheckOnly, [switch]$All, [string]$ExtRoot = "")
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 $node = Get-Command node -ErrorAction SilentlyContinue
-if (-not $node) { Write-Host "Node.js 18 以上が必要です。https://nodejs.org/ から入れて、PowerShell を開き直してください。" -ForegroundColor Red; exit 1 }
+if (-not $node) {
+  Write-Host "Node.js 18 or later is required. Install it from https://nodejs.org/ and reopen PowerShell." -ForegroundColor Red
+  exit 1
+}
 $launch = Join-Path $root "tools\lod2\lod2-launch.mjs"
 if (-not (Test-Path $launch)) {
-  Write-Host "このフォルダ($root)には LOD2 のコードがありません(PR24 など別ブランチの可能性)。" -ForegroundColor Red
-  Write-Host "tools\lod2\README-LAUNCH.md の「別ブランチで使っている場合」の手順で mission152-lod2-parallel を別フォルダに取得してください。" -ForegroundColor Yellow
+  Write-Host "LOD2 code not found in this folder: $root" -ForegroundColor Red
+  Write-Host "You may be on another branch (e.g. PR24). See tools\lod2\README-LAUNCH.md and fetch mission152-lod2-parallel into a separate folder (git worktree add)." -ForegroundColor Yellow
   exit 1
 }
 $a = @($launch, "--port", "$Port")
+if ($All) { $a += "--all" }
 if ($NoOpen) { $a += "--no-open" }
 if ($CheckOnly) { $a += "--check-only" }
 if ($ExtRoot) { $a += @("--ext-root", $ExtRoot) }
