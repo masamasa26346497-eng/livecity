@@ -1,0 +1,153 @@
+{
+  "checks": [
+    {
+      "name": "initial sample = 1120",
+      "ok": true
+    },
+    {
+      "name": "initial counts text labels sample",
+      "ok": true
+    },
+    {
+      "name": "no ward file fetched at startup",
+      "ok": true
+    },
+    {
+      "name": "sumiyoshi: full ward loaded (965)",
+      "ok": true,
+      "extra": 965
+    },
+    {
+      "name": "sumiyoshi: counts text shows 全件",
+      "ok": true
+    },
+    {
+      "name": "sumiyoshi: search finds \"寺谷砦跡\"",
+      "ok": true
+    },
+    {
+      "name": "sumiyoshi: detail has OSM/ODbL",
+      "ok": true
+    },
+    {
+      "name": "sumiyoshi: missing fields show 情報なし",
+      "ok": true
+    },
+    {
+      "name": "chuo: full ward loaded (5084)",
+      "ok": true,
+      "extra": 5084
+    },
+    {
+      "name": "chuo: counts text shows 全件",
+      "ok": true
+    },
+    {
+      "name": "chuo: search finds \"ラジオ塔\"",
+      "ok": true
+    },
+    {
+      "name": "chuo: detail has OSM/ODbL",
+      "ok": true
+    },
+    {
+      "name": "chuo: missing fields show 情報なし",
+      "ok": true
+    },
+    {
+      "name": "markup in data is inert",
+      "ok": true
+    },
+    {
+      "name": "failure shows error + retry button",
+      "ok": true
+    },
+    {
+      "name": "recovers after retry (nishi 2,071)",
+      "ok": true
+    },
+    {
+      "name": "race: late ward response does not overwrite sample",
+      "ok": true
+    },
+    {
+      "name": "race: no error shown after stale completion",
+      "ok": true
+    },
+    {
+      "name": "race: slow earlier ward does not overwrite later ward",
+      "ok": true
+    },
+    {
+      "name": "race: stale failure shows no error",
+      "ok": true
+    },
+    {
+      "name": "JS exceptions = 0",
+      "ok": true,
+      "extra": []
+    },
+    {
+      "name": "Google / external requests = 0",
+      "ok": true,
+      "extra": []
+    }
+  ],
+  "timings": {
+    "initialSampleMs": 405,
+    "sumiyoshiLoadMs": 62,
+    "chuoLoadMs": 162,
+    "jsHeapMB": 14,
+    "fileBytes": {
+      "facilities-startup.json": 905867,
+      "ward-manifest.json": 2345,
+      "wards/sumiyoshi.json": 774994,
+      "wards/chuo.json": 4056358,
+      "wards/nishi.json": 1640239
+    }
+  },
+  "loaderStats": {
+    "requests": 9,
+    "failures": 2,
+    "wardLoads": {
+      "sumiyoshi": {
+        "ms": 11.799999999988358,
+        "chars": 744605,
+        "count": 965,
+        "expected": 965
+      },
+      "chuo": {
+        "ms": 126,
+        "chars": 3918784,
+        "count": 5084,
+        "expected": 5084
+      },
+      "nishi": {
+        "ms": 21.20000000001164,
+        "chars": 1590839,
+        "count": 2071,
+        "expected": 2071
+      },
+      "naniwa": {
+        "ms": 1514,
+        "chars": 1056195,
+        "count": 1363,
+        "expected": 1363
+      },
+      "abeno": {
+        "ms": 10,
+        "chars": 656206,
+        "count": 851,
+        "expected": 851
+      }
+    },
+    "startup": {
+      "ms": 111.29999999998836,
+      "chars": 868335,
+      "count": 1120
+    }
+  },
+  "externalRequests": [],
+  "passed": true,
+  "chrome": "Chrome/154.0.8037.0"
+}
