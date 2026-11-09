@@ -87,7 +87,40 @@
         camera() { const c = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC); return { lon: Cesium.Math.toDegrees(c.longitude), lat: Cesium.Math.toDegrees(c.latitude), h: c.height, pitchDeg: Cesium.Math.toDegrees(viewer.camera.pitch) }; },
         stats() { const s = ts.statistics; return { numberOfTilesWithContentReady: s.numberOfTilesWithContentReady, numberOfTrianglesSelected: s.numberOfTrianglesSelected, geometryByteLength: s.geometryByteLength, selected: ts._selectedTiles ? ts._selectedTiles.length : null }; },
       });
-      if (new URLSearchParams(location.search).get('lod2fly') === '1') fly();
+      // Mission 169: 大阪全域俯瞰 + LOD2 の集中地点へのワンクリック移動 + データ接続状況(日本語)。
+      // 地点名は「LOD2 地点 N」とし、駅名・町名・区名と混同させない(座標と棟数のみを示す)。
+      const OSAKA = { west: 135.30, south: 34.55, east: 135.62, north: 34.82 }; // 大阪市24区を含む概略範囲(表示用)
+      const overview = () => viewer.camera.flyTo({ destination: Cesium.Rectangle.fromDegrees(OSAKA.west, OSAKA.south, OSAKA.east, OSAKA.north), duration: 1.5 });
+      const cells = new Map();
+      for (const f of fp.footprints) {
+        const k = Math.floor(f.hull[0][0] / 0.01) + ',' + Math.floor(f.hull[0][1] / 0.01);
+        const c = cells.get(k) || { n: 0, sx: 0, sy: 0 }; c.n++; c.sx += f.hull[0][0]; c.sy += f.hull[0][1]; cells.set(k, c);
+      }
+      const spots = [...cells.values()].sort((a, b) => b.n - a.n).slice(0, 10).map((c, i) => ({ no: i + 1, n: c.n, lon: c.sx / c.n, lat: c.sy / c.n }));
+      state.spots = spots;
+      const goSpot = (s) => window.__lc152.lookAtFirst(450, -40, [s.lon, s.lat]);
+      const panel = document.createElement('div');
+      panel.style.cssText = 'position:fixed;right:8px;top:8px;z-index:99999;background:rgba(20,24,32,.9);color:#fff;font:12px/1.5 sans-serif;padding:8px 10px;border-radius:6px;max-width:330px;max-height:80vh;overflow:auto';
+      panel.innerHTML = '<b>LOD2 ナビ</b><div style="margin:4px 0"><button id="lc152-ov">大阪24区を俯瞰</button></div>' +
+        '<div style="opacity:.8">LOD2 のある場所(大阪2025 全 ' + fp.footprints.length + ' 棟。駅名・町名ではなく座標の集中地点です)</div>' +
+        spots.map((s) => '<div><button data-s="' + s.no + '">LOD2 地点' + s.no + '</button> ' + s.n + '棟 (' + s.lon.toFixed(3) + ', ' + s.lat.toFixed(3) + ')</div>').join('') +
+        '<hr style="opacity:.3"><b>表示の状態</b><div id="lc152-data">確認中…</div>' +
+        '<div style="opacity:.75;margin-top:4px">凡例: LOD2=屋根・壁つき実形状(このプレビューで追加)/ LOD1=箱型(24区データ接続時のみ)/ 未接続=下の ✕ の項目</div>';
+      document.body.appendChild(panel);
+      panel.querySelector('#lc152-ov').onclick = overview;
+      panel.querySelectorAll('button[data-s]').forEach((b) => { b.onclick = () => goSpot(spots[Number(b.dataset.s) - 1]); });
+      fetch('/__lod2/diag.json', { cache: 'no-store' }).then((r) => r.json()).then((dg) => {
+        const rows = [['24区 LOD1', dg.data.lod1Wards], ['駅', dg.data.stations], ['路線・運営会社', dg.data.railOperators], ['地名', dg.data.towns], ['道路', dg.data.roads], ['河川', dg.data.rivers]];
+        state.data = dg.data; state.extCandidates = dg.extCandidates;
+        let h = rows.map(([n, v]) => '<div>' + (v.ok ? '✓ ' : '✕ ') + '<b>' + n + '</b>: ' + String(v.msg).replace(/[<>&]/g, '') + '</div>').join('');
+        const cand = (dg.extCandidates || []).filter((c) => c.hasIndexJson || c.is45dRoot);
+        if (!dg.data.lod1Wards.ok && cand.length) h += '<div style="color:#fc8">24区 LOD1 の候補を検出: ' + cand.map((c) => c.dir).join(', ') + '(--ext-root で指定)</div>';
+        document.getElementById('lc152-data').innerHTML = h;
+      }).catch(() => { document.getElementById('lc152-data').textContent = '診断情報(diag.json)を取得できません'; });
+      Object.assign(window.__lc152, { overview, goSpot });
+      const qp = new URLSearchParams(location.search);
+      if (qp.get('lod2fly') === '1') fly();
+      else if (qp.get('lod2ov') === '1') overview();
     } catch (e) { state.status = 'error'; state.error = String(e && e.message || e); showFailure(state.error); }
   }
   window.LC152 = { attach };

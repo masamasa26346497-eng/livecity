@@ -57,3 +57,19 @@ node tools/lod2/lod2-launch.mjs --all     # 公式 Range 取得(約73MB)→ 209�
 - 生成物は `temp/lod2-all/`(gitignore)。集計は `data/reports/mission163/lod2-all-report.json`(件数・sha256 のみ。GLB は含まない)。
 - 全体ビューでは GLB を読みません(メッシュ単位ノードの geometricError=120)。建物に近づくとタイル単位でロード/解放されます。
 - 色は頂点色のみ(テクスチャ未対応)。LOD2 の無い建物は LOD1 のままです。
+
+## Mission 169: 大阪全域の確認画面(段階的)
+
+最小コマンド(ローカルの livecity-lod2 フォルダ):
+
+```
+git fetch origin mission152-lod2-parallel && git pull origin mission152-lod2-parallel
+node tools/lod2/lod2-launch.mjs --all [--ext-root <24区 LOD1 の ext-3dtiles フォルダ>]
+```
+
+- `--all` は大阪24区の俯瞰から開始します。右上の「LOD2 ナビ」で、LOD2 がある集中地点(座標と棟数。駅名・町名ではありません)へワンクリックで移動できます。
+- 右上の「表示の状態」で、データごとに ✓(接続済み)/✕(未接続)を日本語で表示します。同じ内容は `/__lod2/diag.json` の `data` にもあります。
+  - 24区 LOD1: `--ext-root` を付けたときだけ ✓。付けないと内蔵サンプル区のみで、24区 LOD1 は出ません。
+  - 路線・運営会社: `public/mission145-data/stations-24.json` が路線ソース無しで生成されている間は ✕(「路線データ未接続」の原因)。駅名自体は出ます。
+  - 地名/道路/河川: ファイルの有無で判定します(道路・河川は内蔵サンプル範囲のみ)。
+- 24区 LOD1 は公開 Git に無く、PR #51 側の生成物(非公開 Release)です。LOD2 の launcher は LOD1 を自動取得しません。起動時に既定の保管場所(`%LOCALAPPDATA%\LiveCity-3DTiles-Out-24` 等)を探して候補を表示するだけです。

@@ -79,7 +79,8 @@ process.on('SIGINT', () => { srv.kill(); process.exit(0); });
 process.on('exit', () => { try { srv.kill(); } catch (e) { /* ignore */ } });
 
 console.log('[4/5] HTTP 200 readiness');
-const URL_PATH = '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2fly=1';
+// Mission 169: --all は大阪24区の俯瞰から開始(LOD2 は右上のナビから移動)。41棟モードは従来どおりLOD2へ直行。
+const URL_PATH = '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&' + (ALL ? 'lod2ov=1' : 'lod2fly=1');
 const probes = ['/mission37g-osaka-24ward-mvp.html', '/lod2-preview/overlay.js', '/lod2-preview/tileset.json', ...(ALL ? [] : ['/lod2-preview/lod2.glb']), '/lod2-preview/footprints.json', '/__lod2/diag.json'];
 let ready = false, last = [];
 for (let i = 0; i < 40 && srvExit === null; i++) {
@@ -95,7 +96,14 @@ console.log('[5/5] 準備完了');
 console.log('\n  ★ 開く URL: ' + url);
 console.log('  ★ このウィンドウは「サーバ実行中」のため終了しません(正常)。閉じる/Ctrl+C でサーバも止まり、ページは開けなくなります。');
 console.log('  ★ 診断: http://localhost:' + port + '/__lod2/diag.json  / ブラウザ F12 コンソールで window.__lc152.state');
-if (!g('--ext-root')) console.log('  ※ --ext-root 未指定: 24区の LOD1 は出ません(LOD2 の41棟と内蔵サンプルのみ)。');
+if (!g('--ext-root')) {
+  console.log('  ※ --ext-root 未指定: 24区の LOD1 は出ません(LOD2 と内蔵サンプルのみ)。右上パネルの「✕」が未接続データです。');
+  try {
+    const dg = await (await fetch(`http://127.0.0.1:${port}/__lod2/diag.json`)).json();
+    for (const c of dg.extCandidates || []) console.log('  候補: ' + c.dir + (c.hasIndexJson ? ' (index.json あり → --ext-root で指定可)' : c.is45dRoot ? ' (45D 出力。tools/mission45e-preview.cjs --src <旧建物dir> --out-root <このdir> --serve で ext-3dtiles を配信)' : ' (index.json なし)'));
+    if (!(dg.extCandidates || []).length) console.log('  24区 LOD1 の保管場所が不明なら、LOD1 変換済みフォルダのパスを教えてください(自動検出できる既定位置に見つかりませんでした)。');
+  } catch (e) { /* 診断のみ */ }
+}
 if (!has('--no-open')) {
   const cmd = process.platform === 'win32' ? ['cmd', ['/c', 'start', '""', url]] : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
   try { const p = spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true, windowsVerbatimArguments: true }); p.on('error', () => console.log('  (ブラウザを自動で開けませんでした。上の URL を手動で開いてください)')); p.unref(); } catch (e) { console.log('  (自動起動不可。URL を手動で開いてください)'); }

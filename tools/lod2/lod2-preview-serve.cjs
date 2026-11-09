@@ -48,7 +48,37 @@ function diagnose() {
     html37g: { exists: !!html, hasLod2Hook: html.includes('/lod2-preview/overlay.js') && html.includes('LC152.attach') },
     extRoot: opt('ext-root') ? { ok: fs.existsSync(path.resolve(opt('ext-root'))) } : null,
     converted: report ? report.converted : null, lod1Remaining: report ? report.lod1Remaining : null,
+    data: dataStatus(), extCandidates: extCandidates(),
   };
+}
+
+// Mission 169: 表示に必要なデータの有無を起動時に検証する(欠落は日本語で明示)。絶対パス・秘密情報は含めない。
+function jsonOf(p) { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return null; } }
+function dataStatus() {
+  const pub = path.join(ROOT, 'public');
+  const ext = opt('ext-root') ? path.resolve(opt('ext-root')) : null;
+  const st = jsonOf(path.join(pub, 'mission145-data', 'stations-24.json'));
+  const stLocal = jsonOf(path.join(pub, 'mission145-data', 'stations-24.local.json'));
+  const stBest = (stLocal && stLocal.operatorData && stLocal.operatorData.connected) ? stLocal : (st || stLocal);
+  const townsOk = ['towns-24.local.json', 'towns-24.json'].find((n) => fs.existsSync(path.join(pub, 'mission145-data', n)));
+  const idx = ext ? jsonOf(path.join(ext, 'index.json')) : null;
+  const e = (ok, okMsg, ngMsg) => ({ ok: !!ok, msg: ok ? okMsg : ngMsg });
+  return {
+    lod1Wards: e(idx && Array.isArray(idx.wards) && idx.wards.length, (idx && idx.wards ? idx.wards.length : 0) + ' 区の LOD1 を接続', ext ? '--ext-root に index.json がありません(24区 LOD1 は出ません)' : '24区 LOD1 未接続(--ext-root 未指定。内蔵サンプル区のみ)'),
+    stations: e(stBest && Array.isArray(stBest.stations) && stBest.stations.length, stBest && stBest.stations ? stBest.stations.length + ' 駅' : '', '駅データ(mission145-data/stations-24.json)がありません'),
+    railOperators: e(stBest && stBest.operatorData && stBest.operatorData.connected, '路線・運営会社を接続済み', '路線データ未接続: 駅名は出ますが運営会社・路線は不明です(stations-24.json が路線ソース無しで生成されたため。tools/mission145-build-stations.cjs に路線ソースを渡して再生成が必要)'),
+    towns: e(townsOk, '地名データ ' + townsOk, '地名データ(mission145-data/towns-24.json)がありません。地名は出ません(tools/mission145-build-towns.cjs で生成)'),
+    roads: e(fs.existsSync(path.join(pub, 'mission49-data')) || (idx && idx.layersWards && idx.layersWards.length), '道路データあり(内蔵サンプル' + (idx && idx.layersWards ? ' + ' + idx.layersWards.length + '区のレイヤー' : '') + ')', '道路データなし'),
+    rivers: e(fs.existsSync(path.join(pub, 'mission50-data')), '河川データあり(大川/中之島のサンプル範囲のみ)', '河川データなし'),
+  };
+}
+// 既存の 24区 LOD1 出力がありそうな場所の候補(存在確認のみ。読み書きはしない)。
+function extCandidates() {
+  const c = [];
+  const add = (p) => { try { if (p && fs.existsSync(p)) c.push(p); } catch (e) { /* ignore */ } };
+  if (process.env.LOCALAPPDATA) add(path.join(process.env.LOCALAPPDATA, 'LiveCity-3DTiles-Out-24'));
+  add(path.join(ROOT, 'ext-3dtiles')); add(path.join(ROOT, 'temp', 'ext-3dtiles')); add(path.join(ROOT, '..', 'ext-3dtiles'));
+  return c.map((p) => ({ dir: path.basename(p), hasIndexJson: fs.existsSync(path.join(p, 'index.json')), is45dRoot: fs.existsSync(path.join(p, '.livecity-45d-root.json')) }));
 }
 
 const server = http.createServer((req, res) => {
@@ -70,4 +100,4 @@ if (require.main === module) server.listen(port, '127.0.0.1', () => {
   console.log('LOD2 preview (localhost only): http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2fly=1');
   console.log('lod2 dir: ' + mounts[0][1] + (opt('ext-root') ? '  ext-3dtiles: ' + opt('ext-root') : '  (ext-3dtiles 未指定: 既存の内蔵サンプル区のみ)'));
 });
-module.exports = { server, resolve, diagnose };
+module.exports = { server, resolve, diagnose, dataStatus, extCandidates };
