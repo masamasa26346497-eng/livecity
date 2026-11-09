@@ -59,7 +59,8 @@ function countExt(pathname, status) {
 // Mission 174: ブラウザからの実リクエストの記録(クエリは許可キーの値のみ。パス・秘密は記録しない)。
 //   extServed.byWard が空 = 区別ファイル(source/build-report/tileset/GLB)が一度も要求されていない。その原因が
 //   「37G を開いていない/別サーバを見ている」か「?ext45=1 が無い」か「index.json は読んだが区を登録しなかった」かを切り分ける。
-const PAGE = { html: 0, redirected: 0, lastQuery: null, indexJson: 0, overlayJs: 0, diagJs: 0, lastHtmlAt: null, lastIndexAt: null };
+const AUTO_EXT45_SNIPPET = '<script>(function(){try{if(!/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname))return;var q=new URLSearchParams(location.search);if(q.has("ext45"))return;q.set("ext45","1");if(!q.has("nobuiltin"))q.set("nobuiltin","1");window.__lc175={autoExt45:true,original:location.search};history.replaceState(null,"",location.pathname+"?"+q.toString()+location.hash);}catch(e){window.__lc175={autoExt45:false,error:String(e)};}})();</script>';
+const PAGE = { html: 0, injected: 0, redirected: 0, lastQuery: null, indexJson: 0, overlayJs: 0, diagJs: 0, lastHtmlAt: null, lastIndexAt: null };
 function noteReq(u) {
   const p = u.pathname;
   if (p === '/mission37g-osaka-24ward-mvp.html') { PAGE.html++; PAGE.lastHtmlAt = new Date().toISOString(); const o = {}; for (const k of ['ext45', 'nobuiltin', 'lod2', 'lod2ov', 'lod2fly', 'lod2auto3d', 'lod2clip', 'extra', 'ext']) if (u.searchParams.has(k)) o[k] = u.searchParams.get(k).slice(0, 20); PAGE.lastQuery = o; }
@@ -70,7 +71,7 @@ function noteReq(u) {
 function requestVerdict() {
   if (!EXT) return '24区 LOD1 はサーバ側で未接続';
   if (!PAGE.html) return '37G のページがこのサーバに一度も要求されていない(別のサーバ/別ポート/古いタブを見ている可能性。診断を開いたサーバと同じ localhost:' + port + ' で 37G を開く)';
-  if (!PAGE.lastQuery || PAGE.lastQuery.ext45 !== '1') return '37G は開かれたが ext45=1 が無い → 37G は index.json を読まず内蔵の住吉だけを出す(?ext45=0 を明示した場合のみ。通常は 302 で補われる)';
+  if ((!PAGE.lastQuery || PAGE.lastQuery.ext45 !== '1') && !PAGE.injected) return '37G は開かれたが ext45=1 が無い → 37G は index.json を読まず内蔵の住吉だけを出す(?ext45=0 を明示した場合のみ。通常はサーバが HTML に ext45=1 を注入して補う。requests.injected 参照)';
   if (!PAGE.indexJson) return 'ext45=1 付きで開かれたが index.json が要求されていない(ページの読み込み途中/スクリプトエラー。F12 コンソールを確認)';
   if (!Object.keys(SERVED).length) return 'index.json は要求されたが区の source.json/build-report.json が一件も要求されていない(37G の loadExtraMeta が走っていない=ページのスクリプトエラーか読み込み中)';
   return 'ブラウザは区別ファイルを要求している(extServed.byWard 参照)';
@@ -145,10 +146,23 @@ const server = http.createServer((req, res) => {
     noteReq(u);
     // Mission 174: 24区 LOD1 を接続済みなのに ?ext45=1 無しで 37G を開くと、37G は index.json を読まず(loadExt45Defs が即 return)、
     //   内蔵サンプルの住吉だけが出る。→ 接続済みならクエリに ext45=1 を補って 302 する(localhost 専用サーバのみ)。?ext45=0 は尊重。
-    if (u.pathname === '/mission37g-osaka-24ward-mvp.html' && EXT && !u.searchParams.has('ext45')) {
-      u.searchParams.set('ext45', '1'); if (!u.searchParams.has('nobuiltin')) u.searchParams.set('nobuiltin', '1');
-      PAGE.redirected++;
-      res.writeHead(302, { location: u.pathname + u.search, 'cache-control': 'no-store' }); res.end(); return;
+    // Mission 175: 302 は廃止(実PC診断で 17/17 件が 302 のまま、補完URLの再要求が一件も記録されなかった=リダイレクトに依存できない)。
+    //   37G の HTML は常に 200。24区 LOD1 接続済みで URL に ext45 が無いとき、<head> 先頭に同期インラインスクリプトを注入し、
+    //   37G が location.search を読む前に history.replaceState で ?ext45=1&nobuiltin=1 を補う(ネットワーク往復なし)。
+    //   localhost 専用サーバのみ。?ext45=0 は尊重。public/ のファイル自体は書き換えない。
+    if (u.pathname === '/mission37g-osaka-24ward-mvp.html' && (req.method === 'GET' || req.method === 'HEAD')) {
+      const f37 = resolve(u.pathname);
+      if (f37 && fs.existsSync(f37)) {
+        const inject = !!EXT && !u.searchParams.has('ext45');
+        let body = fs.readFileSync(f37, 'utf8');
+        if (inject) {
+          PAGE.injected++;
+          body = /<head[^>]*>/i.test(body) ? body.replace(/<head[^>]*>/i, (m) => m + AUTO_EXT45_SNIPPET) : AUTO_EXT45_SNIPPET + body;
+        }
+        res.on('finish', () => countExt(u.pathname, res.statusCode));
+        res.writeHead(200, { 'content-type': TYPES['.html'], 'cache-control': 'no-store', 'x-lc-auto-ext45': inject ? '1' : '0' });
+        res.end(req.method === 'HEAD' ? undefined : body); return;
+      }
     }
     if (u.pathname === '/ext-3dtiles/index.json' && EXT && EXT.kind === '45d-root') { res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(A.indexJsonFor(EXT, LAY)); return; }
     if (u.pathname === '/ext-3dtiles/index.json' && EXT && EXT.kind === 'ext-index' && LAY) {

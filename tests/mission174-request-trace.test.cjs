@@ -32,16 +32,30 @@ test('ページ未要求 → verdict が「37G が一度も要求されていな
   } finally { p.kill(); }
 });
 
-test('ext45 無しで開くと 302 で ext45=1 が補われ、index.json → 区ごとの source/build-report が要求される', async () => {
+test('Mission175: ext45 無しは 302 せず 200 + ext45=1 注入(明示 ext45=1 は注入しない)', async () => {
+  const la = F.mkLocalAppData({ wards: ['asahi'], special: {}, layerWards: [] });
+  const { p, base } = await start({ LOCALAPPDATA: la });
+  try {
+    const r = await fetch(base + '/mission37g-osaka-24ward-mvp.html?lod2=1', { redirect: 'manual' });
+    assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('x-lc-auto-ext45'), '1');
+    const html = await r.text();
+    const i = html.indexOf('__lc175'); assert.ok(i > 0);
+    assert.ok(i < html.indexOf('location.search', i + 400), 'injected before the page reads location.search');
+    const d = await diag(base); assert.strictEqual(d.requests.injected, 1); assert.strictEqual(d.requests.redirected, 0);
+    const r2 = await fetch(base + '/mission37g-osaka-24ward-mvp.html?ext45=1&nobuiltin=1');
+    assert.strictEqual(r2.status, 200); assert.strictEqual(r2.headers.get('x-lc-auto-ext45'), '0');
+    assert.ok(!(await r2.text()).includes('__lc175'));
+  } finally { p.kill(); }
+});
+
+test('ext45 無しで開いても(注入)、index.json → 区ごとの source/build-report が要求される', async () => {
   const la = F.mkLocalAppData({ wards: ['asahi', 'higashiyodogawa'], special: {}, layerWards: [] });
   const { p, base } = await start({ LOCALAPPDATA: la });
   try {
     const r = await fetch(base + '/mission37g-osaka-24ward-mvp.html?lod2=1', { redirect: 'manual' });
-    assert.strictEqual(r.status, 302);
-    const loc = r.headers.get('location'); assert.match(loc, /ext45=1/); assert.match(loc, /nobuiltin=1/); assert.match(loc, /lod2=1/);
-    const r2 = await fetch(base + loc, { redirect: 'manual' }); assert.strictEqual(r2.status, 200);
+    assert.strictEqual(r.status, 200);
     let d = await diag(base);
-    assert.strictEqual(d.requests.lastQuery.ext45, '1');
+    assert.strictEqual(d.requests.injected, 1);
     assert.match(d.requests.verdict, /index\.json が要求されていない/);
     // 37G の loadExt45Defs → loadExtraMeta と同じ GET
     const idx = await (await fetch(base + '/ext-3dtiles/index.json')).json();
