@@ -30,7 +30,10 @@
   async function attach({ Cesium, viewer }) {
     const scene = viewer.scene;
     try {
-      if (!Cesium.ClippingPolygonCollection || !Cesium.ClippingPolygon) {
+      // Mission 172: ClippingPolygon は既定 OFF。足跡が広域に散ると(41 件でも大阪全域に散らした fixture で)ページが固まり、他区の LOD1 が出なくなることを headless Chrome で確認した。?lod2clip=1 のときだけ ON。
+      const CLIP = new URLSearchParams(location.search).get('lod2clip') === '1';
+      state.clipMode = CLIP ? 'on' : 'off';
+      if (CLIP && (!Cesium.ClippingPolygonCollection || !Cesium.ClippingPolygon)) {
         state.status = 'refused'; state.exclusion = 'unsupported';
         state.error = 'Cesium ' + Cesium.VERSION + ' に ClippingPolygonCollection が無いため、LOD1 との二重描画を避けられず LOD2 を追加しません';
         showFailure(state.error);
@@ -59,9 +62,9 @@
         }
         scene.requestRender();
       };
-      applyClip();
-      scene.postRender.addEventListener(() => { if (scene.primitives.length !== (applyClip._n || 0)) { applyClip._n = scene.primitives.length; applyClip(); } });
-      state.exclusion = 'clipping-polygon(足跡の凸包。LOD2 建物の LOD1 のみ除外。LOD2 化していない 3 棟等は残る)';
+      if (CLIP) applyClip();
+      if (CLIP) scene.postRender.addEventListener(() => { if (scene.primitives.length !== (applyClip._n || 0)) { applyClip._n = scene.primitives.length; applyClip(); } });
+      state.exclusion = CLIP ? 'clipping-polygon(足跡の凸包。LOD2 建物の LOD1 のみ除外。LOD2 化していない 3 棟等は残る)' : 'none(既定。LOD2 の建物は LOD1 と重なって描かれる場合があります。?lod2clip=1 で凸包クリップを試せますが、足跡が多いと固まります)';
       scene.primitives.add(ts);
       state.tilesetReady = true; state.status = 'ready';
 
