@@ -1,0 +1,35 @@
+name: Mission 36L Building Photo Linkage Tests
+
+on:
+  push:
+    branches:
+      - feature/mission-36l-building-photo-linking
+    paths:
+      - 'tools/photos/build-building-google-place-index.mjs'
+      - 'tools/photos/prepare-mission36l-building-photo-linking.mjs'
+      - 'tools/photos/finalize-mission36l.mjs'
+      - 'tests/mission36l-building-google-place-index.test.js'
+      - '.github/workflows/mission36l-building-photo-linkage-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-linkage-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run Mission 36L exact linkage tests
+        run: node --test tests/mission36l-building-google-place-index.test.js
+
+      - name: Validate one-command finalizer entry point
+        run: node tools/photos/finalize-mission36l.mjs --help

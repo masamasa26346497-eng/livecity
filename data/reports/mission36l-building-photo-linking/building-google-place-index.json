@@ -1,0 +1,37 @@
+{
+  "mission": "36L",
+  "generatedAt": "2026-10-04T23:12:47.989Z",
+  "policy": {
+    "exactOsmSourceIdentityOnly": true,
+    "verifiedGooglePlaceOnly": true,
+    "rejectsMultipleGooglePlacesPerBuilding": true,
+    "persistsPhotoMedia": false,
+    "resolvesPhotosAtDisplayTime": true
+  },
+  "counts": {
+    "buildingsScanned": 50357,
+    "verifiedFacilityMappingsAvailable": 6908,
+    "linkedBuildings": 14112,
+    "rejectedAmbiguous": 2,
+    "noExactSource": 15614,
+    "exactSourceWithoutVerifiedPlace": 20629
+  },
+  "rejectedAmbiguous": [
+    {
+      "buildingId": "cg_bldg_bldg_3c637125-0d0a-4e7e-9e0d-4c7f80823c24",
+      "buildingName": "造幣局",
+      "googlePlaceIds": [
+        "ChIJ1TU_LtTmAGARdGIgKLxAV34",
+        "ChIJK4WCStTmAGAREg2BPGKLD-Q"
+      ]
+    },
+    {
+      "buildingId": "cg_bldg_bldg_4ded1bff-4fa7-420f-a7e5-bd172798a878",
+      "buildingName": "中津相愛幼稚園",
+      "googlePlaceIds": [
+        "ChIJl6RSXITmAGARbsGYLY80bdw",
+        "ChIJNalNXITmAGARnA6DVRHhjrQ"
+      ]
+    }
+  ]
+}

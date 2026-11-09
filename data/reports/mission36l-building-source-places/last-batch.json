@@ -1,0 +1,1065 @@
+{
+  "mission": "36L-building-source-places",
+  "generatedAt": "2026-10-04T12:45:33.676Z",
+  "policy": {
+    "sourceTypes": [
+      "way",
+      "relation"
+    ],
+    "exactBuildingSourceIdentityGoal": true,
+    "maxDistanceMeters": 120,
+    "verifiedOnlyPersistence": true
+  },
+  "wardFilter": null,
+  "maxPriority": 3,
+  "requestedLimit": 100,
+  "processed": 64,
+  "verifiedThisBatch": 27,
+  "buildingSourceCountsBefore": {
+    "total": 9498,
+    "verified": 6881,
+    "unresolvedOrAmbiguous": 5115,
+    "unattempted": 64,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 117,
+        "unresolvedOrAmbiguous": 50,
+        "unattempted": 0
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 194,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 0
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 388,
+        "unresolvedOrAmbiguous": 330,
+        "unattempted": 0
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 122,
+        "unresolvedOrAmbiguous": 62,
+        "unattempted": 0
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 154,
+        "unresolvedOrAmbiguous": 136,
+        "unattempted": 0
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 137,
+        "unresolvedOrAmbiguous": 146,
+        "unattempted": 19
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 526,
+        "unresolvedOrAmbiguous": 488,
+        "unattempted": 0
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 169,
+        "unresolvedOrAmbiguous": 60,
+        "unattempted": 12
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 787,
+        "unresolvedOrAmbiguous": 914,
+        "unattempted": 0
+      },
+      "joto": {
+        "total": 180,
+        "verified": 131,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 0
+      },
+      "kita": {
+        "total": 764,
+        "verified": 470,
+        "unresolvedOrAmbiguous": 294,
+        "unattempted": 0
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 180,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 0
+      },
+      "minato": {
+        "total": 211,
+        "verified": 160,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 0
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 204,
+        "unresolvedOrAmbiguous": 79,
+        "unattempted": 0
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 159,
+        "unresolvedOrAmbiguous": 106,
+        "unattempted": 0
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 200,
+        "unresolvedOrAmbiguous": 156,
+        "unattempted": 0
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 106,
+        "unresolvedOrAmbiguous": 47,
+        "unattempted": 9
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 144,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 100,
+        "unresolvedOrAmbiguous": 48,
+        "unattempted": 3
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 125,
+        "unresolvedOrAmbiguous": 89,
+        "unattempted": 21
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 124,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 226,
+        "unresolvedOrAmbiguous": 117,
+        "unattempted": 0
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 164,
+        "unresolvedOrAmbiguous": 172,
+        "unattempted": 0
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 314,
+        "unresolvedOrAmbiguous": 206,
+        "unattempted": 0
+      }
+    }
+  },
+  "buildingSourceCountsAfter": {
+    "total": 9498,
+    "verified": 6908,
+    "unresolvedOrAmbiguous": 5152,
+    "unattempted": 0,
+    "byWard": {
+      "abeno": {
+        "total": 167,
+        "verified": 117,
+        "unresolvedOrAmbiguous": 50,
+        "unattempted": 0
+      },
+      "asahi": {
+        "total": 396,
+        "verified": 194,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 0
+      },
+      "chuo": {
+        "total": 718,
+        "verified": 388,
+        "unresolvedOrAmbiguous": 330,
+        "unattempted": 0
+      },
+      "fukushima": {
+        "total": 184,
+        "verified": 122,
+        "unresolvedOrAmbiguous": 62,
+        "unattempted": 0
+      },
+      "higashinari": {
+        "total": 290,
+        "verified": 154,
+        "unresolvedOrAmbiguous": 136,
+        "unattempted": 0
+      },
+      "higashisumiyoshi": {
+        "total": 302,
+        "verified": 147,
+        "unresolvedOrAmbiguous": 155,
+        "unattempted": 0
+      },
+      "higashiyodogawa": {
+        "total": 1014,
+        "verified": 526,
+        "unresolvedOrAmbiguous": 488,
+        "unattempted": 0
+      },
+      "hirano": {
+        "total": 241,
+        "verified": 172,
+        "unresolvedOrAmbiguous": 69,
+        "unattempted": 0
+      },
+      "ikuno": {
+        "total": 1701,
+        "verified": 787,
+        "unresolvedOrAmbiguous": 914,
+        "unattempted": 0
+      },
+      "joto": {
+        "total": 180,
+        "verified": 131,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 0
+      },
+      "kita": {
+        "total": 764,
+        "verified": 470,
+        "unresolvedOrAmbiguous": 294,
+        "unattempted": 0
+      },
+      "konohana": {
+        "total": 279,
+        "verified": 180,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 0
+      },
+      "minato": {
+        "total": 211,
+        "verified": 160,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 0
+      },
+      "miyakojima": {
+        "total": 283,
+        "verified": 204,
+        "unresolvedOrAmbiguous": 79,
+        "unattempted": 0
+      },
+      "naniwa": {
+        "total": 265,
+        "verified": 159,
+        "unresolvedOrAmbiguous": 106,
+        "unattempted": 0
+      },
+      "nishi": {
+        "total": 356,
+        "verified": 200,
+        "unresolvedOrAmbiguous": 156,
+        "unattempted": 0
+      },
+      "nishinari": {
+        "total": 162,
+        "verified": 111,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 0
+      },
+      "nishiyodogawa": {
+        "total": 210,
+        "verified": 144,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "suminoe": {
+        "total": 151,
+        "verified": 102,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 0
+      },
+      "sumiyoshi": {
+        "total": 235,
+        "verified": 132,
+        "unresolvedOrAmbiguous": 103,
+        "unattempted": 0
+      },
+      "taisho": {
+        "total": 190,
+        "verified": 124,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 0
+      },
+      "tennoji": {
+        "total": 343,
+        "verified": 226,
+        "unresolvedOrAmbiguous": 117,
+        "unattempted": 0
+      },
+      "tsurumi": {
+        "total": 336,
+        "verified": 164,
+        "unresolvedOrAmbiguous": 172,
+        "unattempted": 0
+      },
+      "yodogawa": {
+        "total": 520,
+        "verified": 314,
+        "unresolvedOrAmbiguous": 206,
+        "unattempted": 0
+      }
+    }
+  },
+  "countsAfterBatch": {
+    "total": 40585,
+    "verified": 6908,
+    "unresolvedOrAmbiguous": 5152,
+    "unattempted": 28525,
+    "byWard": {
+      "abeno": {
+        "total": 851,
+        "verified": 117,
+        "unresolvedOrAmbiguous": 50,
+        "unattempted": 684
+      },
+      "asahi": {
+        "total": 1097,
+        "verified": 194,
+        "unresolvedOrAmbiguous": 202,
+        "unattempted": 701
+      },
+      "chuo": {
+        "total": 5084,
+        "verified": 388,
+        "unresolvedOrAmbiguous": 330,
+        "unattempted": 4366
+      },
+      "fukushima": {
+        "total": 967,
+        "verified": 122,
+        "unresolvedOrAmbiguous": 62,
+        "unattempted": 783
+      },
+      "higashinari": {
+        "total": 918,
+        "verified": 154,
+        "unresolvedOrAmbiguous": 136,
+        "unattempted": 628
+      },
+      "higashisumiyoshi": {
+        "total": 1025,
+        "verified": 172,
+        "unresolvedOrAmbiguous": 155,
+        "unattempted": 698
+      },
+      "higashiyodogawa": {
+        "total": 2922,
+        "verified": 526,
+        "unresolvedOrAmbiguous": 488,
+        "unattempted": 1908
+      },
+      "hirano": {
+        "total": 1116,
+        "verified": 174,
+        "unresolvedOrAmbiguous": 69,
+        "unattempted": 873
+      },
+      "ikuno": {
+        "total": 3325,
+        "verified": 787,
+        "unresolvedOrAmbiguous": 914,
+        "unattempted": 1624
+      },
+      "joto": {
+        "total": 1051,
+        "verified": 131,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 871
+      },
+      "kita": {
+        "total": 5655,
+        "verified": 1888,
+        "unresolvedOrAmbiguous": 1376,
+        "unattempted": 2391
+      },
+      "konohana": {
+        "total": 1309,
+        "verified": 180,
+        "unresolvedOrAmbiguous": 99,
+        "unattempted": 1030
+      },
+      "minato": {
+        "total": 612,
+        "verified": 160,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 401
+      },
+      "miyakojima": {
+        "total": 1444,
+        "verified": 204,
+        "unresolvedOrAmbiguous": 79,
+        "unattempted": 1161
+      },
+      "naniwa": {
+        "total": 1363,
+        "verified": 159,
+        "unresolvedOrAmbiguous": 106,
+        "unattempted": 1098
+      },
+      "nishi": {
+        "total": 2071,
+        "verified": 200,
+        "unresolvedOrAmbiguous": 156,
+        "unattempted": 1715
+      },
+      "nishinari": {
+        "total": 854,
+        "verified": 111,
+        "unresolvedOrAmbiguous": 51,
+        "unattempted": 692
+      },
+      "nishiyodogawa": {
+        "total": 880,
+        "verified": 144,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 670
+      },
+      "suminoe": {
+        "total": 617,
+        "verified": 102,
+        "unresolvedOrAmbiguous": 49,
+        "unattempted": 466
+      },
+      "sumiyoshi": {
+        "total": 965,
+        "verified": 167,
+        "unresolvedOrAmbiguous": 103,
+        "unattempted": 695
+      },
+      "taisho": {
+        "total": 649,
+        "verified": 124,
+        "unresolvedOrAmbiguous": 66,
+        "unattempted": 459
+      },
+      "tennoji": {
+        "total": 1611,
+        "verified": 226,
+        "unresolvedOrAmbiguous": 117,
+        "unattempted": 1268
+      },
+      "tsurumi": {
+        "total": 842,
+        "verified": 164,
+        "unresolvedOrAmbiguous": 172,
+        "unattempted": 506
+      },
+      "yodogawa": {
+        "total": 3357,
+        "verified": 314,
+        "unresolvedOrAmbiguous": 206,
+        "unattempted": 2837
+      }
+    }
+  },
+  "apiUsage": {
+    "searchCalls": 64,
+    "detailsCalls": 24,
+    "photoMediaCalls": 0,
+    "disabledCalls": 0,
+    "deduped": 0,
+    "rateLimited": 0,
+    "sessionLimited": 0,
+    "executed": 88,
+    "inFlight": 0,
+    "windowCount": 39,
+    "sessionCount": 88
+  },
+  "results": [
+    {
+      "facilityId": "osm-way-893687925",
+      "osmElementType": "way",
+      "name": "ラーメン屋壱番亭",
+      "wardId": "suminoe",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3,
+      "reason": "座標は近い(3m)が名前が一致しない: \"旨さ一番 壱番亭 北加賀屋店\""
+    },
+    {
+      "facilityId": "osm-way-893687926",
+      "osmElementType": "way",
+      "name": "solege",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 6,
+      "reason": "座標(6m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-899183703",
+      "osmElementType": "way",
+      "name": "にぎり長次郎",
+      "wardId": "suminoe",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 0,
+      "reason": "座標(0m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-relation-6015248",
+      "osmElementType": "relation",
+      "name": "ロイヤルホスト",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 9,
+      "reason": "座標(9m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-159243309",
+      "osmElementType": "way",
+      "name": "らーめん ごん",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1678,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1678m）"
+    },
+    {
+      "facilityId": "osm-way-172355192",
+      "osmElementType": "way",
+      "name": "デニーズ",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-317312115",
+      "osmElementType": "way",
+      "name": "くら寿司",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "座標(8m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317312625",
+      "osmElementType": "way",
+      "name": "マクドナルド",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-340400575",
+      "osmElementType": "way",
+      "name": "Shot Bar Shanty",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-350516905",
+      "osmElementType": "way",
+      "name": "長崎堂",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-352193015",
+      "osmElementType": "way",
+      "name": "SHOT BAR  \"Lick Lick\"　NOチャージ!!",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 7124,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 7124m）"
+    },
+    {
+      "facilityId": "osm-way-352193478",
+      "osmElementType": "way",
+      "name": "堀内酒店",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 12475,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 12475m）"
+    },
+    {
+      "facilityId": "osm-way-355598533",
+      "osmElementType": "way",
+      "name": "ポアール帝塚山本店",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-389000749",
+      "osmElementType": "way",
+      "name": "焼き肉　一光",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3860,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3860m）"
+    },
+    {
+      "facilityId": "osm-way-400760485",
+      "osmElementType": "way",
+      "name": "たこ焼き正ちゃん",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-424693474",
+      "osmElementType": "way",
+      "name": "ざんこく料理　あおがき",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 163,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 163m）"
+    },
+    {
+      "facilityId": "osm-way-496577216",
+      "osmElementType": "way",
+      "name": "居酒屋　雪國",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 11,
+      "reason": "座標は近い(11m)が名前が一致しない: \"雪国\""
+    },
+    {
+      "facilityId": "osm-way-496578088",
+      "osmElementType": "way",
+      "name": "焼肉の家族亭",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 11,
+      "reason": "座標は近い(11m)が名前が一致しない: \"焼肉家族亭 住吉本店\""
+    },
+    {
+      "facilityId": "osm-way-496599651",
+      "osmElementType": "way",
+      "name": "中国料理　廣洲",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1492,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1492m）"
+    },
+    {
+      "facilityId": "osm-way-496599655",
+      "osmElementType": "way",
+      "name": "中国料理",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-547820243",
+      "osmElementType": "way",
+      "name": "浪花屋",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 8,
+      "reason": "Mission 36I retry: 日本語表記差(canonical-exact)・タイプ互換・所在地(大阪)・座標(8m)が一意 [conservative-variant]"
+    },
+    {
+      "facilityId": "osm-way-586767455",
+      "osmElementType": "way",
+      "name": "魚ベイ",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-587362198",
+      "osmElementType": "way",
+      "name": "ラーメン屋さん",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 132,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 132m）"
+    },
+    {
+      "facilityId": "osm-way-608552931",
+      "osmElementType": "way",
+      "name": "FamilyMart",
+      "wardId": "sumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6,
+      "reason": "座標は近い(6m)が名前が一致しない: \"ファミリーマート ＭＹＳ我孫子東二丁目店\""
+    },
+    {
+      "facilityId": "osm-way-1102812904",
+      "osmElementType": "way",
+      "name": "さんきゅう",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1102812905",
+      "osmElementType": "way",
+      "name": "てこや",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2075,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2075m）"
+    },
+    {
+      "facilityId": "osm-way-1102812906",
+      "osmElementType": "way",
+      "name": "らー麺　ずんどう屋",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"ラー麺ずんどう屋 東住吉今川店\""
+    },
+    {
+      "facilityId": "osm-way-1102812908",
+      "osmElementType": "way",
+      "name": "からやま",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1102857025",
+      "osmElementType": "way",
+      "name": "たこよし",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-300729815",
+      "osmElementType": "way",
+      "name": "ロイヤルホスト",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317310037",
+      "osmElementType": "way",
+      "name": "びっくりドンキー",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317310072",
+      "osmElementType": "way",
+      "name": "吉野屋",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"吉野家 長居公園通り矢田店\""
+    },
+    {
+      "facilityId": "osm-way-317310080",
+      "osmElementType": "way",
+      "name": "あきんど",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 6836,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 6836m）"
+    },
+    {
+      "facilityId": "osm-way-317310569",
+      "osmElementType": "way",
+      "name": "いも善",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2910,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2910m）"
+    },
+    {
+      "facilityId": "osm-way-317310577",
+      "osmElementType": "way",
+      "name": "来来亭",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 1,
+      "reason": "座標(1m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-317311578",
+      "osmElementType": "way",
+      "name": "ロイヤルホスト",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1778,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 1778m）"
+    },
+    {
+      "facilityId": "osm-way-317313020",
+      "osmElementType": "way",
+      "name": "ザ・めしや",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-462707984",
+      "osmElementType": "way",
+      "name": "ジョリーパスタ",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 44,
+      "reason": "座標(44m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-465311820",
+      "osmElementType": "way",
+      "name": "ボンハンバーガー東住吉店",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"ボンバーガー 東住吉店\""
+    },
+    {
+      "facilityId": "osm-way-547852844",
+      "osmElementType": "way",
+      "name": "焼肉キング",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近い候補が複数あるが、どれも名前が一致しない（曖昧）"
+    },
+    {
+      "facilityId": "osm-way-582497063",
+      "osmElementType": "way",
+      "name": "街かど屋",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 15,
+      "reason": "座標(15m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-742092530",
+      "osmElementType": "way",
+      "name": "焼肉 五苑 湯里店",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-951906667",
+      "osmElementType": "way",
+      "name": "ザ・めしや",
+      "wardId": "higashisumiyoshi",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 7,
+      "reason": "座標(7m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1007573169",
+      "osmElementType": "way",
+      "name": "はま寿司",
+      "wardId": "hirano",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1018942628",
+      "osmElementType": "way",
+      "name": "ワンカルビ",
+      "wardId": "hirano",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2331,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 2331m）"
+    },
+    {
+      "facilityId": "osm-way-1279562292",
+      "osmElementType": "way",
+      "name": "餃子の王将 喜連瓜破店",
+      "wardId": "hirano",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-318011797",
+      "osmElementType": "way",
+      "name": "Domino's",
+      "wardId": "hirano",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1,
+      "reason": "座標は近い(1m)が名前が一致しない: \"ドミノ・ピザ加美福井戸東店\""
+    },
+    {
+      "facilityId": "osm-way-388997611",
+      "osmElementType": "way",
+      "name": "ジョリーパスタ",
+      "wardId": "hirano",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-388997612",
+      "osmElementType": "way",
+      "name": "ココス",
+      "wardId": "hirano",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-447881772",
+      "osmElementType": "way",
+      "name": "ごはん屋 お三度",
+      "wardId": "hirano",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 734,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 734m）"
+    },
+    {
+      "facilityId": "osm-way-447881777",
+      "osmElementType": "way",
+      "name": "ロイヤルホスト",
+      "wardId": "hirano",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-491036603",
+      "osmElementType": "way",
+      "name": "豊一食堂",
+      "wardId": "hirano",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 489770,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 489770m）"
+    },
+    {
+      "facilityId": "osm-way-742056197",
+      "osmElementType": "way",
+      "name": "マクドナルド",
+      "wardId": "hirano",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null,
+      "reason": "座標が近く名前も一致する候補が複数ある（一意に決められない。同名の別施設の可能性）"
+    },
+    {
+      "facilityId": "osm-way-993857871",
+      "osmElementType": "way",
+      "name": "マクドナルド",
+      "wardId": "hirano",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-995566749",
+      "osmElementType": "way",
+      "name": "しゃぶ葉",
+      "wardId": "hirano",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3926,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 3926m）"
+    },
+    {
+      "facilityId": "osm-relation-17719145",
+      "osmElementType": "relation",
+      "name": "あっちち本舗",
+      "wardId": "nishinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2,
+      "reason": "座標(2m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1086058858",
+      "osmElementType": "way",
+      "name": "マロニエ",
+      "wardId": "nishinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 10,
+      "reason": "座標(10m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-1455464980",
+      "osmElementType": "way",
+      "name": "割烹・仕出し料理 大宗",
+      "wardId": "nishinari",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 8,
+      "reason": "座標は近い(8m)が名前が一致しない: \"大宗\""
+    },
+    {
+      "facilityId": "osm-way-390552470",
+      "osmElementType": "way",
+      "name": "くら寿司",
+      "wardId": "nishinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 3,
+      "reason": "座標(3m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-463304829",
+      "osmElementType": "way",
+      "name": "板前焼肉一斗",
+      "wardId": "nishinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 5,
+      "reason": "座標(5m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-547851186",
+      "osmElementType": "way",
+      "name": "ビッグボーイ　岸里店",
+      "wardId": "nishinari",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4,
+      "reason": "座標は近い(4m)が名前が一致しない: \"ビッグボーイ 岸の里店\""
+    },
+    {
+      "facilityId": "osm-way-686244221",
+      "osmElementType": "way",
+      "name": "かっぱ寿司",
+      "wardId": "nishinari",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 4,
+      "reason": "座標(4m以内)と名前が一致"
+    },
+    {
+      "facilityId": "osm-way-823353390",
+      "osmElementType": "way",
+      "name": "お好み焼き屋 SARAN",
+      "wardId": "nishinari",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 152,
+      "reason": "閾値(120m)内に候補が無い（最も近い候補: 152m）"
+    },
+    {
+      "facilityId": "osm-way-899183695",
+      "osmElementType": "way",
+      "name": "丸亀製麵",
+      "wardId": "nishinari",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2,
+      "reason": "座標は近い(2m)が名前が一致しない: \"丸亀製麺住之江\""
+    }
+  ]
+}
