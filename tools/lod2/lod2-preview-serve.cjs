@@ -56,6 +56,26 @@ function countExt(pathname, status) {
   if (status !== 200 && RECENT_FAIL.length < 40) RECENT_FAIL.push({ ward: m[1], kind: k, file: m[2].slice(0, 60), status });
 }
 
+// Mission 174: ブラウザからの実リクエストの記録(クエリは許可キーの値のみ。パス・秘密は記録しない)。
+//   extServed.byWard が空 = 区別ファイル(source/build-report/tileset/GLB)が一度も要求されていない。その原因が
+//   「37G を開いていない/別サーバを見ている」か「?ext45=1 が無い」か「index.json は読んだが区を登録しなかった」かを切り分ける。
+const PAGE = { html: 0, redirected: 0, lastQuery: null, indexJson: 0, overlayJs: 0, diagJs: 0, lastHtmlAt: null, lastIndexAt: null };
+function noteReq(u) {
+  const p = u.pathname;
+  if (p === '/mission37g-osaka-24ward-mvp.html') { PAGE.html++; PAGE.lastHtmlAt = new Date().toISOString(); const o = {}; for (const k of ['ext45', 'nobuiltin', 'lod2', 'lod2ov', 'lod2fly', 'lod2auto3d', 'lod2clip', 'extra', 'ext']) if (u.searchParams.has(k)) o[k] = u.searchParams.get(k).slice(0, 20); PAGE.lastQuery = o; }
+  else if (p === '/ext-3dtiles/index.json') { PAGE.indexJson++; PAGE.lastIndexAt = new Date().toISOString(); }
+  else if (p === '/lod2-preview/overlay.js') PAGE.overlayJs++;
+  else if (p === '/lod2-preview/diagnose.js') PAGE.diagJs++;
+}
+function requestVerdict() {
+  if (!EXT) return '24区 LOD1 はサーバ側で未接続';
+  if (!PAGE.html) return '37G のページがこのサーバに一度も要求されていない(別のサーバ/別ポート/古いタブを見ている可能性。診断を開いたサーバと同じ localhost:' + port + ' で 37G を開く)';
+  if (!PAGE.lastQuery || PAGE.lastQuery.ext45 !== '1') return '37G は開かれたが ext45=1 が無い → 37G は index.json を読まず内蔵の住吉だけを出す(?ext45=0 を明示した場合のみ。通常は 302 で補われる)';
+  if (!PAGE.indexJson) return 'ext45=1 付きで開かれたが index.json が要求されていない(ページの読み込み途中/スクリプトエラー。F12 コンソールを確認)';
+  if (!Object.keys(SERVED).length) return 'index.json は要求されたが区の source.json/build-report.json が一件も要求されていない(37G の loadExtraMeta が走っていない=ページのスクリプトエラーか読み込み中)';
+  return 'ブラウザは区別ファイルを要求している(extServed.byWard 参照)';
+}
+
 // Mission 162: 診断(ファイル存在・37G HTML の attach フック等)。秘密情報・絶対パスは含めない。
 function diagnose() {
   const lodDir = mounts[0][1];
@@ -71,6 +91,7 @@ function diagnose() {
     extRoot: opt('ext-root') ? { ok: fs.existsSync(path.resolve(opt('ext-root'))) } : null,
     extAttach: extSummary(), layers: layersSummary(),
     extServed: { byWard: SERVED, recentFailures: RECENT_FAIL },
+    requests: { ...PAGE, verdict: requestVerdict() },
     converted: report ? report.converted : null, lod1Remaining: report ? report.lod1Remaining : null,
     data: dataStatus(), extCandidates: extCandidates(),
   };
@@ -121,6 +142,14 @@ function extCandidates() {
 const server = http.createServer((req, res) => {
   try {
     const u = new URL(req.url, 'http://localhost');
+    noteReq(u);
+    // Mission 174: 24区 LOD1 を接続済みなのに ?ext45=1 無しで 37G を開くと、37G は index.json を読まず(loadExt45Defs が即 return)、
+    //   内蔵サンプルの住吉だけが出る。→ 接続済みならクエリに ext45=1 を補って 302 する(localhost 専用サーバのみ)。?ext45=0 は尊重。
+    if (u.pathname === '/mission37g-osaka-24ward-mvp.html' && EXT && !u.searchParams.has('ext45')) {
+      u.searchParams.set('ext45', '1'); if (!u.searchParams.has('nobuiltin')) u.searchParams.set('nobuiltin', '1');
+      PAGE.redirected++;
+      res.writeHead(302, { location: u.pathname + u.search, 'cache-control': 'no-store' }); res.end(); return;
+    }
     if (u.pathname === '/ext-3dtiles/index.json' && EXT && EXT.kind === '45d-root') { res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(A.indexJsonFor(EXT, LAY)); return; }
     if (u.pathname === '/ext-3dtiles/index.json' && EXT && EXT.kind === 'ext-index' && LAY) {
       const j = jsonOf(path.join(EXT.dir, 'index.json')) || {}; if (!Array.isArray(j.layersWards) || !j.layersWards.length) j.layersWards = LAY.wards.map((w) => ({ ward: w.ward }));
