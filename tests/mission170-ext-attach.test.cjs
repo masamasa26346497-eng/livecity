@@ -8,18 +8,9 @@ const path = require('node:path');
 const vm = require('node:vm');
 const A = require('../tools/lod2/lod2-ext-attach.cjs');
 
-function mk45d(wards) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'lc170-'));
-  fs.writeFileSync(path.join(root, '.livecity-45d-root.json'), JSON.stringify({ schema: 'livecity.mission45d.convert-all/1' }));
-  for (const w of wards) {
-    const d = w === 'sumiyoshi' ? path.join(root, 'sumiyoshi-a1', 'sumiyoshi') : path.join(root, 'pc23', w + '-a2');
-    fs.mkdirSync(path.join(d, 'tiles'), { recursive: true });
-    fs.writeFileSync(path.join(d, 'tileset.json'), '{}'); fs.writeFileSync(path.join(d, 'tiles', 't0.glb'), 'GLB');
-    fs.writeFileSync(path.join(d, 'build-report.json'), JSON.stringify({ buildings: 10 }));
-    fs.writeFileSync(path.join(d, 'secret.txt'), 'x');
-  }
-  return root;
-}
+// Mission 171: 以前の fixture は tileset.json='{}'・source.json なしの「37G が読めない形」で、検出テストだけ通っていた。実出力に忠実な形へ共通化。
+const F = require('./helpers/lc-45d-fixture.cjs');
+const mk45d = (wards) => F.mk45d(wards, Object.fromEntries(wards.map((w) => [w, { buildings: 10 }])));
 
 test('45D ルート: 検出できた区だけ接続し、欠落区と「未検証」を明示する', () => {
   const root = mk45d(['kita', 'sumiyoshi']);
@@ -36,7 +27,7 @@ test('45D ルート: 検出できた区だけ接続し、欠落区と「未検�
 test('配信は許可リストのみ。traversal・非許可ファイル・他区は拒否', () => {
   const r = A.inspect(mk45d(['kita']));
   assert.ok(A.resolveFromServable(r.servable, 'kita/tileset.json'));
-  assert.ok(A.resolveFromServable(r.servable, 'kita/tiles/t0.glb'));
+  assert.ok(A.resolveFromServable(r.servable, 'kita/tiles/t_0_0.glb'));
   assert.strictEqual(A.resolveFromServable(r.servable, 'kita/secret.txt'), null);
   assert.strictEqual(A.resolveFromServable(r.servable, 'kita/../x/tileset.json'), null);
   assert.strictEqual(A.resolveFromServable(r.servable, 'naniwa/tileset.json'), null);

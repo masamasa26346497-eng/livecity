@@ -134,6 +134,66 @@
       };
       state.live = refreshLive;
       setInterval(refreshLive, 1000);
+      // Mission 171: 区ごとの LOD1 状態。「接続した」ではなく、ブラウザで tileset が実際に読めたか(tileLoad)・描かれたか(tileVisible)・失敗したか(tileFailed)と、
+      //   サーバ側の HTTP 結果(200/404)を並べる。GLB が 0 枚しか読めていない区は「接続済み」と書かない。
+      const wardSt = {};   // wardId -> { loads, visible, failed, lastError, mounted }
+      const wardOf = (b) => { const m = /ext-3dtiles\/([a-z0-9-]+)\//.exec(b || ''); return m ? m[1] : null; };
+      const hook = () => {
+        const prims = viewer.scene.primitives;
+        for (let i = 0; i < prims.length; i++) {
+          const t = prims.get(i); const w = t && t._lcBase ? wardOf(t._lcBase) : null;
+          if (!w || t._lc171) continue;
+          t._lc171 = true;
+          const st = wardSt[w] || (wardSt[w] = { loads: 0, visible: 0, failed: 0, lastError: null, mounted: 0 });
+          st.mounted++;
+          t.tileLoad.addEventListener(() => { st.loads++; });
+          t.tileVisible.addEventListener((tile) => { if (tile.hasRenderableContent !== false) st.visible++; });
+          t.tileFailed.addEventListener((e) => { st.failed++; st.lastError = String((e && e.message) || e).slice(0, 120); });
+        }
+      };
+      const sec = document.createElement('div');
+      sec.style.cssText = 'margin:4px 0;padding:4px 6px;background:rgba(255,255,255,.06);border-radius:4px;max-height:200px;overflow:auto';
+      panel.insertBefore(sec, panel.children[2]);
+      const rowOf = (w, srv, ea) => {
+        const b = wardSt[w.ward]; const sv = (srv || {})[w.ward];
+        const glbOk = sv ? sv.glb[0] : 0, glbNg = sv ? sv.glb[1] + sv.tileset[1] + sv.meta[1] : 0;
+        let mark, msg;
+        if (glbNg > 0 || (b && b.failed > 0)) { mark = '<span style="color:#f88">NG</span>'; msg = '読込失敗(HTTP 404等 ' + glbNg + ' / tileFailed ' + (b ? b.failed : 0) + ')' + (b && b.lastError ? ' ' + b.lastError : ''); }
+        else if (b && b.visible > 0) { mark = '<span style="color:#8f8">描画中</span>'; msg = 'tileVisible ' + b.visible + ' / GLB 200×' + glbOk; }
+        else if (b && b.loads > 0) { mark = '<span style="color:#fd8">読込済</span>'; msg = 'GLB ' + b.loads + '枚読込。視野外/遠景のため未描画'; }
+        else if (b) { mark = '<span style="color:#fd8">待機</span>'; msg = 'tileset は登録済み、GLB 未読込(区に近づく/区を選択)'; }
+        else { mark = '<span style="color:#aaa">未要求</span>'; msg = 'この区の tileset はまだ要求されていません'; }
+        return '<div>' + mark + ' <b>' + w.ward + '</b> ' + (w.buildings != null ? w.buildings + '棟 ' : '') + msg + '</div>';
+      };
+      const refreshWards = () => {
+        hook();
+        fetch('/__lod2/diag.json', { cache: 'no-store' }).then((r) => r.json()).then((dg) => {
+          const ea = dg.extAttach; const c = ea && ea.chosen; const srv = dg.extServed && dg.extServed.byWard;
+          state.extServed = dg.extServed; state.wardSt = wardSt;
+          let h = '<b>区ごとの LOD1 状態</b> (HTTP200 だけでなく tileLoad / tileVisible で判定)<br>';
+          if (!c) h += '<span style="color:#fc8">LOD1 未接続: 区ごとの建物は出ません</span>';
+          else {
+            h += c.wardList.map((w) => rowOf(w, srv, ea)).join('');
+            for (const b of (c.brokenWards || [])) h += '<div><span style="color:#f88">NG</span> <b>' + b.ward + '</b> 出力はあるが 37G が読めない: ' + String((b.reasons[0] || {}).reason || '').replace(/[<>&]/g, '').slice(0, 140) + '</div>';
+            if ((c.missingWards || []).length) h += '<div style="opacity:.8">出力なし: ' + c.missingWards.join(', ') + '</div>';
+          }
+          const ly = dg.layers; h += '<div style="margin-top:3px">道路・河川・公園: ' + (ly && ly.attached ? ly.wards.length + ' 区接続' : '<span style="color:#fc8">未接続(区境界のみ。--layers-root または LiveCity-MapLayers-Out-24 が必要)</span>') + '</div>';
+          const mode = document.getElementById('sel-bldg-mode');
+          if (c && mode && mode.value !== 'all') h += '<div style="color:#fc8">左パネル「3D表示モード」を「全域3D」にするか「3D建物の区」で区を選ぶと建物が出ます(既定は「建物を表示しない」)</div>';
+          if (c && Object.keys(wardSt).length && !Object.values(wardSt).some((x) => x.visible > 0)) h += '<div style="color:#fc8">いまの視点では LOD1 が描かれていません。区に近づいてください(高度が高いと全域3Dは遠景扱いで建物を出しません)</div>';
+          sec.innerHTML = h;
+        }).catch(() => { sec.textContent = '診断情報(diag.json)を取得できません'; });
+      };
+      setInterval(refreshWards, 3000); refreshWards();
+      // 既定では 37G は「建物を表示しない / 選択した1区のみ」。24区 LOD1 を接続できているときだけ、全域3Dを自動で有効化する(?lod2auto3d=0 で止める)。
+      if (new URLSearchParams(location.search).get('lod2auto3d') !== '0') {
+        let tries = 0;
+        const iv = setInterval(() => {
+          const mode = document.getElementById('sel-bldg-mode'); const all = mode && mode.querySelector('option[value="all"]');
+          if (++tries > 40) clearInterval(iv);
+          if (all && !all.disabled && mode.value !== 'all') { mode.value = 'all'; mode.dispatchEvent(new Event('change')); state.auto3d = true; clearInterval(iv); }
+        }, 750);
+      }
       Object.assign(window.__lc152, { overview, goSpot });
       const qp = new URLSearchParams(location.search);
       if (qp.get('lod2fly') === '1') fly();

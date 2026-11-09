@@ -74,6 +74,8 @@ const sargs = [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', S
 if (ALL) sargs.push('--lod2-dir', OUT);
 if (g('--ext-root')) sargs.push('--ext-root', g('--ext-root'));
 if (has('--no-auto-ext')) sargs.push('--no-auto-ext');
+if (g('--layers-root')) sargs.push('--layers-root', g('--layers-root'));
+if (has('--no-auto-layers')) sargs.push('--no-auto-layers');
 const srv = spawn(process.execPath, sargs, { cwd: ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
 let srvExit = null; srv.on('exit', (c) => { srvExit = c; });
 process.on('SIGINT', () => { srv.kill(); process.exit(0); });
@@ -103,12 +105,16 @@ try {
   const ea = dg.extAttach || {};
   if (ea.chosen) {
     console.log(`  ★ 24区 LOD1: ${ea.chosen.wards} 区を接続(${ea.chosen.kind}${ea.chosen.verified ? '' : '・未検証'}${ea.auto ? '・自動検出' : ''})。` + (ea.chosen.buildingsKnown ? `合計 ${ea.chosen.buildings} 棟` : '棟数は不明'));
+    for (const b of ea.chosen.brokenWards || []) console.log('  ✕ ' + b.ward + ': 出力はあるが 37G が読めません → ' + ((b.reasons[0] || {}).reason || ''));
     if (ea.chosen.kind === '45d-root') console.log('    ※ 既存の旧PC変換データの可能性があります。PR51 の公式2025 LOD1(615,234棟)と同一とは限りません。欠落区: ' + ((ea.chosen.missingWards || []).join(',') || 'なし'));
   } else {
     console.log('  ※ 24区の LOD1 は未接続です(LOD2 と内蔵サンプルのみ)。右上パネルの「✕」が未接続データです。');
     for (const x of ea.inspected || []) console.log('    検査した場所 ' + x.name + ': ' + x.reasons.join(' / '));
     if (!(ea.inspected || []).length) console.log('    既定の場所に LOD1 出力が見つかりません。PowerShell: Test-Path "$env:LOCALAPPDATA\\LiveCity-3DTiles-Out-24" / 別の場所なら --ext-root <フォルダ> を指定してください。');
   }
+  const ly = dg.layers || {};
+  console.log(ly.attached ? `  ★ 道路・河川・公園: ${ly.wards.length} 区のレイヤーを接続` : '  ※ 道路・河川・公園の24区レイヤーは未接続(区境界のみ)。' + ((ly.inspected || []).map((x) => x.name + ': ' + x.reasons.join('/')).join(' ; ') || '既定の場所に LiveCity-MapLayers-Out-24 が無い。別の場所なら --layers-root <フォルダ> を指定'));
+  console.log('  ★ 建物は「全域3D」を自動で有効化します。区ごとの状態は右上パネル「区ごとの LOD1 状態」(NG / 描画中 / 待機)で確認できます。');
 } catch (e) { /* 診断のみ */ }
 if (!has('--no-open')) {
   const cmd = process.platform === 'win32' ? ['cmd', ['/c', 'start', '""', url]] : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
