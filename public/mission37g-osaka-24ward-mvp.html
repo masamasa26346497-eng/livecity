@@ -456,6 +456,7 @@
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
 <script src="mission37d-data/town-normalize.js"></script>
 <script src="mission37f-photo-select.js"></script>
+<script src="mission52-photo-panel.js"></script>
 <script src="mission37k-poi-select.js"></script>
 <script src="mission145-towns.js"></script>
 <script src="mission51-seg-dedupe.js"></script>
@@ -3256,12 +3257,15 @@
     const entry = idx && idx.byCanonicalId && idx.byCanonicalId['cg_bldg_' + id];
     const reloc = RELOCATED[id] || null;
     // 共通の優先順位(mission37f-photo-select.js): 適格性(信頼度・ライセンス・https・移転除外) → 新しい日付の根拠 → 元の順序
-    const ranked = LiveCityPhotoSelect.rankPhotos(entry, {
+    // Issue #52 (mission52-photo-panel.js): 権利を個別確認できないライセンス名の写真は採用しない。代表以外の適格写真は追加写真として表示
+    const photoOpts = {
       okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
-      exclude: (reloc ? reloc.exclude : []).concat(((idx && idx.__holds) || []).filter((h) => h.canonicalId === id).map((h) => h.file)),
+      exclude: (reloc ? reloc.exclude : []).concat(((idx && idx.__holds) || []).filter((h) => h.canonicalId === id).map((h) => h.file))
+        .concat(((entry && entry.photos) || []).filter((x) => !LiveCityPhotoPanel.classifyLicense(x.license).ok).map(photoFile)),
       dates: (idx && idx.__dates) || {},
       adds: (idx && idx.__adds) || []
-    });
+    };
+    const ranked = LiveCityPhotoSelect.rankPhotos(entry, photoOpts);
     const photos = ranked.photos.map((r) => r.photo);
     stats.lastPicked.photo = { indexed: !!entry, confidence: entry ? entry.matchConfidence : null, shown: 0, takenAt: ranked.photos[0] && ranked.photos[0].date.basis === 'verified' ? ranked.photos[0].date.takenAt : null, dateBasis: ranked.photos[0] ? ranked.photos[0].date.basis : null, candidates: photos.length };
     if (!ranked.eligibleEntry || !photos.length) {
@@ -3296,6 +3300,9 @@
     const cv = photoCaveat(p);
     if (cv) slot.appendChild(el('div', '⚠ ' + cv, { class: 'cap', 'data-photo-caveat': '1' }));
     if (reloc) slot.appendChild(el('div', '⚠ ' + reloc.notice, { class: 'cap', 'data-photo-relocated': '1' }));
+    const extra = LiveCityPhotoPanel.buildModel(entry, photoOpts, LiveCityPhotoSelect);
+    extra.additional = extra.additional.filter((u) => u.file !== photoFile(p));
+    LiveCityPhotoPanel.renderAdditional(slot, extra, document, displayName(entry) || '建物');
     stats.lastPicked.photo.shown = 1;
     return entry;
   }
