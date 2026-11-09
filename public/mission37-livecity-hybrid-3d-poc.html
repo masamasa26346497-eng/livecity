@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Live City | Hybrid 3D Engine POC</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Cesium.js"></script>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/cesiumjs/1.105/Build/Cesium/Widgets/widgets.css" />
+  <style>
+    html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:#07111f; }
+    #hud {
+      position:fixed; top:12px; left:12px; z-index:10; width:min(360px,calc(100vw - 24px));
+      box-sizing:border-box; padding:12px 14px; border-radius:12px;
+      background:rgba(8,18,32,.86); color:#f4f7fb; font:13px/1.5 system-ui,-apple-system,sans-serif;
+      backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12);
+    }
+    #hud h1 { font-size:15px; margin:0 0 6px; }
+    #status { color:#9bd7ff; }
+    #metrics { margin-top:8px; opacity:.9; white-space:pre-line; }
+    #error { margin-top:8px; color:#ffb4b4; display:none; }
+    #buildingCard {
+      position:fixed; right:14px; top:14px; z-index:11; width:min(340px,calc(100vw - 28px));
+      max-height:calc(100vh - 28px); overflow:auto; display:none; box-sizing:border-box;
+      padding:12px; border-radius:12px; background:rgba(8,18,32,.92); color:#f4f7fb;
+      border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(10px);
+      font:12px/1.5 system-ui,-apple-system,sans-serif;
+    }
+    #buildingCard img { width:100%; max-height:210px; object-fit:contain; border-radius:8px; background:#111827; }
+    #buildingCard .muted { opacity:.7; }
+    #buildingCard .title { font-size:15px; font-weight:700; margin-bottom:4px; }
+    #buildingCard .close { float:right; border:0; background:transparent; color:white; font-size:18px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <aside id="hud">
+    <h1>Live City | Hybrid 3D Engine POC</h1>
+    <div id="status">設定を確認中…</div>
+    <div id="metrics"></div>
+    <div id="error"></div>
+    <div class="muted" style="margin-top:8px;opacity:.72">建物をクリックすると、既存のLive City写真索引から近傍候補を照合します。</div>
+  </aside>
+  <aside id="buildingCard"></aside>
+
+  <script src="./local-config.js"></script>
+  <script src="./livecity-cesium-building-lookup.js"></script>
+  <script>
+    (async function () {
+      const status = document.getElementById('status');
+      const metrics = document.getElementById('metrics');
+      const error = document.getElementById('error');
+      const buildingCard = document.getElementById('buildingCard');
+      let apiKey = String((window.LIVECITY_CONFIG && window.LIVECITY_CONFIG.googleMapTilesApiKey) || sessionStorage.getItem('livecity.mapTilesApiKey') || '').trim();
+      const PHOTO_INDEX_URL = '/map-data/osaka-city/derived/building-photo-index.json';
+      let photoIndexPromise = null;
+      let photoSpatial = null;
+
+      function haversineM(aLat, aLon, bLat, bLon) {
+        const R = 6371008.8;
+        const toR = Math.PI / 180;
+        const p1 = aLat * toR, p2 = bLat * toR;
+        const dP = (bLat - aLat) * toR;
+        const dL = (bLon - aLon) * toR;
+        const q = Math.sin(dP/2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dL/2) ** 2;
+        return 2 * R * Math.asin(Math.sqrt(q));
+      }
+
+      function gridKey(lat, lon) {
+        return Math.floor(lat * 1000) + ':' + Math.floor(lon * 1000);
+      }
+
+      async function loadPhotoSpatialIndex() {
+        if (photoSpatial) return photoSpatial;
+        if (!photoIndexPromise) {
+          photoIndexPromise = fetch(PHOTO_INDEX_URL, { cache:'no-store' })
+            .then(r => { if (!r.ok) throw new Error('photo index ' + r.status); return r.json(); })
+            .then(doc => {
+              const grid = new Map();
+              const recs = Array.isArray(doc.records) ? doc.records : Object.values(doc.byCanonicalId || {});
+              for (const rec of recs) {
+                if (!rec || !rec.canonicalId || !Number.isFinite(Number(rec.lat)) || !Number.isFinite(Number(rec.lon))) continue;
+                const key = gridKey(Number(rec.lat), Number(rec.lon));
+                if (!grid.has(key)) grid.set(key, []);
+                grid.get(key).push(rec);
+              }
+              photoSpatial = { grid, count: recs.length };
+              return photoSpatial;
+            });
+        }
+        return photoIndexPromise;
+      }
+
+      async function exactCanonicalBuilding(lat, lon) {
+        const lookup = window.LiveCityCesiumBuildingLookup;
+        if (!lookup?.buildingsAtLatLon) return null;
+        const result = await lookup.buildingsAtLatLon(lat, lon);
+        return result?.best ? { feature: result.best, lookup: result } : null;
+      }
+
+      async function photoRecordForCanonicalId(canonicalId) {
+        if (!canonicalId) return null;
+        const idx = await loadPhotoSpatialIndex();
+        // The existing photo index exposes byCanonicalId in its source document, but the
+        // browser spatial cache is record based. Build a tiny map lazily once exact picking is used.
+        if (!idx.byCanonical) {
+          idx.byCanonical = new Map();
+          for (const arr of idx.grid.values()) {
+            for (const rec of arr) if (rec?.canonicalId && !idx.byCanonical.has(rec.canonicalId)) idx.byCanonical.set(rec.canonicalId, rec);
+          }
+        }
+        return idx.byCanonical.get(canonicalId) || null;
+      }
+
+      async function nearestPhotoBuilding(lat, lon, maxM) {
+        const idx = await loadPhotoSpatialIndex();
+        const gy = Math.floor(lat * 1000), gx = Math.floor(lon * 1000);
+        let best = null, bestD = Infinity;
+        for (let dy=-1; dy<=1; dy++) for (let dx=-1; dx<=1; dx++) {
+          const arr = idx.grid.get((gy+dy) + ':' + (gx+dx)) || [];
+          for (const rec of arr) {
+            const d = haversineM(lat, lon, Number(rec.lat), Number(rec.lon));
+            if (d < bestD) { bestD = d; best = rec; }
+          }
+        }
+        return best && bestD <= maxM ? { rec:best, distanceM:bestD } : null;
+      }
+
+      function esc(v) {
+        return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+
+      function showBuildingCard(match, lat, lon) {
+        const rec = match && match.rec;
+        const exact = match && match.exact;
+        const canonicalId = exact?.feature?.canonicalId || rec?.canonicalId || null;
+        const photo = rec && Array.isArray(rec.photos) ? rec.photos[0] : null;
+        buildingCard.style.display = 'block';
+        buildingCard.innerHTML = rec ? `
+          <button class="close" aria-label="閉じる">×</button>
+          <div class="title">${esc(rec.buildingName || rec.curatedName || '建物候補')}</div>
+          <div class="muted">${esc(canonicalId)}</div>
+          <div style="margin:5px 0 9px">${exact ? 'canonical footprint 内判定で特定' : ('クリック地点から約 ' + match.distanceM.toFixed(1) + 'm')}</div>
+          ${photo?.imageUrl ? `<img src="${esc(photo.imageUrl)}" alt="${esc(rec.buildingName || '建物写真')}" loading="lazy">` : ''}
+          ${photo?.sourcePageUrl ? `<div style="margin-top:5px"><a style="color:#9bd7ff" href="${esc(photo.sourcePageUrl)}" target="_blank" rel="noopener noreferrer">写真の出典を確認</a></div>` : ''}
+          <div class="muted" style="margin-top:9px">Mission 37 POC: ${exact ? 'canonical footprint の point-in-polygon 判定を使用。' : 'footprint生成タイル未配置時のみ近傍照合へフォールバック。'}</div>
+        ` : `
+          <button class="close" aria-label="閉じる">×</button>
+          <div class="title">Live City建物候補なし</div>
+          <div>緯度 ${lat.toFixed(6)} / 経度 ${lon.toFixed(6)}</div>
+          <div class="muted" style="margin-top:8px">写真索引に近傍候補がない地点です。Photorealistic 3D自体のクリック取得は成功しています。</div>
+        `;
+        buildingCard.querySelector('.close')?.addEventListener('click', () => buildingCard.style.display = 'none');
+      }
+
+      if (!apiKey) {
+        status.textContent = 'Google Map Tiles APIキーを入力してください';
+        error.style.display = 'block';
+        error.innerHTML = [
+          '<div style="margin-bottom:8px">Photorealistic 3D Tiles表示にはGoogle Map Tiles APIキーが必要です。</div>',
+          '<div style="display:flex;gap:6px">',
+          '<input id="mission37ApiKey" type="password" autocomplete="off" placeholder="Map Tiles API key" style="min-width:0;flex:1;padding:8px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:#0b1728;color:white">',
+          '<button id="mission37ApiKeyApply" type="button" style="padding:8px 10px;border-radius:7px;border:0;cursor:pointer">表示</button>',
+          '</div>',
+          '<div style="margin-top:7px;font-size:10px;opacity:.7">キーはこのブラウザのsessionStorageだけに保存し、GitHubには保存しません。</div>'
+        ].join('');
+        document.getElementById('mission37ApiKeyApply')?.addEventListener('click', function () {
+          const value = String(document.getElementById('mission37ApiKey')?.value || '').trim();
+          if (!value) return;
+          sessionStorage.setItem('livecity.mapTilesApiKey', value);
+          location.reload();
+        });
+        return;
+      }
+
+      const t0 = performance.now();
+      Cesium.RequestScheduler.requestsByServer["tile.googleapis.com:443"] = 18;
+
+      const viewer = new Cesium.Viewer('cesiumContainer', {
+        imageryProvider: false,
+        baseLayerPicker: false,
+        geocoder: false,
+        homeButton: false,
+        sceneModePicker: false,
+        navigationHelpButton: false,
+        animation: false,
+        timeline: false,
+        fullscreenButton: false,
+        requestRenderMode: true
+      });
+
+      viewer.scene.globe.show = false;
+      viewer.scene.fog.enabled = true;
+
+      const tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+        url: 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + encodeURIComponent(apiKey),
+        showCreditsOnScreen: true,
+        maximumScreenSpaceError: 16,
+        skipLevelOfDetail: true,
+        baseScreenSpaceError: 1024,
+        skipScreenSpaceErrorFactor: 16,
+        skipLevels: 1,
+        immediatelyLoadDesiredLevelOfDetail: false,
+        loadSiblings: false
+      }));
+
+      // Umeda / Osaka Station area
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(135.49595, 34.70385, 950),
+        orientation: {
+          heading: Cesium.Math.toRadians(165),
+          pitch: Cesium.Math.toRadians(-32),
+          roll: 0
+        }
+      });
+
+      let frames = 0;
+      let fps = 0;
+      let lastFpsAt = performance.now();
+      let selectedFootprintEntities = [];
+
+      viewer.scene.postRender.addEventListener(function () {
+        frames += 1;
+        const now = performance.now();
+        if (now - lastFpsAt >= 1000) {
+          fps = Math.round(frames * 1000 / (now - lastFpsAt));
+          frames = 0;
+          lastFpsAt = now;
+        }
+        metrics.textContent =
+          'FPS: ' + fps +
+          '\n画質閾値(SSE): ' + tileset.maximumScreenSpaceError +
+          '\n読込経過: ' + ((now - t0) / 1000).toFixed(1) + '秒';
+      });
+
+      function clearSelectedFootprint() {
+        for (const e of selectedFootprintEntities) viewer.entities.remove(e);
+        selectedFootprintEntities = [];
+      }
+
+      function localToLatLon(x, z) {
+        const CLAT = 34.604208, CLON = 135.52502, MPD = 111320;
+        return {
+          lat: CLAT - (z / MPD),
+          lon: CLON + (x / (Math.cos(CLAT * Math.PI / 180) * MPD)),
+        };
+      }
+
+      function addRingEntity(ring, height, kind) {
+        if (!Array.isArray(ring) || ring.length < 3) return;
+        const positions = [];
+        for (const p of ring) {
+          const ll = localToLatLon(Number(p[0]), Number(p[1]));
+          positions.push(Cesium.Cartesian3.fromDegrees(ll.lon, ll.lat, height));
+        }
+        const isOuter = kind === 'outer';
+        const entity = viewer.entities.add({
+          polyline: {
+            positions,
+            width: isOuter ? 4 : 2,
+            clampToGround: false,
+            material: isOuter ? Cesium.Color.fromCssColorString('#19a7ff') : Cesium.Color.fromCssColorString('#83d7ff'),
+            depthFailMaterial: Cesium.Color.fromCssColorString('#19a7ff').withAlpha(0.45)
+          }
+        });
+        selectedFootprintEntities.push(entity);
+      }
+
+      function highlightCanonicalFeature(feature, clickHeight) {
+        clearSelectedFootprint();
+        if (!feature) return;
+        const polys = feature.geometryType === 'MultiPolygon' ? feature.coordinates : [feature.coordinates];
+        const baseHeight = Number.isFinite(clickHeight) ? clickHeight + 1.2 : 12;
+        for (const poly of polys || []) {
+          if (!poly || !poly.length) continue;
+          addRingEntity(poly[0], baseHeight, 'outer');
+          for (let i = 1; i < poly.length; i++) addRingEntity(poly[i], baseHeight, 'hole');
+        }
+        viewer.scene.requestRender();
+      }
+
+      try {
+        await tileset.readyPromise;
+        status.textContent = 'Photorealistic 3D Tiles 接続成功（梅田）';
+
+        const clickHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        clickHandler.setInputAction(async function (movement) {
+          let cartesian = null;
+          if (viewer.scene.pickPositionSupported) cartesian = viewer.scene.pickPosition(movement.position);
+          if (!Cesium.defined(cartesian)) {
+            const ray = viewer.camera.getPickRay(movement.position);
+            cartesian = ray ? viewer.scene.globe.pick(ray, viewer.scene) : null;
+          }
+          if (!Cesium.defined(cartesian)) return;
+          const c = Cesium.Cartographic.fromCartesian(cartesian);
+          const lat = Cesium.Math.toDegrees(c.latitude);
+          const lon = Cesium.Math.toDegrees(c.longitude);
+          const clickHeight = Number(c.height) || 0;
+          buildingCard.style.display = 'block';
+          buildingCard.innerHTML = '<div class="title">Live City建物を照合中…</div>';
+          try {
+            const exact = await exactCanonicalBuilding(lat, lon);
+            if (exact?.feature?.canonicalId) {
+              highlightCanonicalFeature(exact.feature, clickHeight);
+              const rec = await photoRecordForCanonicalId(exact.feature.canonicalId);
+              showBuildingCard({ exact, rec, distanceM:0 }, lat, lon);
+            } else {
+              clearSelectedFootprint();
+              const match = await nearestPhotoBuilding(lat, lon, 45);
+              showBuildingCard(match, lat, lon);
+            }
+          } catch (e) {
+            buildingCard.innerHTML = '<div class="title">写真索引を読み込めません</div><div class="muted">' + esc(e.message || e) + '</div>';
+          }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        window.__MISSION37_HYBRID_3D_POC__ = function () {
+          return {
+            ready: !!tileset.ready,
+            maximumScreenSpaceError: tileset.maximumScreenSpaceError,
+            totalMemoryUsageInBytes: tileset.totalMemoryUsageInBytes || null,
+            photoIndexLoaded: !!photoSpatial,
+            photoIndexRecordCount: photoSpatial?.count || null,
+            canonicalLookup: window.LiveCityCesiumBuildingLookup?.stats?.() || null,
+            selectedFootprintEntityCount: selectedFootprintEntities.length,
+            camera: {
+              lon: 135.49595,
+              lat: 34.70385
+            }
+          };
+        };
+      } catch (e) {
+        status.textContent = '3D Tiles接続失敗';
+        error.style.display = 'block';
+        error.textContent = String(e && e.message || e);
+        console.error('[Mission37] tileset load failed', e);
+      }
+    })();
+  </script>
+<!-- Mission37 Vercel public-root redeploy 2026-10-07 -->
+</body>
+</html>
