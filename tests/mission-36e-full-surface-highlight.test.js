@@ -68,6 +68,10 @@ function extractConstMapDecl(html, constName) {
 }
 
 const FN_NAMES = [
+  // extractExactBuildingGeometry が参照する依存ヘルパー(36Dのbi→triangle indexキャッシュ/行列適用)
+  'crBuildBiTriIndex',
+  'crGetBiTriIndex',
+  'crApplyMatrix4',
   'extractExactBuildingGeometry',
   'extractExactRangeGeometry',
   'crRegisterTriFragments',
