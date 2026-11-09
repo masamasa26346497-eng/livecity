@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { selectMeshes } from './mission79-run.mjs';
+import { hardenDir } from './mission164/harden-tileset.mjs';
 import { rightsGate, findDuplicateIds, summarize, shouldSkip, withRetry, buildDeliveryManifest } from './mission156/lib.mjs';
 
 const ROOT = process.cwd();
@@ -79,6 +80,8 @@ for (const w of wards) {
       fs.rmSync(final, { recursive: true, force: true });
       execFileSync(process.execPath, ['tools/mission79-run.mjs', '--ward', w, '--work', work, '--final', final, '--max-mb', String(maxMb)], { stdio: 'inherit', cwd: ROOT, maxBuffer: 1 << 28, timeout: Number(opt('ward-timeout-min', 18)) * 60000 });
     }, { attempts: Number(opt('retries', 3)), onRetry: (i, e) => console.error('[156] retry', w, 'after attempt', i, String(e.message).slice(0, 120)) });
+    // Mission 164: content-less parents must always refine, otherwise Cesium selects the empty root and requests no GLB
+    rec.hardenedNodes = hardenDir(final);
     const src = readJson(path.join(final, 'source.json')), al = readJson(path.join(final, 'alignment.json')), ts = readJson(path.join(final, 'tileset.json'));
     rec.meshesFetched = pl.meshes.length; // run succeeded => every planned mesh was fetched
     rec.meshesContributing = src.sourceMeshes.length; // meshes holding >=1 in-ward building (edge meshes may hold none)

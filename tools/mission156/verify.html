@@ -1,7 +1,9 @@
 <!doctype html>
 <meta charset="utf-8"><title>Mission 156 tileset verify (QA only, local)</title>
-<style>html,body,#c{margin:0;width:100%;height:100%}</style>
+<style>html,body{margin:0}#c{width:1280px;height:800px}</style>
 <div id="c"></div><pre id="result">pending</pre>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>#c canvas{width:100%;height:100%;display:block}</style>
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
 <script>
 (async () => {
@@ -10,7 +12,7 @@
   const done = () => { document.getElementById('result').textContent = JSON.stringify(out); document.title = 'DONE'; };
   try {
     const q = new URLSearchParams(location.search);
-    const viewer = new Cesium.Viewer('c', { baseLayer: false, baseLayerPicker: false, geocoder: false, animation: false, timeline: false, requestRenderMode: false });
+    const viewer = new Cesium.Viewer('c', { baseLayer: false, baseLayerPicker: false, geocoder: false, animation: false, timeline: false, requestRenderMode: false, contextOptions: { webgl: { preserveDrawingBuffer: true } } });
     const ts = await Cesium.Cesium3DTileset.fromUrl(q.get('tileset') || '/tileset.json');
     viewer.scene.primitives.add(ts);
     // Mission 160: event-based counters (statistics objects are reset between passes). tileVisible fires for each tile whose content is rendered.
@@ -61,6 +63,13 @@
     out.selectedTilesMax = Math.max(maxSel, visEvents > 0 ? 1 : 0);
     if (visEvents > 0 && maxTsCmd === 0) out.tilesetCommandsMax = visEvents; // rendered tiles imply issued draw commands
     out.gl = !!viewer.scene.context && !!viewer.scene.context._gl;
+    // Mission 164: pixel difference with the tileset shown vs hidden
+    const grab = () => { const c = viewer.canvas; const t = document.createElement('canvas'); t.width = c.width; t.height = c.height; t.getContext('2d').drawImage(c, 0, 0); return t.getContext('2d').getImageData(0, 0, t.width, t.height).data; };
+    ts.show = true; for (let i = 0; i < 3; i++) { viewer.scene.render(); await new Promise((r) => setTimeout(r, 100)); } const A = grab();
+    ts.show = false; for (let i = 0; i < 3; i++) { viewer.scene.render(); await new Promise((r) => setTimeout(r, 100)); } const B = grab();
+    ts.show = true;
+    let diff = 0; for (let i = 0; i < A.length; i += 4) if (Math.abs(A[i] - B[i]) + Math.abs(A[i + 1] - B[i + 1]) + Math.abs(A[i + 2] - B[i + 2]) > 24) diff++;
+    out.pixelDiff = diff; out.canvasPx = [viewer.canvas.width, viewer.canvas.height];
     out.status = 'ok';
   } catch (e) { out.status = 'error'; out.error = String(e && e.message || e); }
   done();

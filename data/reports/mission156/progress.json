@@ -3,7 +3,7 @@
  "source": "plateau-27100-osaka-shi-2025",
  "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
  "license": "plateau",
- "generatedAt": "2026-11-08T19:48:12.168Z",
+ "generatedAt": "2026-11-09T00:46:25.858Z",
  "wards": {
   "sumiyoshi": {
    "wardCode": "27120",
@@ -12,6 +12,7 @@
    "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
    "compressedMB": 34.4,
    "inflatedMB": 812.2,
+   "hardenedNodes": 1,
    "meshesContributing": 15,
    "sourceBuildings": 62553,
    "convertedBuildings": 35032,
@@ -20,11 +21,10 @@
    "tiles": 52,
    "orientationOk": true,
    "bestTransform": "identity",
-   "outputBytes": 53615211,
+   "outputBytes": 53615217,
    "http200Verified": true,
-   "browserVerified": false,
-   "browserVerifiedNote": "Mission 160: earlier true came from the lenient check (no tileset-only draw proof). Output is gone from the runner; re-verify with the strict check.",
-   "ms": 57881
+   "browserVerified": true,
+   "ms": 48829
   },
   "chuo": {
    "wardCode": "27128",
@@ -43,8 +43,8 @@
    "bestTransform": "identity",
    "outputBytes": 29084771,
    "http200Verified": true,
-   "browserVerified": false,
-   "ms": 55358
+   "browserVerified": true,
+   "ms": 52875
   },
   "kita": {
    "wardCode": "27127",
@@ -53,6 +53,7 @@
    "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
    "compressedMB": 54.6,
    "inflatedMB": 958.3,
+   "hardenedNodes": 1,
    "meshesContributing": 17,
    "sourceBuildings": 58596,
    "convertedBuildings": 19601,
@@ -61,18 +62,17 @@
    "tiles": 52,
    "orientationOk": true,
    "bestTransform": "identity",
-   "outputBytes": 31422643,
+   "outputBytes": 31422649,
    "http200Verified": true,
-   "browserVerified": false,
-   "ms": 52554
+   "browserVerified": true,
+   "ms": 56024
   }
  },
  "summary": {
   "wardsTotal": 24,
   "byStatus": {
    "pending": 21,
-   "complete": 1,
-   "converted": 2
+   "converted": 3
   },
   "convertedBuildingsTotal": 73288,
   "declaredPast": 574213,
@@ -141,13 +141,14 @@
    },
    {
     "ward": "sumiyoshi",
-    "status": "complete",
+    "status": "converted",
     "wardCode": "27120",
     "meshesPlanned": 19,
     "meshesFetched": 19,
     "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
     "compressedMB": 34.4,
     "inflatedMB": 812.2,
+    "hardenedNodes": 1,
     "meshesContributing": 15,
     "sourceBuildings": 62553,
     "convertedBuildings": 35032,
@@ -156,10 +157,10 @@
     "tiles": 52,
     "orientationOk": true,
     "bestTransform": "identity",
-    "outputBytes": 53615211,
-    "http200Verified": true,
+    "outputBytes": 53615217,
+    "http200Verified": false,
     "browserVerified": false,
-    "ms": 57881
+    "ms": 48829
    },
    {
     "ward": "higashisumiyoshi",
@@ -194,6 +195,7 @@
     "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
     "compressedMB": 54.6,
     "inflatedMB": 958.3,
+    "hardenedNodes": 1,
     "meshesContributing": 17,
     "sourceBuildings": 58596,
     "convertedBuildings": 19601,
@@ -202,10 +204,10 @@
     "tiles": 52,
     "orientationOk": true,
     "bestTransform": "identity",
-    "outputBytes": 31422643,
+    "outputBytes": 31422649,
     "http200Verified": false,
     "browserVerified": false,
-    "ms": 52554
+    "ms": 56024
    },
    {
     "ward": "chuo",
@@ -227,7 +229,7 @@
     "outputBytes": 29084771,
     "http200Verified": false,
     "browserVerified": false,
-    "ms": 55358
+    "ms": 52875
    }
   ]
  }

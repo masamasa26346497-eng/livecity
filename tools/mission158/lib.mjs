@@ -77,7 +77,10 @@ export function buildStoreManifest({ ward, wardCode, sourceEtag, sourceVersion, 
 export function strictBrowserOk(b) {
   // Mission 160: when the page reports tileset-only counters they must be > 0 (globe/skybox commands do not prove buildings are drawn)
   const tsOk = b && b.tilesetCommandsMax !== undefined ? Number(b.tilesetCommandsMax) > 0 && Number(b.selectedTilesMax) > 0 : true;
-  return !!(b && b.status === 'ok' && b.gl && (b.jsErrors || []).length === 0 && b.tilesLoaded && Number(b.drawCommands) > 0 && tsOk);
+  // Mission 164: tile events must have fired AND the rendered image must differ when the tileset is hidden (if the page measured it)
+  const evOk = b && b.tileLoadEvents !== undefined ? Number(b.tileLoadEvents) > 0 && Number(b.tileVisibleEvents) > 0 : true;
+  const pxOk = b && b.pixelDiff !== undefined ? Number(b.pixelDiff) > 0 : true;
+  return !!(b && b.status === 'ok' && b.gl && (b.jsErrors || []).length === 0 && b.tilesLoaded && Number(b.drawCommands) > 0 && tsOk && evOk && pxOk);
 }
 
 // Compare re-downloaded asset to the manifest record. Returns list of mismatches (empty = identical).
