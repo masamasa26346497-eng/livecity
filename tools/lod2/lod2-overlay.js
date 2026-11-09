@@ -77,11 +77,11 @@
       Object.assign(window.__lc152, {
         tileset: ts, fly, setShow(v) { ts.show = !!v; scene.requestRender(); },
         // 実描画した LOD2 の一棟中心へカメラを置く(E2E 用・決定的)
-        lookAtFirst(range = 330, pitchDeg = -38) {
+        lookAtFirst(range = 330, pitchDeg = -38, at = null) {
           // LOD2 足跡の重心を注視点にする(bbox 中心は建物が疎な場所になりうる)。
           viewer.camera.cancelFlight();
           const dLat = (range * Math.cos(Cesium.Math.toRadians(-pitchDeg))) / 111000, h = range * Math.sin(Cesium.Math.toRadians(-pitchDeg)) + 10;
-          viewer.camera.setView({ destination: Cesium.Cartesian3.fromDegrees(state.centroid[0], state.centroid[1] - dLat, h), orientation: { heading: 0, pitch: Cesium.Math.toRadians(pitchDeg), roll: 0 } });
+          viewer.camera.setView({ destination: Cesium.Cartesian3.fromDegrees((at || state.centroid)[0], (at || state.centroid)[1] - dLat, h), orientation: { heading: 0, pitch: Cesium.Math.toRadians(pitchDeg), roll: 0 } });
           scene.requestRender();
         },
         camera() { const c = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC); return { lon: Cesium.Math.toDegrees(c.longitude), lat: Cesium.Math.toDegrees(c.latitude), h: c.height, pitchDeg: Cesium.Math.toDegrees(viewer.camera.pitch) }; },

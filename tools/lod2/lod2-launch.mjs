@@ -15,7 +15,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const a = process.argv.slice(2);
 const has = (k) => a.includes(k), g = (k, d = null) => (a.indexOf(k) >= 0 ? a[a.indexOf(k) + 1] : d);
 const port = Number(g('--port', 8152));
-const OUT = path.join(ROOT, 'temp', 'lod2-preview');
+const ALL = has('--all'); // Mission 163: 大阪2025の全LOD2(33メッシュ)を分割タイルで表示
+const OUT = path.join(ROOT, 'temp', ALL ? 'lod2-all' : 'lod2-preview');
 const WANT_BRANCH = 'mission152-lod2-parallel';
 const results = [];
 const check = (name, ok, detail = '', fatal = true) => { results.push({ name, ok, detail, fatal }); console.log((ok ? '  [OK]  ' : fatal ? '  [NG]  ' : '  [注意] ') + name + (detail ? ' — ' + detail : '')); return ok; };
@@ -54,20 +55,23 @@ console.log('[2/5] 実 LOD2 41棟の生成' + (has('--skip-build') ? '(--skip-bu
 if (!has('--skip-build')) {
   const args = [path.join(ROOT, 'tools/lod2/lod2-preview-build.mjs'), '--out', OUT];
   if (g('--gml-dir')) args.push('--gml-dir', g('--gml-dir'));
-  const b = spawnSync(process.execPath, args, { cwd: ROOT, encoding: 'utf8' });
+  if (ALL) { args[0] = path.join(ROOT, 'tools/lod2/lod2-build-all.mjs'); args.push('--resume'); }
+  const b = spawnSync(process.execPath, args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 });
   if (b.status !== 0) {
     const tail = ((b.stderr || '') + (b.stdout || '')).trim().split('\n').slice(-4).join(' | ');
     die('LOD2 生成に失敗しました(公式サイトへ接続できない/プロキシ等の可能性)。' + tail);
   }
   console.log('  ' + b.stdout.trim().split('\n').pop());
 }
-for (const f of ['tileset.json', 'lod2.glb', 'footprints.json', 'report.json']) if (!fs.existsSync(path.join(OUT, f))) die('生成物がありません: temp/lod2-preview/' + f);
+for (const f of ALL ? ['tileset.json', 'footprints.json', 'report.json', 'manifest.json'] : ['tileset.json', 'lod2.glb', 'footprints.json', 'report.json']) if (!fs.existsSync(path.join(OUT, f))) die('生成物がありません: temp/lod2-preview/' + f);
 const rep = JSON.parse(fs.readFileSync(path.join(OUT, 'report.json'), 'utf8'));
 check('生成物', rep.converted > 0, `LOD2 ${rep.converted} 棟 / 失敗 ${rep.failed.length} / LOD1 のまま ${rep.lod1Remaining}`);
 if (!rep.converted) die('LOD2 が 0 棟です。');
+if (ALL && !rep.fullMatch) console.log('  [注意] 全件一致ではありません: 変換 ' + rep.converted + ' / 期待 ' + rep.expected + '(未変換 ' + rep.unconverted + ')。未変換分は LOD1 のまま表示されます。');
 
 console.log('[3/5] ローカルサーバ起動(127.0.0.1 のみ)');
 const sargs = [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port)];
+if (ALL) sargs.push('--lod2-dir', OUT);
 if (g('--ext-root')) sargs.push('--ext-root', g('--ext-root'));
 const srv = spawn(process.execPath, sargs, { cwd: ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
 let srvExit = null; srv.on('exit', (c) => { srvExit = c; });
@@ -76,7 +80,7 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { /* ignore */ } });
 
 console.log('[4/5] HTTP 200 readiness');
 const URL_PATH = '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2fly=1';
-const probes = ['/mission37g-osaka-24ward-mvp.html', '/lod2-preview/overlay.js', '/lod2-preview/tileset.json', '/lod2-preview/lod2.glb', '/lod2-preview/footprints.json', '/__lod2/diag.json'];
+const probes = ['/mission37g-osaka-24ward-mvp.html', '/lod2-preview/overlay.js', '/lod2-preview/tileset.json', ...(ALL ? [] : ['/lod2-preview/lod2.glb']), '/lod2-preview/footprints.json', '/__lod2/diag.json'];
 let ready = false, last = [];
 for (let i = 0; i < 40 && srvExit === null; i++) {
   last = await Promise.all(probes.map(async (p) => ({ p, ...(await get(port, p)) })));

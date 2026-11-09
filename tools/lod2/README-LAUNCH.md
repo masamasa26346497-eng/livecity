@@ -43,3 +43,11 @@ cd ..\livecity-lod2
 - 生成物は `temp/lod2-preview/`(gitignore)。`public/` や GitHub に 3D アセットはコミットしません。
 - 37G HTML への変更は `const scene = viewer.scene;` 直後の opt-in 1ブロック(localhost かつ `?lod2=1` のみ)。PR24 と同じ位置を編集した場合のみ衝突します。ロジックは `tools/lod2/lod2-overlay.js` に隔離。
 - LOD1 二重描画の解消は ClippingPolygon(実測は LOD1 タイルのある環境で要確認)。
+
+## Mission 163: 全LOD2(大阪2025の33メッシュ・10,698棟)を表示する
+```powershell
+node tools/lod2/lod2-launch.mjs --all     # 公式 Range 取得(約73MB)→ 209タイルへ変換 → 127.0.0.1 サーバ → URL を表示
+```
+- 生成物は `temp/lod2-all/`(gitignore)。集計は `data/reports/mission163/lod2-all-report.json`(件数・sha256 のみ。GLB は含まない)。
+- 全体ビューでは GLB を読みません(メッシュ単位ノードの geometricError=120)。建物に近づくとタイル単位でロード/解放されます。
+- 色は頂点色のみ(テクスチャ未対応)。LOD2 の無い建物は LOD1 のままです。

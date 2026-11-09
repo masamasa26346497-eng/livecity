@@ -12,14 +12,16 @@ const http = require('http');
 const argv = process.argv.slice(2);
 const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : d; };
 const port = Number(opt('port', 8152)), cport = Number(opt('cdp', 9332));
-const out = path.resolve(opt('out', 'temp/lod2-verify'));
+const ALL = argv.includes('--all');           // Mission 163: temp/lod2-all(分割タイル)を検証
+const AT = opt('at', null);                    // "lon,lat": 撮影位置(全域モードで先頭/末尾の建物を指定)
+const out = path.resolve(opt('out', ALL ? 'temp/lod2-verify-all' : 'temp/lod2-verify'));
 const chromeBin = opt('chrome', ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find((p) => fs.existsSync(p)));
 fs.mkdirSync(out, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''; r.on('data', (d) => (b += d)); r.on('end', () => { try { res(JSON.parse(b)); } catch (e) { rej(e); } }); }).on('error', rej));
 
 (async () => {
-  const srv = spawn(process.execPath, [path.join(__dirname, 'lod2-preview-serve.cjs'), '--port', String(port)], { stdio: 'inherit' });
+  const srv = spawn(process.execPath, [path.join(__dirname, 'lod2-preview-serve.cjs'), '--port', String(port), ...(ALL ? ['--lod2-dir', 'temp/lod2-all'] : [])], { stdio: 'inherit' });
   const chrome = spawn(chromeBin, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist',
     '--window-size=1280,800', '--remote-debugging-port=' + cport, '--user-data-dir=' + path.join(out, 'profile'), 'about:blank'], { stdio: 'ignore' });
   const result = { chrome: chromeBin, httpResponses: [], console: [] };
@@ -44,7 +46,7 @@ const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''
     for (let i = 0; i < 120; i++) { const s = await ev('window.__lc152 && window.__lc152.state.status'); if (s === 'ready' || s === 'error' || s === 'refused') break; await sleep(500); }
     result.overlayStatus = await ev('JSON.stringify(window.__lc152 && window.__lc152.state)');
     await sleep(8000);   // アプリ自身の初期 flyTo(全域ビュー)が終わってからカメラを置く
-    await ev('window.__lc152.lookAtFirst && window.__lc152.lookAtFirst(330, -38)');
+    await ev('window.__lc152.lookAtFirst && window.__lc152.lookAtFirst(330, -38, ' + (AT ? JSON.stringify(AT.split(',').map(Number)) : 'null') + ')');
     for (let i = 0; i < 40; i++) { await sleep(500); const s = JSON.parse(await ev('JSON.stringify(window.__lc152.state)')); if (s.tileLoad > 0 && s.tileVisible > 0) break; }
     await sleep(6000);   // 地図タイル/LOD1 の読み込み待ち
     result.camera = await ev('JSON.stringify(window.__lc152.camera())');
@@ -62,8 +64,8 @@ const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''
     result.screenshots = { on: on.f, off: off.f, onBytes: on.b.length, offBytes: off.b.length, identical: Buffer.compare(on.b, off.b) === 0 };
     result.renderErrors = await ev('JSON.stringify((window.__qaRenderErrors||[]).slice(0,3))');
     const s = result.state, st = JSON.parse(result.stats);
-    result.pass = result.httpResponses.some((r) => r.url === 'tileset.json' && r.status === 200) && result.httpResponses.some((r) => /lod2\.glb/.test(r.url) && r.status === 200) &&
-      s.tileLoad > 0 && s.tileVisible > 0 && st.numberOfTrianglesSelected > 0 && result.visiblePixelDiff > 200;
+    result.pass = result.httpResponses.some((r) => r.url === 'tileset.json' && r.status === 200) && result.httpResponses.some((r) => /\.glb(\?|$)/.test(r.url) && r.status === 200) && !result.httpResponses.some((r) => r.status >= 400) &&
+      s.tileLoad > 0 && s.tileVisible > 0 && s.tileFailed === 0 && st.numberOfTrianglesSelected > 0 && result.visiblePixelDiff > 200;
     fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 1));
     console.log(JSON.stringify(result, null, 1));
     ws.close();
