@@ -73,6 +73,7 @@ console.log('[3/5] ローカルサーバ起動(127.0.0.1 のみ)');
 const sargs = [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port)];
 if (ALL) sargs.push('--lod2-dir', OUT);
 if (g('--ext-root')) sargs.push('--ext-root', g('--ext-root'));
+if (has('--no-auto-ext')) sargs.push('--no-auto-ext');
 const srv = spawn(process.execPath, sargs, { cwd: ROOT, stdio: ['ignore', 'inherit', 'inherit'] });
 let srvExit = null; srv.on('exit', (c) => { srvExit = c; });
 process.on('SIGINT', () => { srv.kill(); process.exit(0); });
@@ -96,14 +97,19 @@ console.log('[5/5] 準備完了');
 console.log('\n  ★ 開く URL: ' + url);
 console.log('  ★ このウィンドウは「サーバ実行中」のため終了しません(正常)。閉じる/Ctrl+C でサーバも止まり、ページは開けなくなります。');
 console.log('  ★ 診断: http://localhost:' + port + '/__lod2/diag.json  / ブラウザ F12 コンソールで window.__lc152.state');
-if (!g('--ext-root')) {
-  console.log('  ※ --ext-root 未指定: 24区の LOD1 は出ません(LOD2 と内蔵サンプルのみ)。右上パネルの「✕」が未接続データです。');
-  try {
-    const dg = await (await fetch(`http://127.0.0.1:${port}/__lod2/diag.json`)).json();
-    for (const c of dg.extCandidates || []) console.log('  候補: ' + c.dir + (c.hasIndexJson ? ' (index.json あり → --ext-root で指定可)' : c.is45dRoot ? ' (45D 出力。tools/mission45e-preview.cjs --src <旧建物dir> --out-root <このdir> --serve で ext-3dtiles を配信)' : ' (index.json なし)'));
-    if (!(dg.extCandidates || []).length) console.log('  24区 LOD1 の保管場所が不明なら、LOD1 変換済みフォルダのパスを教えてください(自動検出できる既定位置に見つかりませんでした)。');
-  } catch (e) { /* 診断のみ */ }
-}
+// Mission 170: 24区 LOD1 は --ext-root 未指定でも既定位置(%LOCALAPPDATA%\LiveCity-3DTiles-Out-24 等)を読み取り専用で自動検出する。
+try {
+  const dg = await (await fetch(`http://127.0.0.1:${port}/__lod2/diag.json`)).json();
+  const ea = dg.extAttach || {};
+  if (ea.chosen) {
+    console.log(`  ★ 24区 LOD1: ${ea.chosen.wards} 区を接続(${ea.chosen.kind}${ea.chosen.verified ? '' : '・未検証'}${ea.auto ? '・自動検出' : ''})。` + (ea.chosen.buildingsKnown ? `合計 ${ea.chosen.buildings} 棟` : '棟数は不明'));
+    if (ea.chosen.kind === '45d-root') console.log('    ※ 既存の旧PC変換データの可能性があります。PR51 の公式2025 LOD1(615,234棟)と同一とは限りません。欠落区: ' + ((ea.chosen.missingWards || []).join(',') || 'なし'));
+  } else {
+    console.log('  ※ 24区の LOD1 は未接続です(LOD2 と内蔵サンプルのみ)。右上パネルの「✕」が未接続データです。');
+    for (const x of ea.inspected || []) console.log('    検査した場所 ' + x.name + ': ' + x.reasons.join(' / '));
+    if (!(ea.inspected || []).length) console.log('    既定の場所に LOD1 出力が見つかりません。PowerShell: Test-Path "$env:LOCALAPPDATA\\LiveCity-3DTiles-Out-24" / 別の場所なら --ext-root <フォルダ> を指定してください。');
+  }
+} catch (e) { /* 診断のみ */ }
 if (!has('--no-open')) {
   const cmd = process.platform === 'win32' ? ['cmd', ['/c', 'start', '""', url]] : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
   try { const p = spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true, windowsVerbatimArguments: true }); p.on('error', () => console.log('  (ブラウザを自動で開けませんでした。上の URL を手動で開いてください)')); p.unref(); } catch (e) { console.log('  (自動起動不可。URL を手動で開いてください)'); }

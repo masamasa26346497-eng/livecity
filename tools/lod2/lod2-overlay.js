@@ -111,12 +111,29 @@
       panel.querySelectorAll('button[data-s]').forEach((b) => { b.onclick = () => goSpot(spots[Number(b.dataset.s) - 1]); });
       fetch('/__lod2/diag.json', { cache: 'no-store' }).then((r) => r.json()).then((dg) => {
         const rows = [['24区 LOD1', dg.data.lod1Wards], ['駅', dg.data.stations], ['路線・運営会社', dg.data.railOperators], ['地名', dg.data.towns], ['道路', dg.data.roads], ['河川', dg.data.rivers]];
-        state.data = dg.data; state.extCandidates = dg.extCandidates;
+        state.data = dg.data; state.extCandidates = dg.extCandidates; state.extAttach = dg.extAttach;
         let h = rows.map(([n, v]) => '<div>' + (v.ok ? '✓ ' : '✕ ') + '<b>' + n + '</b>: ' + String(v.msg).replace(/[<>&]/g, '') + '</div>').join('');
         const cand = (dg.extCandidates || []).filter((c) => c.hasIndexJson || c.is45dRoot);
         if (!dg.data.lod1Wards.ok && cand.length) h += '<div style="color:#fc8">24区 LOD1 の候補を検出: ' + cand.map((c) => c.dir).join(', ') + '(--ext-root で指定)</div>';
         document.getElementById('lc152-data').innerHTML = h;
       }).catch(() => { document.getElementById('lc152-data').textContent = '診断情報(diag.json)を取得できません'; });
+      // Mission 170: 上部の「建物 / 表示タイル」は 37G の旧タイルだけを数え、このオーバーレイの LOD2 は含まない。ここに別枠で実数を出す。
+      const live = document.createElement('div');
+      live.style.cssText = 'margin:4px 0;padding:4px 6px;background:rgba(255,255,255,.08);border-radius:4px';
+      panel.insertBefore(live, panel.children[1]);
+      const lod1Info = () => {
+        const ea = state.extAttach; const c = ea && ea.chosen;
+        return c ? 'LOD1(24区): ' + c.wards + '区接続 [' + c.kind + (c.verified ? '' : '・未検証') + ']' + (c.buildingsKnown ? ' ' + c.buildings + '棟' : '') : 'LOD1(24区): 未接続';
+      };
+      const refreshLive = () => {
+        const s = ts.statistics; const cam = window.__lc152.camera();
+        live.innerHTML = '<b>このプレビューの実数</b> (画面上部の「建物/表示タイル」は37G旧タイル専用)<br>' +
+          'LOD2: 全 ' + fp.footprints.length + ' 棟のうち、今のカメラで選択中のタイル ' + (ts._selectedTiles ? ts._selectedTiles.length : 0) + ' 枚 / 三角形 ' + s.numberOfTrianglesSelected +
+          '<br>' + lod1Info() + '<br>カメラ高度 ' + Math.round(cam.h) + 'm' +
+          (cam.h > 25000 ? '<br><span style="color:#fc8">高度が高すぎて LOD2 は描かれません。「LOD2 地点」ボタンで近づいてください</span>' : '');
+      };
+      state.live = refreshLive;
+      setInterval(refreshLive, 1000);
       Object.assign(window.__lc152, { overview, goSpot });
       const qp = new URLSearchParams(location.search);
       if (qp.get('lod2fly') === '1') fly();
