@@ -111,6 +111,11 @@
         '<div style="opacity:.75;margin-top:4px">凡例: LOD2=屋根・壁つき実形状(このプレビューで追加)/ LOD1=箱型(24区データ接続時のみ)/ 未接続=下の ✕ の項目</div>';
       document.body.appendChild(panel);
       panel.querySelector('#lc152-ov').onclick = overview;
+      // Mission 173: 診断コピー(読み取り専用)。diagnose.js が読めなくても LOD2 表示は止めない。
+      try {
+        await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = BASE + 'diagnose.js'; sc.onload = res; sc.onerror = () => rej(new Error('diagnose.js')); document.head.appendChild(sc); });
+        window.LC152Diag.attachUi({ Cesium, viewer, state, panel });
+      } catch (e) { state.diagError = String(e && e.message || e); }
       panel.querySelectorAll('button[data-s]').forEach((b) => { b.onclick = () => goSpot(spots[Number(b.dataset.s) - 1]); });
       fetch('/__lod2/diag.json', { cache: 'no-store' }).then((r) => r.json()).then((dg) => {
         const rows = [['24区 LOD1', dg.data.lod1Wards], ['駅', dg.data.stations], ['路線・運営会社', dg.data.railOperators], ['地名', dg.data.towns], ['道路', dg.data.roads], ['河川', dg.data.rivers]];

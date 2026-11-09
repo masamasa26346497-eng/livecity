@@ -38,6 +38,7 @@ function resolve(urlPath) {
     if (!urlPath.startsWith(prefix)) continue;
     let rel = decodeURIComponent(urlPath.slice(prefix.length));
     if (prefix === '/lod2-preview/' && rel === 'overlay.js') return path.join(__dirname, 'lod2-overlay.js');
+    if (prefix === '/lod2-preview/' && rel === 'diagnose.js') return path.join(__dirname, 'lod2-diagnose.js');
     const full = path.resolve(dir, rel);
     if (full !== dir && !full.startsWith(dir + path.sep)) return null;
     return full;

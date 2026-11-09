@@ -12,6 +12,7 @@ const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i
 const ROOT = path.resolve(__dirname, '..', '..');
 const WARDS = (opt('wards', 'sumiyoshi,higashiyodogawa,asahi,chuo')).split(',');
 const WITH_LOD2 = argv.includes('--lod2');
+const AUTO = argv.includes('--auto');   // Mission 173: lod2auto3d=0 を付けず、launcher 既定 URL の自動 全域3D を再現
 const NFP = Number(opt('nfp', 1));   // LOD2 足跡の数(実運用 --all は 10,698)。住吉の中心の 1 つ + 大阪全域へ疑似乱数で散布
 const port = Number(opt('port', 8172)), cport = Number(opt('cdp', 9372));
 const out = path.resolve(opt('out', path.join(ROOT, 'temp/lod2-e2e24')));
@@ -90,12 +91,22 @@ async function main() {
     const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); return r.result ? r.result.value : r; };
     await send('Network.enable'); await send('Runtime.enable'); await send('Page.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: 'http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1' + (WITH_LOD2 ? '&lod2=1&lod2auto3d=0' : '') });
+    await send('Page.navigate', { url: 'http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1' + (WITH_LOD2 ? (AUTO ? '&lod2=1&lod2ov=1' : '&lod2=1&lod2auto3d=0') : '') });   // AUTO: launcher --all の既定 URL そのまま(自動 全域3D)
     for (let i = 0; i < 120; i++) { const n = await ev('(window.__mission37g && window.__mission37g.extraMeta && window.__mission37g.extraMeta.length) || 0'); if (n >= WARDS.length) break; await sleep(500); if (i === 119) result.note = 'extraMeta が揃いません'; }
     if (WITH_LOD2) for (let i = 0; i < 60; i++) { const s = await ev('window.__lc152 && window.__lc152.state.status'); if (s === 'ready' || s === 'error' || s === 'refused') break; await sleep(500); }
     result.extraMeta = await ev('JSON.stringify(window.__mission37g.extraMeta)');
     result.lod2State = WITH_LOD2 ? await ev('JSON.stringify(window.__lc152 && window.__lc152.state)') : null;
-    await ev('(()=>{const m=document.getElementById("sel-bldg-mode");m.value="all";m.dispatchEvent(new Event("change"));})()');
+    if (AUTO) {
+      // 手動切替をしない: オーバーレイの自動 全域3D が実際に働くかを、時系列で記録する。
+      result.autoTrace = [];
+      for (let i = 0; i < 40; i++) {
+        const t = JSON.parse(await ev('JSON.stringify({sel: document.getElementById("sel-bldg-mode").value, on: window.__mission37g.allMode.on, ticks: window.__mission37g.allMode.ticks, mounted: Object.keys(window.__mission37g.allMode.mounted||{}), plan: window.__mission37g.allMode.lastPlan, err: window.__mission37g.allMode.lastError, auto3d: window.__lc152.state.auto3d, cam: window.__lc152.camera && window.__lc152.camera()})'));
+        if (i % 4 === 0) result.autoTrace.push(t);
+        if (t.on && t.mounted.length) break; await sleep(750);
+      }
+      result.autoOk = (result.autoTrace[result.autoTrace.length - 1] || {}).on === true;
+      result.diagnose = JSON.parse(await ev('window.__lc152.diagnose ? window.__lc152.diagnose().then(JSON.stringify) : "null"'));
+    } else await ev('(()=>{const m=document.getElementById("sel-bldg-mode");m.value="all";m.dispatchEvent(new Event("change"));})()');
     await sleep(3000);
     const pixels = async (name) => {
       const r = await send('Page.captureScreenshot', { format: 'png' }); const b = Buffer.from(r.data, 'base64'); fs.writeFileSync(path.join(out, name), b); return b;
