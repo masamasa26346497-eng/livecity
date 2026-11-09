@@ -1,0 +1,110 @@
+{
+ "mission": "38E-plan-ward-mesh",
+ "ward": "naniwa",
+ "wardCode": "27111",
+ "status": "PLAN_ONLY_NOT_FETCHED",
+ "source": {
+  "url": "https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip",
+  "etag": "\"982370acee7a5cc63a94fa2e9b0b33fe\"",
+  "lastModified": "Mon, 31 Mar 2025 02:41:20 GMT",
+  "contentLength": 1523942100,
+  "probeGeneratedAt": "2026-10-01T16:08:58.978Z"
+ },
+ "sampling": "5x5 mesh sample points inside N03 ward polygon (same rule as 37H)",
+ "candidates": [
+  {
+   "mesh": "51357399",
+   "entry": "udx/bldg/51357399_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 228054062,
+   "compressedBytes": 1392193,
+   "uncompressedBytes": 34534516,
+   "wardSampleFraction": 1
+  },
+  {
+   "mesh": "51357389",
+   "entry": "udx/bldg/51357389_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 213437142,
+   "compressedBytes": 1328668,
+   "uncompressedBytes": 32195516,
+   "wardSampleFraction": 0.76
+  },
+  {
+   "mesh": "51357480",
+   "entry": "udx/bldg/51357480_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 305553369,
+   "compressedBytes": 1447834,
+   "uncompressedBytes": 35895989,
+   "wardSampleFraction": 0.72
+  },
+  {
+   "mesh": "51357490",
+   "entry": "udx/bldg/51357490_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 316600589,
+   "compressedBytes": 1755350,
+   "uncompressedBytes": 43054025,
+   "wardSampleFraction": 0.48
+  },
+  {
+   "mesh": "51357398",
+   "entry": "udx/bldg/51357398_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 226334563,
+   "compressedBytes": 1719419,
+   "uncompressedBytes": 42319613,
+   "wardSampleFraction": 0.4
+  },
+  {
+   "mesh": "52350309",
+   "entry": "udx/bldg/52350309_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 336592943,
+   "compressedBytes": 2552673,
+   "uncompressedBytes": 41927319,
+   "wardSampleFraction": 0.28
+  },
+  {
+   "mesh": "51357388",
+   "entry": "udx/bldg/51357388_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 212258673,
+   "compressedBytes": 1178389,
+   "uncompressedBytes": 28872988,
+   "wardSampleFraction": 0.2
+  },
+  {
+   "mesh": "52350308",
+   "entry": "udx/bldg/52350308_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 335330902,
+   "compressedBytes": 1261961,
+   "uncompressedBytes": 30305449,
+   "wardSampleFraction": 0.2
+  },
+  {
+   "mesh": "51357470",
+   "entry": "udx/bldg/51357470_bldg_6697_op.gml",
+   "method": 8,
+   "localOffset": 294833390,
+   "compressedBytes": 1580967,
+   "uncompressedBytes": 38608463,
+   "wardSampleFraction": 0.08
+  }
+ ],
+ "selected": {
+  "mesh": "51357399",
+  "entry": "udx/bldg/51357399_bldg_6697_op.gml",
+  "method": 8,
+  "localOffset": 228054062,
+  "compressedBytes": 1392193,
+  "uncompressedBytes": 34534516,
+  "wardSampleFraction": 1
+ },
+ "fetchCommand": "node tools/mission36k-fetch-citygml-ward-range.mjs --ward naniwa --meshes=51357399 --out temp/gml-naniwa",
+ "notes": [
+  "取得・変換は未実施。sha256 は取得後に記録すること。ward-hint は定数スタンプなので区判定は N03 点内判定で行う。"
+ ]
+}

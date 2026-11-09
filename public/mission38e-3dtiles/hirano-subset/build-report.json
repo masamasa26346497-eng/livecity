@@ -1,0 +1,67 @@
+{
+ "dataset": "osaka-hirano-m38e",
+ "selectedTiles": 4,
+ "groups": 1,
+ "leaf": [
+  {
+   "name": "t_5_-3",
+   "buildings": 1529,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 39930,
+   "triangles": 20900,
+   "bytes": 1120116
+  },
+  {
+   "name": "t_5_-4",
+   "buildings": 1465,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 39505,
+   "triangles": 20773,
+   "bytes": 1107212
+  },
+  {
+   "name": "t_6_-3",
+   "buildings": 916,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 24460,
+   "triangles": 12844,
+   "bytes": 686452
+  },
+  {
+   "name": "t_6_-4",
+   "buildings": 785,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 21085,
+   "triangles": 11081,
+   "bytes": 591904
+  }
+ ],
+ "coarse": [
+  {
+   "name": "g_1_-1",
+   "buildings": 1301,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 26020,
+   "triangles": 13010,
+   "bytes": 736964
+  }
+ ],
+ "totals": {
+  "buildings": 4695,
+  "sourceBuildings": 4695,
+  "skipped": 0,
+  "fallbacks": 0,
+  "glbBytes": 4242648,
+  "uniqueCanonicalIds": 4695
+ },
+ "options": {
+  "group": 4,
+  "coarseError": 40,
+  "coarseMinArea": 100
+ }
+}
