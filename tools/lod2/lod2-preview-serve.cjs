@@ -61,7 +61,10 @@ function countExt(pathname, status) {
 //   「37G を開いていない/別サーバを見ている」か「?ext45=1 が無い」か「index.json は読んだが区を登録しなかった」かを切り分ける。
 const AUTO_EXT45_SNIPPET = '<script>(function(){try{if(!/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname))return;var q=new URLSearchParams(location.search);if(q.has("ext45"))return;q.set("ext45","1");if(!q.has("nobuiltin"))q.set("nobuiltin","1");window.__lc175={autoExt45:true,original:location.search};history.replaceState(null,"",location.pathname+"?"+q.toString()+location.hash);}catch(e){window.__lc175={autoExt45:false,error:String(e)};}})();</script>';
 const PAGE = { html: 0, injected: 0, redirected: 0, lastQuery: null, indexJson: 0, overlayJs: 0, diagJs: 0, lastHtmlAt: null, lastIndexAt: null };
-function noteReq(u) {
+function noteReq(u, req) {
+  // Mission 176: launcher の readiness probe(UA 無し / x-lc-probe)はブラウザの要求と区別する。
+  //   実機診断の html:17 / overlayJs:17 は、launcher の probe ループ(最大40回)由来だった可能性が高い(ブラウザは未アクセス)。
+  if (req && (req.headers['x-lc-probe'] || !/Mozilla/i.test(req.headers['user-agent'] || ''))) { if (u.pathname === '/mission37g-osaka-24ward-mvp.html') PAGE.probeHtml = (PAGE.probeHtml || 0) + 1; return; }
   const p = u.pathname;
   if (p === '/mission37g-osaka-24ward-mvp.html') { PAGE.html++; PAGE.lastHtmlAt = new Date().toISOString(); const o = {}; for (const k of ['ext45', 'nobuiltin', 'lod2', 'lod2ov', 'lod2fly', 'lod2auto3d', 'lod2clip', 'extra', 'ext']) if (u.searchParams.has(k)) o[k] = u.searchParams.get(k).slice(0, 20); PAGE.lastQuery = o; }
   else if (p === '/ext-3dtiles/index.json') { PAGE.indexJson++; PAGE.lastIndexAt = new Date().toISOString(); }
@@ -70,7 +73,7 @@ function noteReq(u) {
 }
 function requestVerdict() {
   if (!EXT) return '24区 LOD1 はサーバ側で未接続';
-  if (!PAGE.html) return '37G のページがこのサーバに一度も要求されていない(別のサーバ/別ポート/古いタブを見ている可能性。診断を開いたサーバと同じ localhost:' + port + ' で 37G を開く)';
+  if (!PAGE.html) return '37G のページがブラウザから一度も要求されていない(launcher probe ' + (PAGE.probeHtml || 0) + ' 回は除外済み)。37G のページがこのサーバに一度も要求されていない(別のサーバ/別ポート/古いタブを見ている可能性。診断を開いたサーバと同じ localhost:' + port + ' で 37G を開く)';
   if ((!PAGE.lastQuery || PAGE.lastQuery.ext45 !== '1') && !PAGE.injected) return '37G は開かれたが ext45=1 が無い → 37G は index.json を読まず内蔵の住吉だけを出す(?ext45=0 を明示した場合のみ。通常はサーバが HTML に ext45=1 を注入して補う。requests.injected 参照)';
   if (!PAGE.indexJson) return 'ext45=1 付きで開かれたが index.json が要求されていない(ページの読み込み途中/スクリプトエラー。F12 コンソールを確認)';
   if (!Object.keys(SERVED).length) return 'index.json は要求されたが区の source.json/build-report.json が一件も要求されていない(37G の loadExtraMeta が走っていない=ページのスクリプトエラーか読み込み中)';
@@ -143,7 +146,7 @@ function extCandidates() {
 const server = http.createServer((req, res) => {
   try {
     const u = new URL(req.url, 'http://localhost');
-    noteReq(u);
+    noteReq(u, req);
     // Mission 174: 24区 LOD1 を接続済みなのに ?ext45=1 無しで 37G を開くと、37G は index.json を読まず(loadExt45Defs が即 return)、
     //   内蔵サンプルの住吉だけが出る。→ 接続済みならクエリに ext45=1 を補って 302 する(localhost 専用サーバのみ)。?ext45=0 は尊重。
     // Mission 175: 302 は廃止(実PC診断で 17/17 件が 302 のまま、補完URLの再要求が一件も記録されなかった=リダイレクトに依存できない)。

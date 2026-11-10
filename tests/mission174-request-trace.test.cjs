@@ -4,6 +4,9 @@
 // 合成 fixture。ブラウザ(Cesium)描画は検証していない。
 const test = require('node:test');
 const assert = require('node:assert');
+// Mission 176: UA が Mozilla でない要求は launcher probe として除外される。ここではブラウザ相当の UA を付ける。
+const _fetch = global.fetch;
+const fetch = (u, o = {}) => _fetch(u, { ...o, headers: { 'user-agent': 'Mozilla/5.0 test', ...(o.headers || {}) } });
 const net = require('node:net');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
@@ -74,5 +77,19 @@ test('ext45=0 は尊重(リダイレクトしない)し、verdict は ext45 欠�
     const r = await fetch(base + '/mission37g-osaka-24ward-mvp.html?ext45=0', { redirect: 'manual' });
     assert.strictEqual(r.status, 200);
     assert.match((await diag(base)).requests.verdict, /ext45=1 が無い/);
+  } finally { p.kill(); }
+});
+
+test('Mission176: launcher probe (UA 無し / x-lc-probe) はブラウザ要求として数えない', async () => {
+  const la = F.mkLocalAppData({ wards: ['asahi', 'higashiyodogawa'], special: {}, layerWards: [] });
+  const { p, base } = await start({ LOCALAPPDATA: la });
+  try {
+    await _fetch(base + '/mission37g-osaka-24ward-mvp.html', { headers: { 'x-lc-probe': '1' } });
+    await _fetch(base + '/lod2-preview/overlay.js');
+    const d = await diag(base);
+    assert.strictEqual(d.requests.html, 0);
+    assert.strictEqual(d.requests.overlayJs, 0);
+    assert.ok(d.requests.probeHtml >= 1);
+    assert.match(d.requests.verdict, /ブラウザから一度も要求されていない/);
   } finally { p.kill(); }
 });

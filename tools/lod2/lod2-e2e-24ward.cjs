@@ -13,7 +13,8 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const WARDS = (opt('wards', 'sumiyoshi,higashiyodogawa,asahi,chuo')).split(',');
 const WITH_LOD2 = argv.includes('--lod2');
 const AUTO = argv.includes('--auto');   // Mission 173: lod2auto3d=0 を付けず、launcher 既定 URL の自動 全域3D を再現
-const NFP = Number(opt('nfp', 1));   // LOD2 足跡の数(実運用 --all は 10,698)。住吉の中心の 1 つ + 大阪全域へ疑似乱数で散布
+const QUERY = opt('query', null);   // Mission 176: 任意クエリ('' = クエリ無し)。指定時は ext45/nobuiltin を自前で付けない
+const NFP =Number(opt('nfp', 1));   // LOD2 足跡の数(実運用 --all は 10,698)。住吉の中心の 1 つ + 大阪全域へ疑似乱数で散布
 const port = Number(opt('port', 8172)), cport = Number(opt('cdp', 9372));
 const out = path.resolve(opt('out', path.join(ROOT, 'temp/lod2-e2e24')));
 const chromeBin = opt('chrome', ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'].find((p) => fs.existsSync(p)));
@@ -91,9 +92,11 @@ async function main() {
     const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); return r.result ? r.result.value : r; };
     await send('Network.enable'); await send('Runtime.enable'); await send('Page.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: 'http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1' + (WITH_LOD2 ? (AUTO ? '&lod2=1&lod2ov=1' : '&lod2=1&lod2auto3d=0') : '') });   // AUTO: launcher --all の既定 URL そのまま(自動 全域3D)
+    await send('Page.navigate', { url: 'http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html' + (QUERY !== null ? QUERY : '?nobuiltin=1&ext45=1' + (WITH_LOD2 ? (AUTO ? '&lod2=1&lod2ov=1' : '&lod2=1&lod2auto3d=0') : '')) });   // AUTO: launcher --all の既定 URL そのまま(自動 全域3D)
     for (let i = 0; i < 120; i++) { const n = await ev('(window.__mission37g && window.__mission37g.extraMeta && window.__mission37g.extraMeta.length) || 0'); if (n >= WARDS.length) break; await sleep(500); if (i === 119) result.note = 'extraMeta が揃いません'; }
     if (WITH_LOD2) for (let i = 0; i < 60; i++) { const s = await ev('window.__lc152 && window.__lc152.state.status'); if (s === 'ready' || s === 'error' || s === 'refused') break; await sleep(500); }
+    result.page = JSON.parse(await ev('JSON.stringify({search: location.search, lc175: window.__lc175 || null, hasMission37g: !!window.__mission37g})'));
+    result.htmlHeader = await ev("fetch('/mission37g-osaka-24ward-mvp.html').then(r => JSON.stringify({status: r.status, xAuto: r.headers.get('x-lc-auto-ext45')}))");
     result.extraMeta = await ev('JSON.stringify(window.__mission37g.extraMeta)');
     result.lod2State = WITH_LOD2 ? await ev('JSON.stringify(window.__lc152 && window.__lc152.state)') : null;
     if (AUTO) {
@@ -128,6 +131,7 @@ async function main() {
       result.wards[wid] = { mounted: st.allMode.mounted, plan: st.allMode.lastPlan, lastError: st.allMode.lastError, extraSets: st.extraSets, pixelDiff: await diff(on, off) };
       result.wards[wid].drawn = result.wards[wid].pixelDiff > 200;
     }
+    result.serverTrace = await getJson('http://127.0.0.1:' + port + '/__lod2/diag.json').then((d) => ({ requests: d.requests, extServed: d.extServed })).catch((e) => String(e));
     result.clipState = WITH_LOD2 ? JSON.parse(await ev("JSON.stringify({clipped: window.__lc152.state.clippedTilesets, status: window.__lc152.state.status, error: window.__lc152.state.error})")) : null;
     result.pass = WARDS.every((w) => result.wards[w] && result.wards[w].drawn);
     fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 1));

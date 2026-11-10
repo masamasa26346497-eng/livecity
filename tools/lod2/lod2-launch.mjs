@@ -23,7 +23,7 @@ const check = (name, ok, detail = '', fatal = true) => { results.push({ name, ok
 const die = (msg) => { console.error('\n[LOD2] 起動できません: ' + msg + '\n  → tools/lod2/README-LAUNCH.md の「うまくいかないとき」を参照してください。'); process.exit(1); };
 
 const portFree = (p) => new Promise((res) => { const s = net.createServer(); s.once('error', () => res(false)); s.once('listening', () => s.close(() => res(true))); s.listen(p, '127.0.0.1'); });
-const get = (p, pathname) => new Promise((res) => { const r = http.get({ host: '127.0.0.1', port: p, path: pathname, timeout: 4000 }, (x) => { let n = 0; x.on('data', (d) => (n += d.length)); x.on('end', () => res({ status: x.statusCode, bytes: n })); }); r.on('error', () => res({ status: 0, bytes: 0 })); r.on('timeout', () => { r.destroy(); res({ status: 0, bytes: 0 }); }); });
+const get = (p, pathname) => new Promise((res) => { const r = http.get({ host: '127.0.0.1', port: p, path: pathname, timeout: 4000, headers: { 'x-lc-probe': '1' } }, (x) => { let n = 0; x.on('data', (d) => (n += d.length)); x.on('end', () => res({ status: x.statusCode, bytes: n })); }); r.on('error', () => res({ status: 0, bytes: 0 })); r.on('timeout', () => { r.destroy(); res({ status: 0, bytes: 0 }); }); });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 console.log('[LOD2] ROOT = ' + ROOT);
