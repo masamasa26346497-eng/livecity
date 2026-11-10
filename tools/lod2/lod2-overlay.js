@@ -73,7 +73,8 @@
           // 注視点(画面中心の地表)を基準にする。取れなければカメラ直下。
           let lon = Cesium.Math.toDegrees(c.longitude), lat = Cesium.Math.toDegrees(c.latitude);
           try { const hit = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2)); if (hit) { const g = Cesium.Cartographic.fromCartesian(hit); lon = Cesium.Math.toDegrees(g.longitude); lat = Cesium.Math.toDegrees(g.latitude); } } catch (e) { /* 直下で代用 */ }
-          const sel = CN.selectNearby(fp.footprints, { lon, lat, h: c.height });
+          const qp = new URLSearchParams(location.search), num = (k) => (qp.get(k) ? Number(qp.get(k)) : undefined);
+          const sel = CN.selectNearby(fp.footprints, { lon, lat, h: c.height }, { maxHeightM: num('lod2cliph'), radiusM: num('lod2clipr'), maxPolys: num('lod2clipmax') });
           if (!CN.needsUpdate(prev, sel)) return;
           const t0 = performance.now(); prev = sel;
           const prims = scene.primitives;

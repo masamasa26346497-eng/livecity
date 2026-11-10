@@ -4,7 +4,7 @@
 // 純関数(Cesium 非依存)。ブラウザでは window.LC152ClipNear、Node では module.exports。
 (function (root) {
   'use strict';
-  const DEFAULTS = { maxHeightM: 2500, radiusM: 1200, maxPolys: 400 };
+  const DEFAULTS = { maxHeightM: 2500, radiusM: 1200, maxPolys: 20 };
   function distM(lon1, lat1, lon2, lat2) {
     const kx = 111320 * Math.cos(((lat1 + lat2) / 2) * Math.PI / 180), ky = 110540;
     return Math.hypot((lon2 - lon1) * kx, (lat2 - lat1) * ky);
@@ -12,7 +12,8 @@
   // footprints: [{hull:[[lon,lat],...]}]; cam: {lon,lat,h}
   // 戻り値: 選ばれた添字(近い順)。遠景(高度超過)では空配列 = クリップなし。
   function selectNearby(footprints, cam, opt) {
-    const o = Object.assign({}, DEFAULTS, opt || {});
+    const o = Object.assign({}, DEFAULTS);
+    for (const k of Object.keys(opt || {})) if (Number.isFinite(opt[k])) o[k] = opt[k];
     if (!cam || !(cam.h < o.maxHeightM)) return [];
     const c = [];
     for (let i = 0; i < footprints.length; i++) {
