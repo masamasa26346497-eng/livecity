@@ -1,0 +1,914 @@
+{
+ "schema": "livecity.mission158.ward2025-inventory/1",
+ "generatedFrom": "git-tracked evidence only",
+ "summary": {
+  "wardsListed": 23,
+  "excluded": [
+   "nishi"
+  ],
+  "zipIdentityLocked": true,
+  "convertedOkOnRunner": 21,
+  "convertedFailedOnRunner": 1,
+  "servableInGit": 0,
+  "browserAcceptedPerCiLog": 19,
+  "browserNotAccepted": [
+   "konohana",
+   "nishinari"
+  ],
+  "noEvidenceAtAll": [
+   "yodogawa"
+  ],
+  "wardAlignmentProven": 0,
+  "note": "24/24 browser acceptance is NOT established. Converted data lives in runner temp / private release assets, not in Git."
+ },
+ "plan": {
+  "nonDestructive": true,
+  "executed": false,
+  "note": "PLAN ONLY. Existing batch (M80) skips status=ok wards and never overwrites; raw GML is deleted only from its own work dir.",
+  "wardsNeedingConversionEvidence": [
+   "konohana",
+   "yodogawa"
+  ],
+  "ownerPcCommand": "node tools/mission158-ward2025-inventory.cjs --local <your 3DTiles output root>   (read-only; prints which wards have vintage-2025 tileset.json)",
+  "existingBatchCommand": "node tools/mission80-batch.mjs --wards konohana,yodogawa --max-mb 1200   (NOT run here)"
+ },
+ "rows": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok-on-runner (not committed)",
+    "buildings": 17651,
+    "uniqueIds": 17651,
+    "idsUnique": true,
+    "meshes": 12,
+    "outBytes": 27274036,
+    "evidence": "mission80/batch-manifest.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 19
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 41.62,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "partial 1.337"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok-on-runner (not committed)",
+    "buildings": 13412,
+    "uniqueIds": 13412,
+    "idsUnique": true,
+    "meshes": 10,
+    "outBytes": 20435755,
+    "evidence": "mission80/batch-manifest.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "none"
+   },
+   "webglPixelDiff": {
+    "state": "none"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "none"
+   },
+   "browserVerdict": "not evaluated",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "FAILED on runner",
+    "error": "Command failed: /usr/local/bin/node tools/mission79-run.mjs --ward konohana --ma",
+    "evidence": "mission80/batch-manifest.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 24
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 35.05,
+    "click": "FAIL"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "partial 1.311"
+   },
+   "browserVerdict": "NOT ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok-on-runner (not committed)",
+    "buildings": 17200,
+    "uniqueIds": 17200,
+    "idsUnique": true,
+    "meshes": 16,
+    "outBytes": 25755990,
+    "evidence": "mission80/batch-manifest.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 24
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 31.76,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.11"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 12
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 35.51,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.121"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 10
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 40.85,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 0.999"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 13
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 43.59,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.015"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 23
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 41.42,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.178"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 27
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 33.21,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.019"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 10
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 36.3,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.03"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 17
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 44.2,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 0.983"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 43
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 41.04,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.113"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 23
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 40.53,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 0.998"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 26
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 44.06,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 0.984"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 15
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 42.22,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 22
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 33.83,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 0.996"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 18
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 33.04,
+    "click": "FAIL"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.097"
+   },
+   "browserVerdict": "NOT ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "no evidence in Git",
+    "buildings": null
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "none"
+   },
+   "webglPixelDiff": {
+    "state": "none"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "none"
+   },
+   "browserVerdict": "not evaluated",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 9
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 33.72,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.147"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 27
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 33.11,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "partial 1.269"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 17
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 41.53,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.046"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 20
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 42.46,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.242"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "source2025": {
+    "zipLocked": true,
+    "gmlBodiesInGit": false,
+    "state": "zip-identity-only (central directory); GML not verifiable from Git"
+   },
+   "converted": {
+    "state": "ok per CI log (21/21 archives, dataOk)",
+    "buildings": null,
+    "evidence": "mission140/run42438843605-acceptance.json"
+   },
+   "servableInGit": {
+    "state": "no (no tracked vintage-2025 tileset)"
+   },
+   "http200": {
+    "state": "glb200 per CI log",
+    "glb200": 17
+   },
+   "webglPixelDiff": {
+    "state": "headless software GL (CI log)",
+    "pct": 51.11,
+    "click": "id-ok"
+   },
+   "wardAlignment": {
+    "state": "unverified",
+    "note": "M140 log has no per-ward N03 check (notProvenByLog)"
+   },
+   "coverage": {
+    "state": "source-count ratio only, not in-browser proof",
+    "value": "full-candidate 1.021"
+   },
+   "browserVerdict": "ACCEPTED",
+   "ownerPc": {
+    "state": "unverified (--local not given; PC-only data cannot be checked from Git)"
+   }
+  }
+ ]
+}
