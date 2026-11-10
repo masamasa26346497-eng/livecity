@@ -5,14 +5,14 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const load = (f) => { const sb = { module: { exports: {} } }; vm.runInNewContext(fs.readFileSync(path.join(root, f), 'utf8'), sb); return sb.module.exports; };
+const load = (f) => { const sb = { module: { exports: {} }, URL }; vm.runInNewContext(fs.readFileSync(path.join(root, f), 'utf8'), sb); return sb.module.exports; };
 const PS = load('public/mission37f-photo-select.js');
 const PP = load('public/mission52-photo-panel.js');
 const idx = JSON.parse(fs.readFileSync(path.join(root, 'public/map-data/osaka-city/derived/building-photo-index.json'), 'utf8'));
 const HANWA_OLD = 'bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0';
 const HANWA_MEM = 'bldg_fae25b63-cddc-4545-8004-c41620676308';
 
-const ph = (f, extra) => Object.assign({ thumbnailUrl: 'https://thumb.wikimedia.org/x/' + f, license: 'CC BY-SA 4.0', author: 'Taro', width: 320, height: 240,
+const ph = (f, extra) => Object.assign({ thumbnailUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/x/' + f, license: 'CC BY-SA 4.0', author: 'Taro', width: 320, height: 240,
   sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:' + f, licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0' }, extra || {});
 
 // ── 最小のDOMスタブ（textContent / 属性 / 子要素 / イベント）
@@ -102,7 +102,7 @@ test('[real-index] 阪和病院の新旧: 旧IDは2023年の新病棟写真を�
   assert.match(page, /<script src="mission52-photo-panel\.js"><\/script>/);
   assert.match(page, /LiveCityPhotoPanel\.buildModel\(entry, photoOpts, LiveCityPhotoSelect\)/);
   assert.match(page, /exclude: \(reloc \? reloc\.exclude : \[\]\)/);
-  assert.match(page, /LiveCityPhotoPanel\.classifyLicense/);
+  assert.match(page, /LiveCityPhotoPanel\.photoEligibility/);
 });
 
 test('[real-index] 既存の確認済み写真: 採用された写真は全て出典URL・https・個別ライセンスを持つ。曖昧なライセンス名は保留', () => {
@@ -118,21 +118,21 @@ test('[real-index] 既存の確認済み写真: 採用された写真は全て�
     if (m.primary) shown++;
     if (m.additional.length) withExtra++;
   }
-  assert.equal(heldTotal, 2, '建物IDで引ける写真のうち曖昧なライセンス名(Attribution / FAL)は2件');
-  assert.equal(shown, 573, '574件中1件(FALのみのFestivalGate)は代表なし。今昔館は別の写真が代表');
-  assert.equal(withExtra, 11, '複数写真を持つ12件のうち、保留で1件が単一になる');
+  assert.equal(heldTotal, 85, '表示条件に満たない写真(保留): ライセンスURLなし70 / 作者なし13 / 曖昧なライセンス名2。索引からは削除しない');
+  assert.equal(shown, 492, '574件中82件は適格な写真がなく代表なし(保留)。索引には残る');
+  assert.equal(withExtra, 10, '複数写真を持つ12件のうち、保留で1件が単一になる');
 });
 
 test('[fixture] 取り込み: 距離だけ・名称不一致・ライセンス不明・移転前後・同名施設・重複・撮影日不明を処理', async () => {
   const { importCandidates, evaluateEvidence } = await import('../tools/photos/lib/import-candidates.mjs');
   const existing = { byCanonicalId: { 'cg_bldg_A': { photos: [ph('Existing.jpg')] } } };
-  const c = (f, o) => Object.assign({ canonicalId: 'cg_bldg_B', route: 'wikidata-p18', thumbnailUrl: 'https://thumb.wikimedia.org/' + f, imageUrl: 'https://upload.wikimedia.org/' + f,
+  const c = (f, o) => Object.assign({ canonicalId: 'cg_bldg_B', route: 'wikidata-p18', thumbnailUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/x/' + f, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/x/' + f,
     sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:' + f, license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0', author: 'Taro',
     evidence: { explicitLink: true, name: true } }, o || {});
   const cands = [
     c('Good_2024.jpg', { takenAt: '2024-05-03', dateEvidenceUrl: 'https://commons.wikimedia.org/wiki/File:Good_2024.jpg' }),
-    c('Good_2024.jpg', { route: 'commons-category' }),                                   // 同一ファイルの別経路 → 二重計上しない
-    c('Existing.jpg', { canonicalId: 'cg_bldg_A', route: 'commons-p180' }),               // 既存と同一 → 重複
+    c('Good_2024.jpg', { route: 'osm-explicit' }),                                   // 同一ファイルの別経路 → 二重計上しない
+    c('Existing.jpg', { canonicalId: 'cg_bldg_A', route: 'commons-p180', evidence: { explicitLink: true, subject: true } }),               // 既存と同一 → 重複
     c('Near.jpg', { route: 'geosearch', evidence: { distanceM: 12 } }),                  // 距離のみ → 保留
     c('Conflict.jpg', { evidence: { explicitLink: true, nameConflict: true } }),         // 名称衝突 → 保留
     c('NC.jpg', { license: 'CC BY-NC 4.0' }),                                           // 非商用 → 保留
@@ -155,7 +155,7 @@ test('[fixture] 取り込み: 距離だけ・名称不一致・ライセンス�
   assert.equal(reasons['NoAuthor.jpg@cg_bldg_B'], 'attribution-required-author-missing');
   assert.equal(reasons['Hanwa memorial hospital 2023-12 2.jpg@' + HANWA_OLD], 'relocation-excluded');
   assert.equal(reasons['Same.jpg@cg_bldg_C'], 'same-file-multiple-buildings');
-  assert.equal(reasons['Plain.jpg@cg_bldg_B'], 'non-https-or-missing-url');
+  assert.equal(reasons['Plain.jpg@cg_bldg_B'], 'invalid-thumbnail-url');
   assert.equal(r.duplicates.length, 2);
   assert.equal(r.adopted.find((a) => a.file === 'NoDate.jpg').takenAt, null, '根拠URLなしの日付は採用しない');
   assert.equal(r.adopted.find((a) => a.file === 'Good 2024.jpg').takenAt, '2024-05-03');

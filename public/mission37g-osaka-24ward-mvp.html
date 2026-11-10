@@ -3229,8 +3229,8 @@
     return e;
   }
   // 索引の作者欄が「Own work」等の定型句だけのとき、それは作者名ではない。名前を作らず Commons のページを案内する
-  const GENERIC_AUTHOR = /^(own work|self[- ]?photographed|i, .+|photo taken by .+|taken by .+)$/i;
-  const authorLabel = (a) => (!a || GENERIC_AUTHOR.test(String(a).trim()) ? '索引に作者名の記載なし（Wikimedia Commons のファイルページを参照）' : a);
+  // 作者表記は mission52-photo-panel.js に一本化（「I, 実名」「Photo taken by 実名」は実名を表示、名前の無い定型句のみ作者名なし）
+  const authorLabel = (a) => LiveCityPhotoPanel.authorText(a) || '索引に作者名の記載なし（Wikimedia Commons のファイルページを参照）';
   // curatedName が Wikidata 名の先頭部分だけ（例: 細井川 ← 細井川停留場）のときは、種別が分かる Wikidata 名を表示する
   const displayName = (e) => (e && e.wikidataLabel && e.buildingName && e.wikidataLabel.length > e.buildingName.length && e.wikidataLabel.startsWith(e.buildingName) ? e.wikidataLabel : (e && e.buildingName) || null);
   // 写真の鮮度注意（撮影日・移転情報が確認できた写真だけを手動登録）。写真の入れ替えはせず、現況と誤解されないよう注記する
@@ -3261,7 +3261,7 @@
     const photoOpts = {
       okConfidence: (idx && idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'],
       exclude: (reloc ? reloc.exclude : []).concat(((idx && idx.__holds) || []).filter((h) => h.canonicalId === id).map((h) => h.file))
-        .concat(((entry && entry.photos) || []).filter((x) => !LiveCityPhotoPanel.classifyLicense(x.license).ok).map(photoFile)),
+        .concat(((entry && entry.photos) || []).filter((x) => !LiveCityPhotoPanel.photoEligibility(x).ok).map(photoFile)),
       dates: (idx && idx.__dates) || {},
       adds: (idx && idx.__adds) || []
     };
@@ -3274,7 +3274,7 @@
       return entry;
     }
     const p = photos[0];
-    const img = el('img', null, { src: p.thumbnailUrl, alt: (displayName(entry) || '建物') + 'の写真', loading: 'lazy', referrerpolicy: 'no-referrer' });
+    const img = el('img', null, { src: LiveCityPhotoPanel.commonsImage(p.thumbnailUrl) || '', alt: (displayName(entry) || '建物') + 'の写真', loading: 'lazy', referrerpolicy: 'no-referrer' });
     img.addEventListener('error', () => {
       if (!img.isConnected) return; // 別の建物に切り替わった後の遅延エラーは無視
       slot.textContent = '写真を読み込めませんでした（画像の取得に失敗）。出典: ';

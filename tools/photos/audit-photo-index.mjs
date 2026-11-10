@@ -5,8 +5,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { classifyLicense } from './lib/photo-license.mjs';
+import { Panel, Select } from './lib/panel-shared.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+// 表示可否の集計: 画面（buildModel）と同じ判定で、表示できる建物/代表/追加写真と保留理由を数える。索引は変更しない。
+//   「表示可能」は既存データの再集計であり、新規取得の純増ではない。
+export function displaySummary(idx) {
+  const ok = (idx.policy && idx.policy.clickShows) || ['VERY_HIGH', 'HIGH'];
+  const s = { entriesInIndex: 0, entriesEligibleByConfidence: 0, entriesWithPrimary: 0, primaryExteriorConfirmed: 0, primaryUnclassified: 0, entriesWithoutPrimaryAllHeld: 0,
+    entriesWithAdditional: 0, additionalPhotos: 0, heldPhotos: 0, heldByReason: {}, entriesWithAnyHeld: 0 };
+  for (const e of Object.values(idx.byCanonicalId || {})) {
+    s.entriesInIndex++;
+    const m = Panel.buildModel(e, { okConfidence: ok }, Select);
+    if (m.state === 'low-confidence' || m.state === 'no-entry') continue;
+    s.entriesEligibleByConfidence++;
+    if (m.held.length) s.entriesWithAnyHeld++;
+    m.held.forEach((h) => { s.heldPhotos++; s.heldByReason[h.reason] = (s.heldByReason[h.reason] || 0) + 1; });
+    if (m.primary) { s.entriesWithPrimary++; if (m.exteriorConfirmed) s.primaryExteriorConfirmed++; else s.primaryUnclassified++; } else s.entriesWithoutPrimaryAllHeld++;
+    if (m.additional.length) { s.entriesWithAdditional++; s.additionalPhotos += m.additional.length; }
+  }
+  return s;
+}
 
 export function audit(idx, dates) {
   const recs = idx.records || [];
@@ -64,6 +84,7 @@ export function audit(idx, dates) {
       licensesNotAdopted: licNg
     },
     dates: dates ? { files: dd.length, verified, verifiedRate: dd.length ? +(verified / dd.length).toFixed(3) : null } : null,
+    display: displaySummary(idx),
     netNewFromThisPR: 0,
     netNewNote: '本PRは外部取得を行っていないため、写真付き建物の純増は 0。上記はすべて既存データの実測。'
   };
