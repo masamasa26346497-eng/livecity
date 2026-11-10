@@ -1,0 +1,150 @@
+{
+  "mission": "37G",
+  "url": "http://localhost:8138/mission37g-osaka-24ward-mvp.html",
+  "browser": "Chrome/154.0.8037.97",
+  "generatedAt": "2026-10-12T11:36:47.867Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8138/favicon.ico"
+  ],
+  "jsErrors": [],
+  "consoleErrors": [],
+  "steps": {
+    "initial": {
+      "camera": {
+        "heightM": 28790,
+        "lat": 34.540217280981885,
+        "lon": 135.47142924095598,
+        "localX": -4910.3550000008145,
+        "localZ": 7123.446841096541
+      },
+      "fps": 1.9,
+      "validation": {
+        "count": 24,
+        "uniqueCodes": 24,
+        "uniqueNames": 24,
+        "uniqueIds": 24,
+        "allCodesOsaka": true,
+        "allHavePolygons": true,
+        "ok": true
+      },
+      "coverage": {
+        "mapWards": 24,
+        "wardsWith3d": 1,
+        "tiles3d": 9,
+        "buildings3d": 10546,
+        "sourceBuildingsTotal": 574213,
+        "sourceTilesTotal": 1097
+      },
+      "status": "loading tiles…",
+      "wardButtons": 24,
+      "screenshot": "data/reports/mission37g-wards/01-citywide.jpg"
+    },
+    "wards": {
+      "北区": {
+        "camera": {
+          "heightM": 6370,
+          "lat": 34.66244791198357,
+          "lon": 135.49869503365417,
+          "localX": -2412.0750000004496,
+          "localZ": -6483.2670020110045
+        },
+        "selected": {
+          "wardCode": "27127",
+          "wardName": "北区",
+          "coverage": "none"
+        },
+        "card3d": "3D建物データ未配信（地図と区境界のみ。元データ 15,779棟は未変換）",
+        "fps": 2.2,
+        "screenshot": "data/reports/mission37g-wards/ward-北区.jpg"
+      },
+      "中央区": {
+        "camera": {
+          "heightM": 5468,
+          "lat": 34.644508431733065,
+          "lon": 135.51631655134614,
+          "localX": -797.469999999392,
+          "localZ": -4486.244060524854
+        },
+        "selected": {
+          "wardCode": "27128",
+          "wardName": "中央区",
+          "coverage": "none"
+        },
+        "card3d": "3D建物データ未配信（地図と区境界のみ。元データ 18,279棟は未変換）",
+        "fps": 2.2,
+        "screenshot": "data/reports/mission37g-wards/ward-中央区.jpg"
+      },
+      "住吉区": {
+        "camera": {
+          "heightM": 5827,
+          "lat": 34.56879535991033,
+          "lon": 135.5053150329645,
+          "localX": -1805.5049999989442,
+          "localZ": 3942.135094781785
+        },
+        "selected": {
+          "wardCode": "27120",
+          "wardName": "住吉区",
+          "coverage": "partial"
+        },
+        "card3d": "3D建物: 一部配信（9タイル・10,546棟。住吉区全体ではありません）",
+        "fps": 1.8,
+        "screenshot": "data/reports/mission37g-wards/ward-住吉区.jpg"
+      },
+      "平野区": {
+        "camera": {
+          "heightM": 8174,
+          "lat": 34.564029706462684,
+          "lon": 135.56403277995054,
+          "localX": 3574.62000000058,
+          "localZ": 4472.647636574048
+        },
+        "selected": {
+          "wardCode": "27126",
+          "wardName": "平野区",
+          "coverage": "none"
+        },
+        "card3d": "3D建物データ未配信（地図と区境界のみ。元データ 44,434棟は未変換）",
+        "fps": 1.8,
+        "screenshot": "data/reports/mission37g-wards/ward-平野区.jpg"
+      }
+    },
+    "search": {
+      "results": "区鶴見区",
+      "selected": {
+        "wardCode": "27124",
+        "wardName": "鶴見区",
+        "coverage": "none"
+      },
+      "screenshot": "data/reports/mission37g-wards/search-tsurumi.jpg"
+    },
+    "backToCity": {
+      "camera": {
+        "heightM": 28790,
+        "lat": 34.540217280981885,
+        "lon": 135.47142924095598,
+        "localX": -4910.3550000008145,
+        "localZ": 7123.446841096541
+      },
+      "selectedWard": null,
+      "heightDiffM": 0,
+      "screenshot": "data/reports/mission37g-wards/99-back-to-citywide.jpg"
+    }
+  },
+  "summary": {
+    "googleRequestCount": 0,
+    "jsErrors": 0,
+    "failedRequests": 1,
+    "wardsListed": 24,
+    "validationOk": true,
+    "initialHeightM": 28790,
+    "fpsCity": 1.9,
+    "hosts": [
+      "",
+      "cdn.jsdelivr.net",
+      "cyberjapandata.gsi.go.jp",
+      "localhost"
+    ]
+  }
+}

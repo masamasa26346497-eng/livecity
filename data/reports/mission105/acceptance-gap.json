@@ -1,0 +1,1094 @@
+{
+ "mission": "86-acceptance",
+ "network": false,
+ "vintage": 2025,
+ "lockEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+ "minInsidePolygonPct": 95,
+ "wardsEvaluated": 24,
+ "strictAcceptedWards": 0,
+ "allWardsAccepted": false,
+ "note": "accepted requires ALL 7 items pass from local real-browser evidence. manifest/tileset presence, fixtures, images only, 2022 data, partial 6-ward display, runner temp are not acceptance.",
+ "itemStatusTotals": {
+  "sourceLock2025": {
+   "missing": 23,
+   "fail": 1
+  },
+  "coverage": {
+   "fail": 4,
+   "missing": 20
+  },
+  "http200": {
+   "missing": 24
+  },
+  "pixelDiff": {
+   "missing": 24
+  },
+  "realClick": {
+   "missing": 24
+  },
+  "n03Inside": {
+   "missing": 24
+  },
+  "roadWater": {
+   "missing": 24
+  }
+ },
+ "wards": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "coverage": {
+     "status": "fail",
+     "why": "manifest meshes 12 != lock 21 and no valid evidence.meshAccounting {planned,withBuildings,emptyMeshes[]}"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "coverage": {
+     "status": "fail",
+     "why": "manifest meshes 10 != lock 16 and no valid evidence.meshAccounting {planned,withBuildings,emptyMeshes[]}"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "fail",
+     "why": "manifest status=failed"
+    },
+    "coverage": {
+     "status": "fail",
+     "why": "manifest status=failed"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "coverage": {
+     "status": "fail",
+     "why": "manifest meshes 16 != lock 20 and no valid evidence.meshAccounting {planned,withBuildings,emptyMeshes[]}"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "accepted": false,
+   "unmet": [
+    "sourceLock2025",
+    "coverage",
+    "http200",
+    "pixelDiff",
+    "realClick",
+    "n03Inside",
+    "roadWater"
+   ],
+   "items": {
+    "sourceLock2025": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "coverage": {
+     "status": "missing",
+     "why": "no batch-manifest entry"
+    },
+    "http200": {
+     "status": "missing",
+     "why": "local tileset.json not on this PC"
+    },
+    "pixelDiff": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "realClick": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "n03Inside": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    },
+    "roadWater": {
+     "status": "missing",
+     "why": "no browser evidence file"
+    }
+   }
+  }
+ ]
+}

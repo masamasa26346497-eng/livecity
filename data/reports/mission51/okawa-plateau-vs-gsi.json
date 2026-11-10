@@ -1,0 +1,4052 @@
+{
+ "summary": {
+  "generated": "2026-10-29T14:06:03.334Z",
+  "window": {
+   "minX": -3310.3,
+   "maxX": -1297,
+   "minZ": -11275.1,
+   "maxZ": -8761.2
+  },
+  "marginM": 60,
+  "buildings": 249,
+  "bySet": [
+   {
+    "set": "kita-sample",
+    "n": 246
+   },
+   {
+    "set": "chuo-sample",
+    "n": 2
+   },
+   {
+    "set": "nishi-sample",
+    "n": 1
+   }
+  ],
+  "waterPolygons": 51,
+  "roadEdgeLines": 2944,
+  "vertices": 2457,
+  "verticesInWater": 0,
+  "verticesInWaterPct": 0,
+  "buildingsWithAnyWaterSample": 0,
+  "buildingsOver20pctWet": 0,
+  "buildingsOver50pctWet": 0,
+  "buildingsCrossingRoadEdge": 19,
+  "medianMaxDepthWetM": null,
+  "nearestToShoreM": [
+   2.9,
+   3.4,
+   4.3,
+   5.6,
+   5.8,
+   8.7,
+   19.4,
+   20.2,
+   42.3,
+   43.5
+  ],
+  "within10mOfShore": 6,
+  "within30mOfShore": 8,
+  "worstWet": [],
+  "shift": {
+   "rangeM": 12,
+   "stepM": 3,
+   "atZero": {
+    "dx": 0,
+    "dz": 0,
+    "vertsInWaterPct": 0
+   },
+   "best": {
+    "dx": -3,
+    "dz": -6,
+    "vertsInWaterPct": 0
+   }
+  }
+ },
+ "buildings": [
+  {
+   "set": "kita-sample",
+   "id": "bldg_0a88bd91-4da0-433f-80c2-6ea659a3dc63",
+   "c": [
+    -3016.8,
+    -11178.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 136.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 24,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_0458f7d1-7951-46e6-b623-5e8588884c0d",
+   "c": [
+    -3142.9,
+    -11094.5
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 55,
+   "maxDepthIntoWaterM": 0,
+   "samples": 12,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f7f885cd-699b-47f5-93bd-d22c0514161a",
+   "c": [
+    -3178.2,
+    -11024.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 105.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 24,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_48292c48-d5ce-45f4-98ba-b654512777b9",
+   "c": [
+    -3064,
+    -11215.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 102.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6b2af07b-6d89-4d0c-898d-59f7bbcdca51",
+   "c": [
+    -3005,
+    -11208.5
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 157.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 23,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f349ff51-1336-4c35-9282-8aea756b9207",
+   "c": [
+    -3219.7,
+    -11069.4
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 67.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_50f4b245-fe4d-4d6c-b818-701865ebd229",
+   "c": [
+    -3201.7,
+    -11062.3
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 74.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_81be5dd0-4f2f-44e7-81d1-9209492bb081",
+   "c": [
+    -3193.1,
+    -11132.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 3.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9488fbde-f8f1-49c4-ae70-388c0e40f59d",
+   "c": [
+    -3172.7,
+    -11013.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 120.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9ec4a0ed-1f41-445e-94f4-205f4580dabc",
+   "c": [
+    -3233.9,
+    -11077.2
+   ],
+   "verts": 9,
+   "vertsInWater": 0,
+   "minShoreM": 62.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 30,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_709f761b-a686-4580-bf9d-238e98780d36",
+   "c": [
+    -3179.5,
+    -11091.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 44.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_cbd6b9a2-5c2c-463d-b63c-34b62f1abdc4",
+   "c": [
+    -3121,
+    -11063.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 87.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 29,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_57366df6-33d9-442c-900e-2ad20b307b60",
+   "c": [
+    -3189.2,
+    -11064.8
+   ],
+   "verts": 20,
+   "vertsInWater": 0,
+   "minShoreM": 64.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 54,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9207f2c0-db3c-4d41-bad9-0111a47da012",
+   "c": [
+    -3145.9,
+    -11085.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 64.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_7f1dfc4c-714c-4b39-aaa2-6d3958361956",
+   "c": [
+    -3166.3,
+    -11067.3
+   ],
+   "verts": 9,
+   "vertsInWater": 0,
+   "minShoreM": 68.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 19,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fcbf265b-056a-4dcb-8ae1-05e231598e99",
+   "c": [
+    -3174.6,
+    -11091.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 45.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_405119e2-6ae5-4a73-80e0-e68a5c18f932",
+   "c": [
+    -3155.9,
+    -11079.6
+   ],
+   "verts": 13,
+   "vertsInWater": 0,
+   "minShoreM": 61,
+   "maxDepthIntoWaterM": 0,
+   "samples": 24,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_19b98759-ffeb-4e52-ba61-9c4a523983e4",
+   "c": [
+    -3168.3,
+    -11203.1
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 8.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_024595cc-15e4-4e05-b539-fcd8549e1996",
+   "c": [
+    -3176.8,
+    -11074.6
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 62.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_3f0785d3-8c6f-44c2-b65a-c522930a067e",
+   "c": [
+    -3200,
+    -11078.2
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 54.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2b311f62-061d-46bf-8f8d-31ea4a5a31d8",
+   "c": [
+    -3100.1,
+    -11171.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 63,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bce69fb9-d092-4ef2-9fe3-7a95f8281104",
+   "c": [
+    -3098.2,
+    -11150.6
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 62.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a222076a-6a1e-4866-a0aa-a18f6de07d02",
+   "c": [
+    -3124.9,
+    -11024
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 123.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_06c4c82d-f838-4ee3-aa86-7489927eb4a8",
+   "c": [
+    -3225.6,
+    -11085.7
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 55.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4a157983-e821-4ccb-939d-2219e72aba95",
+   "c": [
+    -3163.2,
+    -11047.2
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 92.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_45d32740-e667-48c2-8e93-b002b310be5d",
+   "c": [
+    -3167.1,
+    -11093.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 45.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d3833e7c-9ce4-4a44-847f-92d837a3acca",
+   "c": [
+    -3175.8,
+    -11085
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 53.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bf288373-f650-4404-9272-2e4875635990",
+   "c": [
+    -3154.1,
+    -11092.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 48.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 22,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_163639f9-20b5-4226-92a0-7058e5e1987f",
+   "c": [
+    -3166.4,
+    -11036.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 97.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 14,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ea997e4d-2f3e-4c4e-b318-3549eb2a7b4b",
+   "c": [
+    -3217.7,
+    -11084.5
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 53,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_beb975ba-6fec-4aa4-961b-c1e1ceb3ac52",
+   "c": [
+    -3108.9,
+    -11124.3
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 61.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_49e6a8dd-9b87-4e67-b165-5f3276feabe3",
+   "c": [
+    -3173.4,
+    -11005.8
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 128.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c6ec764e-a9f1-4e34-b5d2-1796bc796299",
+   "c": [
+    -3021.5,
+    -11176.8
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 134.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_7877a954-f8a6-4ce2-a55f-7fdb423561ee",
+   "c": [
+    -3020.9,
+    -11192.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 139.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ddb99d9f-8a5e-4332-b928-a02b3b760a25",
+   "c": [
+    -3099.2,
+    -11128.5
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 61.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 20,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_3c000b30-4379-4bde-96dd-1b7798aaabd1",
+   "c": [
+    -3186.4,
+    -11017.5
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 116.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_15dd7973-d45e-46e1-a10e-6370502a90a6",
+   "c": [
+    -3226.2,
+    -11058.9
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 75.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_01854242-1a94-4451-8d5c-6fb89533e659",
+   "c": [
+    -3229.3,
+    -11061.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 79.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_198bef5b-4804-4257-bd59-4e62ead4cb6b",
+   "c": [
+    -3166.1,
+    -11081.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 53.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 16,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b6496341-6d29-4313-82b6-81ed4b36a58d",
+   "c": [
+    -3176.1,
+    -11080.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 57.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_7f976c50-2d8b-487b-9fba-80db9d165e6d",
+   "c": [
+    -3234.3,
+    -11058.4
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 82,
+   "maxDepthIntoWaterM": 0,
+   "samples": 15,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d44c78bc-1a3d-48ff-9803-41c5c1e5fd5e",
+   "c": [
+    -3201.1,
+    -11086.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 49.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c4d80097-c242-4dd0-b88b-d6a3f6a00551",
+   "c": [
+    -3214.8,
+    -11059.8
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 73,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fa2d313a-7f41-45e8-934b-5b893a1562a9",
+   "c": [
+    -3202.5,
+    -11091.2
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 44.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4b75c6f6-d8d3-4616-9c9e-3fb8588116ab",
+   "c": [
+    -3177.2,
+    -11042.5
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 91.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6229a6ad-3278-49af-8d1e-23234a6ecc2a",
+   "c": [
+    -3214.3,
+    -11134
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 19.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1bbe9a43-8147-4409-b997-3744bdf38e17",
+   "c": [
+    -3192.2,
+    -11085.7
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 43.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 23,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 1
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_23a844ae-9775-4c38-9f0f-f7a24d2e4ccb",
+   "c": [
+    -3193.5,
+    -11020.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 112.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6868e51a-0f73-4060-b5f6-75a275dbe21b",
+   "c": [
+    -3226.1,
+    -11077.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 64.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_74ff6ced-7f25-4202-9336-057b3d0a8452",
+   "c": [
+    -3178.2,
+    -11000.8
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 132.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c0c01f0e-7c51-4ac7-a114-f18167d46dd0",
+   "c": [
+    -3168.8,
+    -11197.1
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 4.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_92c1d22a-1658-4935-b919-f5040680522c",
+   "c": [
+    -3110.8,
+    -11096.8
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 69,
+   "maxDepthIntoWaterM": 0,
+   "samples": 65,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_125c3b21-2353-4f1d-b833-6e30382c298f",
+   "c": [
+    -3117.4,
+    -11074.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 81.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 28,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f5be8521-4777-40dd-a16c-371f5a30a3f2",
+   "c": [
+    -3191.1,
+    -11037.6
+   ],
+   "verts": 9,
+   "vertsInWater": 0,
+   "minShoreM": 91.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 21,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bce90d7a-42b8-4f2f-872d-c6a956a47638",
+   "c": [
+    -3208.1,
+    -10984.1
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 102.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 112,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a44e188d-6534-444c-bdeb-544154b3ca4c",
+   "c": [
+    -3172.5,
+    -11030.9
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 102.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 14,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_23ed1444-b87c-4cb1-a8d4-5bc5c661de09",
+   "c": [
+    -3190.3,
+    -11007.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 122.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 17,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_5c22812b-8b26-4fa3-a29e-bf6ddfa64117",
+   "c": [
+    -3196.7,
+    -11041.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 92.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e823e6e5-24b1-47a3-9bf5-f4ceba4b43af",
+   "c": [
+    -3056.6,
+    -11085.5
+   ],
+   "verts": 17,
+   "vertsInWater": 0,
+   "minShoreM": 114.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 90,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+   "c": [
+    -3243.4,
+    -11172.1
+   ],
+   "verts": 65,
+   "vertsInWater": 0,
+   "minShoreM": 2.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 528,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d1d9ff8f-09ff-4a79-be5f-df07c604fc9f",
+   "c": [
+    -3144.4,
+    -11168.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 20.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_0a04c980-e56a-437c-8947-d3aa98a50cea",
+   "c": [
+    -3145.6,
+    -11188.3
+   ],
+   "verts": 26,
+   "vertsInWater": 0,
+   "minShoreM": 5.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 97,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_de0f1087-3c1d-4d7d-b79c-37f7c804bb88",
+   "c": [
+    -3073.9,
+    -11054
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 131.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 22,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f4b9ec05-9cfc-4e67-a3c8-7d324ce43b5b",
+   "c": [
+    -3157,
+    -11145
+   ],
+   "verts": 25,
+   "vertsInWater": 0,
+   "minShoreM": 5.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 90,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_77ca7006-b294-44ab-92f0-03450f8d7a63",
+   "c": [
+    -3259.7,
+    -10936.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 202.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 31,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_0f6c71d6-b9e2-4642-865a-7db79a09b240",
+   "c": [
+    -3185,
+    -10974.1
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 154.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 18,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6f9af250-29c5-4587-a8fe-e3289540567b",
+   "c": [
+    -3227.9,
+    -10940.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 192.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_99685e8c-5c7a-4d62-8764-b55b47e8e9d8",
+   "c": [
+    -3142.2,
+    -10948.4
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 187.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 17,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_5e3d23fe-1898-45f7-9df0-c7f97fc1b73e",
+   "c": [
+    -3232,
+    -10939.4
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 196.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 8,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f0238b89-5331-4503-b4a8-b1a8ab74e5b4",
+   "c": [
+    -3206.8,
+    -10716.2
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 319,
+   "maxDepthIntoWaterM": 0,
+   "samples": 17,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4161a256-642a-4a01-bc2e-791d7d4fe1f6",
+   "c": [
+    -3197.1,
+    -10947.6
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 183.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 22,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f263341d-9d79-45c5-bae4-0d55869f7560",
+   "c": [
+    -3029.3,
+    -10763.8
+   ],
+   "verts": 17,
+   "vertsInWater": 0,
+   "minShoreM": 341.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 300,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1a2f4107-e969-4599-a5e5-d20d937600a5",
+   "c": [
+    -3057.9,
+    -10718
+   ],
+   "verts": 9,
+   "vertsInWater": 0,
+   "minShoreM": 322.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 38,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fef7de2b-58a0-42fe-aeef-372791d684b3",
+   "c": [
+    -3243.6,
+    -10940.8
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 198.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 15,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_405d0603-d00f-45c1-9926-cef8f3815694",
+   "c": [
+    -3191.5,
+    -10997.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 136.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_45199c64-6455-49a4-b5db-9cc74a4b8c11",
+   "c": [
+    -3160.1,
+    -10950.1
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 183.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 28,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e88b9150-1b77-47a8-b5fa-0b11915d106f",
+   "c": [
+    -3179.7,
+    -10993.8
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 139.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e569b87c-1faa-409e-8f3e-ae131e686132",
+   "c": [
+    -3186.2,
+    -10985.9
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 146.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 15,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9b518737-9286-4863-a041-55baae41e294",
+   "c": [
+    -3212.8,
+    -10942.7
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 187.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 19,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_3adbe570-7f46-42f7-8112-2753e107e922",
+   "c": [
+    -3061.4,
+    -10708.4
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 316,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_42c9be1a-8952-4340-b33c-30b920234b1e",
+   "c": [
+    -3194.6,
+    -10759.4
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 353.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 18,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_20a92f0b-9302-4b6d-a4cd-516943f2fc9b",
+   "c": [
+    -3224,
+    -10940.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 191.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_aff72ab0-9008-4992-8bff-b5fc4b31bf8b",
+   "c": [
+    -3220.7,
+    -10939
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 190.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ab9acb7f-a8f0-44aa-847e-f4fe59b6c361",
+   "c": [
+    -3102.7,
+    -10704.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 303.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_95402641-3d74-4559-b796-43955eabc360",
+   "c": [
+    -3120.3,
+    -10685.8
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 259.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 189,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2ed9445d-bb97-48b4-8d1c-6ef2f9a5d746",
+   "c": [
+    -3012.6,
+    -10906.9
+   ],
+   "verts": 24,
+   "vertsInWater": 0,
+   "minShoreM": 247.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 689,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_48c93b52-5a94-47c0-9b92-76ff79735d4b",
+   "c": [
+    -3031.2,
+    -10945.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 237.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 16,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a18409c2-096f-4865-b9c7-24f149057635",
+   "c": [
+    -3040.5,
+    -10934.8
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 241.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f0c33738-1391-43d3-b6d2-c95809ae0a27",
+   "c": [
+    -3071.5,
+    -10932.3
+   ],
+   "verts": 31,
+   "vertsInWater": 0,
+   "minShoreM": 151.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1171,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_8b1f5152-5c13-4730-b85f-d6c7f20f4637",
+   "c": [
+    -2987.1,
+    -11065.8
+   ],
+   "verts": 57,
+   "vertsInWater": 0,
+   "minShoreM": 174.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 211,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_62f2579a-7026-4ef5-ba47-02ef8a51daa3",
+   "c": [
+    -2779.8,
+    -11050.7
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 394.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ba5eabd9-0ed8-475c-93c6-204a0a026bd6",
+   "c": [
+    -2793.4,
+    -11004.9
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 389.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 30,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_590f3fb0-5575-4416-9a5f-61113a51ecd0",
+   "c": [
+    -2568.9,
+    -11031.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 607.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 0,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_92fb0d68-6f73-4516-83d1-b3b2fa90864e",
+   "c": [
+    -2590.4,
+    -11019.3
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 574.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 35,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_eb7041b8-df4d-470f-af59-0668b9a88ea1",
+   "c": [
+    -2504,
+    -11145.6
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 655,
+   "maxDepthIntoWaterM": 0,
+   "samples": 12,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a7966c91-fac9-4303-94b4-d4815ab64e48",
+   "c": [
+    -2532,
+    -11051.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 637.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_66b0445f-b881-41ff-905f-9d39b6ace6eb",
+   "c": [
+    -2706.6,
+    -11062.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 466.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4d300e77-56d3-418e-80b3-7bb8b439a082",
+   "c": [
+    -2548.1,
+    -11072.8
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 609.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 22,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fed338ff-4014-4c1f-9275-525d73cbb40f",
+   "c": [
+    -2533.5,
+    -11011.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 646.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_030f7b84-e0ff-4bad-b93a-02c9cffebef9",
+   "c": [
+    -2733.8,
+    -11056.7
+   ],
+   "verts": 13,
+   "vertsInWater": 0,
+   "minShoreM": 416.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 64,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_daec9935-e8aa-4564-a615-cb205128d168",
+   "c": [
+    -2971.3,
+    -11170.7
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 178.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 30,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_0de33be1-2568-4ec7-8c0e-5dc2bffb699f",
+   "c": [
+    -2785.6,
+    -11056.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 391,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_54d94d05-cf9d-4de3-942a-b4ca5e0ce7c0",
+   "c": [
+    -2521.2,
+    -11171.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 636,
+   "maxDepthIntoWaterM": 0,
+   "samples": 11,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2b5b0a00-9a9a-42b6-976a-ac31454d39e5",
+   "c": [
+    -2658.4,
+    -11090.5
+   ],
+   "verts": 35,
+   "vertsInWater": 0,
+   "minShoreM": 471.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 104,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_5fc9f0e5-38dc-4b14-aeab-c4e5b335135d",
+   "c": [
+    -2956.3,
+    -11170.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 205.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fb6f2e29-8521-4626-9a7c-f55b699f5171",
+   "c": [
+    -2709.3,
+    -11055.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 461.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c44df980-cb72-4793-bbfe-471d070e0eb6",
+   "c": [
+    -2717.7,
+    -11050.2
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 452.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_62f426f9-7554-4275-bfbc-daa6287bbd4d",
+   "c": [
+    -2766.4,
+    -11020.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 412.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 17,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_527a4355-b621-44e3-a0c5-838e99787b25",
+   "c": [
+    -2556,
+    -11059.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 612.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fb892d24-a59b-4949-bdf3-bce74d4fdb26",
+   "c": [
+    -2515.8,
+    -11160
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 638,
+   "maxDepthIntoWaterM": 0,
+   "samples": 33,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_30063c01-62e8-4b40-aa2d-36c823fdba1b",
+   "c": [
+    -2630.7,
+    -11130.1
+   ],
+   "verts": 46,
+   "vertsInWater": 0,
+   "minShoreM": 471.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 845,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_00310274-35b2-4dea-a6b2-b9017befdf1e",
+   "c": [
+    -2706,
+    -11153
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 455.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1de72be5-99bb-4135-a9bd-eaec9855d098",
+   "c": [
+    -2702.2,
+    -11054.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 472.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c47b5e67-d46d-43f0-83c5-2461567e5d62",
+   "c": [
+    -2795.5,
+    -11069.5
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 377,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_31860a87-84cc-4ec7-b6bd-d495fbb8f592",
+   "c": [
+    -2563.1,
+    -11080.1
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 600.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 12,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 4
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_50324530-ba9d-41e5-ad15-1410d66e6697",
+   "c": [
+    -2568.1,
+    -11035.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 604.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9b04740e-7006-4f0d-a1de-6792d62731ed",
+   "c": [
+    -2581,
+    -11026.8
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 596.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_83d21bb8-3fbb-4b8f-b9e2-6385663a9e71",
+   "c": [
+    -2639.7,
+    -11182
+   ],
+   "verts": 36,
+   "vertsInWater": 0,
+   "minShoreM": 456.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 603,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2653e387-7142-48e1-96bd-d5ebef5a379e",
+   "c": [
+    -2543,
+    -11046
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 628.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_93a4ea29-22c4-411a-a75f-6650f0019906",
+   "c": [
+    -2560.1,
+    -11040.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 614.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c86128b0-06c4-416f-a6db-5a1a12d9737d",
+   "c": [
+    -2523.4,
+    -11182.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 633.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 21,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bae4a57b-d54e-46e4-8eda-8b9fc45ae627",
+   "c": [
+    -2804.6,
+    -11062.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 370,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b2109c47-ba4f-4353-9909-f6c13269a8d5",
+   "c": [
+    -2996.7,
+    -11177.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 160.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 14,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_947f6fc4-dfdf-460a-aba9-11304a35e021",
+   "c": [
+    -2771.5,
+    -11142.7
+   ],
+   "verts": 51,
+   "vertsInWater": 0,
+   "minShoreM": 342.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 923,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ec40039c-874a-4692-8f70-8befc2158c33",
+   "c": [
+    -2568.5,
+    -11009.5
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 584.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 93,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d0fa55a3-2eff-41bd-a0c3-2a0fbffe0256",
+   "c": [
+    -2897.4,
+    -11008.7
+   ],
+   "verts": 47,
+   "vertsInWater": 0,
+   "minShoreM": 280.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 563,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_060497ae-221e-4759-bd44-9eb87191514c",
+   "c": [
+    -2929.9,
+    -11056.3
+   ],
+   "verts": 49,
+   "vertsInWater": 0,
+   "minShoreM": 240.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 353,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_5d13efbc-c3a5-4f02-9d47-a3a2f175d5a6",
+   "c": [
+    -2825,
+    -11040.1
+   ],
+   "verts": 20,
+   "vertsInWater": 0,
+   "minShoreM": 353.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 74,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_0333e8ae-e282-4576-b78a-92993cbd03a5",
+   "c": [
+    -2756.8,
+    -10826.8
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 505,
+   "maxDepthIntoWaterM": 0,
+   "samples": 123,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_025e05ac-8bdc-4f84-a407-7bd3e0ea481c",
+   "c": [
+    -2563.3,
+    -10970.5
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 610.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 58,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_539fe5f7-9648-43b1-a06d-2cc73e425f4a",
+   "c": [
+    -2898.8,
+    -10785.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 447.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f1546805-5327-42f3-8cc4-c56d45888bac",
+   "c": [
+    -2627.2,
+    -10740.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 395.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_62189c40-5b68-447a-a2b6-0f3f8158e8c3",
+   "c": [
+    -2526.2,
+    -10673.6
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 324,
+   "maxDepthIntoWaterM": 0,
+   "samples": 11,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b268db91-afdb-4800-b0d2-e8e427a5bac5",
+   "c": [
+    -2534.6,
+    -10991.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 644.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c1a65fbb-6a16-4c18-993a-c8c0b011a746",
+   "c": [
+    -2779.5,
+    -10761.2
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 450,
+   "maxDepthIntoWaterM": 0,
+   "samples": 45,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f8b8a131-f246-4e31-8f82-f715da458ad3",
+   "c": [
+    -2830.1,
+    -10848.1
+   ],
+   "verts": 22,
+   "vertsInWater": 0,
+   "minShoreM": 442.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 175,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_964ccc04-be2a-4bff-bb24-93b85e418aa7",
+   "c": [
+    -2664,
+    -10794.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 453.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_abe9dd72-62c1-4a8d-adde-ab310a9d04fe",
+   "c": [
+    -2853.9,
+    -10724.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 400.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 143,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a8d4405b-f942-48f3-8839-8248b3069075",
+   "c": [
+    -2731.6,
+    -10705
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 389,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ea9a620d-461f-41f2-8dae-b8929afebe8e",
+   "c": [
+    -2594.6,
+    -10728.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 355.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 161,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e2ea277b-32f8-43b6-9163-fe30baa387c7",
+   "c": [
+    -2690.6,
+    -10816.9
+   ],
+   "verts": 44,
+   "vertsInWater": 0,
+   "minShoreM": 481.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f6737a9a-8400-467b-8d5f-113bad56a407",
+   "c": [
+    -2889.6,
+    -10791.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 453.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 5,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_8218e1c8-4b51-4b39-bc03-92af5834d0ff",
+   "c": [
+    -2668.5,
+    -10785.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 447.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a87fcace-f973-4605-a8c0-4302194250eb",
+   "c": [
+    -2859.5,
+    -10969
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 355.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9c2c736c-68d2-42b8-837a-dbdf9d7ca1a1",
+   "c": [
+    -2659.1,
+    -10924
+   ],
+   "verts": 29,
+   "vertsInWater": 0,
+   "minShoreM": 456.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2028,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_cb993a4b-6ff8-45eb-9f1e-b2256bc80edf",
+   "c": [
+    -2708.8,
+    -10815.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 483.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4f3b15b4-6108-430c-b11b-32ed0ae467f4",
+   "c": [
+    -2562.1,
+    -10992.6
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 600.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 63,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c125f256-2e86-44a2-8965-c65f7911b6e6",
+   "c": [
+    -2877,
+    -10796
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 458.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_caacfefd-d38d-4235-a12e-727b00c5e2bb",
+   "c": [
+    -2742.8,
+    -10812
+   ],
+   "verts": 14,
+   "vertsInWater": 0,
+   "minShoreM": 481.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 35,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_cad6c626-4094-4f5d-84bc-62af3f935cf6",
+   "c": [
+    -2579.3,
+    -10915.1
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 564.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1949d6e6-ad2b-4d1b-abdb-5c9593ad2046",
+   "c": [
+    -2864.4,
+    -10945.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 364,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e4b194d8-11f0-47af-bf14-d0e8c3ea8248",
+   "c": [
+    -2626.2,
+    -10787.5
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 441.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_68b43c45-d5f5-4a49-abb1-c261e12813d5",
+   "c": [
+    -2889.2,
+    -10940.7
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 345.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_68bfef04-0b91-404d-a6dd-1934261d053c",
+   "c": [
+    -2812.8,
+    -10883.9
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 414.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 153,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f440ed45-73ca-4d1b-a604-38256090e608",
+   "c": [
+    -2895.3,
+    -10706.7
+   ],
+   "verts": 15,
+   "vertsInWater": 0,
+   "minShoreM": 373.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 144,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bb821372-7228-428c-83e5-821952f19bf0",
+   "c": [
+    -2655.2,
+    -10646.8
+   ],
+   "verts": 58,
+   "vertsInWater": 0,
+   "minShoreM": 278.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 587,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_219fe77a-925e-45bb-85fa-ad35671a90eb",
+   "c": [
+    -2616.5,
+    -10794.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 448.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_85df89cc-67ff-4c83-b1bd-ba7af740abf7",
+   "c": [
+    -2835.1,
+    -10767.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 465.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_51cf4b64-5eb3-47fd-86f3-772acb30db80",
+   "c": [
+    -2673.5,
+    -10863.9
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 516.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 51,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_89410465-e41c-4fbe-98fa-43b20a408f64",
+   "c": [
+    -2776.4,
+    -10685.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 393.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b2e4b5ed-dee6-4c2e-b6d2-408cf58fc003",
+   "c": [
+    -2553.1,
+    -10834.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 486.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b53f8dae-6b6f-43cf-ba30-030e38bb5c23",
+   "c": [
+    -2741.6,
+    -10688.9
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 378.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_190eee97-fae2-486a-b687-585094d8e475",
+   "c": [
+    -2837.2,
+    -10701.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 404.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 10,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2c103cd7-bd89-4c4f-81cc-5ef09222b1b8",
+   "c": [
+    -2955,
+    -10930.8
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 305.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_72a7dee0-aa35-4b1b-893a-bc22d2ba1df5",
+   "c": [
+    -2780.7,
+    -10682
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 392.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_97f7a6c1-1367-4ad3-bbc5-c83e4568f2c7",
+   "c": [
+    -2936.2,
+    -10688.8
+   ],
+   "verts": 15,
+   "vertsInWater": 0,
+   "minShoreM": 312.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 89,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6cb7d920-dcb8-45b4-8fe9-6b016b08dc03",
+   "c": [
+    -2688.5,
+    -10777.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 445.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_26c03b13-7066-4ec1-aa87-fc890ba1bb08",
+   "c": [
+    -2701.6,
+    -10688.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 363,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_3350964c-a420-4dc2-a812-39846703392d",
+   "c": [
+    -2516,
+    -10952
+   ],
+   "verts": 15,
+   "vertsInWater": 0,
+   "minShoreM": 594.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 37,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_06c9047c-0fca-4326-8371-7f5de0a9df23",
+   "c": [
+    -2829.2,
+    -10746.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 443,
+   "maxDepthIntoWaterM": 0,
+   "samples": 37,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d2f03148-4bcd-4233-81e8-8cdba3b8bb5f",
+   "c": [
+    -2809,
+    -10822.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 485.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9b35a998-a8de-4f2d-adc0-319700b9a98d",
+   "c": [
+    -2825.6,
+    -10733.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 443.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_06cc29f0-ed9a-4ea0-a256-99e0a5181601",
+   "c": [
+    -2807.4,
+    -10842
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 457.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 170,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_68184d1d-2ada-48e7-bda9-6bd673a8325f",
+   "c": [
+    -2697.5,
+    -10797.1
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 466,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a20c2e35-6b59-4edb-b749-0ee0f0e64b13",
+   "c": [
+    -2564.1,
+    -10948.7
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 593.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 15,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6653baf9-a7bd-419f-9645-7f42e3db328d",
+   "c": [
+    -2704.3,
+    -10836.1
+   ],
+   "verts": 39,
+   "vertsInWater": 0,
+   "minShoreM": 505,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e93e9037-35b3-421a-8489-6058bfbdc935",
+   "c": [
+    -2528.7,
+    -10996.4
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 649.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_057a4f48-d2df-4539-b0f6-a36db3463a65",
+   "c": [
+    -2906.3,
+    -10779.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 442.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9ecc310e-1394-4565-a6b5-0346d0c7eb36",
+   "c": [
+    -2821.3,
+    -10986.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 373.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 22,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_032c2793-13aa-4003-a4de-a89a0a0b37e1",
+   "c": [
+    -2698.6,
+    -10800
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 468.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_74598968-cc75-4d0a-99a9-12ecf4ac52fa",
+   "c": [
+    -2498.1,
+    -10783
+   ],
+   "verts": 18,
+   "vertsInWater": 0,
+   "minShoreM": 395.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 506,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2fafb2dd-f0ca-4482-bbdf-2ca87966ae42",
+   "c": [
+    -2843.8,
+    -10762.3
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 453.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_7a352e1e-b004-4393-bc22-6f4f674e8211",
+   "c": [
+    -2907.1,
+    -10728.7
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 394.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_80581316-9629-4ce9-a255-ce5fbaeec90c",
+   "c": [
+    -2788.1,
+    -10833.1
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 477.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 141,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ab3c415c-a9ab-4d43-8c86-630b808c2672",
+   "c": [
+    -2532.8,
+    -10734.9
+   ],
+   "verts": 3,
+   "vertsInWater": 0,
+   "minShoreM": 388.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_41f9233b-48a8-42ac-b8e3-3e2dc8581e7e",
+   "c": [
+    -2875.6,
+    -10948.8
+   ],
+   "verts": 16,
+   "vertsInWater": 0,
+   "minShoreM": 346.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 31,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2d0f6c64-8ae3-4ec4-9232-3b9e9f03c130",
+   "c": [
+    -2509.2,
+    -10917.9
+   ],
+   "verts": 13,
+   "vertsInWater": 0,
+   "minShoreM": 549.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 14,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e62d13b5-a60f-4e88-93fe-4f372ba9d2c1",
+   "c": [
+    -2509.1,
+    -10958.1
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 610.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_b2230250-d85d-438e-9ad3-c78b7251b6b3",
+   "c": [
+    -2558.9,
+    -10687.9
+   ],
+   "verts": 16,
+   "vertsInWater": 0,
+   "minShoreM": 339.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9090a7c8-fe3e-465c-ae39-c9b0ae67df6c",
+   "c": [
+    -2832,
+    -10809.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 478.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a7a0f325-c271-44db-bced-7d3066780c65",
+   "c": [
+    -2710.5,
+    -10994.2
+   ],
+   "verts": 38,
+   "vertsInWater": 0,
+   "minShoreM": 383.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1663,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 13
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e90a363e-e809-46bd-bde1-3832301cd1f5",
+   "c": [
+    -2724.1,
+    -10705.6
+   ],
+   "verts": 9,
+   "vertsInWater": 0,
+   "minShoreM": 386.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bed6c8f0-7bde-45c5-a4fc-31e3cde652e9",
+   "c": [
+    -2507.9,
+    -10878.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 530.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4d4d5dd1-c266-4555-8b88-30c7470ddf9a",
+   "c": [
+    -2872.3,
+    -10941.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 360.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_8e9971c3-7dec-4735-a84d-0f6a5441ca7e",
+   "c": [
+    -2859.8,
+    -10669
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 373.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_61c1c0d8-a245-49d5-b2ef-47d760a34cc7",
+   "c": [
+    -2848.2,
+    -10834.6
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 449.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_2dfd5f78-f288-45bc-a155-b8ef374d9330",
+   "c": [
+    -2829.4,
+    -10826.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 468.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1b74aff9-db7e-41a6-98d9-e95c12ec2252",
+   "c": [
+    -2699,
+    -10839
+   ],
+   "verts": 36,
+   "vertsInWater": 0,
+   "minShoreM": 506.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e89cdb33-3bbc-44ea-97cf-f4870360a004",
+   "c": [
+    -2901.2,
+    -10698.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 369.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 6,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c8247c48-9365-4a32-80f9-b980499059b9",
+   "c": [
+    -2717,
+    -10700.5
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 378.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ae9d724b-9bc9-4018-8a19-afa0d6c67666",
+   "c": [
+    -2843.2,
+    -10743.8
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 439.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bf8815fc-9f4c-47ef-851e-f7d7494a3b56",
+   "c": [
+    -2553.4,
+    -10914.7
+   ],
+   "verts": 25,
+   "vertsInWater": 0,
+   "minShoreM": 523.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 27,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_bfee20ad-5b64-48bc-8d47-fd764e89b70c",
+   "c": [
+    -2591,
+    -10868.3
+   ],
+   "verts": 25,
+   "vertsInWater": 0,
+   "minShoreM": 456.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 807,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6fa4d18f-7215-4652-9010-14d8a0e74553",
+   "c": [
+    -2609.3,
+    -10903.3
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 544.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 46,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_8468d1fb-8fd7-4aef-8bf0-cf9c2bd17607",
+   "c": [
+    -2850.8,
+    -10862.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 427.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_87debda5-e452-44e4-83d5-5706aaa41a39",
+   "c": [
+    -2523.2,
+    -10869.3
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 520.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_67957f9f-ea2f-4342-b128-e696e72beee9",
+   "c": [
+    -2636.1,
+    -10885
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 536,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d100178a-b0b3-42ec-a17f-fbde852f82cd",
+   "c": [
+    -2792.4,
+    -10751.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 453.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 9,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_90728130-2da3-46c9-bdaa-2d0a8f74e26f",
+   "c": [
+    -2816.5,
+    -10919.4
+   ],
+   "verts": 5,
+   "vertsInWater": 0,
+   "minShoreM": 416.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 8,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_4fbf020a-6f1c-4298-9136-d881ebd394f0",
+   "c": [
+    -2905.1,
+    -10859.8
+   ],
+   "verts": 13,
+   "vertsInWater": 0,
+   "minShoreM": 378.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 369,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_3323c394-2a88-4007-9cbf-1a1d7ad34e77",
+   "c": [
+    -2313.6,
+    -11199.9
+   ],
+   "verts": 17,
+   "vertsInWater": 0,
+   "minShoreM": 566.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 361,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_8fc8508b-5e0d-44c6-bb0d-1a2ebffe78d8",
+   "c": [
+    -2374.9,
+    -11002.6
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 648.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 257,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 5
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_d3da7c2c-766a-4cf1-9466-9b1ca4388465",
+   "c": [
+    -2425.8,
+    -11114.7
+   ],
+   "verts": 28,
+   "vertsInWater": 0,
+   "minShoreM": 655.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 101,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_169f06fe-849a-4849-8d4a-469de3415e5a",
+   "c": [
+    -2327.7,
+    -11089
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 618.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6f75d3a0-bb0a-46fe-9bec-0a8b702f1c0a",
+   "c": [
+    -2495.5,
+    -11106
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 670.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_6d5d980e-977c-4603-8a04-007c68037bd0",
+   "c": [
+    -2298.5,
+    -11016.7
+   ],
+   "verts": 13,
+   "vertsInWater": 0,
+   "minShoreM": 548,
+   "maxDepthIntoWaterM": 0,
+   "samples": 550,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c4daf359-5a45-4d81-aff4-d6a0a5fbc564",
+   "c": [
+    -2400.4,
+    -11062.5
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 659.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 68,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e27698fa-8ccc-414d-bee4-a2cd38aa08b3",
+   "c": [
+    -2411.7,
+    -10815
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 489.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 12,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1a92cc11-66f5-42e2-a936-108640520240",
+   "c": [
+    -2423.4,
+    -10736.8
+   ],
+   "verts": 14,
+   "vertsInWater": 0,
+   "minShoreM": 379.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 186,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ddc1ee64-727a-4049-8665-95c2f7eee722",
+   "c": [
+    -2373.1,
+    -10841.5
+   ],
+   "verts": 29,
+   "vertsInWater": 0,
+   "minShoreM": 531.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_1f884dc6-96e4-47c5-8a9e-79a355b3ec42",
+   "c": [
+    -2418,
+    -11024.4
+   ],
+   "verts": 14,
+   "vertsInWater": 0,
+   "minShoreM": 612.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 753,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 1
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_71d007f7-3e53-456b-8833-d2ce23a387ce",
+   "c": [
+    -2491.4,
+    -10929.1
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 584.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_198cc801-3552-4a26-8cb5-a7369467fd98",
+   "c": [
+    -2493.8,
+    -10890.6
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 547.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_765a3b67-2a33-4a5b-a1d4-0a07feee45d6",
+   "c": [
+    -2386,
+    -10921.7
+   ],
+   "verts": 28,
+   "vertsInWater": 0,
+   "minShoreM": 566.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 539,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_764339cc-64c0-41d7-a8e5-eec1c5d53f4f",
+   "c": [
+    -2384.6,
+    -10847.2
+   ],
+   "verts": 22,
+   "vertsInWater": 0,
+   "minShoreM": 532.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_74fd1933-c4db-492d-bb9a-79a6a75b556f",
+   "c": [
+    -2481.6,
+    -10705.9
+   ],
+   "verts": 37,
+   "vertsInWater": 0,
+   "minShoreM": 358.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 98,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_9f57cdcc-3d71-4c8c-bc87-dafb42e237c7",
+   "c": [
+    -2436.7,
+    -10804.2
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 450,
+   "maxDepthIntoWaterM": 0,
+   "samples": 211,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_31f5021d-e23d-45f2-98f4-213abe19bd8b",
+   "c": [
+    -2472.3,
+    -10841.7
+   ],
+   "verts": 6,
+   "vertsInWater": 0,
+   "minShoreM": 502,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_fbb56f9a-37c8-450b-9e5c-d5dbdb580a2f",
+   "c": [
+    -2454.6,
+    -10720.4
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 368.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 99,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_76462f48-c25f-4aee-a8f5-e027f751eb2e",
+   "c": [
+    -2295.8,
+    -10765.6
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 481.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 56,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_92224a5b-94f5-4e88-ad6f-683108037db8",
+   "c": [
+    -2349.9,
+    -10993
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 644.9,
+   "maxDepthIntoWaterM": 0,
+   "samples": 2,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_108a888e-3084-4497-87e1-3a73c200c192",
+   "c": [
+    -2379.8,
+    -10840.6
+   ],
+   "verts": 23,
+   "vertsInWater": 0,
+   "minShoreM": 528.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f21a7d6d-4ad2-4b73-bb45-725d545ab271",
+   "c": [
+    -2378.8,
+    -10845.5
+   ],
+   "verts": 21,
+   "vertsInWater": 0,
+   "minShoreM": 533.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_f92418ca-7bcc-4b8d-b37a-c0250f9bf136",
+   "c": [
+    -2300.6,
+    -10802.6
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 504,
+   "maxDepthIntoWaterM": 0,
+   "samples": 115,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_43e875eb-6731-4850-bad8-6295f092c640",
+   "c": [
+    -2497.3,
+    -10902
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 558.2,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_a72b7e38-2390-4660-bc77-42f3d756ddd0",
+   "c": [
+    -2294.2,
+    -10786.8
+   ],
+   "verts": 8,
+   "vertsInWater": 0,
+   "minShoreM": 516.4,
+   "maxDepthIntoWaterM": 0,
+   "samples": 3,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_e72724fe-4ca4-4a03-b4aa-ac57132923be",
+   "c": [
+    -2322.7,
+    -10821.2
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 531.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_ccec3c6b-785f-4510-ab28-6f2ba1b35858",
+   "c": [
+    -2313,
+    -10848.1
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 544,
+   "maxDepthIntoWaterM": 0,
+   "samples": 96,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c5ed9934-2d72-4880-80d1-b596d8288be4",
+   "c": [
+    -2335.7,
+    -10866.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 569.1,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_113f46b6-2995-4ae6-b6e0-ef99532400e3",
+   "c": [
+    -2440.8,
+    -10835
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 498.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 13,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c2774bbd-2cf1-41e3-a132-d9325be32d7c",
+   "c": [
+    -2383.4,
+    -10749.9
+   ],
+   "verts": 20,
+   "vertsInWater": 0,
+   "minShoreM": 408.6,
+   "maxDepthIntoWaterM": 0,
+   "samples": 366,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_73b7667c-a6aa-464b-99f3-de41a55a8660",
+   "c": [
+    -2466.2,
+    -10805.6
+   ],
+   "verts": 11,
+   "vertsInWater": 0,
+   "minShoreM": 447.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 104,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_7296091d-c77d-4356-a1ef-9f0ba9b17d26",
+   "c": [
+    -2494.3,
+    -10884.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 540.5,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_c8ac15d4-7d26-41bb-8190-df5735026b24",
+   "c": [
+    -2371.3,
+    -10835.6
+   ],
+   "verts": 24,
+   "vertsInWater": 0,
+   "minShoreM": 527,
+   "maxDepthIntoWaterM": 0,
+   "samples": 1,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_34121986-6994-40a0-8d93-1d4283bf7bf5",
+   "c": [
+    -2354.8,
+    -10962.9
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 649.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 4,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 2
+  },
+  {
+   "set": "kita-sample",
+   "id": "bldg_5fefecf7-cf1c-47a8-a9b4-4cd66ac910e0",
+   "c": [
+    -2312.3,
+    -10777.5
+   ],
+   "verts": 4,
+   "vertsInWater": 0,
+   "minShoreM": 496.7,
+   "maxDepthIntoWaterM": 0,
+   "samples": 7,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "chuo-sample",
+   "id": "bldg_3b786498-0835-4934-9b69-0efe579e982e",
+   "c": [
+    -1955.8,
+    -8797.6
+   ],
+   "verts": 7,
+   "vertsInWater": 0,
+   "minShoreM": 43.8,
+   "maxDepthIntoWaterM": 0,
+   "samples": 29,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "chuo-sample",
+   "id": "bldg_37020203-93a9-45fa-b36b-eac8871d31d8",
+   "c": [
+    -1930.1,
+    -8796.4
+   ],
+   "verts": 10,
+   "vertsInWater": 0,
+   "minShoreM": 42.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 139,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  },
+  {
+   "set": "nishi-sample",
+   "id": "bldg_baeb92be-ee42-4147-9770-13647ca3139b",
+   "c": [
+    -2668.1,
+    -8811.8
+   ],
+   "verts": 12,
+   "vertsInWater": 0,
+   "minShoreM": 279.3,
+   "maxDepthIntoWaterM": 0,
+   "samples": 92,
+   "wetSamples": 0,
+   "wetFrac": 0,
+   "roadEdgeCrossings": 0
+  }
+ ]
+}

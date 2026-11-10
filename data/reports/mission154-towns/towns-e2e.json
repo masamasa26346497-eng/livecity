@@ -1,0 +1,143 @@
+{
+  "mission": "154",
+  "browser": "Chrome/156.0.8078.79",
+  "generatedAt": "2026-11-08T14:07:54.808Z",
+  "jsErrors": [],
+  "googleRequests": [],
+  "cases": [
+    {
+      "ward": "chuo",
+      "tier": "base",
+      "altitude": 3000,
+      "actualTier": "base",
+      "shownCount": 40,
+      "sample": [
+        "清水谷町",
+        "空清町",
+        "城南寺町",
+        "空堀町",
+        "餌差町",
+        "味原本町"
+      ],
+      "minAlpha": 1,
+      "diagShown": 40,
+      "hasChome": null,
+      "screenshot": "data/reports/mission154-towns/chuo-base.jpg"
+    },
+    {
+      "ward": "chuo",
+      "tier": "full",
+      "altitude": 900,
+      "actualTier": "full",
+      "shownCount": 6,
+      "sample": [
+        "法円坂一丁目",
+        "上町",
+        "森ノ宮中央一丁目",
+        "森ノ宮中央二丁目",
+        "玉造一丁目",
+        "玉造二丁目"
+      ],
+      "minAlpha": 1,
+      "diagShown": 46,
+      "hasChome": true,
+      "screenshot": "data/reports/mission154-towns/chuo-full.jpg"
+    },
+    {
+      "ward": "kita",
+      "tier": "base",
+      "altitude": 3000,
+      "actualTier": "base",
+      "shownCount": 17,
+      "sample": [
+        "十三東",
+        "新北野",
+        "塚本",
+        "田川",
+        "木川西",
+        "柏里"
+      ],
+      "minAlpha": 1,
+      "diagShown": 17,
+      "hasChome": null,
+      "screenshot": "data/reports/mission154-towns/kita-base.jpg"
+    },
+    {
+      "ward": "kita",
+      "tier": "full",
+      "altitude": 900,
+      "actualTier": "full",
+      "shownCount": 3,
+      "sample": [
+        "塚本一丁目",
+        "大淀北一丁目",
+        "大淀北二丁目"
+      ],
+      "minAlpha": 1,
+      "diagShown": 20,
+      "hasChome": true,
+      "screenshot": "data/reports/mission154-towns/kita-full.jpg"
+    },
+    {
+      "ward": "sumiyoshi",
+      "tier": "base",
+      "altitude": 3000,
+      "actualTier": "base",
+      "shownCount": 11,
+      "sample": [
+        "37D-label",
+        "37D-label",
+        "37D-label",
+        "37D-label",
+        "37D-label",
+        "37D-label"
+      ],
+      "minAlpha": 1,
+      "diagShown": 11,
+      "hasChome": null,
+      "screenshot": "data/reports/mission154-towns/sumiyoshi-base.jpg"
+    },
+    {
+      "ward": "sumiyoshi",
+      "tier": "full",
+      "altitude": 900,
+      "actualTier": "full",
+      "shownCount": 5,
+      "sample": [
+        "37D-label",
+        "37D-label",
+        "37D-label",
+        "37D-label",
+        "37D-label"
+      ],
+      "minAlpha": 1,
+      "diagShown": 5,
+      "hasChome": null,
+      "screenshot": "data/reports/mission154-towns/sumiyoshi-full.jpg"
+    }
+  ],
+  "build": "m154-20261108",
+  "townsDiag": {
+    "committed": {
+      "status": 200,
+      "n": 1905
+    },
+    "local": {
+      "status": 404,
+      "n": 0
+    },
+    "used": "committed",
+    "error": null
+  },
+  "loaded": {
+    "total": 1905,
+    "wards": 23
+  },
+  "badHttp": [
+    "/mission145-data/towns-24.json",
+    "/mission145-data/towns-24.local.json"
+  ],
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}

@@ -1,0 +1,34 @@
+# Mission 94 P0: INSTALL BY OWNER as .github/workflows/mission94-private-connect-check.yml
+# (Claude's GitHub App cannot write .github/workflows.)
+# Read-only check that LIVECITY_3D_DATA_TOKEN can see the PRIVATE data repo.
+# Safety: workflow_dispatch only (never PR/issue-comment triggered), no checkout (no untrusted code),
+# default-branch + owner-actor guard, token only in the single step env, masked, GET requests only,
+# no upload, no fallback to other credentials / public repo.
+name: Mission94 private connect check
+on:
+  workflow_dispatch:
+permissions:
+  contents: none
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    steps:
+      - name: Read-only API check
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+          DATA_REPO: masamasa26346497-eng/livecity-3d-data
+        run: |
+          set -u
+          if [ -z "$DATA_TOKEN" ]; then echo "FAIL: secret LIVECITY_3D_DATA_TOKEN is empty or missing. Stopping (no fallback)."; exit 1; fi
+          echo "::add-mask::$DATA_TOKEN"
+          code=$(curl -sS -o /tmp/repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          if [ "$code" != "200" ]; then echo "FAIL: repo GET returned HTTP $code. Stopping (no fallback)."; exit 1; fi
+          vis=$(jq -r '.visibility' /tmp/repo.json)
+          push=$(jq -r '.permissions.push // false' /tmp/repo.json)
+          echo "repo=$DATA_REPO visibility=$vis token_push=$push"
+          if [ "$vis" != "private" ]; then echo "FAIL: repository is not private. Stopping."; exit 1; fi
+          if [ "$push" != "true" ]; then echo "FAIL: token has no write permission (needed later for uploads)."; exit 1; fi
+          rc=$(curl -sS -o /tmp/rel.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO/releases/tags/plateau2025-converted")
+          if [ "$rc" = "200" ]; then echo "stored archives: $(jq '.assets|length' /tmp/rel.json) / 24 wards"; else echo "release not found yet (HTTP $rc): stored wards 0 / 24"; fi
+          echo "OK: private connection verified (read-only). Nothing uploaded."

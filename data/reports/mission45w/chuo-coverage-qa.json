@@ -1,0 +1,30 @@
+{
+  "mission": "45W",
+  "views": [
+    {
+      "view": "sumiyoshi",
+      "roadsWaterOnVsOffPx": 207919,
+      "coverage": {
+        "source": "sumiyoshi-bundle",
+        "ward": "27120",
+        "text": "道路・河川・公園・鉄道: 住吉区9tile束（約2.1km四方）を表示中"
+      },
+      "noteText": "道路・河川・公園・鉄道: 住吉区9tile束（約2.1km四方）を表示中"
+    },
+    {
+      "view": "chuo",
+      "roadsWaterOnVsOffPx": 20,
+      "coverage": {
+        "source": "none",
+        "ward": "27128",
+        "text": "この付近（中央区）は道路・河川・公園・鉄道の描画データ未配信。上の件数は住吉区の束のものです"
+      },
+      "noteText": "この付近（中央区）は道路・河川・公園・鉄道の描画データ未配信。上の件数は住吉区の束のものです"
+    }
+  ],
+  "jsErrors": [],
+  "layerCounts": {
+    "roads": 969,
+    "water": 20
+  }
+}

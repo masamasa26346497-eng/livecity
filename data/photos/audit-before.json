@@ -1,0 +1,82 @@
+{
+  "generatedFrom": "public/map-data/osaka-city/derived/building-photo-index.json",
+  "indexVersion": 2,
+  "indexGeneratedAt": "2026-09-28T11:46:51.769Z",
+  "denominators": {
+    "namedBuildingsTotal": 20130,
+    "note": "分母は名前付き建物。索引のレコード(施設/ランドマーク候補)数とは別物で、施設数を棟数として数えない。"
+  },
+  "records": {
+    "facilityRecords": 2596,
+    "withPhoto": 1792,
+    "byConfidenceAndPhoto": {
+      "UNRESOLVED/photo": 1077,
+      "VERY_HIGH/photo": 344,
+      "AMBIGUOUS/photo": 141,
+      "HIGH/photo": 230,
+      "AMBIGUOUS/nophoto": 389,
+      "UNRESOLVED/nophoto": 413,
+      "VERY_HIGH/nophoto": 1,
+      "HIGH/nophoto": 1
+    }
+  },
+  "uniqueBuildingIds": {
+    "byCanonicalId": 574,
+    "byLandmarkId": 17,
+    "withPhotoShownOnClick": 574,
+    "withPhotoHighConfidence": 574
+  },
+  "hold": {
+    "unresolved": 1490,
+    "ambiguous": 530
+  },
+  "photos": {
+    "total": 1835,
+    "uniqueCommonsFiles": 1835,
+    "filesUsedByMultipleRecords": 0,
+    "missingAuthor": 30,
+    "missingSourcePage": 0,
+    "missingLicenseUrl": 132,
+    "licenses": {
+      "CC BY 4.0": 27,
+      "CC BY-SA 4.0": 526,
+      "CC BY-SA 3.0": 752,
+      "CC BY 2.5": 77,
+      "CC0": 176,
+      "CC BY 3.0": 127,
+      "Public domain": 128,
+      "CC BY-SA 2.0": 11,
+      "CC BY 2.0": 6,
+      "Attribution": 4,
+      "FAL": 1
+    },
+    "licensesNotAdopted": {
+      "Attribution": 4,
+      "FAL": 1
+    }
+  },
+  "dates": {
+    "files": 588,
+    "verified": 565,
+    "verifiedRate": 0.961
+  },
+  "display": {
+    "entriesInIndex": 574,
+    "entriesEligibleByConfidence": 574,
+    "entriesWithPrimary": 492,
+    "primaryExteriorConfirmed": 0,
+    "primaryUnclassified": 492,
+    "entriesWithoutPrimaryAllHeld": 82,
+    "entriesWithAdditional": 10,
+    "additionalPhotos": 11,
+    "heldPhotos": 85,
+    "heldByReason": {
+      "license-url-missing": 70,
+      "attribution-required-author-missing": 13,
+      "license-needs-review": 2
+    },
+    "entriesWithAnyHeld": 85
+  },
+  "netNewFromThisPR": 0,
+  "netNewNote": "本PRは外部取得を行っていないため、写真付き建物の純増は 0。上記はすべて既存データの実測。"
+}

@@ -1,0 +1,59 @@
+# Mission 95: INSTALL BY OWNER as .github/workflows/mission95-persist-ward.yml on the default branch
+# (Claude's GitHub App cannot write .github/workflows).
+# Owner-run only: workflow_dispatch, owner actor, default branch. Never triggered by pushes or comments.
+# Step "Connect check": read-only check that the data token sees the PRIVATE repo; prints evidence lines.
+# Step "Convert ward": NO token. Mission80 converts the ward from the official PLATEAU 2025 CDN via HTTP Range.
+# Step "Persist": token only here. Mission95 -> Mission87 pack/upload/verify (private mandatory, sha256 mandatory).
+# Code executed is the default-branch checkout only (reviewed, merged). No fork code, no event-driven triggers.
+name: Mission95 persist ward to private repo
+on:
+  workflow_dispatch:
+    inputs:
+      ward:
+        description: ward id (e.g. nishi)
+        required: true
+        default: nishi
+permissions:
+  contents: read
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    env:
+      DATA_REPO: masamasa26346497-eng/livecity-3d-data
+      WARD: ${{ inputs.ward }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate input
+        run: |
+          echo "$WARD" | grep -Eq '^[a-z]+$' || { echo "FAIL: invalid ward"; exit 1; }
+      - name: Connect check (read-only)
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -u
+          if [ -z "$DATA_TOKEN" ]; then echo "FAIL: secret empty or missing"; exit 1; fi
+          echo "::add-mask::$DATA_TOKEN"
+          code=$(curl -sS -o /tmp/repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          [ "$code" = "200" ] || { echo "FAIL: repo GET HTTP $code"; exit 1; }
+          vis=$(jq -r '.visibility' /tmp/repo.json); push=$(jq -r '.permissions.push // false' /tmp/repo.json)
+          echo "repo=$DATA_REPO visibility=$vis token_push=$push"
+          [ "$vis" = "private" ] && [ "$push" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
+          echo "OK: private connection verified (read-only)"
+      - name: Convert ward (PLATEAU 2025, no token)
+        run: node tools/mission80-batch.mjs --wards "$WARD" --max-wards 1 --ward-timeout-min 60
+      - name: Strict output check
+        run: node tools/mission95-check-output.mjs "$WARD"
+      - name: Persist to private repo (token only here) and verify sha256
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute
+          node tools/mission87-persist.mjs status
