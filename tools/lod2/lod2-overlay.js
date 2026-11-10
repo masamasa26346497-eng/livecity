@@ -62,9 +62,37 @@
         }
         scene.requestRender();
       };
+      // Mission 177: lod2clip=near — カメラ近傍(高度<2.5km・半径1.2km・最大400件)の足跡だけを動的にクリップ。
+      const NEAR = new URLSearchParams(location.search).get('lod2clip') === 'near';
+      if (NEAR) {
+        await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = BASE + 'clipnear.js'; sc.onload = res; sc.onerror = () => rej(new Error('clipnear.js')); document.head.appendChild(sc); });
+        const CN = window.LC152ClipNear; let prev = []; const colls = new Map();
+        state.clipMode = 'near'; state.nearClip = { polys: 0, updates: 0, lastMs: 0 };
+        const update = () => {
+          const c = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC);
+          // 注視点(画面中心の地表)を基準にする。取れなければカメラ直下。
+          let lon = Cesium.Math.toDegrees(c.longitude), lat = Cesium.Math.toDegrees(c.latitude);
+          try { const hit = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2)); if (hit) { const g = Cesium.Cartographic.fromCartesian(hit); lon = Cesium.Math.toDegrees(g.longitude); lat = Cesium.Math.toDegrees(g.latitude); } } catch (e) { /* 直下で代用 */ }
+          const sel = CN.selectNearby(fp.footprints, { lon, lat, h: c.height });
+          if (!CN.needsUpdate(prev, sel)) return;
+          const t0 = performance.now(); prev = sel;
+          const prims = scene.primitives;
+          for (let i = 0; i < prims.length; i++) {
+            const p = prims.get(i);
+            if (p === ts || !(p instanceof Cesium.Cesium3DTileset)) continue;
+            let col = colls.get(p);
+            if (!col) { col = new Cesium.ClippingPolygonCollection({ polygons: [], inverse: false }); colls.set(p, col); p.clippingPolygons = col; state.clippedTilesets++; }
+            col.removeAll(); for (const k of sel) col.add(polys[k]);
+          }
+          state.nearClip.polys = sel.length; state.nearClip.updates++; state.nearClip.lastMs = Math.round(performance.now() - t0);
+          scene.requestRender();
+        };
+        viewer.camera.moveEnd.addEventListener(update);
+        scene.postRender.addEventListener(() => { if (scene.primitives.length !== (update._n || 0)) { update._n = scene.primitives.length; prev = []; update(); } });
+      }
       if (CLIP) applyClip();
       if (CLIP) scene.postRender.addEventListener(() => { if (scene.primitives.length !== (applyClip._n || 0)) { applyClip._n = scene.primitives.length; applyClip(); } });
-      state.exclusion = CLIP ? 'clipping-polygon(足跡の凸包。LOD2 建物の LOD1 のみ除外。LOD2 化していない 3 棟等は残る)' : 'none(既定。LOD2 の建物は LOD1 と重なって描かれる場合があります。?lod2clip=1 で凸包クリップを試せますが、足跡が多いと固まります)';
+      state.exclusion = NEAR ? 'clipping-polygon-near(カメラ近傍の足跡のみ動的クリップ。遠景では LOD1 と重なる)' : CLIP ?'clipping-polygon(足跡の凸包。LOD2 建物の LOD1 のみ除外。LOD2 化していない 3 棟等は残る)' : 'none(既定。LOD2 の建物は LOD1 と重なって描かれる場合があります。?lod2clip=1 で凸包クリップを試せますが、足跡が多いと固まります)';
       scene.primitives.add(ts);
       state.tilesetReady = true; state.status = 'ready';
 

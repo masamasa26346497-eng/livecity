@@ -28,7 +28,7 @@ const mounts = [
   ['/ext-3dtiles/', extStatic],
   ['/', path.join(ROOT, 'public')],
 ].filter((m) => m[1]);
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.glb': 'model/gltf-binary',
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.cjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.glb': 'model/gltf-binary',
   '.b3dm': 'application/octet-stream', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 function resolve(urlPath) {
@@ -38,6 +38,7 @@ function resolve(urlPath) {
     if (!urlPath.startsWith(prefix)) continue;
     let rel = decodeURIComponent(urlPath.slice(prefix.length));
     if (prefix === '/lod2-preview/' && rel === 'overlay.js') return path.join(__dirname, 'lod2-overlay.js');
+    if (prefix === '/lod2-preview/' && rel === 'clipnear.js') return path.join(__dirname, 'lod2-clip-near.cjs');
     if (prefix === '/lod2-preview/' && rel === 'diagnose.js') return path.join(__dirname, 'lod2-diagnose.js');
     const full = path.resolve(dir, rel);
     if (full !== dir && !full.startsWith(dir + path.sep)) return null;
