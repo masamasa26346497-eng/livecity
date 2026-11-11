@@ -45,13 +45,12 @@ for (const id of wards) {
     if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
     log('LOD1 生成(公式 PLATEAU 2025, Range 取得):', id);
     run('tools/mission79-run.mjs', ['--ward', id, '--max-mb', maxMb]);
-    fs.rmSync(path.join(ROOT, 'temp/mission79', id + '-work'), { recursive: true, force: true });
-    v = verifyWard(dir, w.code);
+    v = verifyWard(dir, w.code); // work ディレクトリは補完 LOD1 生成(2b)で再利用するため、ここでは消さない
   }
   if (!v.ok) throw new Error('LOD1 verification failed for ' + id + ': ' + (v.problems || []).join(';'));
   const src = JSON.parse(fs.readFileSync(path.join(dir, 'source.json'), 'utf8'));
   if (Number(src.vintage) !== 2025) throw new Error(id + ': source.vintage != 2025');
-  wardInfo.push({ id, name: w.name, code: w.code, dir, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src });
+  wardInfo.push({ id, name: w.name, code: w.code, dir, fullBuildings: v.buildings, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src });
 }
 
 // ---- 2. LOD2(公式 2025。区のメッシュ ∩ LOD2 収録メッシュ) ----
@@ -64,6 +63,32 @@ fs.mkdirSync(LOD2_DIR, { recursive: true });
 const st = run('tools/lod2/lod2-build-all.mjs', ['--out', rel(LOD2_DIR), '--meshes', lod2Meshes.join(','), '--resume', '--report-dir', rel(path.join(LOD2_DIR, 'report'))]);
 const lod2Rep = JSON.parse(fs.readFileSync(path.join(LOD2_DIR, 'report.json'), 'utf8'));
 if (!(lod2Rep.converted > 0)) throw new Error('LOD2 が 0 棟');
+
+// ---- 2b. 補完 LOD1(Mission 197): LOD2 と gml:id が完全一致する棟だけを LOD1 から除外して再生成(二重描画の解消) ----
+//   LOD2 manifest の gml:id 集合 = 除外 ID。LOD2 が無い棟は一切除外しない。建物座標は一切動かさない。
+const lod2Manifest = path.join(LOD2_DIR, 'manifest.json');
+if (!fs.existsSync(lod2Manifest)) throw new Error('LOD2 manifest.json がありません(除外 ID を作れない)');
+const lod2Ids = new Set(JSON.parse(fs.readFileSync(lod2Manifest, 'utf8')).assets.flatMap((x) => x.ids || []));
+if (!lod2Ids.size) throw new Error('LOD2 manifest に ID が無い');
+for (const w of wardInfo) {
+  const sdir = path.join(ROOT, 'temp/mission79', w.id + '-2025-supp');
+  fs.rmSync(sdir, { recursive: true, force: true });
+  log('補完 LOD1 生成(LOD2 と ID 一致の棟を除外):', w.id);
+  run('tools/mission79-run.mjs', ['--ward', w.id, '--max-mb', maxMb, '--final', sdir, '--exclude-ids', lod2Manifest]);
+  const v = verifyWard(sdir, w.code);
+  if (!v.ok) throw new Error('補完 LOD1 verification failed for ' + w.id + ': ' + (v.problems || []).join(';'));
+  const src = JSON.parse(fs.readFileSync(path.join(sdir, 'source.json'), 'utf8'));
+  if (Number(src.vintage) !== 2025) throw new Error(w.id + ': supplemental vintage != 2025');
+  const excluded = src.counts.excludedForLod2 | 0;
+  // 監査: 元 LOD1 = 補完 LOD1 + 除外、かつ補完 LOD1 の ID に LOD2 の ID が残っていない(ダブり 0)
+  if (w.fullBuildings !== v.buildings + excluded) throw new Error(`${w.id}: 件数不整合 full=${w.fullBuildings} supp=${v.buildings} excluded=${excluded}`);
+  const kept = new Set(); const idDir = path.join(sdir, 'ids');
+  if (fs.existsSync(idDir)) for (const f of fs.readdirSync(idDir)) { const j = JSON.parse(fs.readFileSync(path.join(idDir, f), 'utf8')); for (const id of Array.isArray(j) ? j : j.ids || Object.keys(j.byId || {})) kept.add(id); }
+  const doubleDrawn = [...kept].filter((id) => lod2Ids.has(id)).length;
+  if (doubleDrawn) throw new Error(`${w.id}: 補完 LOD1 に LOD2 と同じ ID が ${doubleDrawn} 件残っている`);
+  Object.assign(w, { dir: sdir, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAuditedIds: kept.size, doubleDrawn });
+  fs.rmSync(path.join(ROOT, 'temp/mission79', w.id + '-work'), { recursive: true, force: true });
+}
 
 // ---- 3. 組み立て ----
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -109,6 +134,13 @@ const gates = [
 ];
 // 5 箇所目: 内蔵(旧)住吉サンプルを載せないため build-report.json が 404 になる。元コードは `return` で追加区の coverage 計算ごと飛ばしてしまうので、例外にして catch(未配信扱い)へ落とす。
 gates.push(["const r = await fetch(TILES_BASE + 'build-report.json');\n      if (!r.ok) return;", "const r = await fetch(TILES_BASE + 'build-report.json');\n      if (!r.ok) throw new Error('builtin sample absent (cloud preview, nobuiltin)');"]);
+// Mission 197: 区ポップアップの「ローカル変換データ／この PC のみ」表記はクラウド配信の実態と矛盾するため、クラウド専用の出典表記に置換する。
+gates.push(
+  ["'3D建物: ローカル全域変換済み（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開。ブラウザでの全域視認は未確認）'",
+   "'3D建物: 公式PLATEAU大阪2025・クラウド配信（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。非本番Preview。LOD2化した建物は除外して補完）'"],
+  ["'3D建物: ローカル変換データ（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開・全域とは未確認）'",
+   "'3D建物: 公式PLATEAU大阪2025・クラウド配信（補完LOD1 ' + fmt(a.buildings) + '棟＋LOD2。非本番Preview。この区のみ配信・他区は未接続）'"],
+);
 for (const [from, to] of gates) {
   const n = html.split(from).length - 1;
   if (n !== 1) throw new Error('37G HTML のゲート書式が想定と違います(' + n + ' 件): ' + from.slice(0, 80));
@@ -119,15 +151,19 @@ const prov = {
   dataSource: '公式 PLATEAU 大阪市 2025 CityGML v5(ZIP の HTTP Range 取得)のみ。PC 上の旧 45D / OSM / 2024 内蔵サンプルは使用しない(nobuiltin=1)',
   vintage: 2025, attribution: wardInfo[0].source.attribution, license: wardInfo[0].source.license,
   sourceEtag: wardInfo[0].source.sourceEtag,
-  wards: wardInfo.map((w) => ({ ward: w.id, name: w.name, code: w.code, lod1Buildings: w.buildings, lod1ContentTiles: w.contentTiles, lod1GlbBytes: w.glbBytes, meshes: w.source.sourceMeshes.length })),
+  wards: wardInfo.map((w) => ({ ward: w.id, name: w.name, code: w.code, lod1Buildings: w.buildings, lod1OriginalBuildings: w.fullBuildings, lod1ExcludedForLod2: w.excludedForLod2, lod1DoubleDrawn: w.doubleDrawn, lod1ContentTiles: w.contentTiles, lod1GlbBytes: w.glbBytes, meshes: w.source.sourceMeshes.length })),
   lod2: { meshes: lod2Meshes, buildings: lod2Rep.converted, expected: lod2Rep.expected, fullMatch: lod2Rep.fullMatch, tiles: lod2Rep.tiles, glbBytes: lod2Rep.glbBytes, color: lod2Rep.color, textureRendered: false },
-  overlap: 'LOD2 化した建物は LOD1 の箱とも重なって描かれる(同一 2025 GML ID。クリップ既定 OFF)。差集合クリップは ?lod2clip=near で試行可能。未解消として表示。',
+  overlap: '補完 LOD1: 元 LOD1 のうち LOD2 と gml:id が完全一致する棟を除外(補完 LOD1 内の LOD2 同一 ID は 0 件を監査)。LOD2 は区外の建物も含むメッシュ範囲。',
+  cloudCoverage: { servedWards: wardInfo.map((w) => w.id), servedWardCount: wardInfo.length, totalWards: reg.length, note: '配信済みの区のみ。他区は未接続(未配信)' },
+  roadsRiversParks: '未接続(旧道路/路線データは配信しない。2025 道路との整合は未検証)',
   knownOffsets: lod2Rep.vertical,
 };
 const UMEDA = [135.4960, 34.7055];
 const banner = `<div id="lc196-banner" style="position:fixed;left:8px;bottom:8px;z-index:100000;background:rgba(14,18,26,.92);color:#fff;font:12px/1.5 sans-serif;padding:8px 10px;border-radius:6px;max-width:360px">` +
   `<b style="color:#fc8">Preview(非本番・レビュー専用)</b><br>データ: <b>公式 PLATEAU 大阪市 2025</b>(CityGML v5)のみ。旧データ・OSM 不使用<br>` +
-  prov.wards.map((w) => w.name + ' LOD1 ' + w.lod1Buildings.toLocaleString('en-US') + '棟').join(' / ') + ' ・ LOD2 ' + prov.lod2.buildings.toLocaleString('en-US') + '棟(屋根・壁の頂点色。テクスチャ無し)<br>' +
+  prov.wards.map((w) => w.name + ': 元LOD1 ' + w.lod1OriginalBuildings.toLocaleString('en-US') + '棟 − LOD2と同一ID ' + w.lod1ExcludedForLod2.toLocaleString('en-US') + '棟 = 補完LOD1 ' + w.lod1Buildings.toLocaleString('en-US') + '棟').join('<br>') +
+  '<br>LOD2 ' + prov.lod2.buildings.toLocaleString('en-US') + '棟(' + prov.lod2.meshes.length + 'メッシュ範囲。区外の建物を含む。頂点色のみ・テクスチャ無し)<br>' +
+  `<b>クラウド配信: ${prov.cloudCoverage.servedWardCount}/${prov.cloudCoverage.totalWards}区のみ</b>(他区は未接続)。道路・河川・公園・駅は未接続(2025道路との整合は未検証)<br>` +
   `<button id="lc196-umeda" style="margin:4px 4px 0 0">梅田(大阪駅周辺)のLOD2へ近づく</button><button id="lc196-umeda-near" style="margin-top:4px">さらに近景</button><br>` +
   `<span style="opacity:.8">出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成。<a style="color:#9cf" href="https://www.mlit.go.jp/plateau/site-policy/" target="_blank" rel="noopener">利用条件</a> / <a style="color:#9cf" href="/cloud-preview.json" target="_blank">provenance</a></span></div>` +
   `<script>(function(){function go(r){var f=window.__lc152&&window.__lc152.lookAtFirst;if(f)f(r,-40,[${UMEDA[0]},${UMEDA[1]}]);else alert('LOD2 の読み込み中です。数秒後にもう一度押してください')}` +

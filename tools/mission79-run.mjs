@@ -64,6 +64,7 @@ function main() {
   run([T('mission36k-convert-citygml-runtime.mjs'), '--input', path.join(work, 'bldg'), '--output', jsonl, '--ward-hint', wardId]);
   const b = [T('mission79-build-ward-2025.cjs'), '--ward', wardId, '--jsonl', jsonl, '--tran', path.join(work, 'tran'), '--out', final];
   if (opt('legacy')) b.push('--legacy', opt('legacy'));
+  if (opt('exclude-ids')) b.push('--exclude-ids', path.resolve(opt('exclude-ids')));
   run(b);
 }
 import { fileURLToPath } from 'node:url';
