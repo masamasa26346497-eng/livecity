@@ -118,10 +118,7 @@ function triangulate(pts) {
   return { tris, fallback };
 }
 
-function colorFor(h) { // Primitive 版 POC (colorFor) と同一
-  const t = Math.min(h / 60, 1);
-  return [Math.round(190 - 70 * t), Math.round(200 - 50 * t), Math.round(215 - 20 * t)];
-}
+const { colorFor, wallFrom } = require('./lib/building-color.cjs'); // LOD2 と共有(Mission 207。式は従来と同一)
 
 // ── GLB 生成 ──
 // features: [{ id, fp:[[x,z]...], z0, top, h }]（ローカル m）、frame: makeFrame()
@@ -146,7 +143,7 @@ function buildGlb(features, frame) {
     if (!tris.length) { st.skipped++; continue; }
     if (fallback) st.fallbacks++;
     const f = ids.length; ids.push(b.id);
-    const roof = colorFor(b.h), wall = roof.map(v => Math.round(v * 0.78));
+    const roof = colorFor(b.h), wall = wallFrom(roof);
     const lonlat = ring.map(p => [localToLon(p[0]), localToLat(p[1])]);
     for (const [lo, la] of lonlat) {
       if (lo < ext.w) ext.w = lo; if (lo > ext.e) ext.e = lo;

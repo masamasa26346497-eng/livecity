@@ -28,7 +28,8 @@ function toEnu(lat, lon, h, org) {
 }
 
 const SURF = { RoofSurface: 'roof', WallSurface: 'wall', GroundSurface: 'ground', OuterCeilingSurface: 'roof', OuterFloorSurface: 'ground', ClosureSurface: 'wall' };
-const COLOR = { roof: [0.62, 0.34, 0.28], wall: [0.82, 0.8, 0.76], ground: [0.5, 0.5, 0.5] };
+import { createRequire } from 'node:module';
+const { buildingColors } = createRequire(import.meta.url)('../lib/building-color.cjs'); // LOD1 と共通(Mission 207)
 
 /** 1棟のXMLから { surfaces:[{type, ring:[[lat,lon,h]...]}] } (lod2の面のみ) */
 export function extractLod2Surfaces(bldgXml) {
@@ -108,12 +109,14 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
     const surfs = extractLod2Surfaces(xml);
     const bp = [], bc = []; let bad = !surfs.length;
     const gH = surfs.length ? Math.min(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) : 0;
+    const gTop = surfs.length ? Math.max(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) : 0;
+    const bh = buildingColors(gTop - gH); // 建物単位。LOD1 の b.h(地面からの高さ)と同義: 最高点-最低点
     const dz = opts.groundToZero ? toEnu(org.lat, org.lon, gH, org)[2] : 0;
     for (const s of surfs) {
       const e = s.ring.map((r) => { const q = toEnu(r[0], r[1], r[2], org); q[2] -= dz; return q; });
       const tr = triangulate(e);
       if (!tr.length) { bad = true; break; }
-      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(COLOR[s.type]); }
+      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push((s.type === 'roof' ? bh.roof : bh.wall).map((v) => v / 255)); } // ground は壁色(LOD1 は底面なし)
     }
     if (bad) { failed.push(id); continue; }
     for (const p of bp) { pos.push(p); minH = Math.min(minH, p[2]); maxH = Math.max(maxH, p[2]); bx = [Math.min(bx[0], p[0]), Math.max(bx[1], p[0])]; by = [Math.min(by[0], p[1]), Math.max(by[1], p[1])]; }
@@ -127,33 +130,28 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
 // Mission 205: 黒表示の原因調査
 //  既定の PBR 材質は Cesium の scene.light(=クロックの太陽方向)に依存する。Live City は scene.sun.show=false にするだけで
 //  クロックは「現在時刻」のまま(夜の日本時間では太陽が地平線下)なので、PBR+頂点色は夜間に暗転し得る(色値自体は非ゼロ)。
-//  → 既定を「固定の昼光を頂点色へ焼き込み + KHR_materials_unlit」に変更。照明・時刻に依存せず、幾何/座標は不変。
-//  opts.material: 'unlit-baked'(既定) | 'pbr'(従来。A/B検証用)。夜景は将来 tileset 側のスタイル/ライトで別途扱う。
-export const BAKE_SUN = (() => { const el = 55 * Math.PI / 180, az = 150 * Math.PI / 180; // 南東・仰角55°(glTF: x東,y上,z=-北)
-  return [Math.cos(el) * Math.sin(az), Math.sin(el), -Math.cos(el) * Math.cos(az)]; })();
-const BAKE_AMBIENT = 0.62; // 影側でも roof/wall が判別できる下限
+//  → 既定を KHR_materials_unlit にした(照明・時刻に依存しない)。
+// Mission 207: LOD1 と全く同じ色にするため、205 の固定昼光焼き込み陰影(BAKE_SUN/BAKE_AMBIENT)は廃止。
+//  COLOR_0 は LOD1 と同じ Uint8 normalized RGBA。材質は LOD1 と同じ baseColorFactor=[1,1,1,1]・OPAQUE・doubleSided・unlit。
+//  opts.material: 'unlit'(既定) | 'pbr'(A/B検証用)。
 
 /** ENU(x東,y北,z上) → glTF(Y-up: x東, y上, z=-北) で最小GLB。 */
 export function meshToGlb(mesh, opts = {}) {
-  const unlit = (opts.material || 'unlit-baked') !== 'pbr';
+  const unlit = (opts.material || 'unlit') !== 'pbr';
   const n = mesh.positions.length;
-  const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3);
+  const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Uint8Array(n * 4);
   for (let i = 0; i < n; i += 3) {
     const v = [0, 1, 2].map((k) => { const p = mesh.positions[i + k]; return [p[0], p[2], -p[1]]; });
     const u = [v[1][0] - v[0][0], v[1][1] - v[0][1], v[1][2] - v[0][2]], w = [v[2][0] - v[0][0], v[2][1] - v[0][1], v[2][2] - v[0][2]];
     let nn = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
     const l = Math.hypot(...nn) || 1; nn = nn.map((x) => x / l);
-    for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) { P[(i + k) * 3 + c] = v[k][c]; N[(i + k) * 3 + c] = nn[c]; C[(i + k) * 3 + c] = mesh.colors[i + k][c]; }
-    if (unlit) { // 巻き順が不定でも破綻しないよう |n·L| を使う(二面)
-      const d = Math.abs(nn[0] * BAKE_SUN[0] + nn[1] * BAKE_SUN[1] + nn[2] * BAKE_SUN[2]);
-      const f = BAKE_AMBIENT + (1 - BAKE_AMBIENT) * d;
-      for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) C[(i + k) * 3 + c] *= f;
-    }
+    for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) { P[(i + k) * 3 + c] = v[k][c]; N[(i + k) * 3 + c] = nn[c]; }
+    for (let k = 0; k < 3; k++) { for (let c = 0; c < 3; c++) C[(i + k) * 4 + c] = Math.round(mesh.colors[i + k][c] * 255); C[(i + k) * 4 + 3] = 255; }
   }
   const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) { mn[c] = Math.min(mn[c], P[i * 3 + c]); mx[c] = Math.max(mx[c], P[i * 3 + c]); }
   const bin = Buffer.concat([P, N, C].map((a) => Buffer.from(a.buffer)));
-  const bl = n * 12;
+  const bl = n * 12, cl = n * 4; // COLOR_0 は RGBA Uint8(n*4 は4の倍数なので境界OK)
   const json = {
     asset: { version: '2.0', generator: 'livecity-mission153' }, scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
     meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 }, material: 0, mode: 4 }] }],
@@ -162,11 +160,11 @@ export function meshToGlb(mesh, opts = {}) {
       : { pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 0.9 }, alphaMode: 'OPAQUE', doubleSided: true }],
     ...(unlit ? { extensionsUsed: ['KHR_materials_unlit'] } : {}),
     buffers: [{ byteLength: bin.length }],
-    bufferViews: [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 })),
+    bufferViews: [{ buffer: 0, byteOffset: 0, byteLength: bl, target: 34962 }, { buffer: 0, byteOffset: bl, byteLength: bl, target: 34962 }, { buffer: 0, byteOffset: 2 * bl, byteLength: cl, target: 34962 }],
     accessors: [
       { bufferView: 0, componentType: 5126, count: n, type: 'VEC3', min: mn, max: mx },
       { bufferView: 1, componentType: 5126, count: n, type: 'VEC3' },
-      { bufferView: 2, componentType: 5126, count: n, type: 'VEC3' }],
+      { bufferView: 2, componentType: 5121, normalized: true, count: n, type: 'VEC4' }],
   };
   let js = Buffer.from(JSON.stringify(json)); js = Buffer.concat([js, Buffer.alloc((4 - js.length % 4) % 4, 0x20)]);
   const b = Buffer.concat([bin, Buffer.alloc((4 - bin.length % 4) % 4)]);
