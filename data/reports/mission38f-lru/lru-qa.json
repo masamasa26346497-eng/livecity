@@ -1,0 +1,310 @@
+{
+  "mission": "37G+38F LRU regression",
+  "url": "http://localhost:8141/mission37g-osaka-24ward-mvp.html?qa=1",
+  "browser": "Chrome/154.0.8037.97",
+  "generatedAt": "2026-10-14T10:10:55.924Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8141/favicon.ico"
+  ],
+  "jsErrors": [],
+  "wardFetches": [
+    "kita",
+    "tsurumi",
+    "chuo",
+    "nishi",
+    "kita"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "ward": "kita",
+      "loaded": true,
+      "loadMs": 8457,
+      "evictionsBefore": 0,
+      "evictionsAfter": 0,
+      "cached": [
+        "kita"
+      ],
+      "poi": {
+        "culling": true,
+        "created": 119,
+        "removed": 25,
+        "total": 5664,
+        "candidates": 600,
+        "livePoints": 80,
+        "liveLabels": 14,
+        "budget": {
+          "points": 80,
+          "labels": 14,
+          "cell": 26
+        },
+        "syncMs": {
+          "n": 14,
+          "avg": 2.2142857142857144,
+          "p95": 9.099999999976717,
+          "max": 9.099999999976717
+        },
+        "facilities": {
+          "total": 5126,
+          "points": 64,
+          "labels": 5
+        },
+        "spots": {
+          "total": 538,
+          "points": 16,
+          "labels": 9
+        }
+      },
+      "selected": null
+    },
+    {
+      "step": 2,
+      "ward": "tsurumi",
+      "loaded": true,
+      "loadMs": 4786,
+      "evictionsBefore": 0,
+      "evictionsAfter": 0,
+      "cached": [
+        "kita",
+        "tsurumi"
+      ],
+      "poi": {
+        "culling": true,
+        "created": 153,
+        "removed": 119,
+        "total": 6442,
+        "candidates": 600,
+        "livePoints": 20,
+        "liveLabels": 14,
+        "budget": {
+          "points": 80,
+          "labels": 14,
+          "cell": 26
+        },
+        "syncMs": {
+          "n": 27,
+          "avg": 3.25555555555534,
+          "p95": 9.099999999976717,
+          "max": 13
+        },
+        "facilities": {
+          "total": 5832,
+          "points": 19,
+          "labels": 13
+        },
+        "spots": {
+          "total": 610,
+          "points": 1,
+          "labels": 1
+        }
+      },
+      "selected": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism",
+        "sourceId": "node/10031129617"
+      }
+    },
+    {
+      "step": 3,
+      "ward": "chuo",
+      "loaded": true,
+      "loadMs": 3944,
+      "evictionsBefore": 0,
+      "evictionsAfter": 0,
+      "cached": [
+        "kita",
+        "tsurumi",
+        "chuo"
+      ],
+      "poi": {
+        "culling": true,
+        "created": 237,
+        "removed": 160,
+        "total": 11451,
+        "candidates": 600,
+        "livePoints": 63,
+        "liveLabels": 14,
+        "budget": {
+          "points": 80,
+          "labels": 14,
+          "cell": 26
+        },
+        "syncMs": {
+          "n": 33,
+          "avg": 3.8212121212114156,
+          "p95": 10.39999999999418,
+          "max": 13
+        },
+        "facilities": {
+          "total": 10086,
+          "points": 14,
+          "labels": 2
+        },
+        "spots": {
+          "total": 1365,
+          "points": 49,
+          "labels": 12
+        }
+      },
+      "selected": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism",
+        "sourceId": "node/10031129617"
+      }
+    },
+    {
+      "step": 4,
+      "ward": "nishi",
+      "loaded": true,
+      "loadMs": 4600,
+      "evictionsBefore": 0,
+      "evictionsAfter": 1,
+      "cached": [
+        "tsurumi",
+        "chuo",
+        "nishi"
+      ],
+      "poi": {
+        "culling": true,
+        "created": 359,
+        "removed": 265,
+        "total": 13474,
+        "candidates": 600,
+        "livePoints": 80,
+        "liveLabels": 14,
+        "budget": {
+          "points": 80,
+          "labels": 14,
+          "cell": 26
+        },
+        "syncMs": {
+          "n": 39,
+          "avg": 4.456410256409212,
+          "p95": 12,
+          "max": 13
+        },
+        "facilities": {
+          "total": 11965,
+          "points": 78,
+          "labels": 12
+        },
+        "spots": {
+          "total": 1509,
+          "points": 2,
+          "labels": 2
+        }
+      },
+      "selected": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism",
+        "sourceId": "node/10031129617"
+      }
+    },
+    {
+      "step": 5,
+      "ward": "kita",
+      "loaded": true,
+      "loadMs": 5777,
+      "evictionsBefore": 1,
+      "evictionsAfter": 2,
+      "cached": [
+        "chuo",
+        "nishi",
+        "kita"
+      ],
+      "poi": {
+        "culling": true,
+        "created": 474,
+        "removed": 380,
+        "total": 13474,
+        "candidates": 600,
+        "livePoints": 80,
+        "liveLabels": 14,
+        "budget": {
+          "points": 80,
+          "labels": 14,
+          "cell": 26
+        },
+        "syncMs": {
+          "n": 45,
+          "avg": 5.037777777774803,
+          "p95": 10.5,
+          "max": 13
+        },
+        "facilities": {
+          "total": 11965,
+          "points": 64,
+          "labels": 5
+        },
+        "spots": {
+          "total": 1509,
+          "points": 16,
+          "labels": 9
+        }
+      },
+      "selected": {
+        "id": "osm-node-10031129617",
+        "name": "路上喫煙禁止地区案内図",
+        "category": "tourism",
+        "sourceId": "node/10031129617"
+      }
+    }
+  ],
+  "checks": {
+    "selectedKita": true,
+    "lruMax3": true,
+    "maxCachedObserved": 3,
+    "evictionIncreased": true,
+    "kitaEvictedFromCache": true,
+    "evictedSearchGone": true,
+    "selectedKept": true,
+    "kitaRefetched": true,
+    "kitaReloaded": true
+  },
+  "heapStart": 51477533,
+  "selectedKita": {
+    "id": "osm-node-10031129617",
+    "name": "路上喫煙禁止地区案内図",
+    "category": "tourism",
+    "sourceId": "node/10031129617"
+  },
+  "kitaSearchWhileCached": true,
+  "afterEviction": {
+    "cached": [
+      "tsurumi",
+      "chuo",
+      "nishi"
+    ],
+    "evictions": 1,
+    "selected": {
+      "id": "osm-node-10031129617",
+      "name": "路上喫煙禁止地区案内図",
+      "category": "tourism",
+      "sourceId": "node/10031129617"
+    }
+  },
+  "evictedSearch": {
+    "name": "迂回路",
+    "hits": []
+  },
+  "selectedSearchKept": true,
+  "panelNameAfterEviction": "路上喫煙禁止地区案内図",
+  "fetchCounts": {
+    "kita": 2,
+    "tsurumi": 1,
+    "chuo": 1,
+    "nishi": 1
+  },
+  "heapEnd": 94836218,
+  "buildingClick": {
+    "tilesetStats": true,
+    "errors": []
+  },
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}

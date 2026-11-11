@@ -1,0 +1,13 @@
+{
+ "mission": "114",
+ "kind": "owner-device-screenshot-observation",
+ "note": "Manual, screenshot-only observation reported by the owner after Mission113. NOT acceptance: road/water alignment, global position accuracy and click/canonicalId checks were not measured. ownerDeviceAccepted stays 0/24, browserCiAccepted stays 0/24.",
+ "source": "PR #24 owner comment (Mission114 request); screenshots are not stored in the repo",
+ "dataSource": "private release plateau2025-converted (PLATEAU 2025)",
+ "wards": {
+  "nishi": { "wardCode": "27106", "buildingsShown": "not reported", "visualBuildingPlacement": "roughly follows city blocks (screenshot)", "roadWaterAlignment": "unverified", "accepted": false },
+  "fukushima": { "wardCode": "27103", "buildingsShown": 13412, "buildingsShownBasis": "screen value (HUD)", "visualBuildingPlacement": "roughly follows city blocks (screenshot)", "roadWaterAlignment": "unverified - orange road line only in part of ward (cause: GSI window coverage, see layer-coverage.json)", "accepted": false },
+  "yodogawa": { "wardCode": "27123", "buildingsShown": 35296, "buildingsShownBasis": "screen value (HUD)", "visualBuildingPlacement": "roughly follows city blocks (screenshot)", "roadWaterAlignment": "unverified - orange road line only in part of ward (cause: GSI window coverage, see layer-coverage.json)", "accepted": false }
+ },
+ "mission106Matrix": { "ownerDeviceAccepted": 0, "browserCiAccepted": 0, "ownerObservedRenderOk": 3, "remaining21": "not downloaded/rendered; unverified" }
+}
