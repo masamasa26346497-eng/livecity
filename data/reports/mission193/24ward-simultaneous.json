@@ -1,0 +1,316 @@
+{
+ "mission": 193,
+ "data": "REAL PLATEAU 2025 LOD1 (24 wards, one temp dataset) + real LOD2 overlay (clip OFF)",
+ "swiftshader": true,
+ "notVerified": [
+  "user PC",
+  "real GPU",
+  "FPS (SwiftShader ~0-1)",
+  "road/river alignment",
+  "LOD2 duplicate exclusion for 24 wards",
+  "per-ward ON/OFF pixel diff in the 24-ward scene"
+ ],
+ "build": {
+  "verifiedWards": 24,
+  "totalBuildings": 615234,
+  "matchesExpected615234": true,
+  "failed": [],
+  "elapsedSec": 1054
+ },
+ "default37GPolicy": {
+  "coarseMaxOverride": null,
+  "maxMounted": 8,
+  "firstMountAtSec": 48,
+  "allWardsMountedAtSec": null,
+  "peak": {
+   "chromeRssMB": 2207,
+   "jsHeapMB": 182,
+   "consoleErrors": 0,
+   "non200": 0
+  },
+  "http": {
+   "ok": 119,
+   "glb": 56,
+   "non200": 0
+  },
+  "wardsSelectedGt0": 8,
+  "selectedTiles": 56,
+  "triangles": 1375540,
+  "lastError": null,
+  "consoleErrors": 0,
+  "perWard": {
+   "nishi": {
+    "selected": 4,
+    "triangles": 126030
+   },
+   "fukushima": {
+    "selected": 4,
+    "triangles": 134120
+   },
+   "minato": {
+    "selected": 8,
+    "triangles": 172000
+   },
+   "naniwa": {
+    "selected": 5,
+    "triangles": 102830
+   },
+   "taisho": {
+    "selected": 6,
+    "triangles": 194590
+   },
+   "kita": {
+    "selected": 7,
+    "triangles": 196010
+   },
+   "nishiyodogawa": {
+    "selected": 10,
+    "triangles": 273810
+   },
+   "konohana": {
+    "selected": 12,
+    "triangles": 176150
+   }
+  }
+ },
+ "withCoarseMax24": {
+  "coarseMaxOverride": 24,
+  "maxMounted": 24,
+  "firstMountAtSec": 45.7,
+  "allWardsMountedAtSec": 45.7,
+  "peak": {
+   "chromeRssMB": 2621,
+   "jsHeapMB": 318,
+   "consoleErrors": 0,
+   "non200": 0
+  },
+  "http": {
+   "ok": 261,
+   "glb": 182,
+   "non200": 0
+  },
+  "wardsSelectedGt0": 24,
+  "selectedTiles": 181,
+  "triangles": 6161307,
+  "lastError": null,
+  "consoleErrors": 0,
+  "perWard": {
+   "nishi": {
+    "selected": 4,
+    "triangles": 126030
+   },
+   "fukushima": {
+    "selected": 4,
+    "triangles": 134120
+   },
+   "minato": {
+    "selected": 8,
+    "triangles": 172000
+   },
+   "naniwa": {
+    "selected": 5,
+    "triangles": 102830
+   },
+   "taisho": {
+    "selected": 6,
+    "triangles": 194590
+   },
+   "kita": {
+    "selected": 7,
+    "triangles": 196010
+   },
+   "chuo": {
+    "selected": 7,
+    "triangles": 186550
+   },
+   "nishiyodogawa": {
+    "selected": 10,
+    "triangles": 273810
+   },
+   "nishinari": {
+    "selected": 7,
+    "triangles": 320320
+   },
+   "tennoji": {
+    "selected": 4,
+    "triangles": 142350
+   },
+   "yodogawa": {
+    "selected": 10,
+    "triangles": 352960
+   },
+   "konohana": {
+    "selected": 12,
+    "triangles": 176150
+   },
+   "abeno": {
+    "selected": 6,
+    "triangles": 264980
+   },
+   "miyakojima": {
+    "selected": 7,
+    "triangles": 176510
+   },
+   "suminoe": {
+    "selected": 14,
+    "triangles": 274250
+   },
+   "higashinari": {
+    "selected": 4,
+    "triangles": 226310
+   },
+   "ikuno": {
+    "selected": 7,
+    "triangles": 454270
+   },
+   "joto": {
+    "selected": 6,
+    "triangles": 323800
+   },
+   "sumiyoshi": {
+    "selected": 6,
+    "triangles": 350320
+   },
+   "higashisumiyoshi": {
+    "selected": 8,
+    "triangles": 383380
+   },
+   "higashiyodogawa": {
+    "selected": 16,
+    "triangles": 362327
+   },
+   "asahi": {
+    "selected": 5,
+    "triangles": 249620
+   },
+   "tsurumi": {
+    "selected": 8,
+    "triangles": 253090
+   },
+   "hirano": {
+    "selected": 10,
+    "triangles": 464730
+   }
+  }
+ },
+ "withCoarseMax24_run1": {
+  "coarseMaxOverride": 24,
+  "maxMounted": 24,
+  "firstMountAtSec": 45.4,
+  "allWardsMountedAtSec": 45.4,
+  "peak": {
+   "chromeRssMB": 2594,
+   "jsHeapMB": 300,
+   "consoleErrors": 0,
+   "non200": 0
+  },
+  "http": {
+   "ok": 261,
+   "glb": 182,
+   "non200": 0
+  },
+  "wardsSelectedGt0": 24,
+  "selectedTiles": 181,
+  "triangles": 6161307,
+  "lastError": null,
+  "consoleErrors": 0,
+  "perWard": {
+   "nishi": {
+    "selected": 4,
+    "triangles": 126030
+   },
+   "fukushima": {
+    "selected": 4,
+    "triangles": 134120
+   },
+   "minato": {
+    "selected": 8,
+    "triangles": 172000
+   },
+   "naniwa": {
+    "selected": 5,
+    "triangles": 102830
+   },
+   "kita": {
+    "selected": 7,
+    "triangles": 196010
+   },
+   "taisho": {
+    "selected": 6,
+    "triangles": 194590
+   },
+   "chuo": {
+    "selected": 7,
+    "triangles": 186550
+   },
+   "nishiyodogawa": {
+    "selected": 10,
+    "triangles": 273810
+   },
+   "nishinari": {
+    "selected": 7,
+    "triangles": 320320
+   },
+   "tennoji": {
+    "selected": 4,
+    "triangles": 142350
+   },
+   "yodogawa": {
+    "selected": 10,
+    "triangles": 352960
+   },
+   "konohana": {
+    "selected": 12,
+    "triangles": 176150
+   },
+   "abeno": {
+    "selected": 6,
+    "triangles": 264980
+   },
+   "miyakojima": {
+    "selected": 7,
+    "triangles": 176510
+   },
+   "suminoe": {
+    "selected": 14,
+    "triangles": 274250
+   },
+   "higashinari": {
+    "selected": 4,
+    "triangles": 226310
+   },
+   "ikuno": {
+    "selected": 7,
+    "triangles": 454270
+   },
+   "joto": {
+    "selected": 6,
+    "triangles": 323800
+   },
+   "sumiyoshi": {
+    "selected": 6,
+    "triangles": 350320
+   },
+   "higashisumiyoshi": {
+    "selected": 8,
+    "triangles": 383380
+   },
+   "asahi": {
+    "selected": 5,
+    "triangles": 249620
+   },
+   "higashiyodogawa": {
+    "selected": 16,
+    "triangles": 362327
+   },
+   "tsurumi": {
+    "selected": 8,
+    "triangles": 253090
+   },
+   "hirano": {
+    "selected": 10,
+    "triangles": 464730
+   }
+  }
+ }
+}

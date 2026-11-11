@@ -175,3 +175,15 @@ export function parseCodelist(xml) {
   }
   return out;
 }
+
+// [Mission 153] tools/download/plateau-buildings-lod2.js と tests/lod2-pipeline.test.js が期待する API。
+//   既存の readZipEntries / extractEntry は無変更。純粋な追加のみ（エントリには fileName = name を付与）。
+export function readCentralDirectory(file) {
+  return readZipEntries(file).map((e) => Object.assign({}, e, { fileName: e.name, compressionMethod: e.method }));
+}
+export function extractEntryBuffer(file, entry) {
+  return extractEntry(file, entry);
+}
+export function extractEntryText(file, entry) {
+  return extractEntry(file, entry).toString('utf8');
+}

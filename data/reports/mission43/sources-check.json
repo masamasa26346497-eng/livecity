@@ -1,0 +1,31 @@
+{
+  "schema": "livecity.mission43.sources/1",
+  "online": true,
+  "note": "HEAD only (reachability). Reachability is not a licence approval; licenceApproved stays false until terms are read and recorded by a human.",
+  "results": [
+    {
+      "id": "plateau-site-policy",
+      "url": "https://www.mlit.go.jp/plateau/site-policy/",
+      "scope": "general site policy (not dataset-specific)",
+      "status": 200,
+      "licenceApproved": false,
+      "evidenceOfTermsRead": false
+    },
+    {
+      "id": "osm-copyright",
+      "url": "https://www.openstreetmap.org/copyright",
+      "scope": "ODbL 1.0 + attribution \"© OpenStreetMap contributors\"",
+      "status": 200,
+      "licenceApproved": false,
+      "evidenceOfTermsRead": false
+    },
+    {
+      "id": "plateau-osaka-2024",
+      "url": "https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024",
+      "scope": "dataset-specific terms: MUST be read per dataset (some Osaka datasets, e.g. Expo 2025 site, carry different terms)",
+      "status": 200,
+      "licenceApproved": false,
+      "evidenceOfTermsRead": false
+    }
+  ]
+}

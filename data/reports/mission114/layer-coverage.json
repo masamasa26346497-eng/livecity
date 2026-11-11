@@ -1,0 +1,442 @@
+{
+ "mission": 114,
+ "kind": "repo-window-coverage",
+ "cellM": 50,
+ "coordinateConvention": "znorth-neg-v1 (x east, z south-positive, metres)",
+ "explanation": "GSI road edge (orange) and GSI water faces (blue) exist only inside fixed windows. Coverage = share of N03 ward area inside any window. 2025 private archives carry no layers/ (unverified).",
+ "windows": {
+  "road": [
+   {
+    "file": "public/mission49-data/gsi-roadedge-sumiyoshi-9tile.json",
+    "minX": -3300,
+    "maxX": -1200,
+    "minZ": -1800,
+    "maxZ": 300
+   },
+   {
+    "file": "public/mission49-data/gsi-roadedge-kita-sample.json",
+    "minX": -3450,
+    "maxX": -2280,
+    "minZ": -12520,
+    "maxZ": -10650
+   },
+   {
+    "file": "public/mission50-data/gsi-okawa-nakanoshima.json",
+    "minX": -3310.3,
+    "maxX": -1297,
+    "minZ": -11275.1,
+    "maxZ": -8761.2
+   }
+  ],
+  "water": [
+   {
+    "file": "public/mission50-data/gsi-okawa-nakanoshima.json",
+    "minX": -3310.3,
+    "maxX": -1297,
+    "minZ": -11275.1,
+    "maxZ": -8761.2
+   },
+   {
+    "file": "public/mission57-data/gsi-sumiyoshi-9tile.json",
+    "minX": -3813.7,
+    "maxX": -793.7,
+    "minZ": -2221.9,
+    "maxZ": 797.8
+   }
+  ]
+ },
+ "wards": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "roadEdge": {
+    "cells": 2441,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 2441,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "roadEdge": {
+    "cells": 1881,
+    "coveredCells": 67,
+    "pct": 3.6,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 1881,
+    "coveredCells": 58,
+    "pct": 3.1,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "roadEdge": {
+    "cells": 7739,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 7739,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "roadEdge": {
+    "cells": 2088,
+    "coveredCells": 277,
+    "pct": 13.3,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 2088,
+    "coveredCells": 277,
+    "pct": 13.3,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "roadEdge": {
+    "cells": 3157,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3157,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "roadEdge": {
+    "cells": 3787,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3787,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "roadEdge": {
+    "cells": 1941,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 1941,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "roadEdge": {
+    "cells": 1759,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 1759,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "roadEdge": {
+    "cells": 5710,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 5710,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "roadEdge": {
+    "cells": 5321,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 5321,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "roadEdge": {
+    "cells": 1817,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 1817,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "roadEdge": {
+    "cells": 3360,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3360,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "roadEdge": {
+    "cells": 2536,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 2536,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "roadEdge": {
+    "cells": 3367,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3367,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "roadEdge": {
+    "cells": 2395,
+    "coveredCells": 49,
+    "pct": 2,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 2395,
+    "coveredCells": 274,
+    "pct": 11.4,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "roadEdge": {
+    "cells": 3781,
+    "coveredCells": 1621,
+    "pct": 42.9,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 3781,
+    "coveredCells": 2568,
+    "pct": 67.9,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "roadEdge": {
+    "cells": 3892,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3892,
+    "coveredCells": 41,
+    "pct": 1.1,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "roadEdge": {
+    "cells": 2959,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 2959,
+    "coveredCells": 71,
+    "pct": 2.4,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "roadEdge": {
+    "cells": 5131,
+    "coveredCells": 12,
+    "pct": 0.2,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 5131,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "roadEdge": {
+    "cells": 3279,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 3279,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "roadEdge": {
+    "cells": 8288,
+    "coveredCells": 123,
+    "pct": 1.5,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 8288,
+    "coveredCells": 710,
+    "pct": 8.6,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "roadEdge": {
+    "cells": 6130,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   },
+   "water": {
+    "cells": 6130,
+    "coveredCells": 0,
+    "pct": 0,
+    "status": "none"
+   }
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "roadEdge": {
+    "cells": 4143,
+    "coveredCells": 1749,
+    "pct": 42.2,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 4143,
+    "coveredCells": 1166,
+    "pct": 28.1,
+    "status": "partial-window"
+   }
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "roadEdge": {
+    "cells": 3569,
+    "coveredCells": 528,
+    "pct": 14.8,
+    "status": "partial-window"
+   },
+   "water": {
+    "cells": 3569,
+    "coveredCells": 528,
+    "pct": 14.8,
+    "status": "partial-window"
+   }
+  }
+ ],
+ "summary": {
+  "roadFull": 0,
+  "roadPartial": 8,
+  "roadNone": 16,
+  "waterFull": 0,
+  "waterPartial": 9,
+  "waterNone": 15
+ }
+}
