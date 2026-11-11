@@ -1,11 +1,18 @@
 {
+  "buildCommand": "node tools/cloud/build-cloud-preview.mjs",
+  "outputDirectory": "temp/cloud-preview/static",
+  "installCommand": "echo skip-install",
   "redirects": [
-    { "source": "/", "destination": "/mission37g-osaka-24ward-mvp.html", "permanent": false }
+    { "source": "/", "destination": "/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2ov=1", "permanent": false }
   ],
   "headers": [
     {
-      "source": "/(mission37h-3dtiles|mission38e-3dtiles|mission37b-3dtiles|mission37c-layers|mission37d-data|mission37g-data)/(.*)",
+      "source": "/(ext-3dtiles|lod2-preview|mission37g-data)/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=86400" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }
   ]
 }
