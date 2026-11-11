@@ -15,6 +15,7 @@ import crypto from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { verifyWard } from '../lod2/lod2-all-wards.mjs';
+import { auditWard } from './lod1-id-audit.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const a = process.argv.slice(2);
@@ -82,11 +83,10 @@ for (const w of wardInfo) {
   const excluded = src.counts.excludedForLod2 | 0;
   // 監査: 元 LOD1 = 補完 LOD1 + 除外、かつ補完 LOD1 の ID に LOD2 の ID が残っていない(ダブり 0)
   if (w.fullBuildings !== v.buildings + excluded) throw new Error(`${w.id}: 件数不整合 full=${w.fullBuildings} supp=${v.buildings} excluded=${excluded}`);
-  const kept = new Set(); const idDir = path.join(sdir, 'ids');
-  if (fs.existsSync(idDir)) for (const f of fs.readdirSync(idDir)) { const j = JSON.parse(fs.readFileSync(path.join(idDir, f), 'utf8')); for (const id of Array.isArray(j) ? j : j.ids || Object.keys(j.byId || {})) kept.add(id); }
-  const doubleDrawn = [...kept].filter((id) => lod2Ids.has(id)).length;
-  if (doubleDrawn) throw new Error(`${w.id}: 補完 LOD1 に LOD2 と同じ ID が ${doubleDrawn} 件残っている`);
-  Object.assign(w, { dir: sdir, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAuditedIds: kept.size, doubleDrawn });
+  // Mission 198: 厳格 ID 監査(fail closed)。形式不正/0 件/件数不一致/除外漏れは全て例外。
+  const audit = auditWard({ id: w.id, origDir: w.dir, suppDir: sdir, lod2Ids, origBuildings: w.fullBuildings, suppBuildings: v.buildings, excludedCount: excluded });
+  log('ID 監査 OK:', JSON.stringify(audit));
+  Object.assign(w, { dir: sdir, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAudit: audit, idAuditedIds: audit.suppIds, doubleDrawn: audit.doubleDrawn });
   fs.rmSync(path.join(ROOT, 'temp/mission79', w.id + '-work'), { recursive: true, force: true });
 }
 
@@ -151,8 +151,9 @@ const prov = {
   dataSource: '公式 PLATEAU 大阪市 2025 CityGML v5(ZIP の HTTP Range 取得)のみ。PC 上の旧 45D / OSM / 2024 内蔵サンプルは使用しない(nobuiltin=1)',
   vintage: 2025, attribution: wardInfo[0].source.attribution, license: wardInfo[0].source.license,
   sourceEtag: wardInfo[0].source.sourceEtag,
-  wards: wardInfo.map((w) => ({ ward: w.id, name: w.name, code: w.code, lod1Buildings: w.buildings, lod1OriginalBuildings: w.fullBuildings, lod1ExcludedForLod2: w.excludedForLod2, lod1DoubleDrawn: w.doubleDrawn, lod1ContentTiles: w.contentTiles, lod1GlbBytes: w.glbBytes, meshes: w.source.sourceMeshes.length })),
+  wards: wardInfo.map((w) => ({ ward: w.id, name: w.name, code: w.code, lod1Buildings: w.buildings, lod1OriginalBuildings: w.fullBuildings, lod1ExcludedForLod2: w.excludedForLod2, lod1DoubleDrawn: w.doubleDrawn, idAudit: w.idAudit, idAuditedIds: w.idAuditedIds, sourceVintage: w.source.vintage, sourceEtag: w.source.sourceEtag, lod1ContentTiles: w.contentTiles, lod1GlbBytes: w.glbBytes, meshes: w.source.sourceMeshes.length })),
   lod2: { meshes: lod2Meshes, buildings: lod2Rep.converted, expected: lod2Rep.expected, fullMatch: lod2Rep.fullMatch, tiles: lod2Rep.tiles, glbBytes: lod2Rep.glbBytes, color: lod2Rep.color, textureRendered: false },
+  buildCondition: { wards, maxMb, node: process.version, lod2IdsTotal: lod2Ids.size },
   overlap: '補完 LOD1: 元 LOD1 のうち LOD2 と gml:id が完全一致する棟を除外(補完 LOD1 内の LOD2 同一 ID は 0 件を監査)。LOD2 は区外の建物も含むメッシュ範囲。',
   cloudCoverage: { servedWards: wardInfo.map((w) => w.id), servedWardCount: wardInfo.length, totalWards: reg.length, note: '配信済みの区のみ。他区は未接続(未配信)' },
   roadsRiversParks: '未接続(旧道路/路線データは配信しない。2025 道路との整合は未検証)',
@@ -205,7 +206,7 @@ if (forbidden.length) throw new Error('旧データ/ローカル専用ファイ�
 const sizeOf = (sub) => { let n = 0, c = 0; for (const f of files) if (f.startsWith(path.join(OUT, sub) + path.sep)) { n += fs.statSync(f).size; c++; } return { files: c, bytes: n }; };
 const report = {
   mission: '196B', out: rel(OUT), totalFiles: files.length, totalBytes: bytes, totalMB: +(bytes / 1048576).toFixed(1),
-  lod1: Object.fromEntries(wardInfo.map((w) => [w.id, { buildings: w.buildings, ...sizeOf('ext-3dtiles/' + w.id) }])),
+  lod1: Object.fromEntries(wardInfo.map((w) => [w.id, { buildings: w.buildings, original: w.fullBuildings, excluded: w.excludedForLod2, idAudit: w.idAudit, ...sizeOf('ext-3dtiles/' + w.id) }])),
   lod2: { buildings: lod2Rep.converted, meshes: lod2Meshes.length, ...sizeOf('lod2-preview') },
   elapsedSec: Math.round((Date.now() - t0) / 1000),
 };
