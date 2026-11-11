@@ -124,8 +124,18 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
   return { positions: pos, colors: col, ok, failed, footprints, extentEnu: { x: bx, y: by, z: [minH, maxH] } };
 }
 
+// Mission 205: 黒表示の原因調査
+//  既定の PBR 材質は Cesium の scene.light(=クロックの太陽方向)に依存する。Live City は scene.sun.show=false にするだけで
+//  クロックは「現在時刻」のまま(夜の日本時間では太陽が地平線下)なので、PBR+頂点色は夜間に暗転し得る(色値自体は非ゼロ)。
+//  → 既定を「固定の昼光を頂点色へ焼き込み + KHR_materials_unlit」に変更。照明・時刻に依存せず、幾何/座標は不変。
+//  opts.material: 'unlit-baked'(既定) | 'pbr'(従来。A/B検証用)。夜景は将来 tileset 側のスタイル/ライトで別途扱う。
+export const BAKE_SUN = (() => { const el = 55 * Math.PI / 180, az = 150 * Math.PI / 180; // 南東・仰角55°(glTF: x東,y上,z=-北)
+  return [Math.cos(el) * Math.sin(az), Math.sin(el), -Math.cos(el) * Math.cos(az)]; })();
+const BAKE_AMBIENT = 0.62; // 影側でも roof/wall が判別できる下限
+
 /** ENU(x東,y北,z上) → glTF(Y-up: x東, y上, z=-北) で最小GLB。 */
-export function meshToGlb(mesh) {
+export function meshToGlb(mesh, opts = {}) {
+  const unlit = (opts.material || 'unlit-baked') !== 'pbr';
   const n = mesh.positions.length;
   const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3);
   for (let i = 0; i < n; i += 3) {
@@ -134,6 +144,11 @@ export function meshToGlb(mesh) {
     let nn = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
     const l = Math.hypot(...nn) || 1; nn = nn.map((x) => x / l);
     for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) { P[(i + k) * 3 + c] = v[k][c]; N[(i + k) * 3 + c] = nn[c]; C[(i + k) * 3 + c] = mesh.colors[i + k][c]; }
+    if (unlit) { // 巻き順が不定でも破綻しないよう |n·L| を使う(二面)
+      const d = Math.abs(nn[0] * BAKE_SUN[0] + nn[1] * BAKE_SUN[1] + nn[2] * BAKE_SUN[2]);
+      const f = BAKE_AMBIENT + (1 - BAKE_AMBIENT) * d;
+      for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) C[(i + k) * 3 + c] *= f;
+    }
   }
   const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) { mn[c] = Math.min(mn[c], P[i * 3 + c]); mx[c] = Math.max(mx[c], P[i * 3 + c]); }
@@ -142,7 +157,10 @@ export function meshToGlb(mesh) {
   const json = {
     asset: { version: '2.0', generator: 'livecity-mission153' }, scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
     meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 }, material: 0, mode: 4 }] }],
-    materials: [{ pbrMetallicRoughness: { metallicFactor: 0, roughnessFactor: 0.9 }, doubleSided: true }],
+    materials: [unlit
+      ? { pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 }, alphaMode: 'OPAQUE', doubleSided: true, extensions: { KHR_materials_unlit: {} } }
+      : { pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 0.9 }, alphaMode: 'OPAQUE', doubleSided: true }],
+    ...(unlit ? { extensionsUsed: ['KHR_materials_unlit'] } : {}),
     buffers: [{ byteLength: bin.length }],
     bufferViews: [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 })),
     accessors: [
