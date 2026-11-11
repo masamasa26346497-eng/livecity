@@ -170,10 +170,10 @@ function crosswalk(newB, legacy, opts = {}) {
   };
 }
 
-function prepareBuildings(jsonl, ward) {
+function prepareBuildings(jsonl, ward, excludeIds) {
   const tiles = new Map();
   const all = [];
-  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, meshes: new Set() };
+  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, meshes: new Set(), excluded: 0, excludedIds: [] };
   const seen = new Set();
   for (const line of fs.readFileSync(jsonl, 'utf8').split('\n')) {
     if (!line) continue;
@@ -184,6 +184,8 @@ function prepareBuildings(jsonl, ward) {
     const [rx, rz] = centroid(b.fp);
     if (!inWard(rx, rz, ward)) { stat.outsideWard++; continue; }
     stat.inWard++; stat.meshes.add(b.sourceMesh);
+    // Mission184 opt-in: strict gml:id match only (a real LOD2 exists). Everything else stays.
+    if (excludeIds && excludeIds.has(b.id)) { stat.excluded++; stat.excludedIds.push(b.id); continue; }
     const key = Math.floor(rx / TILE) + '_' + Math.floor(rz / TILE);
     if (!tiles.has(key)) tiles.set(key, { tx: Math.floor(rx / TILE), tz: Math.floor(rz / TILE), buildings: [] });
     const rec = { id: b.id, fp: b.fp, z0: b.z0 || 0, dz: b.dz, h: b.h, usage: b.usage, ulabel: b.ulabel || '', repX: r1(rx), repZ: r1(rz), heightSource: b.heightSource };
@@ -208,7 +210,14 @@ function main() {
   if (!ward) throw new Error('unknown ward ' + wardId);
   const lock = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission79/source-lock.json'), 'utf8'));
 
-  const { tiles, all, stat } = prepareBuildings(jsonl, ward);
+  let excludeIds = null;
+  if (opt('exclude-ids')) {
+    const j = JSON.parse(fs.readFileSync(opt('exclude-ids'), 'utf8'));
+    const arr = Array.isArray(j) ? j : (j.assets ? j.assets.flatMap((a) => a.ids || []) : j.ids);
+    if (!arr || !arr.length) throw new Error('--exclude-ids: no ids found');
+    excludeIds = new Set(arr);
+  }
+  const { tiles, all, stat } = prepareBuildings(jsonl, ward, excludeIds);
   const src = fs.mkdtempSync(path.join(os.tmpdir(), 'm79-src-'));
   const mt = [];
   for (const t of [...tiles.values()].sort((a, b) => a.tx - b.tx || a.tz - b.tz)) {
@@ -252,12 +261,13 @@ function main() {
   const sizeOf = (d) => fs.readdirSync(d, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).reduce((n, e) => n + fs.statSync(path.join(e.parentPath || e.path, e.name)).size, 0);
   const heightSources = {};
   for (const b of all) heightSources[b.heightSource] = (heightSources[b.heightSource] || 0) + 1;
+  if (excludeIds) fs.writeFileSync(path.join(out, 'lod1-excluded-ids.json'), JSON.stringify({ note: 'Mission184: LOD1 omitted ONLY where a real LOD2 exists (strict gml:id match)', count: stat.excluded, ids: stat.excludedIds }));
   fs.writeFileSync(path.join(out, 'source.json'), JSON.stringify({
     mission: '79', vintage: 2025, standard: 'PLATEAU CityGML v5 (uro 3.2), EPSG:6697 lat,lon',
     ward: ward.wardName, wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(),
     source: lock.resource.url, sourceEtag: lock.http.etag, sourceBytes: lock.http.contentLength,
     attribution: lock.attribution, license: lock.license,
-    sourceMeshes: [...stat.meshes].sort(), counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate },
+    sourceMeshes: [...stat.meshes].sort(), counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate, excludedForLod2: stat.excluded },
     heightSources, idPolicy: 'gml:id verbatim; no renumbering; 2022/2024 IDs untouched (see crosswalk.*)',
     coordinateConvention: 'znorth-neg-v1', coarseMinArea: 0,
     note: 'Partial unless sourceMeshes covers the ward. Not 27999 (Expo site) data.',
@@ -271,5 +281,5 @@ function main() {
   fs.rmSync(src, { recursive: true, force: true });
 }
 
-module.exports = { pointInRing, inWard, centroid, parseTranRoads, orientationScan, crosswalk, projectLatLon };
+module.exports = { prepareBuildings, pointInRing, inWard, centroid, parseTranRoads, orientationScan, crosswalk, projectLatLon };
 if (require.main === module) main();

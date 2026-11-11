@@ -31,7 +31,7 @@ async function main() {
   fs.writeFileSync(path.join(root, '.livecity-45d-root.json'), JSON.stringify({ schema: 'livecity.mission45d.convert-all/1' }));
   const info = {};
   for (const id of WARDS) {
-    const w = regs.find((x) => x.id === id), src = path.join(ROOT, 'temp/mission79', id + '-2025');
+    const w = regs.find((x) => x.id === id), src = path.join(ROOT, 'temp/mission79', id + (opt('variant', '') ? '-2025-' + opt('variant') : '-2025'));
     if (!fs.existsSync(path.join(src, 'tileset.json'))) throw new Error('実データ未生成: ' + src + ' (tools/mission79-run.mjs --ward ' + id + ')');
     const dst = path.join(root, 'pc23', id + '-a1'); fs.mkdirSync(dst, { recursive: true });
     for (const n of fs.readdirSync(src)) if (ALLOW.some((re) => re.test(n))) fs.cpSync(path.join(src, n), path.join(dst, n), { recursive: true });
