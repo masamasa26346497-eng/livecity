@@ -46,3 +46,22 @@ export function auditWard({ id, origDir, suppDir, lod2Ids, origBuildings, suppBu
   for (const x of supp.ids) { if (lod2Ids.has(x)) fail(`補完LOD1 に LOD2 の ID が残存: ${x}`); if (excluded.has(x)) fail(`補完LOD1 に除外 ID: ${x}`); if (!orig.ids.has(x)) fail(`補完LOD1 の ID が元に無い: ${x}`); }
   return { origIds: orig.ids.size, suppIds: supp.ids.size, excludedIds: excluded.size, lod2CoveredInOrig: lod2InOrig.size, lod2IdsTotal: lod2Ids.size, doubleDrawn: 0, leafFilesOrig: orig.files, leafFilesSupp: supp.files };
 }
+
+// Mission 206: single-pass 用。元 LOD1 は別生成しないので 元 = 補完 + 除外 として再構成し、ソース側の inWard 件数と突き合わせる(fail closed)。
+//   除外 ⊆ LOD2 ID、補完 ∩ LOD2 = ∅、補完 ∩ 除外 = ∅、補完 + 除外 = source.counts.inWard。
+export function auditSinglePass({ id, suppDir, lod2Ids, suppBuildings, excludedCount, inWard }) {
+  const supp = readLeafIds(suppDir, id + ' 補完LOD1');
+  const exFile = path.join(suppDir, 'lod1-excluded-ids.json');
+  if (!fs.existsSync(exFile)) throw new Error(`${id}: lod1-excluded-ids.json が無い`);
+  const exJ = JSON.parse(fs.readFileSync(exFile, 'utf8'));
+  if (!Array.isArray(exJ.ids)) throw new Error(`${id}: lod1-excluded-ids.json に ids 配列が無い`);
+  const excluded = new Set(exJ.ids);
+  const fail = (m) => { throw new Error(`${id}: ID 監査(single-pass)失敗 — ${m}`); };
+  if (excluded.size !== exJ.ids.length) fail('除外 ID に重複');
+  if (supp.ids.size !== suppBuildings) fail(`補完LOD1 ID ${supp.ids.size} ≠ 棟数 ${suppBuildings}`);
+  if (excluded.size !== excludedCount) fail(`除外 ID ${excluded.size} ≠ excludedForLod2 ${excludedCount}`);
+  if (!Number.isInteger(inWard) || supp.ids.size + excluded.size !== inWard) fail(`補完 ${supp.ids.size} + 除外 ${excluded.size} ≠ source inWard ${inWard}`);
+  for (const x of excluded) if (!lod2Ids.has(x)) fail(`除外 ID が LOD2 に無い(過剰除外): ${x}`);
+  for (const x of supp.ids) { if (lod2Ids.has(x)) fail(`補完LOD1 に LOD2 の ID が残存: ${x}`); if (excluded.has(x)) fail(`補完LOD1 に除外 ID: ${x}`); }
+  return { origIds: inWard, suppIds: supp.ids.size, excludedIds: excluded.size, lod2CoveredInOrig: excluded.size, lod2IdsTotal: lod2Ids.size, doubleDrawn: 0, leafFilesSupp: supp.files, mode: 'single-pass' };
+}

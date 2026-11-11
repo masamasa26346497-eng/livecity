@@ -15,7 +15,8 @@ import crypto from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { verifyWard } from '../lod2/lod2-all-wards.mjs';
-import { auditWard } from './lod1-id-audit.mjs';
+import { auditWard, auditSinglePass } from './lod1-id-audit.mjs';
+import { selectMeshes } from '../mission79-run.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
 import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
 
@@ -29,7 +30,18 @@ if (a.includes('--plan-only')) {
 }
 // --shard i/n: --wards(省略時 kita)を決定的に n 分割した i 番目だけをビルド(独立バッチ)。
 // --resume: 検証済みの既存 LOD1(temp/mission79/<区>-2025)を再利用する(これは既定動作。明示用フラグ)。
-const wards = shardWards((opt('wards', 'kita')).split(',').filter(Boolean), opt('shard'));
+// Mission 206: --all-wards は registry 順の全24区。--single-pass(all-wards では既定)は
+//   「LOD2 ID を先に確定 → 区ごとに 1 回の変換で補完 LOD1(除外済み)を作り、直後に出力へ移して work/GML を削除」する。
+//   従来(--wards のみ)の「全区元LOD1→LOD2→全区再変換」は work/GML を全区ぶん残し再変換が二重になるため 24 区では使わない。
+const ALL = a.includes('--all-wards');
+const SINGLE = ALL ? !a.includes('--legacy-two-pass') : a.includes('--single-pass');
+const regAll = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/wards/registry.json'), 'utf8')).wards;
+const wards = shardWards(ALL ? regAll.map((w) => w.id) : (opt('wards', 'kita')).split(',').filter(Boolean), opt('shard'));
+// 無料枠ガード(Hobby: build 45 分 / 23GB disk / team deployment storage 10GB。値は ward-plan.mjs の confirmed 側と同じ)
+const TIME_BUDGET_MIN = Number(opt('time-budget-min', ALL ? '38' : '0'));   // 45 分上限の手前で自主停止(0=無効)
+const MAX_OUT_MB = Number(opt('max-out-mb', ALL ? '6000' : '0'));           // 1 デプロイ出力の自主上限(0=無効)
+const MIN_FREE_GB = Number(opt('min-free-gb', ALL ? '4' : '0'));            // 各区の変換前に必要な空きディスク
+const EXPECTED_TOTAL = Number(opt('expected', ALL ? '615234' : '0'));      // 全24区の元LOD1 棟数(Mission193 実測)。0=検証しない
 const RESUME = a.includes('--resume');
 const OUT = path.resolve(ROOT, opt('out', 'temp/cloud-preview/static'));
 const maxMb = opt('max-mb', '1500');
@@ -42,11 +54,90 @@ const run = (script, args) => {
   if (r.status !== 0 && !(script.includes('lod2-build-all') && r.status === 2)) throw new Error(script + ' failed (exit ' + r.status + ')');
   return r.status;
 };
-const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/wards/registry.json'), 'utf8')).wards;
+const reg = regAll;
 const t0 = Date.now();
-
-// ---- 1. LOD1(公式 2025) ----
+const cp = (s, d) => fs.cpSync(s, d, { recursive: true, dereference: false });
+const dirBytes = (d) => { let n = 0; if (!fs.existsSync(d)) return 0; for (const e of fs.readdirSync(d, { recursive: true, withFileTypes: true })) if (e.isFile()) n += fs.statSync(path.join(e.parentPath || e.path, e.name)).size; return n; };
+const freeGB = () => { const f = fs.statfsSync(ROOT); return (f.bavail * f.bsize) / 1073741824; };
+const extRoot = path.join(OUT, 'ext-3dtiles');
 const wardInfo = [];
+let lod2Meshes, lod2Rep, lod2Ids, lod2Manifest;
+
+if (SINGLE) {
+  // ---- 1S. LOD2 を先に確定(区の対象メッシュ = ward bbox 選定 ∩ LOD2 収録メッシュ。LOD1 を先に作らない) ----
+  const lock = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission79/source-lock.json'), 'utf8'));
+  const area = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/areas/osaka-city.json'), 'utf8'));
+  const polys = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/processed/osaka-city/boundaries/ward-classification-polygons.json'), 'utf8'));
+  const plans = wards.map((id) => {
+    const w = reg.find((x) => x.id === id); if (!w) throw new Error('unknown ward ' + id);
+    const poly = polys.wards.find((x) => x.wardId === id); if (!poly) throw new Error('no ward polygon ' + id);
+    if (String(poly.wardCode) !== String(w.code)) throw new Error(id + ': wardCode mismatch');
+    const sel = selectMeshes(lock, poly, area.projection);
+    if (!sel.meshes.length) throw new Error(id + ': 公式 2025 のソースメッシュが 0 件(24区源の欠落)');
+    const ents = lock.entries.filter((e) => sel.meshes.includes(e.mesh) && (e.kind === 'bldg' || e.kind === 'tran'));
+    return { id, w, meshes: sel.meshes, inflatedMB: ents.reduce((n, e) => n + e.uncompressedBytes, 0) / 1048576 };
+  });
+  const cov = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission159/lod2-coverage-osaka2025.json'), 'utf8'));
+  const lod2Set = new Set(cov.perMesh.filter((r) => r.lod2Any > 0).map((r) => r.mesh));
+  lod2Meshes = [...new Set(plans.flatMap((p) => p.meshes))].filter((m) => lod2Set.has(m)).sort();
+  if (!lod2Meshes.length) throw new Error('選択区に LOD2 収録メッシュがありません');
+  log('single-pass: LOD2 を先に生成', lod2Meshes.length, 'メッシュ / 区', wards.length, '/ 空きディスク', freeGB().toFixed(1) + 'GB');
+  fs.mkdirSync(LOD2_DIR, { recursive: true });
+  run('tools/lod2/lod2-build-all.mjs', ['--out', rel(LOD2_DIR), '--meshes', lod2Meshes.join(','), '--resume', '--report-dir', rel(path.join(LOD2_DIR, 'report'))]);
+  lod2Rep = JSON.parse(fs.readFileSync(path.join(LOD2_DIR, 'report.json'), 'utf8'));
+  if (!(lod2Rep.converted > 0)) throw new Error('LOD2 が 0 棟');
+  lod2Manifest = path.join(LOD2_DIR, 'manifest.json');
+  if (!fs.existsSync(lod2Manifest)) throw new Error('LOD2 manifest.json がありません');
+  lod2Ids = new Set(JSON.parse(fs.readFileSync(lod2Manifest, 'utf8')).assets.flatMap((x) => x.ids || []));
+  if (!lod2Ids.size) throw new Error('LOD2 manifest に ID が無い');
+  // ---- 2S. 区ごとに 1 回の変換(LOD2 同 ID 除外済み)→ 直ちに出力へ移動 → work/GML 削除 ----
+  fs.rmSync(OUT, { recursive: true, force: true });
+  fs.mkdirSync(extRoot, { recursive: true });
+  const peak = { workGB: 0, minFreeGB: freeGB() };
+  const wardSecs = [];
+  for (const [i, p] of plans.entries()) {
+    const free = freeGB();
+    const needGB = Math.max(MIN_FREE_GB, (p.inflatedMB * 2) / 1024);   // 展開 GML + JSONL + 出力の概算(estimated)
+    if (MIN_FREE_GB && free < needGB) throw new Error(`${p.id}: 空きディスク不足 ${free.toFixed(1)}GB < 必要概算 ${needGB.toFixed(1)}GB(無料枠を超える前に停止)`);
+    const outMB = dirBytes(OUT) / 1048576;
+    if (MAX_OUT_MB && outMB > MAX_OUT_MB) throw new Error(`出力 ${outMB.toFixed(0)}MB が自主上限 ${MAX_OUT_MB}MB 超(停止)`);
+    const elapsedMin = (Date.now() - t0) / 60000;
+    if (wardSecs.length) {
+      const avg = wardSecs.reduce((x, y) => x + y, 0) / wardSecs.length;
+      const projMin = elapsedMin + (avg * (plans.length - i)) / 60;
+      log(`進捗 ${i}/${plans.length} 経過 ${elapsedMin.toFixed(1)}分 残り推定 ${(projMin - elapsedMin).toFixed(1)}分 出力 ${outMB.toFixed(0)}MB 空き ${free.toFixed(1)}GB`);
+      if (TIME_BUDGET_MIN && projMin > TIME_BUDGET_MIN) throw new Error(`時間ガード: 完了推定 ${projMin.toFixed(1)}分 > ${TIME_BUDGET_MIN}分(Hobby build 45 分上限の手前で停止。完了済み ${i} 区。--shard で分割)`);
+    }
+    const tw = Date.now();
+    const id = p.id, w = p.w;
+    const sdir = path.join(ROOT, 'temp/mission79', id + '-2025-supp');
+    const workDir = path.join(ROOT, 'temp/mission79', id + '-work');
+    fs.rmSync(sdir, { recursive: true, force: true }); fs.rmSync(workDir, { recursive: true, force: true });
+    log(`[${i + 1}/${plans.length}] 公式2025 取得+変換(1 回・LOD2同ID除外済み):`, id);
+    try {
+      run('tools/mission79-run.mjs', ['--ward', id, '--max-mb', maxMb, '--final', sdir, '--exclude-ids', lod2Manifest]);
+      peak.workGB = Math.max(peak.workGB, dirBytes(workDir) / 1073741824); peak.minFreeGB = Math.min(peak.minFreeGB, freeGB());
+      const v = verifyWard(sdir, w.code);
+      if (!v.ok) throw new Error('LOD1 verification failed for ' + id + ': ' + (v.problems || []).join(';'));
+      const src = JSON.parse(fs.readFileSync(path.join(sdir, 'source.json'), 'utf8'));
+      if (Number(src.vintage) !== 2025) throw new Error(id + ': source.vintage != 2025');
+      const excluded = src.counts.excludedForLod2 | 0;
+      const audit = auditSinglePass({ id, suppDir: sdir, lod2Ids, suppBuildings: v.buildings, excludedCount: excluded, inWard: src.counts.inWard });
+      log('ID 監査 OK:', JSON.stringify(audit));
+      const d = path.join(extRoot, id);
+      fs.mkdirSync(d, { recursive: true });
+      for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(sdir, n))) cp(path.join(sdir, n), path.join(d, n));
+      wardInfo.push({ id, name: w.name, code: w.code, dir: d, fullBuildings: audit.origIds, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAudit: audit, idAuditedIds: audit.suppIds, doubleDrawn: audit.doubleDrawn });
+    } finally {
+      fs.rmSync(sdir, { recursive: true, force: true }); fs.rmSync(workDir, { recursive: true, force: true });   // 直ちに cleanup
+    }
+    wardSecs.push((Date.now() - tw) / 1000);
+  }
+  const total = wardInfo.reduce((n, w) => n + w.fullBuildings, 0);
+  log(`元LOD1 合計 ${total} = 補完LOD1 ${wardInfo.reduce((n, w) => n + w.buildings, 0)} + LOD2同ID除外 ${wardInfo.reduce((n, w) => n + w.excludedForLod2, 0)} / work 最大 ${peak.workGB.toFixed(2)}GB / 最小空き ${peak.minFreeGB.toFixed(1)}GB`);
+  if (EXPECTED_TOTAL && wards.length === regAll.length && total !== EXPECTED_TOTAL) throw new Error(`元LOD1 合計 ${total} ≠ 期待 ${EXPECTED_TOTAL}(Mission193 実測と不整合。--expected 0 で無効化可)`);
+} else {
+// ---- 1. LOD1(公式 2025) ---- (従来 two-pass。3 区程度向け)
 for (const id of wards) {
   const w = reg.find((x) => x.id === id);
   if (!w) throw new Error('unknown ward ' + id);
@@ -68,19 +159,19 @@ for (const id of wards) {
 // ---- 2. LOD2(公式 2025。区のメッシュ ∩ LOD2 収録メッシュ) ----
 const cov = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission159/lod2-coverage-osaka2025.json'), 'utf8'));
 const lod2Set = new Set(cov.perMesh.filter((r) => r.lod2Any > 0).map((r) => r.mesh));
-const lod2Meshes = [...new Set(wardInfo.flatMap((w) => w.source.sourceMeshes))].filter((m) => lod2Set.has(m)).sort();
+lod2Meshes = [...new Set(wardInfo.flatMap((w) => w.source.sourceMeshes))].filter((m) => lod2Set.has(m)).sort();
 if (!lod2Meshes.length) throw new Error('選択区に LOD2 収録メッシュがありません');
 log('LOD2 生成:', lod2Meshes.length, 'メッシュ');
 fs.mkdirSync(LOD2_DIR, { recursive: true });
 const st = run('tools/lod2/lod2-build-all.mjs', ['--out', rel(LOD2_DIR), '--meshes', lod2Meshes.join(','), '--resume', '--report-dir', rel(path.join(LOD2_DIR, 'report'))]);
-const lod2Rep = JSON.parse(fs.readFileSync(path.join(LOD2_DIR, 'report.json'), 'utf8'));
+lod2Rep = JSON.parse(fs.readFileSync(path.join(LOD2_DIR, 'report.json'), 'utf8'));
 if (!(lod2Rep.converted > 0)) throw new Error('LOD2 が 0 棟');
 
 // ---- 2b. 補完 LOD1(Mission 197): LOD2 と gml:id が完全一致する棟だけを LOD1 から除外して再生成(二重描画の解消) ----
 //   LOD2 manifest の gml:id 集合 = 除外 ID。LOD2 が無い棟は一切除外しない。建物座標は一切動かさない。
-const lod2Manifest = path.join(LOD2_DIR, 'manifest.json');
+lod2Manifest = path.join(LOD2_DIR, 'manifest.json');
 if (!fs.existsSync(lod2Manifest)) throw new Error('LOD2 manifest.json がありません(除外 ID を作れない)');
-const lod2Ids = new Set(JSON.parse(fs.readFileSync(lod2Manifest, 'utf8')).assets.flatMap((x) => x.ids || []));
+lod2Ids = new Set(JSON.parse(fs.readFileSync(lod2Manifest, 'utf8')).assets.flatMap((x) => x.ids || []));
 if (!lod2Ids.size) throw new Error('LOD2 manifest に ID が無い');
 for (const w of wardInfo) {
   const sdir = path.join(ROOT, 'temp/mission79', w.id + '-2025-supp');
@@ -100,11 +191,12 @@ for (const w of wardInfo) {
   Object.assign(w, { dir: sdir, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAudit: audit, idAuditedIds: audit.suppIds, doubleDrawn: audit.doubleDrawn });
   fs.rmSync(path.join(ROOT, 'temp/mission79', w.id + '-work'), { recursive: true, force: true });
 }
+}
 
 // ---- 3. 組み立て ----
-fs.rmSync(OUT, { recursive: true, force: true });
+// single-pass は ext-3dtiles を既に OUT へ配置済みなので OUT を消さない。two-pass は従来どおり。
+if (!SINGLE) { fs.rmSync(OUT, { recursive: true, force: true }); }
 fs.mkdirSync(OUT, { recursive: true });
-const cp = (s, d) => fs.cpSync(s, d, { recursive: true, dereference: false });
 // 3a. public/ から 37G の動作に要る静的ファイルのみ(内蔵旧サンプル 3D Tiles・旧 map-data・旧 HTML・テスト・ローカル専用設定は載せない)
 const EXCLUDE_TOP = new Set(['map-data', '__test__', 'mission37b-3dtiles', 'mission37h-3dtiles', 'mission38e-3dtiles', 'mission40j-3dtiles', 'local-config.js']);
 for (const n of fs.readdirSync(path.join(ROOT, 'public'))) {
@@ -114,8 +206,8 @@ for (const n of fs.readdirSync(path.join(ROOT, 'public'))) {
 const stripLocal = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) stripLocal(p); else if (/\.local\.json$/.test(e.name)) fs.rmSync(p); } };
 stripLocal(OUT);
 // 3b. LOD1: 許可リストのみコピー(alignment.json 等の内部レポートは載せない)
-const extRoot = path.join(OUT, 'ext-3dtiles');
 for (const w of wardInfo) {
+  if (SINGLE) break; // single-pass は区ごとに配置済み
   const d = path.join(extRoot, w.id);
   fs.mkdirSync(d, { recursive: true });
   for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(w.dir, n))) cp(path.join(w.dir, n), path.join(d, n));
@@ -178,7 +270,7 @@ const prov = {
   sourceEtag: wardInfo[0].source.sourceEtag,
   wards: wardInfo.map((w) => ({ ward: w.id, name: w.name, code: w.code, lod1Buildings: w.buildings, lod1OriginalBuildings: w.fullBuildings, lod1ExcludedForLod2: w.excludedForLod2, lod1DoubleDrawn: w.doubleDrawn, idAudit: w.idAudit, idAuditedIds: w.idAuditedIds, sourceVintage: w.source.vintage, sourceEtag: w.source.sourceEtag, lod1ContentTiles: w.contentTiles, lod1GlbBytes: w.glbBytes, meshes: w.source.sourceMeshes.length })),
   lod2: { meshes: lod2Meshes, buildings: lod2Rep.converted, expected: lod2Rep.expected, fullMatch: lod2Rep.fullMatch, tiles: lod2Rep.tiles, glbBytes: lod2Rep.glbBytes, color: lod2Rep.color, textureRendered: false },
-  buildCondition: { wards, maxMb, node: process.version, lod2IdsTotal: lod2Ids.size },
+  buildCondition: { wards, maxMb, node: process.version, lod2IdsTotal: lod2Ids.size, singlePass: SINGLE, allWards: ALL, guards: { TIME_BUDGET_MIN, MAX_OUT_MB, MIN_FREE_GB, EXPECTED_TOTAL } },
   overlap: '補完 LOD1: 元 LOD1 のうち LOD2 と gml:id が完全一致する棟を除外(補完 LOD1 内の LOD2 同一 ID は 0 件を監査)。LOD2 は区外の建物も含むメッシュ範囲。',
   cloudCoverage: { servedWards: wardInfo.map((w) => w.id), servedWardNames: wardInfo.map((w) => w.name), servedWardCount: wardInfo.length, totalWards: reg.length, note: '配信済みの区のみ。他区は未接続(未配信)' },
   roadsRiversParks: '未接続(旧道路/路線データは配信しない。2025 道路との整合は未検証)',
@@ -187,9 +279,11 @@ const prov = {
 const UMEDA = [135.4960, 34.7055];
 const banner = `<div id="lc196-banner" style="position:fixed;left:8px;bottom:8px;z-index:100000;background:rgba(14,18,26,.92);color:#fff;font:12px/1.5 sans-serif;padding:8px 10px;border-radius:6px;max-width:360px">` +
   `<b style="color:#fc8">Preview(非本番・レビュー専用)</b><br>データ: <b>公式 PLATEAU 大阪市 2025</b>(CityGML v5)のみ。旧データ・OSM 不使用<br>` +
-  prov.wards.map((w) => w.name + ': 元LOD1 ' + w.lod1OriginalBuildings.toLocaleString('en-US') + '棟 − LOD2と同一ID ' + w.lod1ExcludedForLod2.toLocaleString('en-US') + '棟 = 補完LOD1 ' + w.lod1Buildings.toLocaleString('en-US') + '棟').join('<br>') +
+  (prov.wards.length > 6
+    ? '全' + prov.wards.length + '区合計: 元LOD1 ' + prov.wards.reduce((n, w) => n + w.lod1OriginalBuildings, 0).toLocaleString('en-US') + '棟 − LOD2と同一ID ' + prov.wards.reduce((n, w) => n + w.lod1ExcludedForLod2, 0).toLocaleString('en-US') + '棟 = 補完LOD1 ' + prov.wards.reduce((n, w) => n + w.lod1Buildings, 0).toLocaleString('en-US') + '棟(区別は cloud-preview.json)'
+    : prov.wards.map((w) => w.name + ': 元LOD1 ' + w.lod1OriginalBuildings.toLocaleString('en-US') + '棟 − LOD2と同一ID ' + w.lod1ExcludedForLod2.toLocaleString('en-US') + '棟 = 補完LOD1 ' + w.lod1Buildings.toLocaleString('en-US') + '棟').join('<br>')) +
   '<br>LOD2 ' + prov.lod2.buildings.toLocaleString('en-US') + '棟(' + prov.lod2.meshes.length + 'メッシュ範囲。区外の建物を含む。頂点色のみ・テクスチャ無し・固定昼光の陰影を焼き込み=時刻非依存)<br>' +
-  `<b>クラウド配信: ${prov.cloudCoverage.servedWardCount}/${prov.cloudCoverage.totalWards}区のみ(${wardInfo.map((w) => w.name).join('/')})</b>(他区は未接続)。道路・河川・公園・駅は未接続(2025道路との整合は未検証)<br>` +
+  `<b>クラウド配信: ${prov.cloudCoverage.servedWardCount}/${prov.cloudCoverage.totalWards}区のみ${wardInfo.length > 6 ? '' : '(' + wardInfo.map((w) => w.name).join('/') + ')'}</b>${wardInfo.length < reg.length ? '(他区は未接続)' : '(区は選択で遅延読込。同時全区描画は既定OFF)'}。道路・河川・公園・駅は未接続(2025道路との整合は未検証)<br>` +
   `<button id="lc196-umeda" style="margin:4px 4px 0 0">梅田(大阪駅周辺)のLOD2へ近づく</button><button id="lc196-umeda-near" style="margin-top:4px">さらに近景</button><br>` +
   `<span style="opacity:.8">出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成。<a style="color:#9cf" href="https://www.mlit.go.jp/plateau/site-policy/" target="_blank" rel="noopener">利用条件</a> / <a style="color:#9cf" href="/cloud-preview.json" target="_blank">provenance</a></span></div>` +
   `<script>(function(){function go(r){var f=window.__lc152&&window.__lc152.lookAtFirst;if(f)f(r,-40,[${UMEDA[0]},${UMEDA[1]}]);else alert('LOD2 の読み込み中です。数秒後にもう一度押してください')}` +
