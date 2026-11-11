@@ -16,17 +16,31 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const readJson = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const MB = 1048576;
 
-// Vercel Hobby の既知制限(2026-11 時点で本環境からは公式docsを取得できないため「要再確認の既知値」)。
-// 値は変更されうる。ここの数値は判定の目安であり保証ではない。
-export const VERCEL_HOBBY_ASSUMED = {
-  verified: false,
-  note: 'ネットワーク不可のため公式docsで再確認できていない。過去に公開されていた値を暫定採用。デプロイ前に vercel.com/docs/limits で確認すること。',
-  buildMinutes: 45,
-  deployFileCount: 15000,       // 静的ファイル数の目安(要確認)
-  singleFileMB: 100,            // 静的ファイル1つの上限の目安(要確認)
-  deployTotalMB: 1000,          // build output 総量の目安(要確認; 超過はデプロイ失敗しうる)
-  bandwidthGBPerMonth: 100,     // Fast Data Transfer の目安(要確認)
+// Mission 202: Vercel Hobby 制限。confirmed(ChatGPT が公式docsで確認した値)と unconfirmed を分離する。
+// unconfirmed を確定制限として判定に使ってはならない。この実行環境はネットワーク無しで docs を再取得していない。
+export const VERCEL_HOBBY_LIMITS = {
+  confirmed: {
+    sources: ['https://vercel.com/docs/limits', 'https://vercel.com/docs/deployments/troubleshoot-a-build',
+      'https://vercel.com/changelog/hobby-projects-now-retain-fewer-deployments-to-free-up-storage'],
+    confirmedBy: 'ChatGPT(2026 公式docs確認)。本環境では未再取得',
+    buildMinutes: 45, buildContainer: { cpu: 4, ramGB: 8, diskGB: 23 }, buildCacheGB: 1,
+    buildMinutesPerMonth: 6000, transferGBPerMonth: 100,
+    cliSourceUploadMB: 100, cliSourceFiles: 15000,
+    note_cliSourceUpload: 'CLI の source upload 上限であり build output 総量の上限ではない(混同禁止)',
+    teamDeploymentStorageGB: 10, retention: '直近3 production + 直近3 any-type(例外あり)',
+  },
+  unconfirmed: {
+    buildOutputTotal: '確定した「静的出力総量の上限」は無い。Mission201 の約1GBは未検証の古い推測で、制限として扱わない(訂正)',
+    buildOutputFileCount: '静的出力のファイル数上限は未確認',
+    singleStaticFileMB: '単一静的ファイルの上限は未確認(build は自主ガードで 90MB 超を拒否)',
+    note: '未確認の項目は超過するとも超えないとも断定しない。実デプロイでの観測が必要。',
+  },
 };
+// 後方互換(Mission 201 の import 先)。判定には使わない。
+export const VERCEL_HOBBY_ASSUMED = { verified: false, deprecated: 'VERCEL_HOBBY_LIMITS を使うこと(confirmed/unconfirmed 分離)' };
+
+// Cloudflare R2 無料枠(https://developers.cloudflare.com/r2/pricing/ ; ChatGPT 確認値)。超過後は課金。ユーザー事前承認なしに口座/バケット作成・アップロードしない。
+export const R2_FREE_TIER = { storageGBMonth: 10, classAPerMonth: 1000000, classBPerMonth: 10000000, directEgress: 'free', overFreeTier: 'billed', requiresUserApproval: true };
 
 export function loadInputs() {
   const lock = readJson('data/reports/mission79/source-lock.json');
@@ -92,16 +106,20 @@ export function estimateTotals(plans, { glbSpread = 0.15, includeLod2MB = null }
   };
 }
 
-export function fitAgainstLimits(est, limits = VERCEL_HOBBY_ASSUMED) {
-  const hi = est.lod1GlbMB.high, mid = est.lod1GlbMB.mid;
+// 判定には confirmed のみを使う。unconfirmed は undetermined に列挙し断定しない。
+export function fitAgainstLimits(est, limits = VERCEL_HOBBY_LIMITS) {
+  const c = limits.confirmed, hi = est.lod1GlbMB.high, mid = est.lod1GlbMB.mid;
+  const gb = (x) => +(x / 1024).toFixed(2);
+  const retained = 6; // 直近3 production + 直近3 any-type(最悪ケース)
   return {
-    assumedLimitsVerified: limits.verified,
-    sameOriginSingleDeploy: {
-      bytes: hi <= limits.deployTotalMB ? 'LOD1 GLBのみは想定上限内(未検証の上限・LOD2/HTML/ids等は別途加算)' : 'EXCEEDS 想定上限 → 同一originの全24区一括は不可/危険',
-      files: est.files.high <= limits.deployFileCount ? '想定上限内(推定・未検証)' : 'EXCEEDS 想定上限',
-      buildTime: est.buildSeconds.mid / 60 <= limits.buildMinutes ? '変換のみ実測比例で想定内。ただし公式ZIPのRange取得(約840MB)・LOD2・ID監査は含まず、Vercelビルド機は未測定 → 毎回ビルドは非推奨' : 'EXCEEDS 想定ビルド時間 → 毎回の区変換は不可',
-      midGlbMB: mid, highGlbMB: hi,
-    },
+    confirmedLimitsUsed: true,
+    buildTime: { estimatedConversionMinutes: +(est.buildSeconds.mid / 60).toFixed(1), limitMinutes: c.buildMinutes,
+      verdict: est.buildSeconds.mid / 60 <= c.buildMinutes ? '変換のみなら45分内(4 vCPU Actions の実測比例。Vercel 機は未実測。ZIP Range 取得/LOD2/ID監査は含まず) → 毎回ビルドは非推奨' : '45分超 → 毎回の区変換は不可' },
+    deploymentStorage: { teamLimitGB: c.teamDeploymentStorageGB, perDeploymentGB: { low: gb(est.lod1GlbMB.low), mid: gb(mid), high: gb(hi) }, retainedDeployments: retained, worstCaseGB: gb(hi * retained),
+      verdict: (hi * retained) / 1024 > c.teamDeploymentStorageGB ? '保持6デプロイ×全24区(LOD1のみ)で team storage 10GB 超の可能性 → 同一origin全24区は要警戒' : '範囲内の見込み' },
+    transfer: { limitGBPerMonth: c.transferGBPerMonth, fullViewGB: gb(mid), note: '全区を読むと約' + gb(mid) + 'GB/人。数人で月100GBに達しうる(R2 直送egressは無料)' },
+    undetermined: ['静的出力の総量上限', '静的出力のファイル数上限', '単一静的ファイル上限'],
+    files: { mid: est.files.mid, high: est.files.high, note: 'CLI source files 上限15000は source upload の話で、build output ファイル数の上限ではない' },
   };
 }
 
@@ -140,9 +158,9 @@ function main() {
   const plans = planWards(inp, wards, served);
   const est = estimateTotals(plans);
   const report = {
-    mission: '201', readOnly: true, networkUsed: false, generatedAt: new Date().toISOString(),
+    mission: '202', readOnly: true, networkUsed: false, generatedAt: new Date().toISOString(),
     source: { package: inp.lock.package.name, etag: inp.lock.http.etag, contentLengthMB: +(inp.lock.http.contentLength / MB).toFixed(0), vintage: 2025 },
-    vercelHobbyAssumed: VERCEL_HOBBY_ASSUMED, plans, estimate: est, fit: fitAgainstLimits(est),
+    vercelHobbyLimits: VERCEL_HOBBY_LIMITS, r2FreeTier: R2_FREE_TIER, plans, estimate: est, fit: fitAgainstLimits(est),
     measuredBuildings: plans.reduce((n, p) => n + (p.measured ? p.measured.buildings : 0), 0),
   };
   if (opt('out')) {

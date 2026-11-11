@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { verifyWard } from '../lod2/lod2-all-wards.mjs';
 import { auditWard } from './lod1-id-audit.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
+import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const a = process.argv.slice(2);
@@ -119,6 +120,19 @@ for (const w of wardInfo) {
   fs.mkdirSync(d, { recursive: true });
   for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(w.dir, n))) cp(path.join(w.dir, n), path.join(d, n));
 }
+// Mission 202: 区ごと manifest(vintage=2025/出典/sha256/contentVersion)を生成し実ファイルと照合。区の取り違え(同一contentVersion)も検出。
+const wardManifests = [];
+for (const w of wardInfo) {
+  const d = path.join(extRoot, w.id);
+  wardManifests.push(await writeWardManifest(d, { ward: w.id, name: w.name, code: w.code, source: w.source }));
+  const vr = await verifyWardDir(d, w.id);
+  if (!vr.ok) throw new Error('ward manifest 検証失敗 ' + w.id + ': ' + vr.problems.slice(0, 3).join(';'));
+}
+const distinct = checkWardsDistinct(wardManifests);
+if (!distinct.ok) throw new Error('区データの混在疑い: ' + distinct.problems.join(';'));
+// 区選択パネル + URL 解決レイヤー(既定は同一origin)
+cp(path.join(ROOT, 'tools/cloud/data-resolver.cjs'), path.join(OUT, 'cloud-data-resolver.js'));
+cp(path.join(ROOT, 'tools/cloud/ward-picker.js'), path.join(OUT, 'cloud-ward-picker.js'));
 // Mission 201: 24区全てを列挙し、配信済(served)/未配信(not-served)を明記。未配信区を配信済と見せない。
 fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   ...buildIndex(reg, wardInfo.map((w) => ({ id: w.id, buildings: w.buildings }))),
@@ -182,7 +196,7 @@ const banner = `<div id="lc196-banner" style="position:fixed;left:8px;bottom:8px
   `document.getElementById('lc196-umeda').onclick=function(){go(450)};document.getElementById('lc196-umeda-near').onclick=function(){go(160)}})()</script>`;
 const defaults = `<script>(function(){var q=new URLSearchParams(location.search);if(!q.has('nobuiltin')){q.set('nobuiltin','1');q.set('ext45','1');q.set('lod2','1');if(!q.has('lod2fly')&&!q.has('lod2ov'))q.set('lod2ov','1');history.replaceState(null,'','?'+q.toString())}})()</script>`;
 html = html.replace('<head>', () => '<head>\n' + defaults);
-html = html.replace('</body>', () => banner + '\n</body>');
+html = html.replace('</body>', () => banner + '\n<script src="/cloud-data-resolver.js"></script><script src="/cloud-ward-picker.js"></script>\n</body>');
 fs.writeFileSync(path.join(OUT, HTML), html);
 fs.writeFileSync(path.join(OUT, 'cloud-preview.json'), JSON.stringify(prov, null, 1));
 fs.writeFileSync(path.join(OUT, 'index.html'), `<!doctype html><meta charset="utf-8"><title>Live City cloud preview (PLATEAU 2025)</title><meta http-equiv="refresh" content="0;url=/${HTML}?nobuiltin=1&ext45=1&lod2=1&lod2ov=1"><a href="/${HTML}?nobuiltin=1&ext45=1&lod2=1&lod2ov=1">Live City Preview(公式 PLATEAU 2025・非本番)</a>`);
