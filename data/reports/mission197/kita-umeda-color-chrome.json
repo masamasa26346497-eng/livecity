@@ -1,0 +1,265 @@
+{
+ "fixture": "REAL PLATEAU 2025 (official CityGML via tools/mission79-run.mjs)",
+ "swiftshader": true,
+ "chrome": "/usr/bin/google-chrome",
+ "wardsInfo": {
+  "kita": {
+   "code": "27127",
+   "buildingsMeta": 18130,
+   "selectedTiles": 52,
+   "glbFiles": 52,
+   "rootRegion": [
+    2.364520962883939,
+    0.6053810293395301,
+    2.3653079705458047,
+    0.6059786321449733,
+    0,
+    209
+   ],
+   "sourceWardCode": "27127"
+  }
+ },
+ "http": {
+  "ok": 131,
+  "bad": []
+ },
+ "console": [
+  "ERR [37C] layer:towns24 Error: towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）\n    at Object.mount (http://localhost:81"
+ ],
+ "wards": {
+  "kita": {
+   "center": [
+    135.4996,
+    34.7029
+   ],
+   "mounted": true,
+   "lastError": null,
+   "tilesets": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 28,
+     "triangles": 117547,
+     "clipping": false
+    },
+    {
+     "ward": "kita",
+     "show": true,
+     "ready": true,
+     "contentReady": 47,
+     "selected": 29,
+     "triangles": 229760,
+     "clipping": false
+    }
+   ],
+   "wardTilesets": [
+    {
+     "ward": "kita",
+     "show": true,
+     "ready": true,
+     "contentReady": 47,
+     "selected": 29,
+     "triangles": 229760,
+     "clipping": false
+    }
+   ],
+   "pixelDiff": 193485,
+   "drawn": true
+  }
+ },
+ "lod2": {
+  "footprintsNearChuo": 41,
+  "at": [
+   135.49652027888573,
+   34.70616228523035
+  ],
+  "camera": {
+   "lon": 135.49652027888573,
+   "lat": 34.70297711954933,
+   "h": 363.5533905930857,
+   "pitchDeg": -44.99999999999997
+  },
+  "tris": {
+   "both": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 9,
+     "triangles": 32120,
+     "clipping": false
+    },
+    {
+     "ward": "kita",
+     "show": true,
+     "ready": true,
+     "contentReady": 22,
+     "selected": 5,
+     "triangles": 31787,
+     "clipping": false
+    }
+   ],
+   "lod1Only": [
+    {
+     "ward": "lod2/unknown",
+     "show": false,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 9,
+     "triangles": 32120,
+     "clipping": false
+    },
+    {
+     "ward": "kita",
+     "show": true,
+     "ready": true,
+     "contentReady": 22,
+     "selected": 5,
+     "triangles": 31787,
+     "clipping": false
+    }
+   ],
+   "lod2Only": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 9,
+     "triangles": 32120,
+     "clipping": false
+    }
+   ]
+  },
+  "pixelDiff": {
+   "bothVsLod1Only": 290573,
+   "bothVsLod2Only": 186769,
+   "lod2OnlyVsLod1Only": 477121
+  },
+  "clip": "{\"clipMode\":\"off\",\"clipped\":0,\"near\":null}"
+ },
+ "lod2Status": "{\"status\":\"ready\",\"error\":null,\"clipMode\":\"off\"}",
+ "extraMeta": [
+  {
+   "id": "ext-kita",
+   "wardCode": "27127",
+   "buildings": 18130
+  }
+ ],
+ "diagnose": {
+  "hints": [],
+  "allMode": {
+   "on": true,
+   "mounted": {
+    "27127": "coarse"
+   },
+   "ticks": 19,
+   "mountsTotal": 3,
+   "dropsTotal": 0,
+   "buildings": 18130,
+   "lastPlan": {
+    "27127": "coarse"
+   },
+   "lastError": null,
+   "culledTotal": 0
+  },
+  "wards": {
+   "kita": {
+    "buildings": 18130,
+    "served": {
+     "tileset": [
+      3,
+      0
+     ],
+     "glb": [
+      91,
+      0
+     ],
+     "meta": [
+      2,
+      0
+     ],
+     "layers": [
+      0,
+      0
+     ],
+     "sidecar": [
+      0,
+      0
+     ],
+     "other": [
+      0,
+      0
+     ]
+    },
+    "browser": {
+     "mounted": 3,
+     "loads": 75,
+     "visible": 378,
+     "failed": 0,
+     "lastError": null
+    }
+   }
+  }
+ },
+ "serverTrace": {
+  "requests": {
+   "html": 1,
+   "injected": 0,
+   "redirected": 0,
+   "lastQuery": {
+    "ext45": "1",
+    "nobuiltin": "1",
+    "lod2": "1",
+    "lod2ov": "1",
+    "lod2auto3d": "0"
+   },
+   "indexJson": 2,
+   "overlayJs": 1,
+   "diagJs": 1,
+   "lastHtmlAt": "2026-11-11T23:52:53.365Z",
+   "lastIndexAt": "2026-11-11T23:53:12.340Z",
+   "verdict": "ブラウザは区別ファイルを要求している(extServed.byWard 参照)"
+  },
+  "extServed": {
+   "byWard": {
+    "kita": {
+     "tileset": [
+      3,
+      0
+     ],
+     "glb": [
+      91,
+      0
+     ],
+     "meta": [
+      2,
+      0
+     ],
+     "layers": [
+      0,
+      0
+     ],
+     "sidecar": [
+      0,
+      0
+     ],
+     "other": [
+      0,
+      0
+     ]
+    }
+   },
+   "recentFailures": []
+  },
+  "extAttach": {
+   "attached": true,
+   "wards": 1,
+   "brokenWards": []
+  }
+ },
+ "pass": true
+}
