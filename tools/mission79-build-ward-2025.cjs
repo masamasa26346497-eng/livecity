@@ -170,10 +170,12 @@ function crosswalk(newB, legacy, opts = {}) {
   };
 }
 
-function prepareBuildings(jsonl, ward) {
+const INVERT_IDS = process.argv.includes('--invert-ids');
+function prepareBuildings(jsonl, ward, exclude) {
   const tiles = new Map();
   const all = [];
-  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, meshes: new Set() };
+  const excludedInWard = [];
+  const stat = { read: 0, inWard: 0, outsideWard: 0, duplicate: 0, meshes: new Set(), lod2Excluded: 0 };
   const seen = new Set();
   for (const line of fs.readFileSync(jsonl, 'utf8').split('\n')) {
     if (!line) continue;
@@ -183,13 +185,16 @@ function prepareBuildings(jsonl, ward) {
     seen.add(b.id);
     const [rx, rz] = centroid(b.fp);
     if (!inWard(rx, rz, ward)) { stat.outsideWard++; continue; }
+    // Mission 182A (opt-in): skip ONLY buildings whose exact gml:id is in the same-vintage LOD2 id set
+    // --invert-ids (QA stand-in only): keep ONLY the id-set buildings, i.e. LOD1 extrusions of LOD2 buildings used to measure coexistence
+    if (exclude && exclude.has(b.id) !== INVERT_IDS) { stat.lod2Excluded++; excludedInWard.push(b.id); continue; }
     stat.inWard++; stat.meshes.add(b.sourceMesh);
     const key = Math.floor(rx / TILE) + '_' + Math.floor(rz / TILE);
     if (!tiles.has(key)) tiles.set(key, { tx: Math.floor(rx / TILE), tz: Math.floor(rz / TILE), buildings: [] });
     const rec = { id: b.id, fp: b.fp, z0: b.z0 || 0, dz: b.dz, h: b.h, usage: b.usage, ulabel: b.ulabel || '', repX: r1(rx), repZ: r1(rz), heightSource: b.heightSource };
     tiles.get(key).buildings.push(rec); all.push(rec);
   }
-  return { tiles, all, stat };
+  return { tiles, all, stat, excludedInWard };
 }
 
 function main() {
@@ -208,7 +213,16 @@ function main() {
   if (!ward) throw new Error('unknown ward ' + wardId);
   const lock = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission79/source-lock.json'), 'utf8'));
 
-  const { tiles, all, stat } = prepareBuildings(jsonl, ward);
+  // Mission 182A: optional LOD2-complement mode. Without --exclude-ids the behaviour is unchanged (LOD1-only).
+  let exclude = null;
+  let lod2Meta = null;
+  const exArg = opt('exclude-ids');
+  if (exArg) {
+    lod2Meta = JSON.parse(fs.readFileSync(path.resolve(exArg), 'utf8'));
+    if (Number(lod2Meta.vintage) === 2025 && Array.isArray(lod2Meta.ids)) exclude = new Set(lod2Meta.ids);
+    else console.warn('[182A] id set vintage/shape mismatch -> NO exclusion, all LOD1 kept (vintage=' + lod2Meta.vintage + ')');
+  }
+  const { tiles, all, stat, excludedInWard } = prepareBuildings(jsonl, ward, exclude);
   const src = fs.mkdtempSync(path.join(os.tmpdir(), 'm79-src-'));
   const mt = [];
   for (const t of [...tiles.values()].sort((a, b) => a.tx - b.tx || a.tz - b.tz)) {
@@ -249,6 +263,18 @@ function main() {
     fs.writeFileSync(path.join(out, 'legacy-only-ids.json'), JSON.stringify(cw.legacyOnlyIds));
   }
 
+  if (exArg) {
+    const given = exclude ? exclude.size : 0;
+    fs.writeFileSync(path.join(out, 'lod2-complement-audit.json'), JSON.stringify({
+      mission: '182A', ward: wardId, mode: 'lod2-complement-lod1', idSetVintage: lod2Meta.vintage, exclusionApplied: !!exclude,
+      lod1InWardTotal: stat.inWard + stat.lod2Excluded, lod2IdsMatchedInWard: stat.lod2Excluded, lod1Remaining: stat.inWard,
+      lod2IdsGiven: given, lod2IdsNotInWardLod1: Math.max(0, given - stat.lod2Excluded),
+      tileBuildingSum: report.totals.buildings, uniqueIdsInTiles: report.totals.uniqueCanonicalIds,
+      policy: 'only exact same-vintage gml:id matches are skipped; no-id / other-vintage / unmatched stay LOD1; LOD1-only output lives in a separate dir',
+    }, null, 1));
+    fs.writeFileSync(path.join(out, 'lod2-excluded-ids.json'), JSON.stringify(excludedInWard));
+  }
+
   const sizeOf = (d) => fs.readdirSync(d, { recursive: true, withFileTypes: true }).filter((e) => e.isFile()).reduce((n, e) => n + fs.statSync(path.join(e.parentPath || e.path, e.name)).size, 0);
   const heightSources = {};
   for (const b of all) heightSources[b.heightSource] = (heightSources[b.heightSource] || 0) + 1;
@@ -257,7 +283,8 @@ function main() {
     ward: ward.wardName, wardId, wardCode: ward.wardCode, generatedAt: new Date().toISOString(),
     source: lock.resource.url, sourceEtag: lock.http.etag, sourceBytes: lock.http.contentLength,
     attribution: lock.attribution, license: lock.license,
-    sourceMeshes: [...stat.meshes].sort(), counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate },
+    sourceMeshes: [...stat.meshes].sort(), counts: { read: stat.read, inWard: stat.inWard, outsideWard: stat.outsideWard, duplicate: stat.duplicate, lod2Excluded: stat.lod2Excluded },
+    lod2Complement: exArg ? { enabled: !!exclude, idSetVintage: lod2Meta.vintage } : null,
     heightSources, idPolicy: 'gml:id verbatim; no renumbering; 2022/2024 IDs untouched (see crosswalk.*)',
     coordinateConvention: 'znorth-neg-v1', coarseMinArea: 0,
     note: 'Partial unless sourceMeshes covers the ward. Not 27999 (Expo site) data.',
