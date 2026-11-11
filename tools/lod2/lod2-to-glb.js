@@ -28,7 +28,10 @@ function toEnu(lat, lon, h, org) {
 }
 
 const SURF = { RoofSurface: 'roof', WallSurface: 'wall', GroundSurface: 'ground', OuterCeilingSurface: 'roof', OuterFloorSurface: 'ground', ClosureSurface: 'wall' };
-const COLOR = { roof: [0.62, 0.34, 0.28], wall: [0.82, 0.8, 0.76], ground: [0.5, 0.5, 0.5] };
+// Mission 196: LOD1(tools/mission37b-build-3dtiles.cjs colorFor)と同じ高さ連動の青灰色。屋根=colorFor(h)、壁・底面=×0.78。
+// 旧: 茶/ベージュ固定 + 照明あり(PBR)で、太陽と逆向き面や法線反転面が黒く見えた。
+export function lod1Color(h) { const t = Math.min(Math.max(h, 0) / 60, 1); return [(190 - 70 * t) / 255, (200 - 50 * t) / 255, (215 - 20 * t) / 255]; }
+export function colorForType(type, h) { const r = lod1Color(h); return type === 'roof' ? r : r.map((v) => v * 0.78); }
 
 /** 1棟のXMLから { surfaces:[{type, ring:[[lat,lon,h]...]}] } (lod2の面のみ) */
 export function extractLod2Surfaces(bldgXml) {
@@ -109,11 +112,13 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
     const bp = [], bc = []; let bad = !surfs.length;
     const gH = surfs.length ? Math.min(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) : 0;
     const dz = opts.groundToZero ? toEnu(org.lat, org.lon, gH, org)[2] : 0;
+    const bh = surfs.length ? Math.max(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) - gH : 0;
     for (const s of surfs) {
       const e = s.ring.map((r) => { const q = toEnu(r[0], r[1], r[2], org); q[2] -= dz; return q; });
       const tr = triangulate(e);
       if (!tr.length) { bad = true; break; }
-      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(COLOR[s.type]); }
+      const cc = colorForType(s.type, bh);
+      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(cc); }
     }
     if (bad) { failed.push(id); continue; }
     for (const p of bp) { pos.push(p); minH = Math.min(minH, p[2]); maxH = Math.max(maxH, p[2]); bx = [Math.min(bx[0], p[0]), Math.max(bx[1], p[0])]; by = [Math.min(by[0], p[1]), Math.max(by[1], p[1])]; }
@@ -140,9 +145,9 @@ export function meshToGlb(mesh) {
   const bin = Buffer.concat([P, N, C].map((a) => Buffer.from(a.buffer)));
   const bl = n * 12;
   const json = {
-    asset: { version: '2.0', generator: 'livecity-mission153' }, scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
+    asset: { version: '2.0', generator: 'livecity-mission153' }, extensionsUsed: ['KHR_materials_unlit'], scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
     meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 }, material: 0, mode: 4 }] }],
-    materials: [{ pbrMetallicRoughness: { metallicFactor: 0, roughnessFactor: 0.9 }, doubleSided: true }],
+    materials: [{ pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 }, doubleSided: true, extensions: { KHR_materials_unlit: {} } }],
     buffers: [{ byteLength: bin.length }],
     bufferViews: [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 })),
     accessors: [

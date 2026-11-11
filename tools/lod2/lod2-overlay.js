@@ -45,6 +45,8 @@
       state.centroid = [fp.footprints.reduce((n, f) => n + f.hull[0][0], 0) / fp.footprints.length, fp.footprints.reduce((n, f) => n + f.hull[0][1], 0) / fp.footprints.length];
       state.bbox = report.bbox; state.lod2Buildings = fp.footprints.length; state.footprints = fp.footprints.length;
       const ts = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json');
+      // Mission 196: LOD1(37G 既定トーン pale)と同じ乗算色。?lod2tone=mid|deep|none で変更。
+      { const q = new URLSearchParams(location.search).get('lod2tone') || 'pale'; const T = { pale: '#f4f8fd', mid: '#dbe6f2', deep: '#b9c9dd' }; if (T[q]) ts.style = new Cesium.Cesium3DTileStyle({ color: "color('" + T[q] + "')" }); }
       ts.tileVisible.addEventListener(() => { state.tileVisible++; });
       ts.tileLoad.addEventListener(() => { state.tileLoad++; scene.requestRender(); });
       ts.tileFailed.addEventListener((e) => { state.tileFailed++; state.error = 'tileFailed: ' + (e && e.message); showFailure('タイル読み込み失敗: ' + (e && e.message)); });
