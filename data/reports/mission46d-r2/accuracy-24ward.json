@@ -1,0 +1,447 @@
+{
+  "schema": "livecity.mission46d.independent-accuracy/1",
+  "generatedBy": "tools/mission46d-independent-accuracy.cjs",
+  "reference": "GSI vector tile optimal_bvmap-v1 (BldA, RdEdg)",
+  "thresholds": {
+    "minBuildingsEvaluated": 30,
+    "minRoadSamples": 100,
+    "buildingMatchedPctMin": 80,
+    "buildingMedianVertexM": 3,
+    "buildingP95VertexM": 10,
+    "roadBandM": 30,
+    "roadBracketedPctMin": 60,
+    "minBracketedSamples": 50,
+    "minRingAreaM2": 1,
+    "sharedLineageMedianM": 0.5,
+    "sharedLineageP95M": 1.5,
+    "sharedLineageMinN": 500
+  },
+  "limits": [
+    "GSI optimal_bvmap BldA/RdEdg are generalised cartographic data (zoom-limited), not survey-grade; small residuals are expected.",
+    "Only locations covered by supplied reference tiles are evaluated; coverage is reported and low coverage yields INSUFFICIENT_DATA.",
+    "Road centerlines are not expected to coincide with road edges. A sample counts as inside a road corridor only if a GSI edge exists within the band on BOTH sides of the centerline (bracketed); one-sided proximity is reference-only and never yields PASS.",
+    "GSI and Live City (PLATEAU/OSM) differ in survey date and in outline definition (roof vs footprint, generalisation); results are not a claim of accuracy better than the GSI nominal.",
+    "Near-identical geometry (centimetre-level vertex distance over many vertices) is flagged suspectedSharedLineage and is INSUFFICIENT_DATA, never PASS: agreement with a source the data was built from proves nothing.",
+    "Malformed MVT rings (too few points, non-finite, near-zero area) are excluded; interior rings are treated as holes, not buildings.",
+    "Offsets are reported, never applied."
+  ],
+  "summary": {
+    "wards": 24,
+    "expectedWards": 24,
+    "PASS": 0,
+    "FAIL": 0,
+    "INSUFFICIENT_DATA": 24,
+    "allWardsPass": false
+  },
+  "wards": [
+    {
+      "wardId": "miyakojima",
+      "wardCode": "27102",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "fukushima",
+      "wardCode": "27103",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "konohana",
+      "wardCode": "27104",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "nishi",
+      "wardCode": "27106",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "minato",
+      "wardCode": "27107",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "taisho",
+      "wardCode": "27108",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "tennoji",
+      "wardCode": "27109",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "naniwa",
+      "wardCode": "27111",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "nishiyodogawa",
+      "wardCode": "27113",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "higashiyodogawa",
+      "wardCode": "27114",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "higashinari",
+      "wardCode": "27115",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "ikuno",
+      "wardCode": "27116",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "asahi",
+      "wardCode": "27117",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "joto",
+      "wardCode": "27118",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "abeno",
+      "wardCode": "27119",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "sumiyoshi",
+      "wardCode": "27120",
+      "referenceTiles": 12,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": true,
+        "roads": false
+      },
+      "buildings": {
+        "lcBuildings": 35031,
+        "evaluated": 11271,
+        "coveragePct": 32.17,
+        "matched": 11080,
+        "matchedPct": 98.31,
+        "refBuildings": 11717,
+        "invalidRefRingsExcluded": 32,
+        "vertexDistM": {
+          "median": 0.03,
+          "p95": 0.09,
+          "n": 62357
+        },
+        "centroidOffsetM": {
+          "median": 0.03,
+          "p95": 7.45
+        },
+        "suspectedSharedLineage": true,
+        "meanOffsetRefMinusLcM": {
+          "dx": -0.01,
+          "dz": -0.01,
+          "applied": false
+        }
+      },
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "buildings: vertices coincide with GSI to centimetres (median 0.03 m, p95 0.09 m) - Live City footprints are probably derived from the same GSI/Kiban lineage, so this is NOT an independent check",
+        "roads: insufficient reference coverage",
+        "roads: no Live City road source available (roads/ is not tracked in Git)"
+      ]
+    },
+    {
+      "wardId": "higashisumiyoshi",
+      "wardCode": "27121",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "nishinari",
+      "wardCode": "27122",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "yodogawa",
+      "wardCode": "27123",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "tsurumi",
+      "wardCode": "27124",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "suminoe",
+      "wardCode": "27125",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "hirano",
+      "wardCode": "27126",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "kita",
+      "wardCode": "27127",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    },
+    {
+      "wardId": "chuo",
+      "wardCode": "27128",
+      "referenceTiles": 0,
+      "tileErrors": 0,
+      "liveCitySources": {
+        "buildings": false,
+        "roads": false
+      },
+      "buildings": null,
+      "roads": null,
+      "status": "INSUFFICIENT_DATA",
+      "reasons": [
+        "no GSI reference tiles for ward"
+      ]
+    }
+  ]
+}

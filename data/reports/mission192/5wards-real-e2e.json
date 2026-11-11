@@ -1,0 +1,193 @@
+{
+ "mission": 192,
+ "data": "REAL PLATEAU 2025 LOD1 (mission79-run.mjs --max-mb 1500), headless Chrome+SwiftShader, 37G page, clip OFF, no --exclude-ids",
+ "unverified": [
+  "userPC",
+  "realGPU",
+  "roadRiverOffset",
+  "24wardSimultaneous"
+ ],
+ "simultaneous5": {
+  "firstMountSec": 43.4,
+  "mounted": {
+   "27120": "coarse",
+   "27121": "coarse",
+   "27123": "coarse",
+   "27124": "coarse",
+   "27126": "coarse"
+  },
+  "http": 64,
+  "nonOk": 0,
+  "lastError": null,
+  "fps": "~1 (SwiftShader, not meaningful)"
+ },
+ "wards": {
+  "sumiyoshi": {
+   "code": "27120",
+   "totals": {
+    "buildings": 35032,
+    "sourceBuildings": 35032,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 47959344,
+    "uniqueCanonicalIds": 35032
+   },
+   "tilesLeaf": 52,
+   "tilesCoarse": 6,
+   "alignment": {
+    "best": "identity",
+    "ok": true,
+    "identityHitPct": 0.2,
+    "note": "lower=better; rotation/flip only, not translation"
+   },
+   "overview": {
+    "selectedTiles": 6,
+    "triangles": 350320,
+    "tileLoad": 6,
+    "tileVisible": 148,
+    "tileFailed": 0
+   },
+   "close": {
+    "selectedTiles": 22,
+    "triangles": 284277,
+    "pixelDiff": 422849,
+    "drawn": true,
+    "lastError": null
+   }
+  },
+  "higashisumiyoshi": {
+   "code": "27121",
+   "totals": {
+    "buildings": 38338,
+    "sourceBuildings": 38338,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 52006208,
+    "uniqueCanonicalIds": 38338
+   },
+   "tilesLeaf": 60,
+   "tilesCoarse": 8,
+   "alignment": {
+    "best": "identity",
+    "ok": true,
+    "identityHitPct": 0.22,
+    "note": "lower=better; rotation/flip only, not translation"
+   },
+   "overview": {
+    "selectedTiles": 8,
+    "triangles": 383380,
+    "tileLoad": 8,
+    "tileVisible": 179,
+    "tileFailed": 0
+   },
+   "close": {
+    "selectedTiles": 24,
+    "triangles": 321773,
+    "pixelDiff": 381719,
+    "drawn": true,
+    "lastError": null
+   }
+  },
+  "yodogawa": {
+   "code": "27123",
+   "totals": {
+    "buildings": 35296,
+    "sourceBuildings": 35296,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 51015464,
+    "uniqueCanonicalIds": 35296
+   },
+   "tilesLeaf": 66,
+   "tilesCoarse": 10,
+   "alignment": {
+    "best": "identity",
+    "ok": true,
+    "identityHitPct": 0.24,
+    "note": "lower=better; rotation/flip only, not translation"
+   },
+   "overview": {
+    "selectedTiles": 10,
+    "triangles": 352960,
+    "tileLoad": 10,
+    "tileVisible": 240,
+    "tileFailed": 0
+   },
+   "close": {
+    "selectedTiles": 12,
+    "triangles": 285568,
+    "pixelDiff": 283402,
+    "drawn": true,
+    "lastError": null
+   }
+  },
+  "tsurumi": {
+   "code": "27124",
+   "totals": {
+    "buildings": 25309,
+    "sourceBuildings": 25309,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 35203700,
+    "uniqueCanonicalIds": 25309
+   },
+   "tilesLeaf": 51,
+   "tilesCoarse": 8,
+   "alignment": {
+    "best": "identity",
+    "ok": true,
+    "identityHitPct": 0.4,
+    "note": "lower=better; rotation/flip only, not translation"
+   },
+   "overview": {
+    "selectedTiles": 8,
+    "triangles": 253090,
+    "tileLoad": 8,
+    "tileVisible": 174,
+    "tileFailed": 0
+   },
+   "close": {
+    "selectedTiles": 24,
+    "triangles": 217674,
+    "pixelDiff": 234158,
+    "drawn": true,
+    "lastError": null
+   }
+  },
+  "hirano": {
+   "code": "27126",
+   "totals": {
+    "buildings": 46473,
+    "sourceBuildings": 46473,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 63138828,
+    "uniqueCanonicalIds": 46473
+   },
+   "tilesLeaf": 88,
+   "tilesCoarse": 10,
+   "alignment": {
+    "best": "identity",
+    "ok": true,
+    "identityHitPct": 0.12,
+    "note": "lower=better; rotation/flip only, not translation"
+   },
+   "overview": {
+    "selectedTiles": 10,
+    "triangles": 464730,
+    "tileLoad": 10,
+    "tileVisible": 200,
+    "tileFailed": 0
+   },
+   "close": {
+    "selectedTiles": 23,
+    "triangles": 258824,
+    "pixelDiff": 268741,
+    "drawn": true,
+    "lastError": null
+   }
+  }
+ },
+ "totalBuildings5": 180448,
+ "cumulative": 615234
+}

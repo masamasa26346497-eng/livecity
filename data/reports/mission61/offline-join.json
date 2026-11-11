@@ -1,0 +1,410 @@
+{
+  "mission": "61",
+  "network": {
+    "externalGets": 0,
+    "note": "このスクリプトは http/https/fetch を使わない。入力は Git 追跡済みの既存 JSON のみ。"
+  },
+  "inputs": {
+    "buildingTiles": 9,
+    "buildings": 10546,
+    "gsiRoadEdgeLines": 2982,
+    "gsiWaterPolys": 78,
+    "osmRoadLines": 969,
+    "osmWaterFeatures": 20
+  },
+  "parallaxTheory": [
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 0,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 0,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 0,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 0,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 60,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 1.76,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 60,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 6.54,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 120,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 3.53,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 120,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 13.08,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 144,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 4.24,
+      "footShift_m": 0
+    },
+    {
+      "cam": "persp60-r350",
+      "H": 350,
+      "r_m": 144,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 15.7,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 0,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 0,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 0,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 0,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 60,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 0.05,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 60,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 0.17,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 120,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 0.1,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 120,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 0.34,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 144,
+      "roofHeight_m": 10,
+      "apparentOutwardShift_m": 0.12,
+      "footShift_m": 0
+    },
+    {
+      "cam": "ortho-like-fov2-r12000",
+      "H": 12000,
+      "r_m": 144,
+      "roofHeight_m": 34.4,
+      "apparentOutwardShift_m": 0.41,
+      "footShift_m": 0
+    }
+  ],
+  "layerHeightApparentShift": [
+    {
+      "layer": "waterways",
+      "layerHeight_m": 0.5,
+      "elevationDeg": 90,
+      "apparentGroundShift_m": 0
+    },
+    {
+      "layer": "waterways",
+      "layerHeight_m": 0.5,
+      "elevationDeg": 60,
+      "apparentGroundShift_m": 0.29
+    },
+    {
+      "layer": "waterways",
+      "layerHeight_m": 0.5,
+      "elevationDeg": 45,
+      "apparentGroundShift_m": 0.5
+    },
+    {
+      "layer": "waterways",
+      "layerHeight_m": 0.5,
+      "elevationDeg": 30,
+      "apparentGroundShift_m": 0.87
+    },
+    {
+      "layer": "waterways",
+      "layerHeight_m": 0.5,
+      "elevationDeg": 15,
+      "apparentGroundShift_m": 1.87
+    },
+    {
+      "layer": "parks",
+      "layerHeight_m": 0.9,
+      "elevationDeg": 90,
+      "apparentGroundShift_m": 0
+    },
+    {
+      "layer": "parks",
+      "layerHeight_m": 0.9,
+      "elevationDeg": 60,
+      "apparentGroundShift_m": 0.52
+    },
+    {
+      "layer": "parks",
+      "layerHeight_m": 0.9,
+      "elevationDeg": 45,
+      "apparentGroundShift_m": 0.9
+    },
+    {
+      "layer": "parks",
+      "layerHeight_m": 0.9,
+      "elevationDeg": 30,
+      "apparentGroundShift_m": 1.56
+    },
+    {
+      "layer": "parks",
+      "layerHeight_m": 0.9,
+      "elevationDeg": 15,
+      "apparentGroundShift_m": 3.36
+    },
+    {
+      "layer": "roadsCasing",
+      "layerHeight_m": 1.3,
+      "elevationDeg": 90,
+      "apparentGroundShift_m": 0
+    },
+    {
+      "layer": "roadsCasing",
+      "layerHeight_m": 1.3,
+      "elevationDeg": 60,
+      "apparentGroundShift_m": 0.75
+    },
+    {
+      "layer": "roadsCasing",
+      "layerHeight_m": 1.3,
+      "elevationDeg": 45,
+      "apparentGroundShift_m": 1.3
+    },
+    {
+      "layer": "roadsCasing",
+      "layerHeight_m": 1.3,
+      "elevationDeg": 30,
+      "apparentGroundShift_m": 2.25
+    },
+    {
+      "layer": "roadsCasing",
+      "layerHeight_m": 1.3,
+      "elevationDeg": 15,
+      "apparentGroundShift_m": 4.85
+    },
+    {
+      "layer": "roads",
+      "layerHeight_m": 1.4,
+      "elevationDeg": 90,
+      "apparentGroundShift_m": 0
+    },
+    {
+      "layer": "roads",
+      "layerHeight_m": 1.4,
+      "elevationDeg": 60,
+      "apparentGroundShift_m": 0.81
+    },
+    {
+      "layer": "roads",
+      "layerHeight_m": 1.4,
+      "elevationDeg": 45,
+      "apparentGroundShift_m": 1.4
+    },
+    {
+      "layer": "roads",
+      "layerHeight_m": 1.4,
+      "elevationDeg": 30,
+      "apparentGroundShift_m": 2.42
+    },
+    {
+      "layer": "roads",
+      "layerHeight_m": 1.4,
+      "elevationDeg": 15,
+      "apparentGroundShift_m": 5.22
+    },
+    {
+      "layer": "railways",
+      "layerHeight_m": 2,
+      "elevationDeg": 90,
+      "apparentGroundShift_m": 0
+    },
+    {
+      "layer": "railways",
+      "layerHeight_m": 2,
+      "elevationDeg": 60,
+      "apparentGroundShift_m": 1.15
+    },
+    {
+      "layer": "railways",
+      "layerHeight_m": 2,
+      "elevationDeg": 45,
+      "apparentGroundShift_m": 2
+    },
+    {
+      "layer": "railways",
+      "layerHeight_m": 2,
+      "elevationDeg": 30,
+      "apparentGroundShift_m": 3.46
+    },
+    {
+      "layer": "railways",
+      "layerHeight_m": 2,
+      "elevationDeg": 15,
+      "apparentGroundShift_m": 7.46
+    }
+  ],
+  "roadCenterlineVsGsiEdge": {
+    "nSamples": 14915,
+    "nearestEdgeDist_m": {
+      "p10": 1.11,
+      "p50": 2.6,
+      "p90": 6.22
+    },
+    "meanVectorToNearestEdge_m": {
+      "east": -0.06,
+      "south": 0.58
+    },
+    "note": "無バイアスなら 0 付近。道路が東西/南北の偏りを持つ街区では片側に寄ることがある（符号の一貫性は sweep で確認）。"
+  },
+  "osmWaterAreaVsGsiWater": {
+    "nVerts": 189,
+    "nearestGsiWaterBoundary_m": {
+      "p10": 0.08,
+      "p50": 0.35,
+      "p90": 3.74
+    },
+    "meanVector_m": {
+      "east": -0.25,
+      "south": 0.86
+    },
+    "osmAreaFeatures": 8,
+    "gsiPolygons": 78,
+    "note": "定義が異なる（OSM=自然水域の手動トレース、GSI=基盤地図）。近傍距離は「同一境界線の差」ではなく、最近の別境界線との距離。"
+  },
+  "buildingFootVsGsiEdgeSweep": {
+    "nVertsSampled": 19635,
+    "zeroShift": {
+      "dx": 0,
+      "dz": 0,
+      "median": 5.8,
+      "within1m": 20.3
+    },
+    "bestByMedian": {
+      "dx": 8,
+      "dz": -8,
+      "median": 5.38,
+      "within1m": 11.9
+    },
+    "bestByWithin1m": {
+      "dx": 0,
+      "dz": 0,
+      "median": 5.8,
+      "within1m": 20.3
+    }
+  },
+  "buildingRepPointInGsiWater": {
+    "buildingsChecked": 10546,
+    "repPointInGsiWater": 2,
+    "ids": [
+      "bldg_2ac0842f-9d38-4037-8b19-9beca28a9cf2",
+      "bldg_a7df49c9-f100-442c-a2a4-18c718d415f8"
+    ]
+  },
+  "hanwaHospitalFootprint": {
+    "found": true,
+    "id": "bldg_ec74351a-f344-4b61-b2e6-04b660b05aa0",
+    "h": 34.4,
+    "z0": 0,
+    "nVerts": 46,
+    "vertexToGsiRoadEdge_m": [
+      0.77,
+      4.58,
+      0.49,
+      4.37,
+      8.06,
+      8.21,
+      0.19,
+      0.3,
+      19.88,
+      21.72,
+      22.43,
+      22.41,
+      20.44,
+      20.26,
+      19.49,
+      19.46,
+      21.7,
+      21.48,
+      20.97,
+      20.94,
+      20.01,
+      19.87,
+      20.8,
+      18.17,
+      9.42,
+      6.85,
+      1.75,
+      2.06,
+      1.11,
+      0.41,
+      4.13,
+      0.25,
+      0.43,
+      2.85,
+      2.98,
+      21.71,
+      19.49,
+      10.56,
+      10.51,
+      8.2,
+      8.24,
+      4.89,
+      4.86,
+      2.93,
+      2.99,
+      0.55
+    ],
+    "minVertexToEdge_m": 0.19
+  }
+}

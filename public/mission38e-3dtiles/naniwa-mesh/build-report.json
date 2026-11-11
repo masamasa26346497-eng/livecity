@@ -1,0 +1,85 @@
+{
+ "dataset": "osaka-naniwa",
+ "selectedTiles": 6,
+ "groups": 1,
+ "leaf": [
+  {
+   "name": "t_-7_-14",
+   "buildings": 520,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 16165,
+   "triangles": 8659,
+   "bytes": 452508
+  },
+  {
+   "name": "t_-7_-13",
+   "buildings": 498,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 15545,
+   "triangles": 8331,
+   "bytes": 435180
+  },
+  {
+   "name": "t_-6_-14",
+   "buildings": 363,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 12170,
+   "triangles": 6576,
+   "bytes": 340548
+  },
+  {
+   "name": "t_-6_-13",
+   "buildings": 709,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 21285,
+   "triangles": 11353,
+   "bytes": 595748
+  },
+  {
+   "name": "t_-5_-14",
+   "buildings": 166,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 5025,
+   "triangles": 2683,
+   "bytes": 142060
+  },
+  {
+   "name": "t_-5_-13",
+   "buildings": 210,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 6560,
+   "triangles": 3516,
+   "bytes": 184740
+  }
+ ],
+ "coarse": [
+  {
+   "name": "g_-2_-4",
+   "buildings": 1398,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 27960,
+   "triangles": 13980,
+   "bytes": 791776
+  }
+ ],
+ "totals": {
+  "buildings": 2466,
+  "sourceBuildings": 2466,
+  "skipped": 0,
+  "fallbacks": 0,
+  "glbBytes": 2942560,
+  "uniqueCanonicalIds": 2466
+ },
+ "options": {
+  "group": 4,
+  "coarseError": 40,
+  "coarseMinArea": 100
+ }
+}

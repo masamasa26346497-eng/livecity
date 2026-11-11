@@ -1,0 +1,63 @@
+ward         served  meshes  dlMB   inflMB  bldgs   glbMB  sec
+kita          yes        25   50.5    903.8  19601    26.9    71
+chuo          yes        20   41.6    753.4  18655    24.8  35.8
+nishi         yes        16   26.3    566.2  12603    16.8  20.5
+fukushima     no         16   26.2    560.4  13412    17.4  34.7
+{
+ "estimate": {
+  "wards": 4,
+  "estimatedWards": 0,
+  "lod1GlbMB": {
+   "low": 73,
+   "mid": 86,
+   "high": 99
+  },
+  "contentTiles": 183,
+  "files": {
+   "low": 439,
+   "mid": 549,
+   "high": 824,
+   "basis": "estimated (filesPerTile 仮定)"
+  },
+  "buildSeconds": {
+   "mid": 162,
+   "note": "mission193 の 4 vCPU Actions runner の実測秒の合計/比例推定。Vercel ビルド機の速度は未実測"
+  },
+  "downloadCompressedMB": 144.6
+ },
+ "fit": {
+  "confirmedLimitsUsed": true,
+  "buildTime": {
+   "estimatedConversionMinutes": 2.7,
+   "limitMinutes": 45,
+   "verdict": "変換のみなら45分内(4 vCPU Actions の実測比例。Vercel 機は未実測。ZIP Range 取得/LOD2/ID監査は含まず) → 毎回ビルドは非推奨"
+  },
+  "deploymentStorage": {
+   "teamLimitGB": 10,
+   "perDeploymentGB": {
+    "low": 0.07,
+    "mid": 0.08,
+    "high": 0.1
+   },
+   "retainedDeployments": 6,
+   "worstCaseGB": 0.58,
+   "verdict": "範囲内の見込み"
+  },
+  "transfer": {
+   "limitGBPerMonth": 100,
+   "fullViewGB": 0.08,
+   "fullViewsToLimit": 1250,
+   "note": "全区を読むと約0.08GB/人(LOD1のみ・キャッシュ無し最悪ケース)。月100GBは全区フル閲覧で約1250回分(R2 直送egressは無料)"
+  },
+  "undetermined": [
+   "静的出力の総量上限",
+   "静的出力のファイル数上限",
+   "単一静的ファイル上限"
+  ],
+  "files": {
+   "mid": 549,
+   "high": 824,
+   "note": "CLI source files 上限15000は source upload の話で、build output ファイル数の上限ではない"
+  }
+ }
+}
