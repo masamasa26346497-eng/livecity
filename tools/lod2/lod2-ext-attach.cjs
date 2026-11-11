@@ -138,11 +138,26 @@ function defaultCandidates(env = process.env) {
   return c;
 }
 // 最初に「1区以上を配信できる」候補を採用。無ければ all の検査結果(理由つき)を返す。
-function discover(explicit, env = process.env) {
+// Mission 194R: 旧 45D 出力の無断混入を防ぐ。
+//   explicit(--ext-root)あり → そのフォルダだけを検査して接続(mode 'explicit')。
+//   explicit なし + allowLegacy(--allow-legacy)→ 既定の場所を自動検出(mode 'legacy-auto'。2025 とは限らない)。
+//   どちらも無し → 既定の場所は「検査して報告するだけ」で接続しない(mode 'none'、chosen=null)。
+function discover(explicit, env = process.env, opts = {}) {
+  const mode = explicit ? 'explicit' : (opts.allowLegacy === true ? 'legacy-auto' : 'none');
   const list = (explicit ? [path.resolve(explicit)] : defaultCandidates(env).filter((p) => isDir(p)));
   const inspected = list.map((d) => ({ dir: d, ...inspect(d) }));
-  const chosen = inspected.find((x) => x.kind !== 'unknown' && x.wards.length > 0) || null;
-  return { chosen, inspected };
+  const found = inspected.find((x) => x.kind !== 'unknown' && x.wards.length > 0) || null;
+  return { chosen: mode === 'none' ? null : found, inspected, mode, legacyFound: mode === 'none' ? found : null };
+}
+// 出典(世代)の判定。各区の source.json の vintage を読む。判定できないものを 2025 と書かない。
+//   'plateau-2025' = 接続した全区が vintage 2025 | 'mixed' | 'unverified'(vintage 記載なし。旧 45D 等)
+function vintageOf(ins) {
+  if (!ins) return { label: 'unconnected', wards2025: 0, wardsOther: 0, wards: 0 };
+  let y = 0, o = 0;
+  const check = (file) => { const s = jsonOf(file); if (s && Number(s.vintage) === 2025) y++; else o++; };
+  if (ins.kind === 'ext-index') for (const w of ins.wards || []) check(path.join(ins.dir, String(w.ward), 'source.json'));
+  else for (const w of ins.servable || []) check(path.join(w.dir, 'source.json'));
+  return { label: y && !o ? 'plateau-2025' : (y && o ? 'mixed' : 'unverified'), wards2025: y, wardsOther: o, wards: y + o };
 }
 
 // ---- 道路・河川・公園・鉄道・名称(45I MapLayers)。<root>/<ward>/layers/{roads,waterways,parks,railways,labels,layers-report}.json ----
@@ -209,4 +224,4 @@ function resolveFromServable(servable, rest) {
   return file;
 }
 
-module.exports = { inspect, discover, defaultCandidates, indexJsonFor, resolveFromServable, ALLOWED, wardHealth, inspectLayers, discoverLayers, layersDefaultCandidates, resolveLayers, LAYERS_MARKER, LAYERS_SCHEMA };
+module.exports = { inspect, discover, vintageOf, defaultCandidates, indexJsonFor, resolveFromServable, ALLOWED, wardHealth, inspectLayers, discoverLayers, layersDefaultCandidates, resolveLayers, LAYERS_MARKER, LAYERS_SCHEMA };

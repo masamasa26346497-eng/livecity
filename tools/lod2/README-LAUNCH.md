@@ -73,3 +73,15 @@ node tools/lod2/lod2-launch.mjs --all [--ext-root <24区 LOD1 の ext-3dtiles �
   - 路線・運営会社: `public/mission145-data/stations-24.json` が路線ソース無しで生成されている間は ✕(「路線データ未接続」の原因)。駅名自体は出ます。
   - 地名/道路/河川: ファイルの有無で判定します(道路・河川は内蔵サンプル範囲のみ)。
 - 24区 LOD1 は公開 Git に無く、PR #51 側の生成物(非公開 Release)です。LOD2 の launcher は LOD1 を自動取得しません。起動時に既定の保管場所(`%LOCALAPPDATA%\LiveCity-3DTiles-Out-24` 等)を探して候補を表示するだけです。
+
+## Mission 194R: 24区 LOD1 の接続ルール(旧データの無断混入を防ぐ)
+
+- `node tools/lod2/lod2-launch.mjs --all` だけでは、`%LOCALAPPDATA%\LiveCity-3DTiles-Out-24` などの**旧 45D 出力は接続されません**(LOD2 のみ・24区 LOD1 は未接続)。
+  旧データが見つかった場合は「検出したが接続していない」と起動ログ・右上パネル・`/__lod2/diag.json` の `extAttach.source` に出ます。
+- 旧データを意図して使うときだけ `--allow-legacy` を付けます(画面には「旧データ・2025ではない可能性」と表示)。
+- 2025 版の LOD1 を使うには、そのフォルダ(`index.json` 付き、または 45D 形式)を `--ext-root` で指定します。
+  `node tools/lod2/lod2-launch.mjs --all --ext-root <フォルダ>`(動作は合成 fixture でのテストのみ。ユーザーPCでは未確認)
+- 画面に「公式 PLATEAU 2025」と出るのは、接続した全区の `source.json` に `vintage: 2025` がある場合だけです。無い場合は「2025 とは確認できません」と出ます。
+- `--no-auto-ext` は既定の場所の自動検出を止めるだけで、明示した `--ext-root` は無効にしません。
+- 2025 LOD1 がまだ PC に無い場合: `node tools/mission79-run.mjs --ward <区> --max-mb 1500`(公式 Range 取得・無料)で区ごとに生成できます(出力先は `temp/`)。24区ぶんの生成は `node tools/lod2/lod2-all-wards.mjs`(約18分)。
+- LOD2 は大阪全域ではなく 33 メッシュ 10,698 棟です。大阪駅周辺(半径500m)には 275 棟あります(`data/reports/mission194r/umeda-lod2-coverage.json`)。LOD2 の無い建物は LOD1 の箱型のままです。

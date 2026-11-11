@@ -17,7 +17,7 @@ const freePort = () => new Promise((res) => { const s = net.createServer(); s.li
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function startServer(env, extraArgs = []) {
   const port = await freePort();
-  const p = spawn(process.execPath, [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', 'temp/lc171-none', ...extraArgs],
+  const p = spawn(process.execPath, [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', 'temp/lc171-none', '--allow-legacy', ...extraArgs],
     { cwd: ROOT, env: { ...process.env, ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
   let out = ''; p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { out += d; });
   const base = 'http://127.0.0.1:' + port;

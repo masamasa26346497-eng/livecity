@@ -17,7 +17,9 @@ const port = Number(opt('port', 8152));
 // Mission 170: --ext-root 未指定でも、既存の 24区 LOD1 出力(%LOCALAPPDATA%\LiveCity-3DTiles-Out-24 等)を読み取り専用で検出し、互換なら自動接続する。
 //   --no-auto-ext で自動検出を止める。互換性が不明なら接続せず、理由を diag.json / 画面に出す。
 const A = require('./lod2-ext-attach.cjs');
-const ATTACH = argv.includes('--no-auto-ext') ? { chosen: null, inspected: [], off: true } : A.discover(opt('ext-root'));
+// Mission 194R: 既定の場所(旧 45D 出力など)は --allow-legacy を付けたときだけ自動接続する。--ext-root は常に有効(--no-auto-ext でも無効にしない)。
+const ALLOW_LEGACY = argv.includes('--allow-legacy');
+const ATTACH = (argv.includes('--no-auto-ext') && !opt('ext-root')) ? { chosen: null, inspected: [], off: true, mode: 'none', legacyFound: null } : A.discover(opt('ext-root'), process.env, { allowLegacy: ALLOW_LEGACY });
 // Mission 171: 道路・河川・公園・鉄道・名称の別出力(%LOCALAPPDATA%\\LiveCity-MapLayers-Out-24 等)も読み取り専用で検出する。--layers-root で指定、--no-auto-layers で停止。
 const LAYERS = argv.includes('--no-auto-layers') ? { chosen: null, inspected: [], off: true } : A.discoverLayers(opt('layers-root'));
 const LAY = LAYERS.chosen;
@@ -105,10 +107,22 @@ function diagnose() {
 // Mission 169: 表示に必要なデータの有無を起動時に検証する(欠落は日本語で明示)。絶対パス・秘密情報は含めない。
 function jsonOf(p) { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return null; } }
 // 接続した/しなかった LOD1 の要約(絶対パスなし。出典・検証状態・欠落区を明記)
+// データ出典ラベル(起動ログ・画面・diag.json 共通)。2025 と言えるのは接続した全区の source.json が vintage 2025 のときだけ。
+function sourceInfo() {
+  const v = A.vintageOf(EXT);
+  let label, ja;
+  if (!EXT) { label = 'unconnected'; ja = '24区 LOD1: 未接続(2025 の LOD1 ではありません)'; }
+  else if (v.label === 'plateau-2025') { label = 'plateau-2025'; ja = '24区 LOD1: 公式 PLATEAU 2025(' + v.wards2025 + '区の source.json が vintage 2025)'; }
+  else if (ATTACH.mode === 'legacy-auto') { label = 'legacy-45d'; ja = '24区 LOD1: 旧データ(--allow-legacy で自動接続。2025 ではない可能性・出典未検証)'; }
+  else { label = v.label === 'mixed' ? 'mixed' : 'explicit-unverified'; ja = '24区 LOD1: --ext-root 指定(' + (v.label === 'mixed' ? '2025 と他世代が混在' : 'source.json に vintage 2025 の記載なし=2025 とは確認できません') + ')'; }
+  const lf = ATTACH.legacyFound;
+  return { label, ja, mode: ATTACH.mode, vintage: v, legacyDetectedNotConnected: lf ? { name: lf.name, kind: lf.kind, wards: lf.wards.length } : null,
+    legacyNote: lf ? '既定の場所に旧データ(' + lf.name + ' ' + lf.wards.length + '区)がありますが、2025 版ではないため接続していません。使う場合のみ --allow-legacy を付けてください' : null };
+}
 function extSummary() {
   const slim = (x) => ({ name: x.name || path.basename(x.dir), kind: x.kind, wards: x.wards.length, missingWards: x.missingWards || [], brokenWards: x.brokenWards || [], wardList: (x.wards || []).map((w) => ({ ward: w.ward, buildings: w.buildings })), verified: x.verified === true, reasons: x.reasons });
   return {
-    attached: !!EXT, auto: !opt('ext-root') && !!EXT, off: !!ATTACH.off,
+    attached: !!EXT, auto: !opt('ext-root') && !!EXT, off: !!ATTACH.off, source: sourceInfo(),
     chosen: EXT ? { ...slim(EXT), buildings: EXT.wards.reduce((n, w) => n + (w.buildings || 0), 0), buildingsKnown: EXT.wards.every((w) => w.buildings != null) } : null,
     inspected: ATTACH.inspected.map(slim),
   };
@@ -189,10 +203,11 @@ server.on('error', (e) => {
 if (require.main === module) server.listen(port, '127.0.0.1', () => {
   console.log('LOD2 preview (localhost only): http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2fly=1');
   console.log('lod2 dir: ' + mounts[0][1]);
+  console.log('データ出典: ' + sourceInfo().ja);
   if (EXT) {
     console.log('24区 LOD1: ' + EXT.wards.length + ' 区を読み取り専用で接続 [' + EXT.kind + (EXT.verified ? '' : '・未検証') + '] ' + EXT.reasons.join(' / '));
     for (const b of (EXT.brokenWards || [])) console.log('  NG ' + b.ward + ': ' + b.reasons.map((r) => 'a' + r.attempt + ' ' + r.reason).join(' | '));
-  } else { console.log('24区 LOD1: 未接続(内蔵サンプル区のみ)'); for (const x of ATTACH.inspected) console.log('  検査した候補 ' + x.name + ': ' + x.reasons.join(' / ')); }
+  } else { console.log('24区 LOD1: 未接続(内蔵サンプル区のみ)'); if (sourceInfo().legacyNote) console.log('  ※ ' + sourceInfo().legacyNote); for (const x of ATTACH.inspected) console.log('  検査した候補 ' + x.name + ': ' + x.reasons.join(' / ')); }
   console.log(LAY ? '道路・河川・公園: ' + LAY.wards.length + ' 区のレイヤーを接続' : '道路・河川・公園: 24区レイヤー未接続(' + (LAYERS.inspected.length ? LAYERS.inspected.map((x) => x.reasons.join(' / ')).join(' ; ') : '既定の場所に LiveCity-MapLayers-Out-24 が無い。--layers-root <フォルダ> で指定') + ')');
 });
 module.exports = { server, resolve, diagnose, dataStatus, extCandidates };

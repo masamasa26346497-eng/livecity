@@ -17,7 +17,7 @@ const freePort = () => new Promise((res) => { const s = net.createServer(); s.li
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function start(env) {
   const port = await freePort();
-  const p = spawn(process.execPath, [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', 'temp/lc174-none'], { cwd: ROOT, env: { ...process.env, ...env }, stdio: 'ignore' });
+  const p = spawn(process.execPath, [path.join(ROOT, 'tools/lod2/lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', 'temp/lc174-none', '--allow-legacy'], { cwd: ROOT, env: { ...process.env, ...env }, stdio: 'ignore' });
   const base = 'http://127.0.0.1:' + port;
   for (let i = 0; i < 50; i++) { try { if ((await fetch(base + '/__lod2/diag.json')).ok) return { p, base }; } catch (e) { /* retry */ } await sleep(100); }
   p.kill(); throw new Error('server did not start');

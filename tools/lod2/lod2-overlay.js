@@ -181,7 +181,10 @@
       panel.insertBefore(live, panel.children[1]);
       const lod1Info = () => {
         const ea = state.extAttach; const c = ea && ea.chosen;
-        return c ? 'LOD1(24区): ' + c.wards + '区接続 [' + c.kind + (c.verified ? '' : '・未検証') + ']' + (c.buildingsKnown ? ' ' + c.buildings + '棟' : '') : 'LOD1(24区): 未接続';
+        const sr = ea && ea.source; const esc = (t) => String(t).replace(/[<>&]/g, '');
+        const so = sr && sr.ja ? '<br><b style="color:' + (sr.label === 'plateau-2025' ? '#8f8' : '#fc8') + '">' + esc(sr.ja) + '</b>' : '';
+        const ln = sr && sr.legacyNote ? '<br><span style="color:#fc8">' + esc(sr.legacyNote) + '</span>' : '';
+        return (c ? 'LOD1(24区): ' + c.wards + '区接続 [' + c.kind + (c.verified ? '' : '・未検証') + ']' + (c.buildingsKnown ? ' ' + c.buildings + '棟' : '') : 'LOD1(24区): 未接続(2025のLOD1ではありません)') + so + ln;
       };
       const refreshLive = () => {
         const s = ts.statistics; const cam = window.__lc152.camera();
