@@ -117,7 +117,7 @@ export function fitAgainstLimits(est, limits = VERCEL_HOBBY_LIMITS) {
       verdict: est.buildSeconds.mid / 60 <= c.buildMinutes ? '変換のみなら45分内(4 vCPU Actions の実測比例。Vercel 機は未実測。ZIP Range 取得/LOD2/ID監査は含まず) → 毎回ビルドは非推奨' : '45分超 → 毎回の区変換は不可' },
     deploymentStorage: { teamLimitGB: c.teamDeploymentStorageGB, perDeploymentGB: { low: gb(est.lod1GlbMB.low), mid: gb(mid), high: gb(hi) }, retainedDeployments: retained, worstCaseGB: gb(hi * retained),
       verdict: (hi * retained) / 1024 > c.teamDeploymentStorageGB ? '保持6デプロイ×全24区(LOD1のみ)で team storage 10GB 超の可能性 → 同一origin全24区は要警戒' : '範囲内の見込み' },
-    transfer: { limitGBPerMonth: c.transferGBPerMonth, fullViewGB: gb(mid), note: '全区を読むと約' + gb(mid) + 'GB/人。数人で月100GBに達しうる(R2 直送egressは無料)' },
+    transfer: { limitGBPerMonth: c.transferGBPerMonth, fullViewGB: gb(mid), fullViewsToLimit: Math.floor(c.transferGBPerMonth / gb(mid)), note: '全区を読むと約' + gb(mid) + 'GB/人(LOD1のみ・キャッシュ無し最悪ケース)。月100GBは全区フル閲覧で約' + Math.floor(c.transferGBPerMonth / gb(mid)) + '回分(R2 直送egressは無料)' },
     undetermined: ['静的出力の総量上限', '静的出力のファイル数上限', '単一静的ファイル上限'],
     files: { mid: est.files.mid, high: est.files.high, note: 'CLI source files 上限15000は source upload の話で、build output ファイル数の上限ではない' },
   };

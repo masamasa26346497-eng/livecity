@@ -2,7 +2,7 @@
  "mission": "202",
  "readOnly": true,
  "networkUsed": false,
- "generatedAt": "2026-11-11T13:06:32.369Z",
+ "generatedAt": "2026-11-11T13:06:40.389Z",
  "source": {
   "package": "plateau-27100-osaka-shi-2025",
   "etag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
@@ -621,7 +621,8 @@
   "transfer": {
    "limitGBPerMonth": 100,
    "fullViewGB": 0.78,
-   "note": "全区を読むと約0.78GB/人。数人で月100GBに達しうる(R2 直送egressは無料)"
+   "fullViewsToLimit": 128,
+   "note": "全区を読むと約0.78GB/人(LOD1のみ・キャッシュ無し最悪ケース)。月100GBは全区フル閲覧で約128回分(R2 直送egressは無料)"
   },
   "undetermined": [
    "静的出力の総量上限",
