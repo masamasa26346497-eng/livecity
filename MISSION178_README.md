@@ -1,0 +1,5 @@
+# Mission 178 (PR #51 only)
+- Persistence: NOT done. LIVECITY_3D_DATA_TOKEN is unset; `auth-test` = NOT-TESTED (GITHUB_TOKEN gets 404 on the private repo). No private read/write; nothing put in public Git/artifacts. The existing Release archives are unverified and not assumed identical to the 2025 output.
+- Added `tools/mission178/make-ext-index.mjs`: builds a 37G `/ext-3dtiles/index.json` (the format `?ext45=1` reads) from audit-manifest.json. `verified` stays false (37G UI and road/river overlay not measured); `standaloneVerified24` reports the earlier standalone Chrome result.
+- Not done: 37G-UI Chrome checks (needs the tiles regenerated on the runner plus a local server mapping /ext-3dtiles/), LOD2 ON/OFF/overlap checks (PR #50 not touched). PC 45D reuse by PR50 is policy only: PR50 should read the 45D output through the same index.json contract and join on gml:id.
+- One user action: create a fine-grained PAT (livecity-3d-data, Contents read; write only for put) and save it as repo secret LIVECITY_3D_DATA_TOKEN (`node tools/mission158-private-release.mjs setup`).

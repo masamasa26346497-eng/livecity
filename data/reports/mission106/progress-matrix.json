@@ -1,0 +1,499 @@
+{
+ "mission": "106",
+ "generatedFrom": [
+  "mission105/acceptance-gap.json",
+  "mission80-ward2025/e2e.json",
+  "mission81/e2e.json",
+  "coord-chain fixture"
+ ],
+ "wardsEvaluated": 24,
+ "browserCiAccepted": 0,
+ "ownerDeviceAccepted": 0,
+ "wards": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.083,
+    "maxAbsNorthErrM": 0.779,
+    "maxAbsUpErrM": 0.007
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.021,
+    "maxAbsNorthErrM": 0.844,
+    "maxAbsUpErrM": 0.008
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.062,
+    "maxAbsNorthErrM": 0.811,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.053,
+    "maxAbsNorthErrM": 0.687,
+    "maxAbsUpErrM": 0.006
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.081,
+    "maxAbsNorthErrM": 0.719,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": {
+    "class": "headless-software-render, NOT acceptance",
+    "sources": [
+     "mission80-ward2025/e2e.json"
+    ]
+   },
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.165,
+    "maxAbsNorthErrM": 0.596,
+    "maxAbsUpErrM": 0.006
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.108,
+    "maxAbsNorthErrM": 0.61,
+    "maxAbsUpErrM": 0.006
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.069,
+    "maxAbsNorthErrM": 0.579,
+    "maxAbsUpErrM": 0.004
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.017,
+    "maxAbsNorthErrM": 0.715,
+    "maxAbsUpErrM": 0.004
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.141,
+    "maxAbsNorthErrM": 0.602,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.074,
+    "maxAbsNorthErrM": 0.733,
+    "maxAbsUpErrM": 0.008
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "source2025Verified": "unverified",
+   "privateStored": "owner-reported (Mission105 run 41762805159), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.141,
+    "maxAbsNorthErrM": 0.75,
+    "maxAbsUpErrM": 0.007
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.134,
+    "maxAbsNorthErrM": 0.598,
+    "maxAbsUpErrM": 0.007
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.013,
+    "maxAbsNorthErrM": 0.552,
+    "maxAbsUpErrM": 0.002
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "source2025Verified": "unverified",
+   "privateStored": "owner-reported (Mission105 run 41762805159), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.125,
+    "maxAbsNorthErrM": 0.613,
+    "maxAbsUpErrM": 0.004
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.215,
+    "maxAbsNorthErrM": 0.572,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.277,
+    "maxAbsNorthErrM": 0.871,
+    "maxAbsUpErrM": 0.01
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.155,
+    "maxAbsNorthErrM": 0.556,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "source2025Verified": "unverified",
+   "privateStored": "owner-reported (Mission105 run 41762805159), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.138,
+    "maxAbsNorthErrM": 0.68,
+    "maxAbsUpErrM": 0.007
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.058,
+    "maxAbsNorthErrM": 0.561,
+    "maxAbsUpErrM": 0.005
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.24,
+    "maxAbsNorthErrM": 0.845,
+    "maxAbsUpErrM": 0.009
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.29,
+    "maxAbsNorthErrM": 0.474,
+    "maxAbsUpErrM": 0.006
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.045,
+    "maxAbsNorthErrM": 0.702,
+    "maxAbsUpErrM": 0.006
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "source2025Verified": "unverified",
+   "privateStored": "per Mission103 docs (21 wards), not verifiable here",
+   "sha256": "unverified",
+   "http200": "unverified",
+   "canvasPixelDelta": "unverified",
+   "withinWardPolygons": "unverified",
+   "roadWaterAlignment": "unverified",
+   "coordChainFixture": {
+    "status": "pass-offline",
+    "maxAbsEastErrM": 0.076,
+    "maxAbsNorthErrM": 0.704,
+    "maxAbsUpErrM": 0.008
+   },
+   "headlessEvidence": "none",
+   "browserCiAccepted": false,
+   "ownerDeviceAccepted": false
+  }
+ ]
+}

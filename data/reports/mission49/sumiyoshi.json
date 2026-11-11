@@ -1,0 +1,172 @@
+{
+ "generated": "2026-10-29T12:33:08.118Z",
+ "source": "PLATEAU 3D Tiles (tracked, footprints recovered from GLB) vs GSI optimal_bvmap-v1 z16 (WA, RdEdg, BldA)",
+ "window": {
+  "x": [
+   -3074,
+   -1426
+  ],
+  "z": [
+   -1572,
+   92
+  ]
+ },
+ "tiles": 36,
+ "counts": {
+  "plateauBuildings": 10546,
+  "gsiBldA": 36857,
+  "gsiWaterPolygons": 78,
+  "gsiRdEdgSegments": 32650,
+  "waterCells": 11091,
+  "waterAreaM2": 11091
+ },
+ "plateau": {
+  "water": {
+   "samples": 104908,
+   "wetSamples": 106,
+   "wetPct": 0.101,
+   "buildingsWithAnyWater": 6,
+   "buildingsOver20pctWater": 4,
+   "wetIds": [
+    {
+     "id": "bldg_08ca40f2-920c-40a1-8c21-720c87a14661",
+     "frac": 1
+    },
+    {
+     "id": "bldg_2ac0842f-9d38-4037-8b19-9beca28a9cf2",
+     "frac": 0.35
+    },
+    {
+     "id": "bldg_a7df49c9-f100-442c-a2a4-18c718d415f8",
+     "frac": 0.32
+    },
+    {
+     "id": "bldg_e4900f9a-4cb3-4cd3-8a41-6993b44852ab",
+     "frac": 0.26
+    }
+   ]
+  },
+  "roadEdge": {
+   "buildings": 10546,
+   "buildingsCrossingRoadEdge": 399,
+   "crossPct": 3.78,
+   "crossings": 846,
+   "ids": [
+    "bldg_492a5273-85f0-4280-a68e-c42754fd81d5",
+    "bldg_6e42d6b4-c970-4643-b593-e89bc7d6347a",
+    "bldg_c5fbc41c-4b5c-4481-8442-c68dbd871fa0",
+    "bldg_ddcf1a7a-0662-4e75-ae13-5bdf4c505cc3",
+    "bldg_f2a8c842-cefd-470d-b951-eeaf4c9673a8",
+    "bldg_5acb4d9b-4eee-46c2-8e9a-1c8f846a7b24",
+    "bldg_eefd51af-bdb4-42b6-a56c-a55b1018d770",
+    "bldg_d86c95eb-9dc3-4c42-8b67-a310449b03fd",
+    "bldg_9a4c3c62-b0d4-43b4-82c7-ecae6b9819e2",
+    "bldg_edcadac9-3ae8-476b-939b-d9363d804246",
+    "bldg_6d603c00-33e6-457b-a945-11a831c74a4f",
+    "bldg_de0c3736-b2a8-49d5-bf12-67ad6187c31a",
+    "bldg_f89ab3f5-21be-4eed-8d62-d1d12242cefc",
+    "bldg_b0cc2b11-c4e7-47c6-b3d2-21845deca49f",
+    "bldg_6cf80840-43f1-4c88-8f06-656f1b4a6f37"
+   ]
+  }
+ },
+ "gsiBldAControl": {
+  "water": {
+   "samples": 442847,
+   "wetSamples": 106,
+   "wetPct": 0.024,
+   "buildingsWithAnyWater": 5,
+   "buildingsOver20pctWater": 4,
+   "wetIds": [
+    {
+     "id": "gsi15567",
+     "frac": 0.26
+    },
+    {
+     "id": "gsi23736",
+     "frac": 1
+    },
+    {
+     "id": "gsi24830",
+     "frac": 0.36
+    },
+    {
+     "id": "gsi30847",
+     "frac": 0.32
+    }
+   ]
+  },
+  "roadEdge": {
+   "buildings": 36389,
+   "buildingsCrossingRoadEdge": 606,
+   "crossPct": 1.67,
+   "crossings": 1176,
+   "ids": []
+  }
+ },
+ "shiftSearch": {
+  "stepM": 4,
+  "rangeM": 24,
+  "atZero": {
+   "dx": 0,
+   "dz": 0,
+   "wetSamples": 106,
+   "crossingBuildings": 399,
+   "score": 3.884
+  },
+  "best": {
+   "dx": 0,
+   "dz": 0,
+   "wetSamples": 106,
+   "crossingBuildings": 399,
+   "score": 3.884
+  },
+  "minAtZero": true,
+  "fine": {
+   "rangeM": 6,
+   "stepM": 1,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "wetSamples": 106,
+    "crossingBuildings": 399,
+    "score": 3.884
+   },
+   "minAtZero": true
+  },
+  "quadrants": [
+   {
+    "quadrant": "NW",
+    "dx": 0,
+    "dz": 0,
+    "s": 2.849,
+    "crossPct": 2.65,
+    "n": 2379
+   },
+   {
+    "quadrant": "NE",
+    "dx": 0,
+    "dz": 0,
+    "s": 5.149,
+    "crossPct": 5.15,
+    "n": 2894
+   },
+   {
+    "quadrant": "SW",
+    "dx": 0,
+    "dz": 0,
+    "s": 3.01,
+    "crossPct": 3.01,
+    "n": 2894
+   },
+   {
+    "quadrant": "SE",
+    "dx": 0,
+    "dz": 0,
+    "s": 4.424,
+    "crossPct": 4.2,
+    "n": 2379
+   }
+  ]
+ }
+}

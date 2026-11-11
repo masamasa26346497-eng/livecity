@@ -1,0 +1,29 @@
+{
+  "schema": "livecity.mission43.rebuild/1",
+  "ward": "sumiyoshi",
+  "wardCode": "27120",
+  "source": "Git-tracked legacy tiles only (no network, no local-only input)",
+  "convert": {
+    "tiles": 52,
+    "buildings": 35031,
+    "uniqueIds": 35031,
+    "skipped": 0,
+    "fallbacks": 0,
+    "totalBytes": 40788694,
+    "ms": 1114
+  },
+  "verify": {
+    "ok": true,
+    "problems": [],
+    "wardCode": "27120",
+    "tileUris": 58,
+    "glbOk": 58,
+    "ids": 35031,
+    "uniqueIds": 35031,
+    "reportedBuildings": 35031,
+    "bytes": 40789681,
+    "onDemandOk": true
+  },
+  "published": false,
+  "note": "Output is a local artifact; not added to Git. Publishing needs licenceApproved + owner approval (40J)."
+}

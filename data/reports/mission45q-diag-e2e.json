@@ -1,0 +1,47 @@
+{
+ "browser": "Chrome/156.0.8078.47",
+ "checks": {
+  "beforeLoad": {
+   "side": 310,
+   "canvas": [
+    970,
+    800
+   ],
+   "loaded": false
+  },
+  "twoPaneBeforeLoad": true,
+  "brokenJsonMsg": true,
+  "stillUnloadedAfterBroken": true,
+  "badSchemaMsg": true,
+  "afterLoad": {
+   "loaded": true,
+   "footprints": 25,
+   "roads": 12,
+   "gsi": false,
+   "side": 310
+  },
+  "loadedOk": true,
+  "provenanceShown": true,
+  "pixels": {
+   "red": 9500,
+   "blue": 17500
+  },
+  "redAndBluePainted": true,
+  "pinAdded": true,
+  "afterResize": {
+   "side": 310,
+   "canvas": [
+    590,
+    700
+   ]
+  },
+  "resizeKeepsSidebar": true,
+  "parallax30m30deg": 17.32050807568877,
+  "parallaxOk": true,
+  "noExternalRequests": true,
+  "noJsErrors": true
+ },
+ "errors": [],
+ "externalRequests": [],
+ "pass": true
+}

@@ -1,0 +1,75 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const http = require('http');
+const LAYOUT = require('../tools/mission131/layout.cjs');
+const W = require('../tools/mission129/wards21.cjs');
+const L = require('../tools/mission130/accept-lib.cjs');
+const tmpl = fs.readFileSync(path.join(__dirname, '../tools/mission131/mission129-fetch-21.replacement.workflow.yml.template'), 'utf8');
+const mk = (p, o) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, Buffer.isBuffer(o) ? o : typeof o === 'string' ? o : JSON.stringify(o)); };
+const glb = () => { const b = Buffer.alloc(20); b.write('glTF', 0, 'latin1'); b.writeUInt32LE(2, 4); b.writeUInt32LE(20, 8); return b; };
+
+test('wrapped layout: data check finds it; missing>0 is a FAILURE (the run 42240020830 false positive)', () => {
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'm131-'));
+  mk(path.join(r, '_x_kita', 'export', 'tileset.json'), { root: { content: { uri: 'content/a.glb' }, children: [{ content: { uri: 'content/b.glb' } }] } });
+  mk(path.join(r, '_x_kita', 'export', 'content', 'a.glb'), glb());
+  mk(path.join(r, '_x_kita', 'export', 'content', 'b.glb'), glb());
+  mk(path.join(r, '_x_kita', 'export', 'ids', 't.json'), ['bldg_1', 'bldg_2']);
+  const s = W.check(r, ['kita', 'chuo']);
+  const kita = s.rows.find((x) => x.ward === 'kita'), chuo = s.rows.find((x) => x.ward === 'chuo');
+  assert.match(kita.verdict, /^data-ok/);
+  assert.strictEqual(kita.tiles, 2);
+  assert.strictEqual(kita.layout, 'nested');
+  assert.strictEqual(chuo.verdict, 'missing');
+  assert.strictEqual(s.strictOk, false);
+  assert.ok(s.probe && s.probe.files >= 4);
+});
+test('all-missing root (21 extracted, none attributable) is not ok', () => {
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'm131e-'));
+  mk(path.join(r, '_x_kita', 'something', 'readme.txt'), 'x');
+  const s = W.check(r);
+  assert.strictEqual(s.dataOk, 0);
+  assert.strictEqual(s.missing.length, 21);
+  assert.strictEqual(s.strictOk, false);
+});
+test('discovery never confuses sumiyoshi / higashisumiyoshi, and reports ambiguity', () => {
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'm131a-'));
+  mk(path.join(r, '_x_higashisumiyoshi', 'tileset.json'), {});
+  assert.strictEqual(LAYOUT.discoverWard(r, 'sumiyoshi'), null);
+  mk(path.join(r, '_x_abeno', 'a', 'abeno25', 'tileset.json'), {});
+  mk(path.join(r, '_x_abeno', 'b', 'abeno25', 'tileset.json'), {});
+  assert.strictEqual(LAYOUT.discoverWard(r, 'abeno').layout, 'ambiguous');
+});
+test('content URIs: relative only; server serves them for the discovered ward only', async () => {
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'm131u-'));
+  mk(path.join(r, 'w', 'tileset.json'), { root: { content: { uri: 'content/a.glb' }, children: [{ content: { uri: '../x.glb' } }, { content: { uri: 'https://e/x.glb' } }, { content: { uri: '/abs.glb' } }] } });
+  assert.deepStrictEqual(LAYOUT.contentUris(path.join(r, 'w')), ['content/a.glb']);
+  mk(path.join(r, 'w', 'content', 'a.glb'), 'glTF');
+  mk(path.join(r, 'w', 'content', 'b.glb'), 'glTF');
+  const hits = [];
+  let port = 0;
+  const srv = L.makeServer({ kita: path.join(r, 'w') }, hits, () => port, { kita: new Set(['content/a.glb']) });
+  await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
+  port = srv.address().port;
+  const get = (p) => new Promise((ok) => http.request({ host: '127.0.0.1', port, path: p }, (res) => { res.resume(); ok(res.statusCode); }).end());
+  assert.strictEqual(await get('/ext-3dtiles/kita25/content/a.glb'), 200);
+  assert.strictEqual(await get('/ext-3dtiles/kita25/content/b.glb'), 404);
+  srv.close();
+});
+test('replacement template: same secret/release, strict, one job, uploads nothing, no write token, guarded rm', () => {
+  const code = tmpl.replace(/^\s*#.*$/gm, '');
+  assert.match(tmpl, /LIVECITY_3D_DATA_READ_TOKEN/);
+  assert.match(tmpl, /plateau2025-converted/);
+  assert.match(tmpl, /_x_\$w/);
+  assert.match(tmpl, /mission129\/wards21\.cjs --check/);
+  assert.match(tmpl, /mission130\/accept21\.mjs/);
+  assert.match(tmpl, /permissions:\s*\n\s*contents: read/);
+  assert.ok(!/upload-artifact|actions\/cache|gh release|vercel|r2\.|-X (PUT|POST|DELETE)/i.test(code));
+  for (const line of code.split('\n').filter((l) => /\brm\b/.test(l))) assert.match(line, /\$\{[a-zA-Z]*:\?\}/);
+  assert.ok(!/tar -tzf [^|]*\|\s*grep/.test(code), 'no tar | grep -q (SIGPIPE)');
+  assert.match(tmpl, /--no-same-owner/);
+  assert.match(tmpl, /unsafe member names/);
+});

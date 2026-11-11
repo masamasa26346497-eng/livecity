@@ -1,0 +1,15 @@
+{
+ "mission": "182A",
+ "ward": "chuo",
+ "mode": "lod2-complement-lod1",
+ "idSetVintage": 2025,
+ "exclusionApplied": true,
+ "lod1InWardTotal": 18655,
+ "lod2IdsMatchedInWard": 4764,
+ "lod1Remaining": 13891,
+ "lod2IdsGiven": 6212,
+ "lod2IdsNotInWardLod1": 1448,
+ "tileBuildingSum": 13891,
+ "uniqueIdsInTiles": 13891,
+ "policy": "only exact same-vintage gml:id matches are skipped; no-id / other-vintage / unmatched stay LOD1; LOD1-only output lives in a separate dir"
+}
