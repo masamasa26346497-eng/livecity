@@ -1,0 +1,17 @@
+# Mission 196B: 配置先 .github/workflows/cloud-preview-build.yml (GitHub App は workflows を変更できないため template)。
+# build のみ(無料枠内・手動実行)。Vercel トークンが無くてもビルド検証できる。デプロイは Vercel Git 連携(Preview)が vercel.json に従って行う。
+name: cloud-preview-build
+on: workflow_dispatch
+permissions: { contents: read }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node tools/cloud/build-cloud-preview.mjs
+      - run: node tools/cloud/verify-cloud-preview.cjs --no-chrome
+      - uses: actions/upload-artifact@v4
+        with: { name: cloud-preview-static, path: temp/cloud-preview/static, retention-days: 3 }

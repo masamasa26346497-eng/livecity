@@ -1,0 +1,50 @@
+# Mission 130: INSTALL BY OWNER as .github/workflows/mission130-accept-21.yml on the DEFAULT branch. NOT installed by Claude (the App cannot write workflows). Nothing here has been run.
+# Same read-only fetch as Mission129 (READ token only in curl steps, data only in RUNNER_TEMP), then the private browser acceptance.
+# NOTHING is uploaded (no artifacts); results go only to the job summary (verdicts and counts, no building data). Each archive is extracted into its own
+# subfolder so the runner discovers the real layout instead of assuming <ward>25/. License/secret/PII gates are not touched.
+name: Mission130 private 21-ward Cesium acceptance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mission130-accept-21
+  cancel-in-progress: false
+env:
+  DATA_REPO: masamasa26346497-eng/livecity-3d-data
+  TAG: plateau2025-converted
+jobs:
+  accept:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/issue-23-20261007-1424
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch 21 archives (READ token only here; GET only; into RUNNER_TEMP)
+        env:
+          READ_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+        run: |
+          set -eu
+          [ -n "$READ_TOKEN" ] || { echo "FAIL: read token missing"; exit 1; }
+          echo "::add-mask::$READ_TOKEN"
+          printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sS -K - -H 'Accept: application/vnd.github+json' -o "${RUNNER_TEMP:?}/rel.json" -w 'release GET -> HTTP %{http_code}\n' "https://api.github.com/repos/$DATA_REPO/releases/tags/$TAG"
+          mkdir -p "${RUNNER_TEMP:?}/b21"; ok=0
+          for w in $(node tools/mission129/wards21.cjs --list | sed 's/^[0-9]* wards: //' | tr ',' ' '); do
+            id=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.id' "${RUNNER_TEMP:?}/rel.json" | head -n1)
+            [ -n "$id" ] || { echo "[$w] asset missing"; continue; }
+            printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sSL --fail -K - -H 'Accept: application/octet-stream' -o "${RUNNER_TEMP:?}/$w.tgz" "https://api.github.com/repos/$DATA_REPO/releases/assets/$id" || { echo "[$w] download failed"; continue; }
+            mkdir -p "${RUNNER_TEMP:?}/b21/_x_$w"
+            tar -xzf "${RUNNER_TEMP:?}/$w.tgz" -C "${RUNNER_TEMP:?}/b21/_x_$w"
+            rm -f "${RUNNER_TEMP:?}/${w:?}.tgz"
+            ok=$((ok+1))
+          done
+          echo "fetched+extracted: $ok / 21"
+      - name: Private browser acceptance (loopback only, nothing uploaded)
+        run: node tools/mission130/accept21.mjs --root "$RUNNER_TEMP/b21" --out "$RUNNER_TEMP/m130.json" | tee -a "$GITHUB_STEP_SUMMARY"

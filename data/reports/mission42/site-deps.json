@@ -1,0 +1,373 @@
+{
+  "schema": "livecity.mission42.site-deps/1",
+  "entrypoint": "public/mission37g-osaka-24ward-mvp.html",
+  "publicRepo": true,
+  "gates": {
+    "licenseApproved": false,
+    "privacyReviewApproved": false,
+    "note": "41H/41P の承認ゲートは全 false のまま。本ツールは解除も送信もしない"
+  },
+  "migrationReadiness": {
+    "requiredTotal": 6,
+    "requiredAlreadyTracked": 6,
+    "missingRequired": [],
+    "missingOptional": [],
+    "siteRunsFromGitAlone": true,
+    "runtimeVerifiedInBrowser": false
+  },
+  "alreadyTracked": {
+    "items": 19,
+    "files": 335,
+    "bytes": 82691911
+  },
+  "transferredNow": {
+    "files": 0,
+    "bytes": 0,
+    "note": "今回、新規に Git へ移したデータは 0(既に追跡済みの構成で閲覧に足りるため)"
+  },
+  "requiredStillLocal": [
+    {
+      "id": "fukushima-3dtiles",
+      "why": "福島区の変換 3D Tiles(約13.3MB)。PLATEAU 利用条件・公開承認ゲート未了",
+      "classification": "cannot-transfer-without-access"
+    },
+    {
+      "id": "fukushima-ward-layers",
+      "why": "福島区の OSM 道路/河川(40G)。ODbL 帰属確認と公開承認が未了",
+      "classification": "cannot-transfer-without-access"
+    },
+    {
+      "id": "other-ward-buildings-20",
+      "why": "旧タイル 1,097 tile のうち住吉以外(Git 非追跡、約0.6GB 外挿)。配信方式・ライセンス未承認",
+      "classification": "cannot-transfer-without-access"
+    },
+    {
+      "id": "ward-roads-rivers-23",
+      "why": "住吉 9tile 範囲外の道路/河川(OSM 元タイルがローカルのみ)",
+      "classification": "cannot-transfer-without-access"
+    }
+  ],
+  "nonessentialExcluded": [
+    "public/osaka_3d_buildings*.html の旧バージョン複製(未参照)",
+    "mission37b/37c 旧 PoC ページ",
+    "public/__test__ (28MB)",
+    "data/reports の QA スクリーンショット",
+    "41* の owner PC スキャン成果物(ローカルのみ・公開禁止)"
+  ],
+  "items": [
+    {
+      "id": "entry-html",
+      "role": "entrypoint",
+      "required": true,
+      "priority": 0,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 155625,
+      "existsOnDisk": true,
+      "refs": [
+        "vercel.json redirect"
+      ],
+      "source": "repo-authored",
+      "notes": []
+    },
+    {
+      "id": "scripts-local",
+      "role": "code",
+      "required": true,
+      "priority": 0,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 5,
+      "bytes": 42763,
+      "existsOnDisk": true,
+      "refs": [
+        "37G html L444-448"
+      ],
+      "source": "repo-authored",
+      "notes": []
+    },
+    {
+      "id": "cesium-cdn",
+      "role": "engine",
+      "required": true,
+      "priority": 0,
+      "classification": "reproducible-from-audited-public-source",
+      "gitTrackedFiles": 0,
+      "bytes": 0,
+      "existsOnDisk": null,
+      "refs": [
+        "37G html L443"
+      ],
+      "source": "jsdelivr cesium@1.121.1 (CDN, Git 外・移管不要)",
+      "notes": []
+    },
+    {
+      "id": "wards-boundary",
+      "role": "区境界(24区)",
+      "required": true,
+      "priority": 1,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 242274,
+      "existsOnDisk": true,
+      "refs": [
+        "WARDS_URL"
+      ],
+      "source": "国土数値情報 N03(整形済み)",
+      "notes": []
+    },
+    {
+      "id": "layers-sumiyoshi-9tile",
+      "role": "住吉 道路/河川/公園/鉄道/ラベル",
+      "required": true,
+      "priority": 2,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 15,
+      "bytes": 1063281,
+      "existsOnDisk": true,
+      "refs": [
+        "LAYER_BASE"
+      ],
+      "source": "OSM(ODbL)切り出し",
+      "notes": []
+    },
+    {
+      "id": "tiles-sumiyoshi-9tile",
+      "role": "住吉 3D建物(9tile)",
+      "required": true,
+      "priority": 1,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 24,
+      "bytes": 11084339,
+      "existsOnDisk": true,
+      "refs": [
+        "TILES_BASE"
+      ],
+      "source": "PLATEAU 2024 大阪市 LOD1 から変換",
+      "notes": [
+        "glb=11"
+      ]
+    },
+    {
+      "id": "tiles-kita",
+      "role": "北区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 46,
+      "bytes": 3668418,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=15"
+      ]
+    },
+    {
+      "id": "tiles-chuo",
+      "role": "中央区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 56,
+      "bytes": 7056359,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=19"
+      ]
+    },
+    {
+      "id": "tiles-tennoji",
+      "role": "天王寺区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 43,
+      "bytes": 8093452,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=14"
+      ]
+    },
+    {
+      "id": "tiles-nishi",
+      "role": "西区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 56,
+      "bytes": 5341826,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=19"
+      ]
+    },
+    {
+      "id": "tiles-naniwa-mesh",
+      "role": "浪速区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 23,
+      "bytes": 3301809,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=7"
+      ]
+    },
+    {
+      "id": "tiles-naniwa-mesh2",
+      "role": "浪速区 3D建物(一部)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 34,
+      "bytes": 2341627,
+      "existsOnDisk": true,
+      "refs": [
+        "EXTRA_SET_DEFS"
+      ],
+      "source": "PLATEAU 2024",
+      "notes": [
+        "glb=11"
+      ]
+    },
+    {
+      "id": "published-wards",
+      "role": "公開承認済み区の一覧",
+      "required": false,
+      "priority": 5,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 257,
+      "existsOnDisk": true,
+      "refs": [
+        "loadPublishedDefs"
+      ],
+      "source": "repo-authored(承認ゲート)",
+      "notes": []
+    },
+    {
+      "id": "sumiyoshi-facilities",
+      "role": "住吉 施設149件",
+      "required": false,
+      "priority": 2,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 109766,
+      "existsOnDisk": true,
+      "refs": [
+        "FAC_URL"
+      ],
+      "source": "OSM(ODbL)",
+      "notes": []
+    },
+    {
+      "id": "sumiyoshi-towns",
+      "role": "住吉 町丁目104件",
+      "required": false,
+      "priority": 2,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 133388,
+      "existsOnDisk": true,
+      "refs": [
+        "TOWNS_URL"
+      ],
+      "source": "e-Stat/CODH 町丁字境界(CC BY 4.0)+暫定形状",
+      "notes": []
+    },
+    {
+      "id": "verified-google-place-ids",
+      "role": "Place ID照合表(Google課金は無効)",
+      "required": false,
+      "priority": 6,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 1130657,
+      "existsOnDisk": true,
+      "refs": [
+        "GOOGLE_PLACE_INDEX_URL"
+      ],
+      "source": "repo-authored",
+      "notes": []
+    },
+    {
+      "id": "ward-facilities",
+      "role": "24区 施設(OSM)",
+      "required": false,
+      "priority": 3,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 24,
+      "bytes": 32543967,
+      "existsOnDisk": true,
+      "refs": [
+        "FAC_WARD_BASE"
+      ],
+      "source": "OSM(ODbL)",
+      "notes": []
+    },
+    {
+      "id": "photo-index",
+      "role": "Wikimedia写真索引",
+      "required": false,
+      "priority": 4,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 6149180,
+      "existsOnDisk": true,
+      "refs": [
+        "PHOTO_INDEX_URL"
+      ],
+      "source": "Wikimedia Commons(各写真に作者/ライセンス)",
+      "notes": []
+    },
+    {
+      "id": "photo-dates",
+      "role": "撮影日(検証済み)",
+      "required": false,
+      "priority": 4,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 223598,
+      "existsOnDisk": true,
+      "refs": [
+        "PHOTO_DATES_URL"
+      ],
+      "source": "Commons API",
+      "notes": []
+    },
+    {
+      "id": "photo-review",
+      "role": "写真 holds/adds",
+      "required": false,
+      "priority": 4,
+      "classification": "already-in-Git",
+      "gitTrackedFiles": 1,
+      "bytes": 9325,
+      "existsOnDisk": true,
+      "refs": [
+        "PHOTO_REVIEW_URL"
+      ],
+      "source": "repo-authored",
+      "notes": []
+    }
+  ]
+}

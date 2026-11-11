@@ -1,0 +1,192 @@
+{
+  "mission": "59",
+  "jsErrors": [],
+  "badResponses": [
+    "404 http://localhost:8161/ext-3dtiles/index.json",
+    "404 http://localhost:8161/favicon.ico",
+    "404 https://cyberjapandata.gsi.go.jp/xyz/pale/1/1/0.png",
+    "404 https://cyberjapandata.gsi.go.jp/xyz/pale/1/0/0.png",
+    "404 https://cyberjapandata.gsi.go.jp/xyz/pale/1/0/1.png",
+    "404 https://cyberjapandata.gsi.go.jp/xyz/pale/1/1/1.png",
+    "404 https://cyberjapandata.gsi.go.jp/xyz/pale/0/0/0.png"
+  ],
+  "points": [
+    {
+      "name": "hanwa-hospital",
+      "lat": 34.6044,
+      "lon": 135.5051,
+      "localXZ": [
+        -1825.2,
+        -21.4
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 125548,
+        "bestShiftPx": [
+          -0.13547444832693092,
+          -0.11959002323766081
+        ],
+        "bestAtEdge": false,
+        "peakOverMean": 3.3438468058278312,
+        "zeroOverBest": 1
+      },
+      "shiftMeters": {
+        "dxEast": -0.04,
+        "dySouth": -0.03,
+        "horiz": 0.05
+      }
+    },
+    {
+      "name": "sumiyoshi-taisha",
+      "lat": 34.6114,
+      "lon": 135.493,
+      "localXZ": [
+        -2933.9,
+        -800.6
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 24214,
+        "bestShiftPx": [
+          0.22182067955344373,
+          -0.3213131476254725
+        ],
+        "bestAtEdge": false,
+        "peakOverMean": 1.4162019982106953,
+        "zeroOverBest": 1
+      },
+      "shiftMeters": {
+        "dxEast": 0.06,
+        "dySouth": -0.09,
+        "horiz": 0.11
+      }
+    },
+    {
+      "name": "sumiyoshi-park-ne",
+      "lat": 34.605,
+      "lon": 135.499,
+      "localXZ": [
+        -2384.1,
+        -88.2
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 40852,
+        "bestShiftPx": [
+          0.05367509425476464,
+          -0.04969618423888178
+        ],
+        "bestAtEdge": false,
+        "peakOverMean": 1.6258736942364016,
+        "zeroOverBest": 1
+      },
+      "shiftMeters": {
+        "dxEast": 0.02,
+        "dySouth": -0.01,
+        "horiz": 0.02
+      }
+    },
+    {
+      "name": "hosoigawa",
+      "lat": 34.5984,
+      "lon": 135.5139,
+      "localXZ": [
+        -1018.9,
+        646.5
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 0,
+        "bestShiftPx": [
+          -48,
+          -48
+        ],
+        "bestAtEdge": true,
+        "peakOverMean": null,
+        "zeroOverBest": null
+      },
+      "shiftMeters": {
+        "dxEast": -13.84,
+        "dySouth": -13.84,
+        "horiz": 19.57
+      }
+    },
+    {
+      "name": "north-block",
+      "lat": 34.609,
+      "lon": 135.502,
+      "localXZ": [
+        -2109.3,
+        -533.4
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 65984,
+        "bestShiftPx": [
+          0.04960852102072076,
+          -0.11424428597506434
+        ],
+        "bestAtEdge": false,
+        "peakOverMean": 1.754383409288665,
+        "zeroOverBest": 1
+      },
+      "shiftMeters": {
+        "dxEast": 0.01,
+        "dySouth": -0.03,
+        "horiz": 0.04
+      }
+    },
+    {
+      "name": "south-block",
+      "lat": 34.599,
+      "lon": 135.495,
+      "localXZ": [
+        -2750.6,
+        579.8
+      ],
+      "metersPerPixel": 0.288,
+      "registration": {
+        "W": 700,
+        "H": 450,
+        "scale": 2,
+        "maskPx": 818,
+        "bestShiftPx": [
+          -48,
+          -48
+        ],
+        "bestAtEdge": true,
+        "peakOverMean": null,
+        "zeroOverBest": null
+      },
+      "shiftMeters": {
+        "dxEast": -13.84,
+        "dySouth": -13.84,
+        "horiz": 19.57
+      }
+    }
+  ],
+  "renderInfo": {
+    "globeShow": true,
+    "depthTestAgainstTerrain": false,
+    "terrainProvider": "EV",
+    "imageryLayers": 1,
+    "baseColor": "rgb(233,238,244)",
+    "logDepth": true,
+    "ellipsoidA": 6378137
+  }
+}
