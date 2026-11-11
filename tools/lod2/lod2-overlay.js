@@ -91,6 +91,27 @@
         viewer.camera.moveEnd.addEventListener(update);
         scene.postRender.addEventListener(() => { if (scene.primitives.length !== (update._n || 0)) { update._n = scene.primitives.length; prev = []; update(); } });
       }
+      // Mission 182B: 遠景(高度>lod2coarseh)では LOD1 区タイルが 1 枚も出ない。区 tileset の root は content 無し(ge=160)で、
+      // SSE=ge*viewH/(2*d*tan(fov/2)) が maximumScreenSpaceError(粗い区は 32)を超える d≈3.5km 以内にならないと子(lod/*.glb, ge=40)が選ばれないため。
+      // 遠景だけ他 tileset の maximumScreenSpaceError を下げ、粗い親タイルを出す(近づけば元の値に戻す)。?lod2coarsesse=0 で無効。
+      {
+        const qq = new URLSearchParams(location.search); const target = qq.has('lod2coarsesse') ? Number(qq.get('lod2coarsesse')) : 2; const HI = Number(qq.get('lod2coarseh') || 6000);
+        state.coarseSse = { target, heightM: HI, lowered: 0 };
+        if (target > 0) {
+          const orig = new WeakMap(); let lastChk = 0;
+          scene.postRender.addEventListener(() => {
+            const now = performance.now(); if (now - lastChk < 500) return; lastChk = now;
+            const h = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC).height; const far = h > HI; let n = 0, ch = false;
+            const prims = scene.primitives;
+            for (let i = 0; i < prims.length; i++) {
+              const p = prims.get(i); if (p === ts || !(p instanceof Cesium.Cesium3DTileset)) continue;
+              if (far) { if (p.maximumScreenSpaceError > target) { if (!orig.has(p)) orig.set(p, p.maximumScreenSpaceError); p.maximumScreenSpaceError = target; ch = true; } if (orig.has(p)) n++; }
+              else if (orig.has(p)) { p.maximumScreenSpaceError = orig.get(p); orig.delete(p); ch = true; }
+            }
+            state.coarseSse.lowered = n; if (ch) scene.requestRender();
+          });
+        }
+      }
       if (CLIP) applyClip();
       if (CLIP) scene.postRender.addEventListener(() => { if (scene.primitives.length !== (applyClip._n || 0)) { applyClip._n = scene.primitives.length; applyClip(); } });
       state.exclusion = NEAR ? 'clipping-polygon-near(カメラ近傍の足跡のみ動的クリップ。遠景では LOD1 と重なる)' : CLIP ?'clipping-polygon(足跡の凸包。LOD2 建物の LOD1 のみ除外。LOD2 化していない 3 棟等は残る)' : 'none(既定。LOD2 の建物は LOD1 と重なって描かれる場合があります。?lod2clip=1 で凸包クリップを試せますが、足跡が多いと固まります)';
