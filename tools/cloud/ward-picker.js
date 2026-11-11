@@ -36,7 +36,14 @@
         .then(function (b) { return ts ? R.verifyAsset(new Uint8Array(b), ts) : { ok: false, code: 'no-tileset-asset' }; })
         .then(function (a) { if (!a.ok) throw new Error('整合性NG: ' + a.code); return m; });
     }).then(function (m) {
-      msg('配信済み・検証OK(' + m.vintage + '年版, ' + m.fileCount + 'ファイル)' + (m.synthetic ? ' ※合成fixture' : '') + '。描画は既存ビューで確認してください。');
+      // Mission 203: 検証成功後に、37G 既存の区ボタン(.lc-wardbtn[data-code])を押して既存の WardUI.select(w,true)
+      //   (区ハイライト・setBuildingWard の mount・カメラ移動)を再利用する。3D は再実装しない。
+      var btn = document.querySelector('.lc-wardbtn[data-code="' + String(m.wardCode).replace(/[^0-9]/g, '') + '"]');
+      var linked = !!btn;
+      if (btn) btn.click();
+      state.linked = linked;
+      msg('配信済み・検証OK(' + m.vintage + '年版, ' + m.fileCount + 'ファイル)' + (m.synthetic ? ' ※合成fixture' : '') +
+        (linked ? '。既存の区選択へ移動しました(描画の目視確認は別途必要)。' : '。この画面には対応する区ボタンが無く、移動は未実装です(旧データへは切り替えません)。'));
       document.dispatchEvent(new CustomEvent('lc-ward-select', { detail: { ward: ward, state: 'served', manifest: m.contentVersion } }));
     }).catch(function (e) { msg('検証失敗(旧データへは切り替えません): ' + e.message); });
   }
