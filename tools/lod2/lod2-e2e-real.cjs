@@ -33,7 +33,7 @@ async function main() {
   for (const id of WARDS) {
     const w = regs.find((x) => x.id === id), src = path.join(ROOT, 'temp/mission79', id + (opt('variant', '') ? '-2025-' + opt('variant') : '-2025'));
     if (!fs.existsSync(path.join(src, 'tileset.json'))) throw new Error('実データ未生成: ' + src + ' (tools/mission79-run.mjs --ward ' + id + ')');
-    const dst = path.join(root, 'pc23', id + '-a1'); fs.mkdirSync(dst, { recursive: true });
+    const dst = id === 'sumiyoshi' ? path.join(root, 'sumiyoshi-a1') : path.join(root, 'pc23', id + '-a1'); fs.mkdirSync(dst, { recursive: true });
     for (const n of fs.readdirSync(src)) if (ALLOW.some((re) => re.test(n))) fs.cpSync(path.join(src, n), path.join(dst, n), { recursive: true });
     const rep = JSON.parse(fs.readFileSync(path.join(dst, 'build-report.json'), 'utf8'));
     const tsj = JSON.parse(fs.readFileSync(path.join(dst, 'tileset.json'), 'utf8'));

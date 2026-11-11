@@ -26,7 +26,7 @@ const ALLOW = [/^tileset\.json$/, /^source\.json$/, /^build-report\.json$/, /^ti
   const info = {};
   for (const id of WARDS) {
     const src = path.join(ROOT, 'temp/mission79', id + '-2025');
-    const dst = path.join(root, 'pc23', id + '-a1'); fs.mkdirSync(dst, { recursive: true });
+    const dst = id === 'sumiyoshi' ? path.join(root, 'sumiyoshi-a1') : path.join(root, 'pc23', id + '-a1'); fs.mkdirSync(dst, { recursive: true });
     for (const n of fs.readdirSync(src)) if (ALLOW.some((re) => re.test(n))) fs.cpSync(path.join(src, n), path.join(dst, n), { recursive: true });
     const rep = JSON.parse(fs.readFileSync(path.join(dst, 'build-report.json'), 'utf8'));
     info[id] = { code: regs.find((x) => x.id === id).code, buildings: rep.totals.buildings, tiles: fs.readdirSync(path.join(dst, 'tiles')).length };
