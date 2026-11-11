@@ -1,0 +1,161 @@
+{
+ "mission": 187,
+ "data": "REAL PLATEAU 2025 CityGML LOD1 via mission79-run; headless Chrome SwiftShader; not user PC/GPU",
+ "wards": {
+  "miyakojima": {
+   "totals": {
+    "buildings": 17651,
+    "sourceBuildings": 17651,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 24403236,
+    "uniqueCanonicalIds": 17651
+   },
+   "selectedTiles": 35,
+   "wardsInfo": {
+    "code": "27102",
+    "buildings": 17651,
+    "tiles": 35
+   },
+   "nearPixelDiff": 340600,
+   "nearSelectedTris": 190340,
+   "nearSelectedTiles": 21,
+   "drawn": true
+  },
+  "fukushima": {
+   "totals": {
+    "buildings": 13412,
+    "sourceBuildings": 13412,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 18235576,
+    "uniqueCanonicalIds": 13412
+   },
+   "selectedTiles": 27,
+   "wardsInfo": {
+    "code": "27103",
+    "buildings": 13412,
+    "tiles": 27
+   },
+   "nearPixelDiff": 337132,
+   "nearSelectedTris": 190801,
+   "nearSelectedTiles": 21,
+   "drawn": true
+  },
+  "konohana": {
+   "totals": {
+    "buildings": 17615,
+    "sourceBuildings": 17615,
+    "skipped": 0,
+    "fallbacks": 0,
+    "glbBytes": 24298844,
+    "uniqueCanonicalIds": 17615
+   },
+   "selectedTiles": 88,
+   "wardsInfo": {
+    "code": "27104",
+    "buildings": 17615,
+    "tiles": 88
+   },
+   "nearPixelDiff": 107660,
+   "nearSelectedTris": 59021,
+   "nearSelectedTiles": 21,
+   "drawn": true
+  }
+ },
+ "auto3d": {
+  "query": "?nobuiltin=1&ext45=1&lod2=1&lod2ov=1&lod2auto3d=1",
+  "firstMountAtSec": 53.6,
+  "http": {
+   "ok": 39,
+   "bad": [],
+   "glb": 23
+  },
+  "allMode": {
+   "on": true,
+   "mounted": {
+    "27102": "coarse",
+    "27103": "coarse",
+    "27104": "coarse"
+   },
+   "ticks": 11,
+   "mountsTotal": 3,
+   "dropsTotal": 0,
+   "buildings": 48678,
+   "lastPlan": {
+    "27102": "coarse",
+    "27103": "coarse",
+    "27104": "coarse"
+   },
+   "lastError": null,
+   "culledTotal": 0
+  },
+  "hints": [],
+  "tilesets": [
+   {
+    "ward": "lod2/unknown",
+    "show": true,
+    "ready": true,
+    "contentReady": 0,
+    "selected": 0,
+    "triangles": 0,
+    "clipping": false
+   },
+   {
+    "ward": "fukushima",
+    "show": true,
+    "ready": true,
+    "contentReady": 4,
+    "selected": 4,
+    "triangles": 134120,
+    "clipping": false
+   },
+   {
+    "ward": "konohana",
+    "show": true,
+    "ready": true,
+    "contentReady": 12,
+    "selected": 12,
+    "triangles": 176150,
+    "clipping": false
+   },
+   {
+    "ward": "miyakojima",
+    "show": true,
+    "ready": true,
+    "contentReady": 7,
+    "selected": 7,
+    "triangles": 176510,
+    "clipping": false
+   }
+  ],
+  "consoleErrors": []
+ },
+ "near": {
+  "pass": true,
+  "http": {
+   "ok": 289,
+   "bad": []
+  },
+  "extraMeta": [
+   {
+    "id": "ext-miyakojima",
+    "wardCode": "27102",
+    "buildings": 17651
+   },
+   {
+    "id": "ext-fukushima",
+    "wardCode": "27103",
+    "buildings": 13412
+   },
+   {
+    "id": "ext-konohana",
+    "wardCode": "27104",
+    "buildings": 17615
+   }
+  ],
+  "consoleErrors": [
+   "ERR [37C] layer:towns24 Error: towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）\n    at Object.mount (http://localhost:81"
+  ]
+ }
+}

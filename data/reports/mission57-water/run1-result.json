@@ -1,0 +1,240 @@
+{
+  "mission": "57",
+  "label": "run1",
+  "url": "http://localhost:8157/mission37g-osaka-24ward-mvp.html?qa=1&imagery=0&extra=0&fac=0&bw=27120",
+  "browser": "Chrome/156.0.8078.47",
+  "jsErrors": [],
+  "failed": [
+    "404 http://localhost:8157/ext-3dtiles/index.json",
+    "404 http://localhost:8157/favicon.ico"
+  ],
+  "googleRequests": 0,
+  "views": [
+    {
+      "view": "top",
+      "usable": 120,
+      "before": {
+        "waterColoured": 113
+      },
+      "after": {
+        "waterColoured": 113
+      }
+    },
+    {
+      "view": "oblique",
+      "usable": 120,
+      "before": {
+        "waterColoured": 118
+      },
+      "after": {
+        "waterColoured": 118
+      }
+    }
+  ],
+  "insidePtsCandidates": 200,
+  "center": [
+    -2097.502564102564,
+    -1660.761538461538
+  ],
+  "waterState": {
+    "state": "ready",
+    "polygons": 121,
+    "bboxLocal": {
+      "mission50-data/gsi-okawa-nakanoshima.json": {
+        "polygons": 51,
+        "bboxLocal": {
+          "minX": -3310.3,
+          "maxX": -1297,
+          "minZ": -11275.1,
+          "maxZ": -8761.2
+        }
+      },
+      "mission57-data/gsi-sumiyoshi-9tile.json": {
+        "polygons": 78,
+        "bboxLocal": {
+          "minX": -3813.7,
+          "maxX": -793.7,
+          "minZ": -2221.9,
+          "maxZ": 797.8
+        }
+      }
+    },
+    "windows": {
+      "mission50-data/gsi-okawa-nakanoshima.json": {
+        "polygons": 51,
+        "bboxLocal": {
+          "minX": -3310.3,
+          "maxX": -1297,
+          "minZ": -11275.1,
+          "maxZ": -8761.2
+        }
+      },
+      "mission57-data/gsi-sumiyoshi-9tile.json": {
+        "polygons": 78,
+        "bboxLocal": {
+          "minX": -3813.7,
+          "maxX": -793.7,
+          "minZ": -2221.9,
+          "maxZ": 797.8
+        }
+      }
+    },
+    "dedupe": {
+      "inPolys": 129,
+      "dropped": 8,
+      "droppedAreaM2": 356
+    }
+  },
+  "layers": {
+    "buildings": {
+      "state": "ready",
+      "count": 0,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "roads": {
+      "state": "ready",
+      "count": 969,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "railways": {
+      "state": "ready",
+      "count": 67,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "waterways": {
+      "state": "ready",
+      "count": 20,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "parks": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "labels": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiroadedge": {
+      "state": "ready",
+      "count": 7184,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiwater": {
+      "state": "ready",
+      "count": 121,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "facilities": {
+      "state": "ready",
+      "count": 140,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "spots": {
+      "state": "ready",
+      "count": 4,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "towns": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "townlabels": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wards": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wardlabels": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    }
+  },
+  "stats": {
+    "gsiWater": {
+      "state": "ready",
+      "polygons": 121,
+      "bboxLocal": {
+        "mission50-data/gsi-okawa-nakanoshima.json": {
+          "polygons": 51,
+          "bboxLocal": {
+            "minX": -3310.3,
+            "maxX": -1297,
+            "minZ": -11275.1,
+            "maxZ": -8761.2
+          }
+        },
+        "mission57-data/gsi-sumiyoshi-9tile.json": {
+          "polygons": 78,
+          "bboxLocal": {
+            "minX": -3813.7,
+            "maxX": -793.7,
+            "minZ": -2221.9,
+            "maxZ": 797.8
+          }
+        }
+      },
+      "windows": {
+        "mission50-data/gsi-okawa-nakanoshima.json": {
+          "polygons": 51,
+          "bboxLocal": {
+            "minX": -3310.3,
+            "maxX": -1297,
+            "minZ": -11275.1,
+            "maxZ": -8761.2
+          }
+        },
+        "mission57-data/gsi-sumiyoshi-9tile.json": {
+          "polygons": 78,
+          "bboxLocal": {
+            "minX": -3813.7,
+            "maxX": -793.7,
+            "minZ": -2221.9,
+            "maxZ": 797.8
+          }
+        }
+      },
+      "dedupe": {
+        "inPolys": 129,
+        "dropped": 8,
+        "droppedAreaM2": 356
+      }
+    },
+    "buildingState": "ready"
+  }
+}
