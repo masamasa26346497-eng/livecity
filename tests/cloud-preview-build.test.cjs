@@ -35,7 +35,9 @@ test('vercel.json は静的出力 temp/cloud-preview/static を指し、temp/ �
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
   assert.strictEqual(v.outputDirectory, 'temp/cloud-preview/static');
   assert.ok(v.buildCommand.includes('build-cloud-preview.mjs'));
-  assert.ok(/--wards kita,chuo,nishi(\s|$)/.test(v.buildCommand), 'Mission 200: 北区+中央区+西区');
+  assert.ok(/--wards kita,chuo,nishi,fukushima(\s|$)/.test(v.buildCommand), 'Mission 204: 北区+中央区+西区+福島区');
+  assert.ok(!/nobuiltin=0|ext45=0/.test(JSON.stringify(v.redirects)), '旧45D混在禁止(nobuiltin=1維持)');
+  assert.ok(v.redirects[0].destination.includes('nobuiltin=1'));
   assert.ok(/^temp\/$/m.test(fs.readFileSync(path.join(ROOT, '.gitignore'), 'utf8')));
 });
 test('Mission 199: 複数区ビルド — 区ごとに補完LOD1+ID監査、バナーに区名、LOD2は区外建物を含む旨を明示', () => {

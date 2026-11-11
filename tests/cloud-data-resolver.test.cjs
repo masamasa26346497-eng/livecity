@@ -111,12 +111,12 @@ test('asset 整合性: size/sha256 不一致を拒否', async () => {
   assert.strictEqual((await R.verifyAsset(bytes, { path: 'a.json', bytes: 5, sha256: '0'.repeat(64) })).code, 'sha-mismatch');
 });
 
-test('build は区選択UI/解決レイヤーを配備し、vercel.json の3区ビルドは不変', () => {
+test('build は区選択UI/解決レイヤーを配備し、vercel.json は4区ビルド(福島区追加)', () => {
   const b = fs.readFileSync(path.join(ROOT, 'tools/cloud/build-cloud-preview.mjs'), 'utf8');
   assert.ok(b.includes('cloud-data-resolver.js') && b.includes('cloud-ward-picker.js') && b.includes('writeWardManifest') && b.includes('verifyWardDir'));
   assert.ok(b.includes("'tools/lod2/lod2-clip-near.cjs'") && b.includes('lc196-umeda')); // LOD2 近景ボタンは維持
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-  assert.strictEqual(v.buildCommand, 'node tools/cloud/build-cloud-preview.mjs --wards kita,chuo,nishi');
+  assert.strictEqual(v.buildCommand, 'node tools/cloud/build-cloud-preview.mjs --wards kita,chuo,nishi,fukushima');
   const pk = fs.readFileSync(path.join(ROOT, 'tools/cloud/ward-picker.js'), 'utf8');
   assert.ok(!/osaka_3d_buildings|map-data\//.test(pk)); // 旧データへ fallback しない
   assert.ok(pk.includes('旧データへは切り替えません'));

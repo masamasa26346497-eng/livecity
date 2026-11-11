@@ -47,5 +47,5 @@ test('build は --plan-only/--shard/--resume を持ち、plan はネットワー
 
 test('vercel.json の既定ビルド(北区・中央区・西区)は変更されていない', () => {
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-  assert.strictEqual(v.buildCommand, 'node tools/cloud/build-cloud-preview.mjs --wards kita,chuo,nishi');
+  assert.strictEqual(v.buildCommand, 'node tools/cloud/build-cloud-preview.mjs --wards kita,chuo,nishi,fukushima');
 });

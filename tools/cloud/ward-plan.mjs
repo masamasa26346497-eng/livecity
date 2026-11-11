@@ -154,7 +154,7 @@ function main() {
   const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
   const inp = loadInputs();
   const wards = (opt('wards') || '').split(',').filter(Boolean);
-  const served = (opt('served', 'kita,chuo,nishi')).split(',').filter(Boolean);
+  const served = (opt('served', 'kita,chuo,nishi,fukushima')).split(',').filter(Boolean);
   const plans = planWards(inp, wards, served);
   const est = estimateTotals(plans);
   const report = {
