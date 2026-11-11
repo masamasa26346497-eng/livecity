@@ -139,7 +139,7 @@ gates.push(
   ["'3D建物: ローカル全域変換済み（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開。ブラウザでの全域視認は未確認）'",
    "'3D建物: 公式PLATEAU大阪2025・クラウド配信（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。非本番Preview。LOD2化した建物は除外して補完）'"],
   ["'3D建物: ローカル変換データ（' + a.tiles + 'タイル・' + fmt(a.buildings) + '棟。この PC のみ・未公開・全域とは未確認）'",
-   "'3D建物: 公式PLATEAU大阪2025・クラウド配信（補完LOD1 ' + fmt(a.buildings) + '棟＋LOD2。非本番Preview。この区のみ配信・他区は未接続）'"],
+   "'3D建物: 公式PLATEAU大阪2025・クラウド配信（補完LOD1 ' + fmt(a.buildings) + '棟＋LOD2。非本番Preview。配信済みの区のみ・他区は未接続）'"],
 );
 for (const [from, to] of gates) {
   const n = html.split(from).length - 1;
@@ -155,7 +155,7 @@ const prov = {
   lod2: { meshes: lod2Meshes, buildings: lod2Rep.converted, expected: lod2Rep.expected, fullMatch: lod2Rep.fullMatch, tiles: lod2Rep.tiles, glbBytes: lod2Rep.glbBytes, color: lod2Rep.color, textureRendered: false },
   buildCondition: { wards, maxMb, node: process.version, lod2IdsTotal: lod2Ids.size },
   overlap: '補完 LOD1: 元 LOD1 のうち LOD2 と gml:id が完全一致する棟を除外(補完 LOD1 内の LOD2 同一 ID は 0 件を監査)。LOD2 は区外の建物も含むメッシュ範囲。',
-  cloudCoverage: { servedWards: wardInfo.map((w) => w.id), servedWardCount: wardInfo.length, totalWards: reg.length, note: '配信済みの区のみ。他区は未接続(未配信)' },
+  cloudCoverage: { servedWards: wardInfo.map((w) => w.id), servedWardNames: wardInfo.map((w) => w.name), servedWardCount: wardInfo.length, totalWards: reg.length, note: '配信済みの区のみ。他区は未接続(未配信)' },
   roadsRiversParks: '未接続(旧道路/路線データは配信しない。2025 道路との整合は未検証)',
   knownOffsets: lod2Rep.vertical,
 };
@@ -164,7 +164,7 @@ const banner = `<div id="lc196-banner" style="position:fixed;left:8px;bottom:8px
   `<b style="color:#fc8">Preview(非本番・レビュー専用)</b><br>データ: <b>公式 PLATEAU 大阪市 2025</b>(CityGML v5)のみ。旧データ・OSM 不使用<br>` +
   prov.wards.map((w) => w.name + ': 元LOD1 ' + w.lod1OriginalBuildings.toLocaleString('en-US') + '棟 − LOD2と同一ID ' + w.lod1ExcludedForLod2.toLocaleString('en-US') + '棟 = 補完LOD1 ' + w.lod1Buildings.toLocaleString('en-US') + '棟').join('<br>') +
   '<br>LOD2 ' + prov.lod2.buildings.toLocaleString('en-US') + '棟(' + prov.lod2.meshes.length + 'メッシュ範囲。区外の建物を含む。頂点色のみ・テクスチャ無し)<br>' +
-  `<b>クラウド配信: ${prov.cloudCoverage.servedWardCount}/${prov.cloudCoverage.totalWards}区のみ</b>(他区は未接続)。道路・河川・公園・駅は未接続(2025道路との整合は未検証)<br>` +
+  `<b>クラウド配信: ${prov.cloudCoverage.servedWardCount}/${prov.cloudCoverage.totalWards}区のみ(${wardInfo.map((w) => w.name).join('/')})</b>(他区は未接続)。道路・河川・公園・駅は未接続(2025道路との整合は未検証)<br>` +
   `<button id="lc196-umeda" style="margin:4px 4px 0 0">梅田(大阪駅周辺)のLOD2へ近づく</button><button id="lc196-umeda-near" style="margin-top:4px">さらに近景</button><br>` +
   `<span style="opacity:.8">出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成。<a style="color:#9cf" href="https://www.mlit.go.jp/plateau/site-policy/" target="_blank" rel="noopener">利用条件</a> / <a style="color:#9cf" href="/cloud-preview.json" target="_blank">provenance</a></span></div>` +
   `<script>(function(){function go(r){var f=window.__lc152&&window.__lc152.lookAtFirst;if(f)f(r,-40,[${UMEDA[0]},${UMEDA[1]}]);else alert('LOD2 の読み込み中です。数秒後にもう一度押してください')}` +

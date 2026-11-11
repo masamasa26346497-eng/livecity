@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node tools/cloud/build-cloud-preview.mjs",
+  "buildCommand": "node tools/cloud/build-cloud-preview.mjs --wards kita,chuo",
   "outputDirectory": "temp/cloud-preview/static",
   "installCommand": "echo skip-install",
   "redirects": [

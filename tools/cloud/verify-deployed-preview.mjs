@@ -32,7 +32,7 @@ await chk('/', (r) => ({ ok: [301, 302, 307, 308, 200].includes(r.status) && !/v
 const cp = await chk('/cloud-preview.json', (r, b) => {
   const j = json(b);
   const s = JSON.stringify(j);
-  return { ok: r.status === 200 && /2025/.test(s) && /kita/i.test(s), info: { keys: Object.keys(j).slice(0, 12), has19601: s.includes('19601'), hasLod2: /lod2/i.test(s) } };
+  return { ok: r.status === 200 && /2025/.test(s) && /kita/i.test(s), info: { keys: Object.keys(j).slice(0, 12), hasLod2: /lod2/i.test(s), servedWardCount: j.cloudCoverage && j.cloudCoverage.servedWardCount, wards: (j.wards || []).map((w) => ({ ward: w.ward, orig: w.lod1OriginalBuildings, supp: w.lod1Buildings, excluded: w.lod1ExcludedForLod2, audit: w.idAudit && { origIds: w.idAudit.origIds, suppIds: w.idAudit.suppIds, excludedIds: w.idAudit.excludedIds, doubleDrawn: w.idAudit.doubleDrawn } })) } };
 });
 const idx = await chk('/ext-3dtiles/index.json', (r, b) => ({ ok: r.status === 200 && !!json(b), info: {} }));
 
@@ -46,7 +46,10 @@ async function tilesetAndGlb(path, dir) {
   const gp = uri.startsWith('/') ? uri : dir + uri;
   await chk(gp, (r, b) => ({ ok: r.status === 200 && b.slice(0, 4).toString() === 'glTF', info: { magic: b.slice(0, 4).toString(), glbCount: uris.length } }));
 }
-await tilesetAndGlb('/ext-3dtiles/kita/tileset.json', '/ext-3dtiles/kita/');
+// 配信区は index.json(なければ cloud-preview.json)から取得。ハードコードしない。
+const servedWards = ((idx.ok && json(idx.buf).wards) || (cp.ok && json(cp.buf).wards) || []).map((w) => w.ward);
+if (!servedWards.length) rec('served wards', false, { err: 'index.json/cloud-preview.json に wards が無い' });
+for (const w of servedWards) await tilesetAndGlb('/ext-3dtiles/' + w + '/tileset.json', '/ext-3dtiles/' + w + '/');
 await tilesetAndGlb('/lod2-preview/tileset.json', '/lod2-preview/');
 
 const allOk = results.every((r) => r.ok);
