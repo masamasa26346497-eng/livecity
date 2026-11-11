@@ -13,6 +13,8 @@ const port = Number(opt('port', 8182)), cport = Number(opt('cdp', 9382));
 const out = path.resolve(opt('out', path.join(ROOT, 'temp/lod2-e2e-auto3d')));
 const lod2Dir = path.resolve(opt('lod2-dir', path.join(ROOT, 'temp/lod2-all')));
 const chromeBin = opt('chrome', ['/usr/bin/google-chrome', '/usr/bin/chromium'].find((p) => fs.existsSync(p)));
+const { execSync } = require('child_process');
+const chromeRssMB = () => { try { return Math.round(Number(execSync("ps -eo rss,comm | awk '/chrome|chromium/{s+=$1} END{print s+0}'").toString()) / 1024); } catch (e) { return null; } };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.error('[auto3d]', new Date().toISOString().slice(11, 19), ...a);
 const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''; r.on('data', (d) => (b += d)); r.on('end', () => { try { res(JSON.parse(b)); } catch (e) { rej(e); } }); }).on('error', rej));
@@ -51,18 +53,23 @@ const ALLOW = [/^tileset\.json$/, /^source\.json$/, /^build-report\.json$/, /^ti
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
     const t0 = Date.now();
     await send('Page.navigate', { url: 'http://localhost:' + port + '/mission37g-osaka-24ward-mvp.html' + QUERY });
+    // Mission 193: 37G 既存の plan() 上限(coarseMax=8)を、計測目的でのみランタイム上書きする(HTML は無変更)。
+    const COARSE_MAX = Number(opt('coarse-max', 0));
+    if (COARSE_MAX > 0) { (async () => { for (let i = 0; i < 400; i++) { const ok = await ev('(window.LC45F&&LC45F.DEFAULTS)?(LC45F.DEFAULTS.coarseMax=' + COARSE_MAX + ',true):false', 5000); if (ok === true) { result.coarseMaxOverride = COARSE_MAX; log('coarseMax override', COARSE_MAX, 'at', ((Date.now() - t0) / 1000).toFixed(1)); return; } await sleep(250); } })(); }
     let shot35 = false;
     const probe = 'JSON.stringify((()=>{const g=window.__mission37g||{},a=g.allMode||{},l=window.__lc152;const cam=l&&l.camera&&l.camera();const tx=(i)=>(document.getElementById(i)||{}).textContent;return {sel:(document.getElementById("sel-bldg-mode")||{}).value,on:a.on,ticks:a.ticks,mounted:Object.keys(a.mounted||{}),lastErr:a.lastError,plan:a.lastPlan&&JSON.stringify(a.lastPlan).slice(0,300),culled:a.culledTotal,metas:(g.extraMeta||[]).length,cam:cam,lc152:l&&l.state.status,auto3d:l&&l.state.auto3d,tiles:tx("hs-tiles"),fps:tx("hs-fps")}})())';
     while (Date.now() - t0 < DUR) {
       const t = Date.now() - t0; const v = await ev(probe, 20000);
-      const row = { t: +(t / 1000).toFixed(1), http: result.http.ok };
+      const row = { t: +(t / 1000).toFixed(1), http: result.http.ok, chromeRssMB: chromeRssMB(), jsHeapMB: await ev('Math.round((performance.memory||{usedJSHeapSize:0}).usedJSHeapSize/1048576)', 5000) };
       if (v && v.__timeout) row.hang = true; else { try { Object.assign(row, JSON.parse(v)); } catch (e) { row.raw = String(v).slice(0, 80); } }
       result.timeline.push(row); log(JSON.stringify(row).slice(0, 330));
       if (!shot35 && t >= 35000) { shot35 = true; const s = await send('Page.captureScreenshot', { format: 'png' }); if (s.data) fs.writeFileSync(path.join(out, 't35.png'), Buffer.from(s.data, 'base64')); }
       await sleep(STEP);
     }
+    { const s = await send('Page.captureScreenshot', { format: 'png' }); if (s.data) fs.writeFileSync(path.join(out, 'final.png'), Buffer.from(s.data, 'base64')); }
     result.diagnose = await ev('window.__lc152 && window.__lc152.diagnose().then(d => JSON.stringify({hints: d.hints, allMode: d.allMode, tilesets: d.tilesets, wards: d.wards}))', 60000).then((s) => { try { return JSON.parse(s); } catch (e) { return String(s); } });
     result.server = await getJson('http://127.0.0.1:' + port + '/__lod2/diag.json').then((d) => ({ requests: d.requests, extServed: d.extServed })).catch((e) => String(e));
+    result.peak = { chromeRssMB: Math.max(...result.timeline.map((r) => r.chromeRssMB || 0)), jsHeapMB: Math.max(...result.timeline.map((r) => (typeof r.jsHeapMB === 'number' ? r.jsHeapMB : 0))), consoleErrors: result.console.length, non200: result.http.bad.length };
     const first = result.timeline.find((r) => r.mounted && r.mounted.length); result.firstMountAtSec = first ? first.t : null;
     fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(result, null, 1));
     console.log(JSON.stringify({ ...result, timeline: result.timeline.length + ' rows' }, null, 1)); ws.close();
