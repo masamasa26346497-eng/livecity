@@ -16,11 +16,20 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { verifyWard } from '../lod2/lod2-all-wards.mjs';
 import { auditWard } from './lod1-id-audit.mjs';
+import { buildIndex, shardWards } from './ward-plan.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const a = process.argv.slice(2);
 const opt = (k, d = null) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
-const wards = (opt('wards', 'kita')).split(',').filter(Boolean);
+// Mission 201: --plan-only は read-only(ネットワーク/生成なし)。ward-plan.mjs に委譲して終了する。
+if (a.includes('--plan-only')) {
+  const r = spawnSync(process.execPath, [path.join(path.dirname(fileURLToPath(import.meta.url)), 'ward-plan.mjs'), ...a.filter((x) => x !== '--plan-only')], { stdio: 'inherit' });
+  process.exit(r.status ?? 1);
+}
+// --shard i/n: --wards(省略時 kita)を決定的に n 分割した i 番目だけをビルド(独立バッチ)。
+// --resume: 検証済みの既存 LOD1(temp/mission79/<区>-2025)を再利用する(これは既定動作。明示用フラグ)。
+const wards = shardWards((opt('wards', 'kita')).split(',').filter(Boolean), opt('shard'));
+const RESUME = a.includes('--resume');
 const OUT = path.resolve(ROOT, opt('out', 'temp/cloud-preview/static'));
 const maxMb = opt('max-mb', '1500');
 const LOD2_DIR = path.join(ROOT, 'temp/lod2-cloud');
@@ -43,6 +52,7 @@ for (const id of wards) {
   const dir = path.join(ROOT, 'temp/mission79', id + '-2025');
   let v = fs.existsSync(dir) ? verifyWard(dir, w.code) : { ok: false };
   if (!v.ok) {
+    if (RESUME && fs.existsSync(dir)) log('--resume: 既存 LOD1 が検証不合格のため作り直し:', id);
     if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
     log('LOD1 生成(公式 PLATEAU 2025, Range 取得):', id);
     run('tools/mission79-run.mjs', ['--ward', id, '--max-mb', maxMb]);
@@ -109,9 +119,10 @@ for (const w of wardInfo) {
   fs.mkdirSync(d, { recursive: true });
   for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(w.dir, n))) cp(path.join(w.dir, n), path.join(d, n));
 }
+// Mission 201: 24区全てを列挙し、配信済(served)/未配信(not-served)を明記。未配信区を配信済と見せない。
 fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
-  schema: 'livecity.mission196.cloud-preview/1', verified: false, lod0Wards: [], layersWards: [],
-  wards: wardInfo.map((w) => ({ ward: w.id, wardCode: w.code, buildings: w.buildings })),
+  ...buildIndex(reg, wardInfo.map((w) => ({ id: w.id, buildings: w.buildings }))),
+  lod0Wards: [], layersWards: [],
 }));
 // 3c. LOD2 + オーバーレイ(ローカル serve と同じ URL 構成)
 const l2 = path.join(OUT, 'lod2-preview');

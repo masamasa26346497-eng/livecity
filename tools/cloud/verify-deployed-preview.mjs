@@ -47,7 +47,7 @@ async function tilesetAndGlb(path, dir) {
   await chk(gp, (r, b) => ({ ok: r.status === 200 && b.slice(0, 4).toString() === 'glTF', info: { magic: b.slice(0, 4).toString(), glbCount: uris.length } }));
 }
 // 配信区は index.json(なければ cloud-preview.json)から取得。ハードコードしない。
-const servedWards = ((idx.ok && json(idx.buf).wards) || (cp.ok && json(cp.buf).wards) || []).map((w) => w.ward);
+const servedWards = ((idx.ok && json(idx.buf).wards) || (cp.ok && json(cp.buf).wards) || []).filter((w) => w.status !== 'not-served').map((w) => w.ward);
 if (!servedWards.length) rec('served wards', false, { err: 'index.json/cloud-preview.json に wards が無い' });
 for (const w of servedWards) await tilesetAndGlb('/ext-3dtiles/' + w + '/tileset.json', '/ext-3dtiles/' + w + '/');
 await tilesetAndGlb('/lod2-preview/tileset.json', '/lod2-preview/');
