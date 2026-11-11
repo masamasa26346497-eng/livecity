@@ -42,7 +42,7 @@ async function main() {
     // source.json の wardCode が無い/違う場合は 37G が登録しない。実データの値を尊重し、無ければ明示して失敗させる(捏造しない)。
     const sj = path.join(dst, 'source.json'); info[id].sourceWardCode = fs.existsSync(sj) ? JSON.parse(fs.readFileSync(sj, 'utf8')).wardCode : null;
   }
-  const srv = spawn(process.execPath, [path.join(__dirname, 'lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', lod2Dir, '--no-auto-layers'], { stdio: 'inherit', env: { ...process.env, LOCALAPPDATA: local } });
+  const srv = spawn(process.execPath, [path.join(__dirname, 'lod2-preview-serve.cjs'), '--port', String(port), '--lod2-dir', lod2Dir, '--no-auto-layers', '--ext-root', root], { stdio: 'inherit', env: { ...process.env, LOCALAPPDATA: local } });
   const chrome = spawn(chromeBin, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist',
     '--window-size=1280,800', '--remote-debugging-port=' + cport, '--user-data-dir=' + path.join(out, 'profile'), 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
   const result = { fixture: 'REAL PLATEAU 2025 (official CityGML via tools/mission79-run.mjs)', swiftshader: true, chrome: chromeBin, wardsInfo: info, http: { ok: 0, bad: [] }, console: [], wards: {}, lod2: {} };
@@ -98,7 +98,9 @@ async function main() {
     // ---- LOD2 の実測(実 LOD2 建物のある中央区の LOD2 地点) ----
     const spots = await ev('JSON.stringify(window.__lc152.state.spots || null)');
     const fp = await getJson('http://127.0.0.1:' + port + '/lod2-preview/footprints.json').catch(() => null);
-    const near = fp && fp.footprints ? fp.footprints.filter((f) => f.hull && f.hull[0] && f.hull[0][0] > 135.49 && f.hull[0][0] < 135.52 && f.hull[0][1] > 34.67 && f.hull[0][1] < 34.70) : [];
+    const AT = opt('lod2-at', null) && opt('lod2-at').split(',').map(Number); // Mission195: lon,lat target (nearest LOD2 footprints)
+    const cenOf = (h) => [h.reduce((x, p) => x + p[0], 0) / h.length, h.reduce((x, p) => x + p[1], 0) / h.length];
+    const near = AT && fp && fp.footprints ? fp.footprints.filter((f) => f.hull && Math.hypot((cenOf(f.hull)[0] - AT[0]) * 91000, (cenOf(f.hull)[1] - AT[1]) * 111320) < 150) : fp && fp.footprints ? fp.footprints.filter((f) => f.hull && f.hull[0] && f.hull[0][0] > 135.49 && f.hull[0][0] < 135.52 && f.hull[0][1] > 34.67 && f.hull[0][1] < 34.70) : [];
     result.lod2.footprintsNearChuo = near.length;
     if (near.length) {
       // 足跡が密な点(最初の 1 棟の重心)
