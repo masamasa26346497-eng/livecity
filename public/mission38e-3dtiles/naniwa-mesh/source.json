@@ -1,0 +1,25 @@
+{
+ "mission": "38E",
+ "ward": "浪速区",
+ "wardId": "naniwa",
+ "wardCode": "27111",
+ "generatedAt": "2026-10-14T12:08:41.600Z",
+ "source": "PLATEAU 3D都市モデル 大阪市 2024（国土交通省）CityGML bldg LOD1 / 27100_osaka-shi_city_2024_citygml_1_op",
+ "sourceZipUrl": "https://assets.cms.plateau.reearth.io/assets/40/a85f8e-049c-4b3f-a97b-4a217df787df/27100_osaka-shi_city_2024_citygml_1_op.zip",
+ "requestedMesh": "51357399",
+ "gmlSha256": "7730f4f7e30c045537bc1c706720a88532b9329d6fa7543f1a8de4f7b823dbef",
+ "fetchMethod": "HTTP Range（mission36k-fetch-citygml-ward-range.mjs）。ZIP 全量は取得していない",
+ "sourceMeshes": [
+  "51357399"
+ ],
+ "canonicalId": "CityGML gml:id (bldg_<uuid>) をそのまま使用。新規採番なし",
+ "wardClassification": "N03 区ポリゴンの点内判定（代表点=footprint 重心）。ポリゴン外は除外。wardHint は区判定に使っていない",
+ "counts": {
+  "read": 2522,
+  "inWard": 2466,
+  "outsideWard": 56,
+  "duplicate": 0
+ },
+ "note": "メッシュ単位の限定取得。区全体ではない。",
+ "licenseNote": "出典: 国土交通省 Project PLATEAU。利用条件の最終確認はリポジトリ内に記録なし（公開前に要確認）。"
+}

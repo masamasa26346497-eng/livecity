@@ -1,0 +1,103 @@
+{
+ "mission": "79",
+ "ward": "nishi",
+ "wardCode": "27106",
+ "source": {
+  "mission": "79",
+  "vintage": 2025,
+  "standard": "PLATEAU CityGML v5 (uro 3.2), EPSG:6697 lat,lon",
+  "ward": "西区",
+  "wardId": "nishi",
+  "wardCode": "27106",
+  "generatedAt": "2026-10-31T22:44:33.075Z",
+  "source": "https://assets.cms.plateau.reearth.io/assets/10/a0aecb-67d1-4463-92d5-d67c99f3b8b6/27100_osaka-shi_city_2025_citygml_1_op.zip",
+  "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+  "sourceBytes": 1580421888,
+  "attribution": "出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成",
+  "license": {
+   "id": "plateau",
+   "title": "PLATEAU Site Policy 「３．著作権について」に拠る",
+   "url": "https://www.mlit.go.jp/plateau/site-policy/",
+   "agreement": "Project PLATEAUのサイトポリシーに従って、どなたでも、複製、公衆送信、翻訳・変形等の翻案等、自由に利用できます。商用利用も可能です。（https://www.mlit.go.jp/plateau/site-policy/）\t"
+  },
+  "sourceMeshes": [
+   "52350307",
+   "52350308",
+   "52350309",
+   "52350316",
+   "52350317",
+   "52350318",
+   "52350319",
+   "52350328",
+   "52350329",
+   "52350339"
+  ],
+  "counts": {
+   "read": 42060,
+   "inWard": 12603,
+   "outsideWard": 29457,
+   "duplicate": 0
+  },
+  "heightSources": {
+   "measuredHeight": 11814,
+   "lod1-zRange": 789
+  },
+  "idPolicy": "gml:id verbatim; no renumbering; 2022/2024 IDs untouched (see crosswalk.*)",
+  "coordinateConvention": "znorth-neg-v1",
+  "coarseMinArea": 0,
+  "note": "Partial unless sourceMeshes covers the ward. Not 27999 (Expo site) data."
+ },
+ "alignment": {
+  "roadPolygons": 13636,
+  "buildingPoints": 12603,
+  "candidates": {
+   "identity": {
+    "hits": 77,
+    "hitRatePct": 0.61
+   },
+   "flipX": {
+    "hits": 3884,
+    "hitRatePct": 30.82
+   },
+   "flipZ": {
+    "hits": 3634,
+    "hitRatePct": 28.83
+   },
+   "rot180": {
+    "hits": 3107,
+    "hitRatePct": 24.65
+   },
+   "swapXZ": {
+    "hits": 3961,
+    "hitRatePct": 31.43
+   }
+  },
+  "bestTransform": "identity",
+  "orientationOk": true,
+  "margin": 3030
+ },
+ "crosswalk": {
+  "buildings2025": 12603,
+  "buildingsLegacy": 3893,
+  "exactId": 3893,
+  "geometricCandidate": 0,
+  "newOnly": 8710,
+  "ambiguous": 0,
+  "legacyOnly": 0,
+  "exactIdOffsetM": {
+   "median": 0,
+   "p95": 0,
+   "max": 0
+  },
+  "exactIdHeightDiffM": {
+   "median": 0
+  },
+  "policy": "IDs are never rewritten. exact-gml-id = same gml:id in both vintages (offset/height reported). centroid-candidate/ambiguous/new-in-2025/legacy-only are candidates for review only; legacy-only buildings are NOT declared demolished."
+ },
+ "buildings": 12603,
+ "uniqueIds": 12603,
+ "skipped": 0,
+ "tiles": 30,
+ "glbBytes": 17665940,
+ "note": "converter dropped 1 self-intersecting footprint of 42060 read (mesh-level, may be outside ward)"
+}

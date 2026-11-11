@@ -1,0 +1,1897 @@
+{
+ "mission": "163-lod2-all",
+ "generatedAt": "2026-11-11T05:21:42.962Z",
+ "mode": "official-range",
+ "meshes": [
+  "51357371",
+  "51357381",
+  "51357382",
+  "51357391",
+  "51357392",
+  "52350301",
+  "52350302",
+  "52350309",
+  "52350319",
+  "52350328",
+  "52350329",
+  "52350339",
+  "52350349",
+  "52350359",
+  "52350368",
+  "52350378",
+  "52350379",
+  "52350389",
+  "52350400",
+  "52350410",
+  "52350411",
+  "52350412",
+  "52350420",
+  "52350421",
+  "52350422",
+  "52350430",
+  "52350431",
+  "52350432",
+  "52350440",
+  "52350441",
+  "52350450",
+  "52350470",
+  "52350480"
+ ],
+ "meshesRequested": 33,
+ "meshesProcessed": 33,
+ "meshesFailed": [],
+ "expected": 10698,
+ "expected159Total": 10698,
+ "converted": 10698,
+ "failedIds": 0,
+ "missing": 0,
+ "extra": 0,
+ "notPlannedByIndex": 0,
+ "dupWithinMesh": 0,
+ "dupAcrossMeshes": 0,
+ "unconverted": 0,
+ "tiles": 209,
+ "triangles": 708205,
+ "glbBytes": 76681784,
+ "roofWallInvalid": 0,
+ "lod1Fallback": 49288,
+ "buildingsInProcessedMeshes": 59986,
+ "texturedLod2": 5403,
+ "x3dMaterialLod2": 1,
+ "fullMatch": true,
+ "failed": [],
+ "lod1Remaining": 49288,
+ "bbox": {
+  "west": 135.38849765062756,
+  "east": 135.53750630137108,
+  "south": 34.64356024523674,
+  "north": 34.7382081548154
+ },
+ "source": {
+  "package": "plateau-27100-osaka-shi-2025",
+  "license": "PLATEAU Site Policy 「３．著作権について」に拠る",
+  "attribution": "出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成",
+  "etag": "\"3d62380fdfebb6855b11a53eb6a89909\""
+ },
+ "textureRendered": false,
+ "color": "vertex-color-only (roof/wall/ground)",
+ "vertical": "per-building ground (min source height) placed at ellipsoid h=0; horizontal coordinates untouched. Source min heights kept in manifest tiles[].groundH",
+ "groundHRange": [
+  -14.237,
+  36.90173619
+ ],
+ "resources": {
+  "networkCompressedBytes": 76467845,
+  "elapsedSec": 38,
+  "peakRssMB": 762,
+  "note": "resume 時の値は当該実行分のみ"
+ },
+ "transformTranslationMatchesOrigin": true,
+ "perMesh": [
+  {
+   "mesh": "51357371",
+   "buildings": 12,
+   "expected": 9,
+   "expected159": 9,
+   "converted": 9,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 3,
+   "tiles": 4,
+   "triangles": 361,
+   "glbBytes": 42692,
+   "roofWallInvalid": 0,
+   "texturedLod2": 9,
+   "gmlSha256": "bfbd3626db52004272c040e2456073d4a2d3cf92999d33b05bec109de0fa6a33",
+   "groundHRange": [
+    2.69111223,
+    6.99647866
+   ],
+   "tileSha256": [
+    {
+     "name": "51357371_000.glb",
+     "bytes": 24908,
+     "sha256": "ae4f3553b670f8aceaf384fa6d553227ad0b937a09a8355f42afc88e40cdc350"
+    },
+    {
+     "name": "51357371_001.glb",
+     "bytes": 13348,
+     "sha256": "fb45c5dfa4cdc5c11a97e03c43543cfd4d81d6ec716b3a990b380099d9829fcc"
+    },
+    {
+     "name": "51357371_002.glb",
+     "bytes": 2216,
+     "sha256": "cc8e0fd71e8c1a0d1990bca5dca4b3da6ee16011c350a79a97815108f9a8a334"
+    },
+    {
+     "name": "51357371_003.glb",
+     "bytes": 2220,
+     "sha256": "94a635c6efea7833bb074c54ac48f9893e678eaf6a1203ba4d90c97f43aa9c7e"
+    }
+   ]
+  },
+  {
+   "mesh": "51357381",
+   "buildings": 28,
+   "expected": 28,
+   "expected159": 28,
+   "converted": 28,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 0,
+   "tiles": 5,
+   "triangles": 552,
+   "glbBytes": 64256,
+   "roofWallInvalid": 0,
+   "texturedLod2": 28,
+   "gmlSha256": "77ad5533813c3cba429f2964f3ae9b252f49ec8c4e3166a91a414f2dd7b6889f",
+   "groundHRange": [
+    2.51587961,
+    5.86055048
+   ],
+   "tileSha256": [
+    {
+     "name": "51357381_000.glb",
+     "bytes": 10000,
+     "sha256": "c455f9bc57ab38f7af1505340d16a57cc42c8cc3dc59d1857f28007208196d3a"
+    },
+    {
+     "name": "51357381_001.glb",
+     "bytes": 19936,
+     "sha256": "7db490533ab18026e599abdf3f0e0a2a089a72abf2f9b085e9d67ee26c10eba1"
+    },
+    {
+     "name": "51357381_002.glb",
+     "bytes": 3948,
+     "sha256": "46d5a6d1a4d8671eedee94b4d155f09c24a92c25d988a6c20e200ad86b0f95da"
+    },
+    {
+     "name": "51357381_003.glb",
+     "bytes": 25988,
+     "sha256": "ed825a2c133ce3f21f79d2c868510934bcb92f80bef80137c09726e7600fb1ac"
+    },
+    {
+     "name": "51357381_004.glb",
+     "bytes": 4384,
+     "sha256": "c3224996206e7799722e3ebda11d4333f16e5fcefe1c612b23a8617e529c021f"
+    }
+   ]
+  },
+  {
+   "mesh": "51357382",
+   "buildings": 4,
+   "expected": 4,
+   "expected159": 4,
+   "converted": 4,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 0,
+   "tiles": 3,
+   "triangles": 52,
+   "glbBytes": 8392,
+   "roofWallInvalid": 0,
+   "texturedLod2": 4,
+   "gmlSha256": "663570047e4ce032e78e14dbecf2722192d79b2785b190865149539c17e888ea",
+   "groundHRange": [
+    3.059306,
+    5.94907935
+   ],
+   "tileSha256": [
+    {
+     "name": "51357382_000.glb",
+     "bytes": 3516,
+     "sha256": "1946f7f1c38ae1f31970bb87fb8dd130569249df0f43069319fca301ecbcadb1"
+    },
+    {
+     "name": "51357382_001.glb",
+     "bytes": 2220,
+     "sha256": "c8ebd6d0e2571a005bb2dcd58b014d407e5fc4d48c87110e8cb33f65a88d8ebe"
+    },
+    {
+     "name": "51357382_002.glb",
+     "bytes": 2656,
+     "sha256": "2863bc6e6319381643eabeab167b1cb7d48cafe40f08d7dd625bad238e2180b5"
+    }
+   ]
+  },
+  {
+   "mesh": "51357391",
+   "buildings": 206,
+   "expected": 206,
+   "expected159": 206,
+   "converted": 206,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 0,
+   "tiles": 6,
+   "triangles": 8268,
+   "glbBytes": 898548,
+   "roofWallInvalid": 0,
+   "texturedLod2": 206,
+   "gmlSha256": "0f895ef163849ae45591f573c7f843a3eecedb253f6ff87c391f6ead6d0df296",
+   "groundHRange": [
+    2.18581604,
+    24.28860521
+   ],
+   "tileSha256": [
+    {
+     "name": "51357391_000.glb",
+     "bytes": 81932,
+     "sha256": "41b634d3aa1af894f79dd978b291f470572b251ce6dd9103b3472fab4e9758a7"
+    },
+    {
+     "name": "51357391_001.glb",
+     "bytes": 125460,
+     "sha256": "f6b39895df7ea404aa5bd3fe667ae079dee3de64c6b3bf9ae09e8d829f0e1f12"
+    },
+    {
+     "name": "51357391_002.glb",
+     "bytes": 177948,
+     "sha256": "7a1d3de247a0b4ca82f239c6a08da4984a9dd562b25354ead8ba52dc9514ad81"
+    },
+    {
+     "name": "51357391_003.glb",
+     "bytes": 232272,
+     "sha256": "a21f16cc5bef4304d08928e13d4e7d7fdf71994b005c457b5fd963d624919c66"
+    },
+    {
+     "name": "51357391_004.glb",
+     "bytes": 51908,
+     "sha256": "2ec8aadbe84697a227fc222032dde47118cac3df83be82e9c71463f0eedc245c"
+    },
+    {
+     "name": "51357391_005.glb",
+     "bytes": 229028,
+     "sha256": "b2826aeb075863ad8f236d17757592ce09b1e736ba76e2abf751eb2a7a72e868"
+    }
+   ]
+  },
+  {
+   "mesh": "51357392",
+   "buildings": 137,
+   "expected": 137,
+   "expected159": 137,
+   "converted": 137,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 0,
+   "tiles": 8,
+   "triangles": 7512,
+   "glbBytes": 818764,
+   "roofWallInvalid": 0,
+   "texturedLod2": 137,
+   "gmlSha256": "7a375d55aa123ec043e12c6609f189b433f8026a19bbdcb8e29d859141038dab",
+   "groundHRange": [
+    2.58589268,
+    6.82185537
+   ],
+   "tileSha256": [
+    {
+     "name": "51357392_000.glb",
+     "bytes": 5684,
+     "sha256": "9ca5e60be19925a678fadd0820d90a0038d6d6b742959cd3b0d6facbede742ac"
+    },
+    {
+     "name": "51357392_001.glb",
+     "bytes": 166612,
+     "sha256": "1731bc2611877826d52d6a059833eb5a4c1d0f0b3c6888c325680e96f16c1d33"
+    },
+    {
+     "name": "51357392_002.glb",
+     "bytes": 154300,
+     "sha256": "fa5a8917b9710a1c7aaa3674b1005e68ceffd0d07b7db95a589badcfc5c64cfc"
+    },
+    {
+     "name": "51357392_003.glb",
+     "bytes": 19500,
+     "sha256": "29fbc2c9e6dbe832205713e9fe0e4a3cfcda86041060115306fac2ab64cc4cb8"
+    },
+    {
+     "name": "51357392_004.glb",
+     "bytes": 8056,
+     "sha256": "b997addf98af8042e39c68744806497e290e152caafe56723558e54f882fbb50"
+    },
+    {
+     "name": "51357392_005.glb",
+     "bytes": 22308,
+     "sha256": "19bd7fd9456ddfe99c04aade96992732387b9af45c0606426d4acc8ae2a859ec"
+    },
+    {
+     "name": "51357392_006.glb",
+     "bytes": 383912,
+     "sha256": "62284db83f9335bafbf8b404a01dd486d100c47dc77c9c6d57b38bb26cbfe0ed"
+    },
+    {
+     "name": "51357392_007.glb",
+     "bytes": 58392,
+     "sha256": "ade92bfbf4adda42402c9c9ae7690f25492003d7c5675a5fb8600fd38a8e8437"
+    }
+   ]
+  },
+  {
+   "mesh": "52350301",
+   "buildings": 80,
+   "expected": 80,
+   "expected159": 80,
+   "converted": 80,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 0,
+   "tiles": 5,
+   "triangles": 1392,
+   "glbBytes": 154992,
+   "roofWallInvalid": 0,
+   "texturedLod2": 80,
+   "gmlSha256": "97e1ac8bcc043b5b0da13d277374c4d5675be2a6d1572bc7e3501f32cbe6125a",
+   "groundHRange": [
+    0.86159042,
+    12.66864086
+   ],
+   "tileSha256": [
+    {
+     "name": "52350301_000.glb",
+     "bytes": 4380,
+     "sha256": "511237f76f191d4cc977103cc2e9e45ab52b9b77f1de24b27821b996756054e1"
+    },
+    {
+     "name": "52350301_001.glb",
+     "bytes": 17776,
+     "sha256": "47dcb4cadebc942eca6bea56e5802e1185cd28e7663e35444ca2ce35611ab4ae"
+    },
+    {
+     "name": "52350301_002.glb",
+     "bytes": 52776,
+     "sha256": "cf6ee1a1cff65692f43bcd6ca44a03b9d0e8425f4dcb576ada107088d63803a4"
+    },
+    {
+     "name": "52350301_003.glb",
+     "bytes": 14752,
+     "sha256": "fbeabb9cc8df21231c9d871875f24cdab458266e6f74139260ba4deb18c03805"
+    },
+    {
+     "name": "52350301_004.glb",
+     "bytes": 65308,
+     "sha256": "76a2e16ad7cd56f510f067369ba6fe004e417728c46ea9f157d29c13c4a8ddca"
+    }
+   ]
+  },
+  {
+   "mesh": "52350302",
+   "buildings": 183,
+   "expected": 111,
+   "expected159": 111,
+   "converted": 111,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 72,
+   "tiles": 7,
+   "triangles": 6120,
+   "glbBytes": 667508,
+   "roofWallInvalid": 0,
+   "texturedLod2": 111,
+   "gmlSha256": "d6aaf321ac30b5ed8f21d80e22427a6d289cc3ac14c732edb0a5986600ecda77",
+   "groundHRange": [
+    2.7461932,
+    9.6890953
+   ],
+   "tileSha256": [
+    {
+     "name": "52350302_000.glb",
+     "bytes": 81180,
+     "sha256": "ce7331bf559078fbc9fa860fa57a56ac9f2971ce5365e85e29e8d705adabcc4a"
+    },
+    {
+     "name": "52350302_001.glb",
+     "bytes": 168556,
+     "sha256": "dc99a1b2abd848a813d9f851bc6405babe7765ee8e4ba8f30f39ddbdb6a5fd49"
+    },
+    {
+     "name": "52350302_002.glb",
+     "bytes": 65092,
+     "sha256": "63aeb4d355b9168a37271bf9c7fea6b352b62d510ea0600201432b4a1a5ad24f"
+    },
+    {
+     "name": "52350302_003.glb",
+     "bytes": 116712,
+     "sha256": "4f32e268d6bb2770e2a55a1ece3ba2161edab93ee1779594d69cc202ac4d6a03"
+    },
+    {
+     "name": "52350302_004.glb",
+     "bytes": 202576,
+     "sha256": "4ac0f527215487eae2de9ebf96b1e8546dee35f1280e83d284cee2a892da220a"
+    },
+    {
+     "name": "52350302_005.glb",
+     "bytes": 19072,
+     "sha256": "98ed672ac089112465b40534a46d4c19e5eefe15edd00575834f64d3c843e65e"
+    },
+    {
+     "name": "52350302_006.glb",
+     "bytes": 14320,
+     "sha256": "4e77ffdd4510b6143eee5ec241b05f2bb93039ea2ebf51ae750c0fbb0c7d78c1"
+    }
+   ]
+  },
+  {
+   "mesh": "52350309",
+   "buildings": 2356,
+   "expected": 445,
+   "expected159": 445,
+   "converted": 445,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1911,
+   "tiles": 6,
+   "triangles": 33132,
+   "glbBytes": 3583880,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "70b86ff8fc42d36a270f0d6beaccf9a966a41632032a16c90bd3a3a9ac82f649",
+   "groundHRange": [
+    0,
+    3.6
+   ],
+   "tileSha256": [
+    {
+     "name": "52350309_000.glb",
+     "bytes": 163584,
+     "sha256": "5c01bd500c68806332f8aae032b8c02bec01fea0f9b83d07074e2b4544e705a1"
+    },
+    {
+     "name": "52350309_001.glb",
+     "bytes": 5248,
+     "sha256": "39feb22a2fae0eb3cb226672768b4301d3165807aef341e16d47afb1aa60e8d6"
+    },
+    {
+     "name": "52350309_002.glb",
+     "bytes": 1776684,
+     "sha256": "b48ff148a9d536c1a9e7bab3076846c552ebb959999a41dcc9dec7ee51133ed8"
+    },
+    {
+     "name": "52350309_003.glb",
+     "bytes": 79560,
+     "sha256": "c749c03dd6fc63946d20993e97519011ba6a730953f30fdec39bda6bacba8b6a"
+    },
+    {
+     "name": "52350309_004.glb",
+     "bytes": 1531304,
+     "sha256": "e7cf2d24aa8a7d52c52aeabf19d128e12e73a2c72917657bf6fad696bd629c26"
+    },
+    {
+     "name": "52350309_005.glb",
+     "bytes": 27500,
+     "sha256": "130c23ff9213244d8221cd8a5babf07c9654b81b626a7a240bbe4db82054c19a"
+    }
+   ]
+  },
+  {
+   "mesh": "52350319",
+   "buildings": 2119,
+   "expected": 368,
+   "expected159": 368,
+   "converted": 368,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1751,
+   "tiles": 6,
+   "triangles": 25083,
+   "glbBytes": 2714588,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "4f8af5011e2c170ca81275bf21b83f6d0fe040ea3c7fec0459ea78a171092b8a",
+   "groundHRange": [
+    -14.237,
+    3.44
+   ],
+   "tileSha256": [
+    {
+     "name": "52350319_000.glb",
+     "bytes": 262296,
+     "sha256": "eaea24e8681a20babe1005aa8aa589b38ed556ca47855e8ff84e89b2f7e39929"
+    },
+    {
+     "name": "52350319_001.glb",
+     "bytes": 17996,
+     "sha256": "7cb923352844171f3191397ecbbbc56893089b2c68da1f1584e5cc45977ba2fa"
+    },
+    {
+     "name": "52350319_002.glb",
+     "bytes": 1715880,
+     "sha256": "76ba5ca9352e51102913bc87f6e065b9fe4e1691633ce1c90894214f2eb49179"
+    },
+    {
+     "name": "52350319_003.glb",
+     "bytes": 61628,
+     "sha256": "bb96c80776576b5d26216d75e7f38f670d13b911fad269097b79184bad0ed078"
+    },
+    {
+     "name": "52350319_004.glb",
+     "bytes": 650672,
+     "sha256": "85583455a68c0fc4698a921e9364deb4ccc270a00d7fd9cc3234c4f8c36f130e"
+    },
+    {
+     "name": "52350319_005.glb",
+     "bytes": 6116,
+     "sha256": "81475c7ab8b706561801dbcb2b05b468ae638bebad84424eaaa42bf904df027b"
+    }
+   ]
+  },
+  {
+   "mesh": "52350328",
+   "buildings": 2713,
+   "expected": 30,
+   "expected159": 30,
+   "converted": 30,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2683,
+   "tiles": 3,
+   "triangles": 3908,
+   "glbBytes": 424872,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "6b646a05a06a6d02df8f6ea188b9de1af0104a9de568914c8865bd85fb8db7ba",
+   "groundHRange": [
+    0,
+    1.58
+   ],
+   "tileSha256": [
+    {
+     "name": "52350328_000.glb",
+     "bytes": 21020,
+     "sha256": "0d80d3ed42b0df9c56b16f4683b6319cca9c48be896570a8de203b3cca4f32c6"
+    },
+    {
+     "name": "52350328_001.glb",
+     "bytes": 72216,
+     "sha256": "b33286004fd5fb89050db60d58d99061c05b5aaffda0c024ee1f68881276e460"
+    },
+    {
+     "name": "52350328_002.glb",
+     "bytes": 331636,
+     "sha256": "773567895fa12197ada693119e77fc7a986188da5f74b7287368e6371ae6ac7e"
+    }
+   ]
+  },
+  {
+   "mesh": "52350329",
+   "buildings": 1842,
+   "expected": 359,
+   "expected159": 359,
+   "converted": 359,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1483,
+   "tiles": 7,
+   "triangles": 22608,
+   "glbBytes": 2448208,
+   "roofWallInvalid": 0,
+   "texturedLod2": 1,
+   "gmlSha256": "ed357da082908b3fe82834a6e890bc05685de81628d668bd23568278b121cee9",
+   "groundHRange": [
+    0,
+    2.23
+   ],
+   "tileSha256": [
+    {
+     "name": "52350329_000.glb",
+     "bytes": 200952,
+     "sha256": "4bf4437de27fdadc51256d3ed3cfc739ca1504d90af70246eb7ec4f416dded10"
+    },
+    {
+     "name": "52350329_001.glb",
+     "bytes": 1055024,
+     "sha256": "3719546e4caee149b565a00857cebeeaa7eabcc3e5d367611979796537c3d178"
+    },
+    {
+     "name": "52350329_002.glb",
+     "bytes": 3960,
+     "sha256": "fe10f55b81a7441d6988b803fd14f1fd402302243e9c78910a748b29640f4855"
+    },
+    {
+     "name": "52350329_003.glb",
+     "bytes": 28788,
+     "sha256": "2c7397778368509a9e4a0121c3c7af3a677ace8cfd97828011f9ab67f4f77e31"
+    },
+    {
+     "name": "52350329_004.glb",
+     "bytes": 141984,
+     "sha256": "ffea658e0ab176b17546954cfa24131a26b798a67ad542d1852ce20a124643f4"
+    },
+    {
+     "name": "52350329_005.glb",
+     "bytes": 4816,
+     "sha256": "74c698e1fd80cc7c04cde52f1089b5c17ec213ed66b3a5ab194a6cdfb3fbe0fe"
+    },
+    {
+     "name": "52350329_006.glb",
+     "bytes": 1012684,
+     "sha256": "d8adc87a7dee059c957858fb0ae6a8c6beeba9edd40521e3ff69041aa4c0b45d"
+    }
+   ]
+  },
+  {
+   "mesh": "52350339",
+   "buildings": 1178,
+   "expected": 565,
+   "expected159": 565,
+   "converted": 565,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 613,
+   "tiles": 13,
+   "triangles": 46062,
+   "glbBytes": 4986868,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "05cd64077d90a26b992c6b4b3df576ebe887735eb673244d49e268ce10fbcd0a",
+   "groundHRange": [
+    -1.66,
+    3.91
+   ],
+   "tileSha256": [
+    {
+     "name": "52350339_000.glb",
+     "bytes": 26848,
+     "sha256": "94742e8153ac0bae4b63c499171c47ca3ce1fe3262fc024d1bcac2d3297295e1"
+    },
+    {
+     "name": "52350339_001.glb",
+     "bytes": 20584,
+     "sha256": "76a665bb59e2cb30528746cfbed00abecd3c23e31da2e74efbe3c4575f830467"
+    },
+    {
+     "name": "52350339_002.glb",
+     "bytes": 112184,
+     "sha256": "aa7197d90f9eede3e5dec3ae1acc2f6aba9a8069cd9a830610b233fbe6e06a98"
+    },
+    {
+     "name": "52350339_003.glb",
+     "bytes": 152132,
+     "sha256": "21458007cc9ee9ca3c57095ca5b42287ad820404181441edf7a294fd69f2a158"
+    },
+    {
+     "name": "52350339_004.glb",
+     "bytes": 337252,
+     "sha256": "757f92c3df43899e61123119bb675e47516c57e039ed31c001ed825bc68adfe5"
+    },
+    {
+     "name": "52350339_005.glb",
+     "bytes": 244364,
+     "sha256": "f055d2ffe0bcd99b59c38e7d3f0ff2bc092775ce089db0c668dfd6d297ef4243"
+    },
+    {
+     "name": "52350339_006.glb",
+     "bytes": 114768,
+     "sha256": "6d34cd93ae3531a0d73afbe5d7cde06d4ceceb15defa4bb15b862171ca2c6e88"
+    },
+    {
+     "name": "52350339_007.glb",
+     "bytes": 280872,
+     "sha256": "7a3a6e9c7670ceeb41cf46a498e541845a5cf6c9805745b9a9b5c0e00dd28d8e"
+    },
+    {
+     "name": "52350339_008.glb",
+     "bytes": 970136,
+     "sha256": "6f88b09403ac35ef89c6dc81f50a7127ea9cf3243a682cb257c1209247fec6f6"
+    },
+    {
+     "name": "52350339_009.glb",
+     "bytes": 2563356,
+     "sha256": "e11f6e8507aebf3d3cb5824ad8841fb0e0ad8cfc72bb1a5909f832d45c68dd4c"
+    },
+    {
+     "name": "52350339_010.glb",
+     "bytes": 31176,
+     "sha256": "9b0154943ff3168cdf7e5977ce2bfc72bc874143277df1e90bc0b9e4fb4df4fb"
+    },
+    {
+     "name": "52350339_011.glb",
+     "bytes": 112828,
+     "sha256": "6202309ad4266ba754bb7664bc47f86f258c32ff35e2245fe0c86938773d2de5"
+    },
+    {
+     "name": "52350339_012.glb",
+     "bytes": 20368,
+     "sha256": "42afe8d06884e937f10859683fd2f2063d5c2bd5bdb18c540bbefdab6fcc5140"
+    }
+   ]
+  },
+  {
+   "mesh": "52350349",
+   "buildings": 981,
+   "expected": 239,
+   "expected159": 239,
+   "converted": 239,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 742,
+   "tiles": 11,
+   "triangles": 38583,
+   "glbBytes": 4177268,
+   "roofWallInvalid": 0,
+   "texturedLod2": 21,
+   "gmlSha256": "1d4238ea5923cf0cc34dde79cfe4d64ec8d96e3d2593bec2fab28a5fb34f7175",
+   "groundHRange": [
+    -3.54,
+    0.68576391
+   ],
+   "tileSha256": [
+    {
+     "name": "52350349_000.glb",
+     "bytes": 11948,
+     "sha256": "cc0aefdbe1ec3b3183d198fc28354719824923f2f94daeb57ed5ebd8b327f26d"
+    },
+    {
+     "name": "52350349_001.glb",
+     "bytes": 64444,
+     "sha256": "07999ff54f9b03562567249bc293fd6c52ff9cfbc4c0649511f1ee6f99ffc3f4"
+    },
+    {
+     "name": "52350349_002.glb",
+     "bytes": 177192,
+     "sha256": "a7b21c795b25f6abbab5a8a7a5464fdd7e7bd49bed6c0f2e2fdc65d2808bc7a6"
+    },
+    {
+     "name": "52350349_003.glb",
+     "bytes": 201064,
+     "sha256": "4ad1c13b5043a8d41568ae5b9999e4a50fcc25443a009d05837aee14fd32b62d"
+    },
+    {
+     "name": "52350349_004.glb",
+     "bytes": 667948,
+     "sha256": "6bc126b6f6fac40a5afe8904ee1b093059781303cbae7ac1c40f60f2d60c36db"
+    },
+    {
+     "name": "52350349_005.glb",
+     "bytes": 10648,
+     "sha256": "af940de7120c75f232e7bdb0674cd6cff90ec9b3bc8d5e81e6cd8ac59c5980f2"
+    },
+    {
+     "name": "52350349_006.glb",
+     "bytes": 654996,
+     "sha256": "aba9fa9d0a37ea7bc094bff2827923c166dbc315cbafb45dad2b063d68101df2"
+    },
+    {
+     "name": "52350349_007.glb",
+     "bytes": 867100,
+     "sha256": "8eae19deb96549ed3556450084b6d1b8a978a1d5b4dc14778d6e7e9357ec5f44"
+    },
+    {
+     "name": "52350349_008.glb",
+     "bytes": 1452032,
+     "sha256": "202d26ed53e9c536ee7f87d3dbbe1c65a668b1338f9a835fed22e658d6ee0e71"
+    },
+    {
+     "name": "52350349_009.glb",
+     "bytes": 24256,
+     "sha256": "76351cf51c57578b56e16f27a5d29eccefc28601cf785905f8bb532f65f1b0b1"
+    },
+    {
+     "name": "52350349_010.glb",
+     "bytes": 45640,
+     "sha256": "0a9342d2344729e22f1cbfc95324aa08271ad16ccbf770e699e27c25bfaaa58c"
+    }
+   ]
+  },
+  {
+   "mesh": "52350359",
+   "buildings": 1856,
+   "expected": 98,
+   "expected159": 98,
+   "converted": 98,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1758,
+   "tiles": 4,
+   "triangles": 6566,
+   "glbBytes": 712868,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "012a3916b91035e66609ddf95ad299a7b691d6101347c125ab1e1e301b94cfab",
+   "groundHRange": [
+    -0.88,
+    0.62
+   ],
+   "tileSha256": [
+    {
+     "name": "52350359_000.glb",
+     "bytes": 373760,
+     "sha256": "7189df5508c11981405bf7516f227fd4a1b98a556f1a1c321dde8b452632ffd7"
+    },
+    {
+     "name": "52350359_001.glb",
+     "bytes": 227520,
+     "sha256": "04d10231f2719fce81ce1649541655d5d149abffca3b3f6485bd51e944d58011"
+    },
+    {
+     "name": "52350359_002.glb",
+     "bytes": 10212,
+     "sha256": "90019d419a2ecea36f5e6217b948b5695a0363fea1318823ea17f18d46db5c63"
+    },
+    {
+     "name": "52350359_003.glb",
+     "bytes": 101376,
+     "sha256": "0f6426137660b7df38ecd04cd1a6ad91b25d7fee0b56604b81014333b082a200"
+    }
+   ]
+  },
+  {
+   "mesh": "52350368",
+   "buildings": 3533,
+   "expected": 1536,
+   "expected159": 1536,
+   "converted": 1536,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1997,
+   "tiles": 13,
+   "triangles": 88002,
+   "glbBytes": 9516440,
+   "roofWallInvalid": 0,
+   "texturedLod2": 1536,
+   "gmlSha256": "824de5b7034e662de3c5aea484b758f40603527e8cb5f8d4677f68918eaa89e7",
+   "groundHRange": [
+    -1.7670073551287686,
+    1.4835872931406442
+   ],
+   "tileSha256": [
+    {
+     "name": "52350368_000.glb",
+     "bytes": 1093364,
+     "sha256": "970057f240d43cd4f4412b15aa44f6109b105a89422c35edbce399ca7f1930dd"
+    },
+    {
+     "name": "52350368_001.glb",
+     "bytes": 1469312,
+     "sha256": "66bdefb657369efa4b0280ed6984a3a5140f616f7acf0f1a72043bc37a51cecf"
+    },
+    {
+     "name": "52350368_002.glb",
+     "bytes": 388880,
+     "sha256": "deb37107d0f9f189a84a8b09664c5f96ea854b78370d753e59ba0188ee321d1d"
+    },
+    {
+     "name": "52350368_003.glb",
+     "bytes": 51912,
+     "sha256": "ff4ebf52f7d5e7334d149cb5d0d001e3cb696fac2b9935bbe6c0d8c6a09d1d97"
+    },
+    {
+     "name": "52350368_004.glb",
+     "bytes": 1335604,
+     "sha256": "909a94e8847c92d39e06e570724190a0363672cddcb8dbf1acae946b637fe329"
+    },
+    {
+     "name": "52350368_005.glb",
+     "bytes": 1854876,
+     "sha256": "97dcb8d662470009707056fdd8c2b75f8fee9ddbeb9009a919d922e187df8e8d"
+    },
+    {
+     "name": "52350368_006.glb",
+     "bytes": 1709072,
+     "sha256": "27232ea5d5377d691b7dd4cfae564e9cd77fd0e8190446319c50b947db107781"
+    },
+    {
+     "name": "52350368_007.glb",
+     "bytes": 167904,
+     "sha256": "58c8633a6227ea1e6fdfed6efeb99668425cc6b2bc7b4de98f62612659db23cb"
+    },
+    {
+     "name": "52350368_008.glb",
+     "bytes": 634472,
+     "sha256": "a442370c792056a66ddcdb44b737a1c240a8f14de0bb9f85e223ef2f5b40f19c"
+    },
+    {
+     "name": "52350368_009.glb",
+     "bytes": 9568,
+     "sha256": "befa08a7c07c49940fca7e7f278e1c29d8db0b7167fa492dea6fd585e06b5175"
+    },
+    {
+     "name": "52350368_010.glb",
+     "bytes": 164232,
+     "sha256": "5f8c0b1a052321752daea2c9575e8d75f8782ab70ec389b8ff3cb33b66a81fcd"
+    },
+    {
+     "name": "52350368_011.glb",
+     "bytes": 544616,
+     "sha256": "118e6918bde7b9e87584cbc4df6043ffcb8af6e1807d9abe9d3d8d36f688d262"
+    },
+    {
+     "name": "52350368_012.glb",
+     "bytes": 92628,
+     "sha256": "d6a2d1e61c80d404b3fd10043b06f2e7c89174afbfdb766a245cc698275e0663"
+    }
+   ]
+  },
+  {
+   "mesh": "52350378",
+   "buildings": 3474,
+   "expected": 516,
+   "expected159": 516,
+   "converted": 516,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2958,
+   "tiles": 5,
+   "triangles": 25224,
+   "glbBytes": 2728888,
+   "roofWallInvalid": 0,
+   "texturedLod2": 516,
+   "gmlSha256": "b0018ea935d1c1b8aadef4b31912b3c0a22573e34518394dce989bf4cee57e5f",
+   "groundHRange": [
+    -0.4308837195918471,
+    0.5786068447309702
+   ],
+   "tileSha256": [
+    {
+     "name": "52350378_000.glb",
+     "bytes": 581552,
+     "sha256": "cbf4e397668b1678862861dafd8eb10ccfadc2286c534e6b5ea5992fbd07000b"
+    },
+    {
+     "name": "52350378_001.glb",
+     "bytes": 1569000,
+     "sha256": "218478a34216f36a3bf9b69fe69bf4ffd6f84e9a8ec2fad8bc09c8a8148f0c38"
+    },
+    {
+     "name": "52350378_002.glb",
+     "bytes": 534136,
+     "sha256": "a7e346746117ee2a0c1e05501287bf6c4357d116881036904afc6eb50cf10f19"
+    },
+    {
+     "name": "52350378_003.glb",
+     "bytes": 35712,
+     "sha256": "ce0328a17d892abc8d6ba78ab3b52baed05160bd9a3364617ddd48a7c86b51a8"
+    },
+    {
+     "name": "52350378_004.glb",
+     "bytes": 8488,
+     "sha256": "b181664ea2f5e1cff51eede1f47bffc24eb4e6f10d103b9f223e84337ebf6ae1"
+    }
+   ]
+  },
+  {
+   "mesh": "52350379",
+   "buildings": 2064,
+   "expected": 370,
+   "expected159": 370,
+   "converted": 370,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1694,
+   "tiles": 7,
+   "triangles": 21109,
+   "glbBytes": 2286312,
+   "roofWallInvalid": 0,
+   "texturedLod2": 370,
+   "gmlSha256": "a39841a59dec9429dfb38fcecf01dcef2aab7f11c7fa644d1179ddebd3281255",
+   "groundHRange": [
+    -2.0206557007874437,
+    1.761323392061172
+   ],
+   "tileSha256": [
+    {
+     "name": "52350379_000.glb",
+     "bytes": 14536,
+     "sha256": "80e5725b9c4afca5863c2aac6b9e8bf048180d5f24cb7cbb5fb9d95f2a552edc"
+    },
+    {
+     "name": "52350379_001.glb",
+     "bytes": 32036,
+     "sha256": "f393f2e28bf1cdf1bdea29e69f8c768b23c92740d286b465d7c8717e3e4b196d"
+    },
+    {
+     "name": "52350379_002.glb",
+     "bytes": 283356,
+     "sha256": "477acf538bf8e910983c52684ef8181ae751f9c258cd86d44ccb45b73af7d115"
+    },
+    {
+     "name": "52350379_003.glb",
+     "bytes": 1676132,
+     "sha256": "dc43b8ffcf5040be95b0bfeed3e90b930385e564b023f5b540cf53051cccdd8d"
+    },
+    {
+     "name": "52350379_004.glb",
+     "bytes": 28468,
+     "sha256": "ae796e9209a8b0f65c7d9f565cedadbbe786e45c867a2b85fe09af9d0540f861"
+    },
+    {
+     "name": "52350379_005.glb",
+     "bytes": 212400,
+     "sha256": "f89ffa8ee6bd534cfc44c4f82b2127d26da3395a4eb4090184ba70aa6aa3fdda"
+    },
+    {
+     "name": "52350379_006.glb",
+     "bytes": 39384,
+     "sha256": "1a8c953fffaaacc85d62b1d940832ea524bf6508b338adeca8af60a3dff50e01"
+    }
+   ]
+  },
+  {
+   "mesh": "52350389",
+   "buildings": 2105,
+   "expected": 184,
+   "expected159": 184,
+   "converted": 184,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1921,
+   "tiles": 5,
+   "triangles": 14312,
+   "glbBytes": 1550392,
+   "roofWallInvalid": 0,
+   "texturedLod2": 184,
+   "gmlSha256": "81f0f87d14344f54ea8805c05719d073f4eaaf187730f4820f36aad6ea5435c0",
+   "groundHRange": [
+    -0.6929469879952421,
+    2.134583728854267
+   ],
+   "tileSha256": [
+    {
+     "name": "52350389_000.glb",
+     "bytes": 389636,
+     "sha256": "99af26e429d1b8be0d5157258398503af284c4dc6d17f815cd4b331a3a9f0da5"
+    },
+    {
+     "name": "52350389_001.glb",
+     "bytes": 321052,
+     "sha256": "df3445da26a6d11e961ac536a96cb83196b3915bd39045f3bb58eafd606bbdec"
+    },
+    {
+     "name": "52350389_002.glb",
+     "bytes": 91656,
+     "sha256": "926b9bfa39695a0f74180586e359694ccb4690e1b6cf21bfd6ea36cab0cc2289"
+    },
+    {
+     "name": "52350389_003.glb",
+     "bytes": 730484,
+     "sha256": "609f9c12fa6ffeafcba47f6fca5655e1bee4a941132b06fe1b6fe7346f1cf5fd"
+    },
+    {
+     "name": "52350389_004.glb",
+     "bytes": 17564,
+     "sha256": "b15bd01e8f27f5056ac576e614906c13eb061c5116ca03c0af99b0e3b0078fd7"
+    }
+   ]
+  },
+  {
+   "mesh": "52350400",
+   "buildings": 3385,
+   "expected": 1332,
+   "expected159": 1332,
+   "converted": 1332,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2053,
+   "tiles": 9,
+   "triangles": 83814,
+   "glbBytes": 9060376,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "e30bf0c85750186394ed352e6f22610443ad37b1adcbb2bc6fb20910d190ca81",
+   "groundHRange": [
+    0,
+    5.01
+   ],
+   "tileSha256": [
+    {
+     "name": "52350400_000.glb",
+     "bytes": 602068,
+     "sha256": "c6f1f9b86edf8fc977b2b41526fc9c82082dcec2a4661acbc72da9a72cba9638"
+    },
+    {
+     "name": "52350400_001.glb",
+     "bytes": 260352,
+     "sha256": "c81c506bceaffd2db372aed64cd93bd37f45714e195ecd2a95f89803f9ede85f"
+    },
+    {
+     "name": "52350400_002.glb",
+     "bytes": 19720,
+     "sha256": "3d796e2b0dba76e0342ef6112c9f278ea0ceab4353b84e0776246fa31da8cbed"
+    },
+    {
+     "name": "52350400_003.glb",
+     "bytes": 2076920,
+     "sha256": "cae7a3df66566ddcb4de38c9c0c496d4b252670202e01b581b04bc6c3730b283"
+    },
+    {
+     "name": "52350400_004.glb",
+     "bytes": 1168640,
+     "sha256": "ac304ae286f99748ddfe888c9a8c951f33db445993207a22c445f0247c4aaca3"
+    },
+    {
+     "name": "52350400_005.glb",
+     "bytes": 1830248,
+     "sha256": "5f8c066e3183cefa73eb2cf6b219bc0580fbfdda1c00b7609fcbaeab501d79e3"
+    },
+    {
+     "name": "52350400_006.glb",
+     "bytes": 18648,
+     "sha256": "b9c188a49c953da40a6e0f4a0ccb870f2bea92770fa31e9900d2c87a4e8e81c2"
+    },
+    {
+     "name": "52350400_007.glb",
+     "bytes": 2084916,
+     "sha256": "18211480ca840bb3d4045eaefe324278370a12342f7e04f4ff9071c2afd95d82"
+    },
+    {
+     "name": "52350400_008.glb",
+     "bytes": 998864,
+     "sha256": "4d3cc0f5b1c34c0b3fb6ff7cb432cf2838b4317e4e14562b3bdae7049c354717"
+    }
+   ]
+  },
+  {
+   "mesh": "52350410",
+   "buildings": 2244,
+   "expected": 744,
+   "expected159": 744,
+   "converted": 744,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1500,
+   "tiles": 7,
+   "triangles": 53954,
+   "glbBytes": 5833628,
+   "roofWallInvalid": 0,
+   "texturedLod2": 1,
+   "gmlSha256": "54669d0cf1564e358f784ba20b0ec376d054d49c12c3f3711a78f4c063ed0939",
+   "groundHRange": [
+    -7.431,
+    4.42
+   ],
+   "tileSha256": [
+    {
+     "name": "52350410_000.glb",
+     "bytes": 307444,
+     "sha256": "6bccee0ba92af5585a16df904f7f8dec73754be46d9fa30dd472809b0762db77"
+    },
+    {
+     "name": "52350410_001.glb",
+     "bytes": 157324,
+     "sha256": "022404ca61f78c4ddbe7b3b8254d9fc274483b3e012b274e5a850373d47aae66"
+    },
+    {
+     "name": "52350410_002.glb",
+     "bytes": 37444,
+     "sha256": "7827d68451741e684a2ef85c382eb7dc32519c04902c87e986be0fe53732a4b3"
+    },
+    {
+     "name": "52350410_003.glb",
+     "bytes": 2011476,
+     "sha256": "d5845e720e56f7ff92782d89f34fa01cf99e88bde79a9753f136ba7a1f6e204f"
+    },
+    {
+     "name": "52350410_004.glb",
+     "bytes": 1208384,
+     "sha256": "de3f659b19ab69188dcf546a015bfbe8f28d6b3e2a9e27d9d29d3c3848b23ccf"
+    },
+    {
+     "name": "52350410_005.glb",
+     "bytes": 1329992,
+     "sha256": "87cd935d513e77b8114d0f4f4a21bedd5e9cb66d645281942f046bde565cb062"
+    },
+    {
+     "name": "52350410_006.glb",
+     "bytes": 781564,
+     "sha256": "9358ee8000b697c54a3c3c7ea28eb3c26062a59b3cb1fa7008c6ed2ba0d12491"
+    }
+   ]
+  },
+  {
+   "mesh": "52350411",
+   "buildings": 2414,
+   "expected": 211,
+   "expected159": 211,
+   "converted": 211,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2203,
+   "tiles": 6,
+   "triangles": 13386,
+   "glbBytes": 1451300,
+   "roofWallInvalid": 0,
+   "texturedLod2": 211,
+   "gmlSha256": "b22c7a02117065d556d1ef30f12941e8ad2d4c9b4d2b360bd90e4973df1b51c2",
+   "groundHRange": [
+    10.65884743,
+    23.73187202
+   ],
+   "tileSha256": [
+    {
+     "name": "52350411_000.glb",
+     "bytes": 113364,
+     "sha256": "ab243438126289928af326a672ccdef2d8bdf6d65ac0276a6bbb31d793cef98d"
+    },
+    {
+     "name": "52350411_001.glb",
+     "bytes": 75452,
+     "sha256": "34fb9055af16b8a1c46a29e04e0cb34f3c4b12214d3e904afa99a048a65bbe21"
+    },
+    {
+     "name": "52350411_002.glb",
+     "bytes": 197820,
+     "sha256": "787320781b18ca558cc4be23db9e9ad74905161d5c164bf8399a10eeb9596b5e"
+    },
+    {
+     "name": "52350411_003.glb",
+     "bytes": 833408,
+     "sha256": "ff7fd698a118da5a298096f22e83f05f3eb7385dec91fdc3f2911c003d7528b1"
+    },
+    {
+     "name": "52350411_004.glb",
+     "bytes": 206568,
+     "sha256": "650e13f1419da2ecb5f62dc645b5ff98133f4d6aec38188456c3b6a69e08510c"
+    },
+    {
+     "name": "52350411_005.glb",
+     "bytes": 24688,
+     "sha256": "f9510c7f3cc2e2746d338aabcb1295f05f6626309ee5b3aa2b8879759037c305"
+    }
+   ]
+  },
+  {
+   "mesh": "52350412",
+   "buildings": 2566,
+   "expected": 291,
+   "expected159": 291,
+   "converted": 291,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2275,
+   "tiles": 6,
+   "triangles": 15411,
+   "glbBytes": 1670012,
+   "roofWallInvalid": 0,
+   "texturedLod2": 291,
+   "gmlSha256": "d7aea2dbca838da09aa728b2824de12a773f579be1f9fbd999d872d59347f177",
+   "groundHRange": [
+    0.38913775,
+    23.22342792
+   ],
+   "tileSha256": [
+    {
+     "name": "52350412_000.glb",
+     "bytes": 47592,
+     "sha256": "0c5a0cdb4369eb7e4ab72dd1df62f641a53dd186be07d498062e071b297504e3"
+    },
+    {
+     "name": "52350412_001.glb",
+     "bytes": 103536,
+     "sha256": "2f8de81e404f0f65b615b95b66f454eca2870614c5e495e6c98b9283a10b507b"
+    },
+    {
+     "name": "52350412_002.glb",
+     "bytes": 205380,
+     "sha256": "7ac52a2f3bbf9bd61c973effbe40a1a94bc08fa9ca41231fe7d21128e1eaaf58"
+    },
+    {
+     "name": "52350412_003.glb",
+     "bytes": 652072,
+     "sha256": "b61402833e1e0a5e0785ec31b1c6f49abb33f5003762c682ee6592a8bad9bb48"
+    },
+    {
+     "name": "52350412_004.glb",
+     "bytes": 604124,
+     "sha256": "820ae165d7abb4336727c0dfc25030b0ef5db23f1b118a5f28a0f6f6e4ab920e"
+    },
+    {
+     "name": "52350412_005.glb",
+     "bytes": 57308,
+     "sha256": "2dcb310f91e25ae1326231636f1ee31c97f431715640f8e5c3a884cc19f14f60"
+    }
+   ]
+  },
+  {
+   "mesh": "52350420",
+   "buildings": 1635,
+   "expected": 591,
+   "expected159": 591,
+   "converted": 591,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1044,
+   "tiles": 8,
+   "triangles": 44669,
+   "glbBytes": 4831760,
+   "roofWallInvalid": 0,
+   "texturedLod2": 17,
+   "gmlSha256": "b91555cd5b442e9b39fb29b85f314087557d0fe31c43aa93b553d62d6e7a318b",
+   "groundHRange": [
+    -1.414,
+    3.8
+   ],
+   "tileSha256": [
+    {
+     "name": "52350420_000.glb",
+     "bytes": 162072,
+     "sha256": "a8cddd0b7eaa7abc580f0838cbcaa300541deaf6fdb2b843142fd6d903bdae90"
+    },
+    {
+     "name": "52350420_001.glb",
+     "bytes": 99864,
+     "sha256": "a7a427e5bc7405ae8c731ae0a561a4afd0d94fc7daab301c030db4a0742df699"
+    },
+    {
+     "name": "52350420_002.glb",
+     "bytes": 33548,
+     "sha256": "e3747365369466fa1aeca303cb88ac762e52c704642f2cf0c35340453267edcd"
+    },
+    {
+     "name": "52350420_003.glb",
+     "bytes": 1490584,
+     "sha256": "a38916abccb019bea4faee26e9e62ef12b2831cc4804070bbe787018256f13a3"
+    },
+    {
+     "name": "52350420_004.glb",
+     "bytes": 856088,
+     "sha256": "9a36528168414e13f4065aabf32322581057ead854138d2d5807a53b5be73cfb"
+    },
+    {
+     "name": "52350420_005.glb",
+     "bytes": 8276,
+     "sha256": "35a3d415c4698c6b1906025f802530698790bcfdaa9354581bd580db2e0944fb"
+    },
+    {
+     "name": "52350420_006.glb",
+     "bytes": 1106864,
+     "sha256": "a14cdb8c54dbac0fd362a2079f74a181898702fdac4d51973111ebc08e61af3a"
+    },
+    {
+     "name": "52350420_007.glb",
+     "bytes": 1074464,
+     "sha256": "936faae1b3a69e1c036735744dc3d4808d4888448c64aae8d56b1ca4d1851023"
+    }
+   ]
+  },
+  {
+   "mesh": "52350421",
+   "buildings": 1098,
+   "expected": 508,
+   "expected159": 508,
+   "converted": 508,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 590,
+   "tiles": 11,
+   "triangles": 31081,
+   "glbBytes": 3367052,
+   "roofWallInvalid": 0,
+   "texturedLod2": 508,
+   "gmlSha256": "ff9ba28d5b49562ad92189fdff4789df265ab67c5b23e5c656e425859f0d534f",
+   "groundHRange": [
+    0.94512671,
+    26.23231938
+   ],
+   "tileSha256": [
+    {
+     "name": "52350421_000.glb",
+     "bytes": 34524,
+     "sha256": "d11915018f2a16ee4f3a2c34008b6f2d7bc9685dfac9bd64a2ecbce774970726"
+    },
+    {
+     "name": "52350421_001.glb",
+     "bytes": 237452,
+     "sha256": "0b8cd01878b8be643dd48b126f11a346fc55a0d3f4b492c4c0a320bbbbbc923f"
+    },
+    {
+     "name": "52350421_002.glb",
+     "bytes": 68108,
+     "sha256": "f4158d4c777eb59b42edb463de91864ef233675e9006afb747df0868167f53c5"
+    },
+    {
+     "name": "52350421_003.glb",
+     "bytes": 162072,
+     "sha256": "85896ed000ae12bc7fc9ddf15c2997de7eb137481c1186e68e0a705017dde3ce"
+    },
+    {
+     "name": "52350421_004.glb",
+     "bytes": 1482488,
+     "sha256": "b4a52d70eed014a9737aa8b961a2564eb83960befd85216e2dcecd9610dfa0a8"
+    },
+    {
+     "name": "52350421_005.glb",
+     "bytes": 94248,
+     "sha256": "eb63e4c93af5e72f5bc1153ef201f795bd22200b81a807489fe629218ea824e4"
+    },
+    {
+     "name": "52350421_006.glb",
+     "bytes": 37872,
+     "sha256": "69af7d37712c6c0c3fd8d59bedf60fbba5a9e826250547edc4764375bd243ffd"
+    },
+    {
+     "name": "52350421_007.glb",
+     "bytes": 141768,
+     "sha256": "f85ea37a67bbe13cc097c34e38b871239e6dd9f016e116f4738abe62d33bb250"
+    },
+    {
+     "name": "52350421_008.glb",
+     "bytes": 772496,
+     "sha256": "37d6b84ab7c243f95119c538d53542171a6811170cb6775ceae8c90d53edd883"
+    },
+    {
+     "name": "52350421_009.glb",
+     "bytes": 314144,
+     "sha256": "4883de6faa0a45ad33db807c1bfd0efab27de4e3284e26d276832194f053060a"
+    },
+    {
+     "name": "52350421_010.glb",
+     "bytes": 21880,
+     "sha256": "389afacc01b0c7e1e52e3f84dcf0b2dfde898a24c381377b593b4eff9dd6459d"
+    }
+   ]
+  },
+  {
+   "mesh": "52350422",
+   "buildings": 345,
+   "expected": 292,
+   "expected159": 292,
+   "converted": 292,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 53,
+   "tiles": 12,
+   "triangles": 16785,
+   "glbBytes": 1823992,
+   "roofWallInvalid": 0,
+   "texturedLod2": 292,
+   "gmlSha256": "98ce4f3651cce3d76c9b82ec4f8f39327226d4b382a4dc192f46ffcf1f47c5a5",
+   "groundHRange": [
+    0.79863851,
+    36.90173619
+   ],
+   "tileSha256": [
+    {
+     "name": "52350422_000.glb",
+     "bytes": 43488,
+     "sha256": "6ed8e11afa6fce27bd69380403caf9b668267a969d63a749b5617e85e48d6907"
+    },
+    {
+     "name": "52350422_001.glb",
+     "bytes": 4380,
+     "sha256": "ccd5b790400960422e6e12795397733a34c6b93d87bf16472a2ce1d4c99a5fb9"
+    },
+    {
+     "name": "52350422_002.glb",
+     "bytes": 273312,
+     "sha256": "8eb1c8150db9274386dd13295b259ec833ef297bbd32724ce4dafe3ecf014b7d"
+    },
+    {
+     "name": "52350422_003.glb",
+     "bytes": 33768,
+     "sha256": "ae5f5ab8bafecbee1631bdfa0a59132f66e0bbcc4d87ecd421aa91266d9846f8"
+    },
+    {
+     "name": "52350422_004.glb",
+     "bytes": 230008,
+     "sha256": "a9de673739c34279a1e20ddedece677bbe5a260cbec8332b58e2926b79fb126b"
+    },
+    {
+     "name": "52350422_005.glb",
+     "bytes": 24256,
+     "sha256": "742435801624bec5d52de143210e9b432d00a9fc5295691f6ce8072e3bc9e3a8"
+    },
+    {
+     "name": "52350422_006.glb",
+     "bytes": 153648,
+     "sha256": "ee033351144e762170cb8c856ab8064ae3d73a97ed2bc01ebbe130f6f07cd61e"
+    },
+    {
+     "name": "52350422_007.glb",
+     "bytes": 29656,
+     "sha256": "5fbd95e57bef029f302b9f22f1377c95fcc3a4b0e2aad976b925c416944b968d"
+    },
+    {
+     "name": "52350422_008.glb",
+     "bytes": 16696,
+     "sha256": "fb36b634d488d9d4ef2eebf430feb60019ceee7ef491bbe24ddf85f8d6bd59a5"
+    },
+    {
+     "name": "52350422_009.glb",
+     "bytes": 117788,
+     "sha256": "b906021556c28d93abd9360db8795beb1991774122f16a3bfb04706946757751"
+    },
+    {
+     "name": "52350422_010.glb",
+     "bytes": 556388,
+     "sha256": "1dbfa8f56cfb78d96699bf521b031f9d717264cf9796d1b927d4c2e5ffe06220"
+    },
+    {
+     "name": "52350422_011.glb",
+     "bytes": 340604,
+     "sha256": "ecc65468b15115f628b5cdc43335b93c05768946b02c3c2ccac09baabcd22078"
+    }
+   ]
+  },
+  {
+   "mesh": "52350430",
+   "buildings": 2077,
+   "expected": 429,
+   "expected159": 429,
+   "converted": 429,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1648,
+   "tiles": 7,
+   "triangles": 32518,
+   "glbBytes": 3518512,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "4b612f8573ecca492f3ccc07ac5825c0eaac0fbf1a459acd9c7b157eec367c59",
+   "groundHRange": [
+    -6.738,
+    3.5
+   ],
+   "tileSha256": [
+    {
+     "name": "52350430_000.glb",
+     "bytes": 116492,
+     "sha256": "452a924dec389bde3720522708e80eae135ac25c55c7113a81d002a39d1376e5"
+    },
+    {
+     "name": "52350430_001.glb",
+     "bytes": 44352,
+     "sha256": "e63c6c7e28a0286ec8095a952adc2c7a521d3c2ed30d5e5e5a0b5910f2438a84"
+    },
+    {
+     "name": "52350430_002.glb",
+     "bytes": 522368,
+     "sha256": "3f0c4d9630a9f8003fa0b273fbb3d1aeca1bd45c71ed3a215bb6306c95101e03"
+    },
+    {
+     "name": "52350430_003.glb",
+     "bytes": 384992,
+     "sha256": "2529990518f986b01615c8b141fc710cb4f95647dc8fe537a35f233d0b0306bc"
+    },
+    {
+     "name": "52350430_004.glb",
+     "bytes": 8700,
+     "sha256": "1ecd88fb3ebb8609914611455c6da62074d8f7b6f042714e486a42f03465fce7"
+    },
+    {
+     "name": "52350430_005.glb",
+     "bytes": 1661336,
+     "sha256": "bab215c9df2100699e65ae7dc442bddfed2822494cc1ef9dcff27f5de0223775"
+    },
+    {
+     "name": "52350430_006.glb",
+     "bytes": 780272,
+     "sha256": "ef1df7bd201069c99282cfe3c52b05ebdb403da991dd75f3d99daa8f26b55ccf"
+    }
+   ]
+  },
+  {
+   "mesh": "52350431",
+   "buildings": 2094,
+   "expected": 45,
+   "expected159": 45,
+   "converted": 45,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2049,
+   "tiles": 4,
+   "triangles": 1945,
+   "glbBytes": 213796,
+   "roofWallInvalid": 0,
+   "texturedLod2": 45,
+   "gmlSha256": "247fd527196b29bafd680b5baa323426d2155de923729ce0ac71942859903fc9",
+   "groundHRange": [
+    2.94727763,
+    4.35092746
+   ],
+   "tileSha256": [
+    {
+     "name": "52350431_000.glb",
+     "bytes": 32252,
+     "sha256": "7ad552190c74c41f2c812b8065366e02219a5bfbcb707e21b0f350f7ac40bdee"
+    },
+    {
+     "name": "52350431_001.glb",
+     "bytes": 9360,
+     "sha256": "e06bcea081fc7e7b3f6ee43695d87b0cdda472ba2906d13b41bbcb3111e01a4c"
+    },
+    {
+     "name": "52350431_002.glb",
+     "bytes": 119412,
+     "sha256": "c10fca3250c30db070dfa4c7704e1db1690871730c6cb8584a2bb3a3f47b2f03"
+    },
+    {
+     "name": "52350431_003.glb",
+     "bytes": 52772,
+     "sha256": "229a424e7a7caffcb064c94d62da8a4d206a930a6f224159baa35832969bcc90"
+    }
+   ]
+  },
+  {
+   "mesh": "52350432",
+   "buildings": 2130,
+   "expected": 32,
+   "expected159": 32,
+   "converted": 32,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2098,
+   "tiles": 7,
+   "triangles": 2888,
+   "glbBytes": 318416,
+   "roofWallInvalid": 0,
+   "texturedLod2": 32,
+   "gmlSha256": "03f2f66a3ec6f866281a76699c6a1fc7165ce25690b9bc051f8cfc8622b77c15",
+   "groundHRange": [
+    0.56381164,
+    5.47878188
+   ],
+   "tileSha256": [
+    {
+     "name": "52350432_000.glb",
+     "bytes": 24692,
+     "sha256": "6e8bef43bba145e1a1e576ec5d2e00e09a039c6d7b99e0bb80b624d4938d614b"
+    },
+    {
+     "name": "52350432_001.glb",
+     "bytes": 74592,
+     "sha256": "8bdc9b0287b449958553d2be89ce86bf73b15f05999f0a125474b76a2ae44350"
+    },
+    {
+     "name": "52350432_002.glb",
+     "bytes": 74804,
+     "sha256": "6aa0aa24191f4d7fbeb52ea80ce7804b8aee09b98a6dea6329e2d7e412442ab0"
+    },
+    {
+     "name": "52350432_003.glb",
+     "bytes": 3508,
+     "sha256": "3ea2247389b840f266b6d9c5afcdf41a74d74b9eccb01be5b4096cdaccee8bed"
+    },
+    {
+     "name": "52350432_004.glb",
+     "bytes": 90360,
+     "sha256": "fd2eac2b051b2b694dd51c0c3f4673a2efa10d5b0839ecaff8710526360d45d9"
+    },
+    {
+     "name": "52350432_005.glb",
+     "bytes": 15400,
+     "sha256": "4f021283f5c23d12284fdd54f2146a182b0eac07fdec61f908fe43673f5cf1ae"
+    },
+    {
+     "name": "52350432_006.glb",
+     "bytes": 35060,
+     "sha256": "369520ee595130365e3fa08b1cc184b3be0ef2217315e8908eceb4b8bc0bf932"
+    }
+   ]
+  },
+  {
+   "mesh": "52350440",
+   "buildings": 3122,
+   "expected": 134,
+   "expected159": 134,
+   "converted": 134,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2988,
+   "tiles": 3,
+   "triangles": 12936,
+   "glbBytes": 1399912,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "4fe5451b9c32f7cfb48a21fcbd9d217fc902298eaffc0ef43cdd918a8270bc66",
+   "groundHRange": [
+    -0.2,
+    0.92
+   ],
+   "tileSha256": [
+    {
+     "name": "52350440_000.glb",
+     "bytes": 33984,
+     "sha256": "a01e00fe96c05ad3ebd8ce6b82fe105ec3c78a873f5487b770b20e25d4d92b21"
+    },
+    {
+     "name": "52350440_001.glb",
+     "bytes": 891296,
+     "sha256": "dd3a38f70e64a128dd5e04691174deba9595f5fa86a464250876da7aaee0f277"
+    },
+    {
+     "name": "52350440_002.glb",
+     "bytes": 474632,
+     "sha256": "5367ded724fac9ad5d4f213b193656059c8735919556cc749018ca43ac592de6"
+    }
+   ]
+  },
+  {
+   "mesh": "52350441",
+   "buildings": 2176,
+   "expected": 18,
+   "expected159": 18,
+   "converted": 18,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 2158,
+   "tiles": 2,
+   "triangles": 1090,
+   "glbBytes": 119588,
+   "roofWallInvalid": 0,
+   "texturedLod2": 18,
+   "gmlSha256": "cd228c6c2fa82e9203ecbdba46eb576481f50c482c3633e5bc45b8906852f33e",
+   "groundHRange": [
+    2.71,
+    3.94
+   ],
+   "tileSha256": [
+    {
+     "name": "52350441_000.glb",
+     "bytes": 15620,
+     "sha256": "c26d6b943b65564bf5aaed4a49b67b08f568cc10b89252bde5fab27bb2d731c7"
+    },
+    {
+     "name": "52350441_001.glb",
+     "bytes": 103968,
+     "sha256": "013824c255e42b5de10e74ef1b8935a1285e4864c1b2ce6c6d1c638a3f79914d"
+    }
+   ]
+  },
+  {
+   "mesh": "52350450",
+   "buildings": 3937,
+   "expected": 1,
+   "expected159": 1,
+   "converted": 1,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 3936,
+   "tiles": 1,
+   "triangles": 12,
+   "glbBytes": 2220,
+   "roofWallInvalid": 0,
+   "texturedLod2": 0,
+   "gmlSha256": "88222e260a28b48493f0d81854c69d28cc74988c7fe980f150c5342e70a58dae",
+   "groundHRange": [
+    0.5,
+    0.5
+   ],
+   "tileSha256": [
+    {
+     "name": "52350450_000.glb",
+     "bytes": 2220,
+     "sha256": "17d53efd6989d42551ecf461e97cfbcf267af372e181ee31a352b686388b0432"
+    }
+   ]
+  },
+  {
+   "mesh": "52350470",
+   "buildings": 2070,
+   "expected": 404,
+   "expected159": 404,
+   "converted": 404,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 1666,
+   "tiles": 4,
+   "triangles": 26148,
+   "glbBytes": 2827736,
+   "roofWallInvalid": 0,
+   "texturedLod2": 404,
+   "gmlSha256": "a861f61ff04145fa92f8786e5d310c07e59632a4214ec227d8348c884ca6c02e",
+   "groundHRange": [
+    -1.5943276921692018,
+    2.2617614820902787
+   ],
+   "tileSha256": [
+    {
+     "name": "52350470_000.glb",
+     "bytes": 2039120,
+     "sha256": "a0a6cc403498d93233f9a66821c022ef4cf2e6c25c2b76be511cf1060d025249"
+    },
+    {
+     "name": "52350470_001.glb",
+     "bytes": 351292,
+     "sha256": "65c51e6cb0edaac1c3aa7d83c6741918de636a6c82a1b4481612c726d1546d64"
+    },
+    {
+     "name": "52350470_002.glb",
+     "bytes": 186260,
+     "sha256": "d7f683b8da05cf64141d902af8381a2a0af0041e7faa4a657e64774835a52717"
+    },
+    {
+     "name": "52350470_003.glb",
+     "bytes": 251064,
+     "sha256": "e7ede0ea7def18fb21cb9f2be427d9cf1b319b897c865c8a0b684582fe633aa1"
+    }
+   ]
+  },
+  {
+   "mesh": "52350480",
+   "buildings": 3822,
+   "expected": 381,
+   "expected159": 381,
+   "converted": 381,
+   "failed": 0,
+   "missing": 0,
+   "extra": 0,
+   "lod1Fallback": 3441,
+   "tiles": 4,
+   "triangles": 22722,
+   "glbBytes": 2457748,
+   "roofWallInvalid": 0,
+   "texturedLod2": 381,
+   "gmlSha256": "afcd6ee6b02f16f11f3ac9a4d4c6989f597389f6b77c121e31d15a1141b9083c",
+   "groundHRange": [
+    -2.4422630930223477,
+    3.324727939392986
+   ],
+   "tileSha256": [
+    {
+     "name": "52350480_000.glb",
+     "bytes": 635984,
+     "sha256": "27b46668dfb785cdfe3923431404c99e3b38603f254f976cdaf1276d26ab2071"
+    },
+    {
+     "name": "52350480_001.glb",
+     "bytes": 355396,
+     "sha256": "0591be549134317a20bee308da8eefa9575cb05bd9d21fcff64c5a028cce2ce0"
+    },
+    {
+     "name": "52350480_002.glb",
+     "bytes": 1116692,
+     "sha256": "37c8b9a44d4bff7f393ebcdf7eb803129185ee9216eee93d54b7c15705d77b3d"
+    },
+    {
+     "name": "52350480_003.glb",
+     "bytes": 349676,
+     "sha256": "c4b9cb89c6ba3148fe82703d0bf1523aa01ce44320e1e746b150a52a6f35e18d"
+    }
+   ]
+  }
+ ],
+ "failedIdList": []
+}

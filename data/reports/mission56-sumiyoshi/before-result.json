@@ -1,0 +1,441 @@
+{
+  "mission": "56",
+  "label": "before",
+  "url": "http://localhost:8156/mission37g-osaka-24ward-mvp.html?qa=1&imagery=0&extra=0&fac=0&bw=27120",
+  "browser": "Chrome/156.0.8078.47",
+  "jsErrors": [],
+  "failed": [
+    "404 http://localhost:8156/ext-3dtiles/index.json",
+    "404 http://localhost:8156/favicon.ico"
+  ],
+  "googleRequests": 1,
+  "views": [
+    {
+      "view": "top",
+      "diffPx": {
+        "bldOnlyVsNone": 397376,
+        "edgeVsNone": 187109,
+        "centreVsNone": 111755,
+        "waterVsNone": 5908,
+        "parksVsNone": 6565,
+        "allVsNone": 587728
+      }
+    },
+    {
+      "view": "oblique",
+      "diffPx": {
+        "bldOnlyVsNone": 522320,
+        "edgeVsNone": 126883,
+        "centreVsNone": 117735,
+        "waterVsNone": 6266,
+        "parksVsNone": 2728,
+        "allVsNone": 628053
+      }
+    }
+  ],
+  "points": [
+    {
+      "i": 1,
+      "x": -2250,
+      "z": -750
+    },
+    {
+      "i": 2,
+      "x": -2000,
+      "z": -600
+    },
+    {
+      "i": 3,
+      "x": -1800,
+      "z": -400
+    },
+    {
+      "i": 4,
+      "x": -2500,
+      "z": -900
+    },
+    {
+      "i": 5,
+      "x": -2800,
+      "z": -1100
+    },
+    {
+      "i": 6,
+      "x": -1500,
+      "z": -300
+    },
+    {
+      "i": 7,
+      "x": -2100,
+      "z": -1200
+    },
+    {
+      "i": 8,
+      "x": -1700,
+      "z": -800
+    },
+    {
+      "i": 9,
+      "x": -2600,
+      "z": -500
+    },
+    {
+      "i": 10,
+      "x": -1300,
+      "z": -100
+    }
+  ],
+  "layersInitial": {
+    "buildings": {
+      "state": "ready",
+      "count": 0,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "roads": {
+      "state": "ready",
+      "count": 969,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "railways": {
+      "state": "ready",
+      "count": 67,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "waterways": {
+      "state": "ready",
+      "count": 20,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "parks": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "labels": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiroadedge": {
+      "state": "ready",
+      "count": 7184,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiwater": {
+      "state": "ready",
+      "count": 47,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "facilities": {
+      "state": "ready",
+      "count": 140,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "spots": {
+      "state": "ready",
+      "count": 4,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "towns": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "townlabels": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wards": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wardlabels": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    }
+  },
+  "gsiRoadEdgeInitial": {
+    "state": "ready",
+    "sets": {
+      "gsi-roadedge-sumiyoshi-9tile.json": {
+        "lines": 2982,
+        "bboxLocal": {
+          "minX": -3300,
+          "maxX": -1200,
+          "minZ": -1800,
+          "maxZ": 300
+        }
+      },
+      "gsi-roadedge-kita-sample.json": {
+        "lines": 1258,
+        "bboxLocal": {
+          "minX": -3450,
+          "maxX": -2280,
+          "minZ": -12520,
+          "maxZ": -10650
+        }
+      },
+      "gsi-okawa-nakanoshima.json": {
+        "lines": 2944,
+        "bboxLocal": {
+          "minX": -3310.3,
+          "maxX": -1297,
+          "minZ": -11275.1,
+          "maxZ": -8761.2
+        }
+      }
+    },
+    "lines": 7184,
+    "points": 41475,
+    "dedupe": {
+      "inSegs": 37338,
+      "keptSegs": 34261,
+      "droppedSegs": 3077
+    }
+  },
+  "gsiRoadEdgeAfter": {
+    "state": "ready",
+    "sets": {
+      "gsi-roadedge-sumiyoshi-9tile.json": {
+        "lines": 2982,
+        "bboxLocal": {
+          "minX": -3300,
+          "maxX": -1200,
+          "minZ": -1800,
+          "maxZ": 300
+        }
+      },
+      "gsi-roadedge-kita-sample.json": {
+        "lines": 1258,
+        "bboxLocal": {
+          "minX": -3450,
+          "maxX": -2280,
+          "minZ": -12520,
+          "maxZ": -10650
+        }
+      },
+      "gsi-okawa-nakanoshima.json": {
+        "lines": 2944,
+        "bboxLocal": {
+          "minX": -3310.3,
+          "maxX": -1297,
+          "minZ": -11275.1,
+          "maxZ": -8761.2
+        }
+      }
+    },
+    "lines": 7184,
+    "points": 41475,
+    "dedupe": {
+      "inSegs": 37338,
+      "keptSegs": 34261,
+      "droppedSegs": 3077
+    }
+  },
+  "primitives": null,
+  "clicks": [
+    {
+      "id": "bldg_a3e57199-1832-418d-8271-29d7490e3315",
+      "h": 35.6,
+      "x": -2341.3,
+      "z": -503.7,
+      "pt": {
+        "x": 700.0000000021715,
+        "y": 476,
+        "inCanvas": true
+      },
+      "pickId": "bldg_a3e57199-1832-418d-8271-29d7490e3315",
+      "selected": "bldg_a3e57199-1832-418d-8271-29d7490e3315",
+      "ok": true
+    }
+  ],
+  "layersFinal": {
+    "buildings": {
+      "state": "ready",
+      "count": 0,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "roads": {
+      "state": "ready",
+      "count": 969,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "railways": {
+      "state": "ready",
+      "count": 67,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "waterways": {
+      "state": "ready",
+      "count": 20,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "parks": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "labels": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiroadedge": {
+      "state": "ready",
+      "count": 7184,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "gsiwater": {
+      "state": "ready",
+      "count": 47,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "facilities": {
+      "state": "ready",
+      "count": 140,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "spots": {
+      "state": "ready",
+      "count": 4,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "towns": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "townlabels": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wards": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wardlabels": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    }
+  },
+  "stats": {
+    "gsiRoadEdge": {
+      "state": "ready",
+      "sets": {
+        "gsi-roadedge-sumiyoshi-9tile.json": {
+          "lines": 2982,
+          "bboxLocal": {
+            "minX": -3300,
+            "maxX": -1200,
+            "minZ": -1800,
+            "maxZ": 300
+          }
+        },
+        "gsi-roadedge-kita-sample.json": {
+          "lines": 1258,
+          "bboxLocal": {
+            "minX": -3450,
+            "maxX": -2280,
+            "minZ": -12520,
+            "maxZ": -10650
+          }
+        },
+        "gsi-okawa-nakanoshima.json": {
+          "lines": 2944,
+          "bboxLocal": {
+            "minX": -3310.3,
+            "maxX": -1297,
+            "minZ": -11275.1,
+            "maxZ": -8761.2
+          }
+        }
+      },
+      "lines": 7184,
+      "points": 41475,
+      "dedupe": {
+        "inSegs": 37338,
+        "keptSegs": 34261,
+        "droppedSegs": 3077
+      }
+    },
+    "gsiWater": {
+      "state": "ready",
+      "polygons": 47,
+      "bboxLocal": {
+        "minX": -3310.3,
+        "maxX": -1297,
+        "minZ": -11275.1,
+        "maxZ": -8761.2
+      },
+      "dedupe": {
+        "inPolys": 51,
+        "dropped": 4,
+        "droppedAreaM2": 193
+      }
+    },
+    "buildingState": "ready",
+    "tilesetBuildings": 10546
+  }
+}

@@ -1,0 +1,89 @@
+{
+ "mission": "81",
+ "ward": "nishi",
+ "url": "http://127.0.0.1:8182/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext=nishi25",
+ "headless": true,
+ "note": "software rendering; timings are not device values; road polyline overlay not tested",
+ "launcherLogHasLoopbackOnly": true,
+ "urlHost": "127.0.0.1",
+ "googleRequests": [],
+ "httpErrors": [
+  "404 /favicon.ico",
+  "404 /ext-3dtiles/nishi25/layers/layers-report.json"
+ ],
+ "http200": 83,
+ "glb200": 0,
+ "tileset200": 1,
+ "jsErrors": [],
+ "tilesets": {
+  "n": 1,
+  "bases": [
+   "ext-3dtiles/nishi25/"
+  ],
+  "heapMB": 75
+ },
+ "buildingState": "ready",
+ "hudBuildings": "12,603",
+ "coverageNote": "3D建物を表示中（この区のみ）",
+ "topDown": {
+  "diffPx": 251797,
+  "totalPx": 1410000,
+  "camera": [
+   {
+    "distM": 2816,
+    "radiusM": 2158
+   }
+  ]
+ },
+ "oblique": {
+  "diffPx": 560494,
+  "totalPx": 1410000
+ },
+ "clicks": [
+  {
+   "id": "bldg_a4492901-0a7f-4beb-946e-67f6d5595d9b",
+   "height": 111.1,
+   "realMouseClick": true,
+   "selected": true,
+   "shot": "click-a4492901.jpg"
+  },
+  {
+   "id": "bldg_f88b12f4-cfcd-44a0-aeac-f0003754d382",
+   "height": 108.2,
+   "realMouseClick": true,
+   "selected": true
+  },
+  {
+   "id": "bldg_cdccb570-a9e4-4472-85f6-9071649d3020",
+   "height": 106.5,
+   "realMouseClick": true,
+   "selected": true
+  }
+ ],
+ "coverage": {
+  "buildings": 12603,
+  "bboxX": [
+   -5757,
+   -2511
+  ],
+  "bboxZ": [
+   -9823,
+   -7019
+  ],
+  "wardBbox": {
+   "minX": -5786.09,
+   "maxX": -2507.83,
+   "minZ": -9869.45,
+   "maxZ": -6964.09
+  },
+  "insideWardBboxPct": 100
+ },
+ "serverStats": {
+  "req": 85,
+  "ok": 83,
+  "nf": 2,
+  "glb200": 34,
+  "tileset200": 1
+ },
+ "pass": true
+}

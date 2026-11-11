@@ -1,0 +1,241 @@
+{
+ "note": "REAL PLATEAU 2025 LOD1; headless Chrome + SwiftShader; lod2clip OFF",
+ "beforeFix": {
+  "httpOk": 13,
+  "tilesHud": "0 (75s)",
+  "glb": 0,
+  "mounted": 2
+ },
+ "fix2wards": {
+  "wards": {
+   "chuo": {
+    "code": "27128",
+    "buildings": 18655,
+    "tiles": 52
+   },
+   "higashiyodogawa": {
+    "code": "27114",
+    "buildings": 35336,
+    "tiles": 64
+   }
+  },
+  "query": "?nobuiltin=1&ext45=1&lod2=1&lod2ov=1&lod2auto3d=1",
+  "firstMountAtSec": 29.7,
+  "httpOk": 37,
+  "glb": 24,
+  "bad": [],
+  "exc": [],
+  "steady": {
+   "t": 70,
+   "tiles": "23",
+   "fps": "1",
+   "mounted": [
+    "27114",
+    "27128"
+   ],
+   "camH": 30225.14695199832
+  },
+  "byWard": {
+   "chuo": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     7,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   },
+   "higashiyodogawa": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     17,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   }
+  }
+ },
+ "fix4wards": {
+  "wards": {
+   "chuo": {
+    "code": "27128",
+    "buildings": 18655,
+    "tiles": 52
+   },
+   "higashiyodogawa": {
+    "code": "27114",
+    "buildings": 35336,
+    "tiles": 64
+   },
+   "kita": {
+    "code": "27127",
+    "buildings": 19601,
+    "tiles": 52
+   },
+   "naniwa": {
+    "code": "27111",
+    "buildings": 10283,
+    "tiles": 29
+   }
+  },
+  "query": "?nobuiltin=1&ext45=1&lod2=1&lod2ov=1&lod2auto3d=1",
+  "firstMountAtSec": 30.5,
+  "httpOk": 55,
+  "glb": 36,
+  "bad": [],
+  "exc": [],
+  "steady": {
+   "t": 74.2,
+   "tiles": "35",
+   "fps": "1",
+   "mounted": [
+    "27111",
+    "27114",
+    "27127",
+    "27128"
+   ],
+   "camH": 30225.14695199832
+  },
+  "byWard": {
+   "kita": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     7,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   },
+   "chuo": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     7,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   },
+   "naniwa": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     5,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   },
+   "higashiyodogawa": {
+    "tileset": [
+     1,
+     0
+    ],
+    "glb": [
+     17,
+     0
+    ],
+    "meta": [
+     2,
+     0
+    ],
+    "layers": [
+     0,
+     0
+    ],
+    "sidecar": [
+     0,
+     0
+    ],
+    "other": [
+     0,
+     0
+    ]
+   }
+  }
+ }
+}

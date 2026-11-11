@@ -18,6 +18,7 @@ function parseArgs(argv) {
     else if (arg === '--ward') out.ward = argv[++i];
     else if (arg.startsWith('--out=')) out.output = arg.slice(6);
     else if (arg === '--out') out.output = argv[++i];
+    else if (arg.startsWith('--meshes=')) out.meshes = arg.slice(9).split(',');
     else if (arg.startsWith('--max-files=')) out.maxFiles = Number(arg.slice(12));
     else if (arg === '--max-files') out.maxFiles = Number(argv[++i]);
   }
@@ -124,7 +125,7 @@ const candidates = entries.map((entry) => {
 }).filter(Boolean).filter((e) => bboxIntersects(e.meshBounds, wardGeoBbox));
 
 const uniqueMeshes = [...new Set(candidates.map((e) => e.mesh))].sort();
-const selected = candidates.slice(0, args.maxFiles);
+const selected = (args.meshes ? candidates.filter((e) => args.meshes.includes(e.mesh)) : candidates).slice(0, args.maxFiles);
 const compressedBytes = candidates.reduce((n, e) => n + e.compressedBytes, 0);
 const uncompressedBytes = candidates.reduce((n, e) => n + e.uncompressedBytes, 0);
 const url = probe.source?.url;
