@@ -132,7 +132,11 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
 /** ENU(x東,y北,z上) → glTF(Y-up: x東, y上, z=-北) で最小GLB。 */
 export function meshToGlb(mesh) {
   const n = mesh.positions.length;
-  const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3);
+  const P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3), F = new Float32Array(n);
+  // Mission 206: 建物ごとの feature id(_FEATURE_ID_0) と canonicalId(EXT_structural_metadata)。LOD1 と同じ形式にして 37G のクリック選択を通す。
+  const okList = mesh.ok || [];
+  let fi = 0, left = okList.length ? okList[0].triangles * 3 : n;
+  for (let i = 0; i < n; i++) { while (left === 0 && fi < okList.length - 1) { fi++; left = okList[fi].triangles * 3; } F[i] = fi; left--; }
   for (let i = 0; i < n; i += 3) {
     const v = [0, 1, 2].map((k) => { const p = mesh.positions[i + k]; return [p[0], p[2], -p[1]]; });
     const u = [v[1][0] - v[0][0], v[1][1] - v[0][1], v[1][2] - v[0][2]], w = [v[2][0] - v[0][0], v[2][1] - v[0][1], v[2][2] - v[0][2]];
@@ -142,21 +146,33 @@ export function meshToGlb(mesh) {
   }
   const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) { mn[c] = Math.min(mn[c], P[i * 3 + c]); mx[c] = Math.max(mx[c], P[i * 3 + c]); }
-  const bin = Buffer.concat([P, N, C].map((a) => Buffer.from(a.buffer)));
-  const bl = n * 12;
+  const ids = okList.map((o) => o.id);
+  const strBufs = ids.map((x) => Buffer.from(String(x), 'utf8'));
+  const offs = new Uint32Array(ids.length + 1); strBufs.forEach((bf, i) => { offs[i + 1] = offs[i] + bf.length; });
+  const strBytes = Buffer.concat(strBufs);
+  const pad4 = (bf) => Buffer.concat([bf, Buffer.alloc((4 - bf.length % 4) % 4)]);
+  const parts = [Buffer.from(P.buffer), Buffer.from(N.buffer), Buffer.from(C.buffer), Buffer.from(F.buffer), pad4(strBytes), Buffer.from(offs.buffer)];
+  const bin = Buffer.concat(parts);
+  const views = []; let off = 0;
+  parts.forEach((pt, k) => { views.push({ buffer: 0, byteOffset: off, byteLength: k === 4 ? strBytes.length : pt.length, ...(k < 4 ? { target: 34962 } : {}) }); off += pt.length; });
   const json = {
-    asset: { version: '2.0', generator: 'livecity-mission153' }, extensionsUsed: ['KHR_materials_unlit'], scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
-    meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 }, material: 0, mode: 4 }] }],
+    asset: { version: '2.0', generator: 'livecity-mission153' }, extensionsUsed: ['KHR_materials_unlit', 'EXT_mesh_features', 'EXT_structural_metadata'], scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
+    meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2, _FEATURE_ID_0: 3 }, material: 0, mode: 4,
+      extensions: { EXT_mesh_features: { featureIds: [{ featureCount: ids.length, attribute: 0, propertyTable: 0 }] } } }] }],
     materials: [{ pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 }, doubleSided: true, extensions: { KHR_materials_unlit: {} } }],
     buffers: [{ byteLength: bin.length }],
-    bufferViews: [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 })),
+    bufferViews: views,
     accessors: [
       { bufferView: 0, componentType: 5126, count: n, type: 'VEC3', min: mn, max: mx },
       { bufferView: 1, componentType: 5126, count: n, type: 'VEC3' },
-      { bufferView: 2, componentType: 5126, count: n, type: 'VEC3' }],
+      { bufferView: 2, componentType: 5126, count: n, type: 'VEC3' },
+      { bufferView: 3, componentType: 5126, count: n, type: 'SCALAR' }],
+    extensions: { EXT_structural_metadata: {
+      schema: { id: 'livecity-building', classes: { building: { name: 'Building', properties: { canonicalId: { description: 'PLATEAU gml:id (LOD1 canonicalId と同一)', type: 'STRING', required: true } } } } },
+      propertyTables: [{ name: 'buildings', class: 'building', count: ids.length, properties: { canonicalId: { values: 4, stringOffsets: 5, stringOffsetType: 'UINT32' } } }] } },
   };
   let js = Buffer.from(JSON.stringify(json)); js = Buffer.concat([js, Buffer.alloc((4 - js.length % 4) % 4, 0x20)]);
-  const b = Buffer.concat([bin, Buffer.alloc((4 - bin.length % 4) % 4)]);
+  const b = bin;
   const h = Buffer.alloc(12); h.write('glTF'); h.writeUInt32LE(2, 4); h.writeUInt32LE(12 + 8 + js.length + 8 + b.length, 8);
   const jh = Buffer.alloc(8); jh.writeUInt32LE(js.length, 0); jh.write('JSON', 4);
   const bh = Buffer.alloc(8); bh.writeUInt32LE(b.length, 0); bh.write('BIN\0', 4);

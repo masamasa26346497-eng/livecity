@@ -15,6 +15,6 @@ test('GLB は KHR_materials_unlit(照明で黒くならない)', () => {
   const glb = meshToGlb(m);
   const len = glb.readUInt32LE(12);
   const j = JSON.parse(glb.subarray(20, 20 + len).toString());
-  assert.deepEqual(j.extensionsUsed, ['KHR_materials_unlit']);
+  assert.ok(j.extensionsUsed.includes('KHR_materials_unlit'));
   assert.ok(j.materials[0].extensions.KHR_materials_unlit);
 });
