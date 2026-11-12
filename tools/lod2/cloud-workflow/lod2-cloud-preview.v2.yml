@@ -141,10 +141,32 @@ jobs:
           set -euo pipefail
           test -f bundle/BUNDLE_MANIFEST.json
           node src/tools/lod2/lod2-cloud-audit.mjs bundle 125829120
-          # Reject Vercel link files / env files smuggled into the artifact.
-          if find bundle \( -name '.vercel' -o -name '.env*' -o -name 'vercel.json' \) | grep -q .; then
-            echo "::error::artifact contains .vercel/.env*/vercel.json"; exit 1
+          # Reject Vercel link files / env files smuggled into the artifact (vercel.json is audited separately below).
+          if find bundle \( -name '.vercel' -o -name '.env*' \) | grep -q .; then
+            echo "::error::artifact contains .vercel/.env*"; exit 1
           fi
+          # vercel.json: only the exact minimal config emitted by lod2-cloud-bundle.mjs is allowed (root only).
+          if [ "$(find bundle -name 'vercel.json' | wc -l)" -ne 1 ] || [ ! -f bundle/vercel.json ]; then
+            echo "::error::expected exactly one vercel.json at the bundle root"; exit 1
+          fi
+          # BEGIN-VERCEL-JSON-AUDIT
+          node --input-type=module - bundle/vercel.json <<'AUDIT_EOF'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const j = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const expected = {
+            cleanUrls: false,
+            trailingSlash: false,
+            headers: [
+              { source: '/(.*)\\.glb', headers: [
+                { key: 'Content-Type', value: 'model/gltf-binary' },
+                { key: 'Cache-Control', value: 'public, max-age=3600' } ] },
+              { source: '/(.*)', headers: [{ key: 'X-Robots-Tag', value: 'noindex' }] } ] };
+          try { assert.deepStrictEqual(j, expected); }
+          catch { console.error('::error::vercel.json differs from the allowed minimal config (headers only; no redirects/rewrites/routes/env/build/git/functions)'); process.exit(1); }
+          console.log('vercel.json == allowed minimal config');
+          AUDIT_EOF
+          # END-VERCEL-JSON-AUDIT
 
       - name: Remove repo code before secrets are used
         run: rm -rf src
