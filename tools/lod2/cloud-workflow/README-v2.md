@@ -9,11 +9,12 @@ The Vercel GitHub bot "Ready" on PR #62 and the ChatGPT-plugin API 404 are **unr
 - `tests/mission201-workflow-v2.test.mjs` — offline policy tests (7 pass in the sandbox).
 
 ## Pins: what is and is not verified
-The sandbox could not reach GitHub's API, so the action SHAs were **written from memory and are unverified**:
+**Verified (Mission 202, in the Claude Code Actions runner, `git ls-remote` against upstream tags):** all four pins match their tag commit:
 `checkout v4.2.2`, `setup-node v4.4.0`, `upload-artifact v4.6.2`, `download-artifact v4.3.0`.
-Run `node tools/lod2/cloud-workflow/verify-pins.mjs` first; any `NG` line must be fixed before copying.
-The Vercel CLI version is left as `__VERCEL_CLI_VERSION__` on purpose (the deploy step fails fast while it remains).
-Set it to a real release (`npm view vercel version`) and keep it exact — no `latest`.
+`verify-pins.mjs` can be re-run in any environment with git + network.
+**Vercel CLI version: still unverified.** The runner could not query the npm registry (`npm view`/`curl`/WebFetch were denied), and I will not invent a number.
+Instead of a file placeholder, it is now the run-time input `vercel_cli_version` (exact `X.Y.Z`). The deploy job checks that it exists on npm
+(`npm view`, no secrets in that step) before the token step. Nothing needs editing in the file; deploy=false does not need it.
 
 ## Behaviour
 | | deploy=false (default) | deploy=true |
@@ -31,8 +32,8 @@ Set it to a real release (`npm view vercel version`) and keep it exact — no `l
 - GitHub secret masking is not a substitute for scoping: use a token limited to one project.
 
 ## Minimum user operations
-1. `node tools/lod2/cloud-workflow/verify-pins.mjs` (PC, network); fix any NG.
-2. Set the Vercel CLI version in the file.
-3. `cp tools/lod2/cloud-workflow/lod2-cloud-preview.v2.yml .github/workflows/lod2-cloud-preview.yml` and commit via a PR to `main` (needs your approval).
+1. (none: pins verified; no PC commands needed)
+2. (none: Vercel CLI version is given at deploy time as `vercel_cli_version`)
+3. Copy the file (GitHub web UI "Add file" is enough, or `cp tools/lod2/cloud-workflow/lod2-cloud-preview.v2.yml .github/workflows/lod2-cloud-preview.yml` and commit via a PR to `main` (needs your approval).
 4. For deploy only: create Environment `lod2-preview-approval` (required reviewers, branches: main) and add the three secrets there.
 5. Run with `source_sha`, `deploy=false` first.

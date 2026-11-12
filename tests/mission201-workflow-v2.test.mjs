@@ -38,6 +38,12 @@ test('secrets only in the final deploy step env', () => {
   for (const [, i] of secretLines) assert.ok(i > stepStart);
   assert.doesNotMatch(y.split('\njobs:')[0], /secrets\./);
 });
+test('Vercel CLI version is a validated run-time input, no placeholder', () => {
+  assert.doesNotMatch(y, /__VERCEL_CLI_VERSION__/);
+  assert.match(y, /vercel_cli_version:/);
+  assert.match(deploy, /npm view "vercel@/);
+  assert.ok(deploy.indexOf('npm view') < deploy.indexOf('Deploy PREVIEW'));
+});
 test('re-audit before deploy and no --prod / @latest', () => {
   assert.ok(deploy.indexOf('lod2-cloud-audit.mjs') < deploy.indexOf('Deploy PREVIEW'));
   assert.doesNotMatch(y, /--prod\b|--target=production|@latest/);

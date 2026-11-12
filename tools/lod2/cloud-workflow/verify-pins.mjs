@@ -18,5 +18,4 @@ while ((m = re.exec(text))) {
   console.log(`${ok ? 'OK ' : 'NG '} ${repo} ${tag} pinned=${sha} remote=${shas.join(',') || 'none'}`);
   if (!ok) bad++;
 }
-if (/__VERCEL_CLI_VERSION__/.test(text)) { console.log('TODO VERCEL_CLI_VERSION placeholder still present'); bad++; }
 process.exit(bad ? 1 : 0);

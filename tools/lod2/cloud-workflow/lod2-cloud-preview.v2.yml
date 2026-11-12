@@ -1,7 +1,7 @@
 # Mission 201: LOD2 cloud preview v2 (Kita/Chuo, PLATEAU 2025). REVIEW/COPY ARTIFACT - NOT ACTIVE.
 # Lives outside .github/workflows because the Claude GitHub App cannot write there.
 # A human copies it:  cp tools/lod2/cloud-workflow/lod2-cloud-preview.v2.yml .github/workflows/lod2-cloud-preview.yml
-# BEFORE copying: run  node tools/lod2/cloud-workflow/verify-pins.mjs  (see README-v2.md).
+# Action pins were checked against upstream tags in Mission 202 (git ls-remote). Vercel CLI version is a run-time input (no file edit needed).
 # workflow_dispatch ONLY. This file must be on the DEFAULT branch (main) for the Run-workflow button to appear.
 # The workflow file comes from main; the code that gets BUILT is a fixed 40-hex SHA you supply (source_sha).
 name: lod2-cloud-preview
@@ -21,6 +21,10 @@ on:
         description: 'deploy=true only: type CONFIRMED after a human reviewed license/attribution. Ignored when deploy=false.'
         type: string
         default: ''
+      vercel_cli_version:
+        description: 'deploy=true only: exact released Vercel CLI semver X.Y.Z (no tags like latest). Checked against the npm registry before the token is used.'
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -30,8 +34,6 @@ concurrency:
 
 env:
   ALLOWED_BRANCH: mission152-lod2-parallel
-  # Replace with a real released Vercel CLI version (e.g. from `npm view vercel version`) before copying.
-  VERCEL_CLI_VERSION: '__VERCEL_CLI_VERSION__'
 
 jobs:
   build:
@@ -147,9 +149,20 @@ jobs:
       - name: Remove repo code before secrets are used
         run: rm -rf src
 
+      - name: Validate Vercel CLI version exists on npm (no secrets in this step)
+        env:
+          VERCEL_CLI_VERSION: ${{ inputs.vercel_cli_version }}
+        run: |
+          set -euo pipefail
+          [[ "$VERCEL_CLI_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::vercel_cli_version must be exact semver X.Y.Z"; exit 1; }
+          got="$(npm view "vercel@${VERCEL_CLI_VERSION}" version)"
+          test "$got" = "$VERCEL_CLI_VERSION" || { echo "::error::vercel@${VERCEL_CLI_VERSION} not found on npm"; exit 1; }
+          echo "vercel@${VERCEL_CLI_VERSION} exists on npm"
+
       - name: Deploy PREVIEW (never production)
         working-directory: bundle
         env:
+          VERCEL_CLI_VERSION: ${{ inputs.vercel_cli_version }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -157,7 +170,4 @@ jobs:
           set -euo pipefail
           test -n "$VERCEL_TOKEN" && test -n "$VERCEL_ORG_ID" && test -n "$VERCEL_PROJECT_ID" \
             || { echo "::error::Vercel secrets missing (values never printed)"; exit 1; }
-          case "$VERCEL_CLI_VERSION" in
-            __*|"") echo "::error::VERCEL_CLI_VERSION placeholder not replaced"; exit 1;;
-          esac
           npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --yes --target=preview
