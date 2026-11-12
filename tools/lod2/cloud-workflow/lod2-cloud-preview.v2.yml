@@ -62,7 +62,9 @@ jobs:
           SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
           set -euo pipefail
-          git fetch --no-tags origin "+refs/heads/${ALLOWED_BRANCH}:refs/remotes/origin/${ALLOWED_BRANCH}"
+          # fetch-depth: 0 already fetched every branch; credentials are not persisted, so do NOT fetch again (would fail on a private repo).
+          git rev-parse --verify --quiet "refs/remotes/origin/${ALLOWED_BRANCH}^{commit}" >/dev/null \
+            || { echo "::error::origin/${ALLOWED_BRANCH} not found after checkout"; exit 1; }
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA" || { echo "::error::checked-out HEAD != source_sha"; exit 1; }
           git merge-base --is-ancestor "$SOURCE_SHA" "origin/${ALLOWED_BRANCH}" \
             || { echo "::error::source_sha is not an ancestor of origin/${ALLOWED_BRANCH}"; exit 1; }
