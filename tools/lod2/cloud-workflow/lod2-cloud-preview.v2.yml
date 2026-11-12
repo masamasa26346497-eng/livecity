@@ -1,0 +1,163 @@
+# Mission 201: LOD2 cloud preview v2 (Kita/Chuo, PLATEAU 2025). REVIEW/COPY ARTIFACT - NOT ACTIVE.
+# Lives outside .github/workflows because the Claude GitHub App cannot write there.
+# A human copies it:  cp tools/lod2/cloud-workflow/lod2-cloud-preview.v2.yml .github/workflows/lod2-cloud-preview.yml
+# BEFORE copying: run  node tools/lod2/cloud-workflow/verify-pins.mjs  (see README-v2.md).
+# workflow_dispatch ONLY. This file must be on the DEFAULT branch (main) for the Run-workflow button to appear.
+# The workflow file comes from main; the code that gets BUILT is a fixed 40-hex SHA you supply (source_sha).
+name: lod2-cloud-preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: 'Full 40-char commit SHA on mission152-lod2-parallel (NOT a branch name)'
+        type: string
+        required: true
+      deploy:
+        description: 'Deploy a Vercel PREVIEW after build (default false = build/audit/private artifact only)'
+        type: boolean
+        default: false
+      rights_approved:
+        description: 'deploy=true only: type CONFIRMED after a human reviewed license/attribution. Ignored when deploy=false.'
+        type: string
+        default: ''
+
+permissions: {}
+
+concurrency:
+  group: lod2-cloud-preview
+  cancel-in-progress: false
+
+env:
+  ALLOWED_BRANCH: mission152-lod2-parallel
+  # Replace with a real released Vercel CLI version (e.g. from `npm view vercel version`) before copying.
+  VERCEL_CLI_VERSION: '__VERCEL_CLI_VERSION__'
+
+jobs:
+  build:
+    # No secrets are referenced anywhere in this job.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Validate source_sha format
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::source_sha must be a full 40-char lowercase hex SHA"; exit 1; }
+
+      - name: Checkout fixed SHA
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 (verify with verify-pins.mjs)
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require SHA is reachable from the allowed branch
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "+refs/heads/${ALLOWED_BRANCH}:refs/remotes/origin/${ALLOWED_BRANCH}"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA" || { echo "::error::checked-out HEAD != source_sha"; exit 1; }
+          git merge-base --is-ancestor "$SOURCE_SHA" "origin/${ALLOWED_BRANCH}" \
+            || { echo "::error::source_sha is not an ancestor of origin/${ALLOWED_BRANCH}"; exit 1; }
+          echo "source_sha $SOURCE_SHA OK (on ${ALLOWED_BRANCH})"
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 (verify with verify-pins.mjs)
+        with:
+          node-version: '20'
+
+      - name: Disk space
+        run: df -h .
+
+      - name: Generate official PLATEAU 2025 data (Range fetch only, no auth)
+        run: |
+          set -euo pipefail
+          for w in kita chuo; do node tools/mission79-run.mjs --ward "$w" --max-mb 1500; done
+          node tools/lod2/lod2-build-all.mjs
+          for w in kita chuo; do
+            node tools/mission79-build-ward-2025.cjs --ward "$w" --jsonl "temp/mission79/$w-work/$w.jsonl" --out "temp/mission79/$w-2025-ex" --exclude-ids temp/lod2-all/manifest.json
+          done
+
+      - name: Build static bundle
+        run: node tools/lod2/lod2-cloud-bundle.mjs --wards kita,chuo
+
+      - name: Unit tests
+        run: node --test tests/mission198-cloud-bundle.test.mjs tests/mission199-cloud-workflow.test.mjs
+
+      - name: Browser verify (static HTTP, non-localhost host)
+        run: node tools/lod2/lod2-cloud-verify.cjs
+
+      - name: Audit (size / rights flag / secrets)
+        run: |
+          set -euo pipefail
+          B=temp/cloud-bundle
+          test -f "$B/BUNDLE_MANIFEST.json"
+          node tools/lod2/lod2-cloud-audit.mjs "$B" 125829120
+
+      - name: Upload private artifact (workflow-run scoped, not public)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2 (verify with verify-pins.mjs)
+        with:
+          name: lod2-cloud-bundle
+          path: temp/cloud-bundle
+          retention-days: 3
+          if-no-files-found: error
+
+  deploy:
+    # Only: deploy=true AND typed CONFIRMED AND dispatched from main AND environment approved by a required reviewer.
+    needs: build
+    if: ${{ inputs.deploy == true && inputs.rights_approved == 'CONFIRMED' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment: lod2-preview-approval   # configure Required reviewers + "Deployment branches: main only"
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+
+      - name: Checkout audit script only (same fixed SHA, no credentials, no secrets in this step)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.source_sha }}
+          path: src
+          sparse-checkout: tools/lod2/lod2-cloud-audit.mjs
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0 (verify with verify-pins.mjs)
+        with:
+          name: lod2-cloud-bundle
+          path: bundle
+
+      - name: Re-audit downloaded artifact (no secrets in this step)
+        run: |
+          set -euo pipefail
+          test -f bundle/BUNDLE_MANIFEST.json
+          node src/tools/lod2/lod2-cloud-audit.mjs bundle 125829120
+          # Reject Vercel link files / env files smuggled into the artifact.
+          if find bundle \( -name '.vercel' -o -name '.env*' -o -name 'vercel.json' \) | grep -q .; then
+            echo "::error::artifact contains .vercel/.env*/vercel.json"; exit 1
+          fi
+
+      - name: Remove repo code before secrets are used
+        run: rm -rf src
+
+      - name: Deploy PREVIEW (never production)
+        working-directory: bundle
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$VERCEL_TOKEN" && test -n "$VERCEL_ORG_ID" && test -n "$VERCEL_PROJECT_ID" \
+            || { echo "::error::Vercel secrets missing (values never printed)"; exit 1; }
+          case "$VERCEL_CLI_VERSION" in
+            __*|"") echo "::error::VERCEL_CLI_VERSION placeholder not replaced"; exit 1;;
+          esac
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --yes --target=preview
