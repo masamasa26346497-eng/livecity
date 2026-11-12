@@ -1,0 +1,213 @@
+{
+ "mission": "142",
+ "fixture": "repo PLATEAU 2024 samples renamed kita25/chuo25 + SYNTHETIC kita road/water; not owner data; not Windows",
+ "headless": true,
+ "url": "http://127.0.0.1:8191/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1",
+ "launcherLog": [
+  "[141] 3D delivered (local, private): 2/3 wards, 8327 buildings",
+  "  27104 konohana NOT DELIVERED: no tileset found",
+  "  27127 kita 2698 (private-release)",
+  "  27128 chuo 5629 (private-release)",
+  "[141] roads/rivers (Mission115 output, local only): 1/2 served wards have layers",
+  "  kita roads+waterways",
+  "  chuo no road/river data (nothing is drawn, nothing invented)",
+  "[141] NOT DELIVERED (1): konohana",
+  "[141] note: coverage is per-ward converted data, not proof of whole-ward completeness; roads/rivers are separate and not implied.",
+  "[141] serving read-only on loopback only. Ctrl+C to stop.",
+  "[141] open: http://127.0.0.1:8191/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1   (pick a ward in the left \"3D buildings ward\" selector)"
+ ],
+ "googleRequests": [],
+ "httpErrors": [
+  "404 /favicon.ico",
+  "404 /ext-3dtiles/kita25/layers/parks.json",
+  "404 /ext-3dtiles/kita25/layers/railways.json",
+  "404 /ext-3dtiles/kita25/layers/parks.json",
+  "404 /ext-3dtiles/kita25/layers/railways.json"
+ ],
+ "jsErrors": [],
+ "steps": [
+  {
+   "name": "boot",
+   "ts": {
+    "n": 0,
+    "bases": [],
+    "heapMB": 74
+   },
+   "state": "none",
+   "ward": null,
+   "hud": "—",
+   "vec": {
+    "ward": null,
+    "state": "none",
+    "layers": {}
+   },
+   "unmounted": 0
+  },
+  {
+   "name": "select-kita",
+   "ts": {
+    "n": 1,
+    "bases": [
+     "ext-3dtiles/kita25/"
+    ],
+    "heapMB": 62
+   },
+   "state": "ready",
+   "ward": "27127",
+   "hud": "2,698",
+   "vec": {
+    "ward": "27127",
+    "state": "ready",
+    "layers": {
+     "roads": 1,
+     "waterways": 1
+    },
+    "clip": "ward-polygon"
+   },
+   "unmounted": 0,
+   "buildingsDiffPx": 286904,
+   "roadsToggleDiffPx": 3214,
+   "waterToggleDiffPx": 3372,
+   "clicks": [
+    {
+     "id": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+     "realMouseClick": true,
+     "selected": true
+    },
+    {
+     "id": "bldg_f1bcc2bb-9c0b-416e-ac2f-851a4da4fca7",
+     "realMouseClick": true,
+     "selected": true
+    },
+    {
+     "id": "bldg_f92418ca-7bcc-4b8d-b37a-c0250f9bf136",
+     "realMouseClick": true,
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "select-chuo",
+   "ts": {
+    "n": 1,
+    "bases": [
+     "ext-3dtiles/chuo25/"
+    ],
+    "heapMB": 103
+   },
+   "state": "ready",
+   "ward": "27128",
+   "hud": "5,629",
+   "vec": {
+    "ward": "27128",
+    "state": "no-layers",
+    "layers": {}
+   },
+   "unmounted": 1,
+   "clicks": [
+    {
+     "id": "bldg_f01feb4f-7308-4d6e-9051-1be227f17466",
+     "realMouseClick": true,
+     "selected": true
+    },
+    {
+     "id": "bldg_8ff945fd-3c44-4cf5-b156-e0f9e7727746",
+     "realMouseClick": true,
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "reselect-kita",
+   "ts": {
+    "n": 1,
+    "bases": [
+     "ext-3dtiles/kita25/"
+    ],
+    "heapMB": 110
+   },
+   "state": "ready",
+   "ward": "27127",
+   "hud": "2,698",
+   "vec": {
+    "ward": "27127",
+    "state": "ready",
+    "layers": {
+     "roads": 1,
+     "waterways": 1
+    },
+    "clip": "ward-polygon"
+   },
+   "unmounted": 2,
+   "clicks": [
+    {
+     "id": "bldg_f1bcc2bb-9c0b-416e-ac2f-851a4da4fca7",
+     "realMouseClick": true,
+     "selected": true
+    }
+   ]
+  },
+  {
+   "name": "clear",
+   "ts": {
+    "n": 0,
+    "bases": [],
+    "heapMB": 108
+   },
+   "state": "none",
+   "ward": null,
+   "hud": "0",
+   "vec": {
+    "ward": null,
+    "state": "none",
+    "layers": {}
+   },
+   "unmounted": 3
+  }
+ ],
+ "index": {
+  "verified": false,
+  "vintage": 2025,
+  "wards": [
+   {
+    "ward": "chuo25"
+   },
+   {
+    "ward": "kita25"
+   }
+  ],
+  "layersWards": [
+   {
+    "ward": "kita25"
+   }
+  ]
+ },
+ "serverStats": {
+  "req": 109,
+  "ok": 104,
+  "nf": 5,
+  "glb200": 38,
+  "tileset200": 3
+ },
+ "checks": {
+  "loopbackOnly": true,
+  "notDeliveredListed": true,
+  "indexHasTwoWards": true,
+  "bootNoTileset": true,
+  "kitaOneTileset": true,
+  "kitaPixels": true,
+  "kitaClicks": true,
+  "kitaRoadsDrawn": true,
+  "kitaWaterDrawn": true,
+  "chuoOneTilesetKitaDisposed": true,
+  "chuoClicks": true,
+  "chuoNoLayersNotInvented": true,
+  "reselectKita": true,
+  "clearedToZero": true,
+  "glbAndTileset200": true,
+  "noJsErrors": true,
+  "noGoogle": true,
+  "no404ExceptExpected": true
+ },
+ "pass": true
+}

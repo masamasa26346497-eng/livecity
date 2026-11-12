@@ -1,0 +1,95 @@
+# Mission 108: INSTALL BY OWNER as .github/workflows/mission108-private-2025-qa.yml on the default branch. NOT installed, NOT run by Claude.
+# Read-only: fetch stored PLATEAU 2025 archives (nishi/fukushima/yodogawa) from the PRIVATE release, verify, render in headless Chrome on a
+# 127.0.0.1 server inside the runner, upload a counts-only JSON summary. No archive/tileset/GLB/screenshot is ever uploaded or published.
+# Hashes below are sha256 of git objects at PIN_SHA (commit 90c1f19, which contains the tools). Re-pin only after review.
+name: Mission108 private 2025 QA
+on:
+  workflow_dispatch:
+    inputs:
+      wards:
+        description: "Comma-separated subset of: nishi,fukushima,yodogawa"
+        required: true
+        type: string
+        default: "nishi,fukushima,yodogawa"
+permissions:
+  contents: read
+concurrency:
+  group: mission108-private-2025-qa
+  cancel-in-progress: false
+env:
+  PIN_SHA: "90c1f19fa92721825e75e2247c59d1573aba25a6"
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    steps:
+      - name: Validate input (no repo code, no token)
+        env:
+          IN_WARDS: ${{ inputs.wards }}
+        run: |
+          set -eu
+          raw=$(printf '%s' "$IN_WARDS" | tr -d ' \n\r')
+          [ -n "$raw" ] || { echo "FAIL: no wards"; exit 1; }
+          seen=" "
+          for w in $(printf '%s' "$raw" | tr ',' ' '); do
+            case "$w" in nishi|fukushima|yodogawa) ;; *) echo "FAIL: ward not allowed"; exit 1;; esac
+            case "$seen" in *" $w "*) echo "FAIL: duplicate ward"; exit 1;; esac
+            seen="$seen$w "
+          done
+          echo "WARDS=$raw" >> "$GITHUB_ENV"
+      - name: Checkout pinned commit
+        uses: actions/checkout@v4
+        with:
+          ref: "90c1f19fa92721825e75e2247c59d1573aba25a6"
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify pin, clean tree and file hashes (no token yet)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD != pin"; exit 1; }
+          [ -z "$(git status --porcelain)" ] || { echo "FAIL: dirty tree"; exit 1; }
+          cat > "$RUNNER_TEMP/pin.sha256" <<'HASHES'
+          bc9133a7572b3f6e0f66c845854a4e57381af92863ffb937a1669de6cedbdaaa  tools/mission108/lib.mjs
+          bbb8d33210afc671127f188501f08ebb9bfd71f39ec12e726417f69ee4c40f96  tools/mission108/fetch-verify.mjs
+          fef3f0622f957f629947eaf2aa91d432f25cb5b97d54c5e24b66358d92c495ac  tools/mission108/qa.mjs
+          d8010dcbf997ff491fa2c39cf0d366de93946ae6ffb16a1c73f7b7b826587f87  tools/mission88-collect-evidence.mjs
+          db7cd53e81078041fe30372564a5716267895b45b46331c66d95e5e4508b0b72  tools/lib/cdp-browser.js
+          ba3d6d64f23a8084808d67aacc331d3dd540e8d46d226e21c1c35371e7944d58  data/processed/osaka-city/boundaries/ward-classification-polygons.json
+          cd245726660aca579eb04620d5749d9b1b61b0d5b0485eaa9c258c4524ed8eaa  public/mission37g-osaka-24ward-mvp.html
+          HASHES
+          sed -i 's/^ *//' "$RUNNER_TEMP/pin.sha256"
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+      - name: Fetch + verify private archives (token only here; read-only GETs)
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -eu
+          [ -n "$LIVECITY_3D_DATA_TOKEN" ] || { echo "FAIL: secret empty or missing"; exit 1; }
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          mkdir -p "$RUNNER_TEMP/m108-out"
+          node tools/mission108/fetch-verify.mjs --wards "$WARDS" --dest "$RUNNER_TEMP/m108-root" --summary "$RUNNER_TEMP/m108-out/fetch-summary.json"
+      - name: Headless Chrome QA on 127.0.0.1 (no token in environment)
+        run: |
+          set -eu
+          node tools/mission108/qa.mjs --root "$RUNNER_TEMP/m108-root" --wards "$WARDS" --summary "$RUNNER_TEMP/m108-out/qa-summary.json" || echo "QA reported failures (see summary); not acceptance either way"
+      - name: Counts-only summary
+        if: always()
+        run: |
+          for f in fetch-summary.json qa-summary.json; do
+            if [ -f "$RUNNER_TEMP/m108-out/$f" ]; then { echo '### '"$f"; echo '```json'; cat "$RUNNER_TEMP/m108-out/$f"; echo; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - name: Upload summary only (JSON counts; no data, no archives)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission108-summary
+          path: ${{ runner.temp }}/m108-out/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Wipe runner temp data
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/m108-root" "$RUNNER_TEMP/m108-out" "$RUNNER_TEMP/pin.sha256"

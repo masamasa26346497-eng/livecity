@@ -1,0 +1,453 @@
+{
+  "schema": "livecity.mission43b.ward-input-plan/1",
+  "dryRun": true,
+  "inputs": {
+    "inspectProvided": false,
+    "preflightProvided": false
+  },
+  "gates": {
+    "licenceApproved": false,
+    "noSecretsReviewed": false,
+    "noPersonalDataReviewed": false,
+    "uploadAllowed": 0
+  },
+  "consistentWithSourceRegistry": true,
+  "transferredNow": {
+    "files": 0,
+    "bytes": 0
+  },
+  "summary": {
+    "i-viewable-in-git-partial": 6,
+    "ii-rebuildable-from-git-legacy-tiles": 1,
+    "iii-pc-only-first-transfer-unavoidable": 0,
+    "iv-public-refetch-candidate-licence-unverified": 23,
+    "pcTotals": "preflight not provided"
+  },
+  "note": "Without --inspect/--preflight, category iii cannot be decided (PC contents unknown to the repo). Counts only; no names or paths. A ward can be in several categories.",
+  "wards": [
+    {
+      "ward": "kita",
+      "code": "27127",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 2698
+    },
+    {
+      "ward": "miyakojima",
+      "code": "27102",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "fukushima",
+      "code": "27103",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "konohana",
+      "code": "27104",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "chuo",
+      "code": "27128",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 5629
+    },
+    {
+      "ward": "nishi",
+      "code": "27106",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 3893
+    },
+    {
+      "ward": "minato",
+      "code": "27107",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "taisho",
+      "code": "27108",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "tennoji",
+      "code": "27109",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 6593
+    },
+    {
+      "ward": "naniwa",
+      "code": "27111",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 4267
+    },
+    {
+      "ward": "nishiyodogawa",
+      "code": "27113",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "yodogawa",
+      "code": "27123",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "higashiyodogawa",
+      "code": "27114",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "higashinari",
+      "code": "27115",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "ikuno",
+      "code": "27116",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "asahi",
+      "code": "27117",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "joto",
+      "code": "27118",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "tsurumi",
+      "code": "27124",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "abeno",
+      "code": "27119",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "suminoe",
+      "code": "27125",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "sumiyoshi",
+      "code": "27120",
+      "categories": [
+        "i-viewable-in-git-partial",
+        "ii-rebuildable-from-git-legacy-tiles"
+      ],
+      "primaryRoute": "rebuild-from-git (no transfer)",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 10546
+    },
+    {
+      "ward": "higashisumiyoshi",
+      "code": "27121",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "hirano",
+      "code": "27126",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    },
+    {
+      "ward": "nishinari",
+      "code": "27122",
+      "categories": [
+        "iv-public-refetch-candidate-licence-unverified"
+      ],
+      "primaryRoute": "public re-fetch (36K range fetch) after licence review; or PC data if later confirmed",
+      "sourceTiles": {
+        "expected": null,
+        "listedInPcManifest": null,
+        "foundOnPc": null
+      },
+      "sourceBuildings": null,
+      "anonymousFiles": null,
+      "anonymousBytes": null,
+      "gitBuildings3d": 0
+    }
+  ],
+  "licence": {
+    "licenceApproved": false,
+    "generalPolicy": {
+      "plateau": "MLIT PLATEAU site policy (https://www.mlit.go.jp/plateau/site-policy/) states PDL1.0 / CC BY compatibility for covered content incl. 3D city models and requires source + modification notices; FAQ (https://www.mlit.go.jp/plateau/faq/) states commercial use is allowed. Reported by the requester; this audit did not fetch it.",
+      "osm": "OpenStreetMap data is ODbL 1.0; attribution \"(c) OpenStreetMap contributors\" required (https://www.openstreetmap.org/copyright).",
+      "googlePlaces": "Paid Google Places data is NOT used."
+    },
+    "datasetSpecific": "Osaka City 2024 dataset page (https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024) returned HTTP 403 to the requester: its README / per-resource terms and redistribution / modification rights are UNVERIFIED. Per the product spec (https://www.mlit.go.jp/plateaudocument/toc8/toc8_06/toc8_06_03/) a README states per-dataset terms, so the general policy must not be treated as approval of this dataset.",
+    "attributionAlreadyShownInViewer": "see licenseNote in each source.json"
+  }
+}

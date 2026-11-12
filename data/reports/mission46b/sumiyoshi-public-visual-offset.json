@@ -1,0 +1,113 @@
+{
+ "schema": "livecity.mission46b.visual-offset/1",
+ "scope": "source-geometry statistics + ideal-camera geometry; no rendering, no network, nothing written inside inputs",
+ "assumptions": {
+  "fovDeg": 60,
+  "screenPx": 1080,
+  "drawnPx": {
+   "major": 6,
+   "mid": 4,
+   "local": 1.8
+  },
+  "cellM": 20,
+  "capM": 20
+ },
+ "limits": [
+  "Edge-gap and overlap numbers describe geometry of the SOURCE data only. They do not prove that either dataset matches the real world.",
+  "Real carriageway width is unknown (OSM has centerlines). Nothing here estimates or applies a road width, offset or rotation.",
+  "Ground metres per pixel assumes a 60 degree vertical FOV and a 1080 px tall canvas; real screens differ. Perspective makes the value vary across the image.",
+  "Parallax is the geometric roof shift of an ideal pinhole camera at the stated pitch; it is not measured from a rendering.",
+  "Bridges, elevated roads and tunnels are excluded from the road samples (they legitimately cross footprints)."
+ ],
+ "wards": [
+  {
+   "wardId": "sumiyoshi",
+   "status": "ok",
+   "buildings": 35031,
+   "notes": [
+    "median roof parallax at pitch -35 exceeds the median road-to-footprint gap (roofs look shifted vs roads in oblique views)"
+   ],
+   "roadSamples": 15810,
+   "pctSamplesInsideFootprint": 0.1,
+   "pctSamplesFartherThanCap": 7.51,
+   "edgeGapM": {
+    "measured": 14606,
+    "p5": 1.79,
+    "p25": 3.03,
+    "p50": 4.18,
+    "p75": 6.04
+   },
+   "widthArtefact": [
+    {
+     "rangeM": 300,
+     "groundMetresPerPixel": 0.32,
+     "drawnHalfWidthM": {
+      "major": 0.96,
+      "mid": 0.64,
+      "local": 0.29
+     },
+     "pctOutsideSamplesTouchedByDrawnWidthAlone": 0.08
+    },
+    {
+     "rangeM": 800,
+     "groundMetresPerPixel": 0.86,
+     "drawnHalfWidthM": {
+      "major": 2.57,
+      "mid": 1.71,
+      "local": 0.77
+     },
+     "pctOutsideSamplesTouchedByDrawnWidthAlone": 0.3
+    },
+    {
+     "rangeM": 1500,
+     "groundMetresPerPixel": 1.6,
+     "drawnHalfWidthM": {
+      "major": 4.81,
+      "mid": 3.21,
+      "local": 1.44
+     },
+     "pctOutsideSamplesTouchedByDrawnWidthAlone": 2.92
+    },
+    {
+     "rangeM": 3000,
+     "groundMetresPerPixel": 3.21,
+     "drawnHalfWidthM": {
+      "major": 9.62,
+      "mid": 6.42,
+      "local": 2.89
+     },
+     "pctOutsideSamplesTouchedByDrawnWidthAlone": 31.6
+    }
+   ],
+   "parallax": [
+    {
+     "pitchDeg": -35,
+     "roofShiftM": {
+      "p50": 10,
+      "p90": 15.14,
+      "max": 90.69
+     },
+     "pctBuildingsRoofShiftExceedsMedianRoadGap": 100
+    },
+    {
+     "pitchDeg": -60,
+     "roofShiftM": {
+      "p50": 4.04,
+      "p90": 6.12,
+      "max": 36.66
+     },
+     "pctBuildingsRoofShiftExceedsMedianRoadGap": 45.04
+    },
+    {
+     "pitchDeg": -90,
+     "roofShiftM": {
+      "p50": 0,
+      "p90": 0,
+      "max": 0
+     },
+     "pctBuildingsRoofShiftExceedsMedianRoadGap": 0
+    }
+   ]
+  }
+ ]
+}
