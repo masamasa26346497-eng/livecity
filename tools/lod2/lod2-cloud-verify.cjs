@@ -72,7 +72,7 @@ async function main() {
     await ev('window.__lc152.setShow(true)'); await sleep(2500);
     R.pixelDiff = { bothVsLod1Only: await diff(both, l1) };
     R.lod2Tile = { tileVisible: await ev('window.__lc152.state.tileVisible'), tileLoad: await ev('window.__lc152.state.tileLoad'), tileFailed: await ev('window.__lc152.state.tileFailed') };
-    R.static = { filesServed200: served.ok, notFound: served.notFound.slice(0, 20), notFoundCount: served.notFound.length };
+    R.static = { filesServed200: served.ok, notFound: served.notFound.slice(0, 20), notFoundAll: [...new Set(served.notFound)].slice(0, 400), notFoundCount: served.notFound.length };
     const sel = (R.tilesBoth || []).filter((t) => /lod2/i.test(String(t.ward || t.id || t.kind || '')));
     R.pass = R.lod2State.status === 'ready' && R.extraMeta.length >= WARDS && R.pixelDiff.bothVsLod1Only > 200 && !(R.http.bad.some((b) => /^\/(ext-3dtiles|lod2-preview|mission37g-data)\//.test(b.url) || b.status >= 500)) && R.lod2Tile.tileFailed === 0;
     fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(R, null, 1));
