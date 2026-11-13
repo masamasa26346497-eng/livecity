@@ -28,7 +28,13 @@ function toEnu(lat, lon, h, org) {
 }
 
 const SURF = { RoofSurface: 'roof', WallSurface: 'wall', GroundSurface: 'ground', OuterCeilingSurface: 'roof', OuterFloorSurface: 'ground', ClosureSurface: 'wall' };
-const COLOR = { roof: [0.62, 0.34, 0.28], wall: [0.82, 0.8, 0.76], ground: [0.5, 0.5, 0.5] };
+// Mission 207: LOD2 を LOD1(tools/mission37b-build-3dtiles.cjs の colorFor)と同じ青灰系へ統一。
+//  屋根 = colorFor(建物高さ)、壁 = 屋根×0.78(LOD1と同式)。地面面は壁色。形状/CRS/高さ/gml:id は不変。
+function lod1Color(h) {
+  const t = Math.min(Math.max(h, 0) / 60, 1);
+  const roof = [Math.round(190 - 70 * t), Math.round(200 - 50 * t), Math.round(215 - 20 * t)];
+  return { roof: roof.map((v) => v / 255), wall: roof.map((v) => Math.round(v * 0.78) / 255) };
+}
 
 /** 1棟のXMLから { surfaces:[{type, ring:[[lat,lon,h]...]}] } (lod2の面のみ) */
 export function extractLod2Surfaces(bldgXml) {
@@ -109,11 +115,14 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
     const bp = [], bc = []; let bad = !surfs.length;
     const gH = surfs.length ? Math.min(...surfs.flatMap((s) => s.ring.map((r) => r[2]))) : 0;
     const dz = opts.groundToZero ? toEnu(org.lat, org.lon, gH, org)[2] : 0;
+    const rings = surfs.map((s) => s.ring.map((r) => { const q = toEnu(r[0], r[1], r[2], org); q[2] -= dz; return q; }));
+    const hz = rings.flat().map((q) => q[2]);
+    const pal = lod1Color(hz.length ? Math.max(...hz) - Math.min(...hz) : 0);
     for (const s of surfs) {
       const e = s.ring.map((r) => { const q = toEnu(r[0], r[1], r[2], org); q[2] -= dz; return q; });
       const tr = triangulate(e);
       if (!tr.length) { bad = true; break; }
-      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(COLOR[s.type]); }
+      for (const t of tr) for (const i of t) { bp.push(e[i]); bc.push(s.type === 'roof' ? pal.roof : pal.wall); }
     }
     if (bad) { failed.push(id); continue; }
     for (const p of bp) { pos.push(p); minH = Math.min(minH, p[2]); maxH = Math.max(maxH, p[2]); bx = [Math.min(bx[0], p[0]), Math.max(bx[1], p[0])]; by = [Math.min(by[0], p[1]), Math.max(by[1], p[1])]; }
@@ -144,7 +153,7 @@ export function meshToGlb(mesh, opts = {}) {
     let nn = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
     const l = Math.hypot(...nn) || 1; nn = nn.map((x) => x / l);
     for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) { P[(i + k) * 3 + c] = v[k][c]; N[(i + k) * 3 + c] = nn[c]; C[(i + k) * 3 + c] = mesh.colors[i + k][c]; }
-    if (unlit) { // 巻き順が不定でも破綻しないよう |n·L| を使う(二面)
+    if (unlit && opts.bakeShade) { // 既定は無陰影(LOD1 と同色)。bakeShade:true で従来の固定昼光焼き込み。巻き順が不定でも破綻しないよう |n·L| を使う(二面)
       const d = Math.abs(nn[0] * BAKE_SUN[0] + nn[1] * BAKE_SUN[1] + nn[2] * BAKE_SUN[2]);
       const f = BAKE_AMBIENT + (1 - BAKE_AMBIENT) * d;
       for (let k = 0; k < 3; k++) for (let c = 0; c < 3; c++) C[(i + k) * 3 + c] *= f;

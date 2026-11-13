@@ -54,3 +54,15 @@ test('焼き込みは幾何(POSITION)を変えず、最暗でも下限以上', (
   assert.ok(Math.min(...a.C) >= 0.28 * 0.62 - 1e-6); // 最小チャンネル(屋根の青0.28) × 環境光下限0.62
   for (let i = 0; i < a.C.length; i += 3) assert.ok((a.C[i] + a.C[i + 1] + a.C[i + 2]) / 3 > 0.3);
 });
+
+// Mission 207: LOD2 色を LOD1(colorFor: 青灰, 壁=屋根×0.78)へ統一。既定は無陰影(LOD1 も unlit 無陰影)。
+test('LOD2 既定色は LOD1 の青灰(colorFor高さ式)と一致し、茶橙でない', () => {
+  const { P, N, C } = parse(meshToGlb(mesh));
+  const t = 10 / 60, roof = [190 - 70 * t, 200 - 50 * t, 215 - 20 * t].map((v) => Math.round(v) / 255);
+  let seenRoof = false, seenWall = false;
+  for (let i = 0; i < P.length / 3; i++) {
+    if (Math.abs(N[i * 3 + 1]) > 0.99 && P[i * 3 + 1] > 5) { seenRoof = true; roof.forEach((v, c) => assert.ok(Math.abs(C[i * 3 + c] - v) < 1e-4)); assert.ok(C[i * 3 + 2] > C[i * 3], '青>赤'); }
+    if (Math.abs(N[i * 3 + 1]) < 0.01) { seenWall = true; roof.forEach((v, c) => assert.ok(Math.abs(C[i * 3 + c] - Math.round(v * 255 * 0.78) / 255) < 1e-4)); }
+  }
+  assert.ok(seenRoof && seenWall);
+});
