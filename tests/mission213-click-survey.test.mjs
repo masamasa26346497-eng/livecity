@@ -48,3 +48,9 @@ test('survey: counts size/files per category, follows symlinked wards, flags mis
   assert.doesNotMatch(JSON.stringify(r), /bldg_/);
   fs.rmSync(t, { recursive: true, force: true });
 });
+
+test('Mission 215: API errors and id-format mismatch are FAIL, never silently NO-TARGET', () => {
+  assert.equal(classifyClick({ found: false, apiError: 'x is not a function' }).verdict, 'FAIL');
+  assert.equal(classifyClick({ found: false, idFormatMismatch: '{"BLD_1":3}' }).verdict, 'FAIL');
+  assert.equal(classifyClick({ found: false }).verdict, 'NO-TARGET');
+});

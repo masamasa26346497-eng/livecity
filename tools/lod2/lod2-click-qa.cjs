@@ -12,6 +12,9 @@ const fs = require('fs'), path = require('path'), http = require('http');
 
 // ---- 純関数(テスト対象) ----
 function classifyClick(r) {
+  // Mission 215: API 不在・例外・ID 形式不一致は NO-TARGET に丸めず FAIL にする(原因を握り潰さない)
+  if (r.apiError) return { verdict: 'FAIL', reason: 'pick API が使えない/例外: ' + r.apiError };
+  if (!r.found && r.idFormatMismatch) return { verdict: 'FAIL', reason: 'pick は成功したが canonicalId が bldg_ 形式でない(37G は町丁目クリック扱いにする): ' + r.idFormatMismatch };
   if (!r.found) return { verdict: 'NO-TARGET', reason: 'この視点の画面グリッドに bldg_ の建物が無い(未検証)' };
   if (!r.clicked) return { verdict: 'FAIL', reason: 'クリックを送れなかった' };
   if (r.selectedCanonicalId !== r.id) return { verdict: 'FAIL', reason: r.selectedCanonicalId ? '別の建物が選択された' : 'pick できるのに 37G が選択しなかった(ScreenSpaceEventHandler 経路)' };
@@ -81,13 +84,35 @@ async function main() {
       const rec = { name: t.name, expect: t.expect, found: false, clicked: false };
       if (!t.at) { rec.verdict = 'NO-TARGET'; rec.reason = '区の tileset 領域から中心を取れない'; R.results.push(rec); continue; }
       await ev('window.__mission37g.clearSelection && window.__mission37g.clearSelection()').catch(() => 0);
-      await ev('window.__lc152.lookAtFirst(450, -50, [' + t.at[0] + ',' + t.at[1] + '])'); await sleep(15000);
-      const hits = [];
-      for (const [x, y] of gridPoints(1280, 800)) {
-        const ids = await ev('JSON.stringify(window.__mission37g.drillIds(' + x + ',' + y + '))').then((s) => JSON.parse(s)).catch(() => []);
-        const bid = ids.find((v) => typeof v === 'string' && /^bldg_/.test(v));
+      await ev('window.__lc152.lookAtFirst(450, -50, [' + t.at[0] + ',' + t.at[1] + '])');
+      // タイルが実際に読み込まれて選択されるまで待つ(固定 sleep だけに頼らない。SwiftShader は遅い)
+      rec.waitLog = [];
+      for (let i = 0; i < 40; i++) {
+        await sleep(3000);
+        const st = await ev('JSON.stringify({ready: window.__mission37g.tilesReady && window.__mission37g.tilesReady(), lod2: window.__lc152.stats && window.__lc152.stats(), cam: window.__lc152.camera && window.__lc152.camera()})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
+        rec.waitLog.push(st); if (rec.waitLog.length > 3) rec.waitLog.shift();
+        const lod2sel = st.lod2 && st.lod2.numberOfTrianglesSelected > 0;
+        if (st.ready && (t.expect === 'lod1' || lod2sel) && i >= 3) break;
+      }
+      rec.camera = await ev('JSON.stringify(window.__lc152.camera())').then(JSON.parse).catch(() => null);
+      rec.tilesets = await ev('JSON.stringify({c: window.__mission37g.cameraVsTilesets && window.__mission37g.cameraVsTilesets(), n: window.__mission37g.tilesetCount && window.__mission37g.tilesetCount().n})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
+      const api = await ev('typeof window.__mission37g.drillIds'); rec.drillIdsType = api;
+      const hits = []; const seen = { points: 0, withAnyId: 0, nonBldg: {}, errors: 0, firstError: null };
+      if (api !== 'function') rec.apiError = 'window.__mission37g.drillIds が関数でない(' + api + ')';
+      else for (const [x, y] of gridPoints(1280, 800)) {
+        // ページ内で実行し、例外は握り潰さず記録する
+        const r = await ev('(()=>{try{return JSON.stringify({ids: window.__mission37g.drillIds(' + x + ',' + y + ')})}catch(e){return JSON.stringify({err:String(e&&e.message||e)})}})()').then((q) => JSON.parse(q)).catch((e) => ({ err: 'evaluate: ' + String(e && e.message || e) }));
+        seen.points++;
+        if (r.err) { seen.errors++; seen.firstError = seen.firstError || r.err; continue; }
+        const ids = (r.ids || []).filter((v) => typeof v === 'string' && v);
+        if (ids.length) seen.withAnyId++;
+        for (const v of ids) if (!/^bldg_/.test(v)) { const k = v.slice(0, 5); seen.nonBldg[k] = (seen.nonBldg[k] || 0) + 1; }
+        const bid = ids.find((v) => /^bldg_/.test(v));
         if (bid) { const src = lod2Ids.has(bid) ? 'lod2' : 'lod1'; hits.push({ x, y, id: bid, src }); if (hits.some((h) => h.src === t.expect)) break; }
       }
+      rec.scan = seen;
+      if (!rec.apiError && seen.points > 0 && seen.errors === seen.points) rec.apiError = seen.firstError;
+      if (!hits.length && seen.withAnyId > 0) rec.idFormatMismatch = JSON.stringify(seen.nonBldg);
       const h = hits.find((v) => v.src === t.expect) || null;
       if (h) {
         rec.found = true; rec.id = h.id; rec.source = h.src; rec.px = [h.x, h.y];
@@ -97,6 +122,7 @@ async function main() {
         rec.selectedCanonicalId = s.sel; rec.panelOn = s.on; rec.panelId = s.cid; rec.sidecarText = s.side; rec.panelWard = s.ward;
         const buf = Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'); fs.writeFileSync(path.join(out, t.name + '.png'), buf);
       } else if (hits.length) { rec.otherSourceOnly = hits[0].src; }
+      rec.waitLog = rec.waitLog && rec.waitLog.slice(-1);
       Object.assign(rec, classifyClick(rec));
       if (rec.id) rec.id = rec.id.slice(0, 13) + '…';   // 公開 gml:id の先頭のみ記録
       if (rec.selectedCanonicalId) rec.selectedCanonicalId = String(rec.selectedCanonicalId).slice(0, 13) + '…';
