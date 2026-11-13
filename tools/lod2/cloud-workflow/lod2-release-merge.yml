@@ -1,0 +1,77 @@
+# Mission 209: TEMPLATE (the GitHub App cannot write .github/workflows). Owner copies it ONCE via the Web UI:
+#   cp tools/lod2/cloud-workflow/lod2-release-merge.yml .github/workflows/lod2-release-merge.yml   (on the default branch)
+# Reuses the EXISTING secret LIVECITY_3D_DATA_READ_TOKEN and the exact fixed-curl pattern of mission129-fetch-21.yml. No new secret / PAT.
+# The token is visible ONLY to the fetch step (fixed curl GETs). Node/Claude/gh never see it. Nothing is uploaded: no artifact, no cache, no release write.
+# Data lives in RUNNER_TEMP and vanishes with the job. workflow_dispatch only; owner only; runs the PR-branch tools.
+name: lod2-release-merge
+on:
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'also run static-HTTP Chrome verification of the merged tree'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: lod2-release-merge
+  cancel-in-progress: false
+env:
+  DATA_REPO: masamasa26346497-eng/livecity-3d-data
+  TAG: plateau2025-converted
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: mission152-lod2-parallel
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch ward archives (READ token only here; GET only; size-capped; unsafe members refused)
+        env:
+          READ_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+        run: |
+          set -eu
+          [ -n "$READ_TOKEN" ] || { echo "FAIL: LIVECITY_3D_DATA_READ_TOKEN empty"; exit 1; }
+          echo "::add-mask::$READ_TOKEN"
+          T="${RUNNER_TEMP:?}"; mkdir -p "$T/rel"
+          code=$(printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sS -K - -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' -o "$T/rel.json" -w '%{http_code}' "https://api.github.com/repos/$DATA_REPO/releases/tags/$TAG" || true)
+          echo "release GET -> HTTP $code"; [ "$code" = "200" ] || exit 1
+          wards=$(jq -r '.wards[].id' config/wards/registry.json)
+          total=0
+          for w in $wards; do
+            id=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.id' "$T/rel.json" | head -n1)
+            [ -n "$id" ] || { echo "[$w] asset missing"; continue; }
+            size=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.size' "$T/rel.json" | head -n1)
+            [ "${size:-0}" -le 1073741824 ] || { echo "[$w] REFUSED: archive > 1GiB"; continue; }
+            printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sSL --fail --max-filesize 1073741824 -K - -H 'Accept: application/octet-stream' -o "$T/$w.tgz" "https://api.github.com/repos/$DATA_REPO/releases/assets/$id" || { echo "[$w] download failed"; rm -f "$T/${w:?}.tgz"; continue; }
+            tar -tzf "$T/$w.tgz" > "$T/$w.list" || { echo "[$w] unreadable"; rm -f "$T/${w:?}.tgz"; continue; }
+            if grep -qE '(^/|(^|/)\.\.(/|$)|\\)' "$T/$w.list"; then echo "[$w] REFUSED: unsafe member names"; rm -f "$T/${w:?}.tgz"; continue; fi
+            mkdir -p "$T/b24/_x_$w"
+            tar -xzf "$T/$w.tgz" --no-same-owner --no-same-permissions -C "$T/b24/_x_$w"
+            rm -f "$T/${w:?}.tgz" "$T/${w:?}.list"
+            total=$((total+1))
+          done
+          echo "extracted: $total archives"
+      - name: Assemble 24-ward base (no token; validates tree, ids, GLB, wardCode)
+        run: node tools/lod2/lod2-release-assemble.mjs --root "${RUNNER_TEMP:?}/b24" --out "${RUNNER_TEMP:?}/base24" --report "${RUNNER_TEMP:?}/assemble.json" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Official PLATEAU 2025 Kita/Chuo LOD2 + complement LOD1 (public Range fetch, no token)
+        run: |
+          set -eu
+          for w in kita chuo; do node tools/mission79-run.mjs --ward $w --max-mb 1500; done
+          node tools/lod2/lod2-build-all.mjs
+          for w in kita chuo; do node tools/mission79-build-ward-2025.cjs --ward $w --jsonl temp/mission79/$w-work/$w.jsonl --out temp/mission79/$w-2025-ex --exclude-ids temp/lod2-all/manifest.json; done
+          node tools/lod2/lod2-cloud-bundle.mjs --wards kita,chuo
+      - name: Merge (base 24 wards kept; Kita/Chuo swapped to 2025 complement + LOD2)
+        run: |
+          mkdir -p temp
+          node tools/lod2/lod2-cloud-merge.mjs --base "${RUNNER_TEMP:?}/base24" --overlay temp/cloud-bundle --out temp/cloud-merged --symlink --report temp/merge-report.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Static Chrome verification (optional)
+        if: inputs.browser
+        run: node tools/lod2/lod2-cloud-verify.cjs
