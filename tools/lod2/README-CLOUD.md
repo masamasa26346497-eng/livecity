@@ -50,3 +50,16 @@ PC に配信物を保存せず、runner 上で生成・監査・artifact 保存�
 - Vercel Hobby は非商用・利用上限がある。約 95MB の静的配信が通るかは未確認。
 - このワークフローは未実行。ここで確認したのは YAML の静的監査テストと監査スクリプトの単体テストだけ。
 - 過去の 37G Preview のデータは本バンドル(公式 2025 を再生成)とは別物として扱う。
+
+## Mission 213: 実クリック QA / 404 の分類 / 配信サイズ調査
+
+- `tools/lod2/lod2-click-qa.cjs` — merged ツリーを静的配信し、本物のマウスイベント(CDP `Input.dispatchMouseEvent`)で建物をクリックして
+  `scene.pick → canonicalId → 建物パネル` を検査する。LOD2(北・中央)と LOD1(住吉・平野・生野)。判定は PASS / FAIL / NO-TARGET(未検証)。
+  LOD1 サイドカー(属性)未配信は `diag: sidecar-unconnected` で、選択の FAIL ではない。
+- `tools/lod2/lod2-merged-survey.mjs` — 区別のファイル数・バイト数(`tiles/` と `lod/` 別)、tileset 参照の欠落、404 の分類。建物 ID・属性は出力しない。
+- 404 の分類方針(`RULES`): 駅(OSM/ODbL)・道路/河川・施設・Google Places・写真索引・町丁目地名は **blocked-rights**(権利/出典を人が確認するまで復元・再配布しない)。
+  LOD1 サイドカーは PLATEAU 由来なので **plateau-derived-needs-approval**(人の承認後に復元可)。区境界(N03)は同梱済みで、24区の区選択・区名ラベルはこれで維持される。
+- 配信サイズ: 24区 LOD1 は展開後 約 0.9GB。Vercel Hobby の実際の上限はこのリポジトリでは未確認(公式ドキュメントで要確認)。
+  追加費用が要るストレージは使わない前提の案: (a) Preview は北・中央の 2区 + `lod/`(遠景)のみ、(b) 24区全体の確認は Actions 上の一時 runner だけで行う(artifact も作らない)。
+  `survey` の `fit.lod2PlusLodOnlyFitsLimit` で (a) の見積りが出る。自動の本番公開はしない。
+- 再実行: `tools/lod2/cloud-workflow/mission213-qa-once.yml`(ブランチ `ci/mission213-qa-once` 用。実行コードは TOOLS_SHA に固定)。
