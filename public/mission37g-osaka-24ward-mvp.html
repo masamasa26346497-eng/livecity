@@ -3690,12 +3690,16 @@
     $('lc-cid').textContent = id;
     const extraSrc = extraSets.find((e) => e.base === tilesBaseOf(picked));
     $('lb-ward').textContent = extraSrc ? extraSrc.source.ward : ((bundleManifest && bundleManifest.buildings && bundleManifest.buildings.ward) || '—');
+    // Mission 208: LOD2 の建物は LOD1 の区別（住吉区ベース）に属さないため、区を誤表示せず「LOD2」と明示する
+    const pickedTs = picked.content && picked.content.tile && picked.content.tile.tileset;
+    const isLod2 = !!(pickedTs && pickedTs._lcLod2);
+    if (isLod2) $('lb-ward').textContent = 'LOD2建物（区は未照合）';
     $('lb-side').textContent = '照合中…';
     $('lb-note').textContent = '';
     for (const k of ['lb-h', 'lb-usage', 'lb-tile', 'lb-ll', 'lb-xz']) $(k).textContent = '—';
     $('lc-usage').textContent = '建物';
 
-    stats.lastPicked = { canonicalId: id, featureId: picked.featureId };
+    stats.lastPicked = { canonicalId: id, featureId: picked.featureId, lod2: isLod2 };
     stats.selectedCanonicalId = id;
     // 40E: 区間で同一 ID が再利用されている（40D 実測 262 件）ため、区コード+元 ID の複合キーも併せて保持する。canonicalId 自体は不変。
     stats.selectedKey = (extraSrc ? extraSrc.source.wardCode : BASE_WARD) + ':' + id;
@@ -3713,8 +3717,13 @@
     stats.lastPicked.sidecarMatches = sideId == null ? null : sideId === id;
     $('lb-side').textContent = sideId == null ? '未照合' : (sideId === id ? '✓ 一致' : '✗ 不一致');
 
-    if (attrs) {
-      $('lb-tile').textContent = 't_' + attrs.tx + '_' + attrs.tz;
+    if (isLod2) {
+      $('lb-tile').textContent = 'LOD2';
+      $('lb-side').textContent = '—（LOD2はGLB内の gml:id）';
+      $('lc-usage').textContent = '建物（LOD2）';
+      $('lb-note').textContent = 'LOD2建物です。高さ・用途の属性は未配信のため表示しません（捏造しません）。';
+    } else if (attrs) {
+      $('lb-tile').textContent = 't_ + attrs.tx + '_' + attrs.tz;
       const a = attrs.data.byId && attrs.data.byId[id];
       if (a) {
         const [h, usage, repX, repZ] = a;

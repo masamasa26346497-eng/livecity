@@ -45,6 +45,7 @@
       state.centroid = [fp.footprints.reduce((n, f) => n + f.hull[0][0], 0) / fp.footprints.length, fp.footprints.reduce((n, f) => n + f.hull[0][1], 0) / fp.footprints.length];
       state.bbox = report.bbox; state.lod2Buildings = fp.footprints.length; state.footprints = fp.footprints.length;
       const ts = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json');
+      ts._lcLod2 = true; // Mission 208: 37G のクリック処理が LOD2 と LOD1 を区別するための印
       ts.tileVisible.addEventListener(() => { state.tileVisible++; });
       ts.tileLoad.addEventListener(() => { state.tileLoad++; scene.requestRender(); });
       ts.tileFailed.addEventListener((e) => { state.tileFailed++; state.error = 'tileFailed: ' + (e && e.message); showFailure('タイル読み込み失敗: ' + (e && e.message)); });

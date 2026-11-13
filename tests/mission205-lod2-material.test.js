@@ -19,7 +19,7 @@ for (const material of ['unlit-baked', 'pbr']) {
     const { json, P, N, C } = parse(meshToGlb(mesh, { material }));
     const n = mesh.positions.length;
     assert.equal(P.length, n * 3); assert.equal(C.length, n * 3);
-    json.bufferViews.forEach((bv, k) => assert.equal(bv.byteOffset, k * n * 12));
+    json.bufferViews.slice(0, 3).forEach((bv, k) => assert.equal(bv.byteOffset, k * n * 12));
     for (let i = 0; i < n; i++) {
       assert.ok(Math.abs(Math.hypot(N[i * 3], N[i * 3 + 1], N[i * 3 + 2]) - 1) < 1e-4, '法線は単位長');
       const lum = (C[i * 3] + C[i * 3 + 1] + C[i * 3 + 2]) / 3;
@@ -32,9 +32,9 @@ for (const material of ['unlit-baked', 'pbr']) {
 
 test('既定は KHR_materials_unlit(時刻/ライトに依存しない)、pbr は拡張なし', () => {
   const u = parse(meshToGlb(mesh)).json;
-  assert.deepEqual(u.extensionsUsed, ['KHR_materials_unlit']);
+  assert.ok(u.extensionsUsed.includes('KHR_materials_unlit')); // M208: ID 用拡張が加わるのは可
   assert.ok(u.materials[0].extensions.KHR_materials_unlit);
-  assert.equal(parse(meshToGlb(mesh, { material: 'pbr' })).json.extensionsUsed, undefined);
+  assert.ok(!(parse(meshToGlb(mesh, { material: 'pbr' })).json.extensionsUsed || []).includes('KHR_materials_unlit'));
 });
 
 test('屋根は上向き法線、壁は水平法線、屋根色と壁色が判別できる', () => {
@@ -65,4 +65,26 @@ test('LOD2 既定色は LOD1 の青灰(colorFor高さ式)と一致し、茶橙�
     if (Math.abs(N[i * 3 + 1]) < 0.01) { seenWall = true; roof.forEach((v, c) => assert.ok(Math.abs(C[i * 3 + c] - Math.round(v * 255 * 0.78) / 255) < 1e-4)); }
   }
   assert.ok(seenRoof && seenWall);
+});
+
+// Mission 208: クリック用。LOD2 GLB に建物ごとの canonicalId(gml:id) を載せる(形状/色は不変)。
+test('Mission208: LOD2 GLB が EXT_mesh_features + EXT_structural_metadata で canonicalId を持つ', async () => {
+  const { buildLod2Mesh, meshToGlb } = await import('../tools/lod2/lod2-to-glb.js');
+  const mk = (id, h) => `<bldg:Building gml:id="${id}"><bldg:lod2Solid><gml:Solid><gml:exterior><gml:CompositeSurface>` +
+    `<gml:surfaceMember><bldg:RoofSurface><bldg:lod2MultiSurface><gml:MultiSurface><gml:surfaceMember><gml:Polygon><gml:exterior><gml:LinearRing><gml:posList>34.70 135.50 ${h} 34.70 135.5001 ${h} 34.7001 135.5001 ${h} 34.7001 135.50 ${h} 34.70 135.50 ${h}</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon></gml:surfaceMember></gml:MultiSurface></bldg:lod2MultiSurface></bldg:RoofSurface></gml:surfaceMember>` +
+    `</gml:CompositeSurface></gml:exterior></gml:Solid></bldg:lod2Solid></bldg:Building>`;
+  const m = buildLod2Mesh(new Map([['bldg_aaa', xml.replace('gml:id="a"', 'gml:id="bldg_aaa"')], ['bldg_bbb', xml.replace('gml:id="a"', 'gml:id="bldg_bbb"')]]), { lat: 34.6, lon: 135.5, h: 0 });
+  assert.equal(m.ok.length, 2);
+  assert.equal(m.featureIds.length, m.positions.length);
+  const glb = meshToGlb(m);
+  const jl = glb.readUInt32LE(12), json = JSON.parse(glb.subarray(20, 20 + jl).toString());
+  assert.ok(json.extensionsUsed.includes('EXT_mesh_features') && json.extensionsUsed.includes('EXT_structural_metadata') && json.extensionsUsed.includes('KHR_materials_unlit'));
+  const pt = json.extensions.EXT_structural_metadata.propertyTables[0];
+  assert.equal(pt.count, m.ok.length);
+  const binStart = 20 + jl + 8, bv = json.bufferViews[pt.properties.canonicalId.values], ov = json.bufferViews[pt.properties.canonicalId.stringOffsets];
+  assert.equal(ov.byteOffset % 4, 0);
+  const offs = new Uint32Array(m.ok.length + 1).map((_, i) => glb.readUInt32LE(binStart + ov.byteOffset + i * 4));
+  const ids = m.ok.map((_, i) => glb.subarray(binStart + bv.byteOffset + offs[i], binStart + bv.byteOffset + offs[i + 1]).toString());
+  assert.deepEqual(ids, m.ok.map((o) => o.id));
+  assert.equal(json.meshes[0].primitives[0].attributes._FEATURE_ID_0, 3);
 });

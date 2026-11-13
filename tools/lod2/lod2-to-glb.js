@@ -108,7 +108,7 @@ export function convexHull(points) {
  * 戻り値 footprints: 建物ごとの凸包(lon,lat)。LOD1 側の重複除外(クリップ)に使う。
  */
 export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
-  const pos = [], col = [], ok = [], failed = [], footprints = [];
+  const pos = [], col = [], fid = [], ok = [], failed = [], footprints = [];
   let minH = Infinity, maxH = -Infinity, bx = [Infinity, -Infinity], by = [Infinity, -Infinity];
   for (const [id, xml] of bldgXmlById) {
     const surfs = extractLod2Surfaces(xml);
@@ -127,10 +127,11 @@ export function buildLod2Mesh(bldgXmlById, org, opts = {}) {
     if (bad) { failed.push(id); continue; }
     for (const p of bp) { pos.push(p); minH = Math.min(minH, p[2]); maxH = Math.max(maxH, p[2]); bx = [Math.min(bx[0], p[0]), Math.max(bx[1], p[0])]; by = [Math.min(by[0], p[1]), Math.max(by[1], p[1])]; }
     for (const c of bc) col.push(c);
+    for (let q = 0; q < bp.length; q++) fid.push(ok.length); // Mission 208: 頂点→建物(ok の添字)。クリック時の canonicalId(=gml:id) 解決用
     ok.push({ id, triangles: bp.length / 3, groundH: gH });
     footprints.push({ id, hull: convexHull(surfs.flatMap((s) => s.ring.map((r) => [r[1], r[0]]))) });
   }
-  return { positions: pos, colors: col, ok, failed, footprints, extentEnu: { x: bx, y: by, z: [minH, maxH] } };
+  return { positions: pos, colors: col, featureIds: fid, ok, failed, footprints, extentEnu: { x: bx, y: by, z: [minH, maxH] } };
 }
 
 // Mission 205: 黒表示の原因調査
@@ -161,21 +162,49 @@ export function meshToGlb(mesh, opts = {}) {
   }
   const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < n; i++) for (let c = 0; c < 3; c++) { mn[c] = Math.min(mn[c], P[i * 3 + c]); mx[c] = Math.max(mx[c], P[i * 3 + c]); }
-  const bin = Buffer.concat([P, N, C].map((a) => Buffer.from(a.buffer)));
   const bl = n * 12;
+  const parts = [P, N, C].map((a) => Buffer.from(a.buffer));
+  const withIds = Array.isArray(mesh.featureIds) && mesh.featureIds.length === n && Array.isArray(mesh.ok) && mesh.ok.length > 0;
+  const bufferViews = [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 }));
+  const accessors = [
+    { bufferView: 0, componentType: 5126, count: n, type: 'VEC3', min: mn, max: mx },
+    { bufferView: 1, componentType: 5126, count: n, type: 'VEC3' },
+    { bufferView: 2, componentType: 5126, count: n, type: 'VEC3' }];
+  const attributes = { POSITION: 0, NORMAL: 1, COLOR_0: 2 };
+  const prim = { attributes, material: 0, mode: 4 };
+  const extUsed = unlit ? ['KHR_materials_unlit'] : [];
+  let rootExt = null;
+  if (withIds) {
+    // Mission 208: EXT_mesh_features(頂点ごと _FEATURE_ID_0) + EXT_structural_metadata(canonicalId=gml:id の文字列表)。
+    // 37G のクリック処理は Cesium3DTileFeature.getProperty('canonicalId') を読むため、LOD2 でも同じ経路で建物が特定できる。形状/色/座標は不変。
+    const F = new Float32Array(n); for (let i = 0; i < n; i++) F[i] = mesh.featureIds[i];
+    const strs = mesh.ok.map((o) => Buffer.from(String(o.id), 'utf8'));
+    const offs = new Uint32Array(strs.length + 1); strs.forEach((b, i) => { offs[i + 1] = offs[i] + b.length; });
+    const vals = Buffer.concat(strs); const valsPad = Buffer.concat([vals, Buffer.alloc((4 - vals.length % 4) % 4)]);
+    const offB = Buffer.from(offs.buffer);
+    let at = 3 * bl;
+    const add = (buf, target) => { const v = { buffer: 0, byteOffset: at, byteLength: buf.length }; if (target) v.target = target; bufferViews.push(v); parts.push(buf); at += buf.length; return bufferViews.length - 1; };
+    const fv = add(Buffer.from(F.buffer), 34962);
+    accessors.push({ bufferView: fv, componentType: 5126, count: n, type: 'SCALAR' });
+    attributes._FEATURE_ID_0 = 3;
+    const vv = add(valsPad); bufferViews[vv].byteLength = vals.length; // 実長(パディングは本体側)
+    const ov = add(offB);
+    prim.extensions = { EXT_mesh_features: { featureIds: [{ featureCount: mesh.ok.length, attribute: 0, propertyTable: 0 }] } };
+    rootExt = { EXT_structural_metadata: {
+      schema: { id: 'livecity_lod2', classes: { building: { properties: { canonicalId: { type: 'STRING' } } } } },
+      propertyTables: [{ class: 'building', count: mesh.ok.length, properties: { canonicalId: { values: vv, stringOffsets: ov } } }] } };
+    extUsed.push('EXT_mesh_features', 'EXT_structural_metadata');
+  }
+  const bin = Buffer.concat(parts);
   const json = {
     asset: { version: '2.0', generator: 'livecity-mission153' }, scene: 0, scenes: [{ nodes: [0] }], nodes: [{ mesh: 0 }],
-    meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1, COLOR_0: 2 }, material: 0, mode: 4 }] }],
+    meshes: [{ primitives: [prim] }],
     materials: [unlit
       ? { pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 1 }, alphaMode: 'OPAQUE', doubleSided: true, extensions: { KHR_materials_unlit: {} } }
       : { pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1], metallicFactor: 0, roughnessFactor: 0.9 }, alphaMode: 'OPAQUE', doubleSided: true }],
-    ...(unlit ? { extensionsUsed: ['KHR_materials_unlit'] } : {}),
-    buffers: [{ byteLength: bin.length }],
-    bufferViews: [0, 1, 2].map((k) => ({ buffer: 0, byteOffset: k * bl, byteLength: bl, target: 34962 })),
-    accessors: [
-      { bufferView: 0, componentType: 5126, count: n, type: 'VEC3', min: mn, max: mx },
-      { bufferView: 1, componentType: 5126, count: n, type: 'VEC3' },
-      { bufferView: 2, componentType: 5126, count: n, type: 'VEC3' }],
+    ...(extUsed.length ? { extensionsUsed: extUsed } : {}),
+    ...(rootExt ? { extensions: rootExt } : {}),
+    buffers: [{ byteLength: bin.length }], bufferViews, accessors,
   };
   let js = Buffer.from(JSON.stringify(json)); js = Buffer.concat([js, Buffer.alloc((4 - js.length % 4) % 4, 0x20)]);
   const b = Buffer.concat([bin, Buffer.alloc((4 - bin.length % 4) % 4)]);
