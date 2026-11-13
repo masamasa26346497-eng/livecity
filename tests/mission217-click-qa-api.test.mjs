@@ -18,5 +18,7 @@ test('37G の __mission37dQA は drillIds/tilesReady を定義し、localhost �
 });
 test('QA は localhost + ?qa=1 で開く(ホスト名/qa フラグ不一致の再発防止)', () => {
   assert.match(qa, /const HOST = 'localhost'/);
-  assert.match(qa, /\/\?qa=1&ext45=1/);
+  assert.match(qa, /\/mission37g-osaka-24ward-mvp\.html\?qa=1&ext45=1/);
+  assert.doesNotMatch(qa, /port \+ '\/\?qa=1/); // index.html の meta refresh はクエリを落とす
+  assert.match(qa, /failFast/);
 });

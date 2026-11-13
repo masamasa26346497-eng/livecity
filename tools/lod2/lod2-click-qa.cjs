@@ -71,8 +71,16 @@ async function main() {
     const ev = async (expr) => { const r = await Promise.race([send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }), sleep(90000).then(() => ({ __t: 1 }))]); if (r.__t) throw new Error('応答停止'); return r.result ? r.result.value : r; };
     await send('Runtime.enable'); await send('Page.enable'); await send('Input.setIgnoreInputEvents', { ignore: false });
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: 'http://' + HOST + ':' + port + '/?qa=1&ext45=1&nobuiltin=1&lod2=1&lod2ov=1&lod2auto3d=0&lod2fly=0' });
+    await send('Page.navigate', { url: 'http://' + HOST + ':' + port + '/mission37g-osaka-24ward-mvp.html?qa=1&ext45=1&nobuiltin=1&lod2=1&lod2ov=1&lod2auto3d=0&lod2fly=0' });
     for (let i = 0; i < 120; i++) { if ((await ev('!!document.getElementById("sel-bldg-mode") && !!window.__mission37dQA')) === true) break; await sleep(500); }
+    // 診断: フックが無いなら理由を記録して fail-fast（index.html の meta refresh は ?qa=1 を落とすため、必ず 37G HTML を直接開く）
+    R.pageProbe = await ev('JSON.stringify({href: location.href.replace(/[?].*/, "?…"), host: location.hostname, search: location.search, title: document.title, readyState: document.readyState, hookType: typeof window.__mission37dQA, hookKeys: window.__mission37dQA ? Object.keys(window.__mission37dQA) : null, drillIdsType: window.__mission37dQA ? typeof window.__mission37dQA.drillIds : null, renderErrors: window.__qaRenderErrors || null})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
+    R.htmlSha256 = require('crypto').createHash('sha256').update(fs.readFileSync(path.join(BUNDLE, 'mission37g-osaka-24ward-mvp.html'))).digest('hex').slice(0, 16);
+    log('pageProbe', JSON.stringify(R.pageProbe));
+    if (!R.pageProbe || R.pageProbe.hookType !== 'object' || R.pageProbe.drillIdsType !== 'function') {
+      R.pass = false; R.failFast = 'QA フック(__mission37dQA.drillIds)が無い: search=' + (R.pageProbe && R.pageProbe.search) + ' host=' + (R.pageProbe && R.pageProbe.host);
+      fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify(R, null, 1)); console.log(JSON.stringify(R, null, 1)); ws.close(); process.exitCode = 6; return;
+    }
     await ev('(()=>{const m=document.getElementById("sel-bldg-mode");m.value="all";m.dispatchEvent(new Event("change"));})()');
     const WARDS = JSON.parse(fs.readFileSync(path.join(BUNDLE, 'ext-3dtiles', 'index.json'), 'utf8')).wards.length;
     for (let i = 0; i < 400; i++) { const n = await ev('(window.__mission37g && window.__mission37g.extraMeta && window.__mission37g.extraMeta.length) || 0').catch(() => 0); if (n >= WARDS) break; await sleep(500); }
