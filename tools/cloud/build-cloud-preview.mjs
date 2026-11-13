@@ -19,6 +19,7 @@ import { auditWard, auditSinglePass } from './lod1-id-audit.mjs';
 import { selectMeshes } from '../mission79-run.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
 import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
+import { buildRoadLayer } from './tran-to-layers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const a = process.argv.slice(2);
@@ -62,6 +63,8 @@ const freeGB = () => { const f = fs.statfsSync(ROOT); return (f.bavail * f.bsize
 const extRoot = path.join(OUT, 'ext-3dtiles');
 const wardInfo = [];
 let lod2Meshes, lod2Rep, lod2Ids, lod2Manifest;
+const layersWards = [], roadFailures = [];
+const ROADS = !process.argv.includes('--no-roads');   // Mission 210: 既定 ON(single-pass のみ)
 
 if (SINGLE) {
   // ---- 1S. LOD2 を先に確定(区の対象メッシュ = ward bbox 選定 ∩ LOD2 収録メッシュ。LOD1 を先に作らない) ----
@@ -127,6 +130,14 @@ if (SINGLE) {
       const d = path.join(extRoot, id);
       fs.mkdirSync(d, { recursive: true });
       for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(sdir, n))) cp(path.join(sdir, n), path.join(d, n));
+      // Mission 210: 取得済み tran GML(work/tran)から道路区域レイヤーを生成(cleanup 前)。失敗時は建物表示を壊さないよう道路だけ省略し、理由を記録。
+      if (ROADS) {
+        try {
+          const lr = buildRoadLayer({ tranDir: path.join(workDir, 'tran'), projection: area.projection, ward: id, wardCode: w.code, wardPolygons: polys.wards.find((x) => x.wardId === id).polygons, outDir: path.join(d, 'layers') });
+          layersWards.push({ ward: id, layers: ['roads'], features: lr.layers.roads.features });
+          log('道路レイヤー OK:', id, JSON.stringify({ features: lr.layers.roads.features, sizeMB: lr.layers.roads.sizeMB, truncated: lr.layers.roads.truncated }));
+        } catch (e) { roadFailures.push({ ward: id, error: String(e.message).slice(0, 300) }); log('道路レイヤー省略(建物は影響なし):', id, e.message); }
+      }
       wardInfo.push({ id, name: w.name, code: w.code, dir: d, fullBuildings: audit.origIds, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAudit: audit, idAuditedIds: audit.suppIds, doubleDrawn: audit.doubleDrawn });
     } finally {
       fs.rmSync(sdir, { recursive: true, force: true }); fs.rmSync(workDir, { recursive: true, force: true });   // 直ちに cleanup
@@ -228,7 +239,8 @@ cp(path.join(ROOT, 'tools/cloud/ward-picker.js'), path.join(OUT, 'cloud-ward-pic
 // Mission 201: 24区全てを列挙し、配信済(served)/未配信(not-served)を明記。未配信区を配信済と見せない。
 fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   ...buildIndex(reg, wardInfo.map((w) => ({ id: w.id, buildings: w.buildings }))),
-  lod0Wards: [], layersWards: [],
+  lod0Wards: [], layersWards: SINGLE ? layersWards : [],
+  layersReport: { roads: { source: 'PLATEAU 2025 tran:Road lod1 (道路区域ポリゴン)', delivered: layersWards.length, failed: roadFailures }, waterways: 'not-delivered' },
 }));
 // 3c. LOD2 + オーバーレイ(ローカル serve と同じ URL 構成)
 const l2 = path.join(OUT, 'lod2-preview');

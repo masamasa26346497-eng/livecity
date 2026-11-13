@@ -496,7 +496,7 @@
   const C = {
     accent: '#50a0ff', hi: '#8fc0ff', text: '#eef1f3', dim: '#9cb8d8', mute: '#5a7aa0',
     navy: '#050a18', amber: '#d8a868',
-    roadMajor: '#9fb4c9', roadMid: '#aabdce', roadLocal: '#bac8d7', roadCasing: '#7d93ab',
+    roadArea: '#8d9298', roadMajor: '#9fb4c9', roadMid: '#aabdce', roadLocal: '#bac8d7', roadCasing: '#7d93ab',
     rail: '#8396aa', waterLine: '#4f9fd6', waterArea: '#8dc3e8', park: '#bcd3b4',
   };
   // 建物トーン（3D Tiles の頂点色に掛ける係数。淡色＝ほぼ素の淡い青灰のまま）
@@ -867,6 +867,7 @@
 
   // 40G: 道路・河川の線スタイル（住吉区の束と、区単位の ward layers で共有）
   function roadStyle(f) {
+    if (f.kind === 'area') return null;   // M210: PLATEAU 道路区域(面)は線として描かない
     const t = f.tier || 'local';
     if (t === 'major') return { width: 7.5, casing: 3.5, material: solidMat(C.roadMajor), height: LAYER_H.roads };
     if (t === 'mid') return { width: 5.0, casing: 2.5, material: solidMat(C.roadMid), height: LAYER_H.roads };
@@ -874,6 +875,7 @@
   }
   // 40M: 区単位レイヤー（福島区など）の道路。階層別に細く・半透明にし、細街路は近距離だけ表示して建物を覆わない。住吉区の束（roadStyle）は変更しない。
   function roadStyleWard(f) {
+    if (f.kind === 'area') return null;   // M210: 面は makeRoadAreaLayer が描く
     const t = f.tier || 'local';
     if (t === 'major') return { width: 4.5, casing: 1.5, material: alphaMat(C.roadMajor, 0.8), casingMaterial: alphaMat(C.roadCasing, 0.55), height: LAYER_H.roads };
     if (t === 'mid') return { width: 3.0, casing: 1.0, material: alphaMat(C.roadMid, 0.7), casingMaterial: alphaMat(C.roadCasing, 0.4), height: LAYER_H.roads, maxDist: 12000 };
@@ -1088,8 +1090,14 @@
   // 40G: 区単位の道路・河川・公園・鉄道（<ext>/<区>/layers/*.json。tools/mission40g-build-ward-layers.cjs が旧 OSM タイルから切り出す）。
   //   区の 3D 建物を mount したときだけ読み込み、区の切替・解除で primitives.remove する。layers/ が無ければ何もしない（捏造しない）。
   //   既存の住吉区束（mission37c-layers）とは別 primitive。住吉区の束は変更しない。
+  // M210: PLATEAU 2025 tran:Road 由来の道路区域(kind:'area')。落ち着いたグレーの面。道路中心線(線)とは別物。無ければ(404)何も描かない。
+  function withRoadArea(lineLayer, b, o) {
+    const a = makeAreaLayer('roads.json', { color: C.roadArea, alpha: 0.9, height: LAYER_H.roads - 0.3 }, b, o);
+    return { async mount() { const x = await lineLayer.mount(); const y = await a.mount(); return { count: x.count + y.count }; },
+             applyVisible(on) { lineLayer.applyVisible(on); a.applyVisible(on); }, destroy() { lineLayer.destroy(); a.destroy(); } };
+  }
   const WARD_VEC_FILES = {
-    roads: (b, o, lv) => makeLineLayer('roads.json', lv ? (f) => (LC45I.tierAllows(lv, f.tier) ? roadStyleWard(f) : null) : roadStyleWard, b, o),
+    roads: (b, o, lv) => withRoadArea(makeLineLayer('roads.json', lv ? (f) => (LC45I.tierAllows(lv, f.tier) ? roadStyleWard(f) : null) : roadStyleWard, b, o), b, o),
     waterways: (b, o) => {
       const l = makeLineLayer('waterways.json', waterLineStyle, b, o);
       const a = makeAreaLayer('waterways.json', { color: C.waterArea, alpha: 0.95, height: LAYER_H.waterways }, b, o);
@@ -1141,7 +1149,10 @@
   //   tier 別に分けることで、詳細度の切替を「全 destroy + 再 fetch + 再 clip」ではなく「不足分の追加 + show/hide」にする。
   function makeVecLayer(key, base, opt) {
     const id = LC45I.keyLayer(key), tier = String(key).split(':')[1];
-    if (id === 'roads' && tier) return makeLineLayer('roads.json', (f) => ((f.tier || 'local') === tier ? roadStyleWard(f) : null), base, opt);
+    if (id === 'roads' && tier) {
+      const ln = makeLineLayer('roads.json', (f) => ((f.tier || 'local') === tier ? roadStyleWard(f) : null), base, opt);
+      return tier === 'major' ? withRoadArea(ln, base, opt) : ln;   // M210: 道路区域の面は major キーに 1 回だけ載せる(重複描画しない)
+    }
     return WARD_VEC_FILES[id](base, opt);
   }
   // 区ごとに 1 回だけ作る文脈（区ポリゴンの高速判定、住吉区の束との二重線回避）
