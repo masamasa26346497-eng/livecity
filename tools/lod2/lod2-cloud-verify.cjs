@@ -27,8 +27,10 @@ const srv = http.createServer((req, res) => {
 });
 const getJson = (u) => new Promise((res, rej) => http.get(u, (r) => { let b = ''; r.on('data', (d) => (b += d)); r.on('end', () => { try { res(JSON.parse(b)); } catch (e) { rej(e); } }); }).on('error', rej));
 
+// BUNDLE_MANIFEST.json (cloud-bundle) or ext-3dtiles/index.json (cloud-merged: lod2-cloud-merge does not copy the manifest).
+function wardsListPath() { const m = path.join(BUNDLE, 'BUNDLE_MANIFEST.json'); return fs.existsSync(m) ? m : path.join(BUNDLE, 'ext-3dtiles', 'index.json'); }
 async function main() {
-  if (!fs.existsSync(path.join(BUNDLE, 'BUNDLE_MANIFEST.json'))) throw new Error('バンドル未生成: ' + BUNDLE);
+  if (!fs.existsSync(wardsListPath())) throw new Error('バンドル未生成: ' + BUNDLE);
   fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
   await new Promise((r) => srv.listen(port, '127.0.0.1', r));
   const chrome = spawn(chromeBin, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist',
@@ -49,7 +51,7 @@ async function main() {
     await send('Network.enable'); await send('Runtime.enable'); await send('Page.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: 'http://' + HOST + ':' + port + '/' });   // クエリ無し(既定の補完は HTML 内蔵)
-    const WARDS = JSON.parse(fs.readFileSync(path.join(BUNDLE, 'BUNDLE_MANIFEST.json'), 'utf8')).wards.length;
+    const WARDS = JSON.parse(fs.readFileSync(wardsListPath(), 'utf8')).wards.length;
     for (let i = 0; i < 120; i++) { if ((await ev('!!document.getElementById("sel-bldg-mode")')) === true) break; await sleep(500); }
     await ev('(()=>{const m=document.getElementById("sel-bldg-mode");m.value="all";m.dispatchEvent(new Event("change"));})()');   // 利用者が「全域3D」を選ぶ操作に相当
     for (let i = 0; i < 400; i++) { const n = await ev('(window.__mission37g && window.__mission37g.extraMeta && window.__mission37g.extraMeta.length) || 0').catch(() => 0); if (i % 20 === 0) log('extraMeta', n, 'n=' + i, R.console.slice(-1)[0] || ''); if (n >= WARDS) break; await sleep(500); }

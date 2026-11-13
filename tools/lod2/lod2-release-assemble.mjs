@@ -62,7 +62,7 @@ function glbProblems(dir) {
   return { glbs: uris.length, missing, invalid };
 }
 
-export function assemble({ root, out, registry, maxBytes = MAX_BYTES_DEFAULT, tag = 'plateau2025-converted', rootDir = ROOT }) {
+export function assemble({ root, out, registry, maxBytes = MAX_BYTES_DEFAULT, tag = 'plateau2025-converted', rootDir = ROOT, allowMissing = [] }) {
   const OUT = path.resolve(out);
   const allowed = [process.env.RUNNER_TEMP, path.join(rootDir, 'temp')].filter(Boolean).map((x) => path.resolve(x) + path.sep);
   if (!allowed.some((a) => (OUT + path.sep).startsWith(a))) throw new Error('出力先は RUNNER_TEMP または temp/ 配下のみ');
@@ -108,16 +108,19 @@ export function assemble({ root, out, registry, maxBytes = MAX_BYTES_DEFAULT, ta
     counts: { ok: rows.filter((r) => r.status === 'ok').length, missing: rows.filter((r) => r.status === 'missing').length, problem: rows.filter((r) => r.status === 'data-problem').length, buildings: rows.reduce((s, r) => s + (r.buildings || 0), 0) },
     wards: rows, rights: { confirmedByHuman: false },
   };
-  report.allOk = report.counts.ok === registry.length && !tree.problems.length;
+  // allowMissing: ward(s) the overlay will supply (Kita/Chuo). Only a plain 'missing' is excused; data-problem is never excused.
+  const excused = rows.filter((r) => r.status === 'missing' && allowMissing.includes(r.ward)).length;
+  report.allowMissing = allowMissing;
+  report.allOk = report.counts.ok + excused === registry.length && report.counts.problem === 0 && !tree.problems.length;
   return report;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const a = process.argv.slice(2), o = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
-  if (!o('root') || !o('out')) { console.error('usage: --root <extracted> --out <dir under RUNNER_TEMP|temp> [--report path] [--max-bytes N]'); process.exit(2); }
+  if (!o('root') || !o('out')) { console.error('usage: --root <extracted> --out <dir under RUNNER_TEMP|temp> [--report path] [--max-bytes N] [--allow-missing a,b]'); process.exit(2); }
   try {
     const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/wards/registry.json'), 'utf8')).wards;
-    const r = assemble({ root: path.resolve(o('root')), out: o('out'), registry, maxBytes: Number(o('max-bytes', MAX_BYTES_DEFAULT)) });
+    const r = assemble({ root: path.resolve(o('root')), out: o('out'), registry, maxBytes: Number(o('max-bytes', MAX_BYTES_DEFAULT)), allowMissing: (o('allow-missing', '') || '').split(',').filter(Boolean) });
     if (o('report')) fs.writeFileSync(path.resolve(o('report')), JSON.stringify(r, null, 1));
     console.log(JSON.stringify({ ...r, wards: r.wards.map((w) => `${w.ward}:${w.status}${w.problems.length ? ':' + w.problems.join('|') : ''}`) }, null, 1));
     if (!r.allOk) { console.error('[release-assemble] 24区そろっていない、または問題あり。成功とは扱いません'); process.exit(3); }

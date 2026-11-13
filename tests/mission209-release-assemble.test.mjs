@@ -25,7 +25,7 @@ test('assemble: synthesizes source/build-report, flags them, merge accepts', () 
   assert.equal(r.counts.ok, 1); assert.equal(r.counts.missing, 1); assert.equal(r.allOk, false);
   const kita = r.wards[0]; assert.deepEqual(kita.synthesized, ['source.json', 'build-report.json']);
   const info = inspectWard(path.join(t, 'out', 'kita'), '27127');
-  assert.equal(info.buildings, 2); assert.equal(info.vintage, '2025');
+  assert.equal(info.buildings, 2); assert.equal(info.vintage, null); assert.equal(info.vintageSynthesized, true); // Mission 210: tag-derived vintage is never reported as verified
   const plan = planMerge({ registry: REG, baseWards: { kita: info }, overlayWards: {} });
   assert.equal(plan.find((p) => p.ward === 'chuo').status, 'missing');
 });
@@ -58,4 +58,23 @@ test('workflow template: fixed-curl token step only, no new secret, no upload, n
   assert.equal((y.match(/secrets\./g) || []).length, 1);
   assert.doesNotMatch(y, /upload-artifact|actions\/cache|gh release|--prod|GH_TOKEN|claude-code-action/);
   assert.match(y, /workflow_dispatch/); assert.match(y, /contents: read/); assert.match(y, /persist-credentials: false/);
+});
+
+test('Mission 210: --allow-missing excuses only plain missing wards; data-problem and partial sets still fail', () => {
+  const t = tmp(); process.env.RUNNER_TEMP = t;
+  mkWard(path.join(t, 'in'), 'kita', ['bldg_a']);
+  const ok = assemble({ root: path.join(t, 'in'), out: path.join(t, 'out'), registry: REG, allowMissing: ['chuo'] });
+  assert.equal(ok.allOk, true);
+  const partial = assemble({ root: path.join(t, 'in'), out: path.join(t, 'out'), registry: REG, allowMissing: [] });
+  assert.equal(partial.allOk, false);
+  const t2 = tmp(); process.env.RUNNER_TEMP = t2;
+  mkWard(path.join(t2, 'in'), 'kita', ['bldg_a', 'bldg_a']);
+  assert.equal(assemble({ root: path.join(t2, 'in'), out: path.join(t2, 'out'), registry: REG, allowMissing: ['chuo'] }).allOk, false);
+});
+test('Mission 210: workflow template uses pipefail shell, pre-extraction type audit, caps, and verifies the merged tree', () => {
+  const y = fs.readFileSync(new URL('../tools/lod2/cloud-workflow/lod2-release-merge.yml', import.meta.url), 'utf8');
+  assert.match(y, /defaults:\s*\n\s+run:\s*\n\s+shell: bash/);
+  assert.match(y, /tar -tvzf/); assert.match(y, /grep -qvE '\^\[-d\]'/);
+  assert.match(y, /MAX_UNPACKED_ARCHIVE/); assert.match(y, /--proto =https/);
+  assert.match(y, /--bundle temp\/cloud-merged/); assert.match(y, /--allow-missing kita,chuo/);
 });

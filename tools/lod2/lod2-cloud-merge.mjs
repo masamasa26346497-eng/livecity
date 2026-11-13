@@ -33,7 +33,7 @@ export function inspectWard(dir, code) {
   if (String(s.wardCode) !== String(code)) return null;
   const n = r.totals && r.totals.buildings;
   if (!(n > 0)) return null;
-  return { buildings: n, vintage: s.vintage ? String(s.vintage) : null };
+  return { buildings: n, vintage: s.vintage && !s.synthesized ? String(s.vintage) : null, vintageSynthesized: !!s.synthesized };
 }
 
 function copyTree(src, dst, symlink) {
