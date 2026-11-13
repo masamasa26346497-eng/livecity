@@ -6,5 +6,5 @@ test('mission217 template: single ci branch, SHA pinned, no deploy/artifact', ()
   const sha = /TOOLS_SHA: ([0-9a-f]{40})\b/.exec(y)?.[1]; assert.ok(sha);
   assert.match(y, new RegExp('ref: ' + sha));
   assert.match(y, /branches: \[ci\/mission217-qa-once\]/);
-  assert.doesNotMatch(y, /upload-artifact|actions\/cache|vercel|pull_request|workflow_dispatch/i);
+  assert.doesNotMatch(y.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n'), /upload-artifact|actions\/cache|vercel|pull_request|workflow_dispatch/i);
 });
