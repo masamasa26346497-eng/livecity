@@ -3723,7 +3723,7 @@
       $('lc-usage').textContent = '建物（LOD2）';
       $('lb-note').textContent = 'LOD2建物です。高さ・用途の属性は未配信のため表示しません（捏造しません）。';
     } else if (attrs) {
-      $('lb-tile').textContent = 't_ + attrs.tx + '_' + attrs.tz;
+      $('lb-tile').textContent = 't_' + attrs.tx + '_' + attrs.tz;
       const a = attrs.data.byId && attrs.data.byId[id];
       if (a) {
         const [h, usage, repX, repZ] = a;
