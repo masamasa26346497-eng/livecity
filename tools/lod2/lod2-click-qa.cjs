@@ -38,7 +38,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const BUNDLE = path.resolve(ROOT, opt('bundle', 'temp/cloud-merged'));
 const out = path.resolve(ROOT, opt('out', 'temp/click-qa'));
 const port = Number(opt('port', 8213)), cport = Number(opt('cdp', 9413));
-const HOST = 'lc-cloud.test';
+const HOST = 'localhost'; // 37G の QA フック(__mission37dQA)は localhost かつ ?qa=1 のときだけ公開される(37G HTML:3331)
 const chromeBin = opt('chrome', ['/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find((p) => fs.existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (...a) => console.error('[click-qa]', ...a);
@@ -58,7 +58,7 @@ async function main() {
   for (const w of opt('lod1', 'sumiyoshi,hirano,ikuno').split(',').filter(Boolean)) { const c = wardCenter(w); if (c) targets.push({ name: w + '-LOD1', expect: 'lod1', at: c }); else targets.push({ name: w + '-LOD1', expect: 'lod1', at: null }); }
   await new Promise((r) => srv.listen(port, '127.0.0.1', r));
   const chrome = spawn(chromeBin, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist',
-    '--host-resolver-rules=MAP ' + HOST + ' 127.0.0.1', '--window-size=1280,800', '--remote-debugging-port=' + cport, '--user-data-dir=' + path.join(out, 'profile'), 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
+    '--window-size=1280,800', '--remote-debugging-port=' + cport, '--user-data-dir=' + path.join(out, 'profile'), 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
   const R = { kind: 'REAL merged tree, real CDP mouse clicks (not fixture)', swiftshader: true, results: [], console: [] };
   try {
     let tg; for (let i = 0; i < 150; i++) { try { tg = await getJson('http://127.0.0.1:' + cport + '/json'); break; } catch (e) { await sleep(200); } }
@@ -71,8 +71,8 @@ async function main() {
     const ev = async (expr) => { const r = await Promise.race([send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }), sleep(90000).then(() => ({ __t: 1 }))]); if (r.__t) throw new Error('応答停止'); return r.result ? r.result.value : r; };
     await send('Runtime.enable'); await send('Page.enable'); await send('Input.setIgnoreInputEvents', { ignore: false });
     await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: 'http://' + HOST + ':' + port + '/' });
-    for (let i = 0; i < 120; i++) { if ((await ev('!!document.getElementById("sel-bldg-mode")')) === true) break; await sleep(500); }
+    await send('Page.navigate', { url: 'http://' + HOST + ':' + port + '/?qa=1&ext45=1&nobuiltin=1&lod2=1&lod2ov=1&lod2auto3d=0&lod2fly=0' });
+    for (let i = 0; i < 120; i++) { if ((await ev('!!document.getElementById("sel-bldg-mode") && !!window.__mission37dQA')) === true) break; await sleep(500); }
     await ev('(()=>{const m=document.getElementById("sel-bldg-mode");m.value="all";m.dispatchEvent(new Event("change"));})()');
     const WARDS = JSON.parse(fs.readFileSync(path.join(BUNDLE, 'ext-3dtiles', 'index.json'), 'utf8')).wards.length;
     for (let i = 0; i < 400; i++) { const n = await ev('(window.__mission37g && window.__mission37g.extraMeta && window.__mission37g.extraMeta.length) || 0').catch(() => 0); if (n >= WARDS) break; await sleep(500); }
@@ -83,25 +83,25 @@ async function main() {
     for (const t of targets) {
       const rec = { name: t.name, expect: t.expect, found: false, clicked: false };
       if (!t.at) { rec.verdict = 'NO-TARGET'; rec.reason = '区の tileset 領域から中心を取れない'; R.results.push(rec); continue; }
-      await ev('window.__mission37g.clearSelection && window.__mission37g.clearSelection()').catch(() => 0);
+      await ev('window.__mission37dQA.clearSelection && window.__mission37dQA.clearSelection()').catch(() => 0);
       await ev('window.__lc152.lookAtFirst(450, -50, [' + t.at[0] + ',' + t.at[1] + '])');
       // タイルが実際に読み込まれて選択されるまで待つ(固定 sleep だけに頼らない。SwiftShader は遅い)
       rec.waitLog = [];
       for (let i = 0; i < 40; i++) {
         await sleep(3000);
-        const st = await ev('JSON.stringify({ready: window.__mission37g.tilesReady && window.__mission37g.tilesReady(), lod2: window.__lc152.stats && window.__lc152.stats(), cam: window.__lc152.camera && window.__lc152.camera()})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
+        const st = await ev('JSON.stringify({ready: window.__mission37dQA.tilesReady && window.__mission37dQA.tilesReady(), lod2: window.__lc152.stats && window.__lc152.stats(), cam: window.__lc152.camera && window.__lc152.camera()})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
         rec.waitLog.push(st); if (rec.waitLog.length > 3) rec.waitLog.shift();
         const lod2sel = st.lod2 && st.lod2.numberOfTrianglesSelected > 0;
         if (st.ready && (t.expect === 'lod1' || lod2sel) && i >= 3) break;
       }
       rec.camera = await ev('JSON.stringify(window.__lc152.camera())').then(JSON.parse).catch(() => null);
-      rec.tilesets = await ev('JSON.stringify({c: window.__mission37g.cameraVsTilesets && window.__mission37g.cameraVsTilesets(), n: window.__mission37g.tilesetCount && window.__mission37g.tilesetCount().n})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
-      const api = await ev('typeof window.__mission37g.drillIds'); rec.drillIdsType = api;
+      rec.tilesets = await ev('JSON.stringify({c: window.__mission37dQA.cameraVsTilesets && window.__mission37dQA.cameraVsTilesets(), n: window.__mission37dQA.tilesetCount && window.__mission37dQA.tilesetCount().n})').then(JSON.parse).catch((e) => ({ err: String(e.message || e) }));
+      const api = await ev('typeof window.__mission37dQA.drillIds'); rec.drillIdsType = api;
       const hits = []; const seen = { points: 0, withAnyId: 0, nonBldg: {}, errors: 0, firstError: null };
-      if (api !== 'function') rec.apiError = 'window.__mission37g.drillIds が関数でない(' + api + ')';
+      if (api !== 'function') rec.apiError = 'window.__mission37dQA.drillIds が関数でない(' + api + ')';
       else for (const [x, y] of gridPoints(1280, 800)) {
         // ページ内で実行し、例外は握り潰さず記録する
-        const r = await ev('(()=>{try{return JSON.stringify({ids: window.__mission37g.drillIds(' + x + ',' + y + ')})}catch(e){return JSON.stringify({err:String(e&&e.message||e)})}})()').then((q) => JSON.parse(q)).catch((e) => ({ err: 'evaluate: ' + String(e && e.message || e) }));
+        const r = await ev('(()=>{try{return JSON.stringify({ids: window.__mission37dQA.drillIds(' + x + ',' + y + ')})}catch(e){return JSON.stringify({err:String(e&&e.message||e)})}})()').then((q) => JSON.parse(q)).catch((e) => ({ err: 'evaluate: ' + String(e && e.message || e) }));
         seen.points++;
         if (r.err) { seen.errors++; seen.firstError = seen.firstError || r.err; continue; }
         const ids = (r.ids || []).filter((v) => typeof v === 'string' && v);
