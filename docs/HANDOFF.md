@@ -27,6 +27,14 @@
 | 公開URLへの配信 | 未配信 | missing | Issue #64 |
 | 以後の更新（run 43425976639 以降） | 未確認 | unknown | 要再確認 |
 
+## 1b. クリックQA失敗の原因調査結果（2026-11-13・実コード確認）
+
+- 原因: QA スクリプトが存在しない `window.__mission37g.drillIds` を呼んでいた。実際の pick フックは `window.__mission37dQA`（`public/mission37g-osaka-24ward-mvp.html` 内。`localhost` かつ `?qa=1` のときだけ公開）。`__mission37g` は stats オブジェクトで `drillIds` を持たない。
+- 修正は**既に別ブランチにある**: `origin/mission152-lod2-parallel` の commit `cbd5353`（Mission 217）が QA を `__mission37dQA` 呼び出しへ修正、回帰テスト `tests/mission217-click-qa-api.test.mjs` あり。SHA固定の push-once QA テンプレートは `cf66614`。状態: implemented_unverified（修正後の実ブラウザ run は未確認）。
+- 本ブランチ（main 由来）は 24区ビューア・QA ツールを含まないため、ここで再実装はしていない（二重修正を避けた）。
+- 次の一手: `mission152-lod2-parallel` のテンプレート（`.github/workflows` 配置はオーナー操作が必要。Claude は workflow ファイルを変更できない）で実マウスクリックQAを走らせ、結果を §7 に追記。
+- Preview: `vercel.json` は `/` → `/mission37g-osaka-24ward-mvp.html`（24区）。ただし Vercel project の存在・認証・24区データ(942MiB)の配信可否・PLATEAU 権利は未確認＝unknown。**開けるURLは現時点でなし（ブロッカー）**。無断公開になる配信は行っていない。
+
 ## 2. 次の一手
 
 1. 実クリックQA失敗の原因修正（`window.__mission37g.drillIds` が定義されない件）。まず実コードで `__mission37g` の定義箇所を grep し、PR#50 系の統合で脱落したかを確認する。
@@ -76,5 +84,7 @@
 最新状態が一意に分かるよう §1/§2 を更新し、**過去の情報は消さず**、§7 に証拠リンク付きで残す。
 
 ## 7. 履歴（新しいものを上に追記・削除しない）
+
+- 2026-11-13 閲覧復旧依頼(Issue #64 コメント): drillIds undefined の原因を特定し、修正が `mission152-lod2-parallel` cbd5353 に既存と確認（§1b）。Actions/Vercel はこの環境から実行・確認不可（unknown）。
 
 - 2026-11-13 Mission 218: 引き継ぎドキュメント一式と検証 `tools/validate/handoff-docs.js` を追加（Issue #64）。上記 §1 の事実は Issue 本文由来で、この checkout では run の結果を再確認していない。
