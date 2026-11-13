@@ -1,0 +1,479 @@
+{
+ "mission": "45Z",
+ "scope": "tracked/public data only; private ward data (e.g. fukushima GLB/OSM layers) not available -> unverified. No data fixes applied.",
+ "summary": {
+  "wards": 24,
+  "verifiedInWard": 6,
+  "issues": [],
+  "unverified": 18,
+  "roadWaterVerified": 1
+ },
+ "wards": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "sourceBuildings": 13199,
+   "sourceTiles": 33,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "sourceBuildings": 11159,
+   "sourceTiles": 25,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "sourceBuildings": 13437,
+   "sourceTiles": 58,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "sourceBuildings": 12098,
+   "sourceTiles": 29,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [
+     "public/mission37h-3dtiles/nishi-sample"
+    ],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "attrs": [
+    {
+     "set": "nishi-sample",
+     "n": 3893,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 0,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    }
+   ],
+   "buildingPlacement": "verified-in-ward",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "sourceBuildings": 15489,
+   "sourceTiles": 34,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "sourceBuildings": 17363,
+   "sourceTiles": 40,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "sourceBuildings": 14244,
+   "sourceTiles": 30,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [
+     "public/mission37h-3dtiles/tennoji-sample"
+    ],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "attrs": [
+    {
+     "set": "tennoji-sample",
+     "n": 6593,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 1,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    }
+   ],
+   "buildingPlacement": "verified-in-ward",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "sourceBuildings": 10133,
+   "sourceTiles": 30,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [
+     "public/mission38e-3dtiles/naniwa-mesh",
+     "public/mission38e-3dtiles/naniwa-mesh2"
+    ],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "attrs": [
+    {
+     "set": "naniwa-mesh",
+     "n": 2466,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 0,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    },
+    {
+     "set": "naniwa-mesh2",
+     "n": 1801,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 2,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    }
+   ],
+   "buildingPlacement": "verified-in-ward",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "sourceBuildings": 23242,
+   "sourceTiles": 47,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "sourceBuildings": 34685,
+   "sourceTiles": 66,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "sourceBuildings": 21976,
+   "sourceTiles": 29,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "sourceBuildings": 46212,
+   "sourceTiles": 50,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "sourceBuildings": 22424,
+   "sourceTiles": 35,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "sourceBuildings": 32447,
+   "sourceTiles": 48,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "sourceBuildings": 26924,
+   "sourceTiles": 38,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "sourceBuildings": 35031,
+   "sourceTiles": 52,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "tracked (52 tiles)",
+    "osmRoadWaterLayers": "tracked (9-tile bundle ~2.1km)"
+   },
+   "buildingPlacement": "verified-in-ward (45M/45T/45Y: GLB == footprint, footprints vs roads)",
+   "roadWaterVsBuilding": "verified (tracked 9-tile bundle; see sumiyoshiVector)"
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "sourceBuildings": 38489,
+   "sourceTiles": 59,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "sourceBuildings": 29204,
+   "sourceTiles": 40,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "sourceBuildings": 34289,
+   "sourceTiles": 62,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "sourceBuildings": 22068,
+   "sourceTiles": 46,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "sourceBuildings": 21608,
+   "sourceTiles": 67,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "sourceBuildings": 44434,
+   "sourceTiles": 83,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "buildingPlacement": "unverified (no tracked building data)",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "sourceBuildings": 15779,
+   "sourceTiles": 44,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [
+     "public/mission37h-3dtiles/kita-sample"
+    ],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "attrs": [
+    {
+     "set": "kita-sample",
+     "n": 2698,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 0,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    }
+   ],
+   "buildingPlacement": "verified-in-ward",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "sourceBuildings": 18279,
+   "sourceTiles": 52,
+   "sources": {
+    "n03Polygon": "tracked",
+    "glbTilesets": [
+     "public/mission37h-3dtiles/chuo-sample"
+    ],
+    "plateauFootprintTiles": "private (not available here)",
+    "osmRoadWaterLayers": "private/none (not available here)"
+   },
+   "attrs": [
+    {
+     "set": "chuo-sample",
+     "n": 5629,
+     "insideOwnPct": 100,
+     "insideOtherWardPct": 0,
+     "outsideAllPct": 0,
+     "otherWards": {},
+     "tileCellMismatch": 0,
+     "tileEdgeStraddle": 0,
+     "heightSentinel": 0,
+     "heightOutOfRange": 0,
+     "z0NonZero": 0,
+     "nonFiniteRep": 0
+    }
+   ],
+   "buildingPlacement": "verified-in-ward",
+   "roadWaterVsBuilding": "unverified (vector layers/footprints are private)"
+  }
+ ],
+ "sumiyoshiVector": {
+  "roadVertexPctByWard": {
+   "sumiyoshi": 90.47,
+   "suminoe": 7.71,
+   "abeno": 1.82
+  },
+  "roadVertices": 4995,
+  "taggedFeatures": {
+   "bridge": 8,
+   "tunnel": 2,
+   "underground": 4,
+   "negLayer": 4
+  },
+  "footprints": 18130,
+  "allRoads": {
+   "samples": 29118,
+   "inside": 75,
+   "fraction": 0.0025757263548320626
+  },
+  "surfaceRoadsOnly": {
+   "samples": 29052,
+   "inside": 37,
+   "fraction": 0.0012735784111248796
+  }
+ }
+}

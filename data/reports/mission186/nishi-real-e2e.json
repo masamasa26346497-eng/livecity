@@ -1,0 +1,147 @@
+{
+ "mission": 186,
+ "data": "REAL PLATEAU 2025 CityGML LOD1 (nishi 27106) via mission79-run; swiftshader headless Chrome; not user PC",
+ "build": {
+  "buildings": 12603,
+  "raw": {
+   "buildings": 12603,
+   "sourceBuildings": 12603,
+   "skipped": 0,
+   "fallbacks": 0,
+   "glbBytes": 17665940,
+   "uniqueCanonicalIds": 12603
+  }
+ },
+ "auto3d": {
+  "query": "?nobuiltin=1&ext45=1&lod2=1&lod2ov=1&lod2auto3d=1",
+  "firstMountAtSec": 48.7,
+  "http": {
+   "ok": 14,
+   "bad": [],
+   "glb": 4
+  },
+  "allMode": {
+   "on": true,
+   "mounted": {
+    "27106": "coarse"
+   },
+   "ticks": 17,
+   "mountsTotal": 1,
+   "dropsTotal": 0,
+   "buildings": 12603,
+   "lastPlan": {
+    "27106": "coarse"
+   },
+   "lastError": null,
+   "culledTotal": 0
+  },
+  "tilesets": [
+   {
+    "ward": "lod2/unknown",
+    "show": true,
+    "ready": true,
+    "contentReady": 0,
+    "selected": 0,
+    "triangles": 0,
+    "clipping": false
+   },
+   {
+    "ward": "nishi",
+    "show": true,
+    "ready": true,
+    "contentReady": 4,
+    "selected": 4,
+    "triangles": 126030,
+    "clipping": false
+   }
+  ],
+  "browser": {
+   "mounted": 1,
+   "loads": 4,
+   "visible": 132,
+   "failed": 0,
+   "lastError": null
+  },
+  "served": {
+   "tileset": [
+    1,
+    0
+   ],
+   "glb": [
+    4,
+    0
+   ],
+   "meta": [
+    2,
+    0
+   ],
+   "layers": [
+    0,
+    0
+   ],
+   "sidecar": [
+    0,
+    0
+   ],
+   "other": [
+    0,
+    0
+   ]
+  }
+ },
+ "closeUp": {
+  "http": {
+   "ok": 72,
+   "bad": []
+  },
+  "extraMeta": [
+   {
+    "id": "ext-nishi",
+    "wardCode": "27106",
+    "buildings": 12603
+   }
+  ],
+  "ward": {
+   "center": [
+    135.4799,
+    34.6799
+   ],
+   "mounted": true,
+   "lastError": null,
+   "tilesets": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 6,
+     "selected": 6,
+     "triangles": 14840,
+     "clipping": false
+    },
+    {
+     "ward": "nishi",
+     "show": true,
+     "ready": true,
+     "contentReady": 17,
+     "selected": 7,
+     "triangles": 128188,
+     "clipping": false
+    }
+   ],
+   "wardTilesets": [
+    {
+     "ward": "nishi",
+     "show": true,
+     "ready": true,
+     "contentReady": 17,
+     "selected": 7,
+     "triangles": 128188,
+     "clipping": false
+    }
+   ],
+   "pixelDiff": 528658,
+   "drawn": true
+  },
+  "pass": true
+ }
+}

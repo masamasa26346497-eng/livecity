@@ -1,0 +1,11 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "/mission37g-osaka-24ward-mvp.html", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/(mission37h-3dtiles|mission38e-3dtiles|mission37b-3dtiles|mission37c-layers|mission37d-data|mission37g-data)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=86400" }]
+    }
+  ]
+}

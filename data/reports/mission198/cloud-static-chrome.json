@@ -1,0 +1,120 @@
+{
+ "mission": "198-cloud-static-verify",
+ "kind": "REAL PLATEAU 2025 static bundle (not fixture)",
+ "host": "lc-cloud.test",
+ "swiftshader": true,
+ "search": "?ext45=1&nobuiltin=1&lod2=1&lod2ov=1&lod2auto3d=0&lod2fly=0",
+ "lod2State": {
+  "status": "ready",
+  "error": null,
+  "clipMode": "off",
+  "lod2Buildings": 6574
+ },
+ "extraMeta": [
+  {
+   "id": "ext-kita",
+   "wardCode": "27127",
+   "buildings": 18130
+  },
+  {
+   "id": "ext-chuo",
+   "wardCode": "27128",
+   "buildings": 13891
+  }
+ ],
+ "camera": {
+  "lon": 135.4959,
+  "lat": 34.702314834318976,
+  "h": 363.5533905935933,
+  "pitchDeg": -45
+ },
+ "tilesBoth": [
+  {
+   "ward": "lod2/unknown",
+   "show": true,
+   "ready": true,
+   "contentReady": 11,
+   "selected": 11,
+   "triangles": 40149,
+   "clipping": false
+  },
+  {
+   "ward": "kita",
+   "show": true,
+   "ready": true,
+   "contentReady": 22,
+   "selected": 7,
+   "triangles": 41031,
+   "clipping": false
+  },
+  {
+   "ward": "chuo",
+   "show": true,
+   "ready": true,
+   "contentReady": 7,
+   "selected": 0,
+   "triangles": 0,
+   "clipping": false
+  }
+ ],
+ "pixelDiff": {
+  "bothVsLod1Only": 349435
+ },
+ "lod2Tile": {
+  "tileVisible": 492,
+  "tileLoad": 11,
+  "tileFailed": 0
+ },
+ "httpOk": 73,
+ "httpBadExpectedExcludedData": [
+  "/favicon.ico",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/manifest.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/roads.json",
+  "/mission40j-3dtiles/published.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/parks.json",
+  "/mission145-data/stations-24.json",
+  "/mission145-data/towns-24.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/railways.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/waterways.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/labels.json",
+  "/mission50-data/gsi-okawa-nakanoshima.json",
+  "/mission37d-data/sumiyoshi-facilities.json",
+  "/mission37d-data/sumiyoshi-towns.json",
+  "/mission49-data/gsi-roadedge-sumiyoshi-9tile.json",
+  "/mission37b-3dtiles/osaka-sumiyoshi-9tile/build-report.json",
+  "/mission37c-layers/osaka-sumiyoshi-9tile/manifest.json",
+  "/__lod2/diag.json",
+  "/__lod2/diag.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json",
+  "/__lod2/diag.json",
+  "/map-data/osaka-city/facilities/ward-manifest.json"
+ ],
+ "consoleErrorCount": 32,
+ "pass": true
+}

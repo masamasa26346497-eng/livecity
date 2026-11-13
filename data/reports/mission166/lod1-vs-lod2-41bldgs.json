@@ -1,0 +1,147 @@
+{
+ "mission": 166,
+ "meshes": [
+  "51357371",
+  "51357381",
+  "51357382"
+ ],
+ "overall": {
+  "n": 41,
+  "baseDiffM": {
+   "p50": 0.017,
+   "p95": 0.228,
+   "max": 0.372
+  },
+  "heightDiffM": {
+   "p50": 0.374,
+   "p95": 2.98,
+   "max": 9.993
+  },
+  "horizDiffM": {
+   "p50": 0,
+   "p95": 0.001,
+   "max": 0.001
+  },
+  "baseWithin0_5m": 41,
+  "perBuildingGroundToZeroConsistent": true
+ },
+ "perMesh": {
+  "51357371": {
+   "n": 9,
+   "baseDiffM": {
+    "p50": 0.019,
+    "p95": 0.228,
+    "max": 0.228
+   },
+   "heightDiffM": {
+    "p50": 0.423,
+    "p95": 9.993,
+    "max": 9.993
+   },
+   "horizDiffM": {
+    "p50": 0.001,
+    "p95": 0.001,
+    "max": 0.001
+   },
+   "baseWithin0_5m": 9,
+   "perBuildingGroundToZeroConsistent": true
+  },
+  "51357381": {
+   "n": 28,
+   "baseDiffM": {
+    "p50": 0.013,
+    "p95": 0.043,
+    "max": 0.372
+   },
+   "heightDiffM": {
+    "p50": 0.374,
+    "p95": 2.98,
+    "max": 3.59
+   },
+   "horizDiffM": {
+    "p50": 0,
+    "p95": 0.001,
+    "max": 0.001
+   },
+   "baseWithin0_5m": 28,
+   "perBuildingGroundToZeroConsistent": true
+  },
+  "51357382": {
+   "n": 4,
+   "baseDiffM": {
+    "p50": 0.187,
+    "p95": 0.297,
+    "max": 0.297
+   },
+   "heightDiffM": {
+    "p50": 0.457,
+    "p95": 1.06,
+    "max": 1.06
+   },
+   "horizDiffM": {
+    "p50": 0,
+    "p95": 0,
+    "max": 0
+   },
+   "baseWithin0_5m": 4,
+   "perBuildingGroundToZeroConsistent": true
+  }
+ },
+ "worst": [
+  {
+   "id": "bldg_c375374e-437a-4ee6-a7e6-15c2e09b2397",
+   "l1Base": 2.97,
+   "l2Base": 2.59804365,
+   "baseDiffM": -0.372,
+   "l1Height": 3.553,
+   "l2Height": 3.724,
+   "heightDiffM": 0.171,
+   "measuredHeight": 3.7,
+   "horizDiffM": 0
+  },
+  {
+   "id": "bldg_cd72abd3-98c5-4b31-aab4-8c1be15c3632",
+   "l1Base": 6.015,
+   "l2Base": 5.71793109,
+   "baseDiffM": -0.297,
+   "l1Height": 5.151,
+   "l2Height": 4.091,
+   "heightDiffM": -1.06,
+   "measuredHeight": 4.1,
+   "horizDiffM": 0
+  },
+  {
+   "id": "bldg_c9e4db8f-684a-430b-b9dd-58400e0d84ec",
+   "l1Base": 6.344,
+   "l2Base": 6.57243861,
+   "baseDiffM": 0.228,
+   "l1Height": 3.862,
+   "l2Height": 3.634,
+   "heightDiffM": -0.228,
+   "measuredHeight": 3.6,
+   "horizDiffM": 0.001
+  },
+  {
+   "id": "bldg_f31ab43d-7882-4ae4-a314-1a40037d297a",
+   "l1Base": 2.872,
+   "l2Base": 3.059306,
+   "baseDiffM": 0.187,
+   "l1Height": 2.955,
+   "l2Height": 2.498,
+   "heightDiffM": -0.457,
+   "measuredHeight": 2.5,
+   "horizDiffM": 0
+  },
+  {
+   "id": "bldg_b50617fa-2a9b-4fae-a89d-b827473f37ae",
+   "l1Base": 6.038,
+   "l2Base": 5.94907935,
+   "baseDiffM": -0.089,
+   "l1Height": 3.015,
+   "l2Height": 3.175,
+   "heightDiffM": 0.16,
+   "measuredHeight": 3.2,
+   "horizDiffM": 0
+  }
+ ]
+}

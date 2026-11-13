@@ -1,0 +1,152 @@
+{
+ "source": "PLATEAU Osaka 2025 CityGML v5 (EPSG:6697 lat,lon,h), bldg+tran same mesh set, projection = osaka-city.json local-equirectangular",
+ "A_pipelineFidelity_m": {
+  "matched": 58022,
+  "unmatched": 574,
+  "n": 58022,
+  "p50": 0.001,
+  "p95": 0.003,
+  "max": 0.006
+ },
+ "A_controlPoints": [
+  {
+   "name": "Osaka Station",
+   "lon": 135.4959,
+   "lat": 34.7055,
+   "x": -2668.2,
+   "z": -11275.8,
+   "nearbyBuildings": 339,
+   "centroidDiff_m": {
+    "n": 339,
+    "p50": 0.002,
+    "p95": 0.003,
+    "max": 0.005
+   }
+  },
+  {
+   "name": "Umeda Sky Bldg",
+   "lon": 135.4905,
+   "lat": 34.7053,
+   "x": -3163,
+   "z": -11253.6,
+   "nearbyBuildings": 606,
+   "centroidDiff_m": {
+    "n": 606,
+    "p50": 0.002,
+    "p95": 0.003,
+    "max": 0.005
+   }
+  },
+  {
+   "name": "Chayamachi",
+   "lon": 135.5002,
+   "lat": 34.7096,
+   "x": -2274.2,
+   "z": -11732.2,
+   "nearbyBuildings": 1285,
+   "centroidDiff_m": {
+    "n": 1285,
+    "p50": 0.001,
+    "p95": 0.003,
+    "max": 0.005
+   }
+  },
+  {
+   "name": "Yodobashi Umeda",
+   "lon": 135.4975,
+   "lat": 34.709,
+   "x": -2521.6,
+   "z": -11665.4,
+   "nearbyBuildings": 791,
+   "centroidDiff_m": {
+    "n": 791,
+    "p50": 0.001,
+    "p95": 0.003,
+    "max": 0.005
+   }
+  }
+ ],
+ "roadPolygons": 25652,
+ "B_ward": {
+  "n": 58596,
+  "hitRateAtZeroPct": 0.47,
+  "minHitRateShift": {
+   "dx": 0,
+   "dz": 0,
+   "rate": 0.47
+  },
+  "maxHitRateShift": {
+   "dx": 20,
+   "dz": 20,
+   "rate": 27.75
+  }
+ },
+ "B_controlPoints": [
+  {
+   "name": "Osaka Station",
+   "n": 348,
+   "hitRateAtZeroPct": 2.3,
+   "minHitRateShift": {
+    "dx": 0,
+    "dz": 0,
+    "rate": 2.3
+   },
+   "maxHitRateShift": {
+    "dx": -20,
+    "dz": 16,
+    "rate": 37.07
+   }
+  },
+  {
+   "name": "Umeda Sky Bldg",
+   "n": 626,
+   "hitRateAtZeroPct": 0.64,
+   "minHitRateShift": {
+    "dx": 2,
+    "dz": 0,
+    "rate": 0.48
+   },
+   "maxHitRateShift": {
+    "dx": -18,
+    "dz": -12,
+    "rate": 41.37
+   }
+  },
+  {
+   "name": "Chayamachi",
+   "n": 1285,
+   "hitRateAtZeroPct": 0.39,
+   "minHitRateShift": {
+    "dx": 0,
+    "dz": 0,
+    "rate": 0.39
+   },
+   "maxHitRateShift": {
+    "dx": -16,
+    "dz": 18,
+    "rate": 31.67
+   }
+  },
+  {
+   "name": "Yodobashi Umeda",
+   "n": 791,
+   "hitRateAtZeroPct": 0.63,
+   "minHitRateShift": {
+    "dx": 0,
+    "dz": 0,
+    "rate": 0.63
+   },
+   "maxHitRateShift": {
+    "dx": -18,
+    "dz": 14,
+    "rate": 36.03
+   }
+  }
+ ],
+ "verticalFootprintZ_m": {
+  "n": 58024,
+  "p50": 0,
+  "p95": 0,
+  "max": 0
+ }
+}
