@@ -20,6 +20,7 @@ import { selectMeshes } from '../mission79-run.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
 import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
 import { buildRoadLayer } from './tran-to-layers.mjs';
+import { buildCityLod0 } from './city-lod0.mjs';
 import { buildWaterLayer, makeTileSource, mergeWaterReport } from './gsi-water-layers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -259,6 +260,12 @@ fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   lod0Wards: [], layersWards: SINGLE ? layersWards : [],
   layersReport: { roads: { source: 'PLATEAU 2025 tran:Road lod1 (道路区域ポリゴン)', delivered: layersWards.length, failed: roadFailures }, waterways: { source: '国土地理院 optimal_bvmap-v1 WA(水域面)。公式 PLATEAU 2025 大阪市に wtr は無い', delivered: waterReports.filter((x) => x.status === 'ok').length, none: waterReports.filter((x) => x.status === 'none').map((x) => x.ward), failed: waterFailures, tiles: waterSource.stats } },
 }));
+// Mission 213 Phase 1: 24区一体の都市全体 LOD0(概略ブロック)。feature flag(--city-lod0)・既定OFF=既存 Preview は不変。
+//   元LOD1 = 補完LOD1(attrs) + LOD2化した棟(footprints)から生成。区データ欠落は fail closed で例外。
+if (a.includes('--city-lod0')) {
+  const l0 = buildCityLod0({ extRoot, lod2Footprints: path.join(LOD2_DIR, 'footprints.json'), wards: reg.filter((w) => wardInfo.some((x) => x.id === w.id)), cell: Number(opt('lod0-cell', '200')) });
+  log('都市全体 LOD0:', JSON.stringify(l0.totals));
+}
 // 3c. LOD2 + オーバーレイ(ローカル serve と同じ URL 構成)
 const l2 = path.join(OUT, 'lod2-preview');
 fs.mkdirSync(l2, { recursive: true });
