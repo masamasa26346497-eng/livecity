@@ -1766,6 +1766,25 @@
   let lod0Wards = [];
   fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
   viewer.camera.moveEnd.addEventListener(() => { lod0Sync(); });
+  // Mission 213 Phase1(feature flag ?citylod0=1・既定OFF): 24区一体の都市全体 LOD0(概略ブロック)。実棟ではなくクリック不可(allowPicking:false)。
+  //   index.json の cityLod0 が無ければ何もしない。カメラ高度が ?citylod0min(既定2500m)以上のときだけ表示し、近づくと実LOD1/LOD2に任せる(タイル単位の置換は Phase2)。
+  let cityLod0 = null, cityLod0Pending = false, cityLod0Uri = null;
+  if (q.get('citylod0') === '1') fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.cityLod0 && typeof j.cityLod0.uri === 'string' && /^[A-Za-z0-9_\-\/.]+$/.test(j.cityLod0.uri)) { cityLod0Uri = j.cityLod0.uri; cityLod0Sync(); } }).catch(() => {});
+  async function cityLod0Sync() {
+    if (!cityLod0Uri) return;
+    const minH = Number(q.get('citylod0min')) || 2500;
+    const camH = viewer.camera.positionCartographic ? viewer.camera.positionCartographic.height : 0;
+    if (!cityLod0 && !cityLod0Pending && camH >= minH) {
+      cityLod0Pending = true;
+      try {
+        const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/' + cityLod0Uri, { maximumScreenSpaceError: 16, allowPicking: false });
+        t._lcCityLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
+        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH };
+      } catch (e) { perf.cityLod0 = { loaded: false, error: String(e && e.message || e) }; } finally { cityLod0Pending = false; }
+    }
+    if (cityLod0 && !cityLod0.isDestroyed()) { cityLod0.show = camH >= minH; scene.requestRender(); }
+  }
+  viewer.camera.moveEnd.addEventListener(() => { cityLod0Sync(); });
   viewer.camera.moveEnd.addEventListener(roadScaleSync);   // 46C
   setTimeout(roadScaleSync, 0);
   // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
