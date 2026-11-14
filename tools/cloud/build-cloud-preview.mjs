@@ -20,6 +20,7 @@ import { selectMeshes } from '../mission79-run.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
 import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
 import { buildRoadLayer } from './tran-to-layers.mjs';
+import { buildWaterLayer, makeTileSource, mergeWaterReport } from './gsi-water-layers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const a = process.argv.slice(2);
@@ -63,7 +64,9 @@ const freeGB = () => { const f = fs.statfsSync(ROOT); return (f.bavail * f.bsize
 const extRoot = path.join(OUT, 'ext-3dtiles');
 const wardInfo = [];
 let lod2Meshes, lod2Rep, lod2Ids, lod2Manifest;
-const layersWards = [], roadFailures = [];
+const layersWards = [], roadFailures = [], waterFailures = [], waterReports = [];
+const WATER = !process.argv.includes('--no-water');   // Mission 211: GSI WA 水域面(公式 PLATEAU 2025 に wtr は無い)。既定 ON
+const waterSource = makeTileSource();
 const ROADS = !process.argv.includes('--no-roads');   // Mission 210: 既定 ON(single-pass のみ)
 
 if (SINGLE) {
@@ -131,13 +134,26 @@ if (SINGLE) {
       fs.mkdirSync(d, { recursive: true });
       for (const n of ['tileset.json', 'source.json', 'build-report.json', 'tiles', 'lod', 'ids', 'attrs']) if (fs.existsSync(path.join(sdir, n))) cp(path.join(sdir, n), path.join(d, n));
       // Mission 210: 取得済み tran GML(work/tran)から道路区域レイヤーを生成(cleanup 前)。失敗時は建物表示を壊さないよう道路だけ省略し、理由を記録。
+      const lw = { ward: id, layers: [] };
+      const layersDir = path.join(d, 'layers');
       if (ROADS) {
         try {
-          const lr = buildRoadLayer({ tranDir: path.join(workDir, 'tran'), projection: area.projection, ward: id, wardCode: w.code, wardPolygons: polys.wards.find((x) => x.wardId === id).polygons, outDir: path.join(d, 'layers') });
-          layersWards.push({ ward: id, layers: ['roads'], features: lr.layers.roads.features });
+          const lr = buildRoadLayer({ tranDir: path.join(workDir, 'tran'), projection: area.projection, ward: id, wardCode: w.code, wardPolygons: polys.wards.find((x) => x.wardId === id).polygons, outDir: layersDir });
+          lw.layers.push('roads'); lw.features = lr.layers.roads.features;
           log('道路レイヤー OK:', id, JSON.stringify({ features: lr.layers.roads.features, sizeMB: lr.layers.roads.sizeMB, truncated: lr.layers.roads.truncated }));
         } catch (e) { roadFailures.push({ ward: id, error: String(e.message).slice(0, 300) }); log('道路レイヤー省略(建物は影響なし):', id, e.message); }
       }
+      // Mission 211: 水域面(国土地理院 WA)。tran/建物とは独立で、失敗しても建物・道路は壊さない。タイル取得失敗は欠けた水面を成功扱いにせず省略+記録。
+      if (WATER) {
+        try {
+          const wr = await buildWaterLayer({ source: waterSource, ward: id, wardCode: w.code, wardPolygons: polys.wards.find((x) => x.wardId === id).polygons, outDir: layersDir });
+          waterReports.push({ ward: id, ...wr });
+          if (wr.status === 'ok') { lw.layers.push('waterways'); lw.waterFeatures = wr.features; }
+          mergeWaterReport(layersDir, wr);
+          log('水域レイヤー:', id, JSON.stringify(wr));
+        } catch (e) { waterFailures.push({ ward: id, error: String(e.message).slice(0, 300) }); log('水域レイヤー省略(建物・道路は影響なし):', id, e.message); }
+      }
+      if (lw.layers.length) layersWards.push(lw);
       wardInfo.push({ id, name: w.name, code: w.code, dir: d, fullBuildings: audit.origIds, buildings: v.buildings, contentTiles: v.contentTiles, glbBytes: v.glbBytes, source: src, excludedForLod2: excluded, idAudit: audit, idAuditedIds: audit.suppIds, doubleDrawn: audit.doubleDrawn });
     } finally {
       fs.rmSync(sdir, { recursive: true, force: true }); fs.rmSync(workDir, { recursive: true, force: true });   // 直ちに cleanup
@@ -240,7 +256,7 @@ cp(path.join(ROOT, 'tools/cloud/ward-picker.js'), path.join(OUT, 'cloud-ward-pic
 fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   ...buildIndex(reg, wardInfo.map((w) => ({ id: w.id, buildings: w.buildings }))),
   lod0Wards: [], layersWards: SINGLE ? layersWards : [],
-  layersReport: { roads: { source: 'PLATEAU 2025 tran:Road lod1 (道路区域ポリゴン)', delivered: layersWards.length, failed: roadFailures }, waterways: 'not-delivered' },
+  layersReport: { roads: { source: 'PLATEAU 2025 tran:Road lod1 (道路区域ポリゴン)', delivered: layersWards.length, failed: roadFailures }, waterways: { source: '国土地理院 optimal_bvmap-v1 WA(水域面)。公式 PLATEAU 2025 大阪市に wtr は無い', delivered: waterReports.filter((x) => x.status === 'ok').length, none: waterReports.filter((x) => x.status === 'none').map((x) => x.ward), failed: waterFailures, tiles: waterSource.stats } },
 }));
 // 3c. LOD2 + オーバーレイ(ローカル serve と同じ URL 構成)
 const l2 = path.join(OUT, 'lod2-preview');

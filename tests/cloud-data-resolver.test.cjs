@@ -116,7 +116,7 @@ test('build は区選択UI/解決レイヤーを配備し、vercel.json の3区�
   assert.ok(b.includes('cloud-data-resolver.js') && b.includes('cloud-ward-picker.js') && b.includes('writeWardManifest') && b.includes('verifyWardDir'));
   assert.ok(b.includes("'tools/lod2/lod2-clip-near.cjs'") && b.includes('lc196-umeda')); // LOD2 近景ボタンは維持
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-  assert.strictEqual(v.buildCommand, 'node tools/cloud/build-cloud-preview.mjs --all-wards');
+  assert.strictEqual(v.buildCommand, 'node --test tests/mission209-37g-html-syntax.test.js && node tools/cloud/build-cloud-preview.mjs --all-wards');   // M211: 構文チェック必須ゲート
   const pk = fs.readFileSync(path.join(ROOT, 'tools/cloud/ward-picker.js'), 'utf8');
   assert.ok(!/osaka_3d_buildings|map-data\//.test(pk)); // 旧データへ fallback しない
   assert.ok(pk.includes('旧データへは切り替えません'));

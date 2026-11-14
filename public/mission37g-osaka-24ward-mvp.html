@@ -901,7 +901,8 @@
     let prim = null, cullRec = null, visible = true;
     const instOf = (f) => new Cesium.GeometryInstance({
       geometry: new Cesium.PolygonGeometry({
-        polygonHierarchy: new Cesium.PolygonHierarchy(f.p.map((pt) => toCart(pt[0], pt[1], 0))),
+        polygonHierarchy: new Cesium.PolygonHierarchy(f.p.map((pt) => toCart(pt[0], pt[1], 0)),
+          Array.isArray(f.h) ? f.h.filter((h) => Array.isArray(h) && h.length >= 3).map((h) => new Cesium.PolygonHierarchy(h.map((pt) => toCart(pt[0], pt[1], 0)))) : []),   // M211: 穴(中州・島)を塗らない
         height: opts.height, perPositionHeight: false,
         vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
       }),
