@@ -1781,7 +1781,8 @@
         // Phase2(試験): タイル単位の置換。カメラから ?citylod0near(既定1500m)以内の LOD0 タイルだけ非表示にし、実LOD1/2へ任せる。
         //   実タイルが未ロード(allTilesetsNow に tilesLoaded=false)の間は隠さない=穴を作らない側へ倒す。LOD0 は遠方タイルのみ残る。
         const nearM = Number(q.get('citylod0near')) || 1500;
-        t.tileVisible.addEventListener((tile) => {
+        // 安全側(既定): 距離判定は無効。穴を作る恐れがあり実描画で未検証のため ?citylod0swap=1 の明示時だけ有効。既定は高度しきい値のみ。
+        if (q.get('citylod0swap') === '1') t.tileVisible.addEventListener((tile) => {
           try {
             const bs = tile.boundingSphere; if (!bs) return;
             const d = Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius;
@@ -1790,10 +1791,11 @@
           } catch (e) { tile.show = true; }
         });
         t._lcCityLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
-        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH };
+        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH, swap: q.get('citylod0swap') === '1' };
+        { const n = document.createElement('div'); n.id = 'lc-lod0-note'; n.style.cssText = 'position:fixed;right:8px;bottom:28px;z-index:50;background:rgba(20,30,45,.8);color:#dfe8f3;font:11px/1.4 sans-serif;padding:3px 8px;border-radius:4px;pointer-events:none'; n.textContent = '遠景: 模式LOD0(建物密度ブロック・実棟ではありません/クリック不可)'; document.body.appendChild(n); t._lcNote = n; }
       } catch (e) { perf.cityLod0 = { loaded: false, error: String(e && e.message || e) }; } finally { cityLod0Pending = false; }
     }
-    if (cityLod0 && !cityLod0.isDestroyed()) { cityLod0.show = camH >= minH; scene.requestRender(); }
+    if (cityLod0 && !cityLod0.isDestroyed()) { cityLod0.show = camH >= minH; if (cityLod0._lcNote) cityLod0._lcNote.style.display = cityLod0.show ? '' : 'none'; scene.requestRender(); }
   }
   viewer.camera.moveEnd.addEventListener(() => { cityLod0Sync(); });
   viewer.camera.moveEnd.addEventListener(roadScaleSync);   // 46C
@@ -3712,7 +3714,10 @@
 
   const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction(async (click) => {
-    const picked = scene.pick(click.position);
+    let picked = scene.pick(click.position);
+    // Mission 213: 模式LOD0(_lcCityLod0)は allowPicking:false でも Cesium 1.121.1 では pick に出る(実ブラウザE2Eで確認)。
+    //   LOD0 が手前に出ても実LOD1/2 を従来どおり選べるよう、LOD0 以外を drillPick で拾い直す。LOD0 自体は選択対象にしない。
+    if (picked && picked.tileset && picked.tileset._lcCityLod0) { try { picked = scene.drillPick(click.position, 8).find((f) => !(f && f.tileset && f.tileset._lcCityLod0)); } catch (e) { picked = undefined; } }
     if (picked && picked.id && picked.id.poi) { selectPoi(picked.id.poi); return; }
     const fpId = fpCur ? fpCur.layer.idOfPick(picked) : null;   // 138: 実フットプリント押出し建物（GeometryInstance.id = canonicalId）
     if (fpId) { selectFootprintBuilding(fpId); return; }

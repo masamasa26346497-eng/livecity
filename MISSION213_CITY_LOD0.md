@@ -26,3 +26,11 @@ cold/warm × PC/低速4G で: (A)UI ready (B)最初の建物 (C)24/24区可視 (
 
 ## 検証
 `node --test tests/mission213-city-lod0.test.cjs`(合成fixture)・`tests/mission209-37g-html-syntax.test.js` ほか既存cloudテスト 14件 pass。実データ生成と画面確認は未実施。
+
+## 実ブラウザE2E(合成fixture・実PLATEAUではない)
+`node tools/cloud/e2e-city-lod0.mjs [--chrome /usr/bin/chromium] [--out report.json]`
+headless Chromium(SwiftShader WebGL)+ localhost で 2区×450セルの合成LOD0を Cesium 1.121.1(jsDelivr)で描画。同一カメラで LOD0 表示/非表示のフレームを比較し「LOD0が寄与した画素率」を計測する。
+確認できたこと(合成のみ): tileset/GLB 7件 HTTP200、区境(x=3000)を挟む5地点で LOD0 寄与率 0.67〜0.72 の連続(穴なし)、`?citylod0` 無しでは LOD0 を一切取得しない、近接(800m)で LOD0 非表示、注意書き表示。
+**実測で判明**: Cesium 1.121.1 では `allowPicking:false` でも LOD0 が `scene.pick` に出る。click ハンドラで LOD0 を除外し drillPick で実LOD1/2を拾い直す修正を入れた(LOD0 は `canonicalId` を持たず `bldg_` ではないので建物選択にはならない)。
+**距離ベース tile.show 置換は既定無効に変更**(`?citylod0swap=1` で明示有効)。穴の恐れが未検証のため。
+未実施: 実PLATEAU24区、速度/FPS/転送量計測、LOD1/2 との重なり実描画比較。
