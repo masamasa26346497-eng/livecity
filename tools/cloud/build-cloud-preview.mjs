@@ -252,6 +252,7 @@ if (!distinct.ok) throw new Error('区データの混在疑い: ' + distinct.pro
 // 区選択パネル + URL 解決レイヤー(既定は同一origin)
 cp(path.join(ROOT, 'tools/cloud/data-resolver.cjs'), path.join(OUT, 'cloud-data-resolver.js'));
 cp(path.join(ROOT, 'tools/cloud/ward-picker.js'), path.join(OUT, 'cloud-ward-picker.js'));
+cp(path.join(ROOT, 'tools/cloud/perf-probe.js'), path.join(OUT, 'cloud-perf-probe.js'));   // M212: 開発診断(外部送信なし)
 // Mission 201: 24区全てを列挙し、配信済(served)/未配信(not-served)を明記。未配信区を配信済と見せない。
 fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   ...buildIndex(reg, wardInfo.map((w) => ({ id: w.id, buildings: w.buildings }))),
@@ -321,7 +322,9 @@ const banner = `<div id="lc196-banner" style="position:fixed;left:8px;bottom:8px
   `<script>(function(){function go(r){var f=window.__lc152&&window.__lc152.lookAtFirst;if(f)f(r,-40,[${UMEDA[0]},${UMEDA[1]}]);else alert('LOD2 の読み込み中です。数秒後にもう一度押してください')}` +
   `document.getElementById('lc196-umeda').onclick=function(){go(450)};document.getElementById('lc196-umeda-near').onclick=function(){go(160)}})()</script>`;
 const defaults = `<script>(function(){var q=new URLSearchParams(location.search);if(!q.has('nobuiltin')){q.set('nobuiltin','1');q.set('ext45','1');q.set('lod2','1');if(!q.has('lod2fly')&&!q.has('lod2ov'))q.set('lod2ov','1');history.replaceState(null,'','?'+q.toString())}})()</script>`;
-html = html.replace('<head>', () => '<head>\n' + defaults);
+// M212: 初回表示の経路短縮(機能は削らない)。Cesium CDN への事前接続と Cesium.js の先読み、必ず読む ext-3dtiles/index.json の先読み、読み込み失敗の可視化プローブ。
+const hints = '<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"><link rel="preload" as="fetch" href="/ext-3dtiles/index.json" crossorigin="anonymous"><script src="/cloud-perf-probe.js"></script>';
+html = html.replace('<head>', () => '<head>\n' + hints + '\n' + defaults);
 html = html.replace('</body>', () => banner + '\n<script src="/cloud-data-resolver.js"></script><script src="/cloud-ward-picker.js"></script>\n</body>');
 fs.writeFileSync(path.join(OUT, HTML), html);
 fs.writeFileSync(path.join(OUT, 'cloud-preview.json'), JSON.stringify(prov, null, 1));
