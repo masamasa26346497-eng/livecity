@@ -1778,6 +1778,17 @@
       cityLod0Pending = true;
       try {
         const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/' + cityLod0Uri, { maximumScreenSpaceError: 16, allowPicking: false });
+        // Phase2(試験): タイル単位の置換。カメラから ?citylod0near(既定1500m)以内の LOD0 タイルだけ非表示にし、実LOD1/2へ任せる。
+        //   実タイルが未ロード(allTilesetsNow に tilesLoaded=false)の間は隠さない=穴を作らない側へ倒す。LOD0 は遠方タイルのみ残る。
+        const nearM = Number(q.get('citylod0near')) || 1500;
+        t.tileVisible.addEventListener((tile) => {
+          try {
+            const bs = tile.boundingSphere; if (!bs) return;
+            const d = Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius;
+            let realReady = true; for (const x of allTilesetsNow()) if (!x._lcCityLod0 && !x.tilesLoaded) { realReady = false; break; }
+            tile.show = !(d < nearM && realReady);
+          } catch (e) { tile.show = true; }
+        });
         t._lcCityLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
         scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH };
       } catch (e) { perf.cityLod0 = { loaded: false, error: String(e && e.message || e) }; } finally { cityLod0Pending = false; }
