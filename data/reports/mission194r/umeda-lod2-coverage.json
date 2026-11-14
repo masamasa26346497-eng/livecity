@@ -1,0 +1,27 @@
+{
+ "mission": "194R",
+ "note": "公式PLATEAU大阪2025のLOD2(33メッシュ10,698棟)のうち、大阪駅(135.4959E,34.7055N)周辺に足跡の重心がある棟数。footprints.json(凸包)由来で実測。LOD2が無い建物はLOD1の箱型のまま。",
+ "center": [
+  135.4959,
+  34.7055
+ ],
+ "lod2WithinRadiusM": {
+  "250": 91,
+  "500": 275,
+  "1000": 900,
+  "2000": 2075,
+  "5000": 10123
+ },
+ "totalLod2": 10698,
+ "nearestLod2M": 8,
+ "chrome": {
+  "at": "135.4960,34.7055",
+  "tileLoad": 9,
+  "tileVisible": 162,
+  "tileFailed": 0,
+  "onOffPixelDiff": 490322,
+  "httpNon200": 0,
+  "extAttachWards": 0,
+  "env": "headless Chrome + SwiftShader, 合成でなく実LOD2。LOD1は未接続(LOD2のみ)"
+ }
+}

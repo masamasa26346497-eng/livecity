@@ -1,0 +1,188 @@
+{
+  "mission": "138",
+  "url": "http://127.0.0.1:36765/mission37g-osaka-24ward-mvp.html?qa=1&fp=1&fac=0&extra=0",
+  "browser": "Chrome/156.0.8078.79",
+  "generatedAt": "2026-11-08T01:42:18.535Z",
+  "googleRequests": [],
+  "failedRequests": [],
+  "jsErrors": [],
+  "steps": [
+    {
+      "label": "住吉区 footprints",
+      "pass": true,
+      "fp": {
+        "enabled": true,
+        "state": "ready",
+        "ward": "sumiyoshi",
+        "wardCode": "27120",
+        "declared": 35031,
+        "tiles": 52,
+        "loadedTiles": 52,
+        "failedTiles": 0,
+        "buildings": 35031,
+        "skipped": 0,
+        "byWard": {},
+        "loadMs": 29768,
+        "mountsTotal": 1,
+        "dropsTotal": 0,
+        "sentinelHeights": 0
+      },
+      "info": {
+        "prims": 52,
+        "shown": 52,
+        "scenePrims": 70,
+        "ward": "sumiyoshi"
+      },
+      "mountMs": 35264,
+      "buildingState": "ready",
+      "hsBldg": "35,031",
+      "note": "実フットプリント押出し 35,031棟を表示中（3D Tiles ではありません・この区のみ）"
+    },
+    {
+      "label": "実クリック",
+      "pass": true,
+      "candidates": 5,
+      "clicks": [
+        {
+          "id": "bldg_cd9aba76-1324-450f-8494-b74a499625c5",
+          "h": 18.1,
+          "selected": true,
+          "panelId": "bldg_cd9aba76-1324-450f-8494-b74a499625c5",
+          "ward": "住吉区",
+          "height": "18.1 m",
+          "key": "27120:bldg_cd9aba76-1324-450f-8494-b74a499625c5",
+          "photoSlot": "写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）"
+        },
+        {
+          "id": "bldg_43ec7859-ba15-4135-963a-20dc8b1c444d",
+          "h": 9.9,
+          "selected": true,
+          "panelId": "bldg_43ec7859-ba15-4135-963a-20dc8b1c444d",
+          "ward": "住吉区",
+          "height": "9.9 m",
+          "key": "27120:bldg_43ec7859-ba15-4135-963a-20dc8b1c444d",
+          "photoSlot": "写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）"
+        },
+        {
+          "id": "bldg_bb501b1b-2d9b-468d-8004-c05b7eeab9b3",
+          "h": 14.2,
+          "selected": true,
+          "panelId": "bldg_bb501b1b-2d9b-468d-8004-c05b7eeab9b3",
+          "ward": "住吉区",
+          "height": "14.2 m",
+          "key": "27120:bldg_bb501b1b-2d9b-468d-8004-c05b7eeab9b3",
+          "photoSlot": "写真データなし（Mission 36L の索引に、この建物と確認済みの写真はありません）"
+        }
+      ]
+    },
+    {
+      "label": "建物 ON/OFF",
+      "pass": true,
+      "off": {
+        "prims": 52,
+        "shown": 0,
+        "scenePrims": 72,
+        "ward": "sumiyoshi"
+      },
+      "on": {
+        "prims": 52,
+        "shown": 52,
+        "scenePrims": 72,
+        "ward": "sumiyoshi"
+      }
+    },
+    {
+      "label": "区別 道路・河川（合成 fixture）",
+      "pass": true,
+      "synthetic": true,
+      "wardVec": {
+        "ward": "27120",
+        "state": "ready",
+        "layers": {
+          "roads": 2,
+          "waterways": 1
+        },
+        "clip": "ward-polygon"
+      }
+    },
+    {
+      "label": "区切替 北区",
+      "pass": true,
+      "info": {
+        "prims": 0,
+        "shown": 0,
+        "scenePrims": 18,
+        "ward": null
+      },
+      "fp": {
+        "enabled": true,
+        "state": "none",
+        "ward": null,
+        "wardCode": null,
+        "declared": 35031,
+        "tiles": 52,
+        "loadedTiles": 52,
+        "failedTiles": 0,
+        "buildings": 0,
+        "skipped": 0,
+        "byWard": {
+          "kita": "missing (HTTP 404)"
+        },
+        "loadMs": 29768,
+        "mountsTotal": 1,
+        "dropsTotal": 1,
+        "sentinelHeights": 0
+      },
+      "selectedAfterSwitch": null,
+      "state": "unavailable"
+    },
+    {
+      "label": "競合（住吉→0.4 秒後に解除）",
+      "pass": true,
+      "info": {
+        "prims": 0,
+        "shown": 0,
+        "scenePrims": 18,
+        "ward": null
+      },
+      "scenePrims": 18
+    },
+    {
+      "label": "住吉区 再訪",
+      "pass": true,
+      "fp": {
+        "enabled": true,
+        "state": "ready",
+        "ward": "sumiyoshi",
+        "wardCode": "27120",
+        "declared": 35031,
+        "tiles": 52,
+        "loadedTiles": 52,
+        "failedTiles": 0,
+        "buildings": 35031,
+        "skipped": 0,
+        "byWard": {
+          "kita": "missing (HTTP 404)"
+        },
+        "loadMs": 28077,
+        "mountsTotal": 2,
+        "dropsTotal": 1,
+        "sentinelHeights": 0
+      },
+      "mountsTotal": 2
+    }
+  ],
+  "expected404": [
+    "404 http://127.0.0.1:36765/ext-3dtiles/index.json",
+    "404 http://127.0.0.1:36765/ext-3dtiles/sumiyoshi/layers/layers-report.json",
+    "404 http://127.0.0.1:36765/ext-3dtiles/sumiyoshi/layers/railways.json",
+    "404 http://127.0.0.1:36765/ext-3dtiles/kita/footprints/manifest.json",
+    "404 http://127.0.0.1:36765/ext-3dtiles/sumiyoshi/layers/layers-report.json"
+  ],
+  "startupMs": 5230,
+  "fps": 1.4,
+  "heapMB": 156,
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}

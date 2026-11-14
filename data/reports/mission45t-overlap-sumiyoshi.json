@@ -1,0 +1,65 @@
+{
+ "mission": "45T",
+ "scope": "sumiyoshi tracked public data only; NOT generalizable to fukushima",
+ "footprints": 18130,
+ "roadLines": 969,
+ "radiusM": 15,
+ "whole": {
+  "buildings": 18130,
+  "samples": 29118,
+  "zeroOffsetFraction": 0.0025757263548320626,
+  "best": {
+   "dx": 0,
+   "dz": 0,
+   "fraction": 0.0025757263548320626
+  }
+ },
+ "halves": [
+  {
+   "buildings": 10152,
+   "samples": 16795,
+   "zeroOffsetFraction": 0.0004167907115212861,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "fraction": 0.0004167907115212861
+   }
+  },
+  {
+   "buildings": 7978,
+   "samples": 12323,
+   "zeroOffsetFraction": 0.005518136817333441,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "fraction": 0.005518136817333441
+   }
+  },
+  {
+   "buildings": 8929,
+   "samples": 13801,
+   "zeroOffsetFraction": 0.0023186725599594234,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "fraction": 0.0023186725599594234
+   }
+  },
+  {
+   "buildings": 9201,
+   "samples": 15317,
+   "zeroOffsetFraction": 0.0015015995299340601,
+   "best": {
+    "dx": 0,
+    "dz": 0,
+    "fraction": 0.0015015995299340601
+   }
+  }
+ ],
+ "verdict": "no-consistent-translation-detected-within-15m",
+ "legacyVerdict": "aligned-at-zero",
+ "relativeGainAtBest": 0,
+ "zeroIsMinimum": true,
+ "zeroOffsetFraction": 0.0026,
+ "note": "No translation in the searched radius reduces road-through-building overlap by >=15%. This does NOT prove the layers are aligned: zero-offset overlap is 0.3% (bridges, elevated roads, data vintage, centerline/polygon quality can cause it). Rotation, scale and non-uniform error are not tested."
+}

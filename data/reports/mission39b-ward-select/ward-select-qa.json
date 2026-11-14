@@ -1,0 +1,207 @@
+{
+  "mission": "39B",
+  "url": "http://localhost:8143/mission37g-osaka-24ward-mvp.html?qa=1&fac=0",
+  "browser": "Chrome/155.0.8059.39",
+  "generatedAt": "2026-10-15T05:09:12.041Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8143/favicon.ico"
+  ],
+  "jsErrors": [],
+  "steps": [
+    {
+      "label": "初期（区未選択）",
+      "tilesets": 0,
+      "bases": [],
+      "heapMB": 43,
+      "buildingWard": null,
+      "state": "none",
+      "note": "3D建物は非表示（区を選ぶと表示）",
+      "hsBldg": "—",
+      "transferKB": 2542,
+      "pass": true,
+      "status": "ready"
+    },
+    {
+      "label": "選択: 住吉区",
+      "tilesets": 1,
+      "bases": [
+        "mission37b-3dtiles/osaka-sumiyoshi-9tile/"
+      ],
+      "heapMB": 38,
+      "buildingWard": "27120",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "10,546",
+      "transferKB": 3036,
+      "mountMs": 2382,
+      "pass": true,
+      "click": {
+        "id": "bldg_8e6c46dc-55f8-496c-8678-5026bd71ca93",
+        "realClick": true,
+        "selected": true
+      }
+    },
+    {
+      "label": "選択: 北区",
+      "tilesets": 1,
+      "bases": [
+        "mission37h-3dtiles/kita-sample/"
+      ],
+      "heapMB": 66,
+      "buildingWard": "27127",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "2,698",
+      "transferKB": 21594,
+      "mountMs": 2472,
+      "pass": true,
+      "click": {
+        "id": "bldg_53441ff8-a08a-4a40-a401-00cdf980a1c5",
+        "realClick": true,
+        "selected": true
+      }
+    },
+    {
+      "label": "選択: 中央区",
+      "tilesets": 1,
+      "bases": [
+        "mission37h-3dtiles/chuo-sample/"
+      ],
+      "heapMB": 86,
+      "buildingWard": "27128",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "5,629",
+      "transferKB": 28471,
+      "mountMs": 2467,
+      "pass": true,
+      "click": {
+        "id": "bldg_f01feb4f-7308-4d6e-9051-1be227f17466",
+        "realClick": true,
+        "selected": true
+      }
+    },
+    {
+      "label": "選択解除（建物を表示しない）",
+      "tilesets": 0,
+      "bases": [],
+      "heapMB": 78,
+      "buildingWard": null,
+      "state": "none",
+      "note": "3D建物は非表示（区を選ぶと表示）",
+      "hsBldg": "0",
+      "transferKB": 34301,
+      "pass": true
+    },
+    {
+      "label": "住吉区 再訪",
+      "tilesets": 1,
+      "bases": [
+        "mission37b-3dtiles/osaka-sumiyoshi-9tile/"
+      ],
+      "heapMB": 85,
+      "buildingWard": "27120",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "10,546",
+      "transferKB": 34307,
+      "pass": true,
+      "click": {
+        "id": "bldg_8e6c46dc-55f8-496c-8678-5026bd71ca93",
+        "realClick": true,
+        "selected": true
+      }
+    },
+    {
+      "label": "未整備区 27103",
+      "tilesets": 0,
+      "bases": [],
+      "heapMB": 101,
+      "buildingWard": null,
+      "state": "unavailable",
+      "note": "3D建物未整備（区境界・道路・施設は使えます）",
+      "hsBldg": "0",
+      "transferKB": 44507,
+      "pass": true
+    },
+    {
+      "label": "競合（北→中央→住吉→北を連続）",
+      "tilesets": 1,
+      "bases": [
+        "mission37h-3dtiles/kita-sample/"
+      ],
+      "heapMB": 88,
+      "buildingWard": "27127",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "2,698",
+      "transferKB": 44516,
+      "pass": true
+    },
+    {
+      "label": "繰り返し切替 6 回",
+      "tilesets": 1,
+      "bases": [
+        "mission37h-3dtiles/kita-sample/"
+      ],
+      "heapMB": 86,
+      "buildingWard": "27127",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "2,698",
+      "transferKB": 44573,
+      "pass": true
+    },
+    {
+      "label": "セレクト: 建物を表示しない",
+      "tilesets": 0,
+      "bases": [],
+      "heapMB": 90,
+      "buildingWard": null,
+      "state": "none",
+      "note": "3D建物は非表示（区を選ぶと表示）",
+      "hsBldg": "0",
+      "transferKB": 44573,
+      "pass": true
+    },
+    {
+      "label": "セレクト: 住吉区",
+      "tilesets": 1,
+      "bases": [
+        "mission37b-3dtiles/osaka-sumiyoshi-9tile/"
+      ],
+      "heapMB": 99,
+      "buildingWard": "27120",
+      "state": "ready",
+      "note": "3D建物を表示中（この区のみ）",
+      "hsBldg": "10,546",
+      "transferKB": 54919,
+      "pass": true
+    }
+  ],
+  "startupMs": 9117,
+  "loop": {
+    "tilesets": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "heapMB": [
+      95,
+      99,
+      103,
+      107,
+      81,
+      85
+    ]
+  },
+  "selectOptions": 25,
+  "fps": 1.5,
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}
