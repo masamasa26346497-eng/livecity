@@ -34,3 +34,11 @@ headless Chromium(SwiftShader WebGL)+ localhost で 2区×450セルの合成LOD0
 **実測で判明**: Cesium 1.121.1 では `allowPicking:false` でも LOD0 が `scene.pick` に出る。click ハンドラで LOD0 を除外し drillPick で実LOD1/2を拾い直す修正を入れた(LOD0 は `canonicalId` を持たず `bldg_` ではないので建物選択にはならない)。
 **距離ベース tile.show 置換は既定無効に変更**(`?citylod0swap=1` で明示有効)。穴の恐れが未検証のため。
 未実施: 実PLATEAU24区、速度/FPS/転送量計測、LOD1/2 との重なり実描画比較。
+
+## 実データ(公式PLATEAU 2025)での生成・E2E(Mission 213 続行)
+runner から geospatial.jp への取得が可能(ZIP Range・無料枠ガード内・追加課金なし)。`node tools/cloud/build-cloud-preview.mjs --all-wards --city-lod0 --out temp/cloud-all` を実行(24区・約13.6分・出力約1.0GB・既存ガード time38分/out6GB 内)。
+- **実データ検証で発見・修正したバグ**: `footprints.json` の hull は `[lon,lat]` だが旧 `loadLod2Points` は `[lat,lon]` と誤認(合成fixtureでは検出不能)。LOD2 重心が別位置に落ち、セル数 5599/82タイルだったものが修正後 5393セル/82タイル。値域判定+判定不能は fail closed。
+- 元LOD1 615,234 = 補完LOD1 604,542 + LOD2同ID除外 10,692(ID監査 doubleDrawn 0)。LOD0: 24/24区 ok・5,393セル・82タイル・GLB 3.04MB・tileset 35KB。
+- 実データE2E: `node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --lat <緯度> --lon <経度> --out r.json`(`--static` は build 出力を読み取り専用で配信。元ファイル無改変・`ext-3dtiles/index.json` の `cityLod0` が無ければ exit 3)。
+  実LOD1/2 を載せた状態で、高度3000mの LOD0 寄与画素率、高度600mで LOD0 自動非表示、画面格子 pick(LOD0 pick 0)、CDP の実マウスで建物クリック→`livecity:37d-building-selected` の canonicalId 一致、cold/warm 転送量を取得する。
+- 制限: SwiftShader(ソフトウェアWebGL)・localhost のため FPS/p95/所要時間は実機の値ではない。LOD0 のみの空白(区境の穴)を都市全域で網羅した検証ではない。`?citylod0swap=1` は引き続き未検証・既定OFF。

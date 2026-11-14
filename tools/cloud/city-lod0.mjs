@@ -2,7 +2,7 @@
 //
 // 入力(いずれも公式 PLATEAU 2025 から Cloud ビルドが既に作った成果物。旧 45D / OSM は読まない):
 //   - <extRoot>/<区>/attrs/t_*.json  … 補完 LOD1 の属性 byId:[h,usage,repX,repZ,z0] (repX/repZ は geoToThree 系ローカルm・全区共通)
-//   - <lod2Dir>/footprints.json      … LOD2 棟の凸包(hull=[lat,lon]…)。LOD2 化で補完 LOD1 から除いた棟を LOD0 の棟数・分布へ戻すために使う
+//   - <lod2Dir>/footprints.json      … LOD2 棟の凸包(hull=[lon,lat]…。実データ footprints.json で確認。旧実装は [lat,lon] と誤認していた)。LOD2 化で補完 LOD1 から除いた棟を LOD0 の棟数・分布へ戻すために使う
 // 方針:
 //   - セルは「全区共通のグローバル格子」(区ごとの格子ではない)。区境をまたぐセルは 1 つに統合され、境界の二重化・穴を作らない。
 //   - 元LOD1 全棟 = 補完LOD1 + LOD2 化した棟。LOD2 だけで構成されるセルが欠落しないよう LOD2 の重心も数える(高さは近傍LOD1の平均、無ければ既定値で flag)。
@@ -134,12 +134,15 @@ export function loadWardAttrs(extRoot, wardCode, wardId) {
 
 export function loadLod2Points(footprintsPath) {
   if (!footprintsPath || !fs.existsSync(footprintsPath)) return [];
-  const j = readJson(footprintsPath); const pts = [];
+  const j = readJson(footprintsPath); const pts = []; let badHull = 0;
   for (const f of j.footprints || []) {
     const hull = f.hull || []; if (!hull.length) continue;
-    const lat = hull.reduce((s, p) => s + p[0], 0) / hull.length, lon = hull.reduce((s, p) => s + p[1], 0) / hull.length;
+    // 実データの hull は [lon,lat]。順序は値域で判定(大阪: lon≈135 > 90 > lat≈34)し、どちらの並びでも同じ点になる。判定不能なら除外(誤配置より欠落を数える)。
+    const a0 = hull.reduce((s, p) => s + p[0], 0) / hull.length, a1 = hull.reduce((s, p) => s + p[1], 0) / hull.length;
+    let lat, lon; if (a0 > 90 && a1 <= 90) { lon = a0; lat = a1; } else if (a1 > 90 && a0 <= 90) { lat = a0; lon = a1; } else { badHull++; continue; }
     pts.push({ x: lonToLocal(lon), z: latToLocal(lat), h: Number.isFinite(f.h) ? f.h : undefined });
   }
+  if (badHull) throw new Error('LOD2 footprints の hull 座標順序を判定できません: ' + badHull + ' 件(fail closed)');
   return pts;
 }
 

@@ -67,3 +67,16 @@ test('区のデータ欠落は fail closed(coverage に欠落区を記録して�
   const rep = JSON.parse(fs.readFileSync(path.join(root, '_city-lod0/coverage-report.json'), 'utf8'));
   assert.deepStrictEqual(rep.missingWards, ['c']);
 });
+
+// 実データ(footprints.json)の hull は [lon,lat]。旧実装は [lat,lon] と誤認し、LOD2 重心が約 x/z 反転で別の場所に落ちた(実データ検証で発見)。
+test('loadLod2Points: 実データ順 [lon,lat] と [lat,lon] のどちらでも同じ局所座標になる', async () => {
+  const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+  const { loadLod2Points } = await import('../tools/cloud/city-lod0.mjs');
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'fp-'));
+  const mk = (h) => { const f = path.join(d, 'f' + Math.random() + '.json'); fs.writeFileSync(f, JSON.stringify({ footprints: [{ id: 'bldg_x', hull: h }] })); return f; };
+  const a = loadLod2Points(mk([[135.51, 34.70], [135.511, 34.70], [135.511, 34.701]]));
+  const b = loadLod2Points(mk([[34.70, 135.51], [34.70, 135.511], [34.701, 135.511]]));
+  assert.deepEqual(a, b);
+  assert.ok(Math.abs(a[0].x) < 5000 && Math.abs(a[0].z) < 15000, '大阪市域のローカルm範囲に入る');
+  assert.throws(() => loadLod2Points(mk([[10, 20], [10, 21]])), /判定できません/);
+});
