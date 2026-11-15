@@ -234,6 +234,9 @@ export function resolveHeight(src) {
   return { heightM: null, heightSource: 'unknown', estimated: false, heightAccuracy: acc };
 }
 
+/** 公開可否の確認状態。license 文字列の有無だけでは true にしない（確認済みフラグ + 帰属表記が必要）。 */
+export const licenseConfirmed = (ctx) => !!(ctx && ctx.licenseVerified === true && ctx.license && ctx.license !== 'unknown' && typeof ctx.attribution === 'string' && ctx.attribution.trim());
+
 /** 補完レイヤー用レコード。権利未確認は status=hold-license。LOD1/LOD2 と称さない。 */
 export function toSupplementRecord(cand, verdict, ctx) {
   const h = resolveHeight(cand);
@@ -245,7 +248,7 @@ export function toSupplementRecord(cand, verdict, ctx) {
     geometryConfidence: verdict.decision === DECISION.NEW_CANDIDATE ? 'candidate' : 'unverified',
     ...h,
     representation: 'supplement-extrusion-not-plateau-lod',
-    status: verdict.decision === DECISION.NEW_CANDIDATE ? (ctx.license && ctx.license !== 'unknown' ? 'candidate' : 'candidate-hold-license') : verdict.decision === DECISION.HOLD ? 'hold' : 'matched-existing',
+    status: verdict.decision === DECISION.NEW_CANDIDATE ? (licenseConfirmed(ctx) ? 'candidate' : 'candidate-hold-license') : verdict.decision === DECISION.HOLD ? 'hold' : 'matched-existing',
     decisionReason: verdict.reason, matchedExistingIds: (verdict.partners || []).map((p) => p.id).filter(Boolean),
   };
 }

@@ -4,7 +4,7 @@
 //   node tools/supplement/build-supplement-layer.js \
 //     --existing-dir public/map-data/osaka-city/buildings/osaka-sumiyoshi \
 //     --candidates <file> --candidates-format geojson|world \
-//     --source osm-v3 --source-version <ver> [--license ODbL-1.0] [--acquired-at ISO] \
+//     --source osm-v3 --source-version <ver> [--license ODbL-1.0 --license-verified true --attribution <帰属表記>] [--acquired-at ISO] \
 //     --out-dir <新規dir(非空不可・既存dirと重ならない)>
 //   geojson = WGS84 Polygon/MultiPolygon(Overture/OSM抽出)、world = 旧V3/V4 recovered-index.json 等 {buildings:[{id,ring}]}。
 //   入力が取得できない場合は exit 2 と構造化エラー(JSON)を出して終了する（fixtureで代替しない）。
@@ -20,18 +20,18 @@ export function run(argv) {
   for (const k of ['existing-dir', 'candidates', 'source', 'source-version', 'out-dir']) if (!a[k]) throw new SupplementInputError('missing-arg', `--${k} required`);
   const fmt = a['candidates-format'] || 'geojson';
   const existing = loadExistingTiles(a['existing-dir']);
-  let candidates, candSha;
-  if (fmt === 'world') ({ candidates, sha256: candSha } = loadWorldCandidates(a.candidates));
+  let candidates, candSha, candInfo = {};
+  if (fmt === 'world') { const w = loadWorldCandidates(a.candidates); candidates = w.candidates; candSha = w.sha256; candInfo = { adapter: w.format, declaredCount: w.declaredCount, countMismatch: w.countMismatch }; }
   else if (fmt === 'geojson') {
     try { candSha = crypto.createHash('sha256').update(fs.readFileSync(a.candidates)).digest('hex'); } catch (e) { throw new SupplementInputError('candidates', `cannot read ${a.candidates}: ${e.code || e.message}`); }
     try { candidates = loadFeatures(a.candidates, 'c'); } catch (e) { throw new SupplementInputError('candidates-parse', `invalid GeoJSON: ${a.candidates}`); }
   } else throw new SupplementInputError('bad-format', `--candidates-format must be geojson|world`);
-  const ctx = { source: a.source, sourceVersion: a['source-version'], license: a.license, acquiredAt: a['acquired-at'] };
+  const ctx = { source: a.source, sourceVersion: a['source-version'], license: a.license, licenseVerified: a['license-verified'] === 'true', attribution: a.attribution, acquiredAt: a['acquired-at'] };
   const result = buildSupplement({ existing, candidates, ctx });
   return writeSupplement({
     outDir: a['out-dir'], result,
-    meta: { ctx, tileSize: existing.tileSize, existingDir: a['existing-dir'], existingRef: existing.manifestRef, missingTiles: existing.missingTiles,
-      inputs: { candidates: { file: path.basename(a.candidates), format: fmt, sha256: candSha, count: candidates.length }, existingTiles: { count: existing.items.length, covered: existing.coveredTiles.size } } },
+    meta: { ctx, tileSize: existing.tileSize, existingDir: a['existing-dir'], existingRef: existing.manifestRef, missingTiles: existing.missingTiles, degradedTiles: existing.degradedTiles, existingStats: existing.stats,
+      inputs: { candidates: { file: path.basename(a.candidates), format: fmt, sha256: candSha, count: candidates.length, ...candInfo }, existingTiles: { count: existing.items.length, covered: existing.coveredTiles.size } } },
   });
 }
 if (isMainModule(import.meta.url)) {

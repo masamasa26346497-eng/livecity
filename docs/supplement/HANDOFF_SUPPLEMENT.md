@@ -38,3 +38,13 @@
 - **提案（未適用）**: `OFFLINE_CI_PROPOSAL.md` + `proposed-ci/supplement-offline-test.yml.proposed`、`ASSET_ACCESS_PROPOSAL.md`、`SUPPLEMENT_LAYER_INTEGRATION_SPEC.md`（合流先 PR #68 / 安定 #61、既定OFF・遅延・別manifest）。HTML・高速化側は未変更。
 - **未取得データ**: 旧V3/V4生成物、asset repo、OSM PBF。件数（一致/追加/保留）は **未計測**。住吉の実比較は未実施。
 - **必要な最小承認**: (a) owner が提案ymlを配置し SHA 指定で実行、または Bash(node) が許可される信頼状態（write権限者の起動）、(b) 取得ジョブにのみ asset 読取トークン(contents:read)。
+
+## 第5段階: 2546694 レビュー指摘の修正（テスト未実行 / restrict_untrusted_prs により node 実行不可）
+- byId 上書き: レコードと元候補を入力位置(`inputIndex`)で結付け。同一ID別形状でも判定した形状が出力される。
+- 不正形状: `geometry:null, diagnostic:true` の診断レコードとして hold.json へ。クラッシュしない。
+- 既存タイル: 不正fpは `degradedTiles`（件数・id最大20）/`existingStats.invalidFootprints` に記録、そのタイルは covered にせず周辺候補は `no-existing-coverage` で保留。
+  manifest/tile 形式は main の住吉配信ファイルの記述で照合（manifest `tiles[{tx,tz,file,count}]`, tile `buildings[{id,fp,h,...}]`）。tile原点規則は実行時に `originMismatch` として全棟計測される（本環境では未計測）。
+- 旧V3/V4: `recovered-index.json`（canonicalId/ring/levels/cls/missionId）アダプタ追加。index に元OSM height・heightSource は無く復元不能（levels*3m の推定扱い）。fixture は生成コードのキーを写した合成物。
+- publishable: `licenseVerified=true` + license≠unknown + `attribution` 非空のときのみ true（CLI: `--license-verified true --attribution ...`）。
+- 未取得: 旧V3/V4生成物・実OSM。実建物追加は未完了。件数は未計測（0件ではない）。
+- 次の1操作: owner が `docs/supplement/proposed-ci/supplement-offline-test.yml.proposed` を `.github/workflows/supplement-offline-test.yml` に配置し、修正後SHAを入力して workflow_dispatch。
