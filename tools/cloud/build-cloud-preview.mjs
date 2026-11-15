@@ -113,7 +113,7 @@ if (SINGLE) {
       const avg = wardSecs.reduce((x, y) => x + y, 0) / wardSecs.length;
       const projMin = elapsedMin + (avg * (plans.length - i)) / 60;
       log(`進捗 ${i}/${plans.length} 経過 ${elapsedMin.toFixed(1)}分 残り推定 ${(projMin - elapsedMin).toFixed(1)}分 出力 ${outMB.toFixed(0)}MB 空き ${free.toFixed(1)}GB`);
-      if (TIME_BUDGET_MIN && projMin > TIME_BUDGET_MIN) throw new Error(`時間ガード: 完了推定 ${projMin.toFixed(1)}分 > ${TIME_BUDGET_MIN}分(Hobby build 45 分上限の手前で停止。完了済み ${i} 区。--shard で分割)`);
+      if (TIME_BUDGET_MIN && wardSecs.length >= 3 && projMin > TIME_BUDGET_MIN)   // M213: 1区の所要だけの外挿は誤停止するため 3 区以上の平均で判定 throw new Error(`時間ガード: 完了推定 ${projMin.toFixed(1)}分 > ${TIME_BUDGET_MIN}分(Hobby build 45 分上限の手前で停止。完了済み ${i} 区。--shard で分割)`);
     }
     const tw = Date.now();
     const id = p.id, w = p.w;
