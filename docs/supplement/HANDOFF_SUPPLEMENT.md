@@ -31,3 +31,10 @@
 
 ### 未解決
 テスト実行、V3/V4生成物の所在確認、住吉でのOSM照合（OSM取得にネットワーク要）、Issue #64の統合SHA確定、独立Draft PRでの接続試作（未着手）。件数: 既存一致/追加候補/保留はすべて **未計測**（0件ではない）。
+
+## 第4段階: 小範囲補完パイプライン・CI/asset提案（run 43723091545）
+- **権限拒否の実原因（訂正）**: `restrict_untrusted_prs`（PR作成者が write 未確認 → checkout コードを実行するコマンド拒否）。claude.yml の古さではない。無効化・別トリガー迂回はしていない。今回も `node --test ...` は拒否され **テストは未実行（合否不明）**。
+- **完成したコード**: `tools/lib/supplement-pipeline.js`、`tools/supplement/build-supplement-layer.js`（既存タイル dir + 明示候補 → 新規/既存一致/保留 → 独立 manifest/タイル。既存非上書き、欠落/未収録は `no-existing-coverage` 保留、ID重複保留、座標・高さ根拠・既存ID保存、入力欠落は exit 2 の構造化エラー）、`tests/supplement-pipeline.test.js`（合成入力・**未実行**。実データの結果ではない）。
+- **提案（未適用）**: `OFFLINE_CI_PROPOSAL.md` + `proposed-ci/supplement-offline-test.yml.proposed`、`ASSET_ACCESS_PROPOSAL.md`、`SUPPLEMENT_LAYER_INTEGRATION_SPEC.md`（合流先 PR #68 / 安定 #61、既定OFF・遅延・別manifest）。HTML・高速化側は未変更。
+- **未取得データ**: 旧V3/V4生成物、asset repo、OSM PBF。件数（一致/追加/保留）は **未計測**。住吉の実比較は未実施。
+- **必要な最小承認**: (a) owner が提案ymlを配置し SHA 指定で実行、または Bash(node) が許可される信頼状態（write権限者の起動）、(b) 取得ジョブにのみ asset 読取トークン(contents:read)。
