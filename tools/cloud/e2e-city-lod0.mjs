@@ -71,6 +71,43 @@ async function holdCam(lon, lat, h, pitch = -90) {
   for (let i = 0; i < 20 && stable < 2; i++) { await fly(lon, lat, h, pitch); await sleep(1500); const cur = await ev('window.__v.camera.positionCartographic.height'); stable = Math.abs(cur - h) < h * 0.1 ? stable + 1 : 0; }
   return stable >= 2;
 }
+
+// ---- --sweep: 24区の中心＋隣接区境を最近傍順に巡回し、高度 3000/6000/10000m で LOD0 の寄与と未ロード/穴を区別して記録 ----
+//   判定: 「全タイルがロード済み(tilesLoaded)」なのに LOD0 寄与率が閾値未満 = hole(真の欠落候補)。ロード未完は not-loaded として別集計(欠落と混同しない)。
+//   画面全域が描かれないこと(海・市域外)は hole としない: 点は区の重心/隣接重心の中点なので市域内。
+function planRoute(extDir) {
+  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/wards/registry.json'), 'utf8')).wards;
+  const cs = [];
+  for (const w of reg) {
+    const d = path.join(extDir, w.id, 'attrs'); if (!fs.existsSync(d)) continue;
+    let sx = 0, sz = 0, n = 0;
+    for (const f of fs.readdirSync(d).filter((x) => /^t_-?\d+_-?\d+\.json$/.test(x))) { const j = JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); const ix = j.fields.indexOf('repX'), iz = j.fields.indexOf('repZ'); for (const v of Object.values(j.byId)) if (Number.isFinite(v[ix]) && Number.isFinite(v[iz])) { sx += v[ix]; sz += v[iz]; n++; } }
+    if (n) cs.push({ id: w.id, x: sx / n, z: sz / n, n });
+  }
+  const dist = (p, q) => Math.hypot(p.x - q.x, p.z - q.z);
+  const pts = cs.map((c) => ({ kind: 'ward-center', ward: c.id, x: c.x, z: c.z }));
+  const seen = new Set();
+  for (const c of cs) for (const o of cs.filter((o) => o !== c).sort((p, q) => dist(c, p) - dist(c, q)).slice(0, 2)) { const k = [c.id, o.id].sort().join('|'); if (seen.has(k)) continue; seen.add(k); pts.push({ kind: 'ward-border', ward: k, x: (c.x + o.x) / 2, z: (c.z + o.z) / 2 }); }
+  const route = []; let cur = pts.find((p) => p.ward === 'kita') || pts[0], rest = pts.filter((p) => p !== cur); route.push(cur);
+  while (rest.length) { rest.sort((p, q) => dist(cur, p) - dist(cur, q)); cur = rest.shift(); route.push(cur); }
+  return { route, wardsFound: cs.length };
+}
+async function sweepMode() {
+  const { route, wardsFound } = planRoute(ext); const ALTS = [3000, 6000, 10000], MIN_SHARE = Number(opt('min-share', 0.02));
+  const rows = []; result.sweep = { wardsFound, altitudes: ALTS, minShare: MIN_SHARE, rows };
+  if (wardsFound < 24) result.error = 'attrs のある区が 24 未満: ' + wardsFound;
+  for (const p of route) for (const h of ALTS) {
+    const [lon, lat] = ll(p.x, p.z);
+    const held = await holdCam(lon, lat, h);
+    let loaded = false; for (let i = 0; i < 40; i++) { loaded = await ev(`(()=>{const v=window.__v;v.scene.requestRender();const ps=v.scene.primitives._primitives||[];return ps.filter(p=>p.tilesLoaded!==undefined).every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
+    await sleep(800); const ps = await pixelStat(); const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
+    const status = !held ? 'camera-not-held' : !loaded ? 'not-loaded' : ps.lod0Share >= MIN_SHARE ? 'ok' : 'hole';
+    rows.push({ kind: p.kind, ward: p.ward, alt: h, camH, lod0Share: ps.lod0Share, loaded, status });
+  }
+  const cnt = (s) => rows.filter((r) => r.status === s).length;
+  result.sweep.summary = { points: rows.length, ok: cnt('ok'), hole: cnt('hole'), notLoaded: cnt('not-loaded'), cameraNotHeld: cnt('camera-not-held'), wardCentersCovered: new Set(rows.filter((r) => r.kind === 'ward-center').map((r) => r.ward)).size, borders: new Set(rows.filter((r) => r.kind === 'ward-border').map((r) => r.ward)).size };
+  result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.ok > 0 && wardsFound === 24;
+}
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
   const t0 = Date.now();
@@ -95,6 +132,7 @@ async function realMode() {
   const spot = await ev(`(()=>{const v=window.__v,c=v.scene.canvas;const cand=[];for(let i=1;i<40;i++)for(let j=1;j<28;j++)cand.push([c.clientWidth*i/40,c.clientHeight*j/28]);const cx=c.clientWidth/2,cy=c.clientHeight/2;cand.sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));for(const [x,y] of cand){const p=v.scene.pick(new Cesium.Cartesian2(x,y));if(p&&p.getProperty&&p.getProperty('canonicalId')&&!(p.tileset&&p.tileset._lcCityLod0))return {x,y,id:p.getProperty('canonicalId')}}return null})()`);
   result.checks.clickSpot = spot;
   if (spot) { const r = await ev(`(()=>{const c=window.__v.scene.canvas.getBoundingClientRect();return {l:c.left,t:c.top}})()`); for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: spot.x + r.l, y: spot.y + r.t, button: 'left', clickCount: 1 }); await sleep(1500); result.checks.clickEvents = await ev('window.__ev'); result.checks.clickSelectsBuilding = (result.checks.clickEvents || []).includes(spot.id); }
+  if (a.includes('--sweep')) { await sweepMode(); return; }
   // warm: 再読込(HTTP キャッシュ有り)での転送量と所要時間
   const b0 = result.bytes || 0, w0 = Date.now(); await load('citylod0=1'); await sleep(4000); result.checks.warmBytes = (result.bytes || 0) - b0; result.checks.warmViewerMs = Date.now() - w0;
   const hp = result.checks.highWithReal;
