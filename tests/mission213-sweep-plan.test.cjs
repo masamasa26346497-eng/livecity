@@ -66,3 +66,16 @@ test('統合: 同一キーは今回の行が優先', async () => {
   const m = mergeRows([{ kind: 'k', ward: 'w', alt: 1, status: 'not-loaded' }], [{ kind: 'k', ward: 'w', alt: 1, status: 'ok' }]);
   assert.strictEqual(m.length, 1); assert.strictEqual(m[0].status, 'ok');
 });
+
+test('CI バッチ: ラベルから start-point を厳密に解釈 / 集計に index 範囲と次ラベルを出す', async () => {
+  const { parseBatchLabel, renderBatchSummary } = await import('../tools/cloud/sweep-plan.mjs');
+  assert.deepStrictEqual(parseBatchLabel('run-mission213-qa'), { startPoint: 0 });
+  assert.deepStrictEqual(parseBatchLabel('run-mission213-qa:24'), { startPoint: 24 });
+  for (const bad of ['run-mission213-qa:', 'run-mission213-qa:-1', 'run-mission213-qa:1;rm', 'run-mission213-qa:1234', 'x-run-mission213-qa', '', null]) assert.strictEqual(parseBatchLabel(bad), null, String(bad));
+  const qa = { sweep: { routePlanned: 62, startPoint: 12, wardsFound: 24, nextStartPoint: 24, truncated: 'max-points', summary: { points: 2 }, rows: [
+    { index: 12, kind: 'ward-center', ward: 'a', alt: 3000, lod0Share: 0.4, realShare: 0.1, loaded: true, status: 'ok' },
+    { index: 23, kind: 'ward-border', ward: 'a|b', alt: 10000, lod0Share: 0, realShare: 0, loaded: false, status: 'not-loaded' }] } };
+  const md = renderBatchSummary(qa, { runId: 1, sha: 'abc' });
+  assert.match(md, /12〜23/); assert.match(md, /run-mission213-qa:24/); assert.match(md, /#23 a\|b@10000m=not-loaded/);
+  assert.match(renderBatchSummary(null), /sweep なし/);
+});

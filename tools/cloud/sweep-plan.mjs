@@ -66,3 +66,30 @@ export function mergeRows(prevRows, newRows) {
   const m = new Map(); for (const r of prevRows) m.set(rowKey(r), r); for (const r of newRows) m.set(rowKey(r), r);
   return [...m.values()];
 }
+
+// ---- CI バッチ運用(ラベル経路で start-point を指定する) ----
+// ラベル名 `run-mission213-qa` = 先頭(0)から、`run-mission213-qa:<n>` = 経路 index n から。厳密一致以外は null(workflow は失敗させる)。
+export function parseBatchLabel(name) {
+  const m = /^run-mission213-qa(?::(\d{1,3}))?$/.exec(String(name ?? ''));
+  return m ? { startPoint: m[1] ? Number(m[1]) : 0 } : null;
+}
+
+// qa.json(e2e の --out)から PR コメント用の集計 Markdown を作る。原データは含めず、対象 index 範囲・判定・未検証点だけを出す。
+export function renderBatchSummary(qa, meta = {}) {
+  const s = qa?.sweep; const out = [];
+  out.push(`### Mission213 QA バッチ (run ${meta.runId ?? '?'}, sha ${meta.sha ?? '?'})`);
+  out.push(`- build: ${meta.build ?? '?'} (${meta.buildSec ?? '?'}s)  sweep: ${meta.sweep ?? '?'}  build size MB: ${meta.sizeMb ?? 'n/a'}`);
+  if (!s) { out.push('- qa.json に sweep なし(build か e2e が失敗)'); return out.join('\n') + '\n'; }
+  const rows = s.rows || [], idx = rows.map((r) => r.index).filter(Number.isFinite);
+  const lo = idx.length ? Math.min(...idx) : null, hi = idx.length ? Math.max(...idx) : null;
+  out.push(`- 経路: 全 ${s.routePlanned ?? '?'} 点 / 今回の開始 index ${s.startPoint ?? 0} / 撮影した index 範囲 ${lo ?? '-'}〜${hi ?? '-'} / wardsFound=${s.wardsFound}`);
+  out.push(`- summary: ${JSON.stringify(s.summary)}  truncated=${s.truncated ?? 'なし'}`);
+  const bad = rows.filter((r) => r.status !== 'ok' && r.status !== 'covered-by-real');
+  out.push(`- 要確認(hole / not-loaded / camera-not-held): ${bad.length ? bad.map((r) => `#${r.index} ${r.ward}@${r.alt}m=${r.status}`).join(', ') : 'なし'}`);
+  if (s.nextStartPoint != null) out.push(`- **次バッチ**: PR のラベルを外し \`run-mission213-qa:${s.nextStartPoint}\` を付与(未検証: index ${s.nextStartPoint} 以降)`);
+  else out.push('- 経路の末尾まで到達(この開始 index 以降は全点撮影済み)。ただし先行バッチの結果と合わせて 0 から末尾まで揃ったかは各バッチ summary で確認すること');
+  out.push('', '| index | kind | ward | alt | lod0Share | realShare | loaded | status |', '|---|---|---|---|---|---|---|---|');
+  for (const r of rows) out.push(`| ${[r.index, r.kind, r.ward, r.alt, r.lod0Share, r.realShare, r.loaded, r.status].join(' | ')} |`);
+  out.push('', '※ headless SwiftShader の値であり実機性能ではありません。24区全域の完成は、全バッチで hole/not-loaded 0 かつ末尾到達のときのみ。');
+  return out.join('\n') + '\n';
+}

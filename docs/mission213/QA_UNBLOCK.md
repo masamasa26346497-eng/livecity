@@ -1,6 +1,6 @@
 # Mission 213 QA ブロッカーと最小解除手順
 
-状態: **適用待ち**。QA workflow はまだ存在せず、一度も実行されていません。
+状態: **v1 は適用済み・実行済み**(run 43717330656 / 43720356612)。**v2(下記「v2 差分」)は適用待ち**で、現行 `.github/workflows/mission213-qa.yml` は未更新です(Claude は workflow を書き換えていません)。
 
 ## 事実(実ログ・コメントで確認済み)
 - Claude Code runner の許可ツールは既定のまま(`.github/workflows/claude.yml:49` の `--allowed-tools` はコメントアウト)。`Bash(node …)` は許可されない。
@@ -44,3 +44,36 @@ GitHub App の `workflows` 権限の付与は**不要**(付与しないほうが
 - Cesium 1.121.1 は jsDelivr から取得(runner から到達可能なことは過去 run で確認済み)。
 - 初回は sweep 8点×2高度のみ。24区全域完了は max_points を増やした複数回実行(各回は 55分以内)が必要になる可能性がある。
 - Vercel Preview: この run の GitHub CI ツールで読み取りを試みた結果は PR コメント参照。HTTP 200 は未確認。
+
+## v2 差分(既存 `.github/workflows/mission213-qa.yml` を更新する・1回だけ)
+目的: ラベル経路でも `--start-point` を指定でき、経路の全点を複数バッチで重複なく検証できるようにする。
+
+現行(v1) → v2 の変更点:
+| 項目 | v1(現行・適用済み) | v2(`qa-workflow-proposal.yml`) |
+|---|---|---|
+| ラベル条件 | 名前が `run-mission213-qa` と完全一致 | `startsWith('run-mission213-qa')`。実際の値は `tools/cloud/qa-batch.mjs start` が `^run-mission213-qa(:\d{1,3})?$` で厳密検証し、不正ならビルド前に失敗 |
+| 開始点 | 常に 0(同じ8点を再試験するだけ) | ラベル `run-mission213-qa:<n>` の n(ラベルのみ `run-mission213-qa` は 0)。dispatch は `start_point` 入力 |
+| 1回の点数 | `--max-points 8`(=8点×2高度=16撮影) | 既定 12点×2高度=24撮影、予算 25 分 |
+| 集計 | インライン node | `qa-batch.mjs summary`(index 範囲・要確認点・次ラベルを表示) |
+| unit test | 2ファイル | `mission213-sweep-plan.test.cjs` を追加 |
+| 変更なし | 55分上限、ビルド 38分/6GB ガード、secrets なし、artifact は集計 JSON のみ、PR #68 head 限定 | 同左 |
+
+`--max-points` は「点」数です(1点=全高度を撮影)。経路の総点数は実データの qa.json `sweep.routePlanned` に出ます(fixture の計画値は 62 点。実データは未確認)。62点なら 12点刻みで 0/12/24/36/48/60 の 6 バッチです。
+
+### 管理者が1回だけ行う操作(GitHub Web UI)
+1. ブランチ `claude/issue-67-20261114-1354` で `.github/workflows/mission213-qa.yml` を開き、鉛筆アイコン(Edit)で全文を `docs/mission213/qa-workflow-proposal.yml` の内容に置き換え、同ブランチへコミット。
+2. ラベル `run-mission213-qa:12` 以降を使うには、ラベルを事前に作成(Issues → Labels → New label)。必要な分(`:12 :24 :36 :48 :60`)をまとめて作っておけば以後の操作はラベル付与のみ。
+
+### 更新後の進め方(ラベルの付け外しだけ)
+1. 先頭バッチ: PR #68 の `run-mission213-qa` を外して付け直す(start=0)。
+2. 完了コメントの「次バッチ」に出る `run-mission213-qa:<n>` を PR #68 に付与。これを末尾到達(`次バッチ` が出ない)まで繰り返す。
+3. not-loaded / camera-not-held が出た点は、同じ start のラベルを付け直して再撮影(前回 JSON の引継ぎは不要)。
+4. 同時実行: `concurrency` で直列化。待機中のジョブは最新の1件だけ残り、古い待機は取り消される。前のバッチ完了を待ってからラベルを付けること。
+
+### 費用見積り(推定・未実測の部分あり)
+- 1バッチ ≒ ビルド 11〜15 分(実測 656〜890 秒)+ sweep 最大 25 分 + 準備 ≒ 最大 約45分。ジョブ上限 55 分。
+- 6バッチで最大 約 270 分の Linux runner 分(1x)。private リポジトリの Free プランは月 2,000 分の無料枠内。有料 API・有料サービスは使わない。枠を超えるとジョブが止まる/課金設定次第で課金される可能性があるため、残枠はリポジトリ設定で要確認。
+- 毎バッチの再ビルド(約 1GB)は避けられない。`actions/cache` で省略する案は、容量上限・権利/アクセス境界(private cache、artifact 化しない)の確認が済んでいないため v2 には入れていない。
+
+### resume を使わない理由
+`start_point` だけで区間分割が成立するため、前回 JSON の引継ぎ(artifact の跨ぎ取得)は不要。`--resume` はローカル/dispatch 向けに残している。artifact は 7 日保持の集計 JSON のみ。
