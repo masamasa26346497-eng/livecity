@@ -93,20 +93,26 @@ function planRoute(extDir) {
   return { route, wardsFound: cs.length };
 }
 async function sweepMode() {
-  const { route, wardsFound } = planRoute(ext); const ALTS = [3000, 6000, 10000], MIN_SHARE = Number(opt('min-share', 0.02));
+  const { route, wardsFound } = planRoute(ext); const ALTS = opt('alts', '3000,6000,10000').split(',').map(Number), MIN_SHARE = Number(opt('min-share', 0.02));
   const rows = []; result.sweep = { wardsFound, altitudes: ALTS, minShare: MIN_SHARE, rows };
   if (wardsFound < 24) result.error = 'attrs のある区が 24 未満: ' + wardsFound;
-  for (const p of route) for (const h of ALTS) {
+  // 再発防止: 全体の壁時計予算(--budget-min, 既定20分)と --max-points。超過したら打ち切り、途中結果を JSON に残す(無制限に走らない)
+  const deadline = Date.now() + Number(opt('budget-min', 20)) * 60000, maxPts = Number(opt('max-points', route.length));
+  result.sweep.budgetMin = Number(opt('budget-min', 20)); result.sweep.routePlanned = route.length;
+  const flush = () => { if (OUT) try { fs.writeFileSync(OUT, JSON.stringify(result, null, 1)); } catch {} };
+  let n = 0;
+  outer: for (const p of route) { if (n++ >= maxPts) { result.sweep.truncated = 'max-points'; break; } for (const h of ALTS) {
+    if (Date.now() > deadline) { result.sweep.truncated = 'budget-min'; break outer; }
     const [lon, lat] = ll(p.x, p.z);
     const held = await holdCam(lon, lat, h);
     let loaded = false; for (let i = 0; i < 40; i++) { loaded = await ev(`(()=>{const v=window.__v;v.scene.requestRender();const ps=v.scene.primitives._primitives||[];return ps.filter(p=>p.tilesLoaded!==undefined).every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
     await sleep(800); const ps = await pixelStat(); const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
     const status = !held ? 'camera-not-held' : !loaded ? 'not-loaded' : ps.lod0Share >= MIN_SHARE ? 'ok' : 'hole';
-    rows.push({ kind: p.kind, ward: p.ward, alt: h, camH, lod0Share: ps.lod0Share, loaded, status });
-  }
+    rows.push({ kind: p.kind, ward: p.ward, alt: h, camH, lod0Share: ps.lod0Share, loaded, status }); flush();
+  } }
   const cnt = (s) => rows.filter((r) => r.status === s).length;
   result.sweep.summary = { points: rows.length, ok: cnt('ok'), hole: cnt('hole'), notLoaded: cnt('not-loaded'), cameraNotHeld: cnt('camera-not-held'), wardCentersCovered: new Set(rows.filter((r) => r.kind === 'ward-center').map((r) => r.ward)).size, borders: new Set(rows.filter((r) => r.kind === 'ward-border').map((r) => r.ward)).size };
-  result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.ok > 0 && wardsFound === 24;
+  result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.ok > 0 && wardsFound === 24 && !result.sweep.truncated;
 }
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
