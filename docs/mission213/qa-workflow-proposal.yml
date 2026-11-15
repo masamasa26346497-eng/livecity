@@ -82,10 +82,13 @@ jobs:
           QA_ALTS: ${{ inputs.alts || '3000,10000' }}
           QA_BUDGET: ${{ inputs.budget_min || '15' }}
           QA_POINTS: ${{ inputs.max_points || '8' }}
+          # 再開: 前回 qa.json を artifact から取得して --resume に渡す(下の手順参照)。start_point は経路 index の下限
+          QA_START: ${{ inputs.start_point || '0' }}
         run: |
           node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" \
             --sweep --alts "$QA_ALTS" --budget-min "$QA_BUDGET" \
-            --max-points "$QA_POINTS" --out temp/qa.json
+            --max-points "$QA_POINTS" --start-point "$QA_START" \
+            $( [ -f temp/prev-qa.json ] && echo --resume temp/prev-qa.json ) --out temp/qa.json
 
       - name: Summarize (read-only, aggregates only)
         if: always()
@@ -116,3 +119,7 @@ jobs:
             summary.md
           retention-days: 7
           if-no-files-found: ignore
+
+# 適用メモ(管理者): 24区を8点ずつ反復するには、(1) workflow_dispatch の inputs に start_point(既定0)を追加、
+# (2) sweep 前に actions/cache で temp/cloud-all を保存/復元しビルド(約15分)を省略(private cache・artifact 化しない)、
+# (3) 前回 mission213-qa-aggregate artifact の qa.json を temp/prev-qa.json に置く。qa.json の sweep.nextStartPoint が次回の start_point。

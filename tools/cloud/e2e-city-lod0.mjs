@@ -4,6 +4,7 @@
 //   ネットワーク: Cesium 1.121.1 を jsDelivr CDN から読む(HTML 既存仕様)。到達不能なら理由を出して exit 2。
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import http from 'node:http'; import { spawn } from 'node:child_process';
 import { buildCityLod0 } from './city-lod0.mjs';
+import { planRoute as planRouteImpl, pendingWork, classify, summarize, mergeRows } from './sweep-plan.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const a = process.argv.slice(2), opt = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; };
 const CHROME = opt('chrome', '/usr/bin/chromium'), OUT = opt('out', null);
@@ -46,7 +47,8 @@ ws.onmessage = (m) => { const j = JSON.parse(m.data);
   else if (j.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(j.params.type)) result.console.push(j.params.type + ': ' + j.params.args.map((x) => x.value ?? x.description).join(' ').slice(0, 300));
   else if (j.method === 'Runtime.exceptionThrown') result.console.push('exception: ' + (j.params.exceptionDetails.exception?.description || j.params.exceptionDetails.text).slice(0, 300));
   else if (j.method === 'Network.loadingFinished') { result.bytes = (result.bytes || 0) + (j.params.encodedDataLength || 0); }
-  else if (j.method === 'Network.responseReceived') { const u = j.params.response.url; if (/city-lod0|index\.json|Cesium\.js/.test(u)) result.network.push({ url: u.replace(/^http:\/\/127.0.0.1:\d+/, ''), status: j.params.response.status }); } };
+  else if (j.method === 'Network.loadingFailed') { (result.netFailed ||= []).length < 50 && result.netFailed.push({ err: j.params.errorText, canceled: !!j.params.canceled }); }
+  else if (j.method === 'Network.responseReceived') { if (j.params.response.status >= 400) { const he = (result.httpErrors ||= []); if (he.length < 50) he.push({ url: j.params.response.url.replace(/^http:\/\/127.0.0.1:\d+/, '').slice(0, 120), status: j.params.response.status }); } const u = j.params.response.url; if (/city-lod0|index\.json|Cesium\.js/.test(u)) result.network.push({ url: u.replace(/^http:\/\/127.0.0.1:\d+/, ''), status: j.params.response.status }); } };
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pend.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); if (r.result.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description || 'eval error'); return r.result.result.value; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -59,7 +61,10 @@ async function load(qs) {
   return ev('!!window.__v');
 }
 // 同一カメラで LOD0 表示/非表示のフレームを比較し「LOD0 が寄与した画素率」を出す(背景色の推測に依存しない)。10 分割の列別も返す。
-const pixelStat = () => ev(`(async()=>{const v=window.__v;const grab=()=>{v.scene.render();const c=v.scene.canvas;const t=document.createElement('canvas');t.width=c.width;t.height=c.height;const g=t.getContext('2d');g.drawImage(c,0,0);return g.getImageData(0,0,t.width,t.height).data};const sv=window.__t.show;window.__t.show=true;const on=grab();window.__t.show=false;const off=grab();window.__t.show=sv;const w=v.scene.canvas.width,n=on.length/4;let diff=0;const cols=new Array(10).fill(0);for(let i=0;i<on.length;i+=4){const d=Math.abs(on[i]-off[i])+Math.abs(on[i+1]-off[i+1])+Math.abs(on[i+2]-off[i+2]);if(d>12){diff++;cols[Math.min(9,Math.floor(((i/4)%w)/w*10))]++}}return {w,h:v.scene.canvas.height,lod0Share:+(diff/n).toFixed(4),cols:cols.map(x=>+(x/(n/10)).toFixed(3))}})()`);
+const pixelStat = () => ev(`(async()=>{const v=window.__v;const grab=()=>{v.scene.render();const c=v.scene.canvas;const t=document.createElement('canvas');t.width=c.width;t.height=c.height;const g=t.getContext('2d');g.drawImage(c,0,0);return g.getImageData(0,0,t.width,t.height).data};const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const real=ps.filter(p=>!p._lcCityLod0);const sv=window.__t.show;const rv=real.map(p=>p.show);const frac=(A,B)=>{let d=0;for(let i=0;i<A.length;i+=4){if(Math.abs(A[i]-B[i])+Math.abs(A[i+1]-B[i+1])+Math.abs(A[i+2]-B[i+2])>12)d++}return +(d/(A.length/4)).toFixed(4)};window.__t.show=true;const on=grab();window.__t.show=false;const off=grab();real.forEach(p=>p.show=false);const none=grab();window.__t.show=sv;real.forEach((p,i)=>p.show=rv[i]);const w=v.scene.canvas.width,n=on.length/4;let diff=0;const cols=new Array(10).fill(0);for(let i=0;i<on.length;i+=4){const d=Math.abs(on[i]-off[i])+Math.abs(on[i+1]-off[i+1])+Math.abs(on[i+2]-off[i+2]);if(d>12){diff++;cols[Math.min(9,Math.floor(((i/4)%w)/w*10))]++}}return {w,h:v.scene.canvas.height,lod0Share:+(diff/n).toFixed(4),realShare:frac(off,none),cols:cols.map(x=>+(x/(n/10)).toFixed(3))}})()`);
+// タイルのロード状況(read-only 診断): 未ロード/保留リクエスト/失敗/選択タイル数
+const tileDiag = () => ev(`(()=>{const v=window.__v;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const f=window.__tileFail||0;return {tilesets:ps.length,notLoaded:ps.filter(p=>!p.tilesLoaded).length,pending:ps.reduce((s,p)=>s+((p.statistics&&p.statistics.numberOfPendingRequests)||0),0),processing:ps.reduce((s,p)=>s+((p.statistics&&p.statistics.numberOfTilesProcessing)||0),0),failed:f,lod0Selected:window.__t&&window.__t._selectedTiles?window.__t._selectedTiles.length:null,lod0Shown:window.__t?window.__t.show:null}})()`);
+const hookFail = () => ev(`(()=>{const v=window.__v;window.__tileFail=window.__tileFail||0;for(const p of (v.scene.primitives._primitives||[])){if(p.tilesLoaded!==undefined&&!p.__fh&&p.tileFailed){p.__fh=1;p.tileFailed.addEventListener(()=>{window.__tileFail++})}}return true})()`);
 const fly = (lon, lat, h, pitchDeg = -90) => ev(`(()=>{const v=window.__v;v.camera.cancelFlight();v.camera.setView({destination:Cesium.Cartesian3.fromDegrees(${lon},${lat},${h}),orientation:{heading:0,pitch:Cesium.Math.toRadians(${pitchDeg}),roll:0}});v.camera.moveEnd.raiseEvent&&v.camera.moveEnd.raiseEvent();v.scene.requestRender();return true})()`);
 const CLAT = 34.604208, CLON = 135.525020, D2R = Math.PI / 180;
 const ll = (x, z) => [CLON + x / (Math.cos(CLAT * D2R) * 111320), CLAT - z / 111320];
@@ -75,44 +80,39 @@ async function holdCam(lon, lat, h, pitch = -90) {
 // ---- --sweep: 24区の中心＋隣接区境を最近傍順に巡回し、高度 3000/6000/10000m で LOD0 の寄与と未ロード/穴を区別して記録 ----
 //   判定: 「全タイルがロード済み(tilesLoaded)」なのに LOD0 寄与率が閾値未満 = hole(真の欠落候補)。ロード未完は not-loaded として別集計(欠落と混同しない)。
 //   画面全域が描かれないこと(海・市域外)は hole としない: 点は区の重心/隣接重心の中点なので市域内。
-function planRoute(extDir) {
-  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'config/wards/registry.json'), 'utf8')).wards;
-  const cs = [];
-  for (const w of reg) {
-    const d = path.join(extDir, w.id, 'attrs'); if (!fs.existsSync(d)) continue;
-    let sx = 0, sz = 0, n = 0;
-    for (const f of fs.readdirSync(d).filter((x) => /^t_-?\d+_-?\d+\.json$/.test(x))) { const j = JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); const ix = j.fields.indexOf('repX'), iz = j.fields.indexOf('repZ'); for (const v of Object.values(j.byId)) if (Number.isFinite(v[ix]) && Number.isFinite(v[iz])) { sx += v[ix]; sz += v[iz]; n++; } }
-    if (n) cs.push({ id: w.id, x: sx / n, z: sz / n, n });
-  }
-  const dist = (p, q) => Math.hypot(p.x - q.x, p.z - q.z);
-  const pts = cs.map((c) => ({ kind: 'ward-center', ward: c.id, x: c.x, z: c.z }));
-  const seen = new Set();
-  for (const c of cs) for (const o of cs.filter((o) => o !== c).sort((p, q) => dist(c, p) - dist(c, q)).slice(0, 2)) { const k = [c.id, o.id].sort().join('|'); if (seen.has(k)) continue; seen.add(k); pts.push({ kind: 'ward-border', ward: k, x: (c.x + o.x) / 2, z: (c.z + o.z) / 2 }); }
-  const route = []; let cur = pts.find((p) => p.ward === 'kita') || pts[0], rest = pts.filter((p) => p !== cur); route.push(cur);
-  while (rest.length) { rest.sort((p, q) => dist(cur, p) - dist(cur, q)); cur = rest.shift(); route.push(cur); }
-  return { route, wardsFound: cs.length };
-}
+const planRoute = (extDir) => planRouteImpl(extDir, path.join(ROOT, 'config/wards/registry.json'));
 async function sweepMode() {
   const { route, wardsFound } = planRoute(ext); const ALTS = opt('alts', '3000,6000,10000').split(',').map(Number), MIN_SHARE = Number(opt('min-share', 0.02));
-  const rows = []; result.sweep = { wardsFound, altitudes: ALTS, minShare: MIN_SHARE, rows };
+  // 再開: --resume <前回 --out JSON> の確定行(ok/hole/covered-by-real)は撮り直さない。--start-point <n> は経路 index の下限。
+  let prevRows = []; const RES = opt('resume', null);
+  if (RES && fs.existsSync(RES)) { try { prevRows = JSON.parse(fs.readFileSync(RES, 'utf8')).sweep?.rows || []; } catch { prevRows = []; } }
+  const work = pendingWork(route, ALTS, { startPoint: Number(opt('start-point', 0)), prevRows });
+  const rows = []; result.sweep = { wardsFound, altitudes: ALTS, minShare: MIN_SHARE, rows, resumedFrom: RES && prevRows.length ? prevRows.length : 0, startPoint: Number(opt('start-point', 0)) };
   if (wardsFound < 24) result.error = 'attrs のある区が 24 未満: ' + wardsFound;
-  // 再発防止: 全体の壁時計予算(--budget-min, 既定20分)と --max-points。超過したら打ち切り、途中結果を JSON に残す(無制限に走らない)
+  // 再発防止: 全体の壁時計予算(--budget-min, 既定20分)と --max-points(今回撮る点数)。超過したら打ち切り、途中結果を JSON に残す
   const deadline = Date.now() + Number(opt('budget-min', 20)) * 60000, maxPts = Number(opt('max-points', route.length));
-  result.sweep.budgetMin = Number(opt('budget-min', 20)); result.sweep.routePlanned = route.length;
-  const flush = () => { if (OUT) try { fs.writeFileSync(OUT, JSON.stringify(result, null, 1)); } catch {} };
-  let n = 0;
-  outer: for (const p of route) { if (n++ >= maxPts) { result.sweep.truncated = 'max-points'; break; } for (const h of ALTS) {
-    if (Date.now() > deadline) { result.sweep.truncated = 'budget-min'; break outer; }
+  const waitS = Number(opt('load-wait-s', 20)), extraS = Number(opt('load-extra-wait-s', 40));
+  result.sweep.budgetMin = Number(opt('budget-min', 20)); result.sweep.routePlanned = route.length; result.sweep.pendingPoints = work.length;
+  const flush = () => { if (OUT) try { const all = mergeRows(prevRows, rows); fs.writeFileSync(OUT, JSON.stringify({ ...result, sweep: { ...result.sweep, rows: all, summary: summarize(all) } }, null, 1)); } catch {} };
+  let n = 0, last = null;
+  outer: for (const { point: p, alts } of work) { if (n++ >= maxPts) { result.sweep.truncated = 'max-points'; result.sweep.nextStartPoint = p.index; break; } last = p.index; for (const h of alts) {
+    if (Date.now() > deadline) { result.sweep.truncated = 'budget-min'; result.sweep.nextStartPoint = p.index; break outer; }
     const [lon, lat] = ll(p.x, p.z);
-    const held = await holdCam(lon, lat, h);
-    let loaded = false; for (let i = 0; i < 40; i++) { loaded = await ev(`(()=>{const v=window.__v;v.scene.requestRender();const ps=v.scene.primitives._primitives||[];return ps.filter(p=>p.tilesLoaded!==undefined).every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
-    await sleep(800); const ps = await pixelStat(); const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
-    const status = !held ? 'camera-not-held' : !loaded ? 'not-loaded' : ps.lod0Share >= MIN_SHARE ? 'ok' : 'hole';
-    rows.push({ kind: p.kind, ward: p.ward, alt: h, camH, lod0Share: ps.lod0Share, loaded, status }); flush();
+    const held = await holdCam(lon, lat, h); await hookFail();
+    const isLoaded = () => ev(`(()=>{const v=window.__v;v.scene.requestRender();const ps=v.scene.primitives._primitives||[];return ps.filter(p=>p.tilesLoaded!==undefined).every(p=>p.tilesLoaded)})()`);
+    // not-loaded は「待機不足」か「実エラー」かを区別: 通常待機 → 未収束なら追加待機。追加待機で収束すれば waitedMs に残り、収束しなければ pending/failed/HTTP エラーを記録
+    const t0 = Date.now(); let loaded = false, extended = false;
+    for (let i = 0; i < waitS * 2; i++) { loaded = await isLoaded(); if (loaded) break; await sleep(500); }
+    if (!loaded && Date.now() < deadline) { extended = true; for (let i = 0; i < extraS * 2; i++) { loaded = await isLoaded(); if (loaded) break; await sleep(500); } }
+    const waitedMs = Date.now() - t0, httpErr0 = (result.httpErrors || []).length, netFail0 = (result.netFailed || []).length;
+    await sleep(800); const ps = await pixelStat(); const diag = await tileDiag(); const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
+    const status = classify({ held, loaded, lod0Share: ps.lod0Share, realShare: ps.realShare, minShare: MIN_SHARE });
+    rows.push({ kind: p.kind, ward: p.ward, index: p.index, alt: h, x: Math.round(p.x), z: Math.round(p.z), lon: +lon.toFixed(5), lat: +lat.toFixed(5), camH, lod0Share: ps.lod0Share, realShare: ps.realShare, loaded, waitedMs, extendedWait: extended, diag, httpErrorsTotal: (result.httpErrors || []).length, netFailedTotal: (result.netFailed || []).length, status }); flush();
   } }
-  const cnt = (s) => rows.filter((r) => r.status === s).length;
-  result.sweep.summary = { points: rows.length, ok: cnt('ok'), hole: cnt('hole'), notLoaded: cnt('not-loaded'), cameraNotHeld: cnt('camera-not-held'), wardCentersCovered: new Set(rows.filter((r) => r.kind === 'ward-center').map((r) => r.ward)).size, borders: new Set(rows.filter((r) => r.kind === 'ward-border').map((r) => r.ward)).size };
-  result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.ok > 0 && wardsFound === 24 && !result.sweep.truncated;
+  if (!result.sweep.truncated && last !== null) result.sweep.nextStartPoint = null;
+  const all = mergeRows(prevRows, rows); result.sweep.rows = all; result.sweep.summary = summarize(all);
+  // 24区完了の判定: 全 (点,高度) が確定済み(ok/covered-by-real)で hole 0、かつ打ち切り無し。
+  result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.notLoaded === 0 && result.sweep.summary.cameraNotHeld === 0 && result.sweep.summary.ok > 0 && wardsFound === 24 && !result.sweep.truncated;
 }
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
