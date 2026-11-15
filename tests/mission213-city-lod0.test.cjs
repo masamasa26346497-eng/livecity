@@ -80,3 +80,14 @@ test('loadLod2Points: 実データ順 [lon,lat] と [lat,lon] のどちらでも
   assert.ok(Math.abs(a[0].x) < 5000 && Math.abs(a[0].z) < 15000, '大阪市域のローカルm範囲に入る');
   assert.throws(() => loadLod2Points(mk([[10, 20], [10, 21]])), /判定できません/);
 });
+
+test('build-cloud-preview.mjs / e2e-city-lod0.mjs は構文が正しい(node --check)・時間ガードの throw が有効', () => {
+  const { spawnSync } = require('node:child_process');
+  const path = require('node:path'), fs = require('node:fs');
+  for (const f of ['tools/cloud/build-cloud-preview.mjs', 'tools/cloud/e2e-city-lod0.mjs']) {
+    const r = spawnSync(process.execPath, ['--check', path.join(__dirname, '..', f)], { encoding: 'utf8' });
+    assert.strictEqual(r.status, 0, f + ': ' + r.stderr);
+  }
+  const b = fs.readFileSync(path.join(__dirname, '..', 'tools/cloud/build-cloud-preview.mjs'), 'utf8');
+  assert.ok(/wardSecs\.length >= 3 && projMin > TIME_BUDGET_MIN\) throw new Error/.test(b));
+});
