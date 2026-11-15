@@ -1,16 +1,28 @@
 # Mission 213 QA workflow【適用待ち・未実行】
 # ここ(docs/mission213/)は提案置き場です。GitHub App に workflow 権限が無いため、Claude は
 # .github/workflows/ へ push できません。適用手順は docs/mission213/QA_UNBLOCK.md を参照。
-# 適用先: .github/workflows/mission213-qa.yml (PR #68 ブランチ claude/issue-67-20261114-1354 のみ)
+# 適用先: .github/workflows/mission213-qa.yml
+#
+# 起動経路(GitHub 仕様に基づく。どちらか一方で足りる):
+#  A) pull_request: labeled  ← default branch への配置が不要。PR #68 ブランチにこのファイルを
+#     コミットし、PR #68 にラベル `run-mission213-qa` を付けると起動する(再実行=ラベルを外して付け直す)。
+#     ※ pull_request 系イベントは PR の merge ref 上の workflow ファイルを使うため、PR ブランチ上に
+#       ファイルがあれば動く。同一リポジトリの PR のみ(fork は除外)。
+#  B) workflow_dispatch      ← 「Run workflow」ボタンはファイルが default branch(main)にある場合のみ
+#     Actions UI/`gh workflow run` に現れる。main への配置は管理者の判断事項(Claude は main に push/merge しない)。
+#     配置後は "Use workflow from" で PR #68 ブランチを選ぶと、そのブランチ版の YAML が実行される。
 #
 # 設計:
-#  - workflow_dispatch のみ(push/schedule では動かない=無料枠の無駄打ちなし)。secrets 不使用。
+#  - push/schedule では動かない=無料枠の無駄打ちなし。secrets 不使用。
 #  - 各 step は前景・同期。exit code が Actions に記録される(background/orphan cleanup 問題なし)。
 #  - ジョブ全体 55 分上限。ビルド側は既存ガード(38分/6GB/空きディスク)がそのまま効く。
 #  - artifact は集計 JSON(qa.json)のみ。PLATEAU 原データ/GLB/ビルド出力は上げない。
 #  - 結果は PR #68 へ GITHUB_TOKEN で自動コメント(Claude の App トークン 1時間失効に依存しない)。
+#  - 既存の mission35*/36* workflow とは group・トリガとも独立で影響しない。
 name: mission213-qa
 on:
+  pull_request:
+    types: [labeled]
   workflow_dispatch:
     inputs:
       max_points: { description: 'sweep 最大点数', default: '8' }
@@ -24,11 +36,21 @@ concurrency:
   cancel-in-progress: false
 jobs:
   qa:
-    if: github.ref == 'refs/heads/claude/issue-67-20261114-1354'   # PR #68 ブランチ以外では実行しない
+    # PR #68 ブランチ以外では実行しない。PR 経路は同一リポジトリ・指定ラベルのときのみ。
+    if: >-
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/claude/issue-67-20261114-1354') ||
+      (github.event_name == 'pull_request' &&
+       github.event.label.name == 'run-mission213-qa' &&
+       github.event.pull_request.head.ref == 'claude/issue-67-20261114-1354' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
+        with:
+          # PR 経路では merge ref ではなく PR head そのものを検証する(dispatch 時は選択ブランチ)
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
 
@@ -55,16 +77,21 @@ jobs:
 
       - name: Sweep E2E (real Chromium + SwiftShader, read-only on build output)
         id: sweep
+        env:
+          # 入力はシェルへ直接埋め込まず env 経由(ラベル経路では未指定なので既定値)
+          QA_ALTS: ${{ inputs.alts || '3000,10000' }}
+          QA_BUDGET: ${{ inputs.budget_min || '15' }}
+          QA_POINTS: ${{ inputs.max_points || '8' }}
         run: |
           node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" \
-            --sweep --alts "${{ inputs.alts }}" --budget-min "${{ inputs.budget_min }}" \
-            --max-points "${{ inputs.max_points }}" --out temp/qa.json
+            --sweep --alts "$QA_ALTS" --budget-min "$QA_BUDGET" \
+            --max-points "$QA_POINTS" --out temp/qa.json
 
       - name: Summarize (read-only, aggregates only)
         if: always()
         run: |
           {
-            echo "### Mission213 QA (run ${{ github.run_id }}, sha ${{ github.sha }})"
+            echo "### Mission213 QA (run ${{ github.run_id }}, sha ${{ github.event.pull_request.head.sha || github.sha }})"
             echo "- build: ${{ steps.build.outcome }} (${{ steps.build.outputs.build_sec }}s)  sweep: ${{ steps.sweep.outcome }}"
             echo "- build size MB: $(cut -f1 build-size.txt 2>/dev/null || echo n/a)"
             if [ -f temp/qa.json ]; then
