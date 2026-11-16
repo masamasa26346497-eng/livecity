@@ -48,3 +48,11 @@
 - publishable: `licenseVerified=true` + license≠unknown + `attribution` 非空のときのみ true（CLI: `--license-verified true --attribution ...`）。
 - 未取得: 旧V3/V4生成物・実OSM。実建物追加は未完了。件数は未計測（0件ではない）。
 - 次の1操作: owner が `docs/supplement/proposed-ci/supplement-offline-test.yml.proposed` を `.github/workflows/supplement-offline-test.yml` に配置し、修正後SHAを入力して workflow_dispatch。
+
+## 第6段階（独立レイヤー実装・接続案）
+- 追加: `public/supplement-layer/supplement-layer.js`, `tests/supplement-layer.test.js`, `docs/supplement/proposed-integration/PR68-connection-snippet.md`、SPEC 追記。
+- **テスト: 未実行**（node 実行は restrict_untrusted_prs で拒否される状況が継続。回避せず、この run では再試行もしていない）。CI 提案 workflow は登録済みだが実行履歴 0 件（owner 確認）＝成功扱いしない。合否不明。
+- ビューア接続: **未接続**。PR#68 ブランチは本 run で未読。座標/色/高さ単位は接続時に確認（snippet 参照）。
+- 実データ: **未取得**。旧 V3/V4 生成物・asset repo（過去 run で解決不可）・OSM は取得していない。この run では外部取得を試みていない（過去に拒否/不可だった経路の反復を避けた）。
+- 件数: 照合数/採用数/保留数は **未計測**（0 件ではない）。実建物の追加は未完了。fixture は実在の街の建物として配信していない。
+- 次の最小操作: (1) owner が supplement-offline-test workflow を現 HEAD の SHA で workflow_dispatch（`node --test` で supplement-layer / supplement-pipeline / building-supplement-diff を実行）。(2) 実データ取得は別途、読取専用の取得ジョブで（ASSET_ACCESS_PROPOSAL.md）。(3) PR#68 側で snippet を適用し座標一致を確認。
