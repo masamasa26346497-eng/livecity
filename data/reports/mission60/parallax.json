@@ -1,0 +1,268 @@
+{
+  "mission": "60",
+  "budget": 45,
+  "jsErrors": [],
+  "realGets": 45,
+  "stubbed": 62,
+  "stop": null,
+  "statuses": {
+    "200": 107
+  },
+  "maxZ": 18,
+  "points": [
+    {
+      "name": "hanwa-hospital",
+      "lat": 34.6044,
+      "lon": 135.5051,
+      "localXZ": [
+        -1825.2,
+        -21.4
+      ],
+      "cams": {
+        "persp60-r350": {
+          "fovDeg": 60,
+          "range": 350,
+          "metersPerPixel": 0.288,
+          "maskPx": 86023,
+          "quadrantShift": {
+            "NW": {
+              "px": [
+                -0.54,
+                -0.62
+              ],
+              "east_m": -0.16,
+              "south_m": -0.18,
+              "peakOverMean": 1.56,
+              "atEdge": false
+            },
+            "NE": {
+              "px": [
+                -0.13,
+                -0.59
+              ],
+              "east_m": -0.04,
+              "south_m": -0.17,
+              "peakOverMean": 1.95,
+              "atEdge": false
+            },
+            "SW": {
+              "px": [
+                0.2,
+                0.61
+              ],
+              "east_m": 0.06,
+              "south_m": 0.18,
+              "peakOverMean": 1.82,
+              "atEdge": false
+            },
+            "SE": {
+              "px": [
+                -0.73,
+                -0.66
+              ],
+              "east_m": -0.21,
+              "south_m": -0.19,
+              "peakOverMean": 1.64,
+              "atEdge": false
+            },
+            "all": {
+              "px": [
+                -0.32,
+                -0.32
+              ],
+              "east_m": -0.09,
+              "south_m": -0.09,
+              "peakOverMean": 1.66,
+              "atEdge": false
+            }
+          }
+        },
+        "ortho-like-fov2-r12000": {
+          "fovDeg": 2,
+          "range": 12000,
+          "metersPerPixel": 0.299,
+          "maskPx": 21117,
+          "quadrantShift": {
+            "NW": {
+              "px": [
+                -0.58,
+                0.58
+              ],
+              "east_m": -0.17,
+              "south_m": 0.17,
+              "peakOverMean": 1.76,
+              "atEdge": false
+            },
+            "NE": {
+              "px": [
+                0.15,
+                0.1
+              ],
+              "east_m": 0.04,
+              "south_m": 0.03,
+              "peakOverMean": 1.93,
+              "atEdge": false
+            },
+            "SW": {
+              "px": [
+                24.43,
+                21.46
+              ],
+              "east_m": 7.3,
+              "south_m": 6.41,
+              "peakOverMean": 1.85,
+              "atEdge": false
+            },
+            "SE": {
+              "px": [
+                36.58,
+                39.14
+              ],
+              "east_m": 10.93,
+              "south_m": 11.7,
+              "peakOverMean": 2.23,
+              "atEdge": true
+            },
+            "all": {
+              "px": [
+                -0.31,
+                0.4
+              ],
+              "east_m": -0.09,
+              "south_m": 0.12,
+              "peakOverMean": 1.78,
+              "atEdge": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "north-block",
+      "lat": 34.609,
+      "lon": 135.502,
+      "localXZ": [
+        -2109.3,
+        -533.4
+      ],
+      "cams": {
+        "persp60-r350": {
+          "fovDeg": 60,
+          "range": 350,
+          "metersPerPixel": 0.288,
+          "maskPx": 96159,
+          "quadrantShift": {
+            "NW": {
+              "px": [
+                0.15,
+                -0.79
+              ],
+              "east_m": 0.04,
+              "south_m": -0.23,
+              "peakOverMean": 1.64,
+              "atEdge": false
+            },
+            "NE": {
+              "px": [
+                -0.01,
+                -0.35
+              ],
+              "east_m": 0,
+              "south_m": -0.1,
+              "peakOverMean": 1.95,
+              "atEdge": false
+            },
+            "SW": {
+              "px": [
+                0.01,
+                -0.04
+              ],
+              "east_m": 0,
+              "south_m": -0.01,
+              "peakOverMean": 1.37,
+              "atEdge": false
+            },
+            "SE": {
+              "px": [
+                -0.7,
+                -0.09
+              ],
+              "east_m": -0.2,
+              "south_m": -0.03,
+              "peakOverMean": 1.35,
+              "atEdge": false
+            },
+            "all": {
+              "px": [
+                -0.1,
+                -0.43
+              ],
+              "east_m": -0.03,
+              "south_m": -0.12,
+              "peakOverMean": 1.54,
+              "atEdge": false
+            }
+          }
+        },
+        "ortho-like-fov2-r12000": {
+          "fovDeg": 2,
+          "range": 12000,
+          "metersPerPixel": 0.299,
+          "maskPx": 78991,
+          "quadrantShift": {
+            "NW": {
+              "px": [
+                -0.15,
+                -1.63
+              ],
+              "east_m": -0.04,
+              "south_m": -0.49,
+              "peakOverMean": 2.65,
+              "atEdge": false
+            },
+            "NE": {
+              "px": [
+                -38.32,
+                -8.01
+              ],
+              "east_m": -11.45,
+              "south_m": -2.39,
+              "peakOverMean": 2.28,
+              "atEdge": false
+            },
+            "SW": {
+              "px": [
+                31.94,
+                39.18
+              ],
+              "east_m": 9.55,
+              "south_m": 11.71,
+              "peakOverMean": 1.73,
+              "atEdge": true
+            },
+            "SE": {
+              "px": [
+                -30.63,
+                15.48
+              ],
+              "east_m": -9.16,
+              "south_m": 4.63,
+              "peakOverMean": 2.03,
+              "atEdge": false
+            },
+            "all": {
+              "px": [
+                -0.07,
+                -1.06
+              ],
+              "east_m": -0.02,
+              "south_m": -0.32,
+              "peakOverMean": 1.93,
+              "atEdge": false
+            }
+          }
+        }
+      }
+    }
+  ]
+}

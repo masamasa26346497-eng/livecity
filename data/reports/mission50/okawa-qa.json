@@ -1,0 +1,65 @@
+{
+  "mission": "50",
+  "view": {
+    "x": -2400,
+    "z": -9960,
+    "range": 900,
+    "pitch": -90
+  },
+  "samples": {
+    "water": 192,
+    "land": 1028
+  },
+  "jsErrors": [],
+  "failed": [
+    "404 http://localhost:8150/ext-3dtiles/index.json",
+    "404 http://localhost:8150/favicon.ico"
+  ],
+  "googleRequests": [],
+  "gsiWaterState": {
+    "state": "ready",
+    "polygons": 47,
+    "bboxLocal": {
+      "minX": -3310.3,
+      "maxX": -1297,
+      "minZ": -11275.1,
+      "maxZ": -8761.2
+    },
+    "dedupe": {
+      "inPolys": 51,
+      "dropped": 4,
+      "droppedAreaM2": 193
+    }
+  },
+  "result": {
+    "off": {
+      "waterSamplesUsed": 142,
+      "waterSamplesRenderedAsWater": 4,
+      "landSamplesUsed": 512,
+      "landSamplesRenderedAsWater": 1,
+      "waterHitPct": 2.8,
+      "landFalseWaterPct": 0.2
+    },
+    "on": {
+      "waterSamplesUsed": 142,
+      "waterSamplesRenderedAsWater": 139,
+      "landSamplesUsed": 512,
+      "landSamplesRenderedAsWater": 1,
+      "waterHitPct": 97.9,
+      "landFalseWaterPct": 0.2
+    },
+    "on-noedge": {
+      "waterSamplesUsed": 142,
+      "waterSamplesRenderedAsWater": 142,
+      "landSamplesUsed": 512,
+      "landSamplesRenderedAsWater": 1,
+      "waterHitPct": 100,
+      "landFalseWaterPct": 0.2
+    }
+  },
+  "roundTrip": {
+    "n": 40,
+    "medianM": 0.16,
+    "maxM": 1.45
+  }
+}

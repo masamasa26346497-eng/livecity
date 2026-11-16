@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>LOD2 PoC</title>
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Widgets/widgets.css">
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Cesium.js"></script>
+<div id="c" style="position:absolute;inset:0"></div>
+<script>
+(async () => {
+  const v = new Cesium.Viewer('c', { baseLayer: false, baseLayerPicker: false, geocoder: false, timeline: false, animation: false });
+  v.scene.globe.baseColor = Cesium.Color.DARKSLATEGRAY;
+  const r = await (await fetch('report.json')).json();
+  const ts = await Cesium.Cesium3DTileset.fromUrl('tileset.json');
+  v.scene.primitives.add(ts);
+  const o = r.origin;
+  v.camera.setView({ destination: Cesium.Cartesian3.fromDegrees(o.lon, o.lat - 0.004, 260), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-35) } });
+  for (let i = 0; i < 180; i++) await new Promise((res) => requestAnimationFrame(res));
+  const st = ts.statistics;
+  window.__lod2 = { tilesWithContentReady: st.numberOfTilesWithContentReady, trianglesSelected: st.numberOfTrianglesSelected,
+    commands: v.scene.frameState.commandList ? v.scene.frameState.commandList.length : null, geometryBytes: st.geometryByteLength };
+  document.title = 'DONE ' + JSON.stringify(window.__lod2);
+})().catch((e) => { document.title = 'ERR ' + e; });
+</script>

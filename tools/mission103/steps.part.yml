@@ -1,0 +1,128 @@
+      - name: Checkout pinned audited commit
+        uses: actions/checkout@v4
+        with:
+          ref: "@@PIN_SHA@@"
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Write trusted hash list (from this workflow file)
+        run: |
+          cat > "$RUNNER_TEMP/pin.sha256" <<'HASHES'
+@@HASHES@@
+          HASHES
+          sed -i 's/^ *//' "$RUNNER_TEMP/pin.sha256"
+          wc -l "$RUNNER_TEMP/pin.sha256"
+      - name: Verify pinned SHA, clean tree, file hashes (no token)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD is not the pinned SHA"; exit 1; }
+          [ -z "$(git status --porcelain)" ] || { echo "FAIL: tree not clean"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          echo "OK: pinned code verified"
+      - name: Preflight (no token, no network)
+        run: |
+          set -eu
+          printf '%s' "$WARD" | grep -Eq '^[a-z]+$' || { echo "FAIL: invalid ward"; exit 1; }
+          [ "$DATA_REPO" = "masamasa26346497-eng/livecity-3d-data" ] || { echo "FAIL: unexpected data repo"; exit 1; }
+          node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const polys=JSON.parse(fs.readFileSync("data/processed/osaka-city/boundaries/ward-classification-polygons.json","utf8"));
+            const hit=polys.wards.find(x=>x.wardId===w);
+            if(!hit) throw new Error("ward not in N03 polygons: "+w);
+            if(String(hit.wardCode).startsWith("27999")) throw new Error("expo (27999) excluded");
+            if(!/^271[0-2]\d$/.test(String(hit.wardCode))) throw new Error("not an official Osaka City ward code: "+hit.wardCode);
+            const lock=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8"));
+            if(!/plateau-27100-osaka-shi-2025/.test(JSON.stringify(lock.package))) throw new Error("source lock is not 27100/2025");
+            if(!lock.license||!lock.attribution) throw new Error("license/attribution missing in source lock");
+            const codes=new Set(polys.wards.map(x=>String(x.wardCode))); if(codes.size!==polys.wards.length) throw new Error("duplicate ward codes");
+            console.log("preflight ok ward="+w+" code="+hit.wardCode+" cost=0 (public CDN range reads, free runner minutes, private repo release)");
+          '
+      - name: Connect check (read-only, curl only, no repo code)
+        env:
+          DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -u
+          if [ -z "$DATA_TOKEN" ]; then echo "FAIL: secret empty or missing"; exit 1; fi
+          echo "::add-mask::$DATA_TOKEN"
+          code=$(curl -sS -o /tmp/repo.json -w '%{http_code}' -H "Authorization: Bearer $DATA_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$DATA_REPO")
+          [ "$code" = "200" ] || { echo "FAIL: repo GET HTTP $code"; exit 1; }
+          vis=$(jq -r '.visibility' /tmp/repo.json); push=$(jq -r '.permissions.push // false' /tmp/repo.json)
+          echo "repo=$DATA_REPO visibility=$vis token_push=$push"
+          [ "$vis" = "private" ] && [ "$push" = "true" ] || { echo "FAIL: need private + push"; exit 1; }
+          echo "OK: private connection verified (read-only)"
+      - name: Convert ward (PLATEAU 2025, NO token)
+        id: convert
+        run: node tools/mission80-batch.mjs --wards "$WARD" --max-wards 1 --ward-timeout-min 60
+      - name: Strict output check (no token)
+        id: strict
+        run: node tools/mission95-check-output.mjs "$WARD" | tee "$RUNNER_TEMP/strict.json"
+      - name: Re-verify code hashes before token use (no token)
+        id: reverify
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD changed"; exit 1; }
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+          M=data/reports/mission80/batch-manifest.json
+          bad=$(git status --porcelain | grep -vE '^\?\? (temp/|data/reports/mission80/)' | grep -vE "^ M $M\$" || true)
+          [ -z "$bad" ] || { echo "FAIL: unexpected changes: $bad"; exit 1; }
+          git show "HEAD:$M" > "$RUNNER_TEMP/manifest.head.json"
+          MANIFEST_BASE="$RUNNER_TEMP/manifest.head.json" MANIFEST_NEW="$M" node -e '
+            const fs=require("fs"); const w=process.env.WARD;
+            const a=JSON.parse(fs.readFileSync(process.env.MANIFEST_BASE,"utf8")), b=JSON.parse(fs.readFileSync(process.env.MANIFEST_NEW,"utf8"));
+            const same=(x,y)=>JSON.stringify(x)===JSON.stringify(y);
+            if(b.mission!==a.mission||String(b.vintage)!==String(a.vintage)) throw new Error("manifest header changed");
+            for(const k of Object.keys(a.wards||{})){ if(k!==w && !same(a.wards[k],b.wards[k])) throw new Error("other ward entry modified: "+k); }
+            for(const k of Object.keys(b.wards||{})){ if(k!==w && !(k in a.wards)) throw new Error("unexpected new ward entry: "+k); }
+            const DERIVED=["totals","lastRun","source","crossWardDuplicateIds"];
+            const extra=Object.keys(b).filter(k=>!["mission","vintage","wards","updatedAt"].includes(k)&&!DERIVED.includes(k)&&!same(a[k],b[k]));
+            if(extra.length) throw new Error("unexpected top-level keys changed: "+extra);
+            const ok=Object.values(b.wards).filter(x=>x&&x.status==="ok"), fl=Object.values(b.wards).filter(x=>x&&x.status==="failed");
+            if(b.totals!==undefined){ const t=b.totals, e={wardsOk:ok.length,wardsFailed:fl.length,buildings:ok.reduce((n,x)=>n+x.buildings,0),outBytes:ok.reduce((n,x)=>n+x.outBytes,0)};
+              if(!same(t,e)) throw new Error("totals inconsistent with wards: "+JSON.stringify(t)+" vs "+JSON.stringify(e)); }
+            if(b.lastRun!==undefined){ const r=b.lastRun;
+              if(!r||typeof r!=="object"||!Number.isInteger(r.processed)||r.processed>1||r.failedNow!==0||typeof r.at!=="string"||Object.keys(r).some(k=>!["processed","failedNow","stoppedBy","at"].includes(k))) throw new Error("lastRun invalid: "+JSON.stringify(r)); }
+            if(b.source!==undefined){ const L=JSON.parse(fs.readFileSync("data/reports/mission79/source-lock.json","utf8")), s=b.source;
+              if(s.url!==(L.resource&&L.resource.url)||s.etag!==(L.http&&L.http.etag)||s.bytes!==(L.http&&L.http.contentLength)||s.lastModified!==(L.http&&L.http.lastModified)) throw new Error("manifest source differs from hash-verified source-lock"); }
+            if(b.crossWardDuplicateIds!==undefined){ const d=b.crossWardDuplicateIds;
+              if(!d||typeof d!=="object"||Array.isArray(d)||Object.values(d).some(v=>!Number.isInteger(v))) throw new Error("crossWardDuplicateIds invalid"); }
+            if(!b.wards[w]) throw new Error("target ward entry missing");
+            console.log("manifest diff ok: only wards."+w+" and updatedAt may differ");
+          '
+      - name: Persist to private repo (token only here) and verify sha256
+        id: persist
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          node tools/mission95-persist-ward.mjs --ward "$WARD" --repo "$DATA_REPO" --execute | tee "$RUNNER_TEMP/persist.json"
+          node tools/mission87-persist.mjs status
+          {
+            echo "### $WARD"
+            echo "- strict: \`$(cat "$RUNNER_TEMP/strict.json")\`"
+            echo "- persist: \`$(tail -n1 "$RUNNER_TEMP/persist.json")\`"
+            echo "- browserAccepted: 0 (storage only; Cesium acceptance NOT done)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Write per-ward result (no token; separates generate failure from persist failure)
+        if: always()
+        env:
+          O_CONVERT: ${{ steps.convert.outcome }}
+          O_STRICT: ${{ steps.strict.outcome }}
+          O_REVERIFY: ${{ steps.reverify.outcome }}
+          O_PERSIST: ${{ steps.persist.outcome }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/res"
+          if [ "$O_PERSIST" = "success" ]; then st=stored
+          elif [ "$O_CONVERT" = "failure" ] || [ "$O_STRICT" = "failure" ]; then st=generate-failed
+          elif [ "$O_REVERIFY" = "failure" ] || [ "$O_PERSIST" = "failure" ]; then st=persist-failed
+          else st=incomplete; fi
+          jq -n --arg ward "$WARD" --arg st "$st" --arg c "$O_CONVERT" --arg s "$O_STRICT" --arg r "$O_REVERIFY" --arg p "$O_PERSIST" '{ward:$ward,status:$st,convert:$c,strict:$s,reverify:$r,persist:$p}' > "$RUNNER_TEMP/res/result-$WARD.json"
+          cat "$RUNNER_TEMP/res/result-$WARD.json"
+      - name: Upload per-ward result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ env.WARD }}
+          path: ${{ runner.temp }}/res/result-${{ env.WARD }}.json
+          retention-days: 30
