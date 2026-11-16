@@ -120,7 +120,7 @@ async function sweepMode() {
 async function compareMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
   if (shots) fs.mkdirSync(shots, { recursive: true });
-  const VIEWS_ALL = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'mid4k', h: 4000, pitch: -60 }, { n: 'mid6k', h: 6000, pitch: -45 }, { n: 'near', h: 1200, pitch: -35 }];
+  const VIEWS_ALL = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'mid4k', h: 4000, pitch: -60 }, { n: 'mid6k', h: 6000, pitch: -45 }, { n: 'near', h: 1200, pitch: -35 }, { n: 'mid3kb', h: 3000, pitch: -30, aim: true }, { n: 'mid6kb', h: 6000, pitch: -30, aim: true }];
   const pick = (all, key) => { const f = opt(key, ''); return f ? all.filter((x) => f.split(',').includes(x.n)) : all; };   // --views far,mid4k / --variants swapOn,lod0Off で絞り込み(前景10分上限対策)
   const VIEWS = pick(VIEWS_ALL, 'views');
   const VARIANTS = [{ n: 'swapOn', qs: 'citylod0=1&citylod0min=2500' }, { n: 'swapOff', qs: 'citylod0=1&citylod0min=2500&citylod0swap=0' }, { n: 'lod0Off', qs: '' }];
@@ -130,11 +130,12 @@ async function compareMode() {
     const up = await load(v.qs); if (!up) { result.compare.push({ variant: v.n, error: 'viewer 起動不可' }); continue; }
     await hookFail();
     for (const w of VIEWS) {
-      const held = await holdCam(lon0, lat0, w.h, w.pitch); await hookFail();
+      const camLat = w.aim ? lat0 - (w.h / Math.tan(-w.pitch * D2R)) / 111320 : lat0;   // aim: 視線の着地点が (lon0,lat0) になるようカメラを南へ退避(斜め視で空白域を見ないため)
+      const held = await holdCam(lon0, camLat, w.h, w.pitch); await hookFail();
       let loaded = false; for (let i = 0; i < 120; i++) { await ev('window.__v.scene.requestRender()'); loaded = await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
       await sleep(2500);
       // 起動後のカメラ移動で要求高度が上書きされる(10000→30225m)ため、撮影直前に再固定し、最終高度が要求±10%のときだけ held とする
-      const held2 = await holdCam(lon0, lat0, w.h, w.pitch); await hookFail();
+      const held2 = await holdCam(lon0, camLat, w.h, w.pitch); await hookFail();
       for (let i = 0; i < 40; i++) { await ev('window.__v.scene.requestRender()'); if (await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`)) break; await sleep(500); }
       await ev('window.__v.scene.requestRender()'); await sleep(800);
       const swap = await ev(`JSON.stringify((window.__mission37g&&window.__mission37g.perf&&window.__mission37g.perf.cityLod0Swap)||null)`);
@@ -143,9 +144,14 @@ async function compareMode() {
       await ev(`(()=>{window.__t=null;for(const p of (window.__v.scene.primitives._primitives||[])) if(p._lcCityLod0) window.__t=p; return !!window.__t})()`);
       const l0Show = await ev('window.__t ? window.__t.show : null');
       const ps = (v.n === 'lod0Off' || l0Show !== true) ? null : await pixelStat();   // LOD0 が実際に表示されている高度のときだけ画素寄与を測る
+
+      // UI パネルによる遮蔽を除去(スクリーンショット用。DOM のみ非表示、データ・描画は不変)
+      await ev(`(()=>{for(const e of document.querySelectorAll('body > *:not(#cesiumContainer):not(script):not(style)')){if(!e.contains(window.__v.container)&&e.id!=='lc-lod0-note')e.style.visibility='hidden'}return 1})()`);
+      // 残存(表示中)LOD0セルの分類: 中心が「ロード済み実タイルの境界球」内か否か。球内=実タイルはあるが未選択(粗い/遠景)、球外=実建物が存在しない範囲(妥当なfallback)
+      const resid = (v.n === 'lod0Off' || l0Show !== true) ? null : await ev(`(()=>{const T=window.__t;if(!T||!T._lcCells)return null;const real=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);const sph=[];for(const ts of real){const st=[ts.root];while(st.length){const t=st.pop();if(!t)continue;if(t.contentReady&&t.boundingSphere&&t.boundingSphere.radius<4000)sph.push({s:t.boundingSphere,sel:t._selectedFrame===window.__v.scene.frameState.frameNumber-0||false});if(t.children)for(const c of t.children)st.push(c)}}const o={shown:0,hidden:0,shownInLoadedRealSphere:0,shownNoRealTile:0,realLoadedTiles:sph.length};for(const arr of T._lcCells.values())for(const c of arr){if(!c.f.show){o.hidden++;continue}o.shown++;let hit=false;for(const x of sph){if(Cesium.Cartesian3.distance(c.p,x.s.center)<=x.s.radius){hit=true;break}}if(hit)o.shownInLoadedRealSphere++;else o.shownNoRealTile++}return o})()`);
       const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<30;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[15].toFixed(1),p95:+t[28].toFixed(1)}})()`);
       let png = null; if (shots) { const r = await send('Page.captureScreenshot', { format: 'png' }); png = path.join(shots, `${v.n}-${w.n}.png`); fs.writeFileSync(png, Buffer.from(r.result.data, 'base64')); }
-      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held: held && held2 && Math.abs(camH - w.h) < w.h * 0.1, loaded, lod0Show: l0Show, swap: JSON.parse(swap), swapDbg: await ev('JSON.stringify(window.__mission37g.perf.cityLod0SwapDbg||null)').then(JSON.parse), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
+      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held: held && held2 && Math.abs(camH - w.h) < w.h * 0.1, loaded, lod0Show: l0Show, swap: JSON.parse(swap), swapDbg: await ev('JSON.stringify(window.__mission37g.perf.cityLod0SwapDbg||null)').then(JSON.parse), lod0: JSON.parse(l0), resid, lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
     }
     result.compare.push({ variant: v.n, summary: true, ms: Date.now() - t0, bytes: (result.bytes || 0) - b0, tileFail: await ev('window.__tileFail||0') });
   }
