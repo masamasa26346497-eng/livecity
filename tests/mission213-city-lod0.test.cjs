@@ -104,3 +104,11 @@ test('viewer: LOD0 はセル単位で実タイルの描画範囲に置換され(
   const m = html.match(/Number\(q\.get\('citylod0min'\)\) \|\| (\d+)/);
   assert.ok(m && Number(m[1]) <= 5000, 'セル置換導入後は遠景カバー維持のため既定高度を低く保つ: ' + (m && m[1]));
 });
+
+test('置換は最詳細の実タイルだけを覆い範囲とみなし、比較E2Eは撮影直前にカメラを再固定する', () => {
+  const html = require('fs').readFileSync('public/mission37g-osaka-24ward-mvp.html', 'utf8');
+  assert.match(html, /cityLod0FineGE/);
+  assert.match(html, /tile\.children\.length === 0 \|\| tile\.geometricError <= cityLod0FineGE/);
+  const e2e = require('fs').readFileSync('tools/cloud/e2e-city-lod0.mjs', 'utf8');
+  assert.match(e2e, /held2/);
+});

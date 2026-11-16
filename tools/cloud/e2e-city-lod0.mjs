@@ -130,7 +130,11 @@ async function compareMode() {
     for (const w of VIEWS) {
       const held = await holdCam(lon0, lat0, w.h, w.pitch); await hookFail();
       let loaded = false; for (let i = 0; i < 120; i++) { await ev('window.__v.scene.requestRender()'); loaded = await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
-      await sleep(2500); await ev('window.__v.scene.requestRender()'); await sleep(800);
+      await sleep(2500);
+      // 起動後のカメラ移動で要求高度が上書きされる(10000→30225m)ため、撮影直前に再固定し、最終高度が要求±10%のときだけ held とする
+      const held2 = await holdCam(lon0, lat0, w.h, w.pitch); await hookFail();
+      for (let i = 0; i < 40; i++) { await ev('window.__v.scene.requestRender()'); if (await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`)) break; await sleep(500); }
+      await ev('window.__v.scene.requestRender()'); await sleep(800);
       const swap = await ev(`JSON.stringify((window.__mission37g&&window.__mission37g.perf&&window.__mission37g.perf.cityLod0Swap)||null)`);
       const l0 = await ev(`JSON.stringify((window.__mission37g&&window.__mission37g.perf&&window.__mission37g.perf.cityLod0)||null)`);
       const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
@@ -139,7 +143,7 @@ async function compareMode() {
       const ps = (v.n === 'lod0Off' || l0Show !== true) ? null : await pixelStat();   // LOD0 が実際に表示されている高度のときだけ画素寄与を測る
       const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<30;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[15].toFixed(1),p95:+t[28].toFixed(1)}})()`);
       let png = null; if (shots) { const r = await send('Page.captureScreenshot', { format: 'png' }); png = path.join(shots, `${v.n}-${w.n}.png`); fs.writeFileSync(png, Buffer.from(r.result.data, 'base64')); }
-      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held, loaded, lod0Show: l0Show, swap: JSON.parse(swap), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
+      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held: held && held2 && Math.abs(camH - w.h) < w.h * 0.1, loaded, lod0Show: l0Show, swap: JSON.parse(swap), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
     }
     result.compare.push({ variant: v.n, summary: true, ms: Date.now() - t0, bytes: (result.bytes || 0) - b0, tileFail: await ev('window.__tileFail||0') });
   }

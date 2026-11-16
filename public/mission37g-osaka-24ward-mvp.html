@@ -1773,10 +1773,11 @@
   // 模式LOD0 セル中心の ECEF(37B/geoToThree と同一定数: CLAT=34.604208, CLON=135.525020, 111320 m/deg)。セルは 200m グリッド(id=lod0_<cx>_<cz>)。
   const cityLod0CellPos = (cx, cz) => { const x = (cx + 0.5) * 200, z = (cz + 0.5) * 200; const lat = 34.604208 - z / 111320, lon = 135.525020 + x / (Math.cos(34.604208 * Math.PI / 180) * 111320); return Cesium.Cartesian3.fromDegrees(lon, lat, 0); };
   // 実タイルの描画範囲(球)を毎フレーム収集し、変化があったときだけ(最大2回/秒)セルの show を更新する。
+  const cityLod0FineGE = Number(q.get('citylod0fine')) || 8;   // 置換に使う実タイルの geometricError 上限(m)。葉タイルは常に対象
   const cityLod0Spheres = []; let cityLod0Sig = '', cityLod0LastApply = 0;
   function cityLod0SwapInstall(t) {
     const hooked = new WeakSet();
-    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; if (bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
+    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; /* 遠景で選ばれる粗い親タイル(子あり・geometricError大)は建物が疎ら=画素を満たさない。最詳細(葉 or 誤差が小さい)タイルだけを「実建物で覆われた範囲」とみなし、粗い間は模式セルを残す */ const fine = tile.children ? (tile.children.length === 0 || tile.geometricError <= cityLod0FineGE) : true; if (fine && bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
     scene.preUpdate.addEventListener(() => { hook(); cityLod0Spheres.length = 0; });
     scene.postRender.addEventListener(() => {
       if (!t.show || t.isDestroyed()) return;
