@@ -92,9 +92,15 @@ test('build-cloud-preview.mjs / e2e-city-lod0.mjs は構文が正しい(node --c
   assert.ok(/wardSecs\.length >= 3 && projMin > TIME_BUDGET_MIN\) throw new Error/.test(b));
 });
 
-test('viewer: citylod0min の既定は市域俯瞰高度(>=10000m)で、2500m既定に戻っていない(視覚FAIL回帰)', () => {
+test('viewer: LOD0 はセル単位で実タイルの描画範囲に置換され(既定ON)、高度しきい値だけに頼らない', () => {
   const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
+  assert.ok(/function cityLod0SwapInstall\(/.test(html), 'セル単位置換が存在する');
+  assert.ok(/q\.get\('citylod0swap'\) !== '0'/.test(html), '置換は既定ON(=0で無効)');
+  assert.ok(/tileVisible\.addEventListener/.test(html) && /f\.show = !cov|c\.f\.show = !cov/.test(html), '描画された実タイルの範囲でセルを隠す');
+  assert.ok(!/tile\.show = !\(d < nearM/.test(html), '旧タイル単位の距離判定が復活していない');
+  assert.ok(/allowPicking: false/.test(html), 'LOD0 は pick 対象にしない');
+  // 実タイルが描かれていない範囲(球が無い)ではセルを隠さない=穴を作らない: 隠す条件は球内包のみ
+  assert.ok(/distance\(c\.p, s\.center\) <= s\.radius/.test(html), '球に含まれるセルのみ非表示');
   const m = html.match(/Number\(q\.get\('citylod0min'\)\) \|\| (\d+)/);
-  assert.ok(m, 'citylod0min の既定が見つかる');
-  assert.ok(Number(m[1]) >= 10000, '既定が低いと斜め視で実建物上にLOD0が重なる: ' + m[1]);
+  assert.ok(m && Number(m[1]) <= 5000, 'セル置換導入後は遠景カバー維持のため既定高度を低く保つ: ' + (m && m[1]));
 });

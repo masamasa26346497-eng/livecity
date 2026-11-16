@@ -42,3 +42,8 @@ runner から geospatial.jp への取得が可能(ZIP Range・無料枠ガード
 - 実データE2E: `node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --lat <緯度> --lon <経度> --out r.json`(`--static` は build 出力を読み取り専用で配信。元ファイル無改変・`ext-3dtiles/index.json` の `cityLod0` が無ければ exit 3)。
   実LOD1/2 を載せた状態で、高度3000mの LOD0 寄与画素率、高度600mで LOD0 自動非表示、画面格子 pick(LOD0 pick 0)、CDP の実マウスで建物クリック→`livecity:37d-building-selected` の canonicalId 一致、cold/warm 転送量を取得する。
 - 制限: SwiftShader(ソフトウェアWebGL)・localhost のため FPS/p95/所要時間は実機の値ではない。LOD0 のみの空白(区境の穴)を都市全域で網羅した検証ではない。`?citylod0swap=1` は引き続き未検証・既定OFF。
+
+## セル単位置換(bbac022 の次段階)
+- 高度しきい値(15000m)は暫定策。`citylod0min` 既定を 2500m へ戻し、`cityLod0SwapInstall` で「いま描画されている実LOD1/2(+ward LOD0)タイルの境界球」に中心が入る模式セルだけ `feature.show=false` にする。既定ON、`?citylod0swap=0` で無効(旧 `=1` 方式のタイル単位距離判定は廃止)。
+- 実タイルが未ロード/視錐台外の範囲では球が無いためセルは残る(空白にならない)。境界球に中心が入らない縁のセルは残り、縁でわずかに重なる可能性がある。
+- **実ブラウザでの before/after は未検証。**

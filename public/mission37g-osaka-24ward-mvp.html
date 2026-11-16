@@ -1770,29 +1770,43 @@
   //   index.json の cityLod0 が無ければ何もしない。カメラ高度が ?citylod0min(既定2500m)以上のときだけ表示し、近づくと実LOD1/LOD2に任せる(タイル単位の置換は Phase2)。
   let cityLod0 = null, cityLod0Pending = false, cityLod0Uri = null;
   if (q.get('citylod0') === '1') fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.cityLod0 && typeof j.cityLod0.uri === 'string' && /^[A-Za-z0-9_\-\/.]+$/.test(j.cityLod0.uri)) { cityLod0Uri = j.cityLod0.uri; cityLod0Sync(); } }).catch(() => {});
+  // 模式LOD0 セル中心の ECEF(37B/geoToThree と同一定数: CLAT=34.604208, CLON=135.525020, 111320 m/deg)。セルは 200m グリッド(id=lod0_<cx>_<cz>)。
+  const cityLod0CellPos = (cx, cz) => { const x = (cx + 0.5) * 200, z = (cz + 0.5) * 200; const lat = 34.604208 - z / 111320, lon = 135.525020 + x / (Math.cos(34.604208 * Math.PI / 180) * 111320); return Cesium.Cartesian3.fromDegrees(lon, lat, 0); };
+  // 実タイルの描画範囲(球)を毎フレーム収集し、変化があったときだけ(最大2回/秒)セルの show を更新する。
+  const cityLod0Spheres = []; let cityLod0Sig = '', cityLod0LastApply = 0;
+  function cityLod0SwapInstall(t) {
+    const hooked = new WeakSet();
+    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; if (bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
+    scene.preUpdate.addEventListener(() => { hook(); cityLod0Spheres.length = 0; });
+    scene.postRender.addEventListener(() => {
+      if (!t.show || t.isDestroyed()) return;
+      const now = performance.now(); if (now - cityLod0LastApply < 500) return;
+      let sig = cityLod0Spheres.length + ':'; for (const s of cityLod0Spheres) sig += Math.round(s.center.x + s.center.y + s.center.z + s.radius) + ',';
+      if (sig === cityLod0Sig) return; cityLod0Sig = sig; cityLod0LastApply = now;
+      let hidden = 0, total = 0;
+      for (const arr of t._lcCells.values()) for (const c of arr) { total++; let cov = false; for (const s of cityLod0Spheres) { if (Cesium.Cartesian3.distance(c.p, s.center) <= s.radius) { cov = true; break; } } c.f.show = !cov; if (cov) hidden++; }
+      perf.cityLod0Swap = { spheres: cityLod0Spheres.length, cells: total, hidden };
+      scene.requestRender();
+    });
+  }
   async function cityLod0Sync() {
     if (!cityLod0Uri) return;
-    // 視覚FAIL修正: 旧既定2500mだと斜め視で手前の実LOD1/2の上にも模式ブロックが常時重なり街を格子で覆った。既定を市域全体を俯瞰する高度(15000m)へ。検証用は ?citylod0min=2500。
-    const minH = Number(q.get('citylod0min')) || 15000;
+    // 視覚FAIL修正: 旧既定2500mだと斜め視で手前の実LOD1/2の上にも模式ブロックが常時重なり街を格子で覆った。暫定で15000mへ上げていたが、根本対策としてセル単位置換(cityLod0SwapInstall)を入れたため既定は2500mへ戻した。
+    const minH = Number(q.get('citylod0min')) || 2500;
     const camH = viewer.camera.positionCartographic ? viewer.camera.positionCartographic.height : 0;
     if (!cityLod0 && !cityLod0Pending && camH >= minH) {
       cityLod0Pending = true;
       try {
         const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/' + cityLod0Uri, { maximumScreenSpaceError: 16, allowPicking: false });
-        // Phase2(試験): タイル単位の置換。カメラから ?citylod0near(既定1500m)以内の LOD0 タイルだけ非表示にし、実LOD1/2へ任せる。
-        //   実タイルが未ロード(allTilesetsNow に tilesLoaded=false)の間は隠さない=穴を作らない側へ倒す。LOD0 は遠方タイルのみ残る。
-        const nearM = Number(q.get('citylod0near')) || 1500;
-        // 安全側(既定): 距離判定は無効。穴を作る恐れがあり実描画で未検証のため ?citylod0swap=1 の明示時だけ有効。既定は高度しきい値のみ。
-        if (q.get('citylod0swap') === '1') t.tileVisible.addEventListener((tile) => {
-          try {
-            const bs = tile.boundingSphere; if (!bs) return;
-            const d = Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius;
-            let realReady = true; for (const x of allTilesetsNow()) if (!x._lcCityLod0 && !x.tilesLoaded) { realReady = false; break; }
-            tile.show = !(d < nearM && realReady);
-          } catch (e) { tile.show = true; }
-        });
+        // Phase2: セル単位の置換(既定ON・?citylod0swap=0 で無効)。高度しきい値ではなく「いま実際に描画されている実LOD1/2/ward-LOD0 タイルの範囲」に入る模式セルだけを非表示にする。
+        //   実タイルが選択(描画)されていない範囲=未ロード/視錐台外/遠景はセルを残す=穴を作らない側。実タイルの tileVisible は描画対象のときだけ発火する。
+        const swapOn = q.get('citylod0swap') !== '0';
+        t._lcCells = new Map();   // Cesium3DTile -> [{ f, p(ECEF) }]
+        t.tileLoad.addEventListener((tile) => { try { const c = tile.content, n = c && c.featuresLength || 0, arr = []; for (let i = 0; i < n; i++) { const f = c.getFeature(i), m = /^lod0_(-?\d+)_(-?\d+)$/.exec(String(f.getProperty('canonicalId'))); if (!m) continue; arr.push({ f, p: cityLod0CellPos(+m[1], +m[2]) }); } t._lcCells.set(tile, arr); } catch (e) {} });
+        t.tileUnload.addEventListener((tile) => { t._lcCells.delete(tile); });
+        if (swapOn) cityLod0SwapInstall(t);
         t._lcCityLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
-        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH, swap: q.get('citylod0swap') === '1' };
+        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH, swap: swapOn };
         { const n = document.createElement('div'); n.id = 'lc-lod0-note'; n.style.cssText = 'position:fixed;right:8px;bottom:28px;z-index:50;background:rgba(20,30,45,.8);color:#dfe8f3;font:11px/1.4 sans-serif;padding:3px 8px;border-radius:4px;pointer-events:none'; n.textContent = '遠景: 模式LOD0(建物密度ブロック・実棟ではありません/クリック不可)'; document.body.appendChild(n); t._lcNote = n; }
       } catch (e) { perf.cityLod0 = { loaded: false, error: String(e && e.message || e) }; } finally { cityLod0Pending = false; }
     }
