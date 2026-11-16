@@ -114,6 +114,37 @@ async function sweepMode() {
   // 24区完了の判定: 全 (点,高度) が確定済み(ok/covered-by-real)で hole 0、かつ打ち切り無し。
   result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.notLoaded === 0 && result.sweep.summary.cameraNotHeld === 0 && result.sweep.summary.ok > 0 && wardsFound === 24 && !result.sweep.truncated;
 }
+
+// ---- --compare: 同一カメラで「置換ON / 置換OFF(citylod0swap=0) / LOD0なし」を近・中・遠で撮り比べる(--static 必須)。 --shots <dir> に PNG、結果は result.compare。
+//   スクリーンショットは実データ由来の画素を含むため artifact 公開しないこと(ローカル確認用)。
+async function compareMode() {
+  const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
+  if (shots) fs.mkdirSync(shots, { recursive: true });
+  const VIEWS = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'near', h: 1200, pitch: -35 }];
+  const VARIANTS = [{ n: 'swapOn', qs: 'citylod0=1&citylod0min=2500' }, { n: 'swapOff', qs: 'citylod0=1&citylod0min=2500&citylod0swap=0' }, { n: 'lod0Off', qs: '' }];
+  result.compare = [];
+  for (const v of VARIANTS) {
+    const b0 = result.bytes || 0, t0 = Date.now();
+    const up = await load(v.qs); if (!up) { result.compare.push({ variant: v.n, error: 'viewer 起動不可' }); continue; }
+    await hookFail();
+    for (const w of VIEWS) {
+      const held = await holdCam(lon0, lat0, w.h, w.pitch); await hookFail();
+      let loaded = false; for (let i = 0; i < 120; i++) { await ev('window.__v.scene.requestRender()'); loaded = await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
+      await sleep(2500); await ev('window.__v.scene.requestRender()'); await sleep(800);
+      const swap = await ev(`JSON.stringify((window.__mission37g&&window.__mission37g.perf&&window.__mission37g.perf.cityLod0Swap)||null)`);
+      const l0 = await ev(`JSON.stringify((window.__mission37g&&window.__mission37g.perf&&window.__mission37g.perf.cityLod0)||null)`);
+      const camH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
+      await ev(`(()=>{window.__t=null;for(const p of (window.__v.scene.primitives._primitives||[])) if(p._lcCityLod0) window.__t=p; return !!window.__t})()`);
+      const l0Show = await ev('window.__t ? window.__t.show : null');
+      const ps = (v.n === 'lod0Off' || l0Show !== true) ? null : await pixelStat();   // LOD0 が実際に表示されている高度のときだけ画素寄与を測る
+      const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<30;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[15].toFixed(1),p95:+t[28].toFixed(1)}})()`);
+      let png = null; if (shots) { const r = await send('Page.captureScreenshot', { format: 'png' }); png = path.join(shots, `${v.n}-${w.n}.png`); fs.writeFileSync(png, Buffer.from(r.result.data, 'base64')); }
+      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held, loaded, lod0Show: l0Show, swap: JSON.parse(swap), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
+    }
+    result.compare.push({ variant: v.n, summary: true, ms: Date.now() - t0, bytes: (result.bytes || 0) - b0, tileFail: await ev('window.__tileFail||0') });
+  }
+  result.ok = result.compare.filter((c) => c.view).every((c) => c.held && c.loaded);
+}
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
   const t0 = Date.now();
@@ -145,7 +176,7 @@ async function realMode() {
   result.ok = !!(result.checks.lod0Loaded && hp.lod0Share > 0.02 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
-  if (STATIC) await realMode(); else {
+  if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
   const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);
