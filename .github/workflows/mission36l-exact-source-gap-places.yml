@@ -1,0 +1,82 @@
+name: Mission 36L - Exact Source Gap Places
+
+on:
+  push:
+    branches:
+      - feature/mission-36l-building-photo-linking
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mission36l-exact-source-gap-places
+  cancel-in-progress: false
+
+jobs:
+  exact-source-gap-batch:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[run-36l-exact-gaps]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+      MISSION_BRANCH: feature/mission-36l-building-photo-linking
+    steps:
+      - name: Checkout mission branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.MISSION_BRANCH }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify API key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${GOOGLE_PLACES_API_KEY:-}" || { echo 'GOOGLE_PLACES_API_KEY missing'; exit 2; }
+
+      - name: Process first 100 actionable exact-source gaps
+        run: node tools/google-places/match-mission36l-exact-source-gaps.mjs --limit 100 --requests-per-minute 50
+
+      - name: Validate safe durable output
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json';
+          const d=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(d.maxDistanceMeters!==120) throw new Error('120m hard ceiling changed');
+          if(!d.policy?.persistsOnlyVerifiedLinkage) throw new Error('VERIFIED-only policy missing');
+          if((d.entries||[]).some((e)=>e.matchConfidence!=='VERIFIED')) throw new Error('non-VERIFIED durable entry');
+          const raw=JSON.stringify(d).toLowerCase();
+          for(const banned of ['photouri','photoname','mediaurl','resourcename','base64']) {
+            if(raw.includes(banned)) throw new Error(`forbidden durable media token: ${banned}`);
+          }
+          const r=JSON.parse(fs.readFileSync('data/reports/mission36l-exact-source-gap-places/last-batch.json','utf8'));
+          console.log(JSON.stringify({processed:r.processed, verifiedThisBatch:r.verifiedThisBatch, remainingActionable:r.remainingActionable, missingFacilityRecord:r.missingFacilityRecord}));
+          NODE
+
+      - name: Commit batch result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f public/map-data/osaka-city/derived/google-places-osaka-city-mapping.json
+          git add -f public/map-data/osaka-city/derived/google-places-pilot-mapping.json
+          git add -f data/reports/mission36l-exact-source-gap-places/progress.json
+          git add -f data/reports/mission36l-exact-source-gap-places/last-batch.json
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data(mission36l): exact-source gap Places batch 1'
+          git fetch origin "${MISSION_BRANCH}"
+          git rebase "origin/${MISSION_BRANCH}"
+          git push origin "HEAD:${MISSION_BRANCH}"

@@ -1,0 +1,729 @@
+{
+  "mission": "36L-exact-source-gap-places",
+  "generatedAt": "2026-10-05T11:43:03.412Z",
+  "policy": {
+    "maxDistanceMeters": 120,
+    "verifiedOnlyPersistence": true,
+    "exactSourceOnly": true
+  },
+  "selected": 100,
+  "processed": 100,
+  "verifiedThisBatch": 2,
+  "remainingActionable": 3404,
+  "missingFacilityRecord": 13564,
+  "apiUsage": {
+    "searchCalls": 100,
+    "detailsCalls": 0,
+    "photoMediaCalls": 0,
+    "disabledCalls": 0,
+    "deduped": 0,
+    "rateLimited": 0,
+    "sessionLimited": 0,
+    "executed": 100,
+    "inFlight": 0,
+    "windowCount": 15,
+    "sessionCount": 100
+  },
+  "results": [
+    {
+      "facilityId": "osm-way-1003471708",
+      "sourceId": "way/1003471708",
+      "queryName": "井高野書店",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 79
+    },
+    {
+      "facilityId": "osm-way-1007569147",
+      "sourceId": "way/1007569147",
+      "queryName": "ウエルシア薬局",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1036
+    },
+    {
+      "facilityId": "osm-way-1009849160",
+      "sourceId": "way/1009849160",
+      "queryName": "ホワイト急便",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1013988502",
+      "sourceId": "way/1013988502",
+      "queryName": "業務用スーパー",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 5
+    },
+    {
+      "facilityId": "osm-way-1017316379",
+      "sourceId": "way/1017316379",
+      "queryName": "常翔学園",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1017316382",
+      "sourceId": "way/1017316382",
+      "queryName": "常翔学園",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1018942628",
+      "sourceId": "way/1018942628",
+      "queryName": "ワンカルビ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2331
+    },
+    {
+      "facilityId": "osm-way-102845816",
+      "sourceId": "way/102845816",
+      "queryName": "四天王寺高等学校・中学校",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 49
+    },
+    {
+      "facilityId": "osm-way-1029554610",
+      "sourceId": "way/1029554610",
+      "queryName": "アジア太平洋トレードセンター",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 181
+    },
+    {
+      "facilityId": "osm-way-1030556021",
+      "sourceId": "way/1030556021",
+      "queryName": "大阪神愛館グレース保育園",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2
+    },
+    {
+      "facilityId": "osm-way-1031914519",
+      "sourceId": "way/1031914519",
+      "queryName": "セルフのフルセ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 4926
+    },
+    {
+      "facilityId": "osm-way-1031916460",
+      "sourceId": "way/1031916460",
+      "queryName": "Mika's Kitchen",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 12908
+    },
+    {
+      "facilityId": "osm-way-1033706640",
+      "sourceId": "way/1033706640",
+      "queryName": "パークステーション24",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 38
+    },
+    {
+      "facilityId": "osm-way-1039759700",
+      "sourceId": "way/1039759700",
+      "queryName": "TOYO CARMAX",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 709
+    },
+    {
+      "facilityId": "osm-way-1049165417",
+      "sourceId": "way/1049165417",
+      "queryName": "テニススクール・ノア",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1058545206",
+      "sourceId": "way/1058545206",
+      "queryName": "大阪府浪波警察署 通天閣下警ら連絡所",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 3
+    },
+    {
+      "facilityId": "osm-way-1067614204",
+      "sourceId": "way/1067614204",
+      "queryName": "北野病院",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1071088067",
+      "sourceId": "way/1071088067",
+      "queryName": "ヨドコウ桜スタジアム",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 12
+    },
+    {
+      "facilityId": "osm-way-1074141968",
+      "sourceId": "way/1074141968",
+      "queryName": "ファミリーマート",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 778
+    },
+    {
+      "facilityId": "osm-way-1074141970",
+      "sourceId": "way/1074141970",
+      "queryName": "ケーズデンキ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1855
+    },
+    {
+      "facilityId": "osm-way-1075555533",
+      "sourceId": "way/1075555533",
+      "queryName": "正覺寺",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1077002113",
+      "sourceId": "way/1077002113",
+      "queryName": "The Bridge Hotel",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 6
+    },
+    {
+      "facilityId": "osm-way-1086688882",
+      "sourceId": "way/1086688882",
+      "queryName": "ライゼボックス",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 2
+    },
+    {
+      "facilityId": "osm-way-1087948385",
+      "sourceId": "way/1087948385",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 186
+    },
+    {
+      "facilityId": "osm-way-1095580489",
+      "sourceId": "way/1095580489",
+      "queryName": "パークステーション24",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 355
+    },
+    {
+      "facilityId": "osm-way-1096317816",
+      "sourceId": "way/1096317816",
+      "queryName": "くるっとパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-109650028",
+      "sourceId": "way/109650028",
+      "queryName": "帝塚山学院",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-109725535",
+      "sourceId": "way/109725535",
+      "queryName": "止止呂支比売命神社",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2
+    },
+    {
+      "facilityId": "osm-way-1097681099",
+      "sourceId": "way/1097681099",
+      "queryName": "豊新第七町会集会所",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 112
+    },
+    {
+      "facilityId": "osm-way-109949445",
+      "sourceId": "way/109949445",
+      "queryName": "ドーミーイン心斎橋",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 788
+    },
+    {
+      "facilityId": "osm-way-1102812905",
+      "sourceId": "way/1102812905",
+      "queryName": "てこや",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 2075
+    },
+    {
+      "facilityId": "osm-way-1102812906",
+      "sourceId": "way/1102812906",
+      "queryName": "らー麺　ずんどう屋",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 2
+    },
+    {
+      "facilityId": "osm-way-1102815459",
+      "sourceId": "way/1102815459",
+      "queryName": "スギ薬局",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 9
+    },
+    {
+      "facilityId": "osm-way-1104630420",
+      "sourceId": "way/1104630420",
+      "queryName": "満福寺",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 12
+    },
+    {
+      "facilityId": "osm-way-1107238771",
+      "sourceId": "way/1107238771",
+      "queryName": "北野モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 8708
+    },
+    {
+      "facilityId": "osm-way-1107320641",
+      "sourceId": "way/1107320641",
+      "queryName": "澤田ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 299
+    },
+    {
+      "facilityId": "osm-way-1107608758",
+      "sourceId": "way/1107608758",
+      "queryName": "第8瑞光駐車場",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1145
+    },
+    {
+      "facilityId": "osm-way-1107679054",
+      "sourceId": "way/1107679054",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 212
+    },
+    {
+      "facilityId": "osm-way-1107695926",
+      "sourceId": "way/1107695926",
+      "queryName": "ワタセ第1ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 138
+    },
+    {
+      "facilityId": "osm-way-1107978309",
+      "sourceId": "way/1107978309",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1108066650",
+      "sourceId": "way/1108066650",
+      "queryName": "H&Tモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 265
+    },
+    {
+      "facilityId": "osm-way-1108069446",
+      "sourceId": "way/1108069446",
+      "queryName": "第2H&Tモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 452
+    },
+    {
+      "facilityId": "osm-way-1108110859",
+      "sourceId": "way/1108110859",
+      "queryName": "パラカ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1827
+    },
+    {
+      "facilityId": "osm-way-1108418234",
+      "sourceId": "way/1108418234",
+      "queryName": "豊里モータープール",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 67
+    },
+    {
+      "facilityId": "osm-way-1108476365",
+      "sourceId": "way/1108476365",
+      "queryName": "樋口モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 472
+    },
+    {
+      "facilityId": "osm-way-1108476867",
+      "sourceId": "way/1108476867",
+      "queryName": "福寿堂秀信帝塚山本店",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 13
+    },
+    {
+      "facilityId": "osm-way-1108859230",
+      "sourceId": "way/1108859230",
+      "queryName": "藤本ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 9824
+    },
+    {
+      "facilityId": "osm-way-1108944223",
+      "sourceId": "way/1108944223",
+      "queryName": "豊新沼田モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 207
+    },
+    {
+      "facilityId": "osm-way-1108955621",
+      "sourceId": "way/1108955621",
+      "queryName": "コインパーク豊新1丁目第2",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 4
+    },
+    {
+      "facilityId": "osm-way-1109020271",
+      "sourceId": "way/1109020271",
+      "queryName": "遠里小野老人憩の家",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-1109202801",
+      "sourceId": "way/1109202801",
+      "queryName": "Dパーキング 豊新3丁目第1",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1109202802",
+      "sourceId": "way/1109202802",
+      "queryName": "マスノパーキング",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 7049
+    },
+    {
+      "facilityId": "osm-way-1110142337",
+      "sourceId": "way/1110142337",
+      "queryName": "第1澤田モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 318
+    },
+    {
+      "facilityId": "osm-way-1110431700",
+      "sourceId": "way/1110431700",
+      "queryName": "テニカモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 390
+    },
+    {
+      "facilityId": "osm-way-1110438832",
+      "sourceId": "way/1110438832",
+      "queryName": "テニカAモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 374
+    },
+    {
+      "facilityId": "osm-way-1110460391",
+      "sourceId": "way/1110460391",
+      "queryName": "お菓子のデパートよしや",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 0
+    },
+    {
+      "facilityId": "osm-way-1110639859",
+      "sourceId": "way/1110639859",
+      "queryName": "児島モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 11228
+    },
+    {
+      "facilityId": "osm-way-1110639866",
+      "sourceId": "way/1110639866",
+      "queryName": "大桐大野駐車場",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 230
+    },
+    {
+      "facilityId": "osm-way-1110648035",
+      "sourceId": "way/1110648035",
+      "queryName": "大宮",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 391987
+    },
+    {
+      "facilityId": "osm-way-1110913433",
+      "sourceId": "way/1110913433",
+      "queryName": "野畑ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3918
+    },
+    {
+      "facilityId": "osm-way-1110962610",
+      "sourceId": "way/1110962610",
+      "queryName": "山下モータープール",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 103
+    },
+    {
+      "facilityId": "osm-way-1110968477",
+      "sourceId": "way/1110968477",
+      "queryName": "春日ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 6463
+    },
+    {
+      "facilityId": "osm-way-1111207952",
+      "sourceId": "way/1111207952",
+      "queryName": "中橋第二モータープール",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 54
+    },
+    {
+      "facilityId": "osm-way-1111208025",
+      "sourceId": "way/1111208025",
+      "queryName": "辻中第1ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 471
+    },
+    {
+      "facilityId": "osm-way-1111212495",
+      "sourceId": "way/1111212495",
+      "queryName": "辻中第3モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1241
+    },
+    {
+      "facilityId": "osm-way-1111373419",
+      "sourceId": "way/1111373419",
+      "queryName": "光明寺",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1111373457",
+      "sourceId": "way/1111373457",
+      "queryName": "教徳寺",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1111373476",
+      "sourceId": "way/1111373476",
+      "queryName": "西辻モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 572
+    },
+    {
+      "facilityId": "osm-way-1111687973",
+      "sourceId": "way/1111687973",
+      "queryName": "ガレージ砂濱",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 61
+    },
+    {
+      "facilityId": "osm-way-1111719188",
+      "sourceId": "way/1111719188",
+      "queryName": "北建設専用駐車場",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1111719224",
+      "sourceId": "way/1111719224",
+      "queryName": "第二北野モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 569
+    },
+    {
+      "facilityId": "osm-way-1111909289",
+      "sourceId": "way/1111909289",
+      "queryName": "花水木モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 329
+    },
+    {
+      "facilityId": "osm-way-1111953209",
+      "sourceId": "way/1111953209",
+      "queryName": "青空モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 926
+    },
+    {
+      "facilityId": "osm-way-1112197319",
+      "sourceId": "way/1112197319",
+      "queryName": "大倉モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 371
+    },
+    {
+      "facilityId": "osm-way-1112404265",
+      "sourceId": "way/1112404265",
+      "queryName": "新協ガレージ",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 715
+    },
+    {
+      "facilityId": "osm-way-1112649107",
+      "sourceId": "way/1112649107",
+      "queryName": "樋口モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1007
+    },
+    {
+      "facilityId": "osm-way-1112801755",
+      "sourceId": "way/1112801755",
+      "queryName": "めぐみモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1251
+    },
+    {
+      "facilityId": "osm-way-1112801777",
+      "sourceId": "way/1112801777",
+      "queryName": "美吉モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 684
+    },
+    {
+      "facilityId": "osm-way-1112806693",
+      "sourceId": "way/1112806693",
+      "queryName": "タイムズ",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1112837371",
+      "sourceId": "way/1112837371",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1112853635",
+      "sourceId": "way/1112853635",
+      "queryName": "コーワモータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 3459
+    },
+    {
+      "facilityId": "osm-way-1112853668",
+      "sourceId": "way/1112853668",
+      "queryName": "OnePark 小松2丁目",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 408
+    },
+    {
+      "facilityId": "osm-way-1113188661",
+      "sourceId": "way/1113188661",
+      "queryName": "阪急上新庄駐輪センター",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 16
+    },
+    {
+      "facilityId": "osm-way-1113188735",
+      "sourceId": "way/1113188735",
+      "queryName": "竹内モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 4072
+    },
+    {
+      "facilityId": "osm-way-1113195317",
+      "sourceId": "way/1113195317",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1113242877",
+      "sourceId": "way/1113242877",
+      "queryName": "小松公園前モータープール",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 12
+    },
+    {
+      "facilityId": "osm-way-1113242895",
+      "sourceId": "way/1113242895",
+      "queryName": "中尾モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 4541
+    },
+    {
+      "facilityId": "osm-way-1113253427",
+      "sourceId": "way/1113253427",
+      "queryName": "ケーエム第1プール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 39003
+    },
+    {
+      "facilityId": "osm-way-1113265573",
+      "sourceId": "way/1113265573",
+      "queryName": "大川モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 9675
+    },
+    {
+      "facilityId": "osm-way-1113535580",
+      "sourceId": "way/1113535580",
+      "queryName": "パークス 小松四丁目",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 9
+    },
+    {
+      "facilityId": "osm-way-1114762468",
+      "sourceId": "way/1114762468",
+      "queryName": "第5さつきモータープール",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 90
+    },
+    {
+      "facilityId": "osm-way-1114762474",
+      "sourceId": "way/1114762474",
+      "queryName": "タイムパーキング 下新庄6丁目第3",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 15
+    },
+    {
+      "facilityId": "osm-way-1115385467",
+      "sourceId": "way/1115385467",
+      "queryName": "村田モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1160
+    },
+    {
+      "facilityId": "osm-way-1115414899",
+      "sourceId": "way/1115414899",
+      "queryName": "ウエルシア薬局",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": null
+    },
+    {
+      "facilityId": "osm-way-1115505655",
+      "sourceId": "way/1115505655",
+      "queryName": "文野第3モータープール",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 1604
+    },
+    {
+      "facilityId": "osm-way-1115655356",
+      "sourceId": "way/1115655356",
+      "queryName": "あらた歯科医院",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 44788
+    },
+    {
+      "facilityId": "osm-way-1115666705",
+      "sourceId": "way/1115666705",
+      "queryName": "飛鳥-第3駐車場",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 82
+    },
+    {
+      "facilityId": "osm-way-1115666706",
+      "sourceId": "way/1115666706",
+      "queryName": "Superjpm",
+      "matchConfidence": "VERIFIED",
+      "distanceMeters": 90
+    },
+    {
+      "facilityId": "osm-way-1115918810",
+      "sourceId": "way/1115918810",
+      "queryName": "旭キリスト教会",
+      "matchConfidence": "AMBIGUOUS",
+      "distanceMeters": 1
+    },
+    {
+      "facilityId": "osm-way-1116176596",
+      "sourceId": "way/1116176596",
+      "queryName": "三井のリパーク",
+      "matchConfidence": "UNRESOLVED",
+      "distanceMeters": 206
+    }
+  ]
+}

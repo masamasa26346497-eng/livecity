@@ -1,0 +1,45 @@
+{
+  "mission": "36L-missing-facility-rescue",
+  "generatedAt": "2026-10-08T22:19:27.087Z",
+  "policy": {
+    "exactOsmSourceOnly": true,
+    "maxDistanceMeters": 120,
+    "verifiedOnlyPersistence": true
+  },
+  "selected": 3,
+  "processed": 0,
+  "notEvaluated": 1,
+  "apiError": "Places API: http-403",
+  "apiErrorDiagnostics": {
+    "httpStatus": 403,
+    "retryAfter": null,
+    "errorCode": 403,
+    "errorStatus": "PERMISSION_DENIED"
+  },
+  "prunedApiErrorAttempts": 4919,
+  "verifiedThisBatch": 0,
+  "remainingMissingActionable": 11143,
+  "osmCentersResolved": 3,
+  "apiUsage": {
+    "searchCalls": 1,
+    "detailsCalls": 0,
+    "photoMediaCalls": 0,
+    "disabledCalls": 0,
+    "deduped": 0,
+    "rateLimited": 0,
+    "sessionLimited": 0,
+    "executed": 1,
+    "inFlight": 0,
+    "windowCount": 1,
+    "sessionCount": 1
+  },
+  "results": [
+    {
+      "facilityId": "osm-way-225880645",
+      "sourceId": "way/225880645",
+      "queryName": "サーベント中津",
+      "matchConfidence": "NOT_EVALUATED",
+      "reason": "Places API: http-403"
+    }
+  ]
+}
