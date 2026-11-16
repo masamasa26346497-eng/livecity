@@ -1,0 +1,771 @@
+{
+ "schema": "livecity.mission159.ward-audit/1",
+ "mode": "git-only",
+ "summary": {
+  "wards": 24,
+  "n03Ok": 24,
+  "n03Issues": [],
+  "localChecked": 0,
+  "localFlagged": [],
+  "localNotChecked": [
+   "miyakojima",
+   "fukushima",
+   "konohana",
+   "nishi",
+   "minato",
+   "taisho",
+   "tennoji",
+   "naniwa",
+   "nishiyodogawa",
+   "higashiyodogawa",
+   "higashinari",
+   "ikuno",
+   "asahi",
+   "joto",
+   "abeno",
+   "sumiyoshi",
+   "higashisumiyoshi",
+   "nishinari",
+   "yodogawa",
+   "tsurumi",
+   "suminoe",
+   "hirano",
+   "kita",
+   "chuo"
+  ],
+  "crossWardDupPairs": {},
+  "clickMismatch": [
+   "konohana:unclassified",
+   "nishinari:unclassified"
+  ],
+  "noEvidenceInGit": [
+   "nishi",
+   "yodogawa"
+  ],
+  "browserAcceptedByThisTool": 0,
+  "note": "This tool never claims browser acceptance. M140 = headless software GL on a CI runner; local/fixture dirs are data checks only. 24/24 is not established."
+ },
+ "rows": [
+  {
+   "wardId": "miyakojima",
+   "wardCode": "27102",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 6.1,
+    "centerLonLat": {
+     "lat": 34.7122,
+     "lon": 135.5278
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 19,
+     "pixelDiffPct": 41.62,
+     "click": "id-ok",
+     "coverage": "partial 1.337",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": {
+     "status": "ok",
+     "buildings": 17651,
+     "error": null
+    },
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "fukushima",
+   "wardCode": "27103",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 4.68,
+    "centerLonLat": {
+     "lat": 34.6938,
+     "lon": 135.4764
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": null,
+    "m80Runner": {
+     "status": "ok",
+     "buildings": 13412,
+     "error": null
+    },
+    "knownGap": "not in the M140 21-ward set"
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 19.36,
+    "centerLonLat": {
+     "lat": 34.6585,
+     "lon": 135.4078
+    },
+    "polygons": 9
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 24,
+     "pixelDiffPct": 35.05,
+     "click": "FAIL",
+     "coverage": "partial 1.311",
+     "verdict": "NOT ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": {
+     "status": "failed",
+     "buildings": null,
+     "error": "Command failed: /usr/local/bin/node tools/mission79-run.mjs "
+    },
+    "knownGap": null
+   },
+   "clickClass": {
+    "cls": "unclassified",
+    "why": "no click record: the M140 log row only has id-ok/FAIL; the sub-reason was added to accept21 after that run"
+   },
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "nishi",
+   "wardCode": "27106",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 5.23,
+    "centerLonLat": {
+     "lat": 34.6798,
+     "lon": 135.4798
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": null,
+    "m80Runner": null,
+    "knownGap": "not in the M140 21-ward set"
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "minato",
+   "wardCode": "27107",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 7.89,
+    "centerLonLat": {
+     "lat": 34.661,
+     "lon": 135.4498
+    },
+    "polygons": 3
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 24,
+     "pixelDiffPct": 31.76,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.11",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": {
+     "status": "ok",
+     "buildings": 17200,
+     "error": null
+    },
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "taisho",
+   "wardCode": "27108",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 9.45,
+    "centerLonLat": {
+     "lat": 34.6464,
+     "lon": 135.4646
+    },
+    "polygons": 2
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 12,
+     "pixelDiffPct": 35.51,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.121",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "tennoji",
+   "wardCode": "27109",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 4.86,
+    "centerLonLat": {
+     "lat": 34.6606,
+     "lon": 135.52
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 10,
+     "pixelDiffPct": 40.85,
+     "click": "id-ok",
+     "coverage": "full-candidate 0.999",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "naniwa",
+   "wardCode": "27111",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 4.4,
+    "centerLonLat": {
+     "lat": 34.659,
+     "lon": 135.4956
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 13,
+     "pixelDiffPct": 43.59,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.015",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "nishiyodogawa",
+   "wardCode": "27113",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 14.27,
+    "centerLonLat": {
+     "lat": 34.706,
+     "lon": 135.4406
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 23,
+     "pixelDiffPct": 41.42,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.178",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "higashiyodogawa",
+   "wardCode": "27114",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 13.32,
+    "centerLonLat": {
+     "lat": 34.7441,
+     "lon": 135.5313
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 27,
+     "pixelDiffPct": 33.21,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.019",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "higashinari",
+   "wardCode": "27115",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 4.55,
+    "centerLonLat": {
+     "lat": 34.6738,
+     "lon": 135.547
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 10,
+     "pixelDiffPct": 36.3,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.03",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "ikuno",
+   "wardCode": "27116",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 8.4,
+    "centerLonLat": {
+     "lat": 34.6494,
+     "lon": 135.5442
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 17,
+     "pixelDiffPct": 44.2,
+     "click": "id-ok",
+     "coverage": "full-candidate 0.983",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "asahi",
+   "wardCode": "27117",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 6.34,
+    "centerLonLat": {
+     "lat": 34.7288,
+     "lon": 135.5467
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 43,
+     "pixelDiffPct": 41.04,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.113",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "joto",
+   "wardCode": "27118",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 8.41,
+    "centerLonLat": {
+     "lat": 34.6967,
+     "lon": 135.5499
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 23,
+     "pixelDiffPct": 40.53,
+     "click": "id-ok",
+     "coverage": "full-candidate 0.998",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "abeno",
+   "wardCode": "27119",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 5.99,
+    "centerLonLat": {
+     "lat": 34.6323,
+     "lon": 135.5126
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 26,
+     "pixelDiffPct": 44.06,
+     "click": "id-ok",
+     "coverage": "full-candidate 0.984",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "sumiyoshi",
+   "wardCode": "27120",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 9.42,
+    "centerLonLat": {
+     "lat": 34.6055,
+     "lon": 135.5053
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 15,
+     "pixelDiffPct": 42.22,
+     "click": "id-ok",
+     "coverage": "full-candidate 1",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "higashisumiyoshi",
+   "wardCode": "27121",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 9.78,
+    "centerLonLat": {
+     "lat": 34.6177,
+     "lon": 135.5309
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 22,
+     "pixelDiffPct": 33.83,
+     "click": "id-ok",
+     "coverage": "full-candidate 0.996",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "nishinari",
+   "wardCode": "27122",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 7.39,
+    "centerLonLat": {
+     "lat": 34.6393,
+     "lon": 135.491
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 18,
+     "pixelDiffPct": 33.04,
+     "click": "FAIL",
+     "coverage": "full-candidate 1.097",
+     "verdict": "NOT ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": {
+    "cls": "unclassified",
+    "why": "no click record: the M140 log row only has id-ok/FAIL; the sub-reason was added to accept21 after that run"
+   },
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "yodogawa",
+   "wardCode": "27123",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 12.82,
+    "centerLonLat": {
+     "lat": 34.729,
+     "lon": 135.4761
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": null,
+    "m80Runner": null,
+    "knownGap": "not in the M140 21-ward set"
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "tsurumi",
+   "wardCode": "27124",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 8.2,
+    "centerLonLat": {
+     "lat": 34.7052,
+     "lon": 135.5791
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 9,
+     "pixelDiffPct": 33.72,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.147",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "suminoe",
+   "wardCode": "27125",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 20.74,
+    "centerLonLat": {
+     "lat": 34.6204,
+     "lon": 135.4412
+    },
+    "polygons": 5
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 27,
+     "pixelDiffPct": 33.11,
+     "click": "id-ok",
+     "coverage": "partial 1.269",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "hirano",
+   "wardCode": "27126",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 15.32,
+    "centerLonLat": {
+     "lat": 34.6155,
+     "lon": 135.564
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 17,
+     "pixelDiffPct": 41.53,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.046",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "kita",
+   "wardCode": "27127",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 10.37,
+    "centerLonLat": {
+     "lat": 34.7026,
+     "lon": 135.4987
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 20,
+     "pixelDiffPct": 42.46,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.242",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  },
+  {
+   "wardId": "chuo",
+   "wardCode": "27128",
+   "n03": {
+    "ok": true,
+    "issues": [],
+    "areaKm2": 8.9,
+    "centerLonLat": {
+     "lat": 34.679,
+     "lon": 135.5163
+    },
+    "polygons": 1
+   },
+   "evidence": {
+    "m140CiLog": {
+     "glb200": 17,
+     "pixelDiffPct": 51.11,
+     "click": "id-ok",
+     "coverage": "full-candidate 1.021",
+     "verdict": "ACCEPTED",
+     "scope": "headless software GL on a CI runner, private release assets; NOT the owner PC"
+    },
+    "m80Runner": null,
+    "knownGap": null
+   },
+   "clickClass": null,
+   "local": {
+    "state": "unverified (--local not given; owner-PC data is not visible from Git)"
+   }
+  }
+ ]
+}

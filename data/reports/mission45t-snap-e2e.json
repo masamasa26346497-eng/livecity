@@ -1,0 +1,34 @@
+{
+ "browser": "Chrome/155.0.8059.39",
+ "checks": {
+  "greenBefore": 0,
+  "modeAfterAdd": 1,
+  "mode2AfterRoadClick": true,
+  "greenAfterRoad": 80,
+  "pairs1": 1,
+  "intersectionLabel": true,
+  "c1": {
+   "e": 7.5,
+   "n": 0
+  },
+  "snappedToTrueIntersection": true,
+  "c1OnlyNoApply": true,
+  "greenLineDrawn": true,
+  "pairs2": 2,
+  "segmentKindLabel": true,
+  "segmentNoteShown": true,
+  "modeBeforeReject": 1,
+  "rejectedStaysMode1": true,
+  "rejectMsg": true,
+  "rejectNoNewPair": true,
+  "clearReset": true,
+  "noOffsetsEver": true,
+  "noExternalRequests": true,
+  "noJsErrors": true
+ },
+ "errors": [],
+ "externalRequests": [],
+ "blockedGsi": 12,
+ "pxPerM": 1.6,
+ "pass": true
+}
