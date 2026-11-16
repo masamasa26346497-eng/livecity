@@ -120,10 +120,12 @@ async function sweepMode() {
 async function compareMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
   if (shots) fs.mkdirSync(shots, { recursive: true });
-  const VIEWS = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'near', h: 1200, pitch: -35 }];
+  const VIEWS_ALL = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'mid4k', h: 4000, pitch: -60 }, { n: 'mid6k', h: 6000, pitch: -45 }, { n: 'near', h: 1200, pitch: -35 }];
+  const pick = (all, key) => { const f = opt(key, ''); return f ? all.filter((x) => f.split(',').includes(x.n)) : all; };   // --views far,mid4k / --variants swapOn,lod0Off で絞り込み(前景10分上限対策)
+  const VIEWS = pick(VIEWS_ALL, 'views');
   const VARIANTS = [{ n: 'swapOn', qs: 'citylod0=1&citylod0min=2500' }, { n: 'swapOff', qs: 'citylod0=1&citylod0min=2500&citylod0swap=0' }, { n: 'lod0Off', qs: '' }];
   result.compare = [];
-  for (const v of VARIANTS) {
+  for (const v of pick(VARIANTS, 'variants')) {
     const b0 = result.bytes || 0, t0 = Date.now();
     const up = await load(v.qs); if (!up) { result.compare.push({ variant: v.n, error: 'viewer 起動不可' }); continue; }
     await hookFail();
@@ -143,7 +145,7 @@ async function compareMode() {
       const ps = (v.n === 'lod0Off' || l0Show !== true) ? null : await pixelStat();   // LOD0 が実際に表示されている高度のときだけ画素寄与を測る
       const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<30;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[15].toFixed(1),p95:+t[28].toFixed(1)}})()`);
       let png = null; if (shots) { const r = await send('Page.captureScreenshot', { format: 'png' }); png = path.join(shots, `${v.n}-${w.n}.png`); fs.writeFileSync(png, Buffer.from(r.result.data, 'base64')); }
-      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held: held && held2 && Math.abs(camH - w.h) < w.h * 0.1, loaded, lod0Show: l0Show, swap: JSON.parse(swap), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
+      result.compare.push({ variant: v.n, view: w.n, h: w.h, camH, held: held && held2 && Math.abs(camH - w.h) < w.h * 0.1, loaded, lod0Show: l0Show, swap: JSON.parse(swap), swapDbg: await ev('JSON.stringify(window.__mission37g.perf.cityLod0SwapDbg||null)').then(JSON.parse), lod0: JSON.parse(l0), lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, renderMs: frame, png });
     }
     result.compare.push({ variant: v.n, summary: true, ms: Date.now() - t0, bytes: (result.bytes || 0) - b0, tileFail: await ev('window.__tileFail||0') });
   }

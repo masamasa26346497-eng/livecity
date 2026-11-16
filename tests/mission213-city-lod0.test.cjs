@@ -112,3 +112,10 @@ test('置換は最詳細の実タイルだけを覆い範囲とみなし、比�
   const e2e = require('fs').readFileSync('tools/cloud/e2e-city-lod0.mjs', 'utf8');
   assert.match(e2e, /held2/);
 });
+
+test('置換: 中近景ではカメラ距離が近い選択済み実タイルも置換対象(citylod0nearm)', () => {
+  const h = require('fs').readFileSync(require('path').join(__dirname, '..', 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
+  assert.ok(h.includes("q.get('citylod0nearm')"));
+  assert.ok(h.includes('cityLod0NearM'));
+  assert.ok(h.includes('cityLod0SwapDbg'));
+});
