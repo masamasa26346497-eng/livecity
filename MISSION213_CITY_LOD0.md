@@ -14,7 +14,7 @@
   - id は `lod0_<cx>_<cz>`(`bldg_` ではない)。決定的(乱数・時刻なし)。座標定数は37B同一で不変。
   - `index.json` に `cityLod0` を追記(既存キー不変)。
 - `build-cloud-preview.mjs --city-lod0`: **既定OFF**(既存Preview不変)。
-- 37G HTML `?citylod0=1`: **既定OFF**。カメラ高度 ≥ `citylod0min`(既定2500m)で表示、近づくと実LOD1/2に委譲。`allowPicking:false`。
+- 37G HTML `?citylod0=1`: **既定OFF**。カメラ高度 ≥ `citylod0min`(既定15000m。旧2500mは斜め視で実LOD1/2を格子が覆うため廃止)で表示、近づくと実LOD1/2に委譲。`allowPicking:false`。
 - ロールバック: フラグを付けなければ従来と同一。
 
 ## 未実装(Phase 2 以降)

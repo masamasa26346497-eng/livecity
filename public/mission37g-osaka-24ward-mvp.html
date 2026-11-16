@@ -1772,7 +1772,8 @@
   if (q.get('citylod0') === '1') fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.cityLod0 && typeof j.cityLod0.uri === 'string' && /^[A-Za-z0-9_\-\/.]+$/.test(j.cityLod0.uri)) { cityLod0Uri = j.cityLod0.uri; cityLod0Sync(); } }).catch(() => {});
   async function cityLod0Sync() {
     if (!cityLod0Uri) return;
-    const minH = Number(q.get('citylod0min')) || 2500;
+    // 視覚FAIL修正: 旧既定2500mだと斜め視で手前の実LOD1/2の上にも模式ブロックが常時重なり街を格子で覆った。既定を市域全体を俯瞰する高度(15000m)へ。検証用は ?citylod0min=2500。
+    const minH = Number(q.get('citylod0min')) || 15000;
     const camH = viewer.camera.positionCartographic ? viewer.camera.positionCartographic.height : 0;
     if (!cityLod0 && !cityLod0Pending && camH >= minH) {
       cityLod0Pending = true;

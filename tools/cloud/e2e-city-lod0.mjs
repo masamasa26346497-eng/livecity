@@ -117,7 +117,7 @@ async function sweepMode() {
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
   const t0 = Date.now();
-  const up = await load('citylod0=1'); result.checks.viewerLoaded = up; if (!up) throw new Error('viewer 起動不可: ' + JSON.stringify(result.console.slice(0, 3)));
+  const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; if (!up) throw new Error('viewer 起動不可: ' + JSON.stringify(result.console.slice(0, 3)));
   result.checks.coldFirstViewerMs = Date.now() - t0; result.checks.coldBytesAtViewer = result.bytes || 0;
   await ev(`window.__ev=[];window.addEventListener('livecity:37d-building-selected',e=>window.__ev.push(e.detail&&e.detail.canonicalId||null))`);
   for (let i = 0; i < 12; i++) { await sleep(1500); await fly(lon0, lat0, 3000); if (Math.abs((await ev('window.__v.camera.positionCartographic.height')) - 3000) < 300) break; }
@@ -140,13 +140,13 @@ async function realMode() {
   if (spot) { const r = await ev(`(()=>{const c=window.__v.scene.canvas.getBoundingClientRect();return {l:c.left,t:c.top}})()`); for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: spot.x + r.l, y: spot.y + r.t, button: 'left', clickCount: 1 }); await sleep(1500); result.checks.clickEvents = await ev('window.__ev'); result.checks.clickSelectsBuilding = (result.checks.clickEvents || []).includes(spot.id); }
   if (a.includes('--sweep')) { await sweepMode(); return; }
   // warm: 再読込(HTTP キャッシュ有り)での転送量と所要時間
-  const b0 = result.bytes || 0, w0 = Date.now(); await load('citylod0=1'); await sleep(4000); result.checks.warmBytes = (result.bytes || 0) - b0; result.checks.warmViewerMs = Date.now() - w0;
+  const b0 = result.bytes || 0, w0 = Date.now(); await load('citylod0=1&citylod0min=2500'); await sleep(4000); result.checks.warmBytes = (result.bytes || 0) - b0; result.checks.warmViewerMs = Date.now() - w0;
   const hp = result.checks.highWithReal;
   result.ok = !!(result.checks.lod0Loaded && hp.lod0Share > 0.02 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
   if (STATIC) await realMode(); else {
-  const up = await load('citylod0=1'); result.checks.viewerLoaded = up; 
+  const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);
   for (let i = 0; i < 12; i++) { await sleep(1500); await fly(lx, lz, 6000); if (Math.abs((await ev('window.__v.camera.positionCartographic.height')) - 6000) < 300) break; }   // アプリ起動時の初期カメラ移動に上書きされるため、目標高度に収まるまで再設定

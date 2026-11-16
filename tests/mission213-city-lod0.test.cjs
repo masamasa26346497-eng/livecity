@@ -91,3 +91,10 @@ test('build-cloud-preview.mjs / e2e-city-lod0.mjs は構文が正しい(node --c
   const b = fs.readFileSync(path.join(__dirname, '..', 'tools/cloud/build-cloud-preview.mjs'), 'utf8');
   assert.ok(/wardSecs\.length >= 3 && projMin > TIME_BUDGET_MIN\) throw new Error/.test(b));
 });
+
+test('viewer: citylod0min の既定は市域俯瞰高度(>=10000m)で、2500m既定に戻っていない(視覚FAIL回帰)', () => {
+  const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public/mission37g-osaka-24ward-mvp.html'), 'utf8');
+  const m = html.match(/Number\(q\.get\('citylod0min'\)\) \|\| (\d+)/);
+  assert.ok(m, 'citylod0min の既定が見つかる');
+  assert.ok(Number(m[1]) >= 10000, '既定が低いと斜め視で実建物上にLOD0が重なる: ' + m[1]);
+});
