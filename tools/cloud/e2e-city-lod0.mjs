@@ -30,7 +30,7 @@ const srv = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]); let f;
   if (u.startsWith('/ext-3dtiles/')) f = path.join(ext, u.slice(13)); else f = path.join(STATIC ? path.resolve(STATIC) : path.join(ROOT, 'public'), u === '/' ? 'mission37g-osaka-24ward-mvp.html' : u);
   if (!f.startsWith(ext) && !f.startsWith(STATIC ? path.resolve(STATIC) : path.join(ROOT, 'public'))) { res.writeHead(403); return res.end(); }
-  fs.readFile(f, (e, d) => { if (!e && f.endsWith('mission37g-osaka-24ward-mvp.html')) { const t = d.toString('utf8'), k = 'const scene = viewer.scene;'; if (!t.includes(k)) { e = new Error('注入点が無い'); } else d = Buffer.from(t.replace(k, k + ' window.__v = viewer;')); } if (e) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); res.end(d); });
+  fs.readFile(f, (e, d) => { if (!e && f.endsWith('mission37g-osaka-24ward-mvp.html')) { const t = d.toString('utf8'), k = 'const scene = viewer.scene;'; if (!t.includes(k)) { e = new Error('注入点が無い'); } else d = Buffer.from(t.replace(k, k + ' window.__v = viewer;')); } if (e) { res.writeHead(404); return res.end(); } const hd = { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }; if (u.startsWith('/ext-3dtiles/')) hd['cache-control'] = 'public, max-age=3600'; /* vercel.json の headers と同じ。無いと warm でキャッシュが効かず計測が不正になる */ res.writeHead(200, hd); res.end(d); });
 });
 await new Promise((r) => srv.listen(0, '127.0.0.1', r)); const port = srv.address().port;
 
