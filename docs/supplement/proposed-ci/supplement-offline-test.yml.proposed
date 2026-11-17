@@ -1,0 +1,30 @@
+# 提案ファイル（未適用）。owner がレビュー後 .github/workflows/supplement-offline-test.yml として配置する。
+# secrets なし / contents:read のみ / deploy・upload なし / SHA 固定 / 手動起動のみ。
+name: supplement-offline-test
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "レビュー済みの commit SHA（40桁）"
+        required: true
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validate sha input
+        env:
+          SHA: ${{ inputs.sha }}
+        run: |
+          printf '%s' "$SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "sha must be 40 lowercase hex"; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run supplement tests (no network, no secrets)
+        run: node --test tests/building-supplement-diff.test.js tests/supplement-pipeline.test.js tests/supplement-layer.test.js tests/supplement-cesium-adapter.test.js

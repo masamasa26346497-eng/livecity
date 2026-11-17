@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8"><title>補完レイヤー 隔離統合ページ（データなし）</title>
+<!-- PR#66 内の隔離ページ。本体/PR#68 は未変更。実データは同梱しない（manifest 不在なら state=error と表示するだけ）。
+     ?base=<相対パス> で manifest ディレクトリを指定（同一オリジンの相対パスのみ）。publishable の許可は URL からは変更できない。 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<style>html,body,#c{margin:0;height:100%}#s{position:fixed;top:8px;left:8px;background:#050a18cc;color:#eef1f3;font:12px sans-serif;padding:8px;border-radius:6px}</style>
+<div id="c"></div><div id="s"><button id="t">補完レイヤー ON/OFF（既定OFF）</button><pre id="o">state: off</pre></div>
+<script type="module">
+import { connectSupplement } from './supplement-cesium-adapter.js';
+import { PROJ, makeProjection } from './projection.js';
+const raw = new URLSearchParams(location.search).get('base') || '../map-data/osaka-city/buildings-supplement/osaka-sumiyoshi/';
+const baseUrl = /^(\.\.\/)*[\w\-]+(\/[\w\-]+)*\/$/.test(raw) ? raw : null;
+const viewer = new Cesium.Viewer('c', { baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false, sceneModePicker: false,
+  navigationHelpButton: false, animation: false, timeline: false, fullscreenButton: false, infoBox: false, selectionIndicator: false,
+  requestRenderMode: true, maximumRenderTimeChange: Infinity, scene3DOnly: true, shouldAnimate: false });
+const P = makeProjection(PROJ);
+viewer.camera.setView({ destination: Cesium.Cartesian3.fromDegrees(P.toLon(0), P.toLat(0), 800) });
+const out = document.getElementById('o');
+if (!baseUrl) { out.textContent = 'base が不正（同一オリジン相対パスのみ）。接続しません。'; }
+else {
+  const sup = connectSupplement({ Cesium, viewer, PROJ, baseUrl });
+  const show = () => { out.textContent = `state: ${sup.layer.state}${sup.layer.error ? ' (' + sup.layer.error + ')' : ''}\n` + JSON.stringify(sup.layer.stats); };
+  document.getElementById('t').onclick = async () => { if (sup.layer.state === 'off' || sup.layer.state === 'error') await sup.enable(); else sup.disable(); show(); };
+  window.__supplement = sup;
+}
+</script>
