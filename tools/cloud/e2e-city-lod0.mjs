@@ -46,6 +46,8 @@ ws.onmessage = (m) => { const j = JSON.parse(m.data);
   if (j.id && pend.has(j.id)) { pend.get(j.id)(j); pend.delete(j.id); }
   else if (j.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(j.params.type)) result.console.push(j.params.type + ': ' + j.params.args.map((x) => x.value ?? x.description).join(' ').slice(0, 300));
   else if (j.method === 'Runtime.exceptionThrown') result.console.push('exception: ' + (j.params.exceptionDetails.exception?.description || j.params.exceptionDetails.text).slice(0, 300));
+  else if (j.method === 'Network.requestWillBeSent') { (result._reqs ||= []).push(j.params.request.url.replace(/^http:\/\/127.0.0.1:\d+/, '').split('?')[0]); }
+  else if (j.method === 'Network.responseReceived' && j.params.response.status < 400) { const u = j.params.response.url.replace(/^http:\/\/127.0.0.1:\d+/, '').split('?')[0]; (result._sz ||= {})[u] = j.params.response.encodedDataLength || 0; }
   else if (j.method === 'Network.loadingFinished') { result.bytes = (result.bytes || 0) + (j.params.encodedDataLength || 0); }
   else if (j.method === 'Network.loadingFailed') { (result.netFailed ||= []).length < 50 && result.netFailed.push({ err: j.params.errorText, canceled: !!j.params.canceled }); }
   else if (j.method === 'Network.responseReceived') { if (j.params.response.status >= 400) { const he = (result.httpErrors ||= []); if (he.length < 50) he.push({ url: j.params.response.url.replace(/^http:\/\/127.0.0.1:\d+/, '').slice(0, 120), status: j.params.response.status }); } const u = j.params.response.url; if (/city-lod0|index\.json|Cesium\.js/.test(u)) result.network.push({ url: u.replace(/^http:\/\/127.0.0.1:\d+/, ''), status: j.params.response.status }); } };
@@ -117,6 +119,31 @@ async function sweepMode() {
 
 // ---- --compare: 同一カメラで「置換ON / 置換OFF(citylod0swap=0) / LOD0なし」を近・中・遠で撮り比べる(--static 必須)。 --shots <dir> に PNG、結果は result.compare。
 //   スクリーンショットは実データ由来の画素を含むため artifact 公開しないこと(ローカル確認用)。
+// ---- --baseline: Phase0 性能ベースライン(cold/warm)。初回可視・LOD0完了時間、リクエスト数、重複/4xx、転送量、フレーム p50/p95 を測る(--static 必須) ----
+async function baselineMode() {
+  const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), qs = opt('qs', 'citylod0=1&citylod0min=2500');
+  result.baseline = [];
+  for (const phase of ['cold', 'warm']) {
+    result._reqs = []; result.httpErrors = []; const b0 = result.bytes || 0, t0 = Date.now();
+    if (phase === 'cold') await send('Network.clearBrowserCache'); 
+    await send('Page.navigate', { url: `http://127.0.0.1:${port}/mission37g-osaka-24ward-mvp.html?${qs}` });
+    let tViewer = null, tLod0 = null, tAllLoaded = null;
+    for (let i = 0; i < 400; i++) {
+      const st = await ev(`(()=>{const v=window.__v;if(!v)return null;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);return {n:ps.length,l0:!!(l0&&l0.tilesLoaded),all:ps.length>0&&ps.every(p=>p.tilesLoaded)}})()`).catch(() => null);
+      if (st) { tViewer ??= Date.now() - t0; if (st.l0) tLod0 ??= Date.now() - t0; if (st.all && st.n >= 2) { tAllLoaded = Date.now() - t0; break; } }
+      await sleep(250);
+    }
+    const reqs = result._reqs, cnt = {}; for (const u of reqs) cnt[u] = (cnt[u] || 0) + 1;
+    const dups = Object.entries(cnt).filter(([, c]) => c > 1).map(([u, c]) => ({ u: u.slice(0, 90), c })).slice(0, 15);
+    const byKind = {}; for (const u of reqs) { const k = u.includes('_city-lod0') ? 'lod0' : /\.(glb|b3dm|i3dm)$/.test(u) ? 'tile-content' : /tileset\.json$/.test(u) ? 'tileset.json' : /\.json$/.test(u) ? 'json' : 'other'; byKind[k] = (byKind[k] || 0) + 1; }
+    const lod0Bytes = Object.entries(result._sz || {}).filter(([u]) => u.includes('_city-lod0')).reduce((s, [, b]) => s + b, 0);
+    await holdCam(lon0, lat0, 10000, -90); await sleep(1500);
+    const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<5;i++)v.scene.render();for(let i=0;i<60;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[30].toFixed(1),p95:+t[57].toFixed(1)}})()`);
+    const mem = await ev(`performance.memory?{usedMB:Math.round(performance.memory.usedJSHeapSize/1048576)}:null`);
+    result.baseline.push({ phase, tViewerMs: tViewer, tLod0LoadedMs: tLod0, tAllTilesLoadedMs: tAllLoaded, requests: reqs.length, byKind, bytes: (result.bytes || 0) - b0, lod0Bytes, duplicates: dups, http4xx: result.httpErrors.length, http4xxSample: result.httpErrors.slice(0, 8), frame, mem });
+  }
+  delete result._reqs; delete result._sz; result.ok = result.baseline.every((b) => b.tAllTilesLoadedMs != null);
+}
 async function compareMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
   if (shots) fs.mkdirSync(shots, { recursive: true });
@@ -190,7 +217,7 @@ async function realMode() {
   result.ok = !!(result.checks.lod0Loaded && hp.lod0Share > 0.02 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
-  if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
+  if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
   const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);
