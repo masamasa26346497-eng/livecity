@@ -46,9 +46,10 @@ ws.onmessage = (m) => { const j = JSON.parse(m.data);
   if (j.id && pend.has(j.id)) { pend.get(j.id)(j); pend.delete(j.id); }
   else if (j.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(j.params.type)) result.console.push(j.params.type + ': ' + j.params.args.map((x) => x.value ?? x.description).join(' ').slice(0, 300));
   else if (j.method === 'Runtime.exceptionThrown') result.console.push('exception: ' + (j.params.exceptionDetails.exception?.description || j.params.exceptionDetails.text).slice(0, 300));
-  else if (j.method === 'Network.requestWillBeSent') { (result._reqs ||= []).push(j.params.request.url.replace(/^http:\/\/127.0.0.1:\d+/, '').split('?')[0]); }
+  else if (j.method === 'Network.requestWillBeSent') { const u = j.params.request.url.replace(/^http:\/\/127.0.0.1:\d+/, '').split('?')[0]; (result._reqs ||= []).push(u); (result._rid ||= {})[j.params.requestId] = u; }
   else if (j.method === 'Network.responseReceived' && j.params.response.status < 400) { const u = j.params.response.url.replace(/^http:\/\/127.0.0.1:\d+/, '').split('?')[0]; (result._sz ||= {})[u] = j.params.response.encodedDataLength || 0; }
-  else if (j.method === 'Network.loadingFinished') { result.bytes = (result.bytes || 0) + (j.params.encodedDataLength || 0); }
+  else if (j.method === 'Network.requestServedFromCache') { result._cached = (result._cached || 0) + 1; (result._cachedU ||= []).push((result._rid || {})[j.params.requestId]); }
+  else if (j.method === 'Network.loadingFinished') { const u = (result._rid || {})[j.params.requestId]; if (u) (result._fin ||= {})[u] = (result._fin[u] || 0) + (j.params.encodedDataLength || 0); result.bytes = (result.bytes || 0) + (j.params.encodedDataLength || 0); }
   else if (j.method === 'Network.loadingFailed') { (result.netFailed ||= []).length < 50 && result.netFailed.push({ err: j.params.errorText, canceled: !!j.params.canceled }); }
   else if (j.method === 'Network.responseReceived') { if (j.params.response.status >= 400) { const he = (result.httpErrors ||= []); if (he.length < 50) he.push({ url: j.params.response.url.replace(/^http:\/\/127.0.0.1:\d+/, '').slice(0, 120), status: j.params.response.status }); } const u = j.params.response.url; if (/city-lod0|index\.json|Cesium\.js/.test(u)) result.network.push({ url: u.replace(/^http:\/\/127.0.0.1:\d+/, ''), status: j.params.response.status }); } };
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pend.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
@@ -124,9 +125,13 @@ async function baselineMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), qs = opt('qs', 'citylod0=1&citylod0min=2500');
   result.baseline = [];
   for (const phase of ['cold', 'warm']) {
-    result._reqs = []; result.httpErrors = []; const b0 = result.bytes || 0, t0 = Date.now();
-    if (phase === 'cold') await send('Network.clearBrowserCache'); 
-    await send('Page.navigate', { url: `http://127.0.0.1:${port}/mission37g-osaka-24ward-mvp.html?${qs}` });
+    result._reqs = []; result.httpErrors = []; const b0 = result.bytes || 0; let t0 = Date.now();
+    result._fin = {}; result._cached = 0; result._cachedU = [];
+    if (phase === 'cold') await send('Network.clearBrowserCache');
+    // 旧ページの window.__v 残留で待機判定が即成立するのを防ぐ: about:blank へ遷移し __v 不在を確認してから計測を始める
+    await send('Page.navigate', { url: 'about:blank' }); await sleep(500);
+    result._reqs = []; result.httpErrors = [];
+    t0 = Date.now(); await send('Page.navigate', { url: `http://127.0.0.1:${port}/mission37g-osaka-24ward-mvp.html?${qs}` });
     let tViewer = null, tLod0 = null, tAllLoaded = null;
     for (let i = 0; i < 400; i++) {
       const st = await ev(`(()=>{const v=window.__v;if(!v)return null;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);return {n:ps.length,l0:!!(l0&&l0.tilesLoaded),all:ps.length>0&&ps.every(p=>p.tilesLoaded)}})()`).catch(() => null);
@@ -136,11 +141,11 @@ async function baselineMode() {
     const reqs = result._reqs, cnt = {}; for (const u of reqs) cnt[u] = (cnt[u] || 0) + 1;
     const dups = Object.entries(cnt).filter(([, c]) => c > 1).map(([u, c]) => ({ u: u.slice(0, 90), c })).slice(0, 15);
     const byKind = {}; for (const u of reqs) { const k = u.includes('_city-lod0') ? 'lod0' : /\.(glb|b3dm|i3dm)$/.test(u) ? 'tile-content' : /tileset\.json$/.test(u) ? 'tileset.json' : /\.json$/.test(u) ? 'json' : 'other'; byKind[k] = (byKind[k] || 0) + 1; }
-    const lod0Bytes = Object.entries(result._sz || {}).filter(([u]) => u.includes('_city-lod0')).reduce((s, [, b]) => s + b, 0);
+    const lod0Bytes = Object.entries(result._fin || {}).filter(([u]) => u.includes('_city-lod0')).reduce((s, [, b]) => s + b, 0);
     await holdCam(lon0, lat0, 10000, -90); await sleep(1500);
     const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<5;i++)v.scene.render();for(let i=0;i<60;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[30].toFixed(1),p95:+t[57].toFixed(1)}})()`);
     const mem = await ev(`performance.memory?{usedMB:Math.round(performance.memory.usedJSHeapSize/1048576)}:null`);
-    result.baseline.push({ phase, tViewerMs: tViewer, tLod0LoadedMs: tLod0, tAllTilesLoadedMs: tAllLoaded, requests: reqs.length, byKind, bytes: (result.bytes || 0) - b0, lod0Bytes, duplicates: dups, http4xx: result.httpErrors.length, http4xxSample: result.httpErrors.slice(0, 8), frame, mem });
+    result.baseline.push({ phase, tViewerMs: tViewer, tLod0LoadedMs: tLod0, tAllTilesLoadedMs: tAllLoaded, requests: reqs.length, byKind, bytes: (result.bytes || 0) - b0, lod0Bytes, lod0Glb: reqs.filter((u) => u.includes('_city-lod0') && u.endsWith('.glb')).length, fromCache: result._cached, lod0FromCache: (result._cachedU || []).filter((u) => u && u.includes('_city-lod0')).length, duplicates: dups, http4xx: result.httpErrors.length, http4xxSample: result.httpErrors.slice(0, 8), frame, mem });
   }
   delete result._reqs; delete result._sz; result.ok = result.baseline.every((b) => b.tAllTilesLoadedMs != null);
 }
