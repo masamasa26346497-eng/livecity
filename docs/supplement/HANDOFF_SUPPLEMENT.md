@@ -50,9 +50,25 @@
 - 次の1操作: owner が `docs/supplement/proposed-ci/supplement-offline-test.yml.proposed` を `.github/workflows/supplement-offline-test.yml` に配置し、修正後SHAを入力して workflow_dispatch。
 
 ## 第6段階（独立レイヤー実装・接続案）
-- 追加: `public/supplement-layer/supplement-layer.js`, `tests/supplement-layer.test.js`, `docs/supplement/proposed-integration/PR68-connection-snippet.md`、SPEC 追記。
+- 追加: `public/supplement-layer/supplement-layer.js`, `tests/supplement-layer.test.js`, `docs/supplement/proposed-integration/PR68-connection-snippet.md`（第7段階で削除・Cesium版に置換）、SPEC 追記。
 - **テスト: 未実行**（node 実行は restrict_untrusted_prs で拒否される状況が継続。回避せず、この run では再試行もしていない）。CI 提案 workflow は登録済みだが実行履歴 0 件（owner 確認）＝成功扱いしない。合否不明。
 - ビューア接続: **未接続**。PR#68 ブランチは本 run で未読。座標/色/高さ単位は接続時に確認（snippet 参照）。
 - 実データ: **未取得**。旧 V3/V4 生成物・asset repo（過去 run で解決不可）・OSM は取得していない。この run では外部取得を試みていない（過去に拒否/不可だった経路の反復を避けた）。
 - 件数: 照合数/採用数/保留数は **未計測**（0 件ではない）。実建物の追加は未完了。fixture は実在の街の建物として配信していない。
 - 次の最小操作: (1) owner が supplement-offline-test workflow を現 HEAD の SHA で workflow_dispatch（`node --test` で supplement-layer / supplement-pipeline / building-supplement-diff を実行）。(2) 実データ取得は別途、読取専用の取得ジョブで（ASSET_ACCESS_PROPOSAL.md）。(3) PR#68 側で snippet を適用し座標一致を確認。
+
+## 第7段階（Cesium アダプタ・隔離統合ページ・取得診断）
+- 前提訂正: PR#68 の実ビューアは **Cesium 1.121.1**（Three ではない）。第6段階の THREE 前提 snippet は無効＝削除。前回「PR#68 未読」は fetch 未実施が原因（`git fetch origin claude/issue-67-20261114-1354` と `git show` は拒否されず成功）。PR#68 HEAD は fetch 時点 `efdced09a34cf7edbcac4e9dd78a6b4cca50f900`（並行更新中。書込みなし）。
+- 追加（既存 loader は作り直さず buildMesh/group だけ差し替え）:
+  - `public/supplement-layer/projection.js`: PR#68 L485-489/L1380 と同一の world(x,z)↔lon/lat。
+  - `public/supplement-layer/supplement-cesium-adapter.js`: `createCesiumMeshBuilder`（PolygonHierarchy の穴・MultiPolygon=複数インスタンス・height/extrudedHeight・heightClass 別色）、`createCesiumGroup`（scene.primitives＋requestRender）、`connectSupplement`（既定OFF、moveEnd を 200ms debounce でカメラ範囲更新、disable で listener 解除/Primitive 破棄、`pickRecord`）。`allowUnpublishable` は引数に無く URL からも変えられない。
+  - `public/supplement-layer/integration-preview.html`: 隔離統合ページ（データ無し。manifest 不在なら error 表示のみ。base は同一オリジン相対パスのみ）。
+  - `tests/supplement-cesium-adapter.test.js`: 投影回帰（式・往復・z 北=負・PR68 HTML があれば定数照合）、穴/MultiPolygon/高さ、グループ、既定OFF通信ゼロ、範囲外は取得せず moveEnd で取得、404/unpublishable、破棄。Cesium は最小スタブ。
+  - `docs/supplement/proposed-integration/PR68-connection-patch.md`: IIFE 内へ追加する最小パッチ（案・未適用）。
+  - `docs/supplement/proposed-ci/supplement-offline-test.yml.proposed`: 対象を 4 テスト（diff / pipeline / layer / cesium-adapter）に更新（配置し直しではなく、登録済み workflow の `run:` 行の差し替え案）。
+  - `docs/supplement/proposed-ci/supplement-asset-list.yml.proposed`: 取得診断用 read-only workflow 案（固定 repo `livecity-3d-data`・tag `plateau2025-converted`・asset 名一覧のみ、checkout なし＝PR コードを secret 付きで実行しない）。
+- 取得障害の診断: main の claude.yml は action env の GH_TOKEN に `LIVECITY_3D_DATA_READ_TOKEN` を渡すが、ログは OIDC App token 使用。**これだけで secret 欠落とは断定しない**（action が GH_TOKEN を上書き／この job の環境では gh の token が App token になっている可能性）。上記 workflow の 1 回目の step が「secret が空か」、2 回目が「repo/release に到達できるか」を分けて示す。旧 V3/V4 資産の存在は **未確認**。
+- **テスト: 未実行**（この run で node 実行は試していない。restrict_untrusted_prs の拒否が継続している前提で反復を避けた。新規テストの期待値は手計算＝合否不明）。
+- ビューア接続: PR#68 実 HTML を読み、投影・viewer・IIFE 位置・RR 利用は確認した。**接続自体は未適用**（PR#68 書込み禁止）。ブラウザ表示は未確認。
+- 実データ: 未取得。件数（照合/採用/保留）は**未計測**（0 件ではない）。建物追加は**完了していない**。
+- 次の1操作（owner）: ① `.github/workflows/supplement-offline-test.yml` の `node --test` 行を proposed の行に差し替え、現 HEAD の SHA で workflow_dispatch。② `supplement-asset-list.yml.proposed` を `.github/workflows/supplement-asset-list.yml` として配置し workflow_dispatch（1回）。結果の RESULT 行を共有。

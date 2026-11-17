@@ -1,0 +1,27 @@
+# 提案ファイル（未適用）。owner がレビュー後 .github/workflows/supplement-asset-list.yml として配置する。
+# 目的: 旧 V3/V4 資産の「存在確認」だけ（asset 名一覧）。ダウンロード・PRコード実行・upload・deploy は一切しない。
+# 分離: このjobは PR/チェックアウトのコードを実行しない（checkout なし）。secret は gh の1コマンドにだけ渡る。
+# 手動起動のみ。repo / tag は固定（入力で変更不可）。
+name: supplement-asset-list
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Token presence (値は出力しない)
+        env:
+          GH_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "RESULT: secret LIVECITY_3D_DATA_READ_TOKEN is EMPTY in this context (未設定/環境scope/fork制限のいずれか)"; exit 1; fi
+          echo "RESULT: token present (length hidden)"
+      - name: List releases and asset names only
+        env:
+          GH_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+        run: |
+          set -u
+          gh release list --repo masamasa26346497-eng/livecity-3d-data --limit 50 || { echo "RESULT: repo/release 一覧不可 (権限 or repo名)"; exit 1; }
+          gh release view plateau2025-converted --repo masamasa26346497-eng/livecity-3d-data --json tagName,publishedAt,assets --jq '{tagName,publishedAt,assets:[.assets[]|{name,size}]}'

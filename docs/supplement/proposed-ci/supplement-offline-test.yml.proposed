@@ -27,4 +27,4 @@ jobs:
         with:
           node-version: 20
       - name: Run supplement tests (no network, no secrets)
-        run: node --test tests/building-supplement-diff.test.js tests/supplement-pipeline.test.js
+        run: node --test tests/building-supplement-diff.test.js tests/supplement-pipeline.test.js tests/supplement-layer.test.js tests/supplement-cesium-adapter.test.js

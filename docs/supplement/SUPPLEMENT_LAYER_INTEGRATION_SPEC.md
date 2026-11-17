@@ -17,5 +17,5 @@ HTML 変更は未実施（PR #68 側の現行表示方式の確認後、独立 D
 ## 第6段階の実装状況
 - 独立モジュール実装済み: `public/supplement-layer/supplement-layer.js`（既定OFF・明示 enable・近距離のみ遅延取得・重複合流・disable/範囲外で abort/dispose・失敗隔離・publishable 未確認は読込拒否・高さ区分 measured/estimated/unverified/unknown・診断レコード除外・別 Group/別ピック）。
 - テスト: `tests/supplement-layer.test.js`（**未実行**。fetch/メッシュ生成は注入モックの合成入力）。
-- 接続案: `docs/supplement/proposed-integration/PR68-connection-snippet.md`。**本体HTML・PR#68 は未接続/未変更**。
+- 接続案: `docs/supplement/proposed-integration/PR68-connection-patch.md`（Cesium。旧 THREE 前提 snippet は無効・削除）。**本体HTML・PR#68 は未接続/未変更**。
 - 未確認: PR#68 実ビューアの座標変換・色・高さ単位・ピック。THREE メッシュ生成（`createThreeMeshBuilder`）は実ブラウザ/実ビューアで未検証。
