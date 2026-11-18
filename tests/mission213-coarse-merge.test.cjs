@@ -50,3 +50,11 @@ test('envCoarseMerge: 4 項目形式', () => {
   try { process.env.LC_COARSE_MERGE = '20:150:3:0.6'; assert.deepStrictEqual(envCoarseMerge(), { cellM: 20, belowArea: 150, gapM: 3, minFill: 0.6 }); }
   finally { if (o === undefined) delete process.env.LC_COARSE_MERGE; else process.env.LC_COARSE_MERGE = o; }
 });
+test('道路回避: gap が道路に掛かる成分は統合せず、掛からなければ統合(roadTest 注入)', () => {
+  const f = [{ id: 'bldg_a', fp: sq(0, 0, 8), z0: 0, h: 6 }, { id: 'bldg_b', fp: sq(9, 0, 8), z0: 0, h: 6 }];
+  const m = { cellM: 40, belowArea: 100, gapM: 3, minFill: 0.1 };
+  assert.strictEqual(coarsen(f, 0, { ...m, roadTest: () => false }).filter((o) => o.id.startsWith('lod1c_')).length, 1);
+  const r = coarsen(f, 0, { ...m, roadTest: (x) => x > 8 && x < 9 });   // 建物間の 1m の隙間が道路
+  assert.strictEqual(r.filter((o) => o.id.startsWith('lod1c_')).length, 0);
+  assert.deepStrictEqual(r.map((o) => o.id).sort(), ['bldg_a', 'bldg_b']);
+});

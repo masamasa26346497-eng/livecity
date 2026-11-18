@@ -56,7 +56,7 @@ function audit(boxes, roads, water, step = 2) {
   return { boxes: n, boxAreaM2: r(boxA), memberBboxAreaM2: r(memA), gapUpperBoundM2: r(boxA - memA), roadUnderBoxM2: r(roadA), waterUnderBoxM2: r(waterA),
     roadFracOfBox: +(roadA / boxA).toFixed(4), waterFracOfBox: +(waterA / boxA).toFixed(4), boxesWithWaterOver20pct: worst.filter((w) => w.waterFrac > 0.2).length, boxesWithRoadOver50pct: worst.filter((w) => w.roadFrac > 0.5).length, worst10: worst.slice(0, 10) };
 }
-module.exports = { audit, separate, pip };
+module.exports = { audit, separate, pip, buildIndex, inside };
 if (require.main === module) {
   const [boxesFile, layersDir] = process.argv.slice(2);
   const boxes = fs.readFileSync(boxesFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));

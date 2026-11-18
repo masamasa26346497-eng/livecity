@@ -265,6 +265,24 @@ function loadFeatures(tileJson) {
 // merge = { cellM, belowArea }: Mission213 試作(opt-in)。bbox 面積 < belowArea の小建物を cellM 四方のバケット(重心基準)ごとに 1 箱へ統合する。
 //   統合箱は「そのバケット内の小建物 bbox の和集合」なので、建物の無い範囲(道路/河川/空地)へは cellM+建物寸法を超えて広がらない(固定格子の再利用ではない)。
 //   高さ=面積加重平均。id は 'lod1c_' 接頭辞(bldg_ ではない=クリック対象外)。既定(merge 無し)の出力はバイト単位で従来と同一。
+// Mission213: 道路ポリゴン(前回ビルドの layers/roads.json、LC_COARSE_ROADS=<layersDir>)が与えられたとき、統合箱の gap(構成建物 bbox の外)が
+//   道路を roadMaxM2(既定 5m²)超えて覆うなら統合しない。merge.roadTest(x,z) は点が道路内か。opt-in。1m 格子サンプリングの近似。
+function gapHitsRoad(c, members, merge) {
+  if (typeof merge.roadTest !== 'function') return false;
+  const step = 1, lim = (merge.roadMaxM2 != null ? merge.roadMaxM2 : 5) / (step * step); let n = 0;
+  for (let x = c.x0 + step / 2; x < c.x1; x += step) for (let z = c.z0 + step / 2; z < c.z1; z += step) {
+    if (members.some((e) => x >= e.x0 && x < e.x1 && z >= e.z0 && z < e.z1)) continue;
+    if (merge.roadTest(x, z) && ++n > lim) return true;
+  }
+  return false;
+}
+const _roadCache = new Map();
+function loadRoadTest(dir) {
+  if (_roadCache.has(dir)) return _roadCache.get(dir);
+  const { buildIndex, inside } = require('./cloud/audit-coarse-overlap.cjs');
+  const I = buildIndex(JSON.parse(fs.readFileSync(path.join(dir, 'roads.json'), 'utf8')).features, 64);
+  const f = (x, z) => inside(x, z, I); _roadCache.set(dir, f); return f;
+}
 function coarsen(features, minArea, merge) {
   const out = [], buckets = new Map();
   const mergeOn = merge && merge.cellM > 0 && merge.belowArea > 0;
@@ -310,7 +328,7 @@ function coarsen(features, minArea, merge) {
         if (process.env.LC_COARSE_AUDIT) c.m.push([e.x0, e.z0, e.x1, e.z1]);
       }
       const boxArea = (c.x1 - c.x0) * (c.z1 - c.z0);
-      if (members.length >= 2 && boxArea > 0 && c.as / boxArea >= merge.minFill) { emit(c, k + '_' + (ci++)); continue; }
+      if (members.length >= 2 && boxArea > 0 && c.as / boxArea >= merge.minFill && !gapHitsRoad(c, members, merge)) { emit(c, k + '_' + (ci++)); continue; }
       // フォールバック: 統合せず従来どおり個別 bbox(元 id)
       for (const e of members) if (e.area >= minArea) out.push({ ...e.b, fp: [[e.x0, e.z0], [e.x1, e.z0], [e.x1, e.z1], [e.x0, e.z1]] });
     }
@@ -326,7 +344,9 @@ function envCoarseMerge() {
   // 'cellM:belowArea'(従来) または 'cellM:belowArea:gapM:minFill'(道路跨ぎ防止フィルタ付き。例 '20:150:3:0.6')
   const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)(?::(\d+(?:\.\d+)?):(\d+(?:\.\d+)?))?$/.exec(process.env.LC_COARSE_MERGE || '');
   if (!m) return null;
-  return m[3] ? { cellM: +m[1], belowArea: +m[2], gapM: +m[3], minFill: +m[4] } : { cellM: +m[1], belowArea: +m[2] };
+  const o = m[3] ? { cellM: +m[1], belowArea: +m[2], gapM: +m[3], minFill: +m[4] } : { cellM: +m[1], belowArea: +m[2] };
+  if (m[3] && process.env.LC_COARSE_ROADS) o.roadTest = loadRoadTest(process.env.LC_COARSE_ROADS);   // opt-in(道路は前回ビルドの出力を参照)
+  return o;
 }
 function build(opts) {
   const dir = opts.srcDir || path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
