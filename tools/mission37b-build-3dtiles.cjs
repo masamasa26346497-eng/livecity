@@ -285,7 +285,7 @@ function coarsen(features, minArea, merge) {
   }
   for (const k of [...buckets.keys()].sort()) {
     const g = buckets.get(k), h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
-    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n });
+    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as });
   }
   return out;
 }
@@ -340,6 +340,9 @@ function build(opts) {
     if (!leafs.length) continue;
     const gfRaw = coarsen(gFeatures, opts.coarseMinArea, opts.coarseMerge || envCoarseMerge());
     const gframe = makeFrame((gExt.w + gExt.e) / 2, (gExt.s + gExt.n) / 2);
+    if (process.env.LC_COARSE_AUDIT) {   // Mission213: 統合箱の bbox を JSON Lines で書き出す(道路/河川との交差監査用。出力 GLB には影響しない)
+      for (const f of gfRaw) if (f.id.startsWith('lod1c_')) fs.appendFileSync(process.env.LC_COARSE_AUDIT, JSON.stringify({ id: f.id, x0: f.fp[0][0], z0: f.fp[0][1], x1: f.fp[2][0], z1: f.fp[2][1], n: f.merged, memberArea: Math.round(f.memberArea) }) + '\n');
+    }
     const cr = buildGlb(gfRaw, gframe);
     const gname = 'g_' + gk;
     const node = {
