@@ -152,7 +152,7 @@ async function baselineMode() {
 async function compareMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
   if (shots) fs.mkdirSync(shots, { recursive: true });
-  const VIEWS_ALL = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'mid4k', h: 4000, pitch: -60 }, { n: 'mid6k', h: 6000, pitch: -45 }, { n: 'near', h: 1200, pitch: -35 }, { n: 'mid3kb', h: 3000, pitch: -30, aim: true }, { n: 'mid6kb', h: 6000, pitch: -30, aim: true }];
+  const VIEWS_ALL = [{ n: 'far', h: 10000, pitch: -90 }, { n: 'far15k', h: 15000, pitch: -90 }, { n: 'far20k', h: 20000, pitch: -90 }, { n: 'mid', h: 3000, pitch: -50 }, { n: 'mid4k', h: 4000, pitch: -60 }, { n: 'mid6k', h: 6000, pitch: -45 }, { n: 'near', h: 1200, pitch: -35 }, { n: 'mid3kb', h: 3000, pitch: -30, aim: true }, { n: 'mid6kb', h: 6000, pitch: -30, aim: true }];
   const pick = (all, key) => { const f = opt(key, ''); return f ? all.filter((x) => f.split(',').includes(x.n)) : all; };   // --views far,mid4k / --variants swapOn,lod0Off で絞り込み(前景10分上限対策)
   const VIEWS = pick(VIEWS_ALL, 'views');
   const VARIANTS = [{ n: 'swapOn', qs: 'citylod0=1&citylod0min=2500' }, { n: 'swapOff', qs: 'citylod0=1&citylod0min=2500&citylod0swap=0' }, { n: 'lod0Off', qs: '' }, { n: 'dseOn', qs: 'citylod0=1&citylod0min=2500&dse=1' }];
