@@ -219,8 +219,8 @@ async function realMode() {
   // warm: 再読込(HTTP キャッシュ有り)での転送量と所要時間
   const b0 = result.bytes || 0, w0 = Date.now(); await load('citylod0=1&citylod0min=2500'); await sleep(4000); result.checks.warmBytes = (result.bytes || 0) - b0; result.checks.warmViewerMs = Date.now() - w0;
   const hp = result.checks.highWithReal;
-  // 置換 ON(既定)では高所の lod0Share が小さくなるのが正常(旧判定 >0.02 は誤判定)。LOD0 が読み込まれ、低高度で非表示、クリックで建物選択、を合否とし、lod0Share は参考値(lod0Share>0 を要求)
-  result.ok = !!(result.checks.lod0Loaded && hp.lod0Share > 0 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
+  // 置換 ON(既定)では高所の lod0Share が小さくなるのが正常(旧判定 >0.02 は誤判定)。LOD0 が読み込まれ、低高度で非表示、クリックで建物選択、を合否とし、lod0Share は参考値(0 でも正常)。実建物の画素寄与 realShare>0.05 を要求
+  result.ok = !!(result.checks.lod0Loaded && hp.realShare > 0.05 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
   if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
