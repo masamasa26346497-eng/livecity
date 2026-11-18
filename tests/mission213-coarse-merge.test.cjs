@@ -29,3 +29,24 @@ test('envCoarseMerge: 形式不正は null(=OFF)', () => {
     process.env.LC_COARSE_MERGE = '20:150'; assert.deepStrictEqual(envCoarseMerge(), { cellM: 20, belowArea: 150 });
   } finally { if (o === undefined) delete process.env.LC_COARSE_MERGE; else process.env.LC_COARSE_MERGE = o; }
 });
+test('安全フィルタ: 道路幅(gap>gapM)で離れた建物は統合せず元 id の個別 bbox、近接は統合', () => {
+  const road = [
+    { id: 'bldg_n1', fp: sq(0, 0, 5), z0: 0, h: 6 }, { id: 'bldg_n2', fp: sq(6, 0, 5), z0: 0, h: 6 },   // 1m 差で連結
+    { id: 'bldg_s1', fp: sq(0, 15, 5), z0: 0, h: 6 },                                                    // 10m の道路を挟む
+  ];
+  const o = coarsen(road, 0, { cellM: 40, belowArea: 100, gapM: 3, minFill: 0.6 });
+  const m = o.filter((f) => f.id.startsWith('lod1c_'));
+  assert.strictEqual(m.length, 1); assert.strictEqual(m[0].merged, 2);
+  assert.ok(m[0].fp[2][1] <= 5 + 1e-9);                       // 道路側(z>5)へ広がらない
+  assert.ok(o.some((f) => f.id === 'bldg_s1'));               // 分離側は個別 bbox にフォールバック
+});
+test('安全フィルタ: 充填率が minFill 未満(L字など)の成分は統合しない', () => {
+  const L = [{ id: 'bldg_p', fp: sq(0, 0, 9), z0: 0, h: 6 }, { id: 'bldg_q', fp: sq(10, 10, 9), z0: 0, h: 6 }]; // 対角: 隙間 1m で連結だが充填率 0.5
+  const o = coarsen(L, 0, { cellM: 40, belowArea: 100, gapM: 3, minFill: 0.6 });
+  assert.deepStrictEqual(o.map((f) => f.id).sort(), ['bldg_p', 'bldg_q']);
+});
+test('envCoarseMerge: 4 項目形式', () => {
+  const o = process.env.LC_COARSE_MERGE;
+  try { process.env.LC_COARSE_MERGE = '20:150:3:0.6'; assert.deepStrictEqual(envCoarseMerge(), { cellM: 20, belowArea: 150, gapM: 3, minFill: 0.6 }); }
+  finally { if (o === undefined) delete process.env.LC_COARSE_MERGE; else process.env.LC_COARSE_MERGE = o; }
+});

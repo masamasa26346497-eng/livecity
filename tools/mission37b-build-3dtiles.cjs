@@ -268,6 +268,7 @@ function loadFeatures(tileJson) {
 function coarsen(features, minArea, merge) {
   const out = [], buckets = new Map();
   const mergeOn = merge && merge.cellM > 0 && merge.belowArea > 0;
+  const safe = mergeOn && merge.gapM > 0;   // Mission213: 道路跨ぎ防止フィルタ(opt-in)。gapM 以内で連結する建物だけ統合し、充填率が minFill 未満の箱は統合せず個別 bbox に戻す
   for (const b of features) {
     let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
     for (const p of b.fp) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); }
@@ -275,7 +276,8 @@ function coarsen(features, minArea, merge) {
     if (mergeOn && area < merge.belowArea) {
       const k = Math.floor((x0 + x1) / 2 / merge.cellM) + '_' + Math.floor((z0 + z1) / 2 / merge.cellM);
       let g = buckets.get(k);
-      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [] }; buckets.set(k, g); }
+      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [], list: [] }; buckets.set(k, g); }
+      if (safe) { g.list.push({ b, x0, x1, z0, z1, area }); continue; }
       g.x0 = Math.min(g.x0, x0); g.x1 = Math.max(g.x1, x1); g.z0 = Math.min(g.z0, z0); g.z1 = Math.max(g.z1, z1);
       g.base = Math.min(g.base, b.z0 || 0); g.hs += (b.h || 3) * area; g.as += area; g.n++;
       if (process.env.LC_COARSE_AUDIT) g.m.push([x0, z0, x1, z1]);   // 監査用: 構成建物 bbox(出力 GLB には影響しない)
@@ -284,9 +286,34 @@ function coarsen(features, minArea, merge) {
     if (area < minArea) continue;
     out.push({ ...b, fp: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });
   }
+  const emit = (g, key) => {
+    const h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
+    out.push({ id: 'lod1c_' + key, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as, members: g.m });
+  };
   for (const k of [...buckets.keys()].sort()) {
-    const g = buckets.get(k), h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
-    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as, members: g.m });
+    const g = buckets.get(k);
+    if (!safe) { emit(g, k); continue; }
+    // 連結成分(各 bbox を gapM/2 ずつ膨らませて重なるもの)に分け、成分ごとに統合可否を判定する
+    const L = g.list, par = L.map((_, i) => i), r = merge.gapM / 2;
+    const find = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
+      if (L[i].x0 - r <= L[j].x1 + r && L[j].x0 - r <= L[i].x1 + r && L[i].z0 - r <= L[j].z1 + r && L[j].z0 - r <= L[i].z1 + r) par[find(i)] = find(j);
+    }
+    const comps = new Map();
+    L.forEach((e, i) => { const c = find(i); if (!comps.has(c)) comps.set(c, []); comps.get(c).push(e); });
+    let ci = 0;
+    for (const members of [...comps.values()].sort((p, q) => p[0].x0 - q[0].x0 || p[0].z0 - q[0].z0)) {
+      const c = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [] };
+      for (const e of members) {
+        c.x0 = Math.min(c.x0, e.x0); c.x1 = Math.max(c.x1, e.x1); c.z0 = Math.min(c.z0, e.z0); c.z1 = Math.max(c.z1, e.z1);
+        c.base = Math.min(c.base, e.b.z0 || 0); c.hs += (e.b.h || 3) * e.area; c.as += e.area; c.n++;
+        if (process.env.LC_COARSE_AUDIT) c.m.push([e.x0, e.z0, e.x1, e.z1]);
+      }
+      const boxArea = (c.x1 - c.x0) * (c.z1 - c.z0);
+      if (members.length >= 2 && boxArea > 0 && c.as / boxArea >= merge.minFill) { emit(c, k + '_' + (ci++)); continue; }
+      // フォールバック: 統合せず従来どおり個別 bbox(元 id)
+      for (const e of members) if (e.area >= minArea) out.push({ ...e.b, fp: [[e.x0, e.z0], [e.x1, e.z0], [e.x1, e.z1], [e.x0, e.z1]] });
+    }
   }
   return out;
 }
@@ -296,8 +323,10 @@ const mergeExt = (a, b) => ({ w: Math.min(a.w, b.w), e: Math.max(a.e, b.e), s: M
 
 // 環境変数 LC_COARSE_MERGE='cellM:belowArea'(例 '20:150')で opt-in。未設定なら従来どおり。
 function envCoarseMerge() {
-  const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/.exec(process.env.LC_COARSE_MERGE || '');
-  return m ? { cellM: +m[1], belowArea: +m[2] } : null;
+  // 'cellM:belowArea'(従来) または 'cellM:belowArea:gapM:minFill'(道路跨ぎ防止フィルタ付き。例 '20:150:3:0.6')
+  const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)(?::(\d+(?:\.\d+)?):(\d+(?:\.\d+)?))?$/.exec(process.env.LC_COARSE_MERGE || '');
+  if (!m) return null;
+  return m[3] ? { cellM: +m[1], belowArea: +m[2], gapM: +m[3], minFill: +m[4] } : { cellM: +m[1], belowArea: +m[2] };
 }
 function build(opts) {
   const dir = opts.srcDir || path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
