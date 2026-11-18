@@ -1775,12 +1775,13 @@
   const cityLod0CellPos = (cx, cz) => { const x = (cx + 0.5) * 200, z = (cz + 0.5) * 200; const lat = 34.604208 - z / 111320, lon = 135.525020 + x / (Math.cos(34.604208 * Math.PI / 180) * 111320); return Cesium.Cartesian3.fromDegrees(lon, lat, 0); };
   // 実タイルの描画範囲(球)を毎フレーム収集し、変化があったときだけ(最大2回/秒)セルの show を更新する。
   const cityLod0FineGE = Number(q.get('citylod0fine')) || 8;   // 置換に使う実タイルの geometricError 上限(m)。葉タイルは常に対象
-  const cityLod0NearM = Number(q.get('citylod0nearm')) || 5000;   // これより近い選択済み実タイルは粗くても置換対象(m)
+  const cityLod0NearM = Number(q.get('citylod0nearm')) || 5000;
+  const cityLod0FarM = Number(q.get('citylod0farm')) || 15000;   // カメラ高度がこれ以上の超遠景では、読込済みの粗い実タイルでも置換対象(20km遠景で実建物の上に模式セル格子が残る不具合の対処)。未ロードの範囲はセルが残る   // これより近い選択済み実タイルは粗くても置換対象(m)
   const cityLod0Dbg = perf.cityLod0SwapDbg = { seen: 0, coarse: 0, noContent: 0, bigRadius: 0 };   // 診断: tileVisible の件数と除外理由(累積)
   const cityLod0Spheres = []; let cityLod0Sig = '', cityLod0LastApply = 0;
   function cityLod0SwapInstall(t) {
     const hooked = new WeakSet();
-    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; /* 遠景で選ばれる粗い親タイル(子あり・geometricError大)は建物が疎ら=画素を満たさない。最詳細(葉 or 誤差が小さい)タイルだけを「実建物で覆われた範囲」とみなし、粗い間は模式セルを残す */ const fine = tile.children ? (tile.children.length === 0 || tile.geometricError <= cityLod0FineGE || (bs && Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius <= cityLod0NearM)) : true;   /* 中近景(カメラ距離が近い)では選択済みの実タイルは粗くても画素を満たすため対象に含める。遠景だけ粗い親を除外 */ cityLod0Dbg.seen++; if (!fine) cityLod0Dbg.coarse++; else if (!tile.content) cityLod0Dbg.noContent++; else if (!(bs && bs.radius < 4000)) cityLod0Dbg.bigRadius++; if (fine && bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
+    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; /* 遠景で選ばれる粗い親タイル(子あり・geometricError大)は建物が疎ら=画素を満たさない。最詳細(葉 or 誤差が小さい)タイルだけを「実建物で覆われた範囲」とみなし、粗い間は模式セルを残す */ const fine = tile.children ? (tile.children.length === 0 || tile.geometricError <= cityLod0FineGE || (bs && Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius <= cityLod0NearM) || viewer.camera.positionCartographic.height >= cityLod0FarM) : true;   /* 中近景(カメラ距離が近い)では選択済みの実タイルは粗くても画素を満たすため対象に含める。遠景だけ粗い親を除外 */ cityLod0Dbg.seen++; if (!fine) cityLod0Dbg.coarse++; else if (!tile.content) cityLod0Dbg.noContent++; else if (!(bs && bs.radius < 4000)) cityLod0Dbg.bigRadius++; if (fine && bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
     scene.preUpdate.addEventListener(() => { hook(); cityLod0Spheres.length = 0; });
     scene.postRender.addEventListener(() => {
       if (!t.show || t.isDestroyed()) return;

@@ -119,3 +119,9 @@ test('置換: 中近景ではカメラ距離が近い選択済み実タイルも
   assert.ok(h.includes('cityLod0NearM'));
   assert.ok(h.includes('cityLod0SwapDbg'));
 });
+
+test('超遠景(citylod0farm)では読込済みの粗い実タイルも置換対象にする', () => {
+  const h = require('fs').readFileSync(require('path').join(__dirname, '..', 'public', 'mission37g-osaka-24ward-mvp.html'), 'utf8');
+  assert.match(h, /citylod0farm/);
+  assert.match(h, /positionCartographic\.height >= cityLod0FarM/);
+});
