@@ -262,13 +262,30 @@ function loadFeatures(tileJson) {
   });
 }
 // 簡略 LOD: footprint の軸平行 bbox を押し出し、小建物（bbox 面積 < minArea）は除外
-function coarsen(features, minArea) {
-  const out = [];
+// merge = { cellM, belowArea }: Mission213 試作(opt-in)。bbox 面積 < belowArea の小建物を cellM 四方のバケット(重心基準)ごとに 1 箱へ統合する。
+//   統合箱は「そのバケット内の小建物 bbox の和集合」なので、建物の無い範囲(道路/河川/空地)へは cellM+建物寸法を超えて広がらない(固定格子の再利用ではない)。
+//   高さ=面積加重平均。id は 'lod1c_' 接頭辞(bldg_ ではない=クリック対象外)。既定(merge 無し)の出力はバイト単位で従来と同一。
+function coarsen(features, minArea, merge) {
+  const out = [], buckets = new Map();
+  const mergeOn = merge && merge.cellM > 0 && merge.belowArea > 0;
   for (const b of features) {
     let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
     for (const p of b.fp) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); }
-    if ((x1 - x0) * (z1 - z0) < minArea) continue;
+    const area = (x1 - x0) * (z1 - z0);
+    if (mergeOn && area < merge.belowArea) {
+      const k = Math.floor((x0 + x1) / 2 / merge.cellM) + '_' + Math.floor((z0 + z1) / 2 / merge.cellM);
+      let g = buckets.get(k);
+      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0 }; buckets.set(k, g); }
+      g.x0 = Math.min(g.x0, x0); g.x1 = Math.max(g.x1, x1); g.z0 = Math.min(g.z0, z0); g.z1 = Math.max(g.z1, z1);
+      g.base = Math.min(g.base, b.z0 || 0); g.hs += (b.h || 3) * area; g.as += area; g.n++;
+      continue;
+    }
+    if (area < minArea) continue;
     out.push({ ...b, fp: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });
+  }
+  for (const k of [...buckets.keys()].sort()) {
+    const g = buckets.get(k), h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
+    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n });
   }
   return out;
 }
@@ -276,6 +293,11 @@ const region = (e) => [e.w * D2R, e.s * D2R, e.e * D2R, e.n * D2R, Math.floor(e.
 const mergeExt = (a, b) => ({ w: Math.min(a.w, b.w), e: Math.max(a.e, b.e), s: Math.min(a.s, b.s), n: Math.max(a.n, b.n),
   minH: Math.min(a.minH, b.minH), maxH: Math.max(a.maxH, b.maxH) });
 
+// 環境変数 LC_COARSE_MERGE='cellM:belowArea'(例 '20:150')で opt-in。未設定なら従来どおり。
+function envCoarseMerge() {
+  const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/.exec(process.env.LC_COARSE_MERGE || '');
+  return m ? { cellM: +m[1], belowArea: +m[2] } : null;
+}
 function build(opts) {
   const dir = opts.srcDir || path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
@@ -316,7 +338,7 @@ function build(opts) {
       for (const f of feats) if (kept.has(f.id)) gFeatures.push(f);
     }
     if (!leafs.length) continue;
-    const gfRaw = coarsen(gFeatures, opts.coarseMinArea);
+    const gfRaw = coarsen(gFeatures, opts.coarseMinArea, opts.coarseMerge || envCoarseMerge());
     const gframe = makeFrame((gExt.w + gExt.e) / 2, (gExt.s + gExt.n) / 2);
     const cr = buildGlb(gfRaw, gframe);
     const gname = 'g_' + gk;
@@ -370,5 +392,5 @@ function main() {
   if (r.totals.buildings + r.totals.skipped !== r.totals.sourceBuildings) { console.error('building count mismatch'); process.exit(1); }
 }
 
-module.exports = { buildGlb, parseGlb, build, makeFrame, toEnu,frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
+module.exports = { envCoarseMerge, buildGlb, parseGlb, build, makeFrame, toEnu,frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
 if (require.main === module) main();
