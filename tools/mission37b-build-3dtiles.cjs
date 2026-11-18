@@ -275,9 +275,10 @@ function coarsen(features, minArea, merge) {
     if (mergeOn && area < merge.belowArea) {
       const k = Math.floor((x0 + x1) / 2 / merge.cellM) + '_' + Math.floor((z0 + z1) / 2 / merge.cellM);
       let g = buckets.get(k);
-      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0 }; buckets.set(k, g); }
+      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [] }; buckets.set(k, g); }
       g.x0 = Math.min(g.x0, x0); g.x1 = Math.max(g.x1, x1); g.z0 = Math.min(g.z0, z0); g.z1 = Math.max(g.z1, z1);
       g.base = Math.min(g.base, b.z0 || 0); g.hs += (b.h || 3) * area; g.as += area; g.n++;
+      if (process.env.LC_COARSE_AUDIT) g.m.push([x0, z0, x1, z1]);   // 監査用: 構成建物 bbox(出力 GLB には影響しない)
       continue;
     }
     if (area < minArea) continue;
@@ -285,7 +286,7 @@ function coarsen(features, minArea, merge) {
   }
   for (const k of [...buckets.keys()].sort()) {
     const g = buckets.get(k), h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
-    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as });
+    out.push({ id: 'lod1c_' + k, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as, members: g.m });
   }
   return out;
 }
@@ -341,7 +342,7 @@ function build(opts) {
     const gfRaw = coarsen(gFeatures, opts.coarseMinArea, opts.coarseMerge || envCoarseMerge());
     const gframe = makeFrame((gExt.w + gExt.e) / 2, (gExt.s + gExt.n) / 2);
     if (process.env.LC_COARSE_AUDIT) {   // Mission213: 統合箱の bbox を JSON Lines で書き出す(道路/河川との交差監査用。出力 GLB には影響しない)
-      for (const f of gfRaw) if (f.id.startsWith('lod1c_')) fs.appendFileSync(process.env.LC_COARSE_AUDIT, JSON.stringify({ id: f.id, x0: f.fp[0][0], z0: f.fp[0][1], x1: f.fp[2][0], z1: f.fp[2][1], n: f.merged, memberArea: Math.round(f.memberArea) }) + '\n');
+      for (const f of gfRaw) if (f.id.startsWith('lod1c_')) fs.appendFileSync(process.env.LC_COARSE_AUDIT, JSON.stringify({ id: f.id, x0: f.fp[0][0], z0: f.fp[0][1], x1: f.fp[2][0], z1: f.fp[2][1], n: f.merged, memberArea: Math.round(f.memberArea), m: (f.members || []).map((q) => q.map((v) => +v.toFixed(2))) }) + '\n');
     }
     const cr = buildGlb(gfRaw, gframe);
     const gname = 'g_' + gk;
