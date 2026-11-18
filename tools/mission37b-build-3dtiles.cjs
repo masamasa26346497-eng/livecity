@@ -269,7 +269,9 @@ function loadFeatures(tileJson) {
 //   道路を roadMaxM2(既定 5m²)超えて覆うなら統合しない。merge.roadTest(x,z) は点が道路内か。opt-in。1m 格子サンプリングの近似。
 function gapHitsRoad(c, members, merge) {
   if (typeof merge.roadTest !== 'function') return false;
-  const step = 1, lim = (merge.roadMaxM2 != null ? merge.roadMaxM2 : 5) / (step * step); let n = 0;
+  // 原因調査(Mission213): 旧実装は 1m 格子・許容 5m² で、監査(2m 格子=1点4m²)の 2 点(8m²)が 1m 格子では 5 点以下になり得て、残 1,436m² の一因。
+  // 既定を 0.5m 格子・許容 0(1 点でも道路に掛かれば統合しない)に変更。LC_COARSE_ROAD_STEP / LC_COARSE_ROAD_MAX_M2 で上書き可。
+  const step = merge.roadStep > 0 ? merge.roadStep : 0.5, lim = (merge.roadMaxM2 != null ? merge.roadMaxM2 : 0) / (step * step); let n = 0;
   for (let x = c.x0 + step / 2; x < c.x1; x += step) for (let z = c.z0 + step / 2; z < c.z1; z += step) {
     if (members.some((e) => x >= e.x0 && x < e.x1 && z >= e.z0 && z < e.z1)) continue;
     if (merge.roadTest(x, z) && ++n > lim) return true;
@@ -345,7 +347,7 @@ function envCoarseMerge() {
   const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)(?::(\d+(?:\.\d+)?):(\d+(?:\.\d+)?))?$/.exec(process.env.LC_COARSE_MERGE || '');
   if (!m) return null;
   const o = m[3] ? { cellM: +m[1], belowArea: +m[2], gapM: +m[3], minFill: +m[4] } : { cellM: +m[1], belowArea: +m[2] };
-  if (m[3] && process.env.LC_COARSE_ROADS) o.roadTest = loadRoadTest(process.env.LC_COARSE_ROADS);   // opt-in(道路は前回ビルドの出力を参照)
+  if (m[3] && process.env.LC_COARSE_ROADS) { o.roadTest = loadRoadTest(process.env.LC_COARSE_ROADS); if (process.env.LC_COARSE_ROAD_STEP) o.roadStep = +process.env.LC_COARSE_ROAD_STEP; if (process.env.LC_COARSE_ROAD_MAX_M2) o.roadMaxM2 = +process.env.LC_COARSE_ROAD_MAX_M2; }   // opt-in(道路は前回ビルドの出力を参照)
   return o;
 }
 function build(opts) {

@@ -58,3 +58,9 @@ test('道路回避: gap が道路に掛かる成分は統合せず、掛から�
   assert.strictEqual(r.filter((o) => o.id.startsWith('lod1c_')).length, 0);
   assert.deepStrictEqual(r.map((o) => o.id).sort(), ['bldg_a', 'bldg_b']);
 });
+test('道路回避: 既定は厳格(許容0)。gap に 2m² だけ道路が掛かっても統合しない。roadMaxM2 で緩和可', () => {
+  const f = [{ id: 'bldg_a', fp: sq(0, 0, 8), z0: 0, h: 6 }, { id: 'bldg_b', fp: sq(9, 0, 8), z0: 0, h: 6 }];
+  const m = { cellM: 40, belowArea: 100, gapM: 3, minFill: 0.1, roadTest: (x, z) => x > 8 && x < 9 && z < 2 };
+  assert.strictEqual(coarsen(f, 0, m).filter((o) => o.id.startsWith('lod1c_')).length, 0);
+  assert.strictEqual(coarsen(f, 0, { ...m, roadMaxM2: 5 }).filter((o) => o.id.startsWith('lod1c_')).length, 1);
+});
