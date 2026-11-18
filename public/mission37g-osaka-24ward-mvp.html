@@ -1075,7 +1075,9 @@
   const BASE_WARD = '27120';   // 住吉区: 基本 tileset（TILES_BASE）
   let bldgGen = 0, bldgWard = null;   // generation token / 現在の建物表示区
   async function mountTileset(base, gen) {
-    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', { maximumScreenSpaceError: stats.sse || SSE0 });
+    // Mission213 Phase2(opt-in ?dse=1): Cesium の dynamicScreenSpaceError。カメラから遠い(地平線側)実タイルの SSE を動的に緩め、斜め視で遠方の細部を先読みしすぎない。既定OFF=従来どおり。
+    const dseOpt = q.get('dse') === '1' ? { dynamicScreenSpaceError: true, dynamicScreenSpaceErrorDensity: Number(q.get('dsed')) || 2.0e-4, dynamicScreenSpaceErrorFactor: Number(q.get('dsef')) || 24 } : {};
+    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, dseOpt));
     if (gen !== bldgGen) { try { ts.destroy(); } catch (e) { /* noop */ } return null; }   // 待機中に別の区が選ばれた: 破棄して再表示しない
     ts._lcBase = base;
     scene.primitives.add(ts);
