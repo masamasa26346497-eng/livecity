@@ -11,6 +11,8 @@ const CHROME = opt('chrome', '/usr/bin/chromium'), OUT = opt('out', null);
 // --static <build出力dir>: 実ビルド出力(build-cloud-preview.mjs --city-lod0 の temp/cloud-preview/static 等)を読み取り専用で配信する実データモード。
 //   省略時は合成 fixture。実データと合成は result.fixture で区別する。--lon/--lat で最初の観測地点(既定: 大阪北区)。
 const STATIC = opt('static', null);
+// --ward <id>: --lat/--lon 省略時に <static>/ext-3dtiles/<id>/tileset.json の region から区中心を算出(区ごとの座標手入力ミス=選択0の誤診を防ぐ)
+{ const w = opt('ward', null); if (w && STATIC && !a.includes('--lat')) { try { const r = JSON.parse(fs.readFileSync(path.join(STATIC, 'ext-3dtiles', w, 'tileset.json'), 'utf8')).root.boundingVolume.region; const d = 180 / Math.PI; a.push('--lon', String(((r[0] + r[2]) / 2 * d).toFixed(5)), '--lat', String(((r[1] + r[3]) / 2 * d).toFixed(5))); } catch (e) { throw new Error('--ward の中心算出失敗: ' + e.message); } } }
 
 // ---- fixture: 2 区が x=3000 で接する 6km×3km の街区(各 200m セルに 6 棟) ----
 const ext = STATIC ? path.join(path.resolve(STATIC), 'ext-3dtiles') : fs.mkdtempSync(path.join(os.tmpdir(), 'lod0e2e-'));
@@ -133,16 +135,22 @@ async function baselineMode() {
     result._reqs = []; result.httpErrors = [];
     t0 = Date.now(); await send('Page.navigate', { url: `http://127.0.0.1:${port}/mission37g-osaka-24ward-mvp.html?${qs}` });
     let tViewer = null, tLod0 = null, tAllLoaded = null;
-    for (let i = 0; i < 400; i++) {
-      const st = await ev(`(()=>{const v=window.__v;if(!v)return null;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);return {n:ps.length,l0:!!(l0&&l0.tilesLoaded),all:ps.length>0&&ps.every(p=>p.tilesLoaded)}})()`).catch(() => null);
-      if (st) { tViewer ??= Date.now() - t0; if (st.l0) tLod0 ??= Date.now() - t0; if (st.all && st.n >= 2) { tAllLoaded = Date.now() - t0; break; } }
+    // 修正: 旧版は固定視点を持たず(起動時 flyTo でカメラが動く)、実タイルが1枚も選択されない時点の tilesLoaded=true を「全完了」と誤判定して
+    // cold が早期終了していた(cold 4.4MB/8s vs warm 19.6MB/21s の不整合)。ここでは flyTo を無効化し起動直後から固定視点(--h 既定3000m -60°)に保持、
+    // 「全 tileset tilesLoaded かつ 実タイル(非LOD0)の選択数>0」が 6 回連続(約1.5s)で成立した時刻を完了とする。
+    const bh = Number(opt('h', 3000)), bp = Number(opt('pitch', -60));
+    let ok6 = 0, locked = false;
+    for (let i = 0; i < 600; i++) {
+      const st = await ev(`(()=>{const v=window.__v;if(!v)return null;if(!window.__lcBase){window.__lcBase=1;const c=v.camera;for(const k of ['flyToBoundingSphere','flyTo','flyHome']){c[k]=function(){}}}v.camera.cancelFlight();v.camera.setView({destination:Cesium.Cartesian3.fromDegrees(${lon0},${lat0},${bh}),orientation:{heading:0,pitch:Cesium.Math.toRadians(${bp}),roll:0}});v.scene.requestRender();const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);const real=ps.filter(p=>!p._lcCityLod0);const rsel=real.reduce((s,p)=>s+((p._selectedTiles&&p._selectedTiles.length)||0),0);return {n:ps.length,l0:!!(l0&&l0.tilesLoaded),all:ps.length>0&&ps.every(p=>p.tilesLoaded),rsel}})()`).catch(() => null);
+      if (st) { locked = true; tViewer ??= Date.now() - t0; if (st.l0) tLod0 ??= Date.now() - t0; ok6 = (st.all && st.n >= 2 && st.rsel > 0) ? ok6 + 1 : 0; if (ok6 >= 6) { tAllLoaded = Date.now() - t0 - 1250; break; } }
       await sleep(250);
     }
+    result.baselineView = { h: bh, pitch: bp, lon: lon0, lat: lat0 };
     const reqs = result._reqs, cnt = {}; for (const u of reqs) cnt[u] = (cnt[u] || 0) + 1;
     const dups = Object.entries(cnt).filter(([, c]) => c > 1).map(([u, c]) => ({ u: u.slice(0, 90), c })).slice(0, 15);
     const byKind = {}; for (const u of reqs) { const k = u.includes('_city-lod0') ? 'lod0' : /\.(glb|b3dm|i3dm)$/.test(u) ? 'tile-content' : /tileset\.json$/.test(u) ? 'tileset.json' : /\.json$/.test(u) ? 'json' : 'other'; byKind[k] = (byKind[k] || 0) + 1; }
     const lod0Bytes = Object.entries(result._fin || {}).filter(([u]) => u.includes('_city-lod0')).reduce((s, [, b]) => s + b, 0);
-    await holdCam(lon0, lat0, 10000, -90); await sleep(1500);
+    await sleep(500);
     const frame = await ev(`(async()=>{const v=window.__v;const t=[];for(let i=0;i<5;i++)v.scene.render();for(let i=0;i<60;i++){const a=performance.now();v.scene.render();t.push(performance.now()-a)}t.sort((x,y)=>x-y);return {p50:+t[30].toFixed(1),p95:+t[57].toFixed(1)}})()`);
     const mem = await ev(`performance.memory?{usedMB:Math.round(performance.memory.usedJSHeapSize/1048576)}:null`);
     result.baseline.push({ phase, tViewerMs: tViewer, tLod0LoadedMs: tLod0, tAllTilesLoadedMs: tAllLoaded, requests: reqs.length, byKind, bytes: (result.bytes || 0) - b0, lod0Bytes, lod0Glb: reqs.filter((u) => u.includes('_city-lod0') && u.endsWith('.glb')).length, fromCache: result._cached, lod0FromCache: (result._cachedU || []).filter((u) => u && u.includes('_city-lod0')).length, duplicates: dups, http4xx: result.httpErrors.length, http4xxSample: result.httpErrors.slice(0, 8), frame, mem });
