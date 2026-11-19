@@ -1,0 +1,93 @@
+# Mission 199: LOD2 cloud preview (Kita/Chuo, PLATEAU 2025). TEMPLATE.
+# The Claude GitHub App cannot write .github/workflows, so this lives here.
+# A human must copy it: cp tools/lod2/cloud-workflow/lod2-cloud-preview.yml .github/workflows/lod2-cloud-preview.yml
+# Manual workflow_dispatch ONLY. Never runs on push / pull_request / schedule.
+name: lod2-cloud-preview
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy a Vercel PREVIEW after build (default false = build/audit/artifact only)'
+        type: boolean
+        default: false
+      rights_approved:
+        description: 'Type CONFIRMED only after a human reviewed license/attribution (BUNDLE_MANIFEST rights). Required for deploy.'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lod2-cloud-preview
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Disk space
+        run: df -h .
+      - name: Generate official PLATEAU 2025 data (Range fetch only, no auth)
+        run: |
+          set -euo pipefail
+          for w in kita chuo; do node tools/mission79-run.mjs --ward "$w" --max-mb 1500; done
+          node tools/lod2/lod2-build-all.mjs
+          for w in kita chuo; do
+            node tools/mission79-build-ward-2025.cjs --ward "$w" --jsonl "temp/mission79/$w-work/$w.jsonl" --out "temp/mission79/$w-2025-ex" --exclude-ids temp/lod2-all/manifest.json
+          done
+      - name: Build static bundle
+        run: node tools/lod2/lod2-cloud-bundle.mjs --wards kita,chuo
+      - name: Unit tests
+        run: node --test tests/mission198-cloud-bundle.test.mjs tests/mission199-cloud-workflow.test.mjs
+      - name: Browser verify (static HTTP, non-localhost host)
+        run: node tools/lod2/lod2-cloud-verify.cjs
+      - name: Audit (size / rights flag / secrets)
+        run: |
+          set -euo pipefail
+          B=temp/cloud-bundle
+          test -f "$B/BUNDLE_MANIFEST.json"
+          node tools/lod2/lod2-cloud-audit.mjs "$B" 125829120
+      - name: Upload private artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lod2-cloud-bundle
+          path: temp/cloud-bundle
+          retention-days: 3
+          if-no-files-found: error
+
+  deploy:
+    # Separate job. Runs only if explicitly requested AND rights typed AND the
+    # protected Environment is approved by a required reviewer.
+    needs: build
+    if: ${{ inputs.deploy == true && inputs.rights_approved == 'CONFIRMED' }}
+    runs-on: ubuntu-latest
+    environment: lod2-preview-approval
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/download-artifact@v4
+        with:
+          name: lod2-cloud-bundle
+          path: bundle
+      - name: Check secrets exist (values are never printed)
+        run: |
+          test -n "$VERCEL_TOKEN" || { echo "::error::VERCEL_TOKEN is not set"; exit 1; }
+          test -n "$VERCEL_ORG_ID" || { echo "::error::VERCEL_ORG_ID is not set"; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo "::error::VERCEL_PROJECT_ID is not set"; exit 1; }
+      - name: Deploy PREVIEW (never production)
+        working-directory: bundle
+        run: npx --yes vercel@latest deploy --yes
