@@ -1,0 +1,55 @@
+{
+  "mission": "36K-citygml-ward-range",
+  "generatedAt": "2026-10-13T10:37:22.405Z",
+  "wardId": "tennoji",
+  "wardName": "天王寺区",
+  "wardCode": "27109",
+  "wardBoundaryBbox": {
+    "minX": -1692.32,
+    "maxX": 781.12,
+    "minZ": -8000.23,
+    "maxZ": -4555.41
+  },
+  "wardGeoBbox": {
+    "south": 34.64512975709666,
+    "north": 34.67607496011498,
+    "west": 135.5065503143367,
+    "east": 135.5335450076022
+  },
+  "boundaryGeneratedAt": "2026-08-31T11:25:21.269Z",
+  "selectionMethod": "third-level mesh bbox intersects authoritative N03 ward boundary bbox; deliberate safe overfetch, final buildings are N03 point-in-polygon classified",
+  "candidateEntries": 15,
+  "candidateMeshes": [
+    "51357470",
+    "51357471",
+    "51357472",
+    "51357480",
+    "51357481",
+    "51357482",
+    "51357490",
+    "51357491",
+    "51357492",
+    "52350400",
+    "52350401",
+    "52350402",
+    "52350410",
+    "52350411",
+    "52350412"
+  ],
+  "compressedBytes": 35322745,
+  "uncompressedBytes": 780753953,
+  "dryRun": false,
+  "maxFiles": null,
+  "extracted": [
+    {
+      "mesh": "51357481",
+      "file": "temp/gml-tennoji/51357481_bldg_6697_op.gml",
+      "bytes": 45419497
+    },
+    {
+      "mesh": "51357491",
+      "file": "temp/gml-tennoji/51357491_bldg_6697_op.gml",
+      "bytes": 34905251
+    }
+  ]
+}

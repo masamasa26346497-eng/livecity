@@ -1,0 +1,585 @@
+{
+ "mission": "201",
+ "readOnly": true,
+ "networkUsed": false,
+ "generatedAt": "2026-11-11T12:41:14.012Z",
+ "source": {
+  "package": "plateau-27100-osaka-shi-2025",
+  "etag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+  "contentLengthMB": 1507,
+  "vintage": 2025
+ },
+ "vercelHobbyAssumed": {
+  "verified": false,
+  "note": "ネットワーク不可のため公式docsで再確認できていない。過去に公開されていた値を暫定採用。デプロイ前に vercel.com/docs/limits で確認すること。",
+  "buildMinutes": 45,
+  "deployFileCount": 15000,
+  "singleFileMB": 100,
+  "deployTotalMB": 1000,
+  "bandwidthGBPerMonth": 100
+ },
+ "plans": [
+  {
+   "ward": "kita",
+   "name": "北区",
+   "code": "27127",
+   "served": true,
+   "sourceMeshes": 25,
+   "downloadCompressedMB": 50.5,
+   "inflatedGmlMB": 903.8,
+   "measured": {
+    "buildings": 19601,
+    "contentTiles": 59,
+    "glbBytes": 28188472,
+    "seconds": 71
+   }
+  },
+  {
+   "ward": "miyakojima",
+   "name": "都島区",
+   "code": "27102",
+   "served": false,
+   "sourceMeshes": 21,
+   "downloadCompressedMB": 36.3,
+   "inflatedGmlMB": 861.7,
+   "measured": {
+    "buildings": 17651,
+    "contentTiles": 42,
+    "glbBytes": 24403236,
+    "seconds": 40.7
+   }
+  },
+  {
+   "ward": "fukushima",
+   "name": "福島区",
+   "code": "27103",
+   "served": false,
+   "sourceMeshes": 16,
+   "downloadCompressedMB": 26.2,
+   "inflatedGmlMB": 560.4,
+   "measured": {
+    "buildings": 13412,
+    "contentTiles": 31,
+    "glbBytes": 18235576,
+    "seconds": 34.7
+   }
+  },
+  {
+   "ward": "konohana",
+   "name": "此花区",
+   "code": "27104",
+   "served": false,
+   "sourceMeshes": 70,
+   "downloadCompressedMB": 35,
+   "inflatedGmlMB": 844,
+   "measured": {
+    "buildings": 17615,
+    "contentTiles": 100,
+    "glbBytes": 24298844,
+    "seconds": 97.8
+   }
+  },
+  {
+   "ward": "chuo",
+   "name": "中央区",
+   "code": "27128",
+   "served": true,
+   "sourceMeshes": 20,
+   "downloadCompressedMB": 41.6,
+   "inflatedGmlMB": 753.4,
+   "measured": {
+    "buildings": 18655,
+    "contentTiles": 59,
+    "glbBytes": 26023468,
+    "seconds": 35.8
+   }
+  },
+  {
+   "ward": "nishi",
+   "name": "西区",
+   "code": "27106",
+   "served": true,
+   "sourceMeshes": 16,
+   "downloadCompressedMB": 26.3,
+   "inflatedGmlMB": 566.2,
+   "measured": {
+    "buildings": 12603,
+    "contentTiles": 34,
+    "glbBytes": 17665940,
+    "seconds": 20.5
+   }
+  },
+  {
+   "ward": "minato",
+   "name": "港区",
+   "code": "27107",
+   "served": false,
+   "sourceMeshes": 20,
+   "downloadCompressedMB": 19.6,
+   "inflatedGmlMB": 478.1,
+   "measured": {
+    "buildings": 17200,
+    "contentTiles": 52,
+    "glbBytes": 22933280,
+    "seconds": 25.4
+   }
+  },
+  {
+   "ward": "taisho",
+   "name": "大正区",
+   "code": "27108",
+   "served": false,
+   "sourceMeshes": 28,
+   "downloadCompressedMB": 27.5,
+   "inflatedGmlMB": 681.7,
+   "measured": {
+    "buildings": 19459,
+    "contentTiles": 58,
+    "glbBytes": 25756576,
+    "seconds": 42.7
+   }
+  },
+  {
+   "ward": "tennoji",
+   "name": "天王寺区",
+   "code": "27109",
+   "served": false,
+   "sourceMeshes": 15,
+   "downloadCompressedMB": 34.5,
+   "inflatedGmlMB": 743.7,
+   "measured": {
+    "buildings": 14235,
+    "contentTiles": 33,
+    "glbBytes": 20238288,
+    "seconds": 30.7
+   }
+  },
+  {
+   "ward": "naniwa",
+   "name": "浪速区",
+   "code": "27111",
+   "served": false,
+   "sourceMeshes": 12,
+   "downloadCompressedMB": 22.5,
+   "inflatedGmlMB": 479.3,
+   "measured": {
+    "buildings": 10283,
+    "contentTiles": 34,
+    "glbBytes": 14459380,
+    "seconds": 20.9
+   }
+  },
+  {
+   "ward": "nishiyodogawa",
+   "name": "西淀川区",
+   "code": "27113",
+   "served": false,
+   "sourceMeshes": 33,
+   "downloadCompressedMB": 33.5,
+   "inflatedGmlMB": 842.4,
+   "measured": {
+    "buildings": 27381,
+    "contentTiles": 77,
+    "glbBytes": 37596844,
+    "seconds": 49.6
+   }
+  },
+  {
+   "ward": "yodogawa",
+   "name": "淀川区",
+   "code": "27123",
+   "served": false,
+   "sourceMeshes": 33,
+   "downloadCompressedMB": 64.3,
+   "inflatedGmlMB": 1161.2,
+   "measured": {
+    "buildings": 35296,
+    "contentTiles": 76,
+    "glbBytes": 51015464,
+    "seconds": 58.3
+   }
+  },
+  {
+   "ward": "higashiyodogawa",
+   "name": "東淀川区",
+   "code": "27114",
+   "served": false,
+   "sourceMeshes": 28,
+   "downloadCompressedMB": 38.8,
+   "inflatedGmlMB": 868.6,
+   "measured": {
+    "buildings": 35336,
+    "contentTiles": 75,
+    "glbBytes": 49906796,
+    "seconds": 49.6
+   }
+  },
+  {
+   "ward": "higashinari",
+   "name": "東成区",
+   "code": "27115",
+   "served": false,
+   "sourceMeshes": 12,
+   "downloadCompressedMB": 22.9,
+   "inflatedGmlMB": 563.6,
+   "measured": {
+    "buildings": 22631,
+    "contentTiles": 32,
+    "glbBytes": 29914780,
+    "seconds": 22.5
+   }
+  },
+  {
+   "ward": "ikuno",
+   "name": "生野区",
+   "code": "27116",
+   "served": false,
+   "sourceMeshes": 24,
+   "downloadCompressedMB": 47.6,
+   "inflatedGmlMB": 1188.6,
+   "measured": {
+    "buildings": 45427,
+    "contentTiles": 58,
+    "glbBytes": 59297468,
+    "seconds": 58
+   }
+  },
+  {
+   "ward": "asahi",
+   "name": "旭区",
+   "code": "27117",
+   "served": false,
+   "sourceMeshes": 17,
+   "downloadCompressedMB": 26.8,
+   "inflatedGmlMB": 667.8,
+   "measured": {
+    "buildings": 24962,
+    "contentTiles": 45,
+    "glbBytes": 33821580,
+    "seconds": 32.6
+   }
+  },
+  {
+   "ward": "joto",
+   "name": "城東区",
+   "code": "27118",
+   "served": false,
+   "sourceMeshes": 20,
+   "downloadCompressedMB": 37.1,
+   "inflatedGmlMB": 898.9,
+   "measured": {
+    "buildings": 32380,
+    "contentTiles": 54,
+    "glbBytes": 43850536,
+    "seconds": 43.6
+   }
+  },
+  {
+   "ward": "tsurumi",
+   "name": "鶴見区",
+   "code": "27124",
+   "served": false,
+   "sourceMeshes": 18,
+   "downloadCompressedMB": 22.9,
+   "inflatedGmlMB": 565.6,
+   "measured": {
+    "buildings": 25309,
+    "contentTiles": 59,
+    "glbBytes": 35203700,
+    "seconds": 29.9
+   }
+  },
+  {
+   "ward": "abeno",
+   "name": "阿倍野区",
+   "code": "27119",
+   "served": false,
+   "sourceMeshes": 20,
+   "downloadCompressedMB": 49.8,
+   "inflatedGmlMB": 1213.3,
+   "measured": {
+    "buildings": 26498,
+    "contentTiles": 43,
+    "glbBytes": 37066972,
+    "seconds": 51.5
+   }
+  },
+  {
+   "ward": "suminoe",
+   "name": "住之江区",
+   "code": "27125",
+   "served": false,
+   "sourceMeshes": 50,
+   "downloadCompressedMB": 39.8,
+   "inflatedGmlMB": 990.5,
+   "measured": {
+    "buildings": 27425,
+    "contentTiles": 130,
+    "glbBytes": 37301852,
+    "seconds": 51.4
+   }
+  },
+  {
+   "ward": "sumiyoshi",
+   "name": "住吉区",
+   "code": "27120",
+   "served": false,
+   "sourceMeshes": 19,
+   "downloadCompressedMB": 31.5,
+   "inflatedGmlMB": 770.9,
+   "measured": {
+    "buildings": 35032,
+    "contentTiles": 58,
+    "glbBytes": 47959344,
+    "seconds": 43.4
+   }
+  },
+  {
+   "ward": "higashisumiyoshi",
+   "name": "東住吉区",
+   "code": "27121",
+   "served": false,
+   "sourceMeshes": 23,
+   "downloadCompressedMB": 39.4,
+   "inflatedGmlMB": 977.7,
+   "measured": {
+    "buildings": 38338,
+    "contentTiles": 68,
+    "glbBytes": 52006208,
+    "seconds": 57.4
+   }
+  },
+  {
+   "ward": "hirano",
+   "name": "平野区",
+   "code": "27126",
+   "served": false,
+   "sourceMeshes": 26,
+   "downloadCompressedMB": 31,
+   "inflatedGmlMB": 785.4,
+   "measured": {
+    "buildings": 46473,
+    "contentTiles": 98,
+    "glbBytes": 63138828,
+    "seconds": 52.7
+   }
+  },
+  {
+   "ward": "nishinari",
+   "name": "西成区",
+   "code": "27122",
+   "served": false,
+   "sourceMeshes": 20,
+   "downloadCompressedMB": 36.9,
+   "inflatedGmlMB": 907.4,
+   "measured": {
+    "buildings": 32032,
+    "contentTiles": 49,
+    "glbBytes": 42019000,
+    "seconds": 32
+   }
+  }
+ ],
+ "estimate": {
+  "wards": 24,
+  "estimatedWards": 0,
+  "lod1GlbMB": {
+   "low": 683,
+   "mid": 803,
+   "high": 924
+  },
+  "contentTiles": 1424,
+  "files": {
+   "low": 3418,
+   "mid": 4272,
+   "high": 6408,
+   "basis": "estimated (filesPerTile 仮定)"
+  },
+  "buildSeconds": {
+   "mid": 1053,
+   "note": "mission193 の 4 vCPU Actions runner の実測秒の合計/比例推定。Vercel ビルド機の速度は未実測"
+  },
+  "downloadCompressedMB": 842.3,
+  "perWard": [
+   {
+    "ward": "kita",
+    "glbMB": 26.9,
+    "tiles": 59,
+    "seconds": 71,
+    "basis": "measured"
+   },
+   {
+    "ward": "miyakojima",
+    "glbMB": 23.3,
+    "tiles": 42,
+    "seconds": 41,
+    "basis": "measured"
+   },
+   {
+    "ward": "fukushima",
+    "glbMB": 17.4,
+    "tiles": 31,
+    "seconds": 35,
+    "basis": "measured"
+   },
+   {
+    "ward": "konohana",
+    "glbMB": 23.2,
+    "tiles": 100,
+    "seconds": 98,
+    "basis": "measured"
+   },
+   {
+    "ward": "chuo",
+    "glbMB": 24.8,
+    "tiles": 59,
+    "seconds": 36,
+    "basis": "measured"
+   },
+   {
+    "ward": "nishi",
+    "glbMB": 16.8,
+    "tiles": 34,
+    "seconds": 21,
+    "basis": "measured"
+   },
+   {
+    "ward": "minato",
+    "glbMB": 21.9,
+    "tiles": 52,
+    "seconds": 25,
+    "basis": "measured"
+   },
+   {
+    "ward": "taisho",
+    "glbMB": 24.6,
+    "tiles": 58,
+    "seconds": 43,
+    "basis": "measured"
+   },
+   {
+    "ward": "tennoji",
+    "glbMB": 19.3,
+    "tiles": 33,
+    "seconds": 31,
+    "basis": "measured"
+   },
+   {
+    "ward": "naniwa",
+    "glbMB": 13.8,
+    "tiles": 34,
+    "seconds": 21,
+    "basis": "measured"
+   },
+   {
+    "ward": "nishiyodogawa",
+    "glbMB": 35.9,
+    "tiles": 77,
+    "seconds": 50,
+    "basis": "measured"
+   },
+   {
+    "ward": "yodogawa",
+    "glbMB": 48.7,
+    "tiles": 76,
+    "seconds": 58,
+    "basis": "measured"
+   },
+   {
+    "ward": "higashiyodogawa",
+    "glbMB": 47.6,
+    "tiles": 75,
+    "seconds": 50,
+    "basis": "measured"
+   },
+   {
+    "ward": "higashinari",
+    "glbMB": 28.5,
+    "tiles": 32,
+    "seconds": 23,
+    "basis": "measured"
+   },
+   {
+    "ward": "ikuno",
+    "glbMB": 56.6,
+    "tiles": 58,
+    "seconds": 58,
+    "basis": "measured"
+   },
+   {
+    "ward": "asahi",
+    "glbMB": 32.3,
+    "tiles": 45,
+    "seconds": 33,
+    "basis": "measured"
+   },
+   {
+    "ward": "joto",
+    "glbMB": 41.8,
+    "tiles": 54,
+    "seconds": 44,
+    "basis": "measured"
+   },
+   {
+    "ward": "tsurumi",
+    "glbMB": 33.6,
+    "tiles": 59,
+    "seconds": 30,
+    "basis": "measured"
+   },
+   {
+    "ward": "abeno",
+    "glbMB": 35.3,
+    "tiles": 43,
+    "seconds": 52,
+    "basis": "measured"
+   },
+   {
+    "ward": "suminoe",
+    "glbMB": 35.6,
+    "tiles": 130,
+    "seconds": 51,
+    "basis": "measured"
+   },
+   {
+    "ward": "sumiyoshi",
+    "glbMB": 45.7,
+    "tiles": 58,
+    "seconds": 43,
+    "basis": "measured"
+   },
+   {
+    "ward": "higashisumiyoshi",
+    "glbMB": 49.6,
+    "tiles": 68,
+    "seconds": 57,
+    "basis": "measured"
+   },
+   {
+    "ward": "hirano",
+    "glbMB": 60.2,
+    "tiles": 98,
+    "seconds": 53,
+    "basis": "measured"
+   },
+   {
+    "ward": "nishinari",
+    "glbMB": 40.1,
+    "tiles": 49,
+    "seconds": 32,
+    "basis": "measured"
+   }
+  ]
+ },
+ "fit": {
+  "assumedLimitsVerified": false,
+  "sameOriginSingleDeploy": {
+   "bytes": "LOD1 GLBのみは想定上限内(未検証の上限・LOD2/HTML/ids等は別途加算)",
+   "files": "想定上限内(推定・未検証)",
+   "buildTime": "変換のみ実測比例で想定内。ただし公式ZIPのRange取得(約840MB)・LOD2・ID監査は含まず、Vercelビルド機は未測定 → 毎回ビルドは非推奨",
+   "midGlbMB": 803,
+   "highGlbMB": 924
+  }
+ },
+ "measuredBuildings": 615234
+}

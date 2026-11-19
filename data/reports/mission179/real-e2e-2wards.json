@@ -1,0 +1,265 @@
+{
+ "schema": "livecity.mission179.real-e2e/1",
+ "data": "REAL PLATEAU 2025 (official CityGML via tools/mission79-run.mjs)",
+ "renderer": "headless Chrome + SwiftShader (software GL; not a real GPU)",
+ "query": "?lod2=1&lod2ov=1&lod2auto3d=0&nobuiltin=1&ext45=1",
+ "wardsInfo": {
+  "chuo": {
+   "code": "27128",
+   "buildingsMeta": 18655,
+   "selectedTiles": 52,
+   "glbFiles": 52,
+   "rootRegion": [
+    2.3648646175246895,
+    0.6049744014893488,
+    2.3655499191238643,
+    0.6055424566168518,
+    0,
+    224
+   ],
+   "sourceWardCode": "27128"
+  },
+  "higashiyodogawa": {
+   "code": "27114",
+   "buildingsMeta": 35336,
+   "selectedTiles": 64,
+   "glbFiles": 64,
+   "rootRegion": [
+    2.364956037548901,
+    0.6060103951932271,
+    2.365935681758431,
+    0.6068213195024669,
+    0,
+    29997
+   ],
+   "sourceWardCode": "27114"
+  }
+ },
+ "extraMeta": [
+  {
+   "id": "ext-chuo",
+   "wardCode": "27128",
+   "buildings": 18655
+  },
+  {
+   "id": "ext-higashiyodogawa",
+   "wardCode": "27114",
+   "buildings": 35336
+  }
+ ],
+ "http": {
+  "ok": 244,
+  "bad": []
+ },
+ "wards": {
+  "chuo": {
+   "mounted": true,
+   "lastError": null,
+   "pixelDiff": 345056,
+   "drawn": true,
+   "tilesets": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 33,
+     "selected": 33,
+     "triangles": 136358,
+     "clipping": false
+    },
+    {
+     "ward": "chuo",
+     "show": true,
+     "ready": true,
+     "contentReady": 39,
+     "selected": 19,
+     "triangles": 173581,
+     "clipping": false
+    },
+    {
+     "ward": "higashiyodogawa",
+     "show": true,
+     "ready": true,
+     "contentReady": 0,
+     "selected": 0,
+     "triangles": 0,
+     "clipping": false
+    }
+   ]
+  },
+  "higashiyodogawa": {
+   "mounted": true,
+   "lastError": null,
+   "pixelDiff": 280545,
+   "drawn": true,
+   "tilesets": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 35,
+     "selected": 0,
+     "triangles": 0,
+     "clipping": false
+    },
+    {
+     "ward": "higashiyodogawa",
+     "show": true,
+     "ready": true,
+     "contentReady": 53,
+     "selected": 22,
+     "triangles": 265093,
+     "clipping": false
+    }
+   ]
+  }
+ },
+ "lod2": {
+  "footprintsNearChuo": 4763,
+  "at": [
+   135.50411833492745,
+   34.672133319099196
+  ],
+  "camera": {
+   "lon": 135.50411833492745,
+   "lat": 34.66894815341817,
+   "h": 363.55339059276344,
+   "pitchDeg": -45
+  },
+  "tris": {
+   "both": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 46,
+     "selected": 11,
+     "triangles": 96788,
+     "clipping": false
+    },
+    {
+     "ward": "higashiyodogawa",
+     "show": true,
+     "ready": true,
+     "contentReady": 11,
+     "selected": 0,
+     "triangles": 0,
+     "clipping": false
+    },
+    {
+     "ward": "chuo",
+     "show": true,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 6,
+     "triangles": 68809,
+     "clipping": false
+    }
+   ],
+   "lod1Only": [
+    {
+     "ward": "lod2/unknown",
+     "show": false,
+     "ready": true,
+     "contentReady": 46,
+     "selected": 11,
+     "triangles": 96788,
+     "clipping": false
+    },
+    {
+     "ward": "higashiyodogawa",
+     "show": true,
+     "ready": true,
+     "contentReady": 11,
+     "selected": 0,
+     "triangles": 0,
+     "clipping": false
+    },
+    {
+     "ward": "chuo",
+     "show": true,
+     "ready": true,
+     "contentReady": 28,
+     "selected": 6,
+     "triangles": 68809,
+     "clipping": false
+    }
+   ],
+   "lod2Only": [
+    {
+     "ward": "lod2/unknown",
+     "show": true,
+     "ready": true,
+     "contentReady": 46,
+     "selected": 11,
+     "triangles": 96788,
+     "clipping": false
+    }
+   ]
+  },
+  "pixelDiff": {
+   "bothVsLod1Only": 125756,
+   "bothVsLod2Only": 462535,
+   "lod2OnlyVsLod1Only": 591384
+  },
+  "clip": "{\"clipMode\":\"off\",\"clipped\":0,\"near\":null}"
+ },
+ "serverByWard": {
+  "chuo": {
+   "tileset": [
+    4,
+    0
+   ],
+   "glb": [
+    115,
+    0
+   ],
+   "meta": [
+    2,
+    0
+   ],
+   "layers": [
+    0,
+    0
+   ],
+   "sidecar": [
+    0,
+    0
+   ],
+   "other": [
+    0,
+    0
+   ]
+  },
+  "higashiyodogawa": {
+   "tileset": [
+    4,
+    0
+   ],
+   "glb": [
+    64,
+    0
+   ],
+   "meta": [
+    2,
+    0
+   ],
+   "layers": [
+    0,
+    0
+   ],
+   "sidecar": [
+    0,
+    0
+   ],
+   "other": [
+    0,
+    0
+   ]
+  }
+ },
+ "consoleErrors": [
+  "ERR [37C] layer:towns24 Error: towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）\n    at Object.mount (http://localhost:82"
+ ],
+ "note": "LOD1 ClippingPolygon OFF in this run => LOD1/LOD2 double-draw is expected. Only 2 of 24 wards verified."
+}

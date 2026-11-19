@@ -1,0 +1,23 @@
+{
+  "schema": "livecity.mission46d.gsi-fetch/1",
+  "source": "GSI optimal_bvmap-v1 (BldA, RdEdg) https://cyberjapandata.gsi.go.jp/xyz/optimal_bvmap-v1/",
+  "zoom": 16,
+  "margin": 100,
+  "fetchedAt": "2026-10-29T10:56:09.996Z",
+  "plannedTiles": 12,
+  "skippedWards": [],
+  "wards": {
+    "sumiyoshi": {
+      "requested": 12,
+      "ok": 12,
+      "cached": 0,
+      "absent": 0,
+      "invalid": 0,
+      "error": 0,
+      "bldAFeatures": 11732,
+      "rdEdgFeatures": 1617
+    }
+  },
+  "requests": 12,
+  "stoppedByRequestCap": false
+}
