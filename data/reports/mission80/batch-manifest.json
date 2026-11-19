@@ -1,0 +1,96 @@
+{
+ "mission": "80",
+ "vintage": 2025,
+ "wards": {
+  "miyakojima": {
+   "status": "ok",
+   "wardCode": "27102",
+   "vintage": 2025,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "sourceBytes": 1580421888,
+   "meshes": 12,
+   "buildings": 17651,
+   "sourceBuildings": 17651,
+   "skipped": 0,
+   "fallbacks": 0,
+   "uniqueIds": 17651,
+   "idCount": 17651,
+   "idsUnique": true,
+   "glbBytes": 24403236,
+   "outBytes": 27274036,
+   "tilesetSha256": "c3f9e3451fb40cc690f1704027b1deda5e29f1eb3ec7a081441e4a98d1bed4e3",
+   "wardId": "miyakojima",
+   "ms": 32993,
+   "finishedAt": "2026-11-01T01:11:13.198Z"
+  },
+  "fukushima": {
+   "status": "ok",
+   "wardCode": "27103",
+   "vintage": 2025,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "sourceBytes": 1580421888,
+   "meshes": 10,
+   "buildings": 13412,
+   "sourceBuildings": 13412,
+   "skipped": 0,
+   "fallbacks": 0,
+   "uniqueIds": 13412,
+   "idCount": 13412,
+   "idsUnique": true,
+   "glbBytes": 18235576,
+   "outBytes": 20435755,
+   "tilesetSha256": "296d21588a4f9e15b9be7b6e4c4ab809996e537df77c3f701af4ff990ef5aad9",
+   "wardId": "fukushima",
+   "ms": 41188,
+   "finishedAt": "2026-11-01T01:11:54.448Z"
+  },
+  "konohana": {
+   "status": "failed",
+   "wardId": "konohana",
+   "wardCode": "27104",
+   "error": "Command failed: /usr/local/bin/node tools/mission79-run.mjs --ward konohana --max-mb 1200 --work /home/runner/work/livecity/livecity/temp/mission80/work/konohana --final /home/runner/work/livecity/livecity/temp/mission80/out/konohana-2025",
+   "ms": 46838
+  },
+  "minato": {
+   "status": "ok",
+   "wardCode": "27107",
+   "vintage": 2025,
+   "sourceEtag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+   "sourceBytes": 1580421888,
+   "meshes": 16,
+   "buildings": 17200,
+   "sourceBuildings": 17200,
+   "skipped": 0,
+   "fallbacks": 0,
+   "uniqueIds": 17200,
+   "idCount": 17200,
+   "idsUnique": true,
+   "glbBytes": 22933280,
+   "outBytes": 25755990,
+   "tilesetSha256": "42e6d7db60b7dc3b2500a4a756867559bb113998cc98c8374726d93409cea72b",
+   "wardId": "minato",
+   "ms": 22504,
+   "finishedAt": "2026-11-01T04:45:22.299Z"
+  }
+ },
+ "source": {
+  "url": "https://assets.cms.plateau.reearth.io/assets/10/a0aecb-67d1-4463-92d5-d67c99f3b8b6/27100_osaka-shi_city_2025_citygml_1_op.zip",
+  "etag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+  "bytes": 1580421888,
+  "lastModified": "Tue, 03 Mar 2026 00:15:56 GMT"
+ },
+ "updatedAt": "2026-11-01T04:45:22.341Z",
+ "crossWardDuplicateIds": {},
+ "totals": {
+  "wardsOk": 3,
+  "wardsFailed": 1,
+  "buildings": 48263,
+  "outBytes": 73465781
+ },
+ "lastRun": {
+  "processed": 2,
+  "failedNow": 1,
+  "stoppedBy": null,
+  "at": "2026-11-01T04:45:22.341Z"
+ }
+}

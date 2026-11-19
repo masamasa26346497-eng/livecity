@@ -1,0 +1,221 @@
+{
+  "mission": "37C",
+  "set": "osaka-sumiyoshi-9tile",
+  "generatedAt": "2026-10-08T23:31:23.808Z",
+  "note": "Live City テーマ版 Cesium ページ用のレイヤー束。public/map-data は .gitignore で配信されないため、POC 範囲だけを切り出して配信可能にしたもの。",
+  "buildingTileRange": {
+    "tx0": -6,
+    "tx1": -4,
+    "tz0": -3,
+    "tz1": -1,
+    "tileSize": 500
+  },
+  "bboxLocal": {
+    "minX": -3300,
+    "maxX": -1200,
+    "minZ": -1800,
+    "maxZ": 300
+  },
+  "marginM": 300,
+  "coordinateConvention": "znorth-neg-v1",
+  "coordinateSystem": "local-meters",
+  "projection": {
+    "clat": 34.604208,
+    "clon": 135.52502,
+    "metersPerDegree": 111320,
+    "note": "lon = clon + x/(cos(clat)*mpd), lat = clat - z/mpd"
+  },
+  "coordDecimals": 1,
+  "layers": [
+    {
+      "layer": "roads",
+      "file": "roads.json",
+      "count": 969,
+      "bytes": 254862
+    },
+    {
+      "layer": "railways",
+      "file": "railways.json",
+      "count": 67,
+      "bytes": 13894
+    },
+    {
+      "layer": "waterways",
+      "file": "waterways.json",
+      "count": 20,
+      "bytes": 12202
+    },
+    {
+      "layer": "parks",
+      "file": "parks.json",
+      "count": 26,
+      "bytes": 6398
+    },
+    {
+      "layer": "labels",
+      "file": "labels.json",
+      "count": 26,
+      "bytes": 3838
+    }
+  ],
+  "buildings": {
+    "tileset": "mission37b-3dtiles/osaka-sumiyoshi-9tile/tileset.json",
+    "note": "Mission 37B の生成物を参照するだけ。canonicalId 体系・GLB は変更しない。",
+    "ward": "住吉区",
+    "wardId": "sumiyoshi",
+    "wardCode": "27120",
+    "lod": 1,
+    "sourceGeneratedAt": "2026-10-01T16:09:15.317Z",
+    "buildings": 10546,
+    "bytes": 767252,
+    "tiles": [
+      {
+        "tx": -6,
+        "tz": -3,
+        "file": "attrs/t_-6_-3.json",
+        "count": 1496,
+        "bytes": 109765
+      },
+      {
+        "tx": -6,
+        "tz": -2,
+        "file": "attrs/t_-6_-2.json",
+        "count": 1329,
+        "bytes": 96292
+      },
+      {
+        "tx": -6,
+        "tz": -1,
+        "file": "attrs/t_-6_-1.json",
+        "count": 1449,
+        "bytes": 104542
+      },
+      {
+        "tx": -5,
+        "tz": -3,
+        "file": "attrs/t_-5_-3.json",
+        "count": 1432,
+        "bytes": 105196
+      },
+      {
+        "tx": -5,
+        "tz": -2,
+        "file": "attrs/t_-5_-2.json",
+        "count": 1054,
+        "bytes": 76329
+      },
+      {
+        "tx": -5,
+        "tz": -1,
+        "file": "attrs/t_-5_-1.json",
+        "count": 874,
+        "bytes": 63174
+      },
+      {
+        "tx": -4,
+        "tz": -3,
+        "file": "attrs/t_-4_-3.json",
+        "count": 908,
+        "bytes": 66744
+      },
+      {
+        "tx": -4,
+        "tz": -2,
+        "file": "attrs/t_-4_-2.json",
+        "count": 1149,
+        "bytes": 83283
+      },
+      {
+        "tx": -4,
+        "tz": -1,
+        "file": "attrs/t_-4_-1.json",
+        "count": 855,
+        "bytes": 61927
+      }
+    ]
+  },
+  "usageLabels": {
+    "source": "public/osaka_3d_buildings.ward-ux-v1.html の const BLDGS（PLATEAU 由来、usage と ulabel の対応を多数決で抽出）",
+    "labels": {
+      "401": "官公庁",
+      "402": "消防・警察",
+      "411": "店舗等",
+      "412": "飲食店",
+      "413": "劇場・娯楽",
+      "414": "ホテル・旅館",
+      "415": "卸売・市場",
+      "421": "小中学校",
+      "422": "大学",
+      "431": "専用住宅",
+      "441": "工場",
+      "451": "病院",
+      "452": "医療施設",
+      "454": "福祉施設",
+      "461": "事務所"
+    }
+  },
+  "buildStats": [
+    {
+      "layer": "roads",
+      "status": "ok",
+      "sourceTiles": 4,
+      "missingTiles": 0,
+      "lines": 969,
+      "areas": 0,
+      "droppedOutside": 1751,
+      "vertices": 4995,
+      "features": 969
+    },
+    {
+      "layer": "railways",
+      "status": "ok",
+      "sourceTiles": 4,
+      "missingTiles": 0,
+      "lines": 67,
+      "areas": 0,
+      "droppedOutside": 157,
+      "vertices": 311,
+      "features": 67
+    },
+    {
+      "layer": "waterways",
+      "status": "ok",
+      "sourceTiles": 4,
+      "missingTiles": 0,
+      "lines": 12,
+      "areas": 8,
+      "droppedOutside": 49,
+      "vertices": 380,
+      "features": 20
+    },
+    {
+      "layer": "parks",
+      "status": "ok",
+      "sourceTiles": 4,
+      "missingTiles": 0,
+      "lines": 0,
+      "areas": 26,
+      "droppedOutside": 140,
+      "vertices": 232,
+      "features": 26
+    },
+    {
+      "layer": "labels",
+      "status": "ok",
+      "features": 26,
+      "byKind": {
+        "station": 6,
+        "place": 17,
+        "park": 2,
+        "ward": 1
+      }
+    },
+    {
+      "layer": "building-attrs",
+      "status": "ok",
+      "tiles": 9,
+      "buildings": 10546,
+      "bytes": 767252
+    }
+  ]
+}

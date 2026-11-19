@@ -1,0 +1,88 @@
+# Mission 131: MINIMAL REPLACEMENT for .github/workflows/mission129-fetch-21.yml on the DEFAULT branch (same file name, same secret, same release).
+# NOT installed by Claude (the GitHub App cannot write .github/workflows) and never run. Owner replaces the file ONCE; after that every change
+# lives in the PR-branch tools (checked out below), so no new workflow is ever needed. The READ token and its secret are unchanged: nothing to re-register.
+# Differences vs the Mission129 version: (1) each archive goes to its own _x_<ward>/ so the real layout is discovered, not assumed;
+# (2) tar listings go to a file (no SIGPIPE noise) and unsafe member names are refused; (3) the data check is STRICT (missing/problem wards fail the job);
+# (4) the same job then runs the Mission130 loopback browser acceptance on the very same RUNNER_TEMP data (which vanishes when the job ends).
+# Uploads NOTHING: no artifacts, no cache, no release writes. Output = job summary with counts/verdicts only (no building data).
+name: Mission129 read-only fetch and data check (21 wards)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'data = fetch + strict data check only; full = also run browser acceptance'
+        default: full
+        type: choice
+        options: [full, data]
+      wards:
+        description: 'optional comma list (e.g. kita,chuo) to limit the browser run; empty = all 21'
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: mission129-fetch-21
+  cancel-in-progress: false
+env:
+  DATA_REPO: masamasa26346497-eng/livecity-3d-data
+  TAG: plateau2025-converted
+jobs:
+  fetch-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    steps:
+      - name: Checkout the PR branch tooling (read-only, token not persisted)
+        uses: actions/checkout@v4
+        with:
+          ref: claude/issue-23-20261007-1424
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch 21 archives (READ token only here; GET only; into RUNNER_TEMP)
+        env:
+          READ_TOKEN: ${{ secrets.LIVECITY_3D_DATA_READ_TOKEN }}
+        run: |
+          set -eu
+          [ -n "$READ_TOKEN" ] || { echo "FAIL: LIVECITY_3D_DATA_READ_TOKEN empty or missing"; exit 1; }
+          echo "::add-mask::$READ_TOKEN"
+          T="${RUNNER_TEMP:?}"
+          code=$(printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sS -K - -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28' -o "$T/rel.json" -w '%{http_code}' "https://api.github.com/repos/$DATA_REPO/releases/tags/$TAG" || true)
+          echo "release GET -> HTTP $code"
+          [ "$code" = "200" ] || exit 1
+          mkdir -p "$T/b21"
+          wards=$(node tools/mission129/wards21.cjs --list | sed 's/^[0-9]* wards: //' | tr ',' ' ')
+          [ "$(echo $wards | wc -w)" = "21" ] || { echo "FAIL: ward list is not 21"; exit 1; }
+          ok=0
+          for w in $wards; do
+            id=$(jq -r --arg a "plateau2025-$w.tar.gz" '.assets[]|select(.name==$a)|.id' "$T/rel.json" | head -n1)
+            [ -n "$id" ] || { echo "[$w] asset missing"; continue; }
+            printf 'header = "Authorization: Bearer %s"\n' "$READ_TOKEN" | curl -sSL --fail -K - -H 'Accept: application/octet-stream' -o "$T/$w.tgz" "https://api.github.com/repos/$DATA_REPO/releases/assets/$id" || { echo "[$w] download failed"; rm -f "$T/${w:?}.tgz"; continue; }
+            tar -tzf "$T/$w.tgz" > "$T/$w.list" || { echo "[$w] unreadable archive"; rm -f "$T/${w:?}.tgz" "$T/${w:?}.list"; continue; }
+            if grep -qE '(^/|(^|/)\.\.(/|$))' "$T/$w.list"; then echo "[$w] REFUSED: unsafe member names"; rm -f "$T/${w:?}.tgz" "$T/${w:?}.list"; continue; fi
+            echo "[$w] members=$(wc -l < "$T/$w.list") tileset.json=$(grep -c 'tileset.json' "$T/$w.list" || true) bytes=$(stat -c %s "$T/$w.tgz")"
+            mkdir -p "$T/b21/_x_$w"
+            tar -xzf "$T/$w.tgz" --no-same-owner -C "$T/b21/_x_$w"
+            rm -f "$T/${w:?}.tgz" "$T/${w:?}.list"
+            ok=$((ok+1))
+          done
+          echo "fetched+extracted: $ok / 21"
+          [ "$ok" = "21" ] || { echo "FAIL: not all 21 archives were fetched"; exit 1; }
+      - name: STRICT data check (layout discovery; missing or problem wards FAIL; not browser acceptance)
+        if: always()
+        run: node tools/mission129/wards21.cjs --check "${RUNNER_TEMP:?}/b21" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Browser version (Chrome is preinstalled on ubuntu-latest)
+        if: always() && inputs.mode != 'data'
+        run: google-chrome --version
+      - name: Private browser acceptance (loopback only, Cesium from the jsDelivr CDN, nothing uploaded)
+        if: always() && inputs.mode != 'data'
+        env:
+          WARDS: ${{ inputs.wards }}
+        run: |
+          set -eu
+          args=""
+          if [ -n "$WARDS" ]; then args="--wards $WARDS"; fi
+          # shellcheck disable=SC2086
+          node tools/mission130/accept21.mjs --root "${RUNNER_TEMP:?}/b21" --out "${RUNNER_TEMP:?}/m131-accept.json" $args | tee -a "$GITHUB_STEP_SUMMARY"
