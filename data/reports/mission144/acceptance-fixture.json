@@ -1,0 +1,275 @@
+{
+ "mission": "144",
+ "acceptance": "fixture",
+ "headless": true,
+ "url": "http://127.0.0.1:8192/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1",
+ "googleRequests": [],
+ "httpErrors": [],
+ "layerFetches": [
+  {
+   "url": "/ext-3dtiles/chuo25/layers/roads.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/waterways.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/water-surface.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/parks.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/railways.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/layers-report.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/roads.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/waterways.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/parks.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/chuo25/layers/railways.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/roads.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/waterways.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/water-surface.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/parks.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/railways.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/layers-report.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/roads.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/waterways.json",
+   "status": 200
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/parks.json",
+   "status": 404
+  },
+  {
+   "url": "/ext-3dtiles/kita25/layers/railways.json",
+   "status": 404
+  }
+ ],
+ "jsErrors": [],
+ "wards": [
+  {
+   "ward": "chuo",
+   "key": "chuo25",
+   "checks": {
+    "oneTilesetThisWard": true,
+    "roadsDrawn": true,
+    "waterDrawn": true,
+    "projectionMatchesConstants": true,
+    "layersAboveGround": true,
+    "buildingsNotOnRoads": true
+   },
+   "class": {
+    "roads": "roads ready",
+    "waterways": "waterways ready",
+    "waterLines": 1,
+    "waterAreas": 0,
+    "waterSurface": "water-surface absent",
+    "waterPolygons": "no water polygons in waterways.json",
+    "browser": "browser rendered unverified"
+   },
+   "classLine": "roads ready / waterways ready / water-surface absent / browser rendered unverified",
+   "http": [
+    200,
+    200,
+    404,
+    404,
+    404
+   ],
+   "state": "ready",
+   "vecState": "ready",
+   "vecLayers": {
+    "roads": 1,
+    "waterways": 1
+   },
+   "tilesets": {
+    "n": 1,
+    "bases": [
+     "ext-3dtiles/chuo25/"
+    ],
+    "heapMB": 72
+   },
+   "roadsToggleDiffPx": 5695,
+   "waterToggleDiffPx": 3840,
+   "projection": {
+    "localXZ": [
+     -1181,
+     -6939
+    ],
+    "pageVsConstantsM": 0,
+    "globeGroundH": -0.004377514684942804,
+    "ellipsoidH": 0,
+    "terrainProvider": "EV",
+    "depthTestAgainstTerrain": false,
+    "layerHeightsM": {
+     "waterways": 0.5,
+     "parks": 0.9,
+     "roadsCasing": 1.3,
+     "roads": 1.4,
+     "railways": 2
+    },
+    "pickPositionVsPointM": 0,
+    "pickPositionHeightM": 0
+   },
+   "roadBuildingOverlap": {
+    "sampled": 5629,
+    "onRoad": 0,
+    "onRoadRatio": 0,
+    "thresholdM": 1.5
+   },
+   "heapMB": 72
+  },
+  {
+   "ward": "kita",
+   "key": "kita25",
+   "checks": {
+    "oneTilesetThisWard": true,
+    "previousWardDisposed": true,
+    "roadsDrawn": true,
+    "waterDrawn": true,
+    "projectionMatchesConstants": true,
+    "layersAboveGround": true,
+    "buildingsNotOnRoads": true
+   },
+   "class": {
+    "roads": "roads ready",
+    "waterways": "waterways ready",
+    "waterLines": 1,
+    "waterAreas": 0,
+    "waterSurface": "water-surface absent",
+    "waterPolygons": "no water polygons in waterways.json",
+    "browser": "browser rendered unverified"
+   },
+   "classLine": "roads ready / waterways ready / water-surface absent / browser rendered unverified",
+   "http": [
+    200,
+    200,
+    404,
+    404,
+    404
+   ],
+   "state": "ready",
+   "vecState": "ready",
+   "vecLayers": {
+    "roads": 1,
+    "waterways": 1
+   },
+   "tilesets": {
+    "n": 1,
+    "bases": [
+     "ext-3dtiles/kita25/"
+    ],
+    "heapMB": 110
+   },
+   "roadsToggleDiffPx": 4928,
+   "waterToggleDiffPx": 4274,
+   "projection": {
+    "localXZ": [
+     -2427,
+     -10671
+    ],
+    "pageVsConstantsM": 0,
+    "globeGroundH": -0.003468063002219963,
+    "ellipsoidH": 0,
+    "terrainProvider": "EV",
+    "depthTestAgainstTerrain": false,
+    "layerHeightsM": {
+     "waterways": 0.5,
+     "parks": 0.9,
+     "roadsCasing": 1.3,
+     "roads": 1.4,
+     "railways": 2
+    },
+    "pickPositionVsPointM": 0,
+    "pickPositionHeightM": 1.4
+   },
+   "roadBuildingOverlap": {
+    "sampled": 2698,
+    "onRoad": 0,
+    "onRoadRatio": 0,
+    "thresholdM": 1.5
+   },
+   "heapMB": 110
+  }
+ ],
+ "notes": [],
+ "served": 2,
+ "wardsWithLayers": 2,
+ "sampled": [
+  "chuo25",
+  "kita25"
+ ],
+ "optionalAbsent404": 10,
+ "clear": {
+  "tilesets": 0,
+  "scenePrimitivesBoot": 18,
+  "scenePrimitivesAfterClear": 18,
+  "vecState": "none"
+ },
+ "boot": {
+  "n": 0,
+  "bases": [],
+  "heapMB": 64
+ },
+ "summary": {
+  "acceptance": "fixture",
+  "wardsServed": 2,
+  "wardsWithLayerData": 2,
+  "wardsSampled": 2,
+  "renderedVerifiedWards": [
+   "chuo",
+   "kita"
+  ],
+  "renderedVerifiedCount": 2,
+  "notRendered": [],
+  "waterSurfaceReadyWards": 0,
+  "waterPolygonWards": 0,
+  "allProjectionOk": true,
+  "disposalOk": true,
+  "httpErrors": 0,
+  "jsErrors": 0,
+  "googleRequests": 0,
+  "note": "FIXTURE (synthetic lines): proves the harness only. Not an owner-data result."
+ }
+}

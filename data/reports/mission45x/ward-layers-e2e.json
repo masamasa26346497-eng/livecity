@@ -1,0 +1,130 @@
+{
+ "mission": "45X",
+ "scenarios": {
+  "singleMode": {
+   "pageReady": true,
+   "vecAvailable": 1,
+   "chuoReady": true,
+   "wardVec": {
+    "ward": "27128",
+    "state": "ready",
+    "layers": {
+     "roads": 22,
+     "waterways": 0,
+     "parks": 0,
+     "railways": 0
+    },
+    "clip": "ward-polygon"
+   },
+   "roadFeaturesInFile": 22,
+   "chuoRoadsOnOffPx": 14919,
+   "chuoCoverage": {
+    "source": "ward-layers",
+    "ward": "27128",
+    "text": "道路・河川・公園・鉄道: 中央区 の区別レイヤーを表示中"
+   },
+   "afterSwitch": {
+    "wardVec": {
+     "ward": "27120",
+     "state": "no-layers",
+     "layers": {}
+    },
+    "mounted": {}
+   },
+   "chuoReadyAgain": true,
+   "wardVecAgain": {
+    "ward": "27128",
+    "state": "ready",
+    "layers": {
+     "roads": 22,
+     "waterways": 0,
+     "parks": 0,
+     "railways": 0
+    },
+    "clip": "ward-polygon"
+   },
+   "afterDeselect": {
+    "ward": null,
+    "state": "none",
+    "layers": {}
+   }
+  },
+  "allMode": {
+   "mounted": {
+    "27128": {
+     "level": "mid",
+     "layers": [
+      "roads:major:0",
+      "roads:mid:0",
+      "waterways:0",
+      "railways:0"
+     ]
+    }
+   },
+   "mountedAfter": {
+    "27128": {
+     "level": "near",
+     "layers": [
+      "roads:major:0",
+      "roads:mid:0",
+      "waterways:0",
+      "railways:0",
+      "roads:local:22",
+      "parks:0"
+     ]
+    }
+   },
+   "coverageAfterMount": {
+    "source": "ward-vector",
+    "ward": "27128",
+    "text": "道路・河川・公園・鉄道: 中央区 の区ベクタ（45I）を表示中"
+   },
+   "hit": {
+    "m": [
+     "27128"
+    ]
+   },
+   "vecStats": {
+    "lastError": null,
+    "polylines": 1048,
+    "vertices": 5398
+   },
+   "roadsOnOffPx": 16457,
+   "coverage": {
+    "source": "ward-vector",
+    "ward": "27128",
+    "text": "道路・河川・公園・鉄道: 中央区 の区ベクタ（45I）を表示中"
+   }
+  },
+  "notDelivered": {
+   "pageReady": true,
+   "vecAvailable": 0,
+   "wardVec": {
+    "ward": "27128",
+    "state": "no-layers",
+    "layers": {}
+   },
+   "roadsOnOffPx": 12,
+   "coverage": {
+    "source": "none",
+    "ward": "27128",
+    "text": "この付近（中央区）は道路・河川・公園・鉄道の描画データ未配信。上の件数は住吉区の束のものです"
+   },
+   "sumiyoshiBundleRoadCount": 969
+  }
+ },
+ "errors": [],
+ "note": "synthetic fixture only; no private 45I data was available or read",
+ "diagnoseCli": {
+  "wards": 24,
+  "notDelivered": 23,
+  "ok": 1,
+  "okButEmpty": 0,
+  "withProblems": 0,
+  "incompleteNoReport": 0,
+  "indexLayersWards": 1
+ },
+ "badResponses": [
+  "404 /ext-3dtiles/chuo/layers/layers-report.json"
+ ]
+}

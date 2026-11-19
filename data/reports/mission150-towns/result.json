@@ -1,0 +1,181 @@
+{
+ "mission": "150",
+ "url": "http://localhost:8150/mission37g-osaka-24ward-mvp.html?qa=1&nobuiltin=1&ext45=1",
+ "generatedAt": "2026-11-08T12:51:01.105Z",
+ "dataStage": {
+  "source": "国勢調査 町丁・字等別境界データ（総務省統計局 e-Stat / CODH Geoshape）",
+  "license": "CC BY 4.0",
+  "total": 1905,
+  "wards": 24,
+  "byWard": {
+   "abeno": 68,
+   "asahi": 45,
+   "chuo": 186,
+   "fukushima": 41,
+   "higashinari": 44,
+   "higashisumiyoshi": 102,
+   "higashiyodogawa": 87,
+   "hirano": 140,
+   "ikuno": 90,
+   "joto": 76,
+   "kita": 123,
+   "konohana": 60,
+   "minato": 58,
+   "miyakojima": 47,
+   "naniwa": 62,
+   "nishi": 59,
+   "nishinari": 84,
+   "nishiyodogawa": 63,
+   "suminoe": 101,
+   "sumiyoshi": 104,
+   "taisho": 48,
+   "tennoji": 70,
+   "tsurumi": 59,
+   "yodogawa": 88
+  }
+ },
+ "googleRequests": [],
+ "failed404": [],
+ "jsErrors": [],
+ "checks": {
+  "townsLoadedInViewer": true,
+  "townsHttp200": true,
+  "all24Wards": true,
+  "sumiyoshi104": true,
+  "chuoBaseShown": true,
+  "chuoFullShowsChome": true,
+  "kitaFullShowsChome": true,
+  "fullLabelsAreOfficialNames": true,
+  "baseLabelsHaveNoChome": true,
+  "fullWithinCap": true,
+  "sumiyoshiLabelsShown": true,
+  "pageHasNoJsErrors": true,
+  "googleRequestsZero": true,
+  "noUnexpected404": true
+ },
+ "views": {
+  "chuo": {
+   "ref": "谷町九丁目",
+   "base": {
+    "tier": "base",
+    "altitudeM": 4229,
+    "shown": 40,
+    "texts": [
+     "上本町西",
+     "東平",
+     "上汐",
+     "中寺",
+     "松屋町",
+     "瓦屋町",
+     "高津",
+     "南船場",
+     "島之内",
+     "道頓堀",
+     "千日前",
+     "難波千日前",
+     "難波",
+     "日本橋",
+     "東心斎橋"
+    ],
+    "live": [
+     "chuo"
+    ],
+    "screenshot": "data/reports/mission150-towns/chuo-base.jpg"
+   },
+   "full": {
+    "tier": "full",
+    "altitudeM": 940,
+    "shown": 15,
+    "texts": [
+     "上本町西三丁目",
+     "上本町西四丁目",
+     "上本町西五丁目",
+     "東平一丁目",
+     "東平二丁目",
+     "上汐一丁目",
+     "上汐二丁目",
+     "中寺一丁目",
+     "中寺二丁目",
+     "瓦屋町二丁目",
+     "瓦屋町三丁目",
+     "高津一丁目",
+     "高津二丁目",
+     "谷町八丁目",
+     "谷町九丁目"
+    ],
+    "live": [
+     "chuo"
+    ],
+    "screenshot": "data/reports/mission150-towns/chuo-full.jpg"
+   }
+  },
+  "kita": {
+   "ref": "中之島三丁目",
+   "base": {
+    "tier": "base",
+    "altitudeM": 4229,
+    "shown": 40,
+    "texts": [
+     "北浜",
+     "本町",
+     "久太郎町",
+     "天満橋京町",
+     "北浜東",
+     "本町橋",
+     "大手前",
+     "農人橋",
+     "池田町",
+     "梅田",
+     "扇町",
+     "大深町",
+     "大淀北",
+     "大淀中",
+     "大淀南"
+    ],
+    "live": [
+     "chuo",
+     "kita"
+    ],
+    "screenshot": "data/reports/mission150-towns/kita-base.jpg"
+   },
+   "full": {
+    "tier": "full",
+    "altitudeM": 940,
+    "shown": 9,
+    "texts": [
+     "堂島一丁目",
+     "堂島二丁目",
+     "堂島三丁目",
+     "堂島浜一丁目",
+     "堂島浜二丁目",
+     "中之島二丁目",
+     "中之島三丁目",
+     "中之島四丁目",
+     "中之島五丁目"
+    ],
+    "live": [
+     "chuo",
+     "kita"
+    ],
+    "screenshot": "data/reports/mission150-towns/kita-full.jpg"
+   }
+  },
+  "sumiyoshi": {
+   "ref": "苅田十丁目",
+   "base": {
+    "tier": "base",
+    "shown": 16,
+    "note": "Sumiyoshi uses the 37D layer (boundary-aware); count only",
+    "screenshot": "data/reports/mission150-towns/sumiyoshi-base.jpg"
+   },
+   "full": {
+    "tier": "full",
+    "shown": 7,
+    "note": "Sumiyoshi uses the 37D layer (boundary-aware); count only",
+    "screenshot": "data/reports/mission150-towns/sumiyoshi-full.jpg"
+   }
+  }
+ },
+ "townsHttpStatus": 200,
+ "pass": true
+}

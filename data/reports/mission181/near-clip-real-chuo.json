@@ -1,0 +1,11 @@
+{
+  "data": "REAL PLATEAU 2025 chuo LOD1 (18,655 bldgs, 52 tiles) + REAL LOD2 10,698 (209 tiles, 10,698 footprints)",
+  "env": "headless Chrome + SwiftShader (no real GPU)",
+  "runs": [
+    {"clip": "off", "wallSec": 67, "completed": true, "pixelDiffWardOnOff": 342095, "lod2BothVsLod1Only": 104159},
+    {"clip": "near max400 r1200 (old default)", "completed": false, "note": "capture step ~414s; pixel-diff eval then hung >120s"},
+    {"clip": "near max100 r800", "completed": false, "note": "capture ~105s then page unresponsive >90s"},
+    {"clip": "near max20 r300", "completed": true, "wallSec": 85, "pixelDiffWardOnOff": 521560, "note": "final nearClip.polys=0 at LOD2 spot - unexplained"}
+  ],
+  "conclusion": "ClippingPolygon cost scales steeply with polygon count; >=100 hangs under SwiftShader. Default cap lowered to 20. Real fix for double-draw needs ID-based or tile-level LOD1 exclusion (not done). Real-GPU behaviour and FPS unmeasured."
+}

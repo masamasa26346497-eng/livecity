@@ -1,0 +1,70 @@
+{
+ "mission": "148",
+ "note": "rail lines are SYNTHETIC fixtures near real station coordinates; stations/names are real OSM data",
+ "url": "http://localhost:8148/mission37g-osaka-24ward-mvp.html?qa=1&nobuiltin=1&ext45=1",
+ "generatedAt": "2026-11-08T11:54:42.790Z",
+ "build": {
+  "withOperator": 11,
+  "operatorUnknown": 236,
+  "byBasis": {
+   "nearby-line-name": 14
+  },
+  "operatorData": {
+   "connected": true,
+   "lineTiles": false,
+   "wardLayers": true,
+   "lineFeatures": 4,
+   "osmRaw": false
+  }
+ },
+ "googleRequests": [],
+ "failed404": [],
+ "jsErrors": [],
+ "checks": {
+  "operatorDataConnected": true,
+  "fixtureOperatorsResolved": true,
+  "atLeastTwoDistinctPointColors": true,
+  "noLabelDistanceFade": true,
+  "labelFillOpaque": true,
+  "nameLabelsWhite": true,
+  "pageHasNoJsErrors": true,
+  "googleRequestsZero": true,
+  "noUnexpected404": true
+ },
+ "stations145": {
+  "total": 247,
+  "operatorDataConnected": true,
+  "origin": "mission145-data/stations-24.local.json",
+  "withOperator": 11,
+  "render": {
+   "pointColors": [
+    "#8a949e",
+    "#1f8ecd",
+    "#a8432f",
+    "#2e9e5b",
+    "#2a4fb8"
+   ],
+   "labelCount": 494,
+   "labelMinFillAlpha": 1,
+   "labelsWithDistanceFade": 0,
+   "whiteNameLabels": 247,
+   "labelBackgroundAlpha": 0.94
+  },
+  "operatorColors": {
+   "byOperator": {
+    "unknown": 236,
+    "metro": 3,
+    "jr": 4,
+    "hankyu": 4,
+    "nankai": 3
+   },
+   "transferStations": 3,
+   "confirmedByTag": 0,
+   "inferredFromNetworkOrLine": 11,
+   "unknown": 236
+  }
+ },
+ "shot_near": "data/reports/mission148-stations/sumiyoshi-near.jpg",
+ "shot_mid": "data/reports/mission148-stations/sumiyoshi-mid.jpg",
+ "pass": true
+}

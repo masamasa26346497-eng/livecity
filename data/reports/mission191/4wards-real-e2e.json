@@ -1,0 +1,41 @@
+{
+  "mission": 191,
+  "source": "official PLATEAU Osaka 2025 CityGML (Range fetch, mission79-run.mjs --max-mb 1500)",
+  "env": "headless Chrome + SwiftShader, localhost, no auth. User PC / real GPU NOT verified.",
+  "lod1": {
+    "higashinari": {"code": "27115", "buildings": 22631, "uniqueCanonicalIds": 22631, "skipped": 0, "fallbacks": 0, "tiles": 28, "leafGlbBytes": 17120608},
+    "ikuno":       {"code": "27116", "buildings": 45427, "uniqueCanonicalIds": 45427, "skipped": 0, "fallbacks": 0, "tiles": 51, "leafGlbBytes": 33617864},
+    "asahi":       {"code": "27117", "buildings": 24962, "uniqueCanonicalIds": 24962, "skipped": 0, "fallbacks": 0, "tiles": 40, "leafGlbBytes": 19708552},
+    "joto":        {"code": "27118", "buildings": 32380, "uniqueCanonicalIds": 32380, "skipped": 0, "fallbacks": 0, "tiles": 48, "leafGlbBytes": 25544364},
+    "totalBuildings": 125400
+  },
+  "overview_auto3d_4wards_simultaneous": {
+    "firstMountAtSec": 49.1,
+    "cameraHeightM": 30225,
+    "allModeOn": true,
+    "mounted": ["27115", "27116", "27117", "27118"],
+    "lastError": null,
+    "hints": [],
+    "httpNon200": 0,
+    "browser": {
+      "higashinari": {"loads": 4, "visible": 76, "failed": 0},
+      "ikuno": {"loads": 7, "visible": 145, "failed": 0},
+      "asahi": {"loads": 5, "visible": 98, "failed": 0},
+      "joto": {"loads": 6, "visible": 110, "failed": 0}
+    },
+    "fps": "1 (SwiftShader, not meaningful)"
+  },
+  "closeup_onoff_pixel_diff": {
+    "higashinari": {"selectedTiles": 21, "triangles": 251126, "pixelDiff": 406849, "pass": true},
+    "ikuno":       {"selectedTiles": 24, "triangles": 508962, "pixelDiff": 385278, "pass": true},
+    "asahi":       {"selectedTiles": 13, "triangles": 214780, "pixelDiff": 300156, "pass": true},
+    "joto":        {"selectedTiles": 20, "triangles": 260467, "pixelDiff": 352971, "pass": true},
+    "browserResponses200": 342,
+    "browserResponses4xx5xx": 0
+  },
+  "notVerified": [
+    "LOD1+LOD2 double drawing (no --exclude-ids applied to these 4 wards, clip OFF)",
+    "horizontal offset vs roads/rivers (no real layers connected)",
+    "all-wards-at-once display, real GPU, user PC, memory"
+  ]
+}
