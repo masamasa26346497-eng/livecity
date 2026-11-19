@@ -1,0 +1,114 @@
+{
+  "mission": "37L",
+  "label": "before",
+  "url": "http://localhost:8141/mission37g-osaka-24ward-mvp.html?qa=1&imagery=0&extra=0&fac=0",
+  "browser": "Chrome/154.0.8037.97",
+  "jsErrors": [],
+  "failed": [
+    "404 http://localhost:8141/favicon.ico"
+  ],
+  "views": [
+    {
+      "view": "mid",
+      "diffPx": {
+        "bothVsNone": 173733,
+        "roadsVsNone": 170719,
+        "waterVsNone": 5373
+      }
+    },
+    {
+      "view": "near",
+      "diffPx": {
+        "bothVsNone": 69729,
+        "roadsVsNone": 64514,
+        "waterVsNone": 5393
+      }
+    }
+  ],
+  "layers": {
+    "buildings": {
+      "state": "ready",
+      "count": 10546,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "roads": {
+      "state": "ready",
+      "count": 969,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "railways": {
+      "state": "ready",
+      "count": 67,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "waterways": {
+      "state": "ready",
+      "count": 20,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "parks": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "labels": {
+      "state": "ready",
+      "count": 26,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "facilities": {
+      "state": "ready",
+      "count": 140,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "spots": {
+      "state": "ready",
+      "count": 4,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "towns": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "townlabels": {
+      "state": "ready",
+      "count": 101,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wards": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "wardlabels": {
+      "state": "ready",
+      "count": 24,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    }
+  }
+}
