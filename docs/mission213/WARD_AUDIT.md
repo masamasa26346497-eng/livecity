@@ -50,3 +50,9 @@
 - 西区 `--lod --shots`: 118秒で完走(300秒 timeout は `--compare` の多条件一括が原因で、1視点ずつ/`--lod` なら収まる)。ok=true、全5視点 held、tileFail 0、クリック一致。
 - PNG 目視(3km/6km斜め/15km): 3kmは青灰色建物・灰色道路・水色河川が読め白格子なし。6km/15kmは西区ポリゴン内に実建物が描かれ、北東に 200m 模式セルの帯が残る(西区のみのビルドで隣区実タイルが無いための fallback と推測。24区ビルドでの消失は未確認)。LOD2 重複の定量(21セル問題)は未実施。UI パネルが画面を覆う。
 - baseline: 旧版は固定視点が無く実タイル選択前の tilesLoaded=true で cold が早期終了していた。固定視点(3000m -60°)+「実タイル選択>0 が連続成立」で再計測(西区): cold 15.5MB/183req/完了28.2s、warm 10.1MB/175req/完了47.5s、frame p50/p95 74.4/97.3 vs 73.6/95.3、tileFail 0。**warm の viewer 起動が 24s かかる原因は未解決**(cold は 1.9s)。SwiftShader 値で実機ではない。北区ではなく西区で測定。
+
+## 追記(29ee12b 時点・西区+隣接3区の同一ビルド小規模WebGL)
+- `build-cloud-preview.mjs --wards nishi,chuo,fukushima,kita --single-pass --city-lod0 --out temp/nec`: 101秒、167MB。4区合計 元LOD1 64,271 = 補完57,848 + LOD2同ID除外6,423、LOD2 8,268、全区 doubleDrawn=0、LOD0 754セル/15タイル。
+- `e2e-city-lod0.mjs --static temp/nec --lod --lat 34.6786 --lon 135.4900 --shots temp/shots-nec`: ok=true、クリック canonicalId 一致。4区が同一画面で読み込まれる(UI: 4/24区、kita/fukushima/chuo/nishi が tileVisible>0・GLB 200)。
+- 目視(15km): 西区北東の 200m 模式セル帯は、隣区(中央・福島・北)を同一ビルドに含めると見えない=単独ビルドの fallback と整合。6km斜めは画面左上に小さな青い方形が数個残るが、LOD0 か実建物かは未判定。画面は UI パネルが大半を覆う。konohana は4区ビルドに含めていないため未読込(想定)。
+- 24区一体・速度・Preview は未確認。
