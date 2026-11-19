@@ -1,0 +1,41 @@
+{
+  "schema": "livecity.mission140.run-summary/1",
+  "run": "https://github.com/masamasa26346497-eng/livecity/actions/runs/42438843605",
+  "source": "log of job fetch-check (private release assets of livecity-3d-data, tag plateau2025-converted); real converted data, NOT synthetic fixtures",
+  "steps": { "fetch": "21/21 archives", "strictDataCheck": { "dataOk": 21, "missing": 0, "problems": 0, "browserAcceptedWards": 0, "note": "this step only checks files; it never claims browser acceptance" } },
+  "browser": { "chrome": "156.0.8078.79 headless (software rendering)", "accepted": 19, "notAccepted": 2, "total": 21 },
+  "notAccepted": [
+    { "ward": "konohana", "reason": "click-id-mismatch", "px": 35.05, "coverage": "partial 1.311" },
+    { "ward": "nishinari", "reason": "click-id-mismatch", "px": 33.04, "coverage": "full-candidate 1.097" }
+  ],
+  "wards": [
+    ["miyakojima", 19, 41.62, "id-ok", "partial 1.337", "ACCEPTED"],
+    ["konohana", 24, 35.05, "FAIL", "partial 1.311", "NOT ACCEPTED"],
+    ["minato", 24, 31.76, "id-ok", "full-candidate 1.11", "ACCEPTED"],
+    ["taisho", 12, 35.51, "id-ok", "full-candidate 1.121", "ACCEPTED"],
+    ["tennoji", 10, 40.85, "id-ok", "full-candidate 0.999", "ACCEPTED"],
+    ["naniwa", 13, 43.59, "id-ok", "full-candidate 1.015", "ACCEPTED"],
+    ["nishiyodogawa", 23, 41.42, "id-ok", "full-candidate 1.178", "ACCEPTED"],
+    ["higashiyodogawa", 27, 33.21, "id-ok", "full-candidate 1.019", "ACCEPTED"],
+    ["higashinari", 10, 36.3, "id-ok", "full-candidate 1.03", "ACCEPTED"],
+    ["ikuno", 17, 44.2, "id-ok", "full-candidate 0.983", "ACCEPTED"],
+    ["asahi", 43, 41.04, "id-ok", "full-candidate 1.113", "ACCEPTED"],
+    ["joto", 23, 40.53, "id-ok", "full-candidate 0.998", "ACCEPTED"],
+    ["abeno", 26, 44.06, "id-ok", "full-candidate 0.984", "ACCEPTED"],
+    ["sumiyoshi", 15, 42.22, "id-ok", "full-candidate 1", "ACCEPTED"],
+    ["higashisumiyoshi", 22, 33.83, "id-ok", "full-candidate 0.996", "ACCEPTED"],
+    ["nishinari", 18, 33.04, "FAIL", "full-candidate 1.097", "NOT ACCEPTED"],
+    ["tsurumi", 9, 33.72, "id-ok", "full-candidate 1.147", "ACCEPTED"],
+    ["suminoe", 27, 33.11, "id-ok", "partial 1.269", "ACCEPTED"],
+    ["hirano", 17, 41.53, "id-ok", "full-candidate 1.046", "ACCEPTED"],
+    ["kita", 20, 42.46, "id-ok", "full-candidate 1.242", "ACCEPTED"],
+    ["chuo", 17, 51.11, "id-ok", "full-candidate 1.021", "ACCEPTED"]
+  ],
+  "columns": ["ward", "glb200", "pixelDiffPct", "click", "coverage", "verdict"],
+  "notProvenByLog": [
+    "selected-ward / coordinate consistency per ward (log has no per-ward N03 check)",
+    "roads and rivers (not part of this acceptance)",
+    "whole-ward coverage: 'full-candidate' is a source-count ratio, not an in-browser proof",
+    "ward count: nishi, fukushima, yodogawa are not among the 21; 24/24 is NOT shown"
+  ]
+}

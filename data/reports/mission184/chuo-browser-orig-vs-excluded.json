@@ -1,0 +1,40 @@
+{
+ "note": "real PLATEAU2025 chuo; headless Chrome+SwiftShader; clip OFF; localhost. Pixel diff is supporting only; ID audit is the proof.",
+ "orig": {
+  "wardPixelDiff": 342705,
+  "buildingsMeta": 18655,
+  "lod2Footprints": 4763,
+  "lod2At": [
+   135.50411833492745,
+   34.672133319099196
+  ],
+  "pixelDiff": {
+   "bothVsLod1Only": 108683,
+   "bothVsLod2Only": 406272,
+   "lod2OnlyVsLod1Only": 499394
+  },
+  "httpOk": 179,
+  "httpBad": 0
+ },
+ "excluded": {
+  "wardPixelDiff": 285850,
+  "buildingsMeta": 13891,
+  "lod2Footprints": 4763,
+  "lod2At": [
+   135.50411833492745,
+   34.672133319099196
+  ],
+  "pixelDiff": {
+   "bothVsLod1Only": 361825,
+   "bothVsLod2Only": 147114,
+   "lod2OnlyVsLod1Only": 502936
+  },
+  "httpOk": 154,
+  "httpBad": 0
+ },
+ "chuoLod1TrianglesSameView": {
+  "orig": 68809,
+  "excluded": 34696
+ },
+ "lod2Triangles": 96788
+}

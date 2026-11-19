@@ -1,0 +1,94 @@
+{
+ "mission": 190,
+ "source": "PLATEAU Osaka 2025 CityGML v5 (official, Range fetch)",
+ "env": "headless Chrome + SwiftShader, localhost, no auth; user PC / real GPU NOT verified",
+ "lod1": {
+  "tennoji": {
+   "code": 27109,
+   "buildings": 14235,
+   "tiles": 29,
+   "glbBytes": 20238288,
+   "identityHitPct": 0.51,
+   "skipped": 0,
+   "fallbacks": 0
+  },
+  "abeno": {
+   "code": 27119,
+   "buildings": 26498,
+   "tiles": 37,
+   "glbBytes": 37066972,
+   "note": "needed --max-mb 1500 (inflated 1275MB)"
+  },
+  "suminoe": {
+   "code": 27125,
+   "buildings": 27425,
+   "tiles": 116,
+   "glbBytes": 37301852,
+   "note": "needed --max-mb 1500"
+  },
+  "nishiyodogawa": {
+   "code": 27113,
+   "buildings": 27381,
+   "tiles": 67,
+   "glbBytes": 37596844
+  }
+ },
+ "near": {
+  "tennoji": {
+   "pixelDiff": 324046,
+   "drawn": true,
+   "lastError": null,
+   "selectedTiles": 18,
+   "triangles": 156619
+  },
+  "abeno": {
+   "pixelDiff": 388596,
+   "drawn": true,
+   "lastError": null,
+   "selectedTiles": 24,
+   "triangles": 357880
+  },
+  "suminoe": {
+   "pixelDiff": 107183,
+   "drawn": true,
+   "lastError": null,
+   "selectedTiles": 11,
+   "triangles": 37690
+  },
+  "nishiyodogawa": {
+   "pixelDiff": 226415,
+   "drawn": true,
+   "lastError": null,
+   "selectedTiles": 24,
+   "triangles": 216867
+  }
+ },
+ "auto3d": {
+  "firstMountAtSec": 48.6,
+  "query": "?nobuiltin=1&ext45=1&lod2=1&lod2ov=1&lod2auto3d=1",
+  "tilesetsSelected": "see log: nishiyodogawa 10/273810, tennoji 4/142350, abeno 6/264980, suminoe 14/274250 at h=30225m"
+ },
+ "extraMeta": [
+  {
+   "id": "ext-tennoji",
+   "wardCode": "27109",
+   "buildings": 14235
+  },
+  {
+   "id": "ext-nishiyodogawa",
+   "wardCode": "27113",
+   "buildings": 27381
+  },
+  {
+   "id": "ext-abeno",
+   "wardCode": "27119",
+   "buildings": 26498
+  },
+  {
+   "id": "ext-suminoe",
+   "wardCode": "27125",
+   "buildings": 27425
+  }
+ ],
+ "nearPass": true
+}
