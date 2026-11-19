@@ -42,6 +42,7 @@
       const getJ = (n) => fetch(BASE + n).then((r) => { if (!r.ok) throw new Error(n + ' が HTTP ' + r.status + '(生成物がありません。生成工程が失敗した可能性)'); return r.json(); });
       const [report, fp] = await Promise.all([getJ('report.json'), getJ('footprints.json')]);
       state.report = { converted: report.converted, lod1Remaining: report.lod1Remaining, glbBytes: report.glbBytes, meshes: report.meshes, source: report.source };
+      if (!fp.footprints.length) { state.status = 'no-lod2'; state.lod2Buildings = 0; state.footprints = 0; return; }   // Mission 213: LOD2 収録なしの区(正常)。LOD1 のみ
       state.centroid = [fp.footprints.reduce((n, f) => n + f.hull[0][0], 0) / fp.footprints.length, fp.footprints.reduce((n, f) => n + f.hull[0][1], 0) / fp.footprints.length];
       state.bbox = report.bbox; state.lod2Buildings = fp.footprints.length; state.footprints = fp.footprints.length;
       const ts = await Cesium.Cesium3DTileset.fromUrl(BASE + 'tileset.json');

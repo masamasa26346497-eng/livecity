@@ -196,7 +196,7 @@ async function compareMode() {
 async function lodMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
   if (shots) fs.mkdirSync(shots, { recursive: true });
-  const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; if (!up) throw new Error('viewer 起動せず');
+  const up = await load(opt('qs', 'citylod0=1&citylod0min=2500')); result.checks.viewerLoaded = up; if (!up) throw new Error('viewer 起動せず');
   await ev(`window.__ev=[];window.addEventListener('livecity:37d-building-selected',e=>window.__ev.push(e.detail&&(e.detail.canonicalId||e.detail.id)))`);
   const views = [{ n: 'far30k', h: 30000, p: -90 }, { n: 'far15k', h: 15000, p: -90 }, { n: 'mid6kb', h: 6000, p: -30 }, { n: 'mid3k', h: 3000, p: -60 }, { n: 'near600', h: 600, p: -60 }];
   const rows = (result.checks.lod = []);
