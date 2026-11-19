@@ -191,6 +191,35 @@ async function compareMode() {
   }
   result.ok = result.compare.filter((c) => c.view).every((c) => c.held && c.loaded);
 }
+
+// ---- --lod: 親→葉 LOD 切替の独立E2E(--static 必須)。遠景→近景で実タイルの選択数/geometricError/葉数の変化、tileFail、クリックを測る。 --shots <dir> で PNG(公開禁止) ----
+async function lodMode() {
+  const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), shots = opt('shots', null);
+  if (shots) fs.mkdirSync(shots, { recursive: true });
+  const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; if (!up) throw new Error('viewer 起動せず');
+  await ev(`window.__ev=[];window.addEventListener('livecity:37d-building-selected',e=>window.__ev.push(e.detail&&(e.detail.canonicalId||e.detail.id)))`);
+  const views = [{ n: 'far15k', h: 15000, p: -90 }, { n: 'mid6kb', h: 6000, p: -30 }, { n: 'mid3k', h: 3000, p: -60 }, { n: 'near600', h: 600, p: -60 }];
+  const rows = (result.checks.lod = []);
+  for (const v of views) {
+    const lat = v.p === -90 ? lat0 : lat0 - (v.h / Math.tan(-v.p * D2R)) / 111320;
+    let held = await holdCam(lon0, lat, v.h, v.p); await hookFail();
+    let loaded = false; for (let i = 0; i < 120; i++) { await ev('window.__v.scene.requestRender()'); loaded = await ev(`(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);return ps.length>0&&ps.every(p=>p.tilesLoaded)})()`); if (loaded) break; await sleep(500); }
+    await ev('window.__v.scene.requestRender()'); await sleep(800);
+    const sel = await ev(`(()=>{const v=window.__v;const out={tilesets:[]};let n=0,leaf=0,gmin=Infinity,gmax=0;for(const p of (v.scene.primitives._primitives||[])){if(p.tilesLoaded===undefined||p._lcCityLod0)continue;const st=p._selectedTiles||[];let l=0,a=Infinity,b=0;for(const t of st){const g=t.geometricError;if(!t.children||t.children.length===0)l++;a=Math.min(a,g);b=Math.max(b,g)}n+=st.length;leaf+=l;gmin=Math.min(gmin,a);gmax=Math.max(gmax,b);out.tilesets.push({sel:st.length,leaf:l,gMin:isFinite(a)?a:null,gMax:b})}out.selected=n;out.leaf=leaf;out.gMin=isFinite(gmin)?gmin:null;out.gMax=gmax;out.tileFail=window.__tileFail||0;out.camH=v.camera.positionCartographic.height;return out})()`);
+    const ps = await pixelStat().catch(() => null);
+    let png = null; if (shots) { const r = await send('Page.captureScreenshot', { format: 'png' }); png = path.join(shots, `lod-${v.n}.png`); fs.writeFileSync(png, Buffer.from(r.result.data, 'base64')); }
+    held = held && Math.abs(sel.camH - v.h) < v.h * 0.1;   // 撮影時点の実高度で再判定(起動後カメラ移動の上書き対策)
+    rows.push({ view: v.n, reqH: v.h, held, loaded, ...sel, lod0Share: ps && ps.lod0Share, realShare: ps && ps.realShare, shot: !!png });
+  }
+  // 近景でクリック → canonicalId(LOD0 は pick 対象外)
+  const spot = await ev(`(()=>{const v=window.__v,c=v.scene.canvas;const cx=c.clientWidth/2,cy=c.clientHeight/2;const cand=[];for(let i=1;i<40;i++)for(let j=1;j<28;j++)cand.push([c.clientWidth*i/40,c.clientHeight*j/28]);cand.sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));for(const [x,y] of cand){const p=v.scene.pick(new Cesium.Cartesian2(x,y));if(p&&p.getProperty&&p.getProperty('canonicalId')&&!(p.tileset&&p.tileset._lcCityLod0))return {x,y,id:p.getProperty('canonicalId')}}return null})()`);
+  result.checks.clickSpot = spot;
+  if (spot) { const r = await ev(`(()=>{const c=window.__v.scene.canvas.getBoundingClientRect();return {l:c.left,t:c.top}})()`); for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: spot.x + r.l, y: spot.y + r.t, button: 'left', clickCount: 1 }); await sleep(1500); result.checks.clickSelectsBuilding = ((await ev('window.__ev')) || []).includes(spot.id); }
+  const far = rows[0], near = rows[rows.length - 1];
+  // 合否: 全視点 held/loaded/tileFail=0、遠景で選択tileの geometricError 最大が近景より大きい(=粗い親が選ばれる)、近景は葉が選ばれる、クリック一致。 15km で親が選ばれない場合は不成立として ok=false にする(捏造しない)
+  result.checks.lodSwitch = { farGMax: far.gMax, nearGMax: near.gMax, nearLeaf: near.leaf, nearSelected: near.selected, parentToLeaf: far.gMax > near.gMax && near.leaf > 0 };
+  result.ok = !!(rows.every((r) => r.held && r.loaded && r.tileFail === 0) && result.checks.lodSwitch.parentToLeaf && result.checks.clickSelectsBuilding);
+}
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
   const t0 = Date.now();
@@ -223,7 +252,7 @@ async function realMode() {
   result.ok = !!(result.checks.lod0Loaded && hp.realShare > 0.05 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
-  if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
+  if (STATIC && a.includes('--lod')) await lodMode(); else if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
   const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);
