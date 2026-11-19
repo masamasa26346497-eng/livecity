@@ -1,0 +1,14 @@
+{
+ "mission": 189,
+ "source": "PLATEAU Osaka 2025 CityGML (official, Range fetch via mission79-run.mjs), headless Chrome + SwiftShader, localhost only; user PC / real GPU NOT verified",
+ "wards": {
+  "minato": {"code": "27107", "buildings": 17200, "uniqueCanonicalIds": 17200, "skipped": 0, "fallbacks": 0, "glbBytes": 22933280, "alignment": {"best": "identity", "ok": true, "hitRatePct": {"identity": 0.77, "flipX": 21.88, "flipZ": 25.46, "rot180": 27.05, "swapXZ": 32.2}}, "nearOnOffPixelDiff": 256327, "nearSelectedTiles": 19, "nearTriangles": 173155},
+  "taisho": {"code": "27108", "buildings": 19459, "uniqueCanonicalIds": 19459, "skipped": 0, "fallbacks": 0, "glbBytes": 25756576, "alignment": {"best": "identity", "ok": true, "hitRatePct": {"identity": 0.59, "flipX": 20.4, "flipZ": 24.17, "rot180": 20.65, "swapXZ": 17.58}}, "nearOnOffPixelDiff": 196172, "nearSelectedTiles": 18, "nearTriangles": 121514},
+  "nishinari": {"code": "27122", "buildings": 32032, "uniqueCanonicalIds": 32032, "skipped": 0, "fallbacks": 1, "glbBytes": 42019000, "alignment": {"best": "identity", "ok": true, "hitRatePct": {"identity": 0.24, "flipX": 20.17, "flipZ": 21.41, "rot180": 21.98, "swapXZ": 20.75}}, "nearOnOffPixelDiff": 368083, "nearSelectedTiles": 27, "nearTriangles": 341872}
+ },
+ "totalBuildings": 68691,
+ "auto3d3wards": {"firstMountSec": 29, "firstVisibleTilesSec": 31.2, "altitudeM": 30225, "mounted": ["27107", "27108", "27122"], "lastError": null, "httpOk": 37, "httpBad": 0, "glbRequests": 21, "selected": {"minato": [8, 172000], "taisho": [6, 194590], "nishinari": [7, 320320]}, "lod2Clip": "off"},
+ "nearHttp": {"ok": 297, "bad": 0},
+ "alignmentNote": "hitRatePct = share of building footprint centroids inside tran road polygons after applying each candidate orientation transform to the ROAD layer about its centroid (mission79-build-ward-2025.cjs orientationScan). Buildings should not sit on roads, so the LOWEST rate marks the correct orientation. identity lowest = no flip/rotation evidence. A low identity rate is the good outcome, not a mismatch.",
+ "notVerified": ["tileVisible event counts (not recorded in these runs)", "user PC / real GPU", "11 wards simultaneously on one screen", "alignment against separate real road/river layers", "LOD1/LOD2 duplicate exclusion for these wards"]
+}

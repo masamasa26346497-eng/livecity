@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mission 38F 施設プレビュー（大阪24区）</title>
+<style>
+  body{margin:0;font:14px/1.5 system-ui,sans-serif;display:grid;grid-template-columns:340px 1fr 320px;grid-template-rows:auto 1fr auto;height:100vh}
+  header{grid-column:1/4;padding:8px 12px;background:#1b2a41;color:#fff;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  header h1{font-size:16px;margin:0 12px 0 0}
+  #list{overflow:auto;border-right:1px solid #ccc;margin:0;padding:0;list-style:none}
+  #list li{padding:6px 10px;border-bottom:1px solid #eee;cursor:pointer}
+  #list li:hover,#list li.sel{background:#e8f0fe}
+  #list small{color:#666;display:block}
+  #map{width:100%;height:100%;background:#f4f1ea;display:block}
+  #detail{overflow:auto;padding:10px;border-left:1px solid #ccc}
+  #detail dt{font-weight:600;color:#444;margin-top:8px}
+  #detail dd{margin:0;word-break:break-all}
+  footer{grid-column:1/4;padding:4px 12px;background:#eee;font-size:12px}
+  #status.err{color:#b00020;font-weight:600}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <h1>施設プレビュー</h1>
+  <select id="ward" aria-label="区"></select>
+  <select id="cat" aria-label="カテゴリ"><option value="">全カテゴリ</option></select>
+  <input id="q" type="search" placeholder="名称・住所で検索" aria-label="検索">
+  <span id="counts"></span>
+  <span id="status" role="status"></span>
+  <button id="retry" hidden>再試行</button>
+</header>
+<ul id="list"></ul>
+<canvas id="map" aria-label="施設分布"></canvas>
+<aside id="detail"><p>施設を選択してください。</p></aside>
+<footer id="attr"></footer>
+<script src="mission38f-facility-fastload.js"></script>
+<script>
+(function () {
+  var F = window.Mission38FFacility;
+  var loader = F.createLoader({ baseUrl: 'map-data/osaka-city/facilities/' });
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { records: [], mode: 'sample', wardId: '', selected: null, shown: [] };
+  var MAX_LIST = 200;
+
+  $('attr').textContent = F.ATTRIBUTION + ' — データ: OpenStreetMap。外部地図・Google API は使用しません。';
+
+  function setStatus(msg, isErr) {
+    $('status').textContent = msg || '';
+    $('status').className = isErr ? 'err' : '';
+    $('retry').hidden = !isErr;
+  }
+
+  function refresh() {
+    var res = F.search(state.records, $('q').value, { category: $('cat').value, limit: MAX_LIST });
+    state.shown = res.results;
+    var label = state.mode === 'sample'
+      ? '初期サンプル（全24区の軽量版）'
+      : (state.wardName + ' 全件');
+    $('counts').textContent = label + ': ' + state.records.length + '件中 該当 ' + res.total + '件'
+      + (res.total > MAX_LIST ? '（先頭' + MAX_LIST + '件を表示）' : '');
+    var ul = $('list');
+    ul.textContent = '';
+    res.results.forEach(function (r, i) {
+      var d = F.describe(r);
+      var li = document.createElement('li');
+      li.dataset.index = String(i);
+      if (state.selected && state.selected.sourceId === r.sourceId) li.className = 'sel';
+      var b = document.createElement('b'); b.textContent = d.name;
+      var s = document.createElement('small'); s.textContent = d.category + ' / ' + d.subcategory + ' / ' + d.ward;
+      li.appendChild(b); li.appendChild(s);
+      li.addEventListener('click', function () { select(r); });
+      ul.appendChild(li);
+    });
+    drawMap();
+  }
+
+  function select(r) {
+    state.selected = r;
+    var d = F.describe(r);
+    var rows = [['名称', d.name], ['カテゴリ', d.category], ['種別', d.subcategory], ['区', d.ward],
+      ['住所', d.address], ['電話', d.phone], ['Webサイト', d.website], ['営業時間', d.openingHours],
+      ['車椅子', d.wheelchair], ['出典', d.source], ['出典ID', d.sourceId], ['ライセンス', d.license], ['帰属', d.attribution]];
+    var dl = document.createElement('dl');
+    rows.forEach(function (row) {
+      var dt = document.createElement('dt'); dt.textContent = row[0];
+      var dd = document.createElement('dd'); dd.textContent = row[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    $('detail').textContent = '';
+    $('detail').appendChild(dl);
+    refresh();
+  }
+
+  function drawMap() {
+    var c = $('map'), w = c.clientWidth, h = c.clientHeight;
+    c.width = w; c.height = h;
+    var g = c.getContext('2d');
+    var recs = state.records.filter(function (r) { return !$('cat').value || r.category === $('cat').value; });
+    if (!recs.length) return;
+    var minLa = 90, maxLa = -90, minLo = 180, maxLo = -180;
+    recs.forEach(function (r) {
+      minLa = Math.min(minLa, r.latitude); maxLa = Math.max(maxLa, r.latitude);
+      minLo = Math.min(minLo, r.longitude); maxLo = Math.max(maxLo, r.longitude);
+    });
+    var k = Math.cos(34.69 * Math.PI / 180);
+    var sx = (w - 20) / Math.max((maxLo - minLo) * k, 1e-6), sy = (h - 20) / Math.max(maxLa - minLa, 1e-6);
+    var s = Math.min(sx, sy);
+    function px(r) { return [10 + (r.longitude - minLo) * k * s, h - 10 - (r.latitude - minLa) * s]; }
+    g.fillStyle = 'rgba(30,90,200,.55)';
+    recs.forEach(function (r) { var p = px(r); g.fillRect(p[0] - 1, p[1] - 1, 3, 3); });
+    if (state.selected) {
+      var p = px(state.selected);
+      g.strokeStyle = '#d00'; g.lineWidth = 2; g.beginPath(); g.arc(p[0], p[1], 8, 0, 7); g.stroke();
+    }
+  }
+
+  function showSample() {
+    // selectSample() bumps the same token as selectWard(), so a still-pending ward load becomes stale.
+    var token = loader.currentToken() + 1;
+    return loader.selectSample().then(function (r) {
+      if (r.stale) return;
+      state.mode = 'sample'; state.wardId = ''; state.records = r.records; state.selected = null; refresh();
+      setStatus('');
+    }, function (err) { failIfCurrent(token, err); });
+  }
+
+  function chooseWard(wardId, wardName) {
+    state.wardId = wardId;
+    if (!wardId) { return showSample(); }
+    setStatus(wardName + ' を読み込み中…');
+    var token = loader.currentToken() + 1;
+    return loader.selectWard(wardId).then(function (r) {
+      if (r.stale) return;
+      state.mode = 'ward'; state.loadedWardId = wardId; state.wardName = wardName; state.records = r.records; state.selected = null;
+      setStatus(''); refresh();
+    }, function (err) { failIfCurrent(token, err); });
+  }
+
+  function fail(err) {
+    setStatus('読み込みに失敗しました: ' + err.message, true);
+  }
+
+  // Only the latest selection may show an error; older async failures are ignored.
+  function failIfCurrent(token, err) {
+    if (loader.isCurrent(token)) fail(err);
+  }
+
+  $('retry').addEventListener('click', function () {
+    var sel = $('ward');
+    chooseWard(sel.value, sel.options[sel.selectedIndex].textContent);
+  });
+  $('ward').addEventListener('change', function () {
+    var sel = $('ward');
+    chooseWard(sel.value, sel.options[sel.selectedIndex].textContent);
+  });
+  $('cat').addEventListener('change', refresh);
+  $('q').addEventListener('input', refresh);
+  window.addEventListener('resize', drawMap);
+  $('map').addEventListener('click', function (e) {
+    var rect = this.getBoundingClientRect();
+    // nearest-point pick among currently drawn records
+    var best = null, bd = 144;
+    var recs = state.records;
+    if (!recs.length) return;
+    var c = this, w = c.width, h = c.height;
+    var minLa = 90, maxLa = -90, minLo = 180, maxLo = -180;
+    var cat = $('cat').value;
+    recs = recs.filter(function (r) { return !cat || r.category === cat; });
+    recs.forEach(function (r) {
+      minLa = Math.min(minLa, r.latitude); maxLa = Math.max(maxLa, r.latitude);
+      minLo = Math.min(minLo, r.longitude); maxLo = Math.max(maxLo, r.longitude);
+    });
+    var k = Math.cos(34.69 * Math.PI / 180);
+    var s = Math.min((w - 20) / Math.max((maxLo - minLo) * k, 1e-6), (h - 20) / Math.max(maxLa - minLa, 1e-6));
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    recs.forEach(function (r) {
+      var x = 10 + (r.longitude - minLo) * k * s, y = h - 10 - (r.latitude - minLa) * s;
+      var d = (x - mx) * (x - mx) + (y - my) * (y - my);
+      if (d < bd) { bd = d; best = r; }
+    });
+    if (best) select(best);
+  });
+
+  // init
+  Object.keys(F.CATEGORY_LABELS).forEach(function (k) {
+    var o = document.createElement('option'); o.value = k; o.textContent = F.CATEGORY_LABELS[k]; $('cat').appendChild(o);
+  });
+  var first = document.createElement('option'); first.value = ''; first.textContent = '初期サンプル（全区）';
+  $('ward').appendChild(first);
+  loader.loadManifest().then(function (m) {
+    m.wards.forEach(function (w) {
+      var o = document.createElement('option'); o.value = w.wardId; o.textContent = w.wardName; $('ward').appendChild(o);
+    });
+  }).catch(fail);
+  showSample().catch(fail);
+  window.__m38f = { loader: loader, state: state };
+})();
+</script>
+</body>
+</html>

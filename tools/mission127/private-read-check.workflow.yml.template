@@ -1,0 +1,57 @@
+# Mission 127: INSTALL BY OWNER as .github/workflows/mission127-private-read-check.yml on the DEFAULT branch.
+# (Claude's GitHub App cannot write .github/workflows. NOT installed, NOT run by Claude.)
+# Purpose: read-only check of which stored secret can see the PRIVATE data repo + the release.
+# Safety: workflow_dispatch only; owner + default-branch guard; no checkout (no repo code runs);
+# permissions: contents none; each secret only in its own step env, masked;
+# GET requests only; prints HTTP status codes and counts only (never bodies, never the token);
+# no download of archives, no upload, no fallback between credentials.
+name: Mission127 private read check
+on:
+  workflow_dispatch:
+permissions:
+  contents: none
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    strategy:
+      fail-fast: false
+      matrix:
+        secret_name: [LIVECITY_3D_DATA_READ_TOKEN, LIVECITY_3D_DATA_TOKEN]
+    steps:
+      - name: Read-only API check
+        env:
+          READ_TOKEN: ${{ matrix.secret_name == 'LIVECITY_3D_DATA_READ_TOKEN' && secrets.LIVECITY_3D_DATA_READ_TOKEN || '' }}
+          DATA_TOKEN: ${{ matrix.secret_name == 'LIVECITY_3D_DATA_TOKEN' && secrets.LIVECITY_3D_DATA_TOKEN || '' }}
+          SECRET_NAME: ${{ matrix.secret_name }}
+          DATA_REPO: masamasa26346497-eng/livecity-3d-data
+          TAG: plateau2025-converted
+        run: |
+          set -u
+          T="${READ_TOKEN}${DATA_TOKEN}"
+          if [ -z "$T" ]; then echo "[$SECRET_NAME] FAIL: secret empty or missing (or not exposed to this repo)."; exit 1; fi
+          echo "::add-mask::$T"
+          get() { # $1=url $2=outfile ; prints HTTP code only; token goes via stdin config, not argv
+            printf 'header = "Authorization: Bearer %s"\n' "$T" | \
+              curl -sS -K - -o "$2" -w '%{http_code}' -H 'Accept: application/vnd.github+json' \
+                   -H 'X-GitHub-Api-Version: 2022-11-28' "$1"
+          }
+          code=$(get "https://api.github.com/repos/$DATA_REPO" /tmp/repo.json || true)
+          echo "[$SECRET_NAME] GET repo -> HTTP $code"
+          case "$code" in
+            200) ;;
+            401) echo "[$SECRET_NAME] FAIL: token invalid/expired/revoked."; exit 1;;
+            403) echo "[$SECRET_NAME] FAIL: forbidden (SSO/org policy or rate limit)."; exit 1;;
+            404) echo "[$SECRET_NAME] FAIL: repo not visible to this token (repo not granted to the token)."; exit 1;;
+            *)   echo "[$SECRET_NAME] FAIL: unexpected status."; exit 1;;
+          esac
+          echo "[$SECRET_NAME] visibility=$(jq -r '.visibility' /tmp/repo.json) pull=$(jq -r '.permissions.pull // false' /tmp/repo.json) push=$(jq -r '.permissions.push // false' /tmp/repo.json) (push is informational)"
+          [ "$(jq -r '.visibility' /tmp/repo.json)" = "private" ] || { echo "[$SECRET_NAME] FAIL: repo is not private."; exit 1; }
+          rc=$(get "https://api.github.com/repos/$DATA_REPO/releases/tags/$TAG" /tmp/rel.json || true)
+          echo "[$SECRET_NAME] GET release tag $TAG -> HTTP $rc"
+          [ "$rc" = "200" ] || { echo "[$SECRET_NAME] FAIL: release not readable (token needs Contents: read)."; exit 1; }
+          n=$(jq '[.assets[] | select(.name|test("^plateau2025-[a-z0-9-]+\\.tar\\.gz$"))] | length' /tmp/rel.json)
+          echo "[$SECRET_NAME] archives matching plateau2025-<ward>.tar.gz: $n / 24"
+          [ "$n" = "24" ] || { echo "[$SECRET_NAME] FAIL: expected 24 archives."; exit 1; }
+          echo "[$SECRET_NAME] OK: read-only access verified. Nothing downloaded or uploaded."
