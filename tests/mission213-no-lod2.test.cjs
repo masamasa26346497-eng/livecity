@@ -44,3 +44,10 @@ test('lod2-overlay: no-lod2 でも installCoarseSse を呼ぶ', () => {
   assert.ok(i > 0);
   assert.match(s.slice(i, i + 250), /installCoarseSse\(null/);
 });
+
+test('overlay: LOD2 なし(no-lod2)の早期 return 前にも全域3D 自動有効化 autoAll() を呼ぶ(東住吉区で実タイル 0 件だった回帰)', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../tools/lod2/lod2-overlay.js'), 'utf8');
+  assert.ok(/const autoAll = \(\) =>/.test(src), 'autoAll 関数');
+  assert.ok(/status = 'no-lod2'[^\n]*autoAll\(\); return;/.test(src), 'no-lod2 分岐で autoAll を呼ぶ');
+  assert.ok((src.match(/autoAll\(\)/g) || []).length >= 2, '通常経路でも呼ぶ');
+});
