@@ -1,6 +1,6 @@
 # Mission213 24区 区別監査表（実測できた行のみ「確認済み」。それ以外は未確認＝合格ではない）
 
-更新: 0f045aa 上に 大正/淀川/生野/旭 を直列単独ビルド+--lod で追加(計17区。残7区=天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野は未確認)。以下は旧記述。 2de7915 の次コミット時点(福島/港/西成を追加し計13区。残11区は未確認)。旧: 58b493f 時点(Mission213 区別バッチ: 北・西・平野に加え 都島/此花/中央/東成/住之江/住吉/東住吉 を実ビルド+--lod で確認=計10区。残14区は未確認)。注意: 並列ビルドは temp/lod2-cloud を共有して衝突するため、必ず区ごとに直列でビルドすること(此花/中央/住之江/住吉は直列で再検証済み)。SwiftShader/headless Chromium の値。tileset/GLB の HTTP status 全件記録は未実施（--lod は 4xx/5xx の URL を result.httpErrors に出す。LOD0/実tilesetの非2xxは確認した範囲で 0）。出典は全区 PLATEAU 2025 CityGML v5（既存 Preview が配信している範囲と同一。第三者配信権利の判断は管理者）。
+更新: a4d62ec 上に 残7区(天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野)を直列単独ビルド+--lod で追加。全24行が個別E2E済みだが、24区一体WebGL・画像目視・速度A/B・Preview は未確認で完成ではない。6km斜め(mid6kb)の選択0は 天王寺・浪速・淀川・住之江 等で再現(区外着地の疑い、未判定)。 旧: 0f045aa 上に 大正/淀川/生野/旭 を直列単独ビルド+--lod で追加(計17区。残7区=天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野は未確認)。以下は旧記述。 2de7915 の次コミット時点(福島/港/西成を追加し計13区。残11区は未確認)。旧: 58b493f 時点(Mission213 区別バッチ: 北・西・平野に加え 都島/此花/中央/東成/住之江/住吉/東住吉 を実ビルド+--lod で確認=計10区。残14区は未確認)。注意: 並列ビルドは temp/lod2-cloud を共有して衝突するため、必ず区ごとに直列でビルドすること(此花/中央/住之江/住吉は直列で再検証済み)。SwiftShader/headless Chromium の値。tileset/GLB の HTTP status 全件記録は未実施（--lod は 4xx/5xx の URL を result.httpErrors に出す。LOD0/実tilesetの非2xxは確認した範囲で 0）。出典は全区 PLATEAU 2025 CityGML v5（既存 Preview が配信している範囲と同一。第三者配信権利の判断は管理者）。
 
 | # | 区 | wardId | 状態 | 備考 |
 |---|---|---|---|---|
@@ -12,17 +12,17 @@
 | 6 | 西区 | nishi | 確認済み(個別E2E) | 個別ビルド+--lod E2E ok=true(run 44512755301)。本ジョブでも bw=27106 で遠景 30km=4/15km=30 タイル選択を再確認 |
 | 7 | 港区 | minato | 確認済み(個別E2E・LOD2なし) | 直列単独ビルド+--lod ok=true。LOD1 17,200、LOD2収録なし(除外0)、ID監査OK/doubleDrawn=0、道路4,520、LOD0 200セル/8タイル。30km=親8/15km,6km=葉44/近景=葉9、tileFail=0、クリック一致。画像未目視 |
 | 8 | 大正区 | taisho | 確認済み(個別E2E・LOD2なし) | 直列単独ビルド65秒+--lod ok=true(0f045aa)。中心 34.64664,135.46502(tileset region算出)。LOD1 19,459、LOD2収録なし、ID監査OK/doubleDrawn=0、道路5,156、LOD0 230セル/6タイル。30km=親6(ge40)/15km,6km=葉52/3km=親(ge40)/近景=葉4、tileFail=0、クリック一致、tileset/GLB非2xx0。画像未目視 |
-| 9 | 天王寺区 | tennoji | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
-| 10 | 浪速区 | naniwa | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
-| 11 | 西淀川区 | nishiyodogawa | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
+| 9 | 天王寺区 | tennoji | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.66062,135.52005(tileset region算出)。LOD1 14,235(除外0)、LOD2 2,578、道路3,774、LOD0 209セル/8タイル。ID監査OK/doubleDrawn=0。30km=親4(ge40)/15km=葉29/6km斜め=選択0/3km=葉9+親/近景=葉7、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
+| 10 | 浪速区 | naniwa | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.65898,135.49594(tileset region算出)。LOD1 10,278(LOD2同ID除外5)、LOD2 1,777、道路3,165、LOD0 154セル/5タイル。ID監査OK/doubleDrawn=0。30km=親5/15km=葉28/6km斜め=選択0/3km=葉10+親/近景=葉6、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
+| 11 | 西淀川区 | nishiyodogawa | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.70800,135.43968(tileset region算出)。LOD1 27,381、LOD2収録なし、道路8,090、LOD0 312セル/10タイル。ID監査OK/doubleDrawn=0。30km=親10/15km,6km=葉67/3km=親のみ6/近景=葉6、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
 | 12 | 淀川区 | yodogawa | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(0f045aa)。中心 34.73037,135.47631。LOD1 35,296(LOD2同ID除外2,874)、LOD2 3,863、ID監査OK/doubleDrawn=0、道路10,722、LOD0 358セル/11タイル。30km=親10/15km=葉65/近景=葉5、tileFail=0、クリック一致、非2xx0。**6km斜め(mid6kb)は選択tile 0**(視点が区外着地の疑い、未判定)。画像未目視 |
-| 13 | 東淀川区 | higashiyodogawa | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
+| 13 | 東淀川区 | higashiyodogawa | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.74507,135.53039(tileset region算出)。LOD1 34,825(除外511)、LOD2 785、道路11,488、LOD0 317セル/11タイル。ID監査OK/doubleDrawn=0。30km=親10/15km,6km=葉62/3km=親のみ6/近景=葉6、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
 | 14 | 東成区 | higashinari | 確認済み(個別E2E) | 個別ビルド+--lod ok=true。LOD2 291(除外51)、ID監査OK。親→葉、tileFail=0、クリック一致 |
 | 15 | 生野区 | ikuno | 確認済み(個別E2E・LOD2なし) | 直列単独ビルド+--lod ok=true(0f045aa)。中心 34.64952,135.54428。LOD1 45,427、LOD2収録なし、ID監査OK/doubleDrawn=0、道路9,935、LOD0 246セル/7タイル。30km=親7/15km,6km=葉51/近景=葉6、tileFail=0、クリック一致、非2xx0。画像未目視 |
 | 16 | 旭区 | asahi | 確認済み(個別E2E・LOD2なし) | 直列単独ビルド+--lod ok=true(0f045aa)。中心 34.72772,135.54763。LOD1 24,962、LOD2収録なし、ID監査OK/doubleDrawn=0、道路6,117、LOD0 166セル/5タイル。30km=親5/15km,6km=葉40/近景=葉7、tileFail=0、クリック一致、非2xx0。画像未目視 |
-| 17 | 城東区 | joto | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
-| 18 | 鶴見区 | tsurumi | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
-| 19 | 阿倍野区 | abeno | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
+| 17 | 城東区 | joto | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.69669,135.54987(tileset region算出)。LOD1 32,192(除外188)、LOD2 615、道路8,384、LOD0 267セル/6タイル。ID監査OK/doubleDrawn=0。30km=親6/15km,6km=葉46/3km=葉8+親/近景=葉6、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
+| 18 | 鶴見区 | tsurumi | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.70531,135.57898(tileset region算出)。LOD1 25,309、LOD2収録なし、道路8,131、LOD0 241セル/8タイル。ID監査OK/doubleDrawn=0。30km=親8/15km,6km=葉51/3km=親のみ6/近景=葉7、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
+| 19 | 阿倍野区 | abeno | 確認済み(個別E2E) | 直列単独ビルド+--lod ok=true(a4d62ec 時点、run 44571078211)。中心 34.63228,135.51270(tileset region算出)。LOD1 26,498、LOD2収録なし、道路6,017、LOD0 177セル/6タイル。ID監査OK/doubleDrawn=0。30km=親6/15km,6km=葉37/3km=親のみ5/近景=葉6、tileFail=0、クリック一致、tileset/GLB/_city-lod0 の非2xx 0(4xx 50件打切りは stations-24 等の既存404のみ確認)。画像未目視 |
 | 20 | 住之江区 | suminoe | 確認済み(個別E2E) | 単独ビルド再実行+--lod ok=true。LOD2 9棟、ID監査OK。親→葉、tileFail=0、クリック一致。6km斜め(mid6kb)視点は選択tile 0(視点が区外に着地した可能性。穴かは未判定) |
 | 21 | 住吉区 | sumiyoshi | 確認済み(個別E2E・LOD2なし) | 単独ビルド再実行+--lod ok=true。LOD2 収録なし(footprints=0, noLod2)で ID監査OK(除外0)。親→葉、tileFail=0、クリック一致 |
 | 22 | 東住吉区 | higashisumiyoshi | 確認済み(個別E2E・LOD2なし) | 根因: overlay の no-lod2 早期returnが全域3D自動有効化(autoAll)を飛ばし実タイル0件(58b493f で修正)。修正後 --lod ok=true: 選択 8/60/60/4/7、30km=親(ge40)/近景=葉7、tileFail=0、クリック一致 |
