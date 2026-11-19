@@ -36,3 +36,11 @@ test('ID 監査: noLod2 は除外 0・全棟残存を要求。除外があれば
   // supp ディレクトリの実体が要るため readLeafIds 経由の挙動は、LOD2 ID 混入だけここで確認
   assert.throws(() => auditSinglePass({ id: 'x', suppDir: '/nonexistent', lod2Ids: new Set(['a']), noLod2: true, suppBuildings: 1, excludedCount: 0, inWard: 1 }));
 });
+
+// Mission213: LOD2 収録なしの区でも、遠景の粗い親タイル用 SSE 引下げが overlay で有効になること(平野区で遠景の実タイルが 0 になった根因)
+test('lod2-overlay: no-lod2 でも installCoarseSse を呼ぶ', () => {
+  const s = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'tools', 'lod2', 'lod2-overlay.js'), 'utf8');
+  const i = s.indexOf("state.status = 'no-lod2'");
+  assert.ok(i > 0);
+  assert.match(s.slice(i, i + 250), /installCoarseSse\(null/);
+});

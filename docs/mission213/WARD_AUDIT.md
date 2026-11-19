@@ -26,5 +26,5 @@
 | 20 | 住之江区 | suminoe | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
 | 21 | 住吉区 | sumiyoshi | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
 | 22 | 東住吉区 | higashisumiyoshi | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
-| 23 | 平野区 | hirano | 部分的/ブロッカーあり | 個別ビルド成功(LOD2無しは正常、ID監査OK)。3km以下は実タイル選択・クリックOK。6km以上は実タイル未リクエストで未解決(下記) |
+| 23 | 平野区 | hirano | 確認済み(個別E2E・北区/西区と同条件) | 根因: lod2-overlay.js が LOD2 収録なしで早期 return し、遠景の粗い親用 SSE 引下げ(installCoarseSse)が未登録 → ward tileset の root(ge=160)が SSE<16 で丸ごとスキップ(visited=0)。修正後 --lod ok=true: 30km=親10(ge40)/15km=葉88/6km=葉88/3km=親5+葉/600m=葉6、tileFail=0、クリック canonicalId 一致。白格子・画像は未目視 |
 | 24 | 西成区 | nishinari | 未確認 | この表の作成時点で個別ビルド・E2E 未実施 |
