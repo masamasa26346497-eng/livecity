@@ -30,16 +30,18 @@
   // Mission 213: 遠景の粗い親タイル(SSE 引下げ)。LOD2 収録なしの区(平野区)でも必要なため、LOD2 の有無と独立に呼ぶ。ts は LOD2 tileset(無ければ null)で、対象から除外する。
   function installCoarseSse(ts, defHI) {
     const { Cesium, viewer, scene } = installCoarseSse.ctx;
-        const qq = new URLSearchParams(location.search); const target = qq.has('lod2coarsesse') ? Number(qq.get('lod2coarsesse')) : 2; const HI = Number(qq.get('lod2coarseh') || defHI || 6000);
+        const qq = new URLSearchParams(location.search); const target = qq.has('lod2coarsesse') ? Number(qq.get('lod2coarsesse')) : 2; const HI = Number(qq.get('lod2coarseh') || defHI || 6000); const FAR_DIST_M = Number(qq.get('lod2coarsed') || 6000);
         state.coarseSse = { target, heightM: HI, lowered: 0 };
         if (target > 0) {
           const orig = new WeakMap(); let lastChk = 0;
           scene.postRender.addEventListener(() => {
             const now = performance.now(); if (now - lastChk < 500) return; lastChk = now;
-            const h = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC).height; const far = h > HI; let n = 0, ch = false;
+            const h = Cesium.Cartographic.fromCartesian(viewer.camera.positionWC).height; const hFar = h > HI; let n = 0, ch = false;
             const prims = scene.primitives;
             for (let i = 0; i < prims.length; i++) {
               const p = prims.get(i); if (p === ts || !(p instanceof Cesium.Cesium3DTileset)) continue;
+              // Mission 213: 高度が HI 以下でも斜めに遠方を見る(6km -30° 等)と tileset までの実距離は遠景相当になり、空コンテンツの中間タイル(ge120/160)が SSE<上限で選択0=穴になる(淀川区で実測)。高度に加えて tileset 境界球までの距離でも遠景扱いにする(SSE を下げるだけで、より詳細側に倒れる)。
+              let far = hFar; if (!far && p.boundingSphere) { const dd = Cesium.Cartesian3.distance(viewer.camera.positionWC, p.boundingSphere.center) - p.boundingSphere.radius; far = dd > FAR_DIST_M; }
               if (far) { if (p.maximumScreenSpaceError > target) { if (!orig.has(p)) orig.set(p, p.maximumScreenSpaceError); p.maximumScreenSpaceError = target; ch = true; } if (orig.has(p)) n++; }
               else if (orig.has(p)) { p.maximumScreenSpaceError = orig.get(p); orig.delete(p); ch = true; }
             }

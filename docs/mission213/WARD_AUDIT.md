@@ -28,3 +28,9 @@
 | 22 | 東住吉区 | higashisumiyoshi | 確認済み(個別E2E・LOD2なし) | 根因: overlay の no-lod2 早期returnが全域3D自動有効化(autoAll)を飛ばし実タイル0件(58b493f で修正)。修正後 --lod ok=true: 選択 8/60/60/4/7、30km=親(ge40)/近景=葉7、tileFail=0、クリック一致 |
 | 23 | 平野区 | hirano | 確認済み(個別E2E・北区/西区と同条件) | 根因: lod2-overlay.js が LOD2 収録なしで早期 return し、遠景の粗い親用 SSE 引下げ(installCoarseSse)が未登録 → ward tileset の root(ge=160)が SSE<16 で丸ごとスキップ(visited=0)。修正後 --lod ok=true: 30km=親10(ge40)/15km=葉88/6km=葉88/3km=親5+葉/600m=葉6、tileFail=0、クリック canonicalId 一致。白格子・画像は未目視 |
 | 24 | 西成区 | nishinari | 確認済み(個別E2E・LOD2なし) | 直列単独ビルド+--lod ok=true。LOD1 32,032、LOD2収録なし、ID監査OK/doubleDrawn=0、道路7,338、LOD0 208セル/7タイル。30km=親7/15km,6km=葉42/近景=葉6、tileFail=0、クリック一致。画像未目視 |
+
+## 6km斜め(mid6kb)選択0 の原因(淀川区で実測・修正)
+- 画面中心レイの着地点は tileset 根の境界球の内側(距離 0〜32m)で、区外着地ではなかった。根は visible・cullOk=1(視錐台で除外されていない)。
+- 実原因: 空コンテンツの中間タイル(ge120/160)の SSE が 8.5/13.9 で上限(16/32)未満となり、descend も描画もされず選択0(実建物寄与 0)。遠景用 SSE 引下げが「高度>6000m」のみで、高度6000m・斜めでは未発動だった。
+- 修正: lod2-overlay.js で tileset 境界球までの距離>6000m(`?lod2coarsed`)でも引下げ。淀川区: 選択 0→65(葉65)、realShare 0→0.041、tileFail 0、クリック一致、他視点は不変。
+- 住之江・此花・中央・天王寺・浪速は未再測定(同原因かは未確認)。
