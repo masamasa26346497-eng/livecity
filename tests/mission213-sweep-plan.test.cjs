@@ -79,3 +79,17 @@ test('CI バッチ: ラベルから start-point を厳密に解釈 / 集計に i
   assert.match(md, /12〜23/); assert.match(md, /run-mission213-qa:24/); assert.match(md, /#23 a\|b@10000m=not-loaded/);
   assert.match(renderBatchSummary(null), /sweep なし/);
 });
+
+test('classifyCellPure: --cells のセル分類(fixture)', async () => {
+  const { classifyCellPure: f } = await import('../tools/cloud/sweep-plan.mjs');
+  const base = { W: 1000, H: 800 };
+  assert.strictEqual(f({ ...base, hidden: true, w: { x: 500, y: 400 }, d9: true, d3: true }), 'hidden');
+  assert.strictEqual(f({ ...base, hidden: false, w: null }), 'offscreen');
+  assert.strictEqual(f({ ...base, hidden: false, w: { x: 2, y: 400 } }), 'offscreen');
+  assert.strictEqual(f({ ...base, hidden: false, w: { x: 500, y: 797 } }), 'offscreen');
+  assert.strictEqual(f({ ...base, hidden: false, w: { x: 500, y: 400 }, d9: true, d3: true }), 'realUnder3');
+  assert.strictEqual(f({ ...base, hidden: false, w: { x: 500, y: 400 }, d9: true, d3: false }), 'realUnder9only');
+  assert.strictEqual(f({ ...base, hidden: false, w: { x: 500, y: 400 }, d9: false, d3: false }), 'noRealUnder');
+  // toString() でブラウザ埋め込み可能(外部参照なし)
+  assert.strictEqual(new Function('return (' + f.toString() + ')')()({ ...base, hidden: false, w: { x: 5, y: 5 } }), 'noRealUnder');
+});

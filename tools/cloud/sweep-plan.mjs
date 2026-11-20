@@ -93,3 +93,18 @@ export function renderBatchSummary(qa, meta = {}) {
   out.push('', '※ headless SwiftShader の値であり実機性能ではありません。24区全域の完成は、全バッチで hole/not-loaded 0 かつ末尾到達のときのみ。');
   return out.join('\n') + '\n';
 }
+
+// Mission 213: --cells の1セル分類(純関数。ブラウザ内にも toString() で埋め込むので外部参照・クロージャ禁止)。
+//   in: {hidden, w:{x,y}|null(画面座標、物理px), W, H, d9, d3}  d9/d3 = セル中心の9x9/3x3 窓で
+//   「LOD0のみ消した画」と「全タイル消した画」に差があるか(=実建物画素あり)。
+//   out: 'hidden'(置換で非表示) | 'offscreen' | 'realUnder3'(3x3でも実建物あり=二重描画の強い疑い)
+//        | 'realUnder9only'(9x9のみ=隣接建物の拾い=誤検知の可能性大) | 'noRealUnder'(実建物なし=fallback)
+export function classifyCellPure(c) {
+  if (c.hidden) return 'hidden';
+  if (!c.w) return 'offscreen';
+  const x = Math.round(c.w.x), y = Math.round(c.w.y);
+  if (x < 4 || y < 4 || x >= c.W - 4 || y >= c.H - 4) return 'offscreen';
+  if (c.d3) return 'realUnder3';
+  if (c.d9) return 'realUnder9only';
+  return 'noRealUnder';
+}
