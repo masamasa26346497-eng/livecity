@@ -1,6 +1,6 @@
 # Mission213 24区 区別監査表（実測できた行のみ「確認済み」。それ以外は未確認＝合格ではない）
 
-更新: a4d62ec 上に 残7区(天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野)を直列単独ビルド+--lod で追加。全24行が個別E2E済みだが、24区一体WebGL・画像目視・速度A/B・Preview は未確認で完成ではない。6km斜め(mid6kb)の選択0は 天王寺・浪速・淀川・住之江 等で再現(区外着地の疑い、未判定)。 旧: 0f045aa 上に 大正/淀川/生野/旭 を直列単独ビルド+--lod で追加(計17区。残7区=天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野は未確認)。以下は旧記述。 2de7915 の次コミット時点(福島/港/西成を追加し計13区。残11区は未確認)。旧: 58b493f 時点(Mission213 区別バッチ: 北・西・平野に加え 都島/此花/中央/東成/住之江/住吉/東住吉 を実ビルド+--lod で確認=計10区。残14区は未確認)。注意: 並列ビルドは temp/lod2-cloud を共有して衝突するため、必ず区ごとに直列でビルドすること(此花/中央/住之江/住吉は直列で再検証済み)。SwiftShader/headless Chromium の値。tileset/GLB の HTTP status 全件記録は未実施（--lod は 4xx/5xx の URL を result.httpErrors に出す。LOD0/実tilesetの非2xxは確認した範囲で 0）。出典は全区 PLATEAU 2025 CityGML v5（既存 Preview が配信している範囲と同一。第三者配信権利の判断は管理者）。
+更新: 末尾の run 44730539965 追記も参照。a4d62ec 上に 残7区(天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野)を直列単独ビルド+--lod で追加。全24行が個別E2E済みだが、24区一体WebGL・画像目視・速度A/B・Preview は未確認で完成ではない。6km斜め(mid6kb)の選択0は 天王寺・浪速・淀川・住之江 等で再現(区外着地の疑い、未判定)。 旧: 0f045aa 上に 大正/淀川/生野/旭 を直列単独ビルド+--lod で追加(計17区。残7区=天王寺・浪速・西淀川・東淀川・城東・鶴見・阿倍野は未確認)。以下は旧記述。 2de7915 の次コミット時点(福島/港/西成を追加し計13区。残11区は未確認)。旧: 58b493f 時点(Mission213 区別バッチ: 北・西・平野に加え 都島/此花/中央/東成/住之江/住吉/東住吉 を実ビルド+--lod で確認=計10区。残14区は未確認)。注意: 並列ビルドは temp/lod2-cloud を共有して衝突するため、必ず区ごとに直列でビルドすること(此花/中央/住之江/住吉は直列で再検証済み)。SwiftShader/headless Chromium の値。tileset/GLB の HTTP status 全件記録は未実施（--lod は 4xx/5xx の URL を result.httpErrors に出す。LOD0/実tilesetの非2xxは確認した範囲で 0）。出典は全区 PLATEAU 2025 CityGML v5（既存 Preview が配信している範囲と同一。第三者配信権利の判断は管理者）。
 
 | # | 区 | wardId | 状態 | 備考 |
 |---|---|---|---|---|
@@ -104,3 +104,13 @@
 - 未解決の食い違い: `--resid-detail` なしの `--compare` では pix の realUnder3x3=102/102。前回(--resid-detail/--cells)は 1/102。診断経路差か状態崩れ(既知・非決定的)かは未特定。二重描画の確証はなし。
 - PNG目視(swapOn/lod0Off、同一カメラ): 白格子なし。ON で残る LOD0 は北側(実建物が lod0Off でも疎な範囲)のみ。前面/背面(lod0Front)判定・lod0_-18_-37 は今回未測定(--cells が compare では出力されず)。
 - 未実施: 中央・浪速6km、住之江3km、cold/warm分離、24区一体、認証付きPreview。
+
+## 追記(HEAD 944e187・24区一体QA run 44730539965 のログ精査。実行・ラベル操作なし、ドキュメントのみ)
+- 対象 run: `mission213-qa`(ラベル起動、2026-11-20 11:48Z、SHA は 944e187 のチェックアウトと推定。ログ上のSHA明示は未確認)。build step 成功(24区一体、1023MB、LOD0 5393セル/82タイル/GLB 3.04MB、元LOD1 615,234=補完604,542+LOD2同ID除外10,692、LOD0 wards=24)。build 所要 522秒(報告値。ログ側の秒数は未突合)。
+- 失敗 step は「Sweep E2E」のみ(step 8、exit 1)。設定は `--alts 3000,10000 --max-points 12 --start-point 0 --budget-min 25`。`e2e-city-lod0.mjs:126` は `!result.sweep.truncated` を ok の条件に含むため、**max-points による打切りだけで exit 1 になる設計**。
+- 判定: 報告された内訳(12/55点・24視点、hole=0 / notLoaded=0 / cameraNotHeld=0、wardsFound=24)が正しければ、failure は**品質不合格ではなく「分割QAの未完了(truncated)」**と整合する。ただし**ジョブログの stdout には `sweep` 本体(rows/summary/truncated)が出ておらず**(stdout は click 系の checks と httpErrors のみ。sweep rows は temp/qa.json と PR コメントにのみ出る)、truncated=max-points をログから直接は確認できていない。内訳の数値は PR コメント #7039054186 側の値に依存し、本精査では再検証していない。
+- 同ログの stdout 上の click 系 `checks`: viewerLoaded=true、lod0Loaded=true、clickSelectsBuilding=true(北区 bldg_e79a…)。この `ok:false` は click 判定(sweep と別軸)であり、sweep の合否ではない。コンソール 404 は ward-manifest.json / building-photo-index.json / towns-24 等の既存404。
+- **実測済み 12/55 点、未確認 43点(index 12〜54)**。coveredByReal 17 は「LOD0 寄与0だが実建物が描画」分類で ok ではない(穴ではない)。置換後SHAの区境全域証拠は未成立。
+- 再開方法(安全性レビュー): ラベル `run-mission213-qa:12` → `qa-batch.mjs start` が厳密検証(`^run-mission213-qa(:\d{1,3})?$`)し `--start-point 12`。以降 `:24` `:36` `:48`(計4バッチ、各 ≒ ビルド9〜15分+sweep最大25分、最大約45分/ジョブ、4バッチで最大約180分)。ラベルは付け直し(外す→付ける)で1回起動、ジョブは直列。無料枠(月2,000分)の残量は管理者確認が必要。**今回ラベルは操作していない。**
+- 費用面の観察: 各バッチで24区ビルドを毎回やり直す(約9分/回)。`actions/cache` は容量・権利境界が未確認のため未導入。
+- 未確認のまま: LOD2ゼロ区(平野等)のLOD1代替でのクリック、道路/水路、区境、色、白格子、穴、tileFail(24区一体)、全URL HTTP200、cold/warm、現SHA認証付きPreviewのWebGL。LC_COARSE_MERGE は既定OFF。完成ではない。
