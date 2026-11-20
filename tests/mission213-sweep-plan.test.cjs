@@ -132,3 +132,42 @@ test('swap 状態復元: --cells/--resid-detail は T.show と実タイル show 
     assert.match(line, /H0\.set\(c,c\.f\.show\)/);
   }
 });
+
+test('runState: 5+ ケース(partial/complete/hole/未読込/カメラ/欠損/HTTP)', async () => {
+  const { runState } = await import('../tools/cloud/sweep-plan.mjs');
+  const row = (i, status) => ({ index: i, status, kind: 'ward-center', ward: 'w' + i, alt: 3000 });
+  const mk = (rows, extra = {}) => ({ sweep: { wardsFound: 24, routePlanned: 55, startPoint: 0, rows, ...extra } });
+  // 1. max-points のみ(品質OK) = partial だが予定どおり → exitOk
+  let r = runState(mk([row(0, 'ok'), row(1, 'covered-by-real')], { truncated: 'max-points', nextStartPoint: 12 }));
+  assert.deepEqual([r.state, r.quality, r.plannedStop, r.exitOk, r.nextStartPoint, r.unverifiedPoints, r.wholeRouteVerified], ['partial', 'pass', true, true, 12, 43, false]);
+  assert.deepEqual(r.measuredIndexes, [0, 1]);
+  // 2. 全部完了
+  r = runState(mk([row(0, 'ok'), row(1, 'ok')], { nextStartPoint: null }));
+  assert.deepEqual([r.state, r.quality, r.exitOk, r.wholeRouteVerified, r.unverifiedPoints], ['complete', 'pass', true, true, 0]);
+  // 2b. 途中開始の完了は全経路検証にならない
+  assert.equal(runState(mk([row(44, 'ok')], { startPoint: 44, nextStartPoint: null })).wholeRouteVerified, false);
+  // 3. hole / not-loaded は max-points でも不合格
+  r = runState(mk([row(0, 'hole')], { truncated: 'max-points', nextStartPoint: 12 }));
+  assert.deepEqual([r.state, r.quality, r.exitOk], ['failed', 'fail', false]); assert.ok(r.reasons.includes('hole'));
+  r = runState(mk([row(0, 'ok'), row(1, 'not-loaded')], { nextStartPoint: null }));
+  assert.ok(!r.exitOk && r.reasons.includes('not-loaded'));
+  // 4. camera-not-held / 予定外タイムアウト(budget-min)
+  r = runState(mk([row(0, 'camera-not-held')]));
+  assert.ok(!r.exitOk && r.reasons.includes('camera-not-held'));
+  r = runState(mk([row(0, 'ok')], { truncated: 'budget-min', nextStartPoint: 5 }));
+  assert.deepEqual([r.state, r.quality, r.plannedStop, r.exitOk], ['partial', 'pass', false, false]);
+  // 5. JSON 欠損 / sweep なし / 行なし
+  for (const q of [null, {}, { sweep: {} }]) { r = runState(q); assert.deepEqual([r.state, r.quality, r.exitOk], ['failed', 'unknown', false]); }
+  assert.equal(runState(mk([], { truncated: 'max-points', nextStartPoint: 0 })).exitOk, false);
+  // 6. 実HTTP失敗 / 区数不足
+  r = runState({ ...mk([row(0, 'ok')], { truncated: 'max-points', nextStartPoint: 12 }), httpStat: { realGlb: { nNon2xx: 1 } } });
+  assert.ok(!r.exitOk && r.reasons.includes('real-tile-http-fail'));
+  assert.ok(!runState({ sweep: { wardsFound: 1, rows: [row(0, 'ok')] } }).exitOk);
+});
+
+test('renderBatchSummary: partial でも「成功=24区完成ではない」を明示', async () => {
+  const { renderBatchSummary } = await import('../tools/cloud/sweep-plan.mjs');
+  const md = renderBatchSummary({ sweep: { wardsFound: 24, routePlanned: 55, rows: [{ index: 0, status: 'ok', kind: 'k', ward: 'w', alt: 1 }], truncated: 'max-points', nextStartPoint: 12, summary: {} } });
+  assert.match(md, /実行状態: partial \/ 品質: pass/); assert.match(md, /24区完成を意味しません/); assert.match(md, /次startPoint=12/);
+  assert.match(renderBatchSummary(null), /failed/);
+});

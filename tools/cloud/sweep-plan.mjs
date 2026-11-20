@@ -74,12 +74,43 @@ export function parseBatchLabel(name) {
   return m ? { startPoint: m[1] ? Number(m[1]) : 0 } : null;
 }
 
+// 実行状態の機械可読な判定(品質判定 quality と、経路の完了度 state を分離する)。
+//   state: 'complete'(この開始 index から末尾まで撮影済み・打切り無し) | 'partial'(打切りあり) | 'failed'(品質不合格 / 結果欠損 / 24区未満)
+//   quality: 'pass'(撮影済み行に hole/not-loaded/camera-not-held が無い) | 'fail' | 'unknown'(行なし・結果欠損)
+//   plannedStop: --max-points による予定どおりの分割終了。これだけは CI を失敗にしない(exitOk)。budget-min 打切りは予定外なので失敗扱い。
+//   wholeRouteVerified: 0 から末尾まで1回の結果で揃った場合だけ true(分割バッチ単体では false になり得る)。24区完成を意味しない。
+export function runState(qa) {
+  const s = qa?.sweep;
+  if (!s || !Array.isArray(s.rows)) return { state: 'failed', quality: 'unknown', plannedStop: false, exitOk: false, reasons: ['no-result'], measuredIndexes: [], unverifiedPoints: null, nextStartPoint: null, wholeRouteVerified: false };
+  const sm = s.summary || summarize(s.rows);
+  const reasons = [];
+  if (sm.hole > 0) reasons.push('hole');
+  if (sm.notLoaded > 0) reasons.push('not-loaded');
+  if (sm.cameraNotHeld > 0) reasons.push('camera-not-held');
+  if (qa.error) reasons.push('error:' + qa.error);
+  if (s.wardsFound !== 24) reasons.push('wards-lt-24');
+  const hs = qa.httpStat || {}; if ((hs.realGlb?.nNon2xx || 0) + (hs.realTileset?.nNon2xx || 0) > 0) reasons.push('real-tile-http-fail');
+  const measured = [...new Set(s.rows.map((r) => r.index).filter(Number.isFinite))].sort((a, b) => a - b);
+  if (!s.rows.length) reasons.push('no-rows');
+  const quality = !s.rows.length ? 'unknown' : (reasons.length ? 'fail' : 'pass');
+  const truncated = s.truncated || null;
+  const next = s.nextStartPoint ?? null;
+  const unverified = next != null && Number.isFinite(s.routePlanned) ? Math.max(0, s.routePlanned - next) : (truncated ? null : 0);
+  const plannedStop = truncated === 'max-points';
+  const state = reasons.length || !s.rows.length ? 'failed' : (truncated ? 'partial' : 'complete');
+  const exitOk = quality === 'pass' && (state === 'complete' || (state === 'partial' && plannedStop));
+  return { state, quality, plannedStop, exitOk, reasons, truncated, measuredIndexes: measured, unverifiedPoints: unverified, nextStartPoint: next, wholeRouteVerified: state === 'complete' && !(s.startPoint > 0) && !truncated };
+}
+
 // qa.json(e2e の --out)から PR コメント用の集計 Markdown を作る。原データは含めず、対象 index 範囲・判定・未検証点だけを出す。
 export function renderBatchSummary(qa, meta = {}) {
   const s = qa?.sweep; const out = [];
   out.push(`### Mission213 QA バッチ (run ${meta.runId ?? '?'}, sha ${meta.sha ?? '?'})`);
   out.push(`- build: ${meta.build ?? '?'} (${meta.buildSec ?? '?'}s)  sweep: ${meta.sweep ?? '?'}  build size MB: ${meta.sizeMb ?? 'n/a'}`);
-  if (!s) { out.push('- qa.json に sweep なし(build か e2e が失敗)'); return out.join('\n') + '\n'; }
+  if (!s) { out.push('- **実行状態: failed / 品質: unknown**(結果欠損)', '- ⚠️ バッチの success は 24区完成を意味しません。'); out.push('- qa.json に sweep なし(build か e2e が失敗)'); return out.join('\n') + '\n'; }
+  const rs = runState(qa);
+  out.push(`- **実行状態: ${rs.state} / 品質: ${rs.quality}**(${rs.state === 'partial' ? (rs.plannedStop ? '予定どおりの分割終了。品質OKでも未検証点が残る' : '予定外の打切り') : rs.state === 'complete' ? '今回の開始 index から末尾まで撮影済み' : '不合格要因: ' + rs.reasons.join(',')}) 未検証点数=${rs.unverifiedPoints ?? '?'} 次startPoint=${rs.nextStartPoint ?? 'なし'}`);
+  out.push('- ⚠️ **バッチの success は 24区完成を意味しません。** 完成は全バッチで品質 pass かつ末尾到達のときのみ。');
   const rows = s.rows || [], idx = rows.map((r) => r.index).filter(Number.isFinite);
   const lo = idx.length ? Math.min(...idx) : null, hi = idx.length ? Math.max(...idx) : null;
   out.push(`- 経路: 全 ${s.routePlanned ?? '?'} 点 / 今回の開始 index ${s.startPoint ?? 0} / 撮影した index 範囲 ${lo ?? '-'}〜${hi ?? '-'} / wardsFound=${s.wardsFound}`);

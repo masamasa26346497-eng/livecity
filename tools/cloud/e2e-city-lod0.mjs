@@ -5,7 +5,7 @@
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import http from 'node:http'; import { spawn } from 'node:child_process';
 import { buildCityLod0 } from './city-lod0.mjs';
 import { recordHttp, realFailures } from './http-classify.mjs';
-import { planRoute as planRouteImpl, pendingWork, classify, summarize, mergeRows, classifyCellPure, swapStable, comparableDiag, SWAP_SNAP_EXPR } from './sweep-plan.mjs';
+import { planRoute as planRouteImpl, pendingWork, classify, runState, summarize, mergeRows, classifyCellPure, swapStable, comparableDiag, SWAP_SNAP_EXPR } from './sweep-plan.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const a = process.argv.slice(2), opt = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; }; const has = (k) => a.includes('--' + k);
 const CHROME = opt('chrome', '/usr/bin/chromium'), OUT = opt('out', null);
@@ -124,6 +124,9 @@ async function sweepMode() {
   const all = mergeRows(prevRows, rows); result.sweep.rows = all; result.sweep.summary = summarize(all);
   // 24区完了の判定: 全 (点,高度) が確定済み(ok/covered-by-real)で hole 0、かつ打ち切り無し。
   result.ok = result.sweep.summary.hole === 0 && result.sweep.summary.notLoaded === 0 && result.sweep.summary.cameraNotHeld === 0 && result.sweep.summary.ok > 0 && wardsFound === 24 && !result.sweep.truncated;
+  // 機械可読な実行状態。max-points による予定どおりの分割終了(品質 pass)は exit 0。品質不合格・予定外の打切りは exit 1(quality gate は維持)。
+  result.sweep.runState = runState({ ...result, sweep: result.sweep }); result.exitOk = result.sweep.runState.exitOk;
+  if (OUT) try { fs.writeFileSync(OUT, JSON.stringify(result, null, 1)); } catch {}
 }
 
 // ---- --compare: 同一カメラで「置換ON / 置換OFF(citylod0swap=0) / LOD0なし」を近・中・遠で撮り比べる(--static 必須)。 --shots <dir> に PNG、結果は result.compare。
@@ -339,4 +342,4 @@ try {
 ws.close(); ch.kill(); srv.close();
 result.httpDiag = { realTileFailures: realFailures(result.httpStat || {}), httpErrorsCap: 50, httpErrorsTruncated: (result.httpErrors || []).length >= 50, examplesCapPerClass: 10, note: 'httpStat は分類別の全件数(打切りなし)。examples は種別ごと先頭10件。optionalAsset(towns/stations/favicon等)の404 は実建物の取得失敗ではない。対象: responseReceived の status のみ。loadingFailed は netFailed 別集計、キャッシュ提供は対象外。' };
 const txt = JSON.stringify(result, null, 1); if (OUT) fs.writeFileSync(OUT, txt); console.log(txt);
-process.exit(result.ok ? 0 : (result.checks.viewerLoaded === false ? 2 : 1));
+process.exit((result.exitOk ?? result.ok) ? 0 : (result.checks.viewerLoaded === false ? 2 : 1));
