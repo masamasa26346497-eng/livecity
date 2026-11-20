@@ -1,0 +1,82 @@
+# Mission 156 workflow TEMPLATE. Claude's GitHub App cannot write .github/workflows, so this lives here.
+# To enable: copy to .github/workflows/mission156-fresh-plateau.yml (a human commit). Manual dispatch only; never merges, never deploys.
+# Free-tier design: 1 ward per job (<= ~1.3 GB inflated GML, runner disk ~14 GB), max-parallel 3, 20 min timeout, raw GML deleted,
+# output = small 3D Tiles (~50 MB/ward) uploaded as a short-retention workflow artifact. PLATEAU is open data (commercial use OK, attribution
+# required), but artifacts are still NOT published to Vercel/main. Ward progress is a tiny JSON artifact; failed wards can be re-run via `wards`.
+name: Mission 156 - fresh PLATEAU 24 ward LOD1
+
+on:
+  workflow_dispatch:
+    inputs:
+      wards:
+        description: 'comma separated ward ids, or "all"'
+        default: 'sumiyoshi'
+      store_write:
+        description: 'write tiles to the private Release (needs secret LIVECITY_3D_DATA_TOKEN)'
+        default: 'false'
+      chrome_verify:
+        description: 'run headless Chrome + Cesium check'
+        default: 'true'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mission156-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      wards: ${{ steps.p.outputs.wards }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Rights gate + plan (offline, from committed source-lock)
+        id: p
+        run: |
+          set -euo pipefail
+          node tools/mission156-run-all.mjs --plan
+          if [ "${{ inputs.wards }}" = "all" ]; then
+            W=$(node -e "console.log(JSON.stringify(Object.keys(require('./data/reports/mission156/plan.json').wards)))")
+          else
+            W=$(node -e "console.log(JSON.stringify('${{ inputs.wards }}'.split(',').map(s=>s.trim()).filter(Boolean)))")
+          fi
+          echo "wards=$W" >> "$GITHUB_OUTPUT"
+
+  ward:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        ward: ${{ fromJSON(needs.plan.outputs.wards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Fetch (HTTP Range) -> LOD1 -> 3D Tiles
+        run: node tools/mission156-run-all.mjs --wards "${{ matrix.ward }}" --max-mb 1500 --budget-mb 1500
+      - name: Serve locally, HTTP 200 + Chrome/Cesium
+        run: node tools/mission156-verify-served.mjs --dir "temp/mission156/${{ matrix.ward }}/tiles" --ward "${{ matrix.ward }}" ${{ inputs.chrome_verify == 'true' && '--chrome' || '' }} --record
+      # Mission 158: store in the PRIVATE repo's Release (tag m158-<run_id>), never as an artifact (this repo is public).
+      # Needs repo secret LIVECITY_3D_DATA_TOKEN (fine-grained PAT, only livecity-3d-data, Contents: read+write). Without it: dry-run only.
+      - name: Private store (dry-run unless secret present AND store_write=true)
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          node tools/mission158-private-release.mjs auth-test || true
+          if [ "${{ inputs.store_write }}" = "true" ] && [ -n "$LIVECITY_3D_DATA_TOKEN" ]; then W="--confirm-write"; else W=""; fi
+          node tools/mission158-private-release.mjs put --ward "${{ matrix.ward }}" --dir "temp/mission156/${{ matrix.ward }}/tiles" --tag "m158-${{ github.run_id }}" $W
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mission156-${{ matrix.ward }}-reports
+          path: data/reports/mission156   # reports only (small JSON); NO tiles in a public artifact
+          retention-days: 3
+          if-no-files-found: warn

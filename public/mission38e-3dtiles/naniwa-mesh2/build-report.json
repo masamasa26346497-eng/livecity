@@ -1,0 +1,121 @@
+{
+ "dataset": "osaka-naniwa",
+ "selectedTiles": 9,
+ "groups": 2,
+ "leaf": [
+  {
+   "name": "t_-7_-12",
+   "buildings": 272,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 8040,
+   "triangles": 4280,
+   "bytes": 226296
+  },
+  {
+   "name": "t_-7_-11",
+   "buildings": 7,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 165,
+   "triangles": 85,
+   "bytes": 6504
+  },
+  {
+   "name": "t_-6_-12",
+   "buildings": 837,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 26075,
+   "triangles": 13971,
+   "bytes": 728720
+  },
+  {
+   "name": "t_-6_-11",
+   "buildings": 201,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 6040,
+   "triangles": 3222,
+   "bytes": 170400
+  },
+  {
+   "name": "t_-5_-12",
+   "buildings": 216,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 7065,
+   "triangles": 3807,
+   "bytes": 198596
+  },
+  {
+   "name": "t_-5_-11",
+   "buildings": 201,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 5665,
+   "triangles": 2997,
+   "bytes": 160204
+  },
+  {
+   "name": "t_-7_-13",
+   "buildings": 14,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 655,
+   "triangles": 365,
+   "bytes": 19988
+  },
+  {
+   "name": "t_-6_-13",
+   "buildings": 40,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 1405,
+   "triangles": 763,
+   "bytes": 40936
+  },
+  {
+   "name": "t_-5_-13",
+   "buildings": 13,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 465,
+   "triangles": 253,
+   "bytes": 14800
+  }
+ ],
+ "coarse": [
+  {
+   "name": "g_-2_-3",
+   "buildings": 861,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 17220,
+   "triangles": 8610,
+   "bytes": 488368
+  },
+  {
+   "name": "g_-2_-4",
+   "buildings": 41,
+   "skipped": 0,
+   "fallbacks": 0,
+   "vertices": 820,
+   "triangles": 410,
+   "bytes": 25044
+  }
+ ],
+ "totals": {
+  "buildings": 1801,
+  "sourceBuildings": 1801,
+  "skipped": 0,
+  "fallbacks": 0,
+  "glbBytes": 2079856,
+  "uniqueCanonicalIds": 1801
+ },
+ "options": {
+  "group": 4,
+  "coarseError": 40,
+  "coarseMinArea": 100
+ }
+}

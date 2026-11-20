@@ -1,0 +1,51 @@
+<!doctype html>
+<meta charset="utf-8"><title>Mission 164 diag (QA only, local)</title>
+<style>html,body{margin:0}#c{width:1280px;height:800px}</style>
+<div id="c"></div><pre id="result">pending</pre>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Widgets/widgets.css">
+<style>#c canvas{width:100%;height:100%;display:block}</style>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.121.1/Build/Cesium/Cesium.js"></script>
+<script>
+(async () => {
+  const out = { jsErrors: [], log: [] };
+  window.addEventListener('error', (e) => out.jsErrors.push(String(e.message)));
+  const q = new URLSearchParams(location.search);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  try {
+    const viewer = new Cesium.Viewer('c', { baseLayer: false, baseLayerPicker: false, geocoder: false, animation: false, timeline: false, requestRenderMode: false, contextOptions: { webgl: { preserveDrawingBuffer: true } } });
+    viewer.resize();
+    const ts = await Cesium.Cesium3DTileset.fromUrl(q.get('tileset') || '/tileset.json');
+    viewer.scene.primitives.add(ts);
+    let vis = 0, ld = 0; ts.tileVisible.addEventListener(() => vis++); ts.tileLoad.addEventListener(() => ld++);
+    const bs = ts.boundingSphere;
+    const mode = q.get('cam') || 'view';
+    if (mode === 'view') { viewer.camera.viewBoundingSphere(bs, new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), bs.radius * 1.5)); viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); }
+    else if (mode === 'far') { viewer.camera.viewBoundingSphere(bs, new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-45), bs.radius * 30)); viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); }
+    else { const c = Cesium.Cartographic.fromCartesian(bs.center); viewer.camera.setView({ destination: Cesium.Cartesian3.fromRadians(c.longitude, c.latitude, 1500), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-60), roll: 0 } }); }
+    const snap = (tag) => { const s = ts.statistics; const p0 = ts._statisticsPerPass && ts._statisticsPerPass[0];
+      out.log.push({ tag, frame: viewer.scene.frameState.frameNumber, vis, ld, stat: { visited: s.visited, selected: s.selected, att: s.numberOfAttemptedRequests, pend: s.numberOfPendingRequests, ready: s.numberOfTilesWithContentReady, total: s.numberOfTilesTotal },
+        p0: p0 && { visited: p0.visited, selected: p0.selected, att: p0.numberOfAttemptedRequests }, passRender: viewer.scene.frameState.passes.render, sse: ts.maximumScreenSpaceError, canvas: [viewer.canvas.width, viewer.canvas.height] }); };
+    const waitFrames = async (n, ms) => { for (let i = 0; i < n; i++) { viewer.scene.render(); await sleep(ms); } };
+    await waitFrames(5, 100); snap('initial');
+    const root = ts.root; const fs = viewer.scene.frameState;
+    try { out.rootVisibility = root.visibility(fs, Cesium.CullingVolume.MASK_INDETERMINATE); out.rootDist = root.distanceToTile(fs); out.rootSSE = root.getScreenSpaceError(fs, false); } catch (e) { out.probeErr = String(e); }
+    out.flags = { cullWhileMoving: ts.cullRequestsWhileMoving, cullWithChildren: ts.cullWithChildrenBounds, skipLOD: ts.skipLevelOfDetail, dynamicSSE: ts.dynamicScreenSpaceError, show: ts.show, ready: ts.ready };
+    await waitFrames(60, 100); snap('after-60');
+    out.rootChildrenGE = root.children.map((c) => c.geometricError);
+    out.rootBVType = root.boundingVolume.constructor.name;
+    out.cam = { h: viewer.camera.positionCartographic.height, pitch: viewer.camera.pitch };
+    // pixel difference: tileset shown vs hidden (preserveDrawingBuffer so canvas can be read back)
+    const grab = () => { const c = viewer.canvas; const t = document.createElement('canvas'); t.width = c.width; t.height = c.height; const g = t.getContext('2d'); g.drawImage(c, 0, 0); return g.getImageData(0, 0, t.width, t.height).data; };
+    ts.show = true; await waitFrames(3, 100); const A = grab();
+    ts.show = false; await waitFrames(3, 100); const B = grab();
+    ts.show = true; await waitFrames(2, 100);
+    let diff = 0; for (let i = 0; i < A.length; i += 4) if (Math.abs(A[i] - B[i]) + Math.abs(A[i + 1] - B[i + 1]) + Math.abs(A[i + 2] - B[i + 2]) > 24) diff++;
+    out.pixelDiff = diff; out.pixelTotal = A.length / 4;
+    // position: project the tileset-bounds centre to window coords; must be inside the canvas
+    const wp = Cesium.SceneTransforms.worldToWindowCoordinates(viewer.scene, bs.center);
+    out.centerOnScreen = wp ? [Math.round(wp.x), Math.round(wp.y)] : null;
+    out.vis = vis; out.ld = ld; out.status = 'ok';
+  } catch (e) { out.status = 'error'; out.error = String((e && e.stack) || e); }
+  document.getElementById('result').textContent = JSON.stringify(out); document.title = 'DONE';
+})();
+</script>

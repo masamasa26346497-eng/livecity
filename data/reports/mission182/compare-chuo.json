@@ -1,0 +1,42 @@
+{
+ "views": {
+  "V1_fullLod1": {
+   "jsErrors": [],
+   "status": "ok",
+   "tileLoadEvents": 7,
+   "tileVisibleEvents": 201,
+   "maxTrianglesSelected": 186550,
+   "maxSelectedTiles": 7,
+   "allLoaded": true,
+   "sets": 1,
+   "buildingPixels": 100000
+  },
+  "V2_complementOnly": {
+   "jsErrors": [],
+   "status": "ok",
+   "tileLoadEvents": 7,
+   "tileVisibleEvents": 236,
+   "maxTrianglesSelected": 138910,
+   "maxSelectedTiles": 7,
+   "allLoaded": true,
+   "sets": 1,
+   "buildingPixels": 70114
+  },
+  "V3_complementPlusStandin": {
+   "jsErrors": [],
+   "status": "ok",
+   "tileLoadEvents": 12,
+   "tileVisibleEvents": 348,
+   "maxTrianglesSelected": 186550,
+   "maxSelectedTiles": 12,
+   "allLoaded": true,
+   "sets": 2,
+   "buildingPixels": 100000
+  }
+ },
+ "pixelDiffs": {
+  "V1_vs_V2 (removed LOD2 buildings visible as gap)": 38352,
+  "V1_vs_V3 (must be ~0: no loss, no double draw)": 0,
+  "totalPx": 256000
+ }
+}

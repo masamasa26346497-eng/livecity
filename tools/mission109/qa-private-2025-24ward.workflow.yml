@@ -1,0 +1,135 @@
+# Mission 109: INSTALL BY OWNER as .github/workflows/mission109-private-2025-qa.yml on the default branch. NOT installed, NOT run by Claude.
+# Read-only: fetch stored PLATEAU 2025 archives (any of the 24 wards, batched) from the PRIVATE release, verify, render in headless Chrome on a
+# 127.0.0.1 server inside the runner, upload counts-only JSON. No archive/tileset/GLB/screenshot is ever uploaded or published.
+# Hashes are sha256 of git objects at PIN_SHA. Re-pin (tools/mission109/gen-workflow.mjs) only after review. Generated file: do not hand-edit.
+name: Mission109 private 2025 QA (24 wards)
+on:
+  workflow_dispatch:
+    inputs:
+      wards:
+        description: "ALL or comma-separated subset of the 24 ward ids (e.g. nishi,fukushima). 27999/expo is refused."
+        required: true
+        type: string
+        default: "nishi,fukushima,yodogawa"
+      batch_size:
+        description: "Wards per job (1-6)"
+        required: true
+        type: string
+        default: "4"
+permissions:
+  contents: read
+concurrency:
+  group: mission109-private-2025-qa
+  cancel-in-progress: false
+env:
+  PIN_SHA: "1f1cfb3e83b19944d917f18a6cc32d5ebd8b51d8"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    outputs:
+      batches: ${{ steps.p.outputs.batches }}
+    steps:
+      - id: p
+        name: Validate input and plan batches (no repo code, no token)
+        env:
+          IN_WARDS: ${{ inputs.wards }}
+          IN_BATCH: ${{ inputs.batch_size }}
+        run: |
+          set -eu
+          ALL="miyakojima fukushima konohana nishi minato taisho tennoji naniwa nishiyodogawa higashiyodogawa higashinari ikuno asahi joto abeno sumiyoshi higashisumiyoshi nishinari yodogawa tsurumi suminoe hirano kita chuo"
+          raw=$(printf '%s' "$IN_WARDS" | tr -d ' \n\r')
+          [ -n "$raw" ] || { echo "FAIL: no wards"; exit 1; }
+          case "$IN_BATCH" in [1-6]) ;; *) echo "FAIL: batch_size 1-6"; exit 1;; esac
+          if [ "$(printf '%s' "$raw" | tr a-z A-Z)" = "ALL" ]; then sel="$ALL"; else
+            sel=""; seen=" "
+            for w in $(printf '%s' "$raw" | tr ',' ' '); do
+              case "$w" in miyakojima|fukushima|konohana|nishi|minato|taisho|tennoji|naniwa|nishiyodogawa|higashiyodogawa|higashinari|ikuno|asahi|joto|abeno|sumiyoshi|higashisumiyoshi|nishinari|yodogawa|tsurumi|suminoe|hirano|kita|chuo) ;; *) echo "FAIL: ward not in whitelist"; exit 1;; esac
+              case "$seen" in *" $w "*) echo "FAIL: duplicate ward"; exit 1;; esac
+              seen="$seen$w "
+            done
+            for w in $ALL; do case "$seen" in *" $w "*) sel="$sel $w";; esac; done
+          fi
+          json="["; i=0; cur=""
+          for w in $sel; do
+            cur="${cur:+$cur,}$w"; i=$((i+1))
+            if [ "$i" -ge "$IN_BATCH" ]; then json="$json\"$cur\","; cur=""; i=0; fi
+          done
+          [ -z "$cur" ] || json="$json\"$cur\","
+          json="${json%,}]"
+          echo "batches=$json" >> "$GITHUB_OUTPUT"
+  qa:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        batch: ${{ fromJSON(needs.plan.outputs.batches) }}
+    steps:
+      - name: Re-validate batch (no repo code, no token)
+        env:
+          IN_BATCH: ${{ matrix.batch }}
+        run: |
+          set -eu
+          for w in $(printf '%s' "$IN_BATCH" | tr ',' ' '); do case "$w" in miyakojima|fukushima|konohana|nishi|minato|taisho|tennoji|naniwa|nishiyodogawa|higashiyodogawa|higashinari|ikuno|asahi|joto|abeno|sumiyoshi|higashisumiyoshi|nishinari|yodogawa|tsurumi|suminoe|hirano|kita|chuo) ;; *) echo "FAIL: ward not allowed"; exit 1;; esac; done
+          echo "WARDS=$IN_BATCH" >> "$GITHUB_ENV"
+      - name: Checkout pinned commit
+        uses: actions/checkout@v4
+        with:
+          ref: "1f1cfb3e83b19944d917f18a6cc32d5ebd8b51d8"
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify pin, clean tree and file hashes (no token yet)
+        run: |
+          set -eu
+          [ "$(git rev-parse HEAD)" = "$PIN_SHA" ] || { echo "FAIL: HEAD != pin"; exit 1; }
+          [ -z "$(git status --porcelain)" ] || { echo "FAIL: dirty tree"; exit 1; }
+          cat > "$RUNNER_TEMP/pin.sha256" <<'HASHES'
+          bc9133a7572b3f6e0f66c845854a4e57381af92863ffb937a1669de6cedbdaaa  tools/mission108/lib.mjs
+          fef3f0622f957f629947eaf2aa91d432f25cb5b97d54c5e24b66358d92c495ac  tools/mission108/qa.mjs
+          9e8a5c0d860cd9889cc5883127c84b54db5cbd8a867f1eb313e150a458db56ea  tools/mission109/wards.mjs
+          5165a292bf38554e6c94ecb916468ead2dff54d0f8c530e0d0b36d61182ef1a5  tools/mission109/fetch-verify.mjs
+          b23ac5d6085ed27c165e3391d3cb635550d0670d8e13dfdc98cac309dc38e98c  tools/mission109/qa.mjs
+          d8010dcbf997ff491fa2c39cf0d366de93946ae6ffb16a1c73f7b7b826587f87  tools/mission88-collect-evidence.mjs
+          db7cd53e81078041fe30372564a5716267895b45b46331c66d95e5e4508b0b72  tools/lib/cdp-browser.js
+          ba3d6d64f23a8084808d67aacc331d3dd540e8d46d226e21c1c35371e7944d58  data/processed/osaka-city/boundaries/ward-classification-polygons.json
+          cd245726660aca579eb04620d5749d9b1b61b0d5b0485eaa9c258c4524ed8eaa  public/mission37g-osaka-24ward-mvp.html
+          HASHES
+          sed -i 's/^ *//' "$RUNNER_TEMP/pin.sha256"
+          sha256sum -c "$RUNNER_TEMP/pin.sha256"
+      - name: Fetch + verify private archives (token only here; read-only GETs)
+        env:
+          LIVECITY_3D_DATA_TOKEN: ${{ secrets.LIVECITY_3D_DATA_TOKEN }}
+        run: |
+          set -eu
+          [ -n "$LIVECITY_3D_DATA_TOKEN" ] || { echo "FAIL: secret empty or missing"; exit 1; }
+          echo "::add-mask::$LIVECITY_3D_DATA_TOKEN"
+          mkdir -p "$RUNNER_TEMP/m109-out"
+          node tools/mission109/fetch-verify.mjs --wards "$WARDS" --dest "$RUNNER_TEMP/m109-root" --summary "$RUNNER_TEMP/m109-out/fetch-summary.json" || echo "fetch reported failures (see summary)"
+      - name: Headless Chrome QA on 127.0.0.1 (no token in environment)
+        run: |
+          set -eu
+          node tools/mission109/qa.mjs --root "$RUNNER_TEMP/m109-root" --wards "$WARDS" --summary "$RUNNER_TEMP/m109-out/qa-summary.json" || echo "QA reported failures (see summary); not acceptance either way"
+      - name: Counts-only summary
+        if: always()
+        run: |
+          for f in fetch-summary.json qa-summary.json; do
+            if [ -f "$RUNNER_TEMP/m109-out/$f" ]; then { echo '### '"$f"; echo '```json'; cat "$RUNNER_TEMP/m109-out/$f"; echo; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+      - name: Upload summary only (JSON counts; no data, no archives)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission109-summary-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/m109-out/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Wipe runner temp data
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/m109-root" "$RUNNER_TEMP/m109-out" "$RUNNER_TEMP/pin.sha256"

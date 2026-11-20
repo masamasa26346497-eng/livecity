@@ -1,0 +1,145 @@
+{
+  "mission": "145",
+  "url": "http://localhost:8145/mission37g-osaka-24ward-mvp.html?qa=1&nobuiltin=1",
+  "browser": "Chrome/156.0.8078.79",
+  "generatedAt": "2026-11-08T07:33:21.057Z",
+  "googleRequests": [],
+  "failedRequests": [
+    "404 http://localhost:8145/ext-3dtiles/index.json",
+    "404 http://localhost:8145/mission145-data/stations-24.local.json",
+    "404 http://localhost:8145/mission145-data/towns-24.json",
+    "404 http://localhost:8145/favicon.ico"
+  ],
+  "jsErrors": [],
+  "cases": [
+    {
+      "ward": "住吉区",
+      "target": {
+        "id": "st145_node_3981964288",
+        "name": "住吉大社"
+      },
+      "projected": {
+        "x": 750.0000000013653,
+        "y": 484.27243697301583,
+        "inCanvas": true
+      },
+      "pickAtPoint": "st145_node_3981964288",
+      "selectedPoi": {
+        "id": "st145_node_3981964288",
+        "name": "住吉大社",
+        "category": "transport"
+      },
+      "panel": {
+        "name": "住吉大社",
+        "sub": "駅",
+        "ops": "未取得（路線データ未接続）",
+        "opsVisible": true,
+        "src": "出典: © OpenStreetMap contributors（ODbL 1.0） / 運営会社は根拠がある場合のみ表示（不明は不明のまま）"
+      },
+      "realClick": true,
+      "opsHonest": true,
+      "screenshot": "data/reports/mission145-places/station-sumiyoshi.jpg",
+      "searchFound": true
+    },
+    {
+      "ward": "北区",
+      "target": {
+        "id": "st145_way_610362551",
+        "name": "OAP港"
+      },
+      "projected": {
+        "x": 750,
+        "y": 484.27243697162595,
+        "inCanvas": true
+      },
+      "pickAtPoint": "st145_way_610362551",
+      "selectedPoi": {
+        "id": "st145_way_610362551",
+        "name": "OAP港",
+        "category": "transport"
+      },
+      "panel": {
+        "name": "OAP港",
+        "sub": "駅",
+        "ops": "未取得（路線データ未接続）",
+        "opsVisible": true,
+        "src": "出典: © OpenStreetMap contributors（ODbL 1.0） / 運営会社は根拠がある場合のみ表示（不明は不明のまま）"
+      },
+      "realClick": true,
+      "opsHonest": true,
+      "screenshot": "data/reports/mission145-places/station-kita.jpg",
+      "searchFound": true
+    },
+    {
+      "ward": "中央区",
+      "target": {
+        "id": "st145_node_12731312920",
+        "name": "なんば"
+      },
+      "projected": {
+        "x": 750.0000000000001,
+        "y": 484.27243697165056,
+        "inCanvas": true
+      },
+      "pickAtPoint": "st145_node_12731312920",
+      "selectedPoi": {
+        "id": "st145_node_12731312920",
+        "name": "なんば",
+        "category": "transport"
+      },
+      "panel": {
+        "name": "なんば",
+        "sub": "駅",
+        "ops": "未取得（路線データ未接続）",
+        "opsVisible": true,
+        "src": "出典: © OpenStreetMap contributors（ODbL 1.0） / 運営会社は根拠がある場合のみ表示（不明は不明のまま）"
+      },
+      "realClick": true,
+      "opsHonest": true,
+      "screenshot": "data/reports/mission145-places/station-chuo.jpg",
+      "searchFound": true
+    }
+  ],
+  "stats": {
+    "stations145": {
+      "total": 247,
+      "operatorDataConnected": false,
+      "origin": "mission145-data/stations-24.json",
+      "withOperator": 0
+    },
+    "towns145": null
+  },
+  "layerStates": {
+    "stations": {
+      "state": "ready",
+      "count": 247,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "towns24": {
+      "state": "error",
+      "count": 0,
+      "visible": true,
+      "error": "towns-24.json 未接続（生成: node tools/mission145-build-towns.cjs --input <小地域GeoJSON>）",
+      "dummy": false
+    },
+    "facilities": {
+      "state": "ready",
+      "count": 138,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    },
+    "labels": {
+      "state": "ready",
+      "count": 20,
+      "visible": true,
+      "error": null,
+      "dummy": false
+    }
+  },
+  "jsErrorCount": 0,
+  "googleRequestCount": 0,
+  "pass": true
+}
