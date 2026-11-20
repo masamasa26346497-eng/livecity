@@ -108,3 +108,28 @@ export function classifyCellPure(c) {
   if (c.d9) return 'realUnder9only';
   return 'noRealUnder';
 }
+
+// ---- 統一診断(Mission213): --cells(--lod)と --compare --resid-detail を「置換の適用状態が同じ」場合だけ比較できるようにする純関数群 ----
+// 同一カメラ・同一ビルド・置換ON固定・安定待機完了の前提を、出力(swapState)から機械的に判定する。
+export const swapKey = (s) => (s ? `${s.swapEnabled}|${s.hidden}|${s.visible}|${s.total}` : 'null');
+// samples(時系列のスナップショット)の末尾 need 件が全て同一(hidden/visible/total/swapEnabled)かつ tilesLoaded なら安定。
+export function swapStable(samples, need = 3) {
+  if (!Array.isArray(samples) || samples.length < need) return false;
+  const t = samples.slice(-need); return t.every((s) => s && s.tilesLoaded === true && swapKey(s) === swapKey(t[0]));
+}
+// 2つの診断(別モード/別時点)が数値比較可能か。不一致の理由を返す。置換OFF(または適用0)・カメラ差・viewport差は比較不可。
+export function comparableDiag(a, b, camTol = 0.05) {
+  const reasons = [];
+  if (!a || !b) return { comparable: false, reasons: ['swapState 欠落'] };
+  if (a.swapEnabled !== b.swapEnabled) reasons.push(`swapEnabled 不一致(${a.swapEnabled} vs ${b.swapEnabled})`);
+  if (a.swapEnabled && a.hidden === 0) reasons.push('A: 置換有効だが hidden=0(置換未適用)');
+  if (b.swapEnabled && b.hidden === 0) reasons.push('B: 置換有効だが hidden=0(置換未適用)');
+  if (a.hidden !== b.hidden) reasons.push(`hidden 不一致(${a.hidden} vs ${b.hidden})`);
+  if (a.visible !== b.visible) reasons.push(`visible 不一致(${a.visible} vs ${b.visible})`);
+  if (a.camH && b.camH && Math.abs(a.camH - b.camH) > Math.max(a.camH, b.camH) * camTol) reasons.push(`camH 不一致(${a.camH} vs ${b.camH})`);
+  const va = a.viewport || {}, vb = b.viewport || {};
+  if (va.w !== vb.w || va.h !== vb.h) reasons.push(`viewport 不一致(${va.w}x${va.h} vs ${vb.w}x${vb.h})`);
+  return { comparable: reasons.length === 0, reasons };
+}
+// ブラウザ内で評価する置換状態スナップショット(read-only。cells の f.show を数えるだけで状態は変えない)。
+export const SWAP_SNAP_EXPR = `(()=>{const v=window.__v;if(!v)return null;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);const real=ps.filter(p=>!p._lcCityLod0);let hidden=0,visible=0;if(l0&&l0._lcCells)for(const arr of l0._lcCells.values())for(const c of arr){if(c.f.show)visible++;else hidden++}let sel=0,leaf=0;for(const p of real)for(const t of (p._selectedTiles||[])){if(!t.content)continue;sel++;if(!t.children||t.children.length===0)leaf++}const c=v.scene.canvas;const sw=new URLSearchParams(location.search).get('citylod0swap');const pf=(window.__mission37g&&window.__mission37g.perf)||{};return {swapEnabled:sw!=='0',swapInstalled:!!pf.cityLod0Swap,spheres:pf.cityLod0Swap?pf.cityLod0Swap.spheres:null,l0Show:l0?l0.show:null,hidden,visible,total:hidden+visible,selected:sel,selectedLeaf:leaf,tilesLoaded:ps.length>0&&ps.every(p=>p.tilesLoaded),camH:Math.round(v.camera.positionCartographic.height),viewport:{w:c.width,h:c.height,cw:c.clientWidth,ch:c.clientHeight,dpr:window.devicePixelRatio},tileFail:window.__tileFail||0}})()`;

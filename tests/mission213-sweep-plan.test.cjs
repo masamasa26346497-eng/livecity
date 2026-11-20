@@ -93,3 +93,20 @@ test('classifyCellPure: --cells のセル分類(fixture)', async () => {
   // toString() でブラウザ埋め込み可能(外部参照なし)
   assert.strictEqual(new Function('return (' + f.toString() + ')')()({ ...base, hidden: false, w: { x: 5, y: 5 } }), 'noRealUnder');
 });
+
+test('swapStable / comparableDiag: 置換状態の安定判定と比較可否(fixture)', async () => {
+  const { swapStable, comparableDiag } = await import('../tools/cloud/sweep-plan.mjs');
+  const mk = (o = {}) => ({ swapEnabled: true, hidden: 436, visible: 102, total: 538, tilesLoaded: true, camH: 6000, viewport: { w: 800, h: 600 }, ...o });
+  assert.equal(swapStable([mk(), mk(), mk()]), true);
+  assert.equal(swapStable([mk(), mk(), mk({ hidden: 0, visible: 538 })]), false, '末尾が変動');
+  assert.equal(swapStable([mk(), mk()]), false, 'サンプル不足');
+  assert.equal(swapStable([mk(), mk(), mk({ tilesLoaded: false })]), false, '未ロード');
+  assert.equal(comparableDiag(mk(), mk()).comparable, true);
+  // 天王寺6km の実例: --cells は hidden 436、--compare は hidden 0 → 比較不可
+  const r = comparableDiag(mk(), mk({ hidden: 0, visible: 538 }));
+  assert.equal(r.comparable, false); assert.ok(r.reasons.some((x) => /hidden=0/.test(x)));
+  assert.equal(comparableDiag(mk(), mk({ swapEnabled: false })).comparable, false);
+  assert.equal(comparableDiag(mk(), mk({ camH: 30000 })).comparable, false);
+  assert.equal(comparableDiag(mk(), mk({ viewport: { w: 1, h: 1 } })).comparable, false);
+  assert.equal(comparableDiag(null, mk()).comparable, false);
+});

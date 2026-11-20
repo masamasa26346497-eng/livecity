@@ -80,3 +80,10 @@
 - `--compare --resid-detail` mid6kb: **非表示 0 / 表示 538**(置換がセルを隠していない状態で診断)。realUnder 396、lod0Front 0(実建物が手前=二重表示ではない)。
 - 結論(確定範囲): 102 と 1 の差は、診断の画素差分そのものより、**診断時点で置換が適用済みか(非表示セル数 436 vs 0)** と判定窓に依存して見える可能性が高い。前回「102/102」がどの状態の値かは記録が無く、断定不可。`--compare` では置換が効いていない理由は未調査。表示コードは変更していない。
 - e2e に rdetail.hidden(診断時の非表示セル数)を追加し、状態の違いを結果から判別できるようにした。
+
+## 追記(統一診断: --compare の「hidden 0 / 表示 538」の原因特定・SHA は本コミット、efc4e52 上)
+- 同一3区ビルド(chuo,tennoji,naniwa、50秒)で `--compare --resid-detail --ward tennoji --variants swapOn --views mid6kb` を4回実行。置換は常に有効(`swapEnabled=true`、安定待機後 hidden 436 / visible 102 / spheres 100、camH 6000 held、tileFail 0、HTTP 4xx は既存404のみ)。
+- **`--compare` が置換OFFだったわけではない。** 診断(`pix`/`rdetail`)内で `T.show` や実tilesetの `show` を切り替えて撮るため、その後の `c.f.show` を読むと全セルが「表示」に見える(pix直後の生スナップショットが 0/538 になる実行があり、待機後は 436/102 に戻る。4回中3回で再現、1回は崩れず=非決定的)。崩れる機構自体は未特定。
+- 修正: `rdetail`/`pix`/`--cells` は撮影前に H0(セル→show)を採取し、その値で hidden を判定する。修正後の rdetail は hidden 436 / shown 102 / 3x3 realUnder 1 / lod0Front 0 で、`--cells`(436/102/3x3=1)と一致。
+- 新規出力 `swapState`(`pre`/`atDetailRaw`/`atDetail`/`rawVsPre`/`rdetailHiddenMatchesPre`、`--lod` 各行にも): swapEnabled・hidden・visible・total・selected/selectedLeaf・camH・viewport・tileFail・httpNon2xx・待機時間。純関数 `swapStable`/`comparableDiag`(sweep-plan.mjs)でfixtureテスト済み。
+- 102 セル ID の同一性の突合、境界セル `lod0_-18_-37` の再確認(優先2)、住之江/中央/浪速(優先3)は未実施。表示コード(HTML)は変更していない。二重描画件数の断定はしない(3x3 実建物あり 1/102 は 6km・天王寺・この1ビルドの値)。
