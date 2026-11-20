@@ -4,6 +4,7 @@
 //   ネットワーク: Cesium 1.121.1 を jsDelivr CDN から読む(HTML 既存仕様)。到達不能なら理由を出して exit 2。
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import http from 'node:http'; import { spawn } from 'node:child_process';
 import { buildCityLod0 } from './city-lod0.mjs';
+import { recordHttp, realFailures } from './http-classify.mjs';
 import { planRoute as planRouteImpl, pendingWork, classify, summarize, mergeRows, classifyCellPure, swapStable, comparableDiag, SWAP_SNAP_EXPR } from './sweep-plan.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const a = process.argv.slice(2), opt = (k, d) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : d; }; const has = (k) => a.includes('--' + k);
@@ -49,7 +50,7 @@ const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebugge
 let id = 0; const pend = new Map();
 ws.onmessage = (m) => { const j = JSON.parse(m.data);
   // URL種別ごとの HTTP status 集計(打切りなし。httpErrors は先頭50件で打切られるため別集計)
-  if (j.method === 'Network.responseReceived') { const u0 = j.params.response.url, st = j.params.response.status, cls = /_city-lod0\/.*\.glb/.test(u0) ? 'lod0Glb' : /_city-lod0\/.*tileset\.json/.test(u0) ? 'lod0Tileset' : /\.glb(\?|$)/.test(u0) ? 'realGlb' : /tileset\.json/.test(u0) ? 'realTileset' : null; if (cls) { const hs = ((result.httpStat ||= {})[cls] ||= { n2xx: 0, nNon2xx: 0, non2xx: {} }); if (st >= 200 && st < 300) hs.n2xx++; else { hs.nNon2xx++; hs.non2xx[u0.replace(/^http:\/\/127.0.0.1:\d+/, '').slice(0, 120)] = st; } } }
+  if (j.method === 'Network.responseReceived') recordHttp((result.httpStat ||= {}), j.params.response.url, j.params.response.status);
   if (j.id && pend.has(j.id)) { pend.get(j.id)(j); pend.delete(j.id); }
   else if (j.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(j.params.type)) result.console.push(j.params.type + ': ' + j.params.args.map((x) => x.value ?? x.description).join(' ').slice(0, 300));
   else if (j.method === 'Runtime.exceptionThrown') result.console.push('exception: ' + (j.params.exceptionDetails.exception?.description || j.params.exceptionDetails.text).slice(0, 300));
@@ -336,5 +337,6 @@ try {
   }
 } catch (e) { result.error = String(e.message || e); }
 ws.close(); ch.kill(); srv.close();
+result.httpDiag = { realTileFailures: realFailures(result.httpStat || {}), httpErrorsCap: 50, httpErrorsTruncated: (result.httpErrors || []).length >= 50, examplesCapPerClass: 10, note: 'httpStat は分類別の全件数(打切りなし)。examples は種別ごと先頭10件。optionalAsset(towns/stations/favicon等)の404 は実建物の取得失敗ではない。対象: responseReceived の status のみ。loadingFailed は netFailed 別集計、キャッシュ提供は対象外。' };
 const txt = JSON.stringify(result, null, 1); if (OUT) fs.writeFileSync(OUT, txt); console.log(txt);
 process.exit(result.ok ? 0 : (result.checks.viewerLoaded === false ? 2 : 1));
