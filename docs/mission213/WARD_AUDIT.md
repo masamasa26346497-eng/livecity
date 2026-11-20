@@ -87,3 +87,12 @@
 - 修正: `rdetail`/`pix`/`--cells` は撮影前に H0(セル→show)を採取し、その値で hidden を判定する。修正後の rdetail は hidden 436 / shown 102 / 3x3 realUnder 1 / lod0Front 0 で、`--cells`(436/102/3x3=1)と一致。
 - 新規出力 `swapState`(`pre`/`atDetailRaw`/`atDetail`/`rawVsPre`/`rdetailHiddenMatchesPre`、`--lod` 各行にも): swapEnabled・hidden・visible・total・selected/selectedLeaf・camH・viewport・tileFail・httpNon2xx・待機時間。純関数 `swapStable`/`comparableDiag`(sweep-plan.mjs)でfixtureテスト済み。
 - 102 セル ID の同一性の突合、境界セル `lod0_-18_-37` の再確認(優先2)、住之江/中央/浪速(優先3)は未実施。表示コード(HTML)は変更していない。二重描画件数の断定はしない(3x3 実建物あり 1/102 は 6km・天王寺・この1ビルドの値)。
+
+## 追記(f924a39 上・同一3区ビルドでの 102 セル ID 突合。ローカル実測、SwiftShader)
+- `build-cloud-preview.mjs --wards chuo,tennoji,naniwa --single-pass --city-lod0 --out temp/ctn`: 78秒、118MB、元LOD1 43,173、doubleDrawn=0、LOD0 538セル/13タイル。
+- `--compare --resid-detail --ward tennoji --variants swapOn --views mid6kb`(約1分)と `--lod --cells --ward tennoji`(約3分)を同一ビルドで実行。出力に表示中セルの全 ID(`shownIds`、上限なし)を追加して突合。
+- 6km斜め(held=true): `--resid-detail` 非表示436/表示102/3x3 realUnder 1、`--cells` 非表示436/表示102/画面外0/3x3 realUnder 1/noRealUnder 87。**表示102セルの ID 集合は完全一致**(共通102、片側のみ0)。swapState の rdetailHiddenMatchesPre=true。
+- 唯一の realUnder3 セルは `lod0_-18_-37`(境界セル。最寄り選択球の外 11m、葉タイル)。lod0Front=0・realUnderLod0Front=0 のため、LOD0 が実建物の前面に出ている証拠はない(=二重表示の確証なし)。表示コードは変更しない。
+- HTTP(`--lod --cells` 実行): LOD0 tileset 1/GLB 13、実 tileset 4/実 GLB 131 がすべて 2xx、非2xx 0(外部 404 は towns-24/stations-24/favicon/旧 mission の build-report 等で LOD0・実建物と無関係)。クリック canonicalId 一致、親→葉 true、全視点 held・tileFail 0。
+- 非決定的な状態崩れ(pix 直後に 0/538 になる現象)は、今回の2実行では再現せず。機構は未特定のまま。fixture での再現は未実施。
+- 未実施: 住之江3km親、中央・浪速6km、24行監査表の更新、cold/warm 分離計測、24区一体、現SHAの認証付き Preview。
