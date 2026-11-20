@@ -96,3 +96,11 @@
 - HTTP(`--lod --cells` 実行): LOD0 tileset 1/GLB 13、実 tileset 4/実 GLB 131 がすべて 2xx、非2xx 0(外部 404 は towns-24/stations-24/favicon/旧 mission の build-report 等で LOD0・実建物と無関係)。クリック canonicalId 一致、親→葉 true、全視点 held・tileFail 0。
 - 非決定的な状態崩れ(pix 直後に 0/538 になる現象)は、今回の2実行では再現せず。機構は未特定のまま。fixture での再現は未実施。
 - 未実施: 住之江3km親、中央・浪速6km、24行監査表の更新、cold/warm 分離計測、24区一体、現SHAの認証付き Preview。
+
+## 追記(055976f 上・3区ビルド再実行、ローカル実測、SwiftShader。表示コード変更なし)
+- 検証SHA: 055976f。`build-cloud-preview.mjs --wards chuo,tennoji,naniwa --single-pass --city-lod0 --out temp/c3`: 178秒、118MB、元LOD1 43,173、doubleDrawn=0、LOD0 538セル/13タイル。
+- `--compare --cells --variants swapOn,lod0Off --views mid6kb --ward tennoji`(324秒): held/loaded=true、tileFail 0、swap hidden 436/visible 102、lod0Share 0.0097、realShare 0.0547。httpStat: LOD0 tileset 1/GLB 13、実tileset 8/実GLB 232、いずれも非2xx 0。realLayerOrIndex の非2xx 15(railways/parks 等の欠落レイヤー 404)、optionalAsset の 404 は towns/stations/favicon/旧mission。netFailed 未出力。
+- `--lod --ward tennoji`(107秒): ok=true。30km 親(選択16/葉0)→15km以下は葉、近景600m 葉8、parentToLeaf=true、clickSelectsBuilding=true、全視点 held・tileFail 0。
+- 未解決の食い違い: `--resid-detail` なしの `--compare` では pix の realUnder3x3=102/102。前回(--resid-detail/--cells)は 1/102。診断経路差か状態崩れ(既知・非決定的)かは未特定。二重描画の確証はなし。
+- PNG目視(swapOn/lod0Off、同一カメラ): 白格子なし。ON で残る LOD0 は北側(実建物が lod0Off でも疎な範囲)のみ。前面/背面(lod0Front)判定・lod0_-18_-37 は今回未測定(--cells が compare では出力されず)。
+- 未実施: 中央・浪速6km、住之江3km、cold/warm分離、24区一体、認証付きPreview。
