@@ -1,0 +1,481 @@
+{
+ "set": "public/mission37b-3dtiles/osaka-sumiyoshi-9tile",
+ "nTiles": 9,
+ "nPoints": 228,
+ "horizMax_m": 0,
+ "horizMean_m": 0,
+ "vertAbsMax_m": 0,
+ "note": "GLB頂点→(node)→Y-up→Z-up→leaf→group→ECEF→WGS84(反復)。比較先は元tile JSON footprintの最近傍頂点(geoToThree逆変換)。ビルダー関数は未使用。",
+ "perTile": [
+  {
+   "tile": "tiles/t_-4_-1.glb",
+   "nPts": 20,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-4_-2.glb",
+   "nPts": 20,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-4_-3.glb",
+   "nPts": 17,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-5_-1.glb",
+   "nPts": 23,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-5_-2.glb",
+   "nPts": 43,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-5_-3.glb",
+   "nPts": 32,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-6_-1.glb",
+   "nPts": 20,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-6_-2.glb",
+   "nPts": 25,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  },
+  {
+   "tile": "tiles/t_-6_-3.glb",
+   "nPts": 28,
+   "horizMax_m": 0,
+   "horizP95_m": 0,
+   "vertAbsMax_m": 0,
+   "vertMean_m": 0
+  }
+ ],
+ "samples": [
+  {
+   "tile": "tiles/t_-4_-1.glb",
+   "id": "bldg_146354cd-9804-47a0-8438-a933ce92a14b",
+   "ring": 6,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5072272,
+   "lat": 34.605335
+  },
+  {
+   "tile": "tiles/t_-4_-1.glb",
+   "id": "bldg_4b80e269-9697-4d75-8420-069c15a051de",
+   "ring": 6,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5078882,
+   "lat": 34.6046368
+  },
+  {
+   "tile": "tiles/t_-4_-1.glb",
+   "id": "bldg_492a5273-85f0-4280-a68e-c42754fd81d5",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5071177,
+   "lat": 34.6078442
+  },
+  {
+   "tile": "tiles/t_-4_-1.glb",
+   "id": "bldg_4d4d9095-f9fe-4e4d-88db-7a0f0ecaa663",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5033893,
+   "lat": 34.6046358
+  },
+  {
+   "tile": "tiles/t_-4_-2.glb",
+   "id": "bldg_3e510444-36b2-4a2c-bc80-147987096c9c",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5041822,
+   "lat": 34.610454
+  },
+  {
+   "tile": "tiles/t_-4_-2.glb",
+   "id": "bldg_1c70a0fe-118a-46f8-b811-d15bc5b50236",
+   "ring": 8,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5039994,
+   "lat": 34.6089479
+  },
+  {
+   "tile": "tiles/t_-4_-2.glb",
+   "id": "bldg_83e1e59d-be37-458b-8b4c-f5d4db84ac7e",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5047128,
+   "lat": 34.6120344
+  },
+  {
+   "tile": "tiles/t_-4_-2.glb",
+   "id": "bldg_1f2c30d3-d65c-4185-8c0d-bbc166b7a080",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.503293,
+   "lat": 34.6116318
+  },
+  {
+   "tile": "tiles/t_-4_-3.glb",
+   "id": "bldg_0cc4a1a2-124c-4dc1-a2ac-48e0246a10e1",
+   "ring": 5,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5056356,
+   "lat": 34.6142328
+  },
+  {
+   "tile": "tiles/t_-4_-3.glb",
+   "id": "bldg_f9ad3683-5056-43d7-acad-f2a029986a19",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5084299,
+   "lat": 34.6158635
+  },
+  {
+   "tile": "tiles/t_-4_-3.glb",
+   "id": "bldg_361d209b-9d11-4b94-800f-2dcb9b87bf6e",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5032549,
+   "lat": 34.6162385
+  },
+  {
+   "tile": "tiles/t_-4_-3.glb",
+   "id": "bldg_a72a00e2-bf1d-4889-bde0-03c303996659",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.5058381,
+   "lat": 34.6137439
+  },
+  {
+   "tile": "tiles/t_-5_-1.glb",
+   "id": "bldg_961b0fad-250d-4cde-bfff-f62c984b44b8",
+   "ring": 5,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4981107,
+   "lat": 34.6047605
+  },
+  {
+   "tile": "tiles/t_-5_-1.glb",
+   "id": "bldg_f05c79c5-843d-4b06-bae8-6bbadb6616b2",
+   "ring": 8,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4996245,
+   "lat": 34.6053984
+  },
+  {
+   "tile": "tiles/t_-5_-1.glb",
+   "id": "bldg_ce953706-8149-4e0e-a6d2-825c3f1552e0",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4982844,
+   "lat": 34.6043124
+  },
+  {
+   "tile": "tiles/t_-5_-1.glb",
+   "id": "bldg_d902a810-6c32-4bd2-95f1-90d13aeca0bc",
+   "ring": 6,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4987607,
+   "lat": 34.6063735
+  },
+  {
+   "tile": "tiles/t_-5_-2.glb",
+   "id": "bldg_530f4af4-8df2-4700-ab01-82a823a97b6c",
+   "ring": 8,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4977431,
+   "lat": 34.611165
+  },
+  {
+   "tile": "tiles/t_-5_-2.glb",
+   "id": "bldg_01bfe8e2-1363-4edd-80a9-0cc241b403c0",
+   "ring": 9,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4983235,
+   "lat": 34.6100764
+  },
+  {
+   "tile": "tiles/t_-5_-2.glb",
+   "id": "bldg_352297c6-9bf8-42ef-8b55-195a891ef42c",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4994994,
+   "lat": 34.6111934
+  },
+  {
+   "tile": "tiles/t_-5_-2.glb",
+   "id": "bldg_6c0fe9c4-6dcf-40df-baa1-50e8aab83c05",
+   "ring": 22,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4980614,
+   "lat": 34.6111104
+  },
+  {
+   "tile": "tiles/t_-5_-3.glb",
+   "id": "bldg_c083ec4e-22a8-4642-a8db-71dc6df511d4",
+   "ring": 10,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4985122,
+   "lat": 34.6163884
+  },
+  {
+   "tile": "tiles/t_-5_-3.glb",
+   "id": "bldg_6c8a46dd-3347-4a24-85df-e2a9c19cff98",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4994066,
+   "lat": 34.6136312
+  },
+  {
+   "tile": "tiles/t_-5_-3.glb",
+   "id": "bldg_0d7e12ca-1f42-4c8d-9478-40aaeb9c65cf",
+   "ring": 14,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4998437,
+   "lat": 34.6135025
+  },
+  {
+   "tile": "tiles/t_-5_-3.glb",
+   "id": "bldg_21716e44-03cb-4797-92a2-cfbd499b65e0",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4994525,
+   "lat": 34.6158574
+  },
+  {
+   "tile": "tiles/t_-6_-1.glb",
+   "id": "bldg_3b49d506-5434-4aac-89e8-9ca7ddbdc933",
+   "ring": 5,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4962894,
+   "lat": 34.6053394
+  },
+  {
+   "tile": "tiles/t_-6_-1.glb",
+   "id": "bldg_0c215b42-f91b-4bb1-a975-973ec7cd2305",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4941719,
+   "lat": 34.6076493
+  },
+  {
+   "tile": "tiles/t_-6_-1.glb",
+   "id": "bldg_ac7d9dbd-d2fd-4278-a4db-ae58bb2bdebb",
+   "ring": 7,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4948436,
+   "lat": 34.6048757
+  },
+  {
+   "tile": "tiles/t_-6_-1.glb",
+   "id": "bldg_c01d9824-f1f1-47d8-ba40-419f132f03ce",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4933838,
+   "lat": 34.6069645
+  },
+  {
+   "tile": "tiles/t_-6_-2.glb",
+   "id": "bldg_76e473aa-f206-45ba-820a-4d0e33d0bc09",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4971473,
+   "lat": 34.6112955
+  },
+  {
+   "tile": "tiles/t_-6_-2.glb",
+   "id": "bldg_61411b02-053a-45df-8eac-f9d3ecf2d588",
+   "ring": 12,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4939926,
+   "lat": 34.6095814
+  },
+  {
+   "tile": "tiles/t_-6_-2.glb",
+   "id": "bldg_5e79d798-deaf-448c-be64-fbe1adbcb96d",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4968945,
+   "lat": 34.6090764
+  },
+  {
+   "tile": "tiles/t_-6_-2.glb",
+   "id": "bldg_a3cb2697-9897-44f8-a244-daef2351eef3",
+   "ring": 5,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4959593,
+   "lat": 34.6121086
+  },
+  {
+   "tile": "tiles/t_-6_-3.glb",
+   "id": "bldg_bb47e6bc-6b04-4d8d-b788-3df281dffbeb",
+   "ring": 4,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4965456,
+   "lat": 34.6152263
+  },
+  {
+   "tile": "tiles/t_-6_-3.glb",
+   "id": "bldg_ae80c5ce-a02b-40a8-a4c4-022769318246",
+   "ring": 9,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4931823,
+   "lat": 34.6151043
+  },
+  {
+   "tile": "tiles/t_-6_-3.glb",
+   "id": "bldg_491f9af1-ca7c-42c4-abc5-111e3cba7a00",
+   "ring": 8,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4963893,
+   "lat": 34.6153773
+  },
+  {
+   "tile": "tiles/t_-6_-3.glb",
+   "id": "bldg_33e47b79-fe18-4b39-b683-8b9dfe87deaa",
+   "ring": 7,
+   "horiz_m": 0,
+   "dE_m": 0,
+   "dN_m": 0,
+   "vert_m": 0,
+   "lon": 135.4965904,
+   "lat": 34.6140776
+  }
+ ]
+}
