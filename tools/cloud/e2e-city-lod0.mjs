@@ -48,6 +48,8 @@ if (!targets) throw new Error('chrome のデバッグポートに接続できま
 const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl); await new Promise((r) => (ws.onopen = r));
 let id = 0; const pend = new Map();
 ws.onmessage = (m) => { const j = JSON.parse(m.data);
+  // URL種別ごとの HTTP status 集計(打切りなし。httpErrors は先頭50件で打切られるため別集計)
+  if (j.method === 'Network.responseReceived') { const u0 = j.params.response.url, st = j.params.response.status, cls = /_city-lod0\/.*\.glb/.test(u0) ? 'lod0Glb' : /_city-lod0\/.*tileset\.json/.test(u0) ? 'lod0Tileset' : /\.glb(\?|$)/.test(u0) ? 'realGlb' : /tileset\.json/.test(u0) ? 'realTileset' : null; if (cls) { const hs = ((result.httpStat ||= {})[cls] ||= { n2xx: 0, nNon2xx: 0, non2xx: {} }); if (st >= 200 && st < 300) hs.n2xx++; else { hs.nNon2xx++; hs.non2xx[u0.replace(/^http:\/\/127.0.0.1:\d+/, '').slice(0, 120)] = st; } } }
   if (j.id && pend.has(j.id)) { pend.get(j.id)(j); pend.delete(j.id); }
   else if (j.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(j.params.type)) result.console.push(j.params.type + ': ' + j.params.args.map((x) => x.value ?? x.description).join(' ').slice(0, 300));
   else if (j.method === 'Runtime.exceptionThrown') result.console.push('exception: ' + (j.params.exceptionDetails.exception?.description || j.params.exceptionDetails.text).slice(0, 300));

@@ -56,3 +56,8 @@
 - `e2e-city-lod0.mjs --static temp/nec --lod --lat 34.6786 --lon 135.4900 --shots temp/shots-nec`: ok=true、クリック canonicalId 一致。4区が同一画面で読み込まれる(UI: 4/24区、kita/fukushima/chuo/nishi が tileVisible>0・GLB 200)。
 - 目視(15km): 西区北東の 200m 模式セル帯は、隣区(中央・福島・北)を同一ビルドに含めると見えない=単独ビルドの fallback と整合。6km斜めは画面左上に小さな青い方形が数個残るが、LOD0 か実建物かは未判定。画面は UI パネルが大半を覆う。konohana は4区ビルドに含めていないため未読込(想定)。
 - 24区一体・速度・Preview は未確認。
+
+## 追記(95863b8 の次コミット・4区一体の HTTP 打切りなし集計)
+- `temp/nec`(西・中央・福島・北、101〜165秒)で `--lod`: ok=true、クリック一致、親→葉、全視点 tileFail=0。新設 `result.httpStat`(打切りなし): LOD0 tileset 1/GLB 15、実 tileset 5/実 GLB 219 がすべて 2xx、非2xx 0。
+- 6km斜めの青い方形は未判定(4区ビルドの LOD0 は 4区由来で、未ロード区由来ではないことのみ判明)。詳細は `QA_24WARD_PATH.md`。
+- 24区一体・速度・Preview は未確認。個別E2E(旧SHA)と 4区一体(現SHA)は別欄で扱い、20区は一体では未確認。
