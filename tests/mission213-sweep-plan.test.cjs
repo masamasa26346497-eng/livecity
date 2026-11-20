@@ -110,3 +110,25 @@ test('swapStable / comparableDiag: 置換状態の安定判定と比較可否(fi
   assert.equal(comparableDiag(mk(), mk({ viewport: { w: 1, h: 1 } })).comparable, false);
   assert.equal(comparableDiag(null, mk()).comparable, false);
 });
+
+test('compareShownIds: 順序違い・重複・空集合・不一致(fixture)', async () => {
+  const { compareShownIds: f } = await import('../tools/cloud/sweep-plan.mjs');
+  const ok = f(['b', 'a', 'c'], ['c', 'b', 'a']);
+  assert.equal(ok.match, true); assert.equal(ok.intersection, 3); assert.equal(ok.dupA, 0);
+  const dup = f(['a', 'a', 'b'], ['b', 'a']);
+  assert.equal(dup.match, true); assert.equal(dup.dupA, 1); assert.equal(dup.sizeA, 2);
+  const empty = f([], null);
+  assert.equal(empty.match, true); assert.equal(empty.bothEmpty, true);
+  const diff = f(['a', 'b'], ['b', 'z']);
+  assert.equal(diff.match, false); assert.deepEqual(diff.onlyA, ['a']); assert.deepEqual(diff.onlyB, ['z']);
+  assert.equal(f(['a'], []).match, false);
+});
+
+test('swap 状態復元: --cells/--resid-detail は T.show と実タイル show を元に戻す(静的確認)', () => {
+  const fs = require('node:fs');
+  const src = fs.readFileSync(require('node:path').join(__dirname, '../tools/cloud/e2e-city-lod0.mjs'), 'utf8');
+  for (const line of src.split('\n').filter((l) => l.includes('H0=new Map()'))) {
+    assert.match(line, /T\.show=sv;real\.forEach\(\(p,i\)=>p\.show=rv\[i\]\)/);
+    assert.match(line, /H0\.set\(c,c\.f\.show\)/);
+  }
+});

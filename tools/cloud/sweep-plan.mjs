@@ -133,3 +133,12 @@ export function comparableDiag(a, b, camTol = 0.05) {
 }
 // ブラウザ内で評価する置換状態スナップショット(read-only。cells の f.show を数えるだけで状態は変えない)。
 export const SWAP_SNAP_EXPR = `(()=>{const v=window.__v;if(!v)return null;const ps=(v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined);const l0=ps.find(p=>p._lcCityLod0);const real=ps.filter(p=>!p._lcCityLod0);let hidden=0,visible=0;if(l0&&l0._lcCells)for(const arr of l0._lcCells.values())for(const c of arr){if(c.f.show)visible++;else hidden++}let sel=0,leaf=0;for(const p of real)for(const t of (p._selectedTiles||[])){if(!t.content)continue;sel++;if(!t.children||t.children.length===0)leaf++}const c=v.scene.canvas;const sw=new URLSearchParams(location.search).get('citylod0swap');const pf=(window.__mission37g&&window.__mission37g.perf)||{};return {swapEnabled:sw!=='0',swapInstalled:!!pf.cityLod0Swap,spheres:pf.cityLod0Swap?pf.cityLod0Swap.spheres:null,l0Show:l0?l0.show:null,hidden,visible,total:hidden+visible,selected:sel,selectedLeaf:leaf,tilesLoaded:ps.length>0&&ps.every(p=>p.tilesLoaded),camH:Math.round(v.camera.positionCartographic.height),viewport:{w:c.width,h:c.height,cw:c.clientWidth,ch:c.clientHeight,dpr:window.devicePixelRatio},tileFail:window.__tileFail||0}})()`;
+// --cells と --resid-detail の shownIds(表示中LOD0セルID)集合の一致判定。重複/順序/空集合を正規化して比較する(純関数)。
+export function compareShownIds(a, b) {
+  const norm = (x) => { const arr = Array.isArray(x) ? x.map(String) : []; const set = new Set(arr); return { n: arr.length, dup: arr.length - set.size, set }; };
+  const A = norm(a), B = norm(b);
+  const onlyA = [...A.set].filter((i) => !B.set.has(i)).sort();
+  const onlyB = [...B.set].filter((i) => !A.set.has(i)).sort();
+  const inter = [...A.set].filter((i) => B.set.has(i)).length;
+  return { sizeA: A.set.size, sizeB: B.set.size, dupA: A.dup, dupB: B.dup, intersection: inter, onlyA, onlyB, match: onlyA.length === 0 && onlyB.length === 0, bothEmpty: A.set.size === 0 && B.set.size === 0 };
+}
