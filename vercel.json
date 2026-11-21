@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node --test tests/mission209-37g-html-syntax.test.js && node tools/cloud/build-cloud-preview.mjs --all-wards",
+  "buildCommand": "node --test tests/mission209-37g-html-syntax.test.js && node tools/cloud/build-cloud-preview.mjs --all-wards --city-lod0",
   "outputDirectory": "temp/cloud-preview/static",
   "installCommand": "echo skip-install",
   "redirects": [

@@ -9,6 +9,7 @@
 // 配置(ローカル serve と同じ URL):  /ext-3dtiles/<区>/…(LOD1)  /lod2-preview/…(LOD2)  /__lod2/diag.json  /mission37g-osaka-24ward-mvp.html
 // 37G HTML は「複製に対して」localhost 限定ゲート 4 箇所だけを外す(元の public/ は変更しない)。nobuiltin=1 既定で内蔵旧サンプルは載せない。
 import fs from 'node:fs';
+import { writeEmptyLod2 } from './empty-lod2.mjs';
 import path from 'node:path';
 import http from 'node:http';
 import crypto from 'node:crypto';
@@ -20,6 +21,7 @@ import { selectMeshes } from '../mission79-run.mjs';
 import { buildIndex, shardWards } from './ward-plan.mjs';
 import { writeWardManifest, verifyWardDir, checkWardsDistinct } from './ward-manifest.mjs';
 import { buildRoadLayer } from './tran-to-layers.mjs';
+import { buildCityLod0 } from './city-lod0.mjs';
 import { buildWaterLayer, makeTileSource, mergeWaterReport } from './gsi-water-layers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -63,7 +65,7 @@ const dirBytes = (d) => { let n = 0; if (!fs.existsSync(d)) return 0; for (const
 const freeGB = () => { const f = fs.statfsSync(ROOT); return (f.bavail * f.bsize) / 1073741824; };
 const extRoot = path.join(OUT, 'ext-3dtiles');
 const wardInfo = [];
-let lod2Meshes, lod2Rep, lod2Ids, lod2Manifest;
+let lod2Meshes, lod2Rep, lod2Ids, lod2Manifest, NO_LOD2 = false;
 const layersWards = [], roadFailures = [], waterFailures = [], waterReports = [];
 const WATER = !process.argv.includes('--no-water');   // Mission 211: GSI WA 水域面(公式 PLATEAU 2025 に wtr は無い)。既定 ON
 const waterSource = makeTileSource();
@@ -86,7 +88,22 @@ if (SINGLE) {
   const cov = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/reports/mission159/lod2-coverage-osaka2025.json'), 'utf8'));
   const lod2Set = new Set(cov.perMesh.filter((r) => r.lod2Any > 0).map((r) => r.mesh));
   lod2Meshes = [...new Set(plans.flatMap((p) => p.meshes))].filter((m) => lod2Set.has(m)).sort();
-  if (!lod2Meshes.length) throw new Error('選択区に LOD2 収録メッシュがありません');
+  // LOD2 収録メッシュが 0 の区(例: 平野区単独)は正常状態。公式 2025 の LOD2 収録調査(cov)に載っていることを確認した上で空 LOD2 を出力する。
+  //   cov に対象メッシュが1件も無い(=調査対象外)場合は、データ欠損と区別できないため従来どおり失敗させる。
+  const allMeshes = [...new Set(plans.flatMap((p) => p.meshes))];
+  const noLod2 = !lod2Meshes.length;
+  if (noLod2) {
+    // 収録調査は lock の建物メッシュ全件を監査し(perMesh は LOD2 を持つメッシュだけ列挙)、エラー 0 であること。調査が不完全なら欠損と区別できないので失敗。
+    const lockBldg = new Set(lock.entries.filter((e) => e.kind === 'bldg').map((e) => e.mesh));
+    const notInLock = allMeshes.filter((m) => !lockBldg.has(m));
+    if (cov.meshesAudited !== lockBldg.size || (cov.errors || []).length || notInLock.length) throw new Error(`LOD2 収録調査が不完全で欠損と区別不能(audited ${cov.meshesAudited} / lock ${lockBldg.size} / errors ${(cov.errors || []).length} / lock外 ${notInLock.length})`);
+    log('single-pass: 選択区に LOD2 収録メッシュなし(収録調査で確認済み・正常)。空 LOD2 で続行。メッシュ', allMeshes.length);
+    fs.rmSync(LOD2_DIR, { recursive: true, force: true });
+    lod2Rep = writeEmptyLod2(LOD2_DIR, { meshesChecked: allMeshes });
+    lod2Manifest = path.join(LOD2_DIR, 'manifest.json');
+    lod2Ids = new Set();
+    NO_LOD2 = true;
+  } else {
   log('single-pass: LOD2 を先に生成', lod2Meshes.length, 'メッシュ / 区', wards.length, '/ 空きディスク', freeGB().toFixed(1) + 'GB');
   fs.mkdirSync(LOD2_DIR, { recursive: true });
   run('tools/lod2/lod2-build-all.mjs', ['--out', rel(LOD2_DIR), '--meshes', lod2Meshes.join(','), '--resume', '--report-dir', rel(path.join(LOD2_DIR, 'report'))]);
@@ -96,6 +113,7 @@ if (SINGLE) {
   if (!fs.existsSync(lod2Manifest)) throw new Error('LOD2 manifest.json がありません');
   lod2Ids = new Set(JSON.parse(fs.readFileSync(lod2Manifest, 'utf8')).assets.flatMap((x) => x.ids || []));
   if (!lod2Ids.size) throw new Error('LOD2 manifest に ID が無い');
+  }
   // ---- 2S. 区ごとに 1 回の変換(LOD2 同 ID 除外済み)→ 直ちに出力へ移動 → work/GML 削除 ----
   fs.rmSync(OUT, { recursive: true, force: true });
   fs.mkdirSync(extRoot, { recursive: true });
@@ -112,7 +130,7 @@ if (SINGLE) {
       const avg = wardSecs.reduce((x, y) => x + y, 0) / wardSecs.length;
       const projMin = elapsedMin + (avg * (plans.length - i)) / 60;
       log(`進捗 ${i}/${plans.length} 経過 ${elapsedMin.toFixed(1)}分 残り推定 ${(projMin - elapsedMin).toFixed(1)}分 出力 ${outMB.toFixed(0)}MB 空き ${free.toFixed(1)}GB`);
-      if (TIME_BUDGET_MIN && projMin > TIME_BUDGET_MIN) throw new Error(`時間ガード: 完了推定 ${projMin.toFixed(1)}分 > ${TIME_BUDGET_MIN}分(Hobby build 45 分上限の手前で停止。完了済み ${i} 区。--shard で分割)`);
+      if (TIME_BUDGET_MIN && wardSecs.length >= 3 && projMin > TIME_BUDGET_MIN) throw new Error(`時間ガード: 完了推定 ${projMin.toFixed(1)}分 > ${TIME_BUDGET_MIN}分(Hobby build 45 分上限の手前で停止。完了済み ${i} 区。--shard で分割)`);
     }
     const tw = Date.now();
     const id = p.id, w = p.w;
@@ -121,14 +139,14 @@ if (SINGLE) {
     fs.rmSync(sdir, { recursive: true, force: true }); fs.rmSync(workDir, { recursive: true, force: true });
     log(`[${i + 1}/${plans.length}] 公式2025 取得+変換(1 回・LOD2同ID除外済み):`, id);
     try {
-      run('tools/mission79-run.mjs', ['--ward', id, '--max-mb', maxMb, '--final', sdir, '--exclude-ids', lod2Manifest]);
+      run('tools/mission79-run.mjs', ['--ward', id, '--max-mb', maxMb, '--final', sdir, ...(NO_LOD2 ? [] : ['--exclude-ids', lod2Manifest])]);
       peak.workGB = Math.max(peak.workGB, dirBytes(workDir) / 1073741824); peak.minFreeGB = Math.min(peak.minFreeGB, freeGB());
       const v = verifyWard(sdir, w.code);
       if (!v.ok) throw new Error('LOD1 verification failed for ' + id + ': ' + (v.problems || []).join(';'));
       const src = JSON.parse(fs.readFileSync(path.join(sdir, 'source.json'), 'utf8'));
       if (Number(src.vintage) !== 2025) throw new Error(id + ': source.vintage != 2025');
       const excluded = src.counts.excludedForLod2 | 0;
-      const audit = auditSinglePass({ id, suppDir: sdir, lod2Ids, suppBuildings: v.buildings, excludedCount: excluded, inWard: src.counts.inWard });
+      const audit = auditSinglePass({ id, suppDir: sdir, lod2Ids, noLod2: NO_LOD2, suppBuildings: v.buildings, excludedCount: excluded, inWard: src.counts.inWard });
       log('ID 監査 OK:', JSON.stringify(audit));
       const d = path.join(extRoot, id);
       fs.mkdirSync(d, { recursive: true });
@@ -259,6 +277,12 @@ fs.writeFileSync(path.join(extRoot, 'index.json'), JSON.stringify({
   lod0Wards: [], layersWards: SINGLE ? layersWards : [],
   layersReport: { roads: { source: 'PLATEAU 2025 tran:Road lod1 (道路区域ポリゴン)', delivered: layersWards.length, failed: roadFailures }, waterways: { source: '国土地理院 optimal_bvmap-v1 WA(水域面)。公式 PLATEAU 2025 大阪市に wtr は無い', delivered: waterReports.filter((x) => x.status === 'ok').length, none: waterReports.filter((x) => x.status === 'none').map((x) => x.ward), failed: waterFailures, tiles: waterSource.stats } },
 }));
+// Mission 213 Phase 1: 24区一体の都市全体 LOD0(概略ブロック)。feature flag(--city-lod0)・既定OFF=既存 Preview は不変。
+//   元LOD1 = 補完LOD1(attrs) + LOD2化した棟(footprints)から生成。区データ欠落は fail closed で例外。
+if (a.includes('--city-lod0')) {
+  const l0 = buildCityLod0({ extRoot, lod2Footprints: path.join(LOD2_DIR, 'footprints.json'), wards: reg.filter((w) => wardInfo.some((x) => x.id === w.id)), cell: Number(opt('lod0-cell', '200')) });
+  log('都市全体 LOD0:', JSON.stringify(l0.totals));
+}
 // 3c. LOD2 + オーバーレイ(ローカル serve と同じ URL 構成)
 const l2 = path.join(OUT, 'lod2-preview');
 fs.mkdirSync(l2, { recursive: true });

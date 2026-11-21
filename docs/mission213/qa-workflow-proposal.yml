@@ -1,0 +1,138 @@
+# Mission 213 QA workflow v2【適用待ち・未実行】(現行 .github/workflows/mission213-qa.yml との差分は docs/mission213/QA_UNBLOCK.md 参照)
+# ここ(docs/mission213/)は提案置き場です。GitHub App に workflow 権限が無いため、Claude は
+# .github/workflows/ へ push できません。適用手順は docs/mission213/QA_UNBLOCK.md を参照。
+# 適用先: .github/workflows/mission213-qa.yml
+#
+# 起動経路(GitHub 仕様に基づく。どちらか一方で足りる):
+#  A) pull_request: labeled  ← default branch への配置が不要。PR #68 ブランチにこのファイルを
+#     コミットし、PR #68 にラベル `run-mission213-qa` を付けると起動する(再実行=ラベルを外して付け直す)。
+#     ※ pull_request 系イベントは PR の merge ref 上の workflow ファイルを使うため、PR ブランチ上に
+#       ファイルがあれば動く。同一リポジトリの PR のみ(fork は除外)。
+#  B) workflow_dispatch      ← 「Run workflow」ボタンはファイルが default branch(main)にある場合のみ
+#     Actions UI/`gh workflow run` に現れる。main への配置は管理者の判断事項(Claude は main に push/merge しない)。
+#     配置後は "Use workflow from" で PR #68 ブランチを選ぶと、そのブランチ版の YAML が実行される。
+#
+# 設計:
+#  - push/schedule では動かない=無料枠の無駄打ちなし。secrets 不使用。
+#  - 各 step は前景・同期。exit code が Actions に記録される(background/orphan cleanup 問題なし)。
+#  - ジョブ全体 55 分上限。ビルド側は既存ガード(38分/6GB/空きディスク)がそのまま効く。
+#  - artifact は集計 JSON(qa.json)のみ。PLATEAU 原データ/GLB/ビルド出力は上げない。
+#  - 結果は PR #68 へ GITHUB_TOKEN で自動コメント(Claude の App トークン 1時間失効に依存しない)。
+#  - 既存の mission35*/36* workflow とは group・トリガとも独立で影響しない。
+name: mission213-qa
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      start_point: { description: 'sweep 開始 index(経路上の点番号)', default: '0' }
+      max_points: { description: 'sweep 最大「点」数(1点=全高度を撮影)', default: '12' }
+      alts:       { description: '高度(m,カンマ区切り)', default: '3000,10000' }
+      budget_min: { description: 'sweep 壁時計予算(分)', default: '25' }
+permissions:
+  contents: read
+  pull-requests: write   # PR #68 へ結果コメントを投稿するためだけに使用
+concurrency:
+  group: mission213-qa
+  cancel-in-progress: false
+jobs:
+  qa:
+    # PR #68 ブランチ以外では実行しない。PR 経路は同一リポジトリ・指定ラベルのときのみ。
+    if: >-
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/claude/issue-67-20261114-1354') ||
+      (github.event_name == 'pull_request' &&
+       startsWith(github.event.label.name, 'run-mission213-qa') &&
+       github.event.pull_request.head.ref == 'claude/issue-67-20261114-1354' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # PR 経路では merge ref ではなく PR head そのものを検証する(dispatch 時は選択ブランチ)
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: Guard (disk / chrome / node)
+        run: |
+          df -h .
+          node --version
+          CHROME="$(command -v google-chrome || command -v chromium || true)"
+          echo "CHROME=$CHROME" >> "$GITHUB_ENV"
+          test -n "$CHROME" || { echo "chrome/chromium が無い"; exit 1; }
+          "$CHROME" --version
+
+      - name: Batch start point (label -> --start-point; strict validation, fail before build)
+        id: batch
+        env:
+          QA_LABEL: ${{ github.event.label.name }}
+          QA_DISPATCH_START: ${{ inputs.start_point }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${QA_DISPATCH_START:-0}" in (*[!0-9]*|'') echo "start_point は数字のみ"; exit 1;; esac
+            echo "start=${QA_DISPATCH_START:-0}" >> "$GITHUB_OUTPUT"
+          else
+            node tools/cloud/qa-batch.mjs start >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
+
+      - name: Unit tests (fixture, no network)
+        run: node --test tests/mission213-city-lod0.test.cjs tests/cloud-ward-plan.test.cjs tests/mission213-sweep-plan.test.cjs
+
+      - name: Build 24 wards + LOD0 (official PLATEAU 2025; guards 38min/6GB)
+        id: build
+        run: |
+          set -o pipefail
+          start=$(date +%s)
+          node tools/cloud/build-cloud-preview.mjs --all-wards --city-lod0 --out temp/cloud-all 2>&1 | tail -n 200 | tee temp-build.log
+          echo "build_sec=$(( $(date +%s) - start ))" >> "$GITHUB_OUTPUT"
+          du -sm temp/cloud-all | tee build-size.txt
+
+      - name: Sweep E2E (real Chromium + SwiftShader, read-only on build output)
+        id: sweep
+        env:
+          # 入力はシェルへ直接埋め込まず env 経由。ラベル経路は inputs が空なので既定値(12点×2高度=24撮影, 予算25分)。
+          QA_ALTS: ${{ inputs.alts || '3000,10000' }}
+          QA_BUDGET: ${{ inputs.budget_min || '25' }}
+          QA_POINTS: ${{ inputs.max_points || '12' }}
+          QA_START: ${{ steps.batch.outputs.start }}
+        run: |
+          node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" \
+            --sweep --alts "$QA_ALTS" --budget-min "$QA_BUDGET" \
+            --max-points "$QA_POINTS" --start-point "$QA_START" --out temp/qa.json
+
+      - name: Summarize (read-only, aggregates only)
+        if: always()
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BUILD: ${{ steps.build.outcome }}
+          BUILD_SEC: ${{ steps.build.outputs.build_sec }}
+          SWEEP: ${{ steps.sweep.outcome }}
+        run: |
+          export SIZE_MB="$(cut -f1 build-size.txt 2>/dev/null || echo n/a)"
+          node tools/cloud/qa-batch.mjs summary temp/qa.json > summary.md
+          cat summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment on PR #68
+        if: always()
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: gh pr comment 68 --repo "${{ github.repository }}" --body-file summary.md || echo "comment failed (non-fatal)"
+
+      - name: Upload aggregate JSON only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission213-qa-aggregate
+          path: |
+            temp/qa.json
+            summary.md
+          retention-days: 7
+          if-no-files-found: ignore
+
+# バッチ運用メモ: 1点=全高度(既定2)を撮影。--max-points は「点」数で撮影枚数ではない(12点×2高度=24撮影)。
+# 経路の総点数は qa.json の sweep.routePlanned(summary に表示)。各バッチ summary の「次バッチ」ラベル
+# `run-mission213-qa:<n>` を付けると n 以降から続行する。前回 JSON の引継ぎは不要(start_point だけで区間分割が成立)。
+# not-loaded/camera-not-held の点は同じ start で再実行して撮り直す。actions/cache(private・約1GB)でビルド省略は未検証のため本案には含めない。

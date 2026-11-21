@@ -234,6 +234,7 @@
   #lc-results button, #lc-results .empty { display: flex; width: 100%; gap: 8px; align-items: baseline; text-align: left; padding: 8px 10px;
                 font: 12px var(--lc-font); color: var(--lc-text); background: transparent; border: 0; border-bottom: 1px solid rgba(80,160,255,0.12); }
   #lc-results button { cursor: pointer; }
+  #lc-results button.active { background: var(--lc-accent-soft); box-shadow: inset 3px 0 0 var(--lc-hi); }
   #lc-results button:hover, #lc-results button:focus { background: var(--lc-accent-soft); outline: 0; }
   #lc-results .kind { font-size: 10px; color: var(--lc-text-mute); flex: 0 0 auto; min-width: 34px; }
   #lc-results .empty { color: var(--lc-text-mute); }
@@ -263,6 +264,8 @@
   .lc-soon { font-size: 11px; color: var(--lc-text-mute); line-height: 1.9; }
   .lc-soon b { font-weight: 500; color: var(--lc-dim); }
   #btn-panels { display: none; }
+  #lc-info-close { display: none; position: absolute; top: 4px; right: 6px; z-index: 2; background: none; border: 0; color: var(--lc-text-mute); font-size: 18px; cursor: pointer; }
+  #btn-panels:focus-visible, #wc-close:focus-visible, #lc-info-close:focus-visible, .lc-tab:focus-visible, #lc-results button:focus-visible { outline: 2px solid var(--lc-hi); outline-offset: 2px; }
   @media (max-width: 720px) {
     :root { --lc-header-h: 52px; }
     #lc-sub, #lc-modes, #lc-head-stats .lc-stat, #lc-minimap { display: none; }
@@ -274,6 +277,11 @@
     #lc-left { display: none; left: 8px; right: 8px; width: auto; top: calc(var(--lc-header-h) + 8px); max-height: 60vh; }
     body.show-left #lc-left { display: block; }
     #lc-right { left: 8px; right: 8px; width: auto; top: auto; bottom: 8px; max-height: 42vh; }
+    /* Mission 215: 未選択(空の案内文だけ)のときは右パネルで地図を遮らない。:has 非対応ブラウザは従来表示のまま */
+    #lc-right:has(#lc-bldg-empty:not([style*="none"])) { display: none; }
+    #lc-info-close { display: inline-block; }
+    #lc-ward-card { bottom: auto; top: calc(var(--lc-header-h) + 8px); }
+    #btn-panels, .lc-wardbtn, #lc-info-close, #wc-close { min-height: 44px; min-width: 44px; }
     #lc-results { position: fixed; left: 8px; right: 8px; top: calc(var(--lc-header-h) + 4px); }
   }
 </style>
@@ -287,7 +295,7 @@
     <div id="lc-sub">大阪市24区 · 地図ビュー</div>
   </div>
   <form id="lc-search" role="search" autocomplete="off">
-    <input id="lc-q" type="search" placeholder="区・駅・地名・施設を検索" aria-label="駅・地名・施設検索" aria-controls="lc-results">
+    <input id="lc-q" type="search" placeholder="区・駅・地名・施設を検索" aria-label="駅・地名・施設検索" aria-controls="lc-results" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-haspopup="listbox">
     <div id="lc-results" role="listbox" aria-label="検索結果"></div>
   </form>
   <nav id="lc-modes" role="tablist" aria-label="モード">
@@ -302,7 +310,7 @@
     <div class="lc-stat"><b id="hs-tiles">—</b><span>表示タイル</span></div>
     <div class="lc-stat"><b id="hs-fps">—</b><span>FPS</span></div>
     <button class="lc-btn" id="btn-home">全域に戻る</button>
-    <button class="lc-btn" id="btn-panels" type="button" aria-expanded="false">レイヤー</button>
+    <button class="lc-btn" id="btn-panels" type="button" aria-expanded="false" aria-controls="lc-left">レイヤー</button>
   </div>
 </header>
 
@@ -380,6 +388,7 @@
 
 <!-- 右: 建物情報パネル -->
 <aside class="lc-panel" id="lc-right">
+  <button id="lc-info-close" type="button" aria-label="情報を閉じる">×</button>
   <div class="lc-sec">
     <h2>情報</h2>
     <div id="lc-bldg-empty">建物または施設マーカーをクリックすると詳細を表示します。</div>
@@ -982,16 +991,24 @@
   }
   // 45E: ?ext45=1（localhost 限定）。tools/mission45e-preview.cjs が検証済みの 24 区を /ext-3dtiles/<区>/ で読み取り専用配信し、
   //   /ext-3dtiles/index.json に区の一覧を出す。ここで全区を ext 定義として登録する（URL に 24 区を並べない）。無ければ何もしない。
+  // Mission 215 第3: ext45(Cloud/24区 index)が複数区を登録したときだけ、住吉区ローカル前提の文言を事実に即した文言へ置き換える。
+  //   「全24区描画済」とは断定しない(登録=配信 index 上の区数であり、各区の描画確認とは別)。住吉区ローカルモード(ext45 なし)の文言は不変。
+  function cloudMode() { return !!(stats.ext45 && stats.ext45.wards > 1); }
+  function applyCloudWording() {
+    if (!cloudMode()) return;
+    const m = document.getElementById('lc-loading-msg'); if (m && !document.getElementById('lc-loading').classList.contains('done')) m.textContent = '地図と3D建物（' + stats.ext45.wards + '区分のタイルセット登録）を読み込み中…';
+    const n = document.getElementById('ward-cov-note'); if (n) n.textContent = '全24区で地図と区境界を閲覧できます。3D建物は配信 index に登録された ' + stats.ext45.wards + ' 区分を読み込みます。各区の描画状況は区ごとに異なります。';
+  }
   async function loadExt45Defs() {
     if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || new URLSearchParams(location.search).get('ext45') !== '1') return;
     try {
-      const r = await fetch('ext-3dtiles/index.json');
-      if (!r.ok) return;
-      const j = await r.json();
+      const j = await (window.__lcIdx || (window.__lcIdx = () => (window.__lcIdxP ||= fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)))))();
+      if (!j) return;
       for (const w of (j.wards || [])) {
         if (w && /^[a-z0-9-]+$/.test(w.ward || '') && !EXTRA_SET_DEFS.some((d) => d.id === 'ext-' + w.ward)) EXTRA_SET_DEFS.push({ id: 'ext-' + w.ward, base: 'ext-3dtiles/' + w.ward + '/', external: true, verified45: j.verified === true });
       }
       stats.ext45 = { wards: (j.wards || []).length, verified: j.verified === true };
+      applyCloudWording();
       vecWards = new Set((j.layersWards || []).map((x) => x && x.ward).filter((x) => /^[a-z0-9-]+$/.test(x || '')));   // 45I
       vecSync();
     } catch (e) { /* index が無い/壊れている: 追加しない */ }
@@ -1076,7 +1093,9 @@
   const BASE_WARD = '27120';   // 住吉区: 基本 tileset（TILES_BASE）
   let bldgGen = 0, bldgWard = null;   // generation token / 現在の建物表示区
   async function mountTileset(base, gen) {
-    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', { maximumScreenSpaceError: stats.sse || SSE0 });
+    // Mission213 Phase2(opt-in ?dse=1): Cesium の dynamicScreenSpaceError。カメラから遠い(地平線側)実タイルの SSE を動的に緩め、斜め視で遠方の細部を先読みしすぎない。既定OFF=従来どおり。
+    const dseOpt = q.get('dse') === '1' ? { dynamicScreenSpaceError: true, dynamicScreenSpaceErrorDensity: Number(q.get('dsed')) || 2.0e-4, dynamicScreenSpaceErrorFactor: Number(q.get('dsef')) || 24 } : {};
+    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, dseOpt));
     if (gen !== bldgGen) { try { ts.destroy(); } catch (e) { /* noop */ } return null; }   // 待機中に別の区が選ばれた: 破棄して再表示しない
     ts._lcBase = base;
     scene.primitives.add(ts);
@@ -1764,8 +1783,59 @@
     scene.requestRender();
   }
   let lod0Wards = [];
-  fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
+  (window.__lcIdx ? window.__lcIdx() : fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null))).then((j) => { if (j && Array.isArray(j.lod0Wards)) { lod0Wards = j.lod0Wards.filter((c) => /^[0-9]{5}$/.test(c)); perf.lod0.available = lod0Wards.length; } }).catch(() => {});
   viewer.camera.moveEnd.addEventListener(() => { lod0Sync(); });
+  // Mission 213 Phase1(feature flag ?citylod0=1・既定OFF): 24区一体の都市全体 LOD0(概略ブロック)。実棟ではなくクリック不可(allowPicking:false)。
+  //   index.json の cityLod0 が無ければ何もしない。カメラ高度が ?citylod0min(既定2500m)以上のときだけ表示し、近づくと実LOD1/LOD2に任せる(タイル単位の置換は Phase2)。
+  let cityLod0 = null, cityLod0Pending = false, cityLod0Uri = null;
+  if (q.get('citylod0') === '1') (window.__lcIdx ? window.__lcIdx() : fetch('ext-3dtiles/index.json').then((r) => (r.ok ? r.json() : null))).then((j) => { if (j && j.cityLod0 && typeof j.cityLod0.uri === 'string' && /^[A-Za-z0-9_\-\/.]+$/.test(j.cityLod0.uri)) { cityLod0Uri = j.cityLod0.uri; cityLod0Sync(); } }).catch(() => {});
+  // 模式LOD0 セル中心の ECEF(37B/geoToThree と同一定数: CLAT=34.604208, CLON=135.525020, 111320 m/deg)。セルは 200m グリッド(id=lod0_<cx>_<cz>)。
+  const cityLod0CellPos = (cx, cz) => { const x = (cx + 0.5) * 200, z = (cz + 0.5) * 200; const lat = 34.604208 - z / 111320, lon = 135.525020 + x / (Math.cos(34.604208 * Math.PI / 180) * 111320); return Cesium.Cartesian3.fromDegrees(lon, lat, 0); };
+  // 実タイルの描画範囲(球)を毎フレーム収集し、変化があったときだけ(最大2回/秒)セルの show を更新する。
+  const cityLod0FineGE = Number(q.get('citylod0fine')) || 8;   // 置換に使う実タイルの geometricError 上限(m)。葉タイルは常に対象
+  const cityLod0NearM = Number(q.get('citylod0nearm')) || 5000;
+  const cityLod0FarM = Number(q.get('citylod0farm')) || 15000;   // カメラ高度がこれ以上の超遠景では、読込済みの粗い実タイルでも置換対象(20km遠景で実建物の上に模式セル格子が残る不具合の対処)。未ロードの範囲はセルが残る   // これより近い選択済み実タイルは粗くても置換対象(m)
+  const cityLod0Dbg = perf.cityLod0SwapDbg = { seen: 0, coarse: 0, noContent: 0, bigRadius: 0 };   // 診断: tileVisible の件数と除外理由(累積)
+  const cityLod0Spheres = []; let cityLod0Sig = '', cityLod0LastApply = 0;
+  function cityLod0SwapInstall(t) {
+    const hooked = new WeakSet();
+    const hook = () => { for (const x of allTilesetsNow().concat(lod0Live())) { if (hooked.has(x) || x._lcCityLod0) continue; hooked.add(x); x.tileVisible.addEventListener((tile) => { const bs = tile.boundingSphere; /* 遠景で選ばれる粗い親タイル(子あり・geometricError大)は建物が疎ら=画素を満たさない。最詳細(葉 or 誤差が小さい)タイルだけを「実建物で覆われた範囲」とみなし、粗い間は模式セルを残す */ const fine = tile.children ? (tile.children.length === 0 || tile.geometricError <= cityLod0FineGE || (bs && Cesium.Cartesian3.distance(viewer.camera.positionWC, bs.center) - bs.radius <= cityLod0NearM) || viewer.camera.positionCartographic.height >= cityLod0FarM) : true;   /* 中近景(カメラ距離が近い)では選択済みの実タイルは粗くても画素を満たすため対象に含める。遠景だけ粗い親を除外 */ cityLod0Dbg.seen++; if (!fine) cityLod0Dbg.coarse++; else if (!tile.content) cityLod0Dbg.noContent++; else if (!(bs && bs.radius < 4000)) cityLod0Dbg.bigRadius++; if (fine && bs && tile.content && bs.radius < 4000 && cityLod0Spheres.length < 4000) cityLod0Spheres.push(bs); }); } };
+    scene.preUpdate.addEventListener(() => { hook(); cityLod0Spheres.length = 0; });
+    scene.postRender.addEventListener(() => {
+      if (!t.show || t.isDestroyed()) return;
+      const now = performance.now(); if (now - cityLod0LastApply < 500) return;
+      let sig = cityLod0Spheres.length + ':'; for (const s of cityLod0Spheres) sig += Math.round(s.center.x + s.center.y + s.center.z + s.radius) + ',';
+      if (sig === cityLod0Sig) return; cityLod0Sig = sig; cityLod0LastApply = now;
+      let hidden = 0, total = 0;
+      for (const arr of t._lcCells.values()) for (const c of arr) { total++; let cov = false; for (const s of cityLod0Spheres) { if (Cesium.Cartesian3.distance(c.p, s.center) <= s.radius) { cov = true; break; } } c.f.show = !cov; if (cov) hidden++; }
+      perf.cityLod0Swap = { spheres: cityLod0Spheres.length, cells: total, hidden };
+      scene.requestRender();
+    });
+  }
+  async function cityLod0Sync() {
+    if (!cityLod0Uri) return;
+    // 視覚FAIL修正: 旧既定2500mだと斜め視で手前の実LOD1/2の上にも模式ブロックが常時重なり街を格子で覆った。暫定で15000mへ上げていたが、根本対策としてセル単位置換(cityLod0SwapInstall)を入れたため既定は2500mへ戻した。
+    const minH = Number(q.get('citylod0min')) || 2500;
+    const camH = viewer.camera.positionCartographic ? viewer.camera.positionCartographic.height : 0;
+    if (!cityLod0 && !cityLod0Pending && camH >= minH) {
+      cityLod0Pending = true;
+      try {
+        const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/' + cityLod0Uri, { maximumScreenSpaceError: 16, allowPicking: false });
+        // Phase2: セル単位の置換(既定ON・?citylod0swap=0 で無効)。高度しきい値ではなく「いま実際に描画されている実LOD1/2/ward-LOD0 タイルの範囲」に入る模式セルだけを非表示にする。
+        //   実タイルが選択(描画)されていない範囲=未ロード/視錐台外/遠景はセルを残す=穴を作らない側。実タイルの tileVisible は描画対象のときだけ発火する。
+        const swapOn = q.get('citylod0swap') !== '0';
+        t._lcCells = new Map();   // Cesium3DTile -> [{ f, p(ECEF) }]
+        t.tileLoad.addEventListener((tile) => { try { const c = tile.content, n = c && c.featuresLength || 0, arr = []; for (let i = 0; i < n; i++) { const f = c.getFeature(i), m = /^lod0_(-?\d+)_(-?\d+)$/.exec(String(f.getProperty('canonicalId'))); if (!m) continue; arr.push({ f, p: cityLod0CellPos(+m[1], +m[2]) }); } t._lcCells.set(tile, arr); } catch (e) {} });
+        t.tileUnload.addEventListener((tile) => { t._lcCells.delete(tile); });
+        if (swapOn) cityLod0SwapInstall(t);
+        t._lcCityLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
+        scene.primitives.add(t); cityLod0 = t; perf.cityLod0 = { loaded: true, minH, swap: swapOn };
+        { const n = document.createElement('div'); n.id = 'lc-lod0-note'; n.style.cssText = 'position:fixed;right:8px;bottom:28px;z-index:50;background:rgba(20,30,45,.8);color:#dfe8f3;font:11px/1.4 sans-serif;padding:3px 8px;border-radius:4px;pointer-events:none'; n.textContent = '遠景: 模式LOD0(建物密度ブロック・実棟ではありません/クリック不可)'; document.body.appendChild(n); t._lcNote = n; }
+      } catch (e) { perf.cityLod0 = { loaded: false, error: String(e && e.message || e) }; } finally { cityLod0Pending = false; }
+    }
+    if (cityLod0 && !cityLod0.isDestroyed()) { cityLod0.show = camH >= minH; if (cityLod0._lcNote) cityLod0._lcNote.style.display = cityLod0.show ? '' : 'none'; scene.requestRender(); }
+  }
+  viewer.camera.moveEnd.addEventListener(() => { cityLod0Sync(); });
   viewer.camera.moveEnd.addEventListener(roadScaleSync);   // 46C
   setTimeout(roadScaleSync, 0);
   // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
@@ -2814,7 +2884,8 @@
         const cv = stats.coverage, nw = cv.wardsWith3d;
         const nfull = d.wards.filter((w) => w.cover.state === 'full').length;
         cv.wardsFullLocal = nfull;
-        if (nfull > 0) $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。この PC にはローカル全域変換済みの区が ' + nfull + ' 区あります（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟。未公開。ブラウザでの全域視認は区ごとの確認が必要）。';
+        if (cloudMode()) applyCloudWording();
+        else if (nfull > 0) $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。この PC にはローカル全域変換済みの区が ' + nfull + ' 区あります（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟。未公開。ブラウザでの全域視認は区ごとの確認が必要）。';
         else $('ward-cov-note').textContent = '全24区で地図と区境界を閲覧できます。3D建物が見えるのは ' + nw + ' 区（' + d.wards.filter((w) => w.cover.state !== 'none').map((w) => w.wardName).join('・')
           + '）の一部だけ（計 ' + cv.tiles3d + ' タイル・' + fmt(cv.buildings3d) + ' 棟）で、残り ' + (24 - nw) + ' 区は未配信です。';
         populateBldgSelect(d);
@@ -2958,7 +3029,7 @@
         const b = el('button', null, { type: 'button', class: 'lc-wardbtn', 'data-code': w.wardCode, 'aria-pressed': 'false', title: w.cover.text });
         b.appendChild(el('span', w.wardName));
         b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : (w.cover.state === 'full' ? (w.cover.text.indexOf('ローカル') >= 0 ? 'ローカル全域' : '3D配信済み') : '3D一部'), { class: 'tag ' + w.cover.state }));
-        b.onclick = () => { clearSelection(); select(w, true); };
+        b.onclick = () => { clearSelection(); select(w, true); document.body.classList.remove('show-left'); };
         box.appendChild(b);
       }
       $('lc-ward-count').textContent = d.wards.length + '区';
@@ -3682,7 +3753,10 @@
 
   const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
   handler.setInputAction(async (click) => {
-    const picked = scene.pick(click.position);
+    let picked = scene.pick(click.position);
+    // Mission 213: 模式LOD0(_lcCityLod0)は allowPicking:false でも Cesium 1.121.1 では pick に出る(実ブラウザE2Eで確認)。
+    //   LOD0 が手前に出ても実LOD1/2 を従来どおり選べるよう、LOD0 以外を drillPick で拾い直す。LOD0 自体は選択対象にしない。
+    if (picked && picked.tileset && picked.tileset._lcCityLod0) { try { picked = scene.drillPick(click.position, 8).find((f) => !(f && f.tileset && f.tileset._lcCityLod0)); } catch (e) { picked = undefined; } }
     if (picked && picked.id && picked.id.poi) { selectPoi(picked.id.poi); return; }
     const fpId = fpCur ? fpCur.layer.idOfPick(picked) : null;   // 138: 実フットプリント押出し建物（GeometryInstance.id = canonicalId）
     if (fpId) { selectFootprintBuilding(fpId); return; }
@@ -3887,7 +3961,21 @@
     return idx;
   }
   const resBox = $('lc-results');
-  function closeResults() { resBox.classList.remove('on'); resBox.textContent = ''; }
+  // Mission 215 第3: キーボード操作(ArrowUp/Down/Enter/Escape)。focus は常に入力欄に置き、aria-activedescendant で選択候補を示す。
+  let searchSeq = 0, curHits = [], curTerm = '', activeIdx = -1;
+  const qInput = $('lc-q');
+  function setActive(i) {
+    const opts = resBox.querySelectorAll('button[role=option]');
+    activeIdx = (i >= 0 && i < opts.length) ? i : -1;
+    opts.forEach((b, k) => { const on = k === activeIdx; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    if (activeIdx >= 0) { qInput.setAttribute('aria-activedescendant', opts[activeIdx].id); opts[activeIdx].scrollIntoView({ block: 'nearest' }); }
+    else qInput.removeAttribute('aria-activedescendant');
+  }
+  function closeResults() {
+    searchSeq++;   // 進行中の検索応答を無効化(閉じた後に結果が復活しない)
+    resBox.classList.remove('on'); resBox.textContent = ''; curHits = []; curTerm = ''; activeIdx = -1;
+    qInput.setAttribute('aria-expanded', 'false'); qInput.removeAttribute('aria-activedescendant');
+  }
   function chooseResult(h) {
     closeResults();
     $('lc-q').value = h.name;
@@ -3900,10 +3988,11 @@
   async function runSearch() {
     const term = norm($('lc-q').value);
     if (!term) { closeResults(); return []; }
-    resBox.classList.add('on'); resBox.textContent = '';
+    const seq = ++searchSeq; curHits = []; curTerm = ''; activeIdx = -1; qInput.removeAttribute('aria-activedescendant');
+    resBox.classList.add('on'); resBox.textContent = ''; qInput.setAttribute('aria-expanded', 'true');
     resBox.appendChild(el('div', '検索中…', { class: 'empty' }));
     const idx = await buildSearchIndex();
-    if (norm($('lc-q').value) !== term) return [];
+    if (seq !== searchSeq || norm($('lc-q').value) !== term) return [];
     const others = idx.filter((i) => i.key.includes(term))
       .sort((a, b) => (a.key === term ? -1 : 0) - (b.key === term ? -1 : 0) || a.rank - b.rank || a.key.length - b.key.length).slice(0, 6);
     // 町丁目: 漢数字/算用数字/空白の揺れを正規化して照合。区名付きで表示して区別する
@@ -3915,8 +4004,9 @@
         .sort((a, b) => b.s - a.s || a.t.key.localeCompare(b.t.key, 'ja', { numeric: true })).slice(0, 6)
         .map((x) => ({ name: x.t.ward + ' ' + x.t.name, kind: '町丁目', town: x.t, x: x.t.cx, z: x.t.cz }));
     } catch (e) { townErr = e; fail('search:towns', e); }
-    if (norm($('lc-q').value) !== term) return [];
+    if (seq !== searchSeq || norm($('lc-q').value) !== term) return [];
     try { for (const h of await towns24Hits($('lc-q').value)) townHits.push(h); } catch (e) { fail('search:towns145', e); }   // 145: 住吉区以外の町丁目
+    if (seq !== searchSeq || norm($('lc-q').value) !== term) return [];   // 古い応答が新しい結果を上書きしない
     const exactOther = others.length && others[0].key === term;
     const hits = (exactOther ? others.concat(townHits) : townHits.concat(others)).slice(0, 10);
     resBox.textContent = '';
@@ -3924,7 +4014,7 @@
       resBox.appendChild(el('div', '「' + $('lc-q').value.trim() + '」に一致する町丁目・駅・地名・施設はありません（住所検索は未対応）', { class: 'empty' }));
     }
     for (const h of hits) {
-      const b = el('button', null, { type: 'button', role: 'option' });
+      const b = el('button', null, { type: 'button', role: 'option', id: 'lc-opt-' + hits.indexOf(h), tabindex: '-1', 'aria-selected': 'false' });
       b.appendChild(el('span', h.kind, { class: 'kind' }));
       b.appendChild(el('span', h.name));
       b.onclick = () => chooseResult(h);
@@ -3932,20 +4022,41 @@
     }
     if (idx.partial) resBox.appendChild(el('div', idx.partial + 'データを読み込めなかったため、結果が不完全です', { class: 'empty' }));
     if (townErr) resBox.appendChild(el('div', '町丁目データが未接続のため、町丁目は検索できません', { class: 'empty' }));
+    curHits = hits; curTerm = term;
     stats.lastSearch = { term: $('lc-q').value.trim(), hits: hits.length, townHits: townHits.length, townsConnected: !townErr };
     return hits;
   }
   $('lc-q').addEventListener('input', () => { runSearch().catch((e) => fail('search', e)); });
   $('lc-search').addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    try { const hits = await runSearch(); if (hits && hits.length) chooseResult(hits[0]); } catch (e) { fail('search', e); }
+    try {
+      // 結果表示済みで入力が変わっていなければ、ハイライト中の候補(無ければ先頭)を選ぶ。再検索しない
+      if (curHits.length && curTerm === norm($('lc-q').value)) { chooseResult(curHits[activeIdx >= 0 ? activeIdx : 0]); return; }
+      const hits = await runSearch(); if (hits && hits.length) chooseResult(hits[0]);
+    } catch (e) { fail('search', e); }
+  });
+  qInput.addEventListener('keydown', (ev) => {
+    // preventDefault は「検索欄にフォーカスがあり、候補が出ているとき」の矢印キーだけ(ページスクロール・地図操作は妨げない)
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+      const n = resBox.querySelectorAll('button[role=option]').length;
+      if (!resBox.classList.contains('on') || !n) return;
+      ev.preventDefault();
+      setActive(ev.key === 'ArrowDown' ? (activeIdx + 1) % n : (activeIdx <= 0 ? n - 1 : activeIdx - 1));
+    } else if (ev.key === 'Tab') closeResults();   // Tab はフォーカスを通常どおり進める(閉じ込めない)
   });
   document.addEventListener('click', (ev) => { if (!$('lc-search').contains(ev.target)) closeResults(); });
-  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeResults(); });
-  $('btn-panels').onclick = () => {
-    const on = document.body.classList.toggle('show-left');
-    $('btn-panels').setAttribute('aria-expanded', String(on));
-  };
+  // Mission 215: Escape は 検索結果 → 左パネル(モバイル) → 選択(情報カード/区カード) の順に1段ずつ閉じる
+  function setLeft(on) { document.body.classList.toggle('show-left', on); $('btn-panels').setAttribute('aria-expanded', String(on)); }
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape') return;
+    if (resBox.classList.contains('on')) { closeResults(); $('lc-q').focus(); return; }
+    if (document.body.classList.contains('show-left')) { setLeft(false); $('btn-panels').focus(); return; }
+    if (stats.selectedKey || stats.selectedCanonicalId || stats.selectedWard || stats.selectedPoi) clearSelection();
+  });
+  $('btn-panels').onclick = () => setLeft(!document.body.classList.contains('show-left'));
+  $('lc-info-close').onclick = () => { clearSelection(); $('btn-panels').focus(); };
+  new MutationObserver(() => { if (!document.body.classList.contains('show-left')) $('btn-panels').setAttribute('aria-expanded', 'false'); })
+    .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
   // ── ミニマップ（簡易）: major/mid 道路とカメラ位置を 2D canvas に描く ──
   const mm = $('lc-mm'), mctx = mm.getContext('2d');

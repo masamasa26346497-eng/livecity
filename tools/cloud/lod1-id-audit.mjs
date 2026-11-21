@@ -49,8 +49,16 @@ export function auditWard({ id, origDir, suppDir, lod2Ids, origBuildings, suppBu
 
 // Mission 206: single-pass 用。元 LOD1 は別生成しないので 元 = 補完 + 除外 として再構成し、ソース側の inWard 件数と突き合わせる(fail closed)。
 //   除外 ⊆ LOD2 ID、補完 ∩ LOD2 = ∅、補完 ∩ 除外 = ∅、補完 + 除外 = source.counts.inWard。
-export function auditSinglePass({ id, suppDir, lod2Ids, suppBuildings, excludedCount, inWard }) {
+export function auditSinglePass({ id, suppDir, lod2Ids, suppBuildings, excludedCount, inWard, noLod2 = false }) {
   const supp = readLeafIds(suppDir, id + ' 補完LOD1');
+  if (noLod2) {   // LOD2 収録なしの正常状態: 除外は 0 でなければならず、LOD1 は全棟(inWard)が残る
+    const f = (m) => { throw new Error(`${id}: ID 監査(single-pass/LOD2なし)失敗 — ${m}`); };
+    if (lod2Ids.size) f('LOD2 ID があるのに noLod2');
+    if (excludedCount !== 0) f(`除外 ${excludedCount} ≠ 0`);
+    if (fs.existsSync(path.join(suppDir, 'lod1-excluded-ids.json'))) f('LOD2 が無いのに除外 ID ファイルがある');
+    if (!Number.isInteger(inWard) || inWard <= 0 || supp.ids.size !== suppBuildings || supp.ids.size !== inWard) f(`LOD1 ID ${supp.ids.size} / 棟数 ${suppBuildings} / inWard ${inWard} 不一致`);
+    return { origIds: inWard, suppIds: supp.ids.size, excludedIds: 0, lod2CoveredInOrig: 0, lod2IdsTotal: 0, doubleDrawn: 0, leafFilesSupp: supp.files, mode: 'single-pass-no-lod2' };
+  }
   const exFile = path.join(suppDir, 'lod1-excluded-ids.json');
   if (!fs.existsSync(exFile)) throw new Error(`${id}: lod1-excluded-ids.json が無い`);
   const exJ = JSON.parse(fs.readFileSync(exFile, 'utf8'));
