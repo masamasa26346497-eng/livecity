@@ -34,3 +34,13 @@
 | 模擬(emulated) | 地図遷移 | 合成座標への `camera.positionWC` 変化のみ確認。実データの位置は未確認 |
 | NOT_TESTED | 古い検索応答の上書き防止(`searchSeq` ガードはコード上のみ。E2E は応答遅延を再現していない)、検索失敗時の表示、実機スマホ/IME変換中の Enter、実3Dクリック、速度、Vercel 現SHA WebGL、同一SHA55地点 | 未実施 |
 文言: ext45 の index が2区以上を登録したときだけ読み込み文言と `ward-cov-note` を切替(「全24区描画済」とは書かない)。ext45 なし(住吉区ローカル)は従来文言のまま。Cloud 文言の実ブラウザ確認は NOT_TESTED。
+
+## 第4サイクル: 検索の信頼性(基準 SHA 3526480)
+実行: `node tools/mission215-search-robust-e2e.mjs [--html <旧版>]`(headless Chromium + CDP。390×844 / 1366×768 各16項目、新コード 32/32 PASS)。既存 `mission215-search-e2e.mjs` は 24/24 PASS(回帰なし)、`mission215-mobile-ux`/`mission209-37g-html-syntax` 7件 PASS。360×640 は未実施。スクリーンショットなし。
+| 区分 | 項目 | 結果 |
+|---|---|---|
+| REAL(CDP実入力) | IME 変換中(`Input.imeSetComposition` + keyCode 229)の Enter で submit しない / 候補表示中でも候補を確定しない / 確定文字列(insertText)で候補が更新される / 通常 Enter は従来どおり候補を選ぶ / ext45 なしの文言維持 | PASS |
+| EMULATED | Safari 型(compositionend の後に keyCode 229 の Enter keydown): 合成 KeyboardEvent。**旧 HTML は FAIL(defaultPrevented=false)→ 修正後 PASS**。実 Safari/実 IME は NOT_TESTED | 修正で PASS |
+| FIXTURE(サーバ合成) | 先発A(応答2.5s遅延)→後発B先着→A後着でもBの結果のまま / 入力後 Escape → 古い応答が来ても閉じたまま / 候補選択後の古い応答で再オープンしない / labels.json 500 で「不完全」表示・偽の候補なし・再読込で復旧 / index.json 3区=Cloud文言(「全24区描画済」とは書かない)、1区・500・404=ローカル文言 | PASS |
+修正: `qInput` keydown で `Enter` かつ `isComposing || keyCode===229` なら `preventDefault`(Safari の変換確定 Enter による誤 submit 対策)。Chromium の実 IME 変換中 Enter は修正前から submit されなかった(欠陥は再現せず)。競合・失敗時・Cloud 文言も欠陥は再現せず。
+NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタイミング(合成 index では tile 無し)、実データの 24区 WebGL/3Dクリック/FPS、現 HEAD の Vercel Preview、同一SHA 55地点 QA。次ゲート: 北区/西区の単独ビルド(`build-cloud-preview.mjs --wards kita --single-pass --city-lod0`)+ `e2e-city-lod0.mjs --lod` を現 HEAD で実行(実3Dクリック)、Preview はデプロイURL+認証済みアクセスが必要。

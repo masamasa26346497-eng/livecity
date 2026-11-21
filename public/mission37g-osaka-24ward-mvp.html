@@ -4036,6 +4036,8 @@
     } catch (e) { fail('search', e); }
   });
   qInput.addEventListener('keydown', (ev) => {
+    // IME: 変換中/変換確定の Enter(isComposing・keyCode 229。Safari は compositionend の後に 229 の Enter が来る)で検索の確定・form submit を起こさない
+    if (ev.key === 'Enter' && (ev.isComposing || ev.keyCode === 229)) { ev.preventDefault(); return; }
     // preventDefault は「検索欄にフォーカスがあり、候補が出ているとき」の矢印キーだけ(ページスクロール・地図操作は妨げない)
     if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
       const n = resBox.querySelectorAll('button[role=option]').length;
