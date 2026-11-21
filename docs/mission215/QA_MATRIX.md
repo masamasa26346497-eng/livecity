@@ -25,3 +25,12 @@
 - `:has(#lc-bldg-empty:not([style*="none"]))` は 4 状態(未選択/施設/町丁目/建物)で選択中カードを消さなかった。**欠陥は再現せず、アプリ本体は変更していない**(fail→pass の根拠となる修正はなし)。
 - 未検証: 実データでの建物/施設クリック経路そのもの、Escape 時のカメラ不変(`clearSelection` は `flyTarget=null` にするため飛行中の Escape は飛行を中断する。コード読解のみ)、`:has` 非対応ブラウザ、実機スマホ、Vercel 認証済み現 HEAD、FPS。
 - 前サイクルの `tests/mission215-mobile-ux.test.js` 6件は PASS(静的)であり、上の実ブラウザ結果とは別物。
+
+## 第3サイクル: 検索のキーボード操作(基準 SHA 7b0caa4)
+実行: `node tools/mission215-search-e2e.mjs [--html <旧版>]`(headless Chromium + CDP の**実キー入力**。labels.json の fetch のみ合成の3候補に差し替え。Cesium は CDN)。
+| 区分 | 項目 | 結果 |
+|---|---|---|
+| 実ブラウザ PASS | ArrowDown/Up でハイライト(class・aria-selected・aria-activedescendant)移動、Enter でハイライト済み候補を選択、Escape で閉じて検索欄 focus、Tab で閉じ込めない、0件で矢印が安全、結果が無いとき矢印を preventDefault しない、combobox/aria-expanded/aria-controls | 390×844 と 1366×768 で各12項目、新コード 24/24 PASS。旧コード(`--html` に変更前版)は 12 項目 FAIL(Enter が常に先頭候補を選ぶ、ARIA/ハイライトなし、Tab で結果が残る) |
+| 模擬(emulated) | 地図遷移 | 合成座標への `camera.positionWC` 変化のみ確認。実データの位置は未確認 |
+| NOT_TESTED | 古い検索応答の上書き防止(`searchSeq` ガードはコード上のみ。E2E は応答遅延を再現していない)、検索失敗時の表示、実機スマホ/IME変換中の Enter、実3Dクリック、速度、Vercel 現SHA WebGL、同一SHA55地点 | 未実施 |
+文言: ext45 の index が2区以上を登録したときだけ読み込み文言と `ward-cov-note` を切替(「全24区描画済」とは書かない)。ext45 なし(住吉区ローカル)は従来文言のまま。Cloud 文言の実ブラウザ確認は NOT_TESTED。
