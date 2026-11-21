@@ -263,6 +263,8 @@
   .lc-soon { font-size: 11px; color: var(--lc-text-mute); line-height: 1.9; }
   .lc-soon b { font-weight: 500; color: var(--lc-dim); }
   #btn-panels { display: none; }
+  #lc-info-close { display: none; position: absolute; top: 4px; right: 6px; z-index: 2; background: none; border: 0; color: var(--lc-text-mute); font-size: 18px; cursor: pointer; }
+  #btn-panels:focus-visible, #wc-close:focus-visible, #lc-info-close:focus-visible, .lc-tab:focus-visible, #lc-results button:focus-visible { outline: 2px solid var(--lc-hi); outline-offset: 2px; }
   @media (max-width: 720px) {
     :root { --lc-header-h: 52px; }
     #lc-sub, #lc-modes, #lc-head-stats .lc-stat, #lc-minimap { display: none; }
@@ -274,6 +276,11 @@
     #lc-left { display: none; left: 8px; right: 8px; width: auto; top: calc(var(--lc-header-h) + 8px); max-height: 60vh; }
     body.show-left #lc-left { display: block; }
     #lc-right { left: 8px; right: 8px; width: auto; top: auto; bottom: 8px; max-height: 42vh; }
+    /* Mission 215: 未選択(空の案内文だけ)のときは右パネルで地図を遮らない。:has 非対応ブラウザは従来表示のまま */
+    #lc-right:has(#lc-bldg-empty:not([style*="none"])) { display: none; }
+    #lc-info-close { display: inline-block; }
+    #lc-ward-card { bottom: auto; top: calc(var(--lc-header-h) + 8px); }
+    #btn-panels, .lc-wardbtn, #lc-info-close, #wc-close { min-height: 44px; min-width: 44px; }
     #lc-results { position: fixed; left: 8px; right: 8px; top: calc(var(--lc-header-h) + 4px); }
   }
 </style>
@@ -302,7 +309,7 @@
     <div class="lc-stat"><b id="hs-tiles">—</b><span>表示タイル</span></div>
     <div class="lc-stat"><b id="hs-fps">—</b><span>FPS</span></div>
     <button class="lc-btn" id="btn-home">全域に戻る</button>
-    <button class="lc-btn" id="btn-panels" type="button" aria-expanded="false">レイヤー</button>
+    <button class="lc-btn" id="btn-panels" type="button" aria-expanded="false" aria-controls="lc-left">レイヤー</button>
   </div>
 </header>
 
@@ -380,6 +387,7 @@
 
 <!-- 右: 建物情報パネル -->
 <aside class="lc-panel" id="lc-right">
+  <button id="lc-info-close" type="button" aria-label="情報を閉じる">×</button>
   <div class="lc-sec">
     <h2>情報</h2>
     <div id="lc-bldg-empty">建物または施設マーカーをクリックすると詳細を表示します。</div>
@@ -3010,7 +3018,7 @@
         const b = el('button', null, { type: 'button', class: 'lc-wardbtn', 'data-code': w.wardCode, 'aria-pressed': 'false', title: w.cover.text });
         b.appendChild(el('span', w.wardName));
         b.appendChild(el('i', w.cover.state === 'none' ? '地図のみ' : (w.cover.state === 'full' ? (w.cover.text.indexOf('ローカル') >= 0 ? 'ローカル全域' : '3D配信済み') : '3D一部'), { class: 'tag ' + w.cover.state }));
-        b.onclick = () => { clearSelection(); select(w, true); };
+        b.onclick = () => { clearSelection(); select(w, true); document.body.classList.remove('show-left'); };
         box.appendChild(b);
       }
       $('lc-ward-count').textContent = d.wards.length + '区';
@@ -3996,11 +4004,18 @@
     try { const hits = await runSearch(); if (hits && hits.length) chooseResult(hits[0]); } catch (e) { fail('search', e); }
   });
   document.addEventListener('click', (ev) => { if (!$('lc-search').contains(ev.target)) closeResults(); });
-  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeResults(); });
-  $('btn-panels').onclick = () => {
-    const on = document.body.classList.toggle('show-left');
-    $('btn-panels').setAttribute('aria-expanded', String(on));
-  };
+  // Mission 215: Escape は 検索結果 → 左パネル(モバイル) → 選択(情報カード/区カード) の順に1段ずつ閉じる
+  function setLeft(on) { document.body.classList.toggle('show-left', on); $('btn-panels').setAttribute('aria-expanded', String(on)); }
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape') return;
+    if (resBox.classList.contains('on')) { closeResults(); $('lc-q').focus(); return; }
+    if (document.body.classList.contains('show-left')) { setLeft(false); $('btn-panels').focus(); return; }
+    if (stats.selectedKey || stats.selectedCanonicalId || stats.selectedWard || stats.selectedPoi) clearSelection();
+  });
+  $('btn-panels').onclick = () => setLeft(!document.body.classList.contains('show-left'));
+  $('lc-info-close').onclick = () => { clearSelection(); $('btn-panels').focus(); };
+  new MutationObserver(() => { if (!document.body.classList.contains('show-left')) $('btn-panels').setAttribute('aria-expanded', 'false'); })
+    .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
   // ── ミニマップ（簡易）: major/mid 道路とカメラ位置を 2D canvas に描く ──
   const mm = $('lc-mm'), mctx = mm.getContext('2d');
