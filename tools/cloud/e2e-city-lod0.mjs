@@ -269,11 +269,21 @@ async function lodMode() {
   const spot = await ev(`(()=>{const v=window.__v,c=v.scene.canvas;const cx=c.clientWidth/2,cy=c.clientHeight/2;const cand=[];for(let i=1;i<40;i++)for(let j=1;j<28;j++)cand.push([c.clientWidth*i/40,c.clientHeight*j/28]);cand.sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));for(const [x,y] of cand){const p=v.scene.pick(new Cesium.Cartesian2(x,y));if(p&&p.getProperty&&p.getProperty('canonicalId')&&!(p.tileset&&p.tileset._lcCityLod0))return {x,y,id:p.getProperty('canonicalId')}}return null})()`);
   result.checks.clickSpot = spot;
   if (spot) { const r = await ev(`(()=>{const c=window.__v.scene.canvas.getBoundingClientRect();return {l:c.left,t:c.top}})()`); for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: spot.x + r.l, y: spot.y + r.t, button: 'left', clickCount: 1 }); await sleep(1500); result.checks.clickSelectsBuilding = ((await ev('window.__ev')) || []).includes(spot.id); }
+  // Mission215 第5: 情報カード(#lc-bldg-body.on / #lc-bldg-empty 非表示)→ Escape で閉じる(canonicalId=null)。実クリック後の DOM 状態のみ(検索→区選択は含まない)
+  if (spot) {
+    const cardState = `(()=>{const b=document.getElementById('lc-bldg-body'),e=document.getElementById('lc-bldg-empty');return {bodyOn:!!(b&&b.classList.contains('on')),emptyHidden:!!(e&&getComputedStyle(e).display==='none'),text:b?b.innerText.trim().slice(0,60).length:0}})()`;
+    const opened = await ev(cardState);
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+    await sleep(800);
+    const closed = await ev(cardState);
+    result.checks.infoCard = { opened, closed, cardOpensThenCloses: !!(opened && opened.bodyOn && opened.emptyHidden && closed && !closed.bodyOn && !closed.emptyHidden) };
+  }
   result.checks.flyBlocked = await ev('JSON.stringify(window.__flyBlocked||[])').then(JSON.parse).catch(() => null);
   const far = rows[0], near = rows[rows.length - 1];
   // 合否: 全視点 held/loaded/tileFail=0、遠景で選択tileの geometricError 最大が近景より大きい(=粗い親が選ばれる)、近景は葉が選ばれる、クリック一致。 15km で親が選ばれない場合は不成立として ok=false にする(捏造しない)
   result.checks.lodSwitch = { farGMax: far.gMax, nearGMax: near.gMax, nearLeaf: near.leaf, nearSelected: near.selected, parentToLeaf: far.gMax > near.gMax && near.leaf > 0 };
-  result.ok = !!(rows.every((r) => r.held && r.loaded && r.tileFail === 0) && result.checks.lodSwitch.parentToLeaf && result.checks.clickSelectsBuilding);
+  result.ok = !!(rows.every((r) => r.held && r.loaded && r.tileFail === 0) && result.checks.lodSwitch.parentToLeaf && result.checks.clickSelectsBuilding && (!result.checks.infoCard || result.checks.infoCard.cardOpensThenCloses));
 }
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));

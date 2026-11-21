@@ -44,3 +44,20 @@
 | FIXTURE(サーバ合成) | 先発A(応答2.5s遅延)→後発B先着→A後着でもBの結果のまま / 入力後 Escape → 古い応答が来ても閉じたまま / 候補選択後の古い応答で再オープンしない / labels.json 500 で「不完全」表示・偽の候補なし・再読込で復旧 / index.json 3区=Cloud文言(「全24区描画済」とは書かない)、1区・500・404=ローカル文言 | PASS |
 修正: `qInput` keydown で `Enter` かつ `isComposing || keyCode===229` なら `preventDefault`(Safari の変換確定 Enter による誤 submit 対策)。Chromium の実 IME 変換中 Enter は修正前から submit されなかった(欠陥は再現せず)。競合・失敗時・Cloud 文言も欠陥は再現せず。
 NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタイミング(合成 index では tile 無し)、実データの 24区 WebGL/3Dクリック/FPS、現 HEAD の Vercel Preview、同一SHA 55地点 QA。次ゲート: 北区/西区の単独ビルド(`build-cloud-preview.mjs --wards kita --single-pass --city-lod0`)+ `e2e-city-lod0.mjs --lod` を現 HEAD で実行(実3Dクリック)、Preview はデプロイURL+認証済みアクセスが必要。
+
+## 第5サイクル: 実PLATEAU北区の実3Dクリック(基準 SHA a9e9e4e)
+実行: `build-cloud-preview.mjs --wards kita --single-pass --city-lod0 --out temp/kita`(89秒、75.9MB、LOD1 18,130棟、LOD2 4,553棟、doubleDrawn=0)→ `e2e-city-lod0.mjs --static temp/kita --lod`(headless Chromium+SwiftShader、約2分、2回実行し2回とも ok=true)。`--lod` に情報カード開閉チェック(`checks.infoCard`)を追加。
+| 項目 | 結果 |
+|---|---|
+| 実LOD1/2 GLB(realGlb) | 94件、非2xx 0 / LOD0 GLB 8件 非2xx 0 / tileset 非2xx 0 |
+| tileFail | 全5視点 0 / held・loaded 全て true |
+| 親→葉 | 30km: 選択7(葉0, geometricError最大40) → 600m: 6(葉6, 0)。PASS |
+| Cesium canvas への実マウスクリック(CDP)→canonicalId一致 | PASS(2回とも) |
+| 情報カード表示(#lc-bldg-body.on, empty 非表示)→ Escape で閉じる | PASS(実キー入力) |
+| 転送量(1実行) | 約53MB(キャッシュ条件未統制の参考値) |
+| 404 | optionalAsset(towns/stations/favicon/GSI blank等)と未生成の railways/parks。実建物資産ではない |
+| 検索→区選択→3D表示 | NOT_TESTED(本E2Eは検索を経由しない) |
+| LOD2の黒化の画素確認 | NOT_TESTED(PNG未取得・未目視。GLB数値のみ) |
+| navigation→初回実建物描画の時間・FPS | NOT_TESTED(本モードは出力しない。`--baseline` は warm 不具合あり) |
+| Vercel 認証済み Preview HTTP200/WebGL | NOT_TESTED。ユーザー操作: Vercel にログインして PR の Preview URL を開く、または Shareable Link を発行 |
+値は SwiftShader であり実GPU性能ではない。本体HTMLは無変更。
