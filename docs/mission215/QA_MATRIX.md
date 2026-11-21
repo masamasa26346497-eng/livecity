@@ -61,3 +61,25 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 | navigation→初回実建物描画の時間・FPS | NOT_TESTED(本モードは出力しない。`--baseline` は warm 不具合あり) |
 | Vercel 認証済み Preview HTTP200/WebGL | NOT_TESTED。ユーザー操作: Vercel にログインして PR の Preview URL を開く、または Shareable Link を発行 |
 値は SwiftShader であり実GPU性能ではない。本体HTMLは無変更。
+
+## 第6サイクル(段階A): 速度ベースライン(基準 SHA a57991d + 本コミット。アプリ本体は無変更)
+実行: `build-cloud-preview.mjs --wards kita --single-pass --city-lod0 --out temp/kita`(148秒=ビルド時間でありユーザー閲覧のロード時間ではない)→ `e2e-city-lod0.mjs --static temp/kita --baseline`(headless Chromium+SwiftShader、視点 3000m/-60°、`--out`)。**実GPUではない。各条件 1〜3回の参考値**。
+`--baseline` に追加した段階別指標(定義): `tViewerMs`=viewer(`window.__v`)出現 / `tFirstRealMs`=実タイル(非LOD0)選択数>0 / `tFirstRealPixelMs`=実タイルを隠したフレームとの画素差>0.2%(選択数>0だけでは描画を意味しないため) / `tClickableMs`=画面格子pickで実建物canonicalIdが取れた最初 / `tAllTilesLoadedMs`=全tileset tilesLoaded かつ選択>0が1.5秒連続 / `clickInPage`=CDP実クリック→選択イベント・情報カードの in-page 時間と longtask。建物IDは出力しない。
+| 指標(ms) | cold(3回) | warm(3回) |
+|---|---|---|
+| viewer 出現 | 2042〜2063 | 2089〜2244 |
+| 最初の実タイル選択 | 21027〜25330 | 20845〜20994 |
+| 最初の実建物画素フレーム | 22405〜27376 | 23347〜24971 |
+| クリック可能(pick取得) | 25376〜30705 | 26231〜27984 |
+| 全タイル安定 | 26280〜31074 | 27512〜28062 |
+| 転送量 | 18.7MB | 4.6MB(キャッシュ有効) |
+| frame p50/p95 | 61〜62 / 69〜78 | 56〜59 / 65〜75 |
+| heap | 86〜108MB | 86〜101MB |
+| tileFail | 0 | 0 |
+- **warm 起動遅延バグは再現しなかった**(旧: 30秒)。cold/warm 差は転送量(18.7→4.6MB)のみで、**表示完了時間は cold と warm で差がない(どちらも約20〜28秒)**。= 時間の支配項はネットワークではない。
+- 最大のボトルネック(測定事実): viewer 出現(約2秒)から最初の実タイル選択まで約19〜23秒、リクエストが出ない無通信区間(cold 18.8秒、warm 9秒。直後の要求は `/map-data/osaka-city/facilities/ward-manifest.json`)。ネットワークでもタイル選択でもなく**メインスレッドの初期化(JS/SwiftShader)側**。ただし原因の関数までは未特定で、SwiftShader 起因かアプリ起因かは切り分けていない。→ 実GPU または CPU プロファイル(`Profiler`)が次の測定。**アプリ本体は推測では変更していない**。
+- 異常値(要追試): 実クリック直前の `scene.pick` 1回が約21.7秒(3回中3回。in-page 計測)。同じ pick を含む画面格子探索は数秒で終わっており、直前の計測処理(60回の `scene.render` や画素差プローブ)との相互作用の可能性がある。pick 後のクリック→選択イベント→情報カードは 0.6〜1.2秒、Escape で閉じる PASS。原因未特定のため修正していない。
+- `realPixelShare` は cold 0.15〜0.22、warm 0.90〜0.97 と大きくばらつく(warm の値は画像タイル読込等の差を含む疑い)。**画素差の絶対値は改善証拠に使わない**。出現判定(>0.2%)のみに使用。
+- LOD2 の色: `--lod --shots` の近景 600m(-60°)PNG をローカル目視。建物は青灰色で黒化なし。ただし**このフレーム内の建物がLOD2かLOD1かは識別していない**ため、LOD2 の色一致は NOT_TESTED。PNG は commit/upload していない。`--lod` は ok=true(5視点 held/loaded/tileFail=0、親→葉、クリック、情報カード開閉)。
+- 計測重複: `tools/cloud/perf-probe.js`/`public/mission45g-perf.js`/`mission45l-interaction.js` は実ページ内の別系統計測で、本 E2E とは統合していない(今回は触らず)。
+- NOT_TESTED: 実PC GPU、現HEAD同一SHA 55地点、保護付き Vercel Preview、24区全域、モバイル相当(CPU スロットリング)、プロファイラによる初期化の内訳。
