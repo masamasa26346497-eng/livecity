@@ -43,7 +43,7 @@ await new Promise((r) => srv.listen(0, '127.0.0.1', r)); const port = srv.addres
 // ---- chrome + CDP ----
 const port2 = 9333 + Math.floor(Math.random() * 500);
 const prof = fs.mkdtempSync(path.join(os.tmpdir(), 'chr-'));
-const ch = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--use-gl=angle', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--window-size=1000,700', '--remote-debugging-port=' + port2, '--user-data-dir=' + prof, 'about:blank'], { stdio: 'ignore' });
+const ch = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu-sandbox', '--use-angle=swiftshader', '--use-gl=angle', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--window-size=1000,700', ...(process.env.E2E_CHROME_ARGS ? process.env.E2E_CHROME_ARGS.split(' ') : []), '--remote-debugging-port=' + port2, '--user-data-dir=' + prof, 'about:blank'], { stdio: 'ignore' });
 let targets; for (let i = 0; i < 60; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port2}/json`)).json(); if (targets.some((t) => t.type === 'page')) break; } catch {} await new Promise((r) => setTimeout(r, 500)); }
 if (!targets) throw new Error('chrome のデバッグポートに接続できません');
 const ws = new WebSocket(targets.find((t) => t.type === 'page').webSocketDebuggerUrl); await new Promise((r) => (ws.onopen = r));
@@ -175,6 +175,59 @@ async function baselineMode() {
     result.baseline.push({ phase, reqHead: rt.slice(0, 12), maxGap: gap, tViewerMs: tViewer, tFirstRealMs: tFirstReal, tFirstRealPixelMs: tFirstRealPixel, realPixelShare, tClickableMs: tClickable, clickToCardMs, clickInPage, escCloseOk, httpStatSoFar: hs, tLod0LoadedMs: tLod0, tAllTilesLoadedMs: tAllLoaded, requests: reqs.length, byKind, bytes: (result.bytes || 0) - b0, lod0Bytes, lod0Glb: reqs.filter((u) => u.includes('_city-lod0') && u.endsWith('.glb')).length, fromCache: result._cached, lod0FromCache: (result._cachedU || []).filter((u) => u && u.includes('_city-lod0')).length, duplicates: dups, http4xx: result.httpErrors.length, http4xxSample: result.httpErrors.slice(0, 8), frame, mem, tileFail, cesiumLocal: !!CESIUM_LOCAL });
   }
   delete result._reqs; delete result._sz; result.ok = result.baseline.every((b) => b.tAllTilesLoadedMs != null);
+}
+
+// ---- --profile: Mission216 第6段階B。CDP Profiler + longtask でロード中のメインスレッド占有を関数単位で特定する(--static 必須)。
+//   条件A(既定): 計測介入なし。ロード中は軽量eval(選択数の読み取りのみ。render/pick/画素差/格子pick なし)を 500ms 周期で呼ぶだけ。
+//   条件B(--probe): 既存 --baseline と同じ介入(画素差プローブ=scene.render×2+canvas読出し)を実タイル選択後に毎周期実行。A/B の差が「計測が作る遅延」。
+//   プロファイルは JS 関数名/URL/行のみ出力(建物ID・画像・GLB は出さない)。
+async function profileMode() {
+  const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), qs = opt('qs', 'citylod0=1&citylod0min=2500'), probe = has('probe');
+  const bh = Number(opt('h', 3000)), bp = Number(opt('pitch', -60)), maxMs = Number(opt('profile-max-ms', 70000));
+  await send('Page.enable'); await send('Profiler.enable'); await send('Profiler.setSamplingInterval', { interval: 1000 });
+  await send('Page.addScriptToEvaluateOnNewDocument', { source: `window.__lt=[];${has('labels-off') ? "let C;Object.defineProperty(window,'Cesium',{configurable:true,get(){return C},set(v){C=v;try{const u=v.LabelCollection.prototype.update;v.LabelCollection.prototype.update=function(f){if(!this.__keep)return;return u.call(this,f)}}catch(e){}}});" : ''}try{new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push([Math.round(e.startTime),Math.round(e.duration)])}).observe({entryTypes:['longtask']})}catch(e){}` });
+  const profiles = [];
+  result.profile = { cond: (probe ? 'B-probe' : 'A-passive') + (has('labels-off') ? '+labels-off(診断用: 全LabelCollection.show=false)' : ''), runs: [] };
+  for (const phase of ['cold', 'cold2']) {   // 毎回 HTTP キャッシュ消去(cold 2回)
+    result._reqs = []; result._reqT = []; result.httpErrors = []; const b0 = result.bytes || 0;
+    await send('Network.clearBrowserCache'); await send('Page.navigate', { url: 'about:blank' }); await sleep(500);
+    result._reqT = []; result._reqs = [];
+    await send('Profiler.start'); const t0 = Date.now();
+    await send('Page.navigate', { url: `http://127.0.0.1:${port}/mission37g-osaka-24ward-mvp.html?${qs}` });
+    let tViewer = null, tFirstReal = null, tFirstPix = null, tStable = null, ok = 0, pollMs = [];
+    while (Date.now() - t0 < maxMs) {
+      const q0 = Date.now();
+      const st = await ev(`(()=>{const v=window.__v;if(!v)return null;if(!window.__lcP){window.__lcP=1;const c=v.camera;for(const k of ['flyToBoundingSphere','flyTo','flyHome'])c[k]=function(){};c.cancelFlight();c.setView({destination:Cesium.Cartesian3.fromDegrees(${lon0},${lat0},${bh}),orientation:{heading:0,pitch:Cesium.Math.toRadians(${bp}),roll:0}})}let rsel=0,all=true,n=0;window.__lbl=window.__lbl||{};for(const p of (v.scene.primitives._primitives||[])){if(p._labels!==undefined){${has('labels-off') ? 'p.show=false;' : ''}window.__lbl.n=Math.max(window.__lbl.n||0,(v.scene.primitives._primitives||[]).filter(q=>q._labels!==undefined).reduce((a,q)=>a+q._labels.length,0));window.__lbl.colls=(v.scene.primitives._primitives||[]).filter(q=>q._labels!==undefined).length}if(p.tilesLoaded===undefined)continue;n++;if(!p.tilesLoaded)all=false;if(!p._lcCityLod0)rsel+=(p._selectedTiles||[]).length}return{rsel,all,n}})()`).catch(() => null);
+      pollMs.push(Date.now() - q0);
+      if (st) {
+        tViewer ??= Date.now() - t0;
+        if (st.rsel > 0) tFirstReal ??= Date.now() - t0;
+        if (probe && st.rsel > 0 && tFirstPix == null) { const sh = await realPixelProbe().catch(() => null); if (sh != null && sh > 0.002) tFirstPix = Date.now() - t0; }
+        if (st.rsel > 0 && st.all) { if (++ok >= 3 && tStable == null) { tStable = Date.now() - t0; break; } } else ok = 0;
+      }
+      await sleep(500);
+    }
+    let pickProf = null;
+    if (has('pick') && tStable != null) {   // 安定後の最初の scene.pick(中央1点)単体をプロファイル: pick 外れ値(約21秒)が shader compile 等かを関数単位で特定
+      await send('Profiler.stop'); await send('Profiler.start');
+      const pm = await ev(`(()=>{const v=window.__v,c=v.scene.canvas;const a=performance.now();v.scene.pick(new Cesium.Cartesian2(c.clientWidth/2,c.clientHeight/2));const b=performance.now();v.scene.pick(new Cesium.Cartesian2(c.clientWidth/2+3,c.clientHeight/2));return {firstPickMs:Math.round(b-a),secondPickMs:Math.round(performance.now()-b)}})()`);
+      const pp = (await send('Profiler.stop')).result.profile; const nm = new Map(pp.nodes.map((n) => [n.id, n])); const mm = new Map(); for (let i = 0; i < pp.samples.length; i++) { const cf = nm.get(pp.samples[i]).callFrame; const k = `${cf.functionName || '(anon)'} ${(cf.url || '').slice(-40)}:${cf.lineNumber + 1}`; mm.set(k, (mm.get(k) || 0) + (pp.timeDeltas[i + 1] ?? pp.timeDeltas[i]) / 1000); }
+      pickProf = { ...pm, top: [...mm].sort((x, y) => y[1] - x[1]).slice(0, 6).map(([k, v]) => [k, Math.round(v)]) };
+      await send('Profiler.start');
+    }
+    const { profile } = (await send('Profiler.stop')).result;
+    const lt = await ev('window.__lt||[]').catch(() => []);
+    // 集計: サンプルごとの経過時刻(ms, プロファイル開始起点)
+    const nodes = new Map(profile.nodes.map((n) => [n.id, n])); const parent = new Map(); for (const n of profile.nodes) for (const c of n.children || []) parent.set(c, n.id); const appOf = (id) => { for (let x = id; x != null; x = parent.get(x)) { const cf = nodes.get(x).callFrame; if (cf.url && !/cesium/i.test(cf.url) && !['(root)', '(program)', '(idle)'].includes(cf.functionName)) return `${cf.functionName || '(anon)'}:${cf.lineNumber + 1}`; } return '(no-app-frame)'; }; const t = []; let acc = 0; for (const d of profile.timeDeltas) { acc += d; t.push(acc / 1000); }
+    const agg = (from, to) => { const m = new Map(), am = new Map(); let busy = 0, idle = 0, total = 0; for (let i = 0; i < profile.samples.length; i++) { if (t[i] < from || t[i] >= to) continue; const d = (profile.timeDeltas[i + 1] ?? profile.timeDeltas[i]) / 1000; const cf = nodes.get(profile.samples[i]).callFrame; total += d; if (['(idle)', '(program)'].includes(cf.functionName)) { idle += d; continue; } busy += d; { const ak = appOf(profile.samples[i]); am.set(ak, (am.get(ak) || 0) + d); } const k = `${cf.functionName || '(anon)'} ${(cf.url || '').replace(/^https?:\/\/[^/]+/, '').slice(-60)}:${cf.lineNumber + 1}`; m.set(k, (m.get(k) || 0) + d); } return { totalMs: Math.round(total), busyMs: Math.round(busy), idleMs: Math.round(idle), byAppFrame: [...am].sort((x, y) => y[1] - x[1]).slice(0, 8).map(([k, v]) => [k, Math.round(v)]), top: [...m].sort((x, y) => y[1] - x[1]).slice(0, 12).map(([k, v]) => [k, Math.round(v)]) }; };
+    const w1 = tViewer ?? 0, w2 = tFirstReal ?? (Date.now() - t0);
+    const buckets = []; for (let b = 0; b < (tStable ?? maxMs); b += 2000) { const g = agg(b, b + 2000); buckets.push({ fromS: b / 1000, busyPct: g.totalMs ? Math.round(100 * g.busyMs / g.totalMs) : null, top: g.top[0] || null }); }
+    const gaps = []; const rt = (result._reqT || []).map(([tt, u]) => [tt - t0, u.slice(0, 60)]); for (let k = 1; k < rt.length; k++) if (rt[k][0] - rt[k - 1][0] > 2000) gaps.push({ fromMs: rt[k - 1][0], ms: rt[k][0] - rt[k - 1][0], next: rt[k][1] });
+    const ltSorted = [...lt].sort((x, y) => y[1] - x[1]); const tileFail = await ev('window.__tileFail||0').catch(() => null);
+    const bytes = (result.bytes || 0) - b0; const sorted = [...pollMs].sort((x, y) => x - y);
+    result.profile.runs.push({ phase, tViewerMs: tViewer, tFirstRealMs: tFirstReal, tFirstRealPixelMs: tFirstPix, tStableMs: tStable, bytes, requests: (result._reqs || []).length, idleNetworkGaps: gaps, viewerToFirstRealWindow: { fromMs: w1, toMs: w2, ...agg(w1, w2) }, buckets2s: buckets, longtasks: { count: lt.length, over1s: lt.filter((x) => x[1] > 1000).length, top: ltSorted.slice(0, 8), sumMs: lt.reduce((s, x) => s + x[1], 0) }, evalPollMs: { n: pollMs.length, p50: sorted[sorted.length >> 1], max: sorted[sorted.length - 1] }, tileFail, pickProf, labels: await ev('window.__lbl||null').catch(() => null), httpNon2xxReal: realFailures(result.httpStat || {}) });
+  }
+  delete result._reqs; delete result._sz; result.ok = result.profile.runs.every((r) => r.tStableMs != null);
 }
 // 置換状態が安定するまで(hidden/visible/total/swapEnabled が3回連続同一かつ全 tileset tilesLoaded)待ち、スナップショット列と待機時間を返す。
 async function awaitSwapStable(maxMs = 30000) {
@@ -324,7 +377,7 @@ async function realMode() {
   result.ok = !!(result.checks.lod0Loaded && hp.realShare > 0.05 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
-  if (STATIC && a.includes('--lod')) await lodMode(); else if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
+  if (STATIC && a.includes('--lod')) await lodMode(); else if (STATIC && a.includes('--profile')) await profileMode(); else if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
   const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);

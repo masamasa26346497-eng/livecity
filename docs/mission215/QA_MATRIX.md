@@ -83,3 +83,21 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 - LOD2 の色: `--lod --shots` の近景 600m(-60°)PNG をローカル目視。建物は青灰色で黒化なし。ただし**このフレーム内の建物がLOD2かLOD1かは識別していない**ため、LOD2 の色一致は NOT_TESTED。PNG は commit/upload していない。`--lod` は ok=true(5視点 held/loaded/tileFail=0、親→葉、クリック、情報カード開閉)。
 - 計測重複: `tools/cloud/perf-probe.js`/`public/mission45g-perf.js`/`mission45l-interaction.js` は実ページ内の別系統計測で、本 E2E とは統合していない(今回は触らず)。
 - NOT_TESTED: 実PC GPU、現HEAD同一SHA 55地点、保護付き Vercel Preview、24区全域、モバイル相当(CPU スロットリング)、プロファイラによる初期化の内訳。
+
+## 第6サイクル(段階B): 描画開始までの約20秒の切り分け(基準 SHA ee1225b + 本コミット。**アプリ本体は無変更**)
+実行: 北区ビルド(`--wards kita --single-pass --city-lod0`、86秒=ビルド時間でありユーザー閲覧のロード時間ではない)→ `e2e-city-lod0.mjs --static temp/kita --profile [--probe] [--pick] [--labels-off]`(新規モード。CDP `Profiler`(1ms)+ longtask。cold を毎回キャッシュ消去で2回)。headless Chromium+SwiftShader、実GPUではない。出力は関数名/URL/行のみ(建物ID・PNG・GLB なし)。
+| 条件 | 最初の実タイル選択(ms, cold×2) | 安定(ms) | 転送 | tileFail |
+|---|---|---|---|---|
+| A 計測介入なし(500ms周期の軽量evalのみ) | 24946/28485、27818/29759(2回実行) | 26402〜31194 | 18.1MB・153〜168req | 0 |
+| B 介入あり(`--probe`: 画素差プローブ=scene.render×2+canvas読出し) | 28038/29207 | 31234/32128 | 18.1MB | 0 |
+| **C 環境のみ変更 `--disable-accelerated-2d-canvas`**(A と同じ計測) | **11674/11502** | 12941/13031 | 18.0MB | 0 |
+| C+B | 12270/12622 | 15101/15564 | 17.8MB | 0 |
+| A+全LabelCollection無効(診断) | 8777/9681 | 9806/10703 | 17.8MB | 0 |
+- **計測介入は主因ではない**: A(介入なし)でも 25〜30秒。B は A より数秒遅い(介入は一部上乗せするが、20秒の主因ではない)。
+- **プロファイラが特定した主因**: viewer 出現〜最初の実タイル選択の約25秒のうち、メインスレッドは 93%(busy 23〜25秒)。ネットワークの無通信区間はメインスレッドの長いタスク(3〜14秒×数回)と一致。内訳(自己時間): `Cesium.js:8787 hHe`(Cesium のテキスト寸法計測: `measureText`+`canvas.getImageData` — LabelCollection のラベル文字ごと)13.6〜17.7秒、`Cesium.js:92 _Le`(shader compile/link、SwiftShader)4.6〜5.3秒、残りは各数百ms以下。呼び出し元スタックにアプリ側の関数は無く(Cesium の render ループ内)、アプリ初期化(`poiSyncAll`/`updateVecCoverage`/`mmDraw` 等)は各 20〜650ms 程度。ラベルは 8 コレクション・計667個。
+- **切り分け**: `--disable-accelerated-2d-canvas`(2D canvas を CPU 実装にするだけ)で `hHe` が消え、最初の実タイル選択が約26秒→約11.5秒。= **2D canvas の GPU(SwiftShader)読み戻し(`getImageData`)が支配的で、SwiftShader/ヘッドレス環境起因の可能性が高い**。実GPU/実ブラウザで同じ読み戻しコストが出るかは **NOT_TESTED**(実ブラウザでは `hHe` が速い可能性も、ラベル数667に比例して効く可能性もある)。ラベルを全て無効にしても 9〜10秒かかり、これは shader compile(SwiftShader)など。
+- **pick 約21秒の外れ値**: 安定後に単独で `scene.pick` を1回呼ぶと 0.76〜0.81秒(2回目 0.12秒、内訳は `readPixels`=GPU同期待ち 0.74〜0.79秒)。`--disable-accelerated-2d-canvas` の baseline でも クリック直前 pick は 17.6〜21.0秒だったため、これは **`--baseline` のプローブ列(格子pick約280回・60回の scene.render 等)直後に起きる計測起因の外れ値で、アプリ単体の遅さではない**(厳密な原因関数は未特定)。
+- **判断**: 原因が SwiftShader の CPU 描画・計測介入・外部待機側であるため、**アプリ本体は変更しない**(根拠なしの変更を避ける)。pick/クリック回帰も不要。5% 程度の差は改善と扱わない。
+- 回帰(本体無変更のため軽量のみ): `tests/mission213-city-lod0`・`mission213-sweep-plan`・`mission213-http-classify`・`mission214-color-gate`・`mission215-mobile-ux`・`mission209-37g-html-syntax` で 32件 pass。
+- NOT_TESTED: 実GPU/実ブラウザでのラベル寸法計測コスト、モバイル相当、現HEAD同一SHA 55地点、24区全域、Vercel 認証付き Preview の WebGL。
+- 次の安全な一手: (1) 実GPU/実ブラウザ(ユーザーのPC)で `?` なしの Preview を開き DevTools Performance で `measureText`/`getImageData` が長いか確認、(2) 長い場合のみ、ラベルを実タイル安定後に遅延生成/件数上限にする最小変更を A/B(`--profile` の A条件で再計測)。
