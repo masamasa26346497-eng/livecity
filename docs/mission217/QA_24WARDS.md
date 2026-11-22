@@ -1,3 +1,17 @@
+# Mission217B 取得失敗の切り分け（HEAD 13529d9 基準・追記）
+
+## 診断（実測、秘密情報・署名URLなし）
+- 取得元: `assets.cms.plateau.reearth.io` の公式 PLATEAU 2025 ZIP（1.58GB, ETag/Accept-Ranges あり）。呼び出し元は `tools/mission79-plateau2025-fetch.mjs` → `rangeFetch`（Node 組込 fetch/undici、Range、timeout 120s）。
+- 本run: HEAD=200、Range 1KB/1MB/8MB=すべて206で成功。単一GML(28.8MB, 実取得1.2MB)も0.8秒で成功。**取得元の恒常的障害ではない**。
+- 旧実装の弱点: `rangeFetch` はリトライなし、本文長の検証なし、エラーに `cause`(UND_ERR_SOCKET等)を出さない、GML書込が非原子的。前runの `fetch failed` は undici のソケット切断（推定。cause未記録のため**確定度: 中**）。
+- 修正: rangeFetch に短い上限付きバックオフのリトライ(4回, 1→8s)・本文長厳格検証(短い/長い本文は失敗)・4xxは即失敗・`cause` 出力、fetch 側は `.part`→rename の原子的書込み。回帰テスト `tests/mission217b-range-retry.test.cjs`(3件, ローカルfixture HTTP: 切断→再試行→成功 / 切断本文→安全失敗 / 404即失敗)。
+
+## 現HEADでの実測（北区のみ・SwiftShader）
+- 北区単独ビルド（`--wards kita --single-pass --city-lod0`）: **PASS**（建物18,130, LOD2 4,553, `doubleDrawn=0`, 道路7,119, 水域141, 出力77MB）。
+- 静的テスト(mission214 color / mission215 mobile-ux / mission213 city-lod0 / html-syntax / mission79-plateau2025 / retry): 全PASS（fixture/静的であり実描画の証拠ではない）。
+- `--lod` + `lblidle=0/1`: 下記「E2E結果」参照。
+- 西区・24区一体・実GPU・Vercel Preview: NOT_TESTED。
+
 # Mission217 第7段階 24区QA 状況（基準 HEAD 5739fa2）
 
 ## 結果の区分
@@ -24,3 +38,7 @@
 2. 区単独ビルド（約30〜100秒）+ `--lod --lat/--lon` を区ごとに。LOD2ありの区を先に。
 3. 55地点は既存ラベル `run-mission213-qa:<n>` で順次（各回 all-wards 約1GB を再作成。無料枠残量は不明）。ビルドのキャッシュは権利/容量未確認で未採用。
 4. 省コスト順: (a) 北区ビルド+lblidle 0/1 画素比較（`--shots` の同一カメラ、ラベル近傍の差分）→ (b) 区単独E2E → (c) sweep。
+
+## E2E結果（北区のみ、実データ、headless Chromium+SwiftShader）
+- `--lod --qs "citylod0=1&lblidle=0"` と `lblidle=1`: どちらも `ok=true`, `clickSelectsBuilding=true`（各1回, exit 0）。
+- ラベル画素比較(lblidle 0/1)・tileFail/視点別数値の精査・FPS: NOT_TESTED（今回は ok/click のみ確認）。実GPUは未確認。

@@ -25,10 +25,33 @@ export function pickCityGmlResource(pkg) {
   return r;
 }
 
-export async function rangeFetch(url, start, end) {
-  const res = await fetch(url, { headers: { range: 'bytes=' + start + '-' + end, 'accept-encoding': 'identity', 'user-agent': UA }, signal: AbortSignal.timeout(120000) });
-  if (res.status !== 206) { try { await res.body?.cancel(); } catch {} throw new Error('Range HTTP ' + res.status); }
-  return Buffer.from(await res.arrayBuffer());
+// Mission 217B: Range fetch with bounded retry. Each attempt must return 206 with exactly (end-start+1) bytes
+// (a short/over-long body is treated as a broken download, never as success). Errors report err.cause.code
+// (e.g. ECONNRESET / UND_ERR_SOCKET) without URLs/headers. Backoff is short and capped; failure is explicit.
+export function errCause(e) {
+  const c = e && e.cause;
+  return (c && (c.code || c.message)) || (e && e.name) || 'unknown';
+}
+export async function rangeFetch(url, start, end, opts = {}) {
+  const attempts = opts.attempts ?? 4, backoffMs = opts.backoffMs ?? 1000, timeoutMs = opts.timeoutMs ?? 120000;
+  const want = end - start + 1;
+  let last;
+  for (let a = 1; a <= attempts; a++) {
+    try {
+      const res = await fetch(url, { headers: { range: 'bytes=' + start + '-' + end, 'accept-encoding': 'identity', 'user-agent': UA }, signal: AbortSignal.timeout(timeoutMs) });
+      if (res.status !== 206) { try { await res.body?.cancel(); } catch {} const e = new Error('Range HTTP ' + res.status); e.fatal = res.status >= 400 && res.status < 500 && res.status !== 429; throw e; }
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length !== want) throw new Error('short/long body ' + buf.length + '/' + want);
+      return buf;
+    } catch (e) {
+      last = e;
+      if (e.fatal || a === attempts) break;
+      const wait = Math.min(backoffMs * 2 ** (a - 1), 8000);
+      console.error('[rangeFetch] attempt ' + a + '/' + attempts + ' failed: ' + e.message + ' cause=' + errCause(e) + ' retry in ' + wait + 'ms');
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
+  throw new Error('rangeFetch failed after retries: ' + last.message + ' cause=' + errCause(last));
 }
 
 // Parse a (possibly ZIP64) central directory buffer.
