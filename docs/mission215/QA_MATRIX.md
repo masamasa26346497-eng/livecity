@@ -101,3 +101,22 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 - 回帰(本体無変更のため軽量のみ): `tests/mission213-city-lod0`・`mission213-sweep-plan`・`mission213-http-classify`・`mission214-color-gate`・`mission215-mobile-ux`・`mission209-37g-html-syntax` で 32件 pass。
 - NOT_TESTED: 実GPU/実ブラウザでのラベル寸法計測コスト、モバイル相当、現HEAD同一SHA 55地点、24区全域、Vercel 認証付き Preview の WebGL。
 - 次の安全な一手: (1) 実GPU/実ブラウザ(ユーザーのPC)で `?` なしの Preview を開き DevTools Performance で `measureText`/`getImageData` が長いか確認、(2) 長い場合のみ、ラベルを実タイル安定後に遅延生成/件数上限にする最小変更を A/B(`--profile` の A条件で再計測)。
+
+## 第7サイクル(段階C): ラベル初期化の遅延 `?lblidle=1`(opt-in・既定OFF。基準 SHA cd154b1)
+**実装**(`public/mission37g-osaka-24ward-mvp.html`、`?lblidle=1` のときだけ): `Cesium.LabelCollection.prototype.update` を包み、ラベル数 >40 の collection(北区では 2 個)だけ、最初の実LOD1/2 タイル選択(保険: `?lblidlemax`=20秒)まで update を止め、その後 idle で 1 個ずつ解放。ラベルは削除・縮小しない。少数(区名等)は即時。診断: `window.__lblGate`。
+**コード追跡**: LabelCollection は 8 個(labels.json=地名/公園、stations 148、towns24 は区ごと base/full、townlabels 3、wardlabels、facilities)。計667個。文字寸法計測は Cesium が最初の update で行う(作成時ではない)ため、update 側で遅延するのが最小介入。
+**A/B**(北区1区ビルド、headless SwiftShader、`--profile` A条件、cold 各2回、HTTP キャッシュ消去。2回目の A は別実行):
+| 条件 | 最初の実タイル選択(ms) | tileFail | 非2xx |
+|---|---|---|---|
+| A 既定 | 46901 / 35749 / 38297 / 38262 | 0 | 0 |
+| B `lblidle=1` | 17913 / 20484 / 12140 / 18879 | 0 | 0 |
+- B は全4回で A の最短より速い(差 約15〜25秒)。ただし**実行ごとのばらつきが大きく**(A は前サイクルで 25〜28秒)、SwiftShader の 2D canvas 読み戻し(`hHe`)を後ろへ回しただけの可能性が高い。**実GPUでの改善とは言えない。NOT_TESTED。**
+- 最終表示: `--settle`(安定後20秒)で `open=true, pending=0, released=2` を2回確認(全 heavy collection が解放済み)。ラベルの画素レベルの最終表示確認は NOT_TESTED。
+- 計測プローブは A/B 同一(500ms周期の軽量 eval のみ。介入なし)。
+- 回帰: syntax・city-lod0・mobile-ux・color-gate で 20件 pass(静的)。**検索・クリック・区切替・スマホの実ブラウザ回帰は今回 NOT_TESTED**。
+- **判断**: 既定は OFF のまま。実GPU/実機での確証と上記回帰が済むまで既定ONにしない。区切替で towns24 を再作成する経路(towns は区ごとに collection を作るが、開始後は gate が open 済み)は、遅延の対象外。
+## 第7段階(24区・55地点)の最小QA案(今回は実行しない)
+1. 1GB ビルドを避ける: 既存 `mission213-qa` のラベル `run-mission213-qa:<n>` バッチ(12点×2高度/回)を現SHAで再実行(全55点で約5回、各 約45分未満、無料runner)。
+2. 区ごとの単独ビルド(`--wards <区> --single-pass --city-lod0`、数十秒〜1分、LOD2を持つ区のみ)で `--lod` を回し、クリックcanonicalId・LOD2色(mission214-color-gate)・roads/waterways HTTP を確認。
+3. 24区を跨ぐ確認は上の sweep バッチ。Vercel Preview は認証付きで管理者側確認(NOT_TESTED)。
+- NOT_TESTED: 実GPU・実機Safari・現SHA 55地点/24区・Vercel Preview。

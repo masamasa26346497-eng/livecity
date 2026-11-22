@@ -207,6 +207,7 @@ async function profileMode() {
       }
       await sleep(500);
     }
+    if (has('settle')) for (let k = 0; k < 40; k++) { await ev('window.__v.scene.requestRender()').catch(() => {}); await sleep(500); }   // 安定後 20秒待ち、遅延ラベルの全解放を確認
     let pickProf = null;
     if (has('pick') && tStable != null) {   // 安定後の最初の scene.pick(中央1点)単体をプロファイル: pick 外れ値(約21秒)が shader compile 等かを関数単位で特定
       await send('Profiler.stop'); await send('Profiler.start');
@@ -225,7 +226,7 @@ async function profileMode() {
     const gaps = []; const rt = (result._reqT || []).map(([tt, u]) => [tt - t0, u.slice(0, 60)]); for (let k = 1; k < rt.length; k++) if (rt[k][0] - rt[k - 1][0] > 2000) gaps.push({ fromMs: rt[k - 1][0], ms: rt[k][0] - rt[k - 1][0], next: rt[k][1] });
     const ltSorted = [...lt].sort((x, y) => y[1] - x[1]); const tileFail = await ev('window.__tileFail||0').catch(() => null);
     const bytes = (result.bytes || 0) - b0; const sorted = [...pollMs].sort((x, y) => x - y);
-    result.profile.runs.push({ phase, tViewerMs: tViewer, tFirstRealMs: tFirstReal, tFirstRealPixelMs: tFirstPix, tStableMs: tStable, bytes, requests: (result._reqs || []).length, idleNetworkGaps: gaps, viewerToFirstRealWindow: { fromMs: w1, toMs: w2, ...agg(w1, w2) }, buckets2s: buckets, longtasks: { count: lt.length, over1s: lt.filter((x) => x[1] > 1000).length, top: ltSorted.slice(0, 8), sumMs: lt.reduce((s, x) => s + x[1], 0) }, evalPollMs: { n: pollMs.length, p50: sorted[sorted.length >> 1], max: sorted[sorted.length - 1] }, tileFail, pickProf, labels: await ev('window.__lbl||null').catch(() => null), httpNon2xxReal: realFailures(result.httpStat || {}) });
+    result.profile.runs.push({ phase, tViewerMs: tViewer, tFirstRealMs: tFirstReal, tFirstRealPixelMs: tFirstPix, tStableMs: tStable, bytes, requests: (result._reqs || []).length, idleNetworkGaps: gaps, viewerToFirstRealWindow: { fromMs: w1, toMs: w2, ...agg(w1, w2) }, buckets2s: buckets, longtasks: { count: lt.length, over1s: lt.filter((x) => x[1] > 1000).length, top: ltSorted.slice(0, 8), sumMs: lt.reduce((s, x) => s + x[1], 0) }, evalPollMs: { n: pollMs.length, p50: sorted[sorted.length >> 1], max: sorted[sorted.length - 1] }, tileFail, pickProf, labels: await ev('window.__lbl||null').catch(() => null), lblGate: await ev('JSON.stringify(window.__lblGate?{open:window.__lblGate.open,pending:window.__lblGate.pending.length,released:window.__lblGate.released,triggerMs:window.__lblGate.triggerMs,reason:window.__lblGate.reason,doneMs:window.__lblGate.doneMs}:null)').then(JSON.parse).catch(() => null), httpNon2xxReal: realFailures(result.httpStat || {}) });
   }
   delete result._reqs; delete result._sz; result.ok = result.profile.runs.every((r) => r.tStableMs != null);
 }

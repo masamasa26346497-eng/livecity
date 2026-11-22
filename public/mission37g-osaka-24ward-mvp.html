@@ -540,6 +540,30 @@
     scene3DOnly: true, shouldAnimate: false,
   });
   const scene = viewer.scene;
+  // Mission 216 第6段階C: ラベル初期化の遅延(opt-in。?lblidle=1 のときだけ。既定OFF=従来と完全同一)。
+  //   多数ラベル(>40)の LabelCollection だけ、最初の実タイル選択(または ?lblidlemax ms の保険)まで update を止め、その後 1 つずつ idle で解放する。
+  //   ラベルは削除・縮小しない(最終的に全 collection が従来どおり描画される)。少数ラベルの collection(区名など)は即時。
+  if (q.get('lblidle') === '1') {
+    const G = window.__lblGate = { open: false, pending: [], released: 0, triggerMs: null, reason: null, doneMs: null };
+    const heavyMin = +q.get('lblidlemin') || 40, maxWait = +q.get('lblidlemax') || 20000, t0g = performance.now();
+    const LC = Cesium.LabelCollection.prototype, upd = LC.update;
+    LC.update = function (fs) {
+      if (G.open || this.__go || this.length <= heavyMin) return upd.call(this, fs);
+      if (!this.__queued) { this.__queued = true; G.pending.push(this); }
+      return undefined;
+    };
+    const step = () => {
+      const c = G.pending.shift();
+      if (!c) { G.open = true; G.doneMs = Math.round(performance.now() - t0g); scene.requestRender(); return; }
+      c.__go = true; G.released++; scene.requestRender();
+      (window.requestIdleCallback || ((f) => setTimeout(f, 50)))(step, { timeout: 1500 });
+    };
+    const realSelected = () => (scene.primitives._primitives || []).some((p) => p.tilesLoaded !== undefined && !p._lcCityLod0 && (p._selectedTiles || []).length > 0);
+    const poll = setInterval(() => {
+      const ms = performance.now() - t0g, hit = realSelected();
+      if (hit || ms > maxWait) { clearInterval(poll); G.triggerMs = Math.round(ms); G.reason = hit ? 'real-tile-selected' : 'timeout'; step(); }
+    }, 250);
+  }
   // Mission 161 (PR#50): LOD2 オーバーレイ opt-in。localhost かつ ?lod2=1 のときだけ /lod2-preview/overlay.js を読む。公開ホストでは何もしない。
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('lod2') === '1') {
     const s152 = document.createElement('script'); s152.src = '/lod2-preview/overlay.js';
