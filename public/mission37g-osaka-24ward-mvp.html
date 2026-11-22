@@ -553,6 +553,7 @@
       return undefined;
     };
     const step = () => {
+      if (viewer.isDestroyed()) { G.open = true; G.reason = G.reason || 'viewer-destroyed'; return; }
       const c = G.pending.shift();
       if (!c) { G.open = true; G.doneMs = Math.round(performance.now() - t0g); scene.requestRender(); return; }
       c.__go = true; G.released++; scene.requestRender();
@@ -560,6 +561,7 @@
     };
     const realSelected = () => (scene.primitives._primitives || []).some((p) => p.tilesLoaded !== undefined && !p._lcCityLod0 && (p._selectedTiles || []).length > 0);
     const poll = setInterval(() => {
+      if (viewer.isDestroyed()) { clearInterval(poll); G.open = true; G.reason = 'viewer-destroyed'; return; }
       const ms = performance.now() - t0g, hit = realSelected();
       if (hit || ms > maxWait) { clearInterval(poll); G.triggerMs = Math.round(ms); G.reason = hit ? 'real-tile-selected' : 'timeout'; step(); }
     }, 250);

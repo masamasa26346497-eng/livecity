@@ -120,3 +120,13 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 2. 区ごとの単独ビルド(`--wards <区> --single-pass --city-lod0`、数十秒〜1分、LOD2を持つ区のみ)で `--lod` を回し、クリックcanonicalId・LOD2色(mission214-color-gate)・roads/waterways HTTP を確認。
 3. 24区を跨ぐ確認は上の sweep バッチ。Vercel Preview は認証付きで管理者側確認(NOT_TESTED)。
 - NOT_TESTED: 実GPU・実機Safari・現SHA 55地点/24区・Vercel Preview。
+
+## 第6段階D: `?lblidle=1` のレビューと北区 click 回帰(Mission216)
+環境: headless Chromium + SwiftShader / 北区実データ(`--wards kita --single-pass --city-lod0`、18,130棟) / 既定OFFのまま。
+- コードレビュー(静的): `LabelCollection.prototype.update` をページ全体で差し替える(複数viewerなら二重ラップ、`__lblGate`は後勝ち)。破棄済みcollectionがpendingに残っても `__go=true` 設定のみで無害。件数が0→40超に増えても次のupdateで保留に入る。timeout 20秒の保険あり。
+  - 指摘: viewer破棄後もpoll/idleが走り `scene.requestRender()` が例外(破棄済みオブジェクト)を投げ続ける恐れ → `viewer.isDestroyed()` ガードを追加(opt-in内のみ、既定の挙動は不変)。
+  - `_primitives` / `_selectedTiles` はCesium非公開APIで、1.121.1固定が前提。取れなくてもtimeoutで解放される。
+- 実行: `node tools/cloud/e2e-city-lod0.mjs --static temp/kita --qs "citylod0=1&citylod0min=2500&lblidle=1"` → ok=true、clickSelectsBuilding=true(canonicalId一致)、近景でLOD0非表示、pick real=194/LOD0=0、コンソールerr 0(他区404は北区のみビルドのため想定内)。**PASS(北区1点・SwiftShader)**
+- NOT_TESTED: ラベル画素の最終表示(release前非描画/後表示)、区名・駅名の保持、ラベル出現までの時間のA/B、検索・区切替、スマホ390x844/PC1366x768、実GPU、現SHA55地点、保護付きPreview。
+- 採否: 既定OFF維持。ONにする基準 = 実GPUで初回建物表示が改善 + ラベル画素の遅延表示確認 + 検索/クリック回帰PASS。
+- 第7段階: 現行 `mission213-qa.yml` は毎回 `--all-wards --city-lod0` の約1GBフルビルド(実測約10〜15分)をバッチごとに実行する(read-only点検)。実行案: 区別単独ビルド+`--lod`で代表区を確認し、55地点は6バッチをラベルで順次(runner無料枠・各<55分)。1GBビルド結果のキャッシュは権利/容量未確認のため未採用。
