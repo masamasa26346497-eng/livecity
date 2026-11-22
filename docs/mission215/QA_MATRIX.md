@@ -147,3 +147,20 @@ lblidle 移行基準: 実GPUでcold/warm各N回の初建物・ラベル完了時
 - 検索→結果選択→飛行、区選択→飛行、実建物クリック→canonicalId+カード本文→ESC: PC 1366x768 / mobile 390x844 × lblidle=0/1 の4条件すべて PASS(390 の初回クリック失敗はUIオーバーレイによるハーネス欠陥、本体修正なし)。
 - 390x844/lblidle=1 の区選択飛行量が 1.0km(他は 11〜17km)。原因未調査。
 - ラベル画素差分・日本語フォント(NOT_TESTED)・実GPU(NOT_TESTED)・lblidle 既定ON禁止の詳細は docs/mission217/QA_24WARDS.md の Mission218B 節。
+
+## Mission218C(2026-11-23、基準 SHA 45aa526)第6段階 適用監査と第7段階 P0
+### 第6段階 施策別の適用状況(コード/git で確認した事実のみ)
+確認: HEAD は `claude/issue-67-20261114-1354` のみに含まれ、`origin/main` には含まれない(`git merge-base --is-ancestor HEAD origin/main`=no)。`origin/feature/mission206-osaka24-cloud-direct` とは merge-base なし(履歴が非共通)で、差分比較は不能。PR #61 との包含は今回未確認。Vercel Preview は認証のため今回は NOT_TESTED。
+| 施策 | 実装branch | 通常既定 | preview適用 | main適用 | 実画素QA | 採否 |
+|---|---|---|---|---|---|---|
+| 遠景LOD0置換(セル単位) | PR#68 | `?citylod0=1` が無ければ全体OFF。有効時は置換ON(`citylod0swap=0`で無効) | PR#68 の vercel.json buildCommand が `--city-lod0` を含む=PR#68 Preview にデータは載る(配信は未確認) | 未適用 | 北区のみ SwiftShader(目視+画素) | opt-in 維持 |
+| 親SSE調整(coarse SSE) | PR#68 | 既存コード(mission76/182b)の既定動作 | 同上 | 未適用 | 24区実描画の同SHA確認なし | 未確認 |
+| index.json 共有Promise | PR#68(`window.__lcIdx`) | 常時(opt-in ではない) | 同上 | 未適用 | 重複リクエスト3件のままで効果未確認 | 効果未実証 |
+| `lblidle` | PR#68 | OFF(`?lblidle=1`) | 同上 | 未適用 | 北区のみ、SwiftShader | 試験版・採用保留 |
+| dse / LC_COARSE_MERGE | PR#68 | OFF | OFF | 未適用 | 効果なし/利得8% | **不採用** |
+### 第7段階 P0 実測(北区・SwiftShader・同一ビルド 75.9MB)
+- 日本語フォント: `sudo apt-get install fonts-noto-cjk`(SIL OFL・無償、runner 環境のみ、workflow/repo 変更なし)で `fc-list :lang=ja` 有、E2E の `font.jaGlyphRendered=true`/`sameAsTofuForRare=false`(豆腐ではない)。以前の「文字未検証」は解消。ただしラベル文字の画素比較(判読性)自体はこの run では未実施。
+- `--lblab` PC 1366x768: lblidle 0/1 とも ok=true(検索/区選択/クリック canonicalId/カード/ESC)。
+- `--lblab` mobile 390x844: 0/1 とも ok=true。
+- **390x844 lblidle=1 の区選択 1.0km の原因 = ハーネス欠陥**: 飛行量を「100m超えた最初の1秒ポーリング」で採取しており飛行途中の値だった(再測で 5.4km、さらに修正後 0/1 とも 11,122m で完全一致)。本体修正なし。修正: `e2e-city-lod0.mjs` を飛行が止まるまで待つよう変更。
+- 複数viewer/destroy 時の patch 安全性: 未実施(NOT_TESTED)。

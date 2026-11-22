@@ -397,7 +397,7 @@ async function lblabMode() {
       const moved = `(()=>{const c=window.__v.camera.positionWC,o=window.__c0;return Math.hypot(c.x-o[0],c.y-o[1],c.z-o[2])})()`;
       await window_unlock(); await ev(`(()=>{const b=[...document.querySelectorAll('.lc-wardbtn')].find(x=>x.textContent.includes(${JSON.stringify(wardName)}));window.__wardBtn=!!b;if(b)b.click()})()`);
       R.steps.wardBtnFound = await ev('!!window.__wardBtn');
-      let mv = 0; for (let i = 0; i < 20 && mv < 100; i++) { await sleep(1000); mv = await ev(moved); } R.steps.wardSelectFlightMovedM = Math.round(mv);
+      let mv = 0, prevMv = -1; for (let i = 0; i < 20; i++) { await sleep(1000); mv = await ev(moved); if (mv >= 100 && Math.abs(mv - prevMv) < 50) break; prevMv = mv; } R.steps.wardSelectFlightMovedM = Math.round(mv); /* 飛行が止まる(2回連続で差<50m)まで待つ。以前は100m超えた最初の時点で採取し飛行途中の値(例:1.0km)を記録していた=ハーネス欠陥 */
       // ---- 操作: 検索→結果選択 ----
       await ev(`(()=>{const q=document.getElementById('lc-q');q.value='';q.focus()})()`); await send('Input.insertText', { text: '大阪' });
       let nopt = 0; for (let i = 0; i < 30 && !nopt; i++) { await sleep(500); nopt = await ev(`document.querySelectorAll('#lc-results button[role=option]').length`); } R.steps.searchResults = nopt;

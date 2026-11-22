@@ -168,3 +168,9 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/kita --lblab --lblab-size 1366x
 
 ## 次の優先順位
 1. 日本語フォント導入可否の判断(許可後に文字領域の画素比較)。2. 390x844/lblidle=1 の区選択飛行量(1.0km)の原因調査。3. 平野区・西区で lblab。4. 実GPU。
+
+## Mission218C(2026-11-23)第7段階ゲート分類
+**自動で確認済み(北区・SwiftShader・各1回、基準 45aa526+ハーネス修正)**: 日本語フォントありで lblab PC/mobile × lblidle 0/1 の4条件 PASS(検索・区選択・クリック・カード・ESC)。390 の区選択1.0kmはハーネス欠陥(修正後 0/1 とも 11.1km)。
+**ユーザー実機確認待ち**: 実GPUでの cold/warm 各5回以上の初建物・ラベル完了時刻(lblidle 0/1)、実Chrome での日本語ラベル判読、認証付き Vercel Preview(現行SHA の HTML/tileset/GLB 200 と WebGL)。合格条件: ラベル領域画素が lblidle 0/1 で同等、操作 PASS、tileFail=0、初建物時刻が悪化しない。
+**阻害要因**: (1) 24区同一SHA 110視点+24区クリックは 1GB ビルド(約10〜15分)と 55 地点バッチ(約5ジョブ)が必要。前景10分上限・`.github/workflows` 編集不可。今回起動していない=**NOT_TESTED**。364ae1e の過去 sweep は別SHAで現HEADのPASSではない。(2) 西区/平野区の `--lblab`・複数viewer patch・Preview は今回未実施(NOT_TESTED)。
+**P2 最短策**: 既存ラベル `run-mission213-qa:<n>` を 0/12/24/36/48 の順に1件ずつ付与(各バッチは自前ビルド約10〜15分・無料public runner)。現 workflow は `--lod`/`--lblab` を呼ばないため、置換後の24区クリックには管理者による `docs/mission213/qa-24ward-minimal-diff.patch` 方式の更新が必要(承認事項)。同一SHAで全バッチを揃えるまで「24区PASS」とは書かない。
