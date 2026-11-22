@@ -346,6 +346,83 @@ async function lodMode() {
   result.checks.lodSwitch = { farGMax: far.gMax, nearGMax: near.gMax, nearLeaf: near.leaf, nearSelected: near.selected, parentToLeaf: far.gMax > near.gMax && near.leaf > 0 };
   result.ok = !!(rows.every((r) => r.held && r.loaded && r.tileFail === 0) && result.checks.lodSwitch.parentToLeaf && result.checks.clickSelectsBuilding && (!result.checks.infoCard || result.checks.infoCard.cardOpensThenCloses));
 }
+// ---- --lblab: Mission218B 第7段階 第2サイクル。lblidle=0 対 1 を 同一区・同一視点で A/B(PC 1366x768 / mobile 390x844)。
+//   ラベル有無は状態フラグではなく「全 LabelCollection.show=false/true の 2 フレーム画素差」で判定する(推定 bbox 内の差分画素も数える)。
+//   併せて 検索→結果選択 / 区選択→飛行 / 建物クリック→canonicalId+カード本文→ESC を同じ変種で実行。フォントは canvas で 日 と 未定義コードポイントの描画一致=豆腐 を検査。
+//   使い方: --static <出力> --lblab [--lblab-size 1366x768|390x844] [--lblab-v 0|1] [--ward-name 北区] [--lat --lon]
+const LBL_JS = `(()=>{const sc=window.__v.scene;const o=[];const walk=(p)=>{if(!p)return;if(p instanceof Cesium.LabelCollection){o.push(p);return}if(p instanceof Cesium.PrimitiveCollection){for(let i=0;i<p.length;i++)walk(p.get(i))}};walk(sc.primitives);return o})()`;
+const LBL_MEASURE = `(()=>{const v=window.__v,sc=v.scene,cv=sc.canvas;const cols=${LBL_JS};
+ const grab=()=>{sc.render();const t=document.createElement('canvas');t.width=cv.width;t.height=cv.height;const g=t.getContext('2d');g.drawImage(cv,0,0);return g.getImageData(0,0,t.width,t.height).data};
+ const k=cv.width/Math.max(1,cv.clientWidth);const bbs=[];let total=0,inView=0,heavyCols=0;
+ for(const c of cols){if(c.length>40)heavyCols++;for(let i=0;i<c.length&&bbs.length<4000;i++){const l=c.get(i);total++;if(!l.show)continue;let wp=null;try{wp=Cesium.SceneTransforms.worldToWindowCoordinates(sc,l.position)}catch(e){}if(!wp)continue;
+  const px=parseFloat((String(l.font).match(/(\\d+(?:\\.\\d+)?)px/)||[])[1])||30,s=l.scale||1,w=String(l.text||'').length*px*s,h=px*s;const ox=(l.pixelOffset&&l.pixelOffset.x)||0,oy=(l.pixelOffset&&l.pixelOffset.y)||0;
+  const x0=(wp.x+ox-4)*k,x1=(wp.x+ox+w+4)*k,y0=(wp.y+oy-h*1.2)*k,y1=(wp.y+oy+h*0.5)*k;if(x1<0||y1<0||x0>cv.width||y0>cv.height)continue;inView++;bbs.push([x0,y0,x1,y1])}}
+ const sv=cols.map(c=>c.show);cols.forEach(c=>c.show=false);const A=grab();const A2=grab();cols.forEach((c,i)=>c.show=sv[i]);const B=grab();
+ const W=cv.width,H=cv.height,mask=new Uint8Array(W*H);for(const [x0,y0,x1,y1] of bbs){for(let y=Math.max(0,Math.floor(y0));y<Math.min(H,Math.ceil(y1));y++)for(let x=Math.max(0,Math.floor(x0));x<Math.min(W,Math.ceil(x1));x++)mask[y*W+x]=1}
+ let diff=0,diffIn=0,maskPx=0,unstable=0;for(let i=0,p=0;i<A.length;i+=4,p++){if(mask[p])maskPx++;if(Math.abs(A[i]-A2[i])+Math.abs(A[i+1]-A2[i+1])+Math.abs(A[i+2]-A2[i+2])>24){unstable++;continue}const d=Math.abs(A[i]-B[i])+Math.abs(A[i+1]-B[i+1])+Math.abs(A[i+2]-B[i+2]);if(d>24){diff++;if(mask[p])diffIn++}}
+ return {cols:cols.length,heavyCols,labelsTotal:total,labelsInView:inView,canvas:[W,H],labelDiffPx:diff,labelDiffPxInBBox:diffIn,bboxPx:maskPx,unstablePx:unstable,bboxNote:'bbox は font px×文字数からの推定(実グリフ幅ではない)'}})()`;
+const REAL_SEL = `(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);return ps.some(p=>(p._selectedTiles||[]).length>0)})()`;
+const REAL_SHARE = `(()=>{const v=window.__v,sc=v.scene,cv=sc.canvas;const grab=()=>{sc.render();const t=document.createElement('canvas');t.width=cv.width;t.height=cv.height;const g=t.getContext('2d');g.drawImage(cv,0,0);return g.getImageData(0,0,t.width,t.height).data};
+ const real=(sc.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);const sv=real.map(p=>p.show);const B=grab();real.forEach(p=>p.show=false);const A=grab();real.forEach((p,i)=>p.show=sv[i]);
+ let d=0;for(let i=0;i<A.length;i+=4)if(Math.abs(A[i]-B[i])+Math.abs(A[i+1]-B[i+1])+Math.abs(A[i+2]-B[i+2])>24)d++;return {realPx:d,total:A.length/4,realShare:+(d/(A.length/4)).toFixed(4)}})()`;
+const FONT_JS = `(()=>{const t=(s)=>{const c=document.createElement('canvas');c.width=60;c.height=40;const g=c.getContext('2d');g.font='28px sans-serif';g.fillText(s,4,30);return c.toDataURL()};return {jaGlyphRendered:t('日')!==t('\\u{10FFFD}'),sameAsTofuForRare:t('龘')===t('\\u{10FFFD}')}})()`;
+async function lblabMode() {
+  const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51)), wardName = opt('ward-name', '北区');
+  const sizes = opt('lblab-size', '1366x768,390x844').split(','), vars = opt('lblab-v', '0,1').split(',');
+  result.checks.lblab = []; result.checks.font = null;
+  for (const sz of sizes) for (const lv of vars) {
+    const [w, h] = sz.split('x').map(Number), R = { size: sz, lblidle: lv, ok: false, steps: {} }; result.checks.lblab.push(R);
+    try {
+      await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 600 });
+      const t0 = Date.now(); const up = await load(`citylod0=1&citylod0min=2500&lblidle=${lv}`); R.viewerMs = Date.now() - t0; if (!up) throw new Error('viewer 起動せず');
+      if (!result.checks.font) result.checks.font = await ev(FONT_JS);
+      await hookFail();
+      await ev(`window.__ev=[];window.addEventListener('livecity:37d-building-selected',e=>window.__ev.push(e.detail&&(e.detail.canonicalId||e.detail.id)));window.__flyOrig={};const c=window.__v.camera;for(const k of ['flyToBoundingSphere','flyTo','flyHome']){window.__flyOrig[k]=c[k];c[k]=function(){}}`);
+      // 同一視点(3000m,-45°): 起動時の初期カメラ移動に上書きされるため実高度に収まるまで再設定。最初の実タイル選択までの時刻を記録
+      const pitch = -45, lat = lat0 - (3000 / Math.tan(-pitch * D2R)) / 111320; let tReal = null;
+      for (let i = 0; i < 60; i++) { await fly(lon0, lat, 3000, pitch); await ev('window.__v.scene.requestRender()'); if (await ev(REAL_SEL)) { tReal = Date.now() - t0; break; } await sleep(1000); }
+      R.firstRealTileSelectedMs = tReal; await sleep(2000); await fly(lon0, lat, 3000, pitch);
+      R.heldH = await ev('Math.round(window.__v.camera.positionCartographic.height)');
+      R.initialBuilding = await ev(REAL_SHARE);
+      R.labelsEarly = await ev(LBL_MEASURE); R.gateEarly = await ev('window.__lblGate?JSON.stringify(window.__lblGate):null');
+      // ラベル完了: lblidle=1 は gate 開放、さらに共通で「ラベル差分画素>0」になる最初の時刻(状態ではなく画素で判定)
+      let tPx = null, tGate = null; const deadline = Date.now() + 60000;
+      while (Date.now() < deadline) { await fly(lon0, lat, 3000, pitch); const m = await ev(LBL_MEASURE); if (tPx === null && m.labelDiffPx > 0) tPx = Date.now() - t0; const g = await ev('window.__lblGate?JSON.stringify(window.__lblGate):null'); if (g) { const gj = JSON.parse(g); if (gj.open && tGate === null) tGate = Date.now() - t0; } if (tPx !== null && (lv === '0' || tGate !== null)) break; await sleep(1000); }
+      R.labelPixelFirstMs = tPx; R.gateOpenMs = tGate;
+      R.labelsFinal = await ev(LBL_MEASURE); R.gateFinal = await ev('window.__lblGate?JSON.stringify(window.__lblGate):null');
+      const lf = R.labelsFinal; R.labelReleasedButNoPixels = !!(lf.labelsInView > 0 && lf.labelDiffPx === 0 && (lv === '0' || (R.gateFinal && JSON.parse(R.gateFinal).open)));
+      R.tileFail = await ev('window.__tileFail||0');
+      // ---- 操作: 区選択→飛行 ----
+      await ev(`(()=>{const c=window.__v.camera.positionWC;window.__c0=[c.x,c.y,c.z]})()`);
+      const moved = `(()=>{const c=window.__v.camera.positionWC,o=window.__c0;return Math.hypot(c.x-o[0],c.y-o[1],c.z-o[2])})()`;
+      await window_unlock(); await ev(`(()=>{const b=[...document.querySelectorAll('.lc-wardbtn')].find(x=>x.textContent.includes(${JSON.stringify(wardName)}));window.__wardBtn=!!b;if(b)b.click()})()`);
+      R.steps.wardBtnFound = await ev('!!window.__wardBtn');
+      let mv = 0; for (let i = 0; i < 20 && mv < 100; i++) { await sleep(1000); mv = await ev(moved); } R.steps.wardSelectFlightMovedM = Math.round(mv);
+      // ---- 操作: 検索→結果選択 ----
+      await ev(`(()=>{const q=document.getElementById('lc-q');q.value='';q.focus()})()`); await send('Input.insertText', { text: '大阪' });
+      let nopt = 0; for (let i = 0; i < 30 && !nopt; i++) { await sleep(500); nopt = await ev(`document.querySelectorAll('#lc-results button[role=option]').length`); } R.steps.searchResults = nopt;
+      if (nopt) { await ev(`(()=>{const c=window.__v.camera.positionWC;window.__c0=[c.x,c.y,c.z]})()`); await ev(`document.querySelector('#lc-results button[role=option]').click()`); let m2 = 0; for (let i = 0; i < 20 && m2 < 100; i++) { await sleep(1000); m2 = await ev(moved); } R.steps.searchSelectFlightMovedM = Math.round(m2); }
+      // ---- 操作: 建物クリック→canonicalId+カード本文→ESC(600m) ----
+      await ev(`(()=>{const c=window.__v.camera;for(const k in window.__flyOrig)c[k]=function(){}})()`);
+      const lat6 = lat0 - (600 / Math.tan(60 * D2R)) / 111320; R.steps.near600Held = await holdCam(lon0, lat6, 600, -60); await sleep(2500);
+      let spot = await ev(`(()=>{const v=window.__v,c=v.scene.canvas;const cx=c.clientWidth/2,cy=c.clientHeight/2,cand=[];for(let i=1;i<40;i++)for(let j=1;j<28;j++)cand.push([c.clientWidth*i/40,c.clientHeight*j/28]);cand.sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));const rc=c.getBoundingClientRect();let covered=0;for(const [x,y] of cand){const p=v.scene.pick(new Cesium.Cartesian2(x,y));if(p&&p.getProperty&&p.getProperty('canonicalId')&&!(p.tileset&&p.tileset._lcCityLod0)){const e=document.elementFromPoint(x+rc.left,y+rc.top);if(e!==c){covered++;continue}return {x,y,id:p.getProperty('canonicalId'),coveredSkipped:covered}}}return {none:true,coveredSkipped:covered}})()`);
+      R.steps.coveredSpotsSkipped = spot && spot.coveredSkipped; if (spot && spot.none) spot = null;
+      R.steps.clickSpot = !!spot;
+      if (spot) {
+        const r = await ev(`(()=>{const c=window.__v.scene.canvas.getBoundingClientRect();return {l:c.left,t:c.top}})()`); await ev('window.__ev=[]');
+        for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: spot.x + r.l, y: spot.y + r.t, button: 'left', clickCount: 1 });
+        await sleep(1500); R.steps.clickSelectsBuilding = ((await ev('window.__ev')) || []).includes(spot.id);
+        const cs = `(()=>{const b=document.getElementById('lc-bldg-body');return {bodyOn:!!(b&&b.classList.contains('on')),innerText:b?b.innerText.trim().length:0,tc:b?b.textContent.replace(/\\s+/g,'').length:0,cid:(document.getElementById('lc-cid')||{}).textContent||null,rendered:!!(b&&b.getClientRects().length)}})()`;
+        R.steps.cardOpen = await ev(cs); await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await sleep(800);
+        R.steps.cardClosed = await ev(cs);
+      }
+      const s = R.steps; R.ok = !!(R.heldH && Math.abs(R.heldH - 3000) < 300 && R.tileFail === 0 && R.firstRealTileSelectedMs !== null && s.wardBtnFound && s.wardSelectFlightMovedM >= 100 && s.searchResults > 0 && s.searchSelectFlightMovedM >= 100 && s.clickSelectsBuilding && s.cardOpen && s.cardOpen.bodyOn && s.cardOpen.tc > 0 && s.cardClosed && !s.cardClosed.bodyOn);
+    } catch (e) { R.error = String(e.message || e); }
+  }
+  await send('Emulation.clearDeviceMetricsOverride');
+  result.ok = result.checks.lblab.length > 0 && result.checks.lblab.every((r) => r.ok);
+}
+const window_unlock = () => ev(`(()=>{const c=window.__v.camera;for(const k in window.__flyOrig||{})c[k]=window.__flyOrig[k];return true})()`);
 async function realMode() {
   const lat0 = Number(opt('lat', 34.7055)), lon0 = Number(opt('lon', 135.51));
   const t0 = Date.now();
@@ -378,7 +455,7 @@ async function realMode() {
   result.ok = !!(result.checks.lod0Loaded && hp.realShare > 0.05 && result.checks.lowAltLod0Shown === false && result.checks.clickSelectsBuilding);
 }
 try {
-  if (STATIC && a.includes('--lod')) await lodMode(); else if (STATIC && a.includes('--profile')) await profileMode(); else if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
+  if (STATIC && a.includes('--lblab')) await lblabMode(); else if (STATIC && a.includes('--lod')) await lodMode(); else if (STATIC && a.includes('--profile')) await profileMode(); else if (STATIC && a.includes('--baseline')) await baselineMode(); else if (STATIC && a.includes('--compare')) await compareMode(); else if (STATIC) await realMode(); else {
   const up = await load('citylod0=1&citylod0min=2500'); result.checks.viewerLoaded = up; 
   if (!up) { result.checks.error = 'Cesium/viewer が起動しません(CDN 到達不能の可能性): ' + JSON.stringify(result.console.slice(0, 3)); throw new Error(result.checks.error); }
   const [lx, lz] = ll(3000, 1500);

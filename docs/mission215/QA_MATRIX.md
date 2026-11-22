@@ -141,3 +141,9 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 | LC_COARSE_MERGE | (c) 不採用(既定OFF) | 親−8〜−37%、道路被覆トレードオフ |
 
 lblidle 移行基準: 実GPUでcold/warm各N回の初建物・ラベル完了時刻、ラベル領域画素一致、検索/クリック/カード/区切替合格、idle未発火時20s保険の劣化なし。
+
+
+## Mission218B 第2サイクル(北区・SwiftShader・各1回)
+- 検索→結果選択→飛行、区選択→飛行、実建物クリック→canonicalId+カード本文→ESC: PC 1366x768 / mobile 390x844 × lblidle=0/1 の4条件すべて PASS(390 の初回クリック失敗はUIオーバーレイによるハーネス欠陥、本体修正なし)。
+- 390x844/lblidle=1 の区選択飛行量が 1.0km(他は 11〜17km)。原因未調査。
+- ラベル画素差分・日本語フォント(NOT_TESTED)・実GPU(NOT_TESTED)・lblidle 既定ON禁止の詳細は docs/mission217/QA_24WARDS.md の Mission218B 節。

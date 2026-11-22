@@ -126,3 +126,45 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/hirano --lod --lat 34.6150 --lo
 1. E2Eに「ラベル表示完了時刻」と、同一カメラのラベル領域画素差分(PNG→Chromium canvasで比較)を追加。
 2. 北区・西区・平野区で 1366x768 / 390x844 の検索・区選択・ESC。
 3. LOD2あり区を1区ずつ追加（現SHAで）。24区一体はワークフロー分割の管理者承認後。
+
+
+# Mission218B 第2サイクル（HEAD 969075a、北区のみ・実データ、headless Chromium+SwiftShader、各条件1回）
+
+## 追加物
+- `e2e-city-lod0.mjs --static <出力> --lblab [--lblab-size 1366x768|390x844] [--lblab-v 0|1]`: 同一視点(3000m,-45°)で `lblidle=0/1` を比較。ラベル有無は **全 LabelCollection の show=false/true の画素差**(A,A2,B の3フレームで不安定画素を除外)で判定。推定bbox内の差分画素も出力。ラベル完了=画素差>0の最初の時刻(状態フラグではない)。
+- 同じ変種で 区選択→飛行 / 検索→結果選択→飛行 / 建物実クリック→canonicalId+カード本文→ESC を実行。
+- `tests/mission218b-lblidle-patch.test.cjs`(5件 pass): fake Cesium 上で monkey patch の既定OFF非影響・heavy 保留/少数即時・20秒保険・viewer destroy を確認。実ブラウザ/実GPUの代替ではない。
+
+## 結果(北区、各1回。時間は誤差範囲かもしれず、改善とは言わない)
+| サイズ | lblidle | ok | 最初の実タイル選択 | ラベル画素 最初に>0 | gate open | 最終ラベル差分画素(bbox内) | ラベル数(視野内) | tileFail | 区選択飛行 | 検索選択飛行 | クリックID一致 | カード本文tc | ESC閉 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1366x768 | 0 | PASS | 18.1s | 31.2s | - | 87,103(81,822) | 80 | 0 | 16.6km | 17.9km | PASS | 142 | PASS |
+| 1366x768 | 1 | PASS | 10.6s | 24.3s | 24.3s | 131,053(76,319、不安定画素65,271) | 80 | 0 | 16.4km | 19.6km | PASS | 142 | PASS |
+| 390x844 | 0 | PASS | 9.7s | 18.2s | - | 56,564(54,260) | 88 | 0 | 11.1km | 9.3km | PASS | 141 | PASS |
+| 390x844 | 1 | PASS | 7.8s | 16.5s | 16.6s | 56,563(54,259) | 88 | 0 | 1.0km | 8.7km | PASS | 141 | PASS |
+(飛行量は camera.positionWC の移動距離[m→km換算]。`wardSelectFlightMovedM` を参照。390x844/lblidle=1 の区選択は1.0kmで他より小さい。原因未調査)
+
+- **ラベル画素**: 390x844 は lblidle 0/1 で最終画素差(56,564 / 56,563)がほぼ一致。1366x768 は bbox内が 81,822 対 76,319(約93%)で、完全一致ではない。lblidle=1 は不安定画素が多く(タイル更新中)、**画素一致の確証は取れていない**。ラベル「省略」が起きていないこと(labelReleasedButNoPixels=false、released しても画素0になる問題は検出されず)までは言える。
+- **initial building pixel**(最初の実タイル選択直後の実建物画素率)は 1366: 0.556(lbl0)/0.355(lbl1)、390: 0.255/0.253。計測時刻のタイル進行が異なり比較不能。
+- lblidle=1 の gate: triggerMs=3.4〜8.9s(実タイル選択)、doneMs=7.2〜18.1s(ページ起動から)。
+
+## フォント(限界)
+runner に日本語フォントなし(`fc-list :lang=ja` 空、canvas で「日」が未定義コードポイントと同一描画=豆腐)。**文字の判読/文字化け/フォント欠損の画素検証は NOT_TESTED**。ラベルは「豆腐として描かれる画素」の有無・位置でしか見ていない。日本語フォント(Noto Sans CJK JP は SIL OFL=無償)の導入は apt で可能と思われるが、runner へのインストールは workflow/環境変更に当たるため今回は行っていない。
+
+## ハーネス欠陥 vs 本体
+- 390x844 で最初クリック不一致(c=false)だった原因は **ハーネス**: 画面中心付近の pick 候補が UI オーバーレイ(ヘッダ/シート)に覆われクリックが canvas に届かなかった(`elementFromPoint` で 143 候補が覆われ、canvas 上の候補へ変更し PASS)。本体修正なし。
+- 区選択が 0m だった初回は、E2E 側の flyTo 無効化を解除する前にクリックしたハーネス欠陥(順序修正済み)。
+
+## NOT_TESTED
+実GPU(SwiftShader のみ)・日本語文字の画素検証・複数 viewer での monkey patch 二重ラップ・viewer destroy 後の実ブラウザ挙動・北区以外・平野区/西区での lblab・24区/55地点(今回は起動していない)・Vercel 認証付き Preview。
+**lblidle は既定OFFのまま採用保留**(再現: 下記)。
+
+## ユーザー実GPUでの採用判定手順
+```
+node tools/cloud/build-cloud-preview.mjs --wards kita --single-pass --city-lod0 --out temp/kita
+node tools/cloud/e2e-city-lod0.mjs --static temp/kita --lblab --lblab-size 1366x768 --out lblab-pc.json   # 実機GPUなら --chrome で実Chrome指定(SwiftShader フラグは E2E 内で固定)
+```
+実GPU採否は、最初の実タイル選択時刻・ラベル画素>0 時刻・bbox 内差分画素が lblidle 0/1 で同等かを複数回(各5回以上)見る。
+
+## 次の優先順位
+1. 日本語フォント導入可否の判断(許可後に文字領域の画素比較)。2. 390x844/lblidle=1 の区選択飛行量(1.0km)の原因調査。3. 平野区・西区で lblab。4. 実GPU。
