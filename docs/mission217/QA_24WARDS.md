@@ -1,3 +1,50 @@
+# Mission217C 西区・平野区(LOD2=0) 実区QA（HEAD 21653f4 基準、SwiftShader・実PLATEAU2025・各1回）
+
+PASS/FAIL/NOT_TESTED。実GPU・認証付きVercel Preview の成功ではない。Actions の queued/in_progress は開始時 0 件。
+
+## 実行コマンド
+```
+node tools/cloud/build-cloud-preview.mjs --wards nishi  --single-pass --city-lod0 --out temp/nishi    # 49秒 43.9MB
+node tools/cloud/e2e-city-lod0.mjs --static temp/nishi --lod --lat 34.6786 --lon 135.4900 --out temp/lod-nishi.json   # 110秒
+node tools/cloud/build-cloud-preview.mjs --wards hirano --single-pass --city-lod0 --out temp/hirano   # 113秒 81.0MB
+node tools/cloud/e2e-city-lod0.mjs --static temp/hirano --lod --lat 34.6150 --lon 135.5400 --shots temp/shots-hirano --out temp/lod-hirano.json   # 118秒
+```
+取得は Range retry 版(Mission217B)で、2区とも取得エラー・リトライ起因の失敗なし（通信エラーcauseの発生なし, `netFailed` なし）。
+
+## 結果
+| 項目 | 西区 | 平野区(LOD2=0) |
+|---|---|---|
+| ビルド | PASS: LOD1 12,603棟(補完12,425+LOD2同ID除外178), LOD2 1,767, doubleDrawn=0 | PASS: LOD1 46,473棟, LOD2 0(空LOD2正常), doubleDrawn=0 |
+| 道路/水域 | 3,421件(0.77MB) / 77件 | 13,703件(2.88MB) / 377件 |
+| LOD0 | 197セル 5タイル 115KB | 425セル 10タイル 246KB |
+| `--lod` ok | PASS | PASS |
+| tileset/GLB HTTP | LOD0 tileset 1/1, LOD0 GLB 5/5, 実tileset 2/2, 実GLB 55/55 が2xx | 1/1, 10/10, 1/1, 98/98 が2xx |
+| optionalAsset 404 | 112件(towns-24等・他区source.json等。実建物の取得失敗ではない) | 118件(同) |
+| realLayerOrIndex 404 | railways/parks 等4件（この区に無い任意レイヤー） | 同4件 |
+| click→canonicalId | PASS(bldg_d2d021f6…) | PASS(bldg_ab0c4680…) |
+| 情報カード開閉 | PASS | 開閉は成立。ただし開時 text=0(本文空)。内容の正否は NOT_TESTED（要調査） |
+| tileFail | 全視点 0 | 全視点 0 |
+| 親→葉(30km→600m) | PASS (GE 40→0, 葉6) | PASS (GE 40→0, 葉3) |
+| held/loaded | 全5視点 true | 全5視点 true |
+| 視点別 realShare (30k/15k/6k/3k/600) | .006/.019/.022/.390/.711 | .018/.061/.060/.310/.204 |
+
+- 平野区 3000m/600m のPNGを目視: LOD1建物は青灰色、道路は灰色、区境線あり。黒化・白格子・LOD0とLOD1の二重描画は見えない。画面の白い領域は単独区ビルドで隣区が無い範囲。ラベル文字はフォント無しで化ける（SwiftShader環境）。PNG は実データ由来のため commit しない。
+- 平野区のLOD1 fallback は、LOD2=0でもクリック・親→葉が維持されることを確認（今回SHA）。
+- LOD1/LOD2色の比較は西区で数値化していない（`shot:false`）。LOD2色の目視は NOT_TESTED。座標は aim.hit=true(中心から10〜16m以内)のみで確認。
+
+## NOT_TESTED（今回）
+ラベル最終画素・検索・カードのESC・スマホ(390x844)・実GPU・認証付きVercel Preview・24区一体・55地点（現SHA）。
+
+## 24区/55地点 最終QAの低コスト案（未実行）
+- 現行 workflow はバッチ毎に all-wards(約1GB, 10〜15分)を再生成する。バッチ6回=約60〜90 runner分。
+- 案A（推奨・権利/容量リスク最小）: 1 workflow run 内で all-wards を1回だけビルドし、同じ run の同一SHAで sweep を `--start-point` で複数ステップ(各 budget 20分以内)実行する。job上限55分に収まらない場合は2 job に分け、artifactではなく再ビルドを許容（ビルド1回/jobで計2回）。要 `.github/workflows` 編集＝管理者作業。
+- 案B: `actions/cache` にビルド出力を保存。公式PLATEAU派生で既存Previewと同一範囲だが、容量(約1GB/10GB上限)と権利は管理者判断。未採用。
+- 案C: 区単独ビルド+`--lod`(各約1.5〜4分)を、LOD2あり/なしの代表区＋隣接2〜3区で現SHA再検証し、24区一体は1回の最終runに限る。
+- 直ちに24区ビルドは起動していない。
+
+## 現在の未達ゲート / 次
+1. 24区一体・55地点を現SHA統一で（上記案A/C）。 2. 平野区カード本文空(text=0)の原因確認。 3. ラベル画素・検索・ESC・スマホ。 4. 実GPU/Vercel認証付きPreview。
+
 # Mission217B 取得失敗の切り分け（HEAD 13529d9 基準・追記）
 
 ## 診断（実測、秘密情報・署名URLなし）
