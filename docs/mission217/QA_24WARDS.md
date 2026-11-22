@@ -89,3 +89,21 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/hirano --lod --lat 34.6150 --lo
 ## E2E結果（北区のみ、実データ、headless Chromium+SwiftShader）
 - `--lod --qs "citylod0=1&lblidle=0"` と `lblidle=1`: どちらも `ok=true`, `clickSelectsBuilding=true`（各1回, exit 0）。
 - ラベル画素比較(lblidle 0/1)・tileFail/視点別数値の精査・FPS: NOT_TESTED（今回は ok/click のみ確認）。実GPUは未確認。
+
+
+# Mission217D（HEAD 3c677a6 基準）
+
+## 平野区 カード text=0 の切り分け（コード読解のみ。再現は未実施）
+- `selectBuilding`(public/mission37g-osaka-24ward-mvp.html:3744-3745,3800-3801)は `#lc-bldg-body.on` を付けた直後に同期で `#lc-cid` 等へ textContent を書く。区ごとの資産有無に依存せず、本文は非空になるはず。
+- E2E の `text` は `innerText` の長さ。`innerText` は祖先が非描画(display:none 等)だと 0 を返すため、「bodyOn=true なのに text=0」は本体の空カードより、**測定側の偽陰性(祖先非表示・viewport 依存)**の可能性が高い。ただし**確定ではない**(平野区の単独ビルドは Actions 外では再現していない)。
+- 診断を追加: `checks.infoCard.opened/closed` に `tc`(textContent長)・`cid`・`rendered`・`hiddenBy`・`vw/vh` を記録(`tools/cloud/e2e-city-lod0.mjs`)。次回の平野区 `--lod` で、tc>0 かつ rendered=false なら偽陰性、tc=0 なら本体不具合と判定できる。本体HTMLは未変更。
+- 必須/任意アセット: カード本文に必須の外部資産は無い(属性はタイル由来、sidecar/写真索引は任意で失敗しても本文は残る設計)。
+
+## 今回 NOT_TESTED
+平野区カード再現、ESC/検索/区選択/スマホ390x844/PC1366x768、実GPU、`lblidle=1`(既定OFF維持)、24区一体、Vercel認証付きPreview。この run では実ブラウザもビルドも実行していない。
+
+## 案A(1回生成・複数sweep)の read-only 精査
+- 実行可能: 同一job内で `build --all-wards --city-lod0`(実測590〜890秒,約1GB)後、`e2e --sweep --start-point N --budget-min 20` を3〜4ステップ。計 約75〜95分で単一job上限(現55分)を超えるため2 job(ビルド2回)か、sweepを2ステップ(約40分)に絞る必要あり。
+- 必要差分: `.github/workflows/mission213-qa.yml` の編集(管理者作業、App権限なし)。差分案は `docs/mission213/qa-24ward-minimal-diff.patch` を拡張する形。
+- 費用: public repo の標準runnerなら無料想定だが、無料枠の確証は未取得。確証がないため全域ビルドは起動していない。
+- 権利/privateリスク: 出力は公式PLATEAU2025派生で既存Previewと同範囲。artifactには集計JSONのみ(GLB/PNG非掲載)を維持。
