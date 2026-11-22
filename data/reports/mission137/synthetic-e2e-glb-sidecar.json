@@ -1,0 +1,356 @@
+{
+ "schema": "livecity.mission135.e2e/1",
+ "dataKind": "synthetic-fixture",
+ "realData24WardsProven": false,
+ "wards": {
+  "kita": {
+   "layers": {
+    "buildings": {
+     "cls": "ready",
+     "text": "表示中（3D Tiles）"
+    },
+    "roads": {
+     "cls": "ready",
+     "text": "表示中（線2本）"
+    },
+    "waterLine": {
+     "cls": "ready",
+     "text": "表示中（1本）"
+    },
+    "waterArea": {
+     "cls": "ready",
+     "text": "表示中（3面）"
+    }
+   },
+   "http": {
+    "tileset": [
+     200,
+     200
+    ],
+    "glb": [
+     200
+    ],
+    "roads": [
+     200
+    ],
+    "waterways": [
+     200
+    ],
+    "waterSurface": [
+     200
+    ],
+    "notFound": []
+   },
+   "pixels": {
+    "buildings": {
+     "diff": 31115,
+     "pct": 3.039
+    },
+    "roads": {
+     "diff": 7573,
+     "pct": 0.74
+    },
+    "waterLine": {
+     "diff": 5101,
+     "pct": 0.498
+    },
+    "waterArea": {
+     "diff": 55414,
+     "pct": 5.412
+    },
+    "allOffVsAllOn": {
+     "diff": 99155,
+     "pct": 9.683
+    }
+   },
+   "resources": {
+    "tilesets": 1,
+    "polylineCollections": 2,
+    "areaPrimitives": 1,
+    "total": 4
+   },
+   "noise": {
+    "diff": 0,
+    "pct": 0
+   },
+   "alignment": {
+    "errorM": 0,
+    "toleranceM": 3
+   },
+   "expectMissing": []
+  },
+  "miyakojima": {
+   "layers": {
+    "buildings": {
+     "cls": "ready",
+     "text": "表示中（3D Tiles）"
+    },
+    "roads": {
+     "cls": "ready",
+     "text": "表示中（線2本）"
+    },
+    "waterLine": {
+     "cls": "ready",
+     "text": "表示中（1本）"
+    },
+    "waterArea": {
+     "cls": "ready",
+     "text": "表示中（3面）"
+    }
+   },
+   "http": {
+    "tileset": [
+     200,
+     200
+    ],
+    "glb": [
+     200
+    ],
+    "roads": [
+     200
+    ],
+    "waterways": [
+     200
+    ],
+    "waterSurface": [
+     200
+    ],
+    "notFound": []
+   },
+   "pixels": {
+    "buildings": {
+     "diff": 31112,
+     "pct": 3.038
+    },
+    "roads": {
+     "diff": 7573,
+     "pct": 0.74
+    },
+    "waterLine": {
+     "diff": 5100,
+     "pct": 0.498
+    },
+    "waterArea": {
+     "diff": 55218,
+     "pct": 5.392
+    },
+    "allOffVsAllOn": {
+     "diff": 98981,
+     "pct": 9.666
+    }
+   },
+   "resources": {
+    "tilesets": 1,
+    "polylineCollections": 2,
+    "areaPrimitives": 1,
+    "total": 4
+   },
+   "noise": {
+    "diff": 0,
+    "pct": 0
+   },
+   "alignment": {
+    "errorM": 0,
+    "toleranceM": 3
+   },
+   "expectMissing": []
+  },
+  "fukushima": {
+   "layers": {
+    "buildings": {
+     "cls": "ready",
+     "text": "表示中（3D Tiles）"
+    },
+    "roads": {
+     "cls": "missing",
+     "text": "未取得（HTTP 404）"
+    },
+    "waterLine": {
+     "cls": "ready",
+     "text": "表示中（1本）"
+    },
+    "waterArea": {
+     "cls": "ready",
+     "text": "表示中（3面）"
+    }
+   },
+   "http": {
+    "tileset": [
+     200,
+     200
+    ],
+    "glb": [
+     200
+    ],
+    "roads": [
+     404
+    ],
+    "waterways": [
+     200
+    ],
+    "waterSurface": [
+     200
+    ],
+    "notFound": [
+     "roads.json"
+    ]
+   },
+   "pixels": {
+    "buildings": {
+     "diff": 31114,
+     "pct": 3.038
+    },
+    "roads": {
+     "diff": 153,
+     "pct": 0.015
+    },
+    "waterLine": {
+     "diff": 5105,
+     "pct": 0.499
+    },
+    "waterArea": {
+     "diff": 55386,
+     "pct": 5.409
+    },
+    "allOffVsAllOn": {
+     "diff": 91758,
+     "pct": 8.961
+    }
+   },
+   "resources": {
+    "tilesets": 1,
+    "polylineCollections": 1,
+    "areaPrimitives": 1,
+    "total": 3
+   },
+   "noise": {
+    "diff": 0,
+    "pct": 0
+   },
+   "alignment": {
+    "errorM": 0,
+    "toleranceM": 3
+   },
+   "expectMissing": [
+    "roads"
+   ]
+  }
+ },
+ "checks": {
+  "wardA_fourLayersPixelDiff_http200_aligned": true,
+  "wardB_fourLayersPixelDiff_http200_aligned": true,
+  "switch_releasedPreviousWard": true,
+  "missingRoads_not_treated_as_success": true,
+  "missingRoads_other_layers_still_render": true,
+  "race_finalWardIsLastRequest_noLeak": true,
+  "canonicalIdClick_3dtiles_sidecar_allMatch": true,
+  "sidecar_missing_is_404": true,
+  "noJsErrors": true
+ },
+ "browser": "Chrome/156.0.8078.79",
+ "jsErrors": [],
+ "port": 41787,
+ "webgl": true,
+ "switch": {
+  "releasesDelta": 1,
+  "resources": {
+   "tilesets": 1,
+   "polylineCollections": 2,
+   "areaPrimitives": 1,
+   "total": 4
+  }
+ },
+ "race": {
+  "finalWard": "miyakojima",
+  "aborted": 2,
+  "resources": {
+   "tilesets": 1,
+   "polylineCollections": 2,
+   "areaPrimitives": 1,
+   "total": 4
+  },
+  "layers": {
+   "buildings": {
+    "cls": "ready",
+    "text": "表示中（3D Tiles）"
+   },
+   "roads": {
+    "cls": "ready",
+    "text": "表示中（線2本）"
+   },
+   "waterLine": {
+    "cls": "ready",
+    "text": "表示中（1本）"
+   },
+   "waterArea": {
+    "cls": "ready",
+    "text": "表示中（3面）"
+   }
+  }
+ },
+ "click3dTiles": {
+  "dataKind": "synthetic-fixture",
+  "ward": "kita",
+  "samples": 6,
+  "matched": 6,
+  "results": [
+   {
+    "id": "fx--2412--10953-00",
+    "picked": "fx--2412--10953-00",
+    "via": "3dtiles-sidecar",
+    "featureId": 0,
+    "x": 405,
+    "y": 244
+   },
+   {
+    "id": "fx--2412--10953-01",
+    "picked": "fx--2412--10953-01",
+    "via": "3dtiles-sidecar",
+    "featureId": 1,
+    "x": 398,
+    "y": 560
+   },
+   {
+    "id": "fx--2412--10953-10",
+    "picked": "fx--2412--10953-10",
+    "via": "3dtiles-sidecar",
+    "featureId": 2,
+    "x": 640,
+    "y": 240
+   },
+   {
+    "id": "fx--2412--10953-11",
+    "picked": "fx--2412--10953-11",
+    "via": "3dtiles-sidecar",
+    "featureId": 3,
+    "x": 640,
+    "y": 565
+   },
+   {
+    "id": "fx--2412--10953-20",
+    "picked": "fx--2412--10953-20",
+    "via": "3dtiles-sidecar",
+    "featureId": 4,
+    "x": 889,
+    "y": 235
+   },
+   {
+    "id": "fx--2412--10953-21",
+    "picked": "fx--2412--10953-21",
+    "via": "3dtiles-sidecar",
+    "featureId": 5,
+    "x": 896,
+    "y": 570
+   }
+  ],
+  "sidecarHttp": {
+   "b.glb": 200
+  },
+  "sidecar404Probe": 404
+ },
+ "allPassed": true,
+ "hitsSummary": {
+  "total": 46,
+  "notFound": 2
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "schema": "livecity.mission137.click-mismatch/1",
+ "dir": "public/map-data/osaka-city/buildings/osaka-sumiyoshi",
+ "buildings": 35031,
+ "targets": [
+  {
+   "id": "bldg_b64b32d4-c04b-4ef9-82e2-1a189fa1b4b3",
+   "class": "none",
+   "ownContainsRep": true,
+   "top": 3.9,
+   "areaM2": 30.3,
+   "coveredBy": []
+  },
+  {
+   "id": "bldg_8460a90b-0c50-4235-83f5-af49cbdb49ba",
+   "class": "none",
+   "ownContainsRep": true,
+   "top": 11.7,
+   "areaM2": 121.3,
+   "coveredBy": []
+  }
+ ],
+ "wardOverlap": {
+  "total": 35031,
+  "byClass": {
+   "none": 34907,
+   "overlap-higher": 95,
+   "overlap-lower": 29
+  }
+ }
+}

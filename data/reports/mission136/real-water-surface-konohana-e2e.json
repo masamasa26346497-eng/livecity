@@ -1,0 +1,53 @@
+{
+ "schema": "livecity.mission136.water-e2e/1",
+ "ward": "konohana",
+ "dataKind": "real-water-surface-only",
+ "threeLayersRealVerified": false,
+ "realData24WardsProven": false,
+ "checks": {
+  "waterAreaReady": true,
+  "waterSurfaceHttp200": true,
+  "waterAreaOnOffPixelDiff": true,
+  "buildingsRoadsMissingNotFaked": true,
+  "noJsErrors": true
+ },
+ "jsErrors": [],
+ "browser": "Chrome/156.0.8078.79",
+ "layers": {
+  "buildings": {
+   "cls": "missing",
+   "text": "未取得（tileset / footprints とも HTTP 404）"
+  },
+  "roads": {
+   "cls": "missing",
+   "text": "未取得（HTTP 404）"
+  },
+  "waterLine": {
+   "cls": "missing",
+   "text": "未取得（waterways HTTP 404）"
+  },
+  "waterArea": {
+   "cls": "ready",
+   "text": "表示中（3820面）"
+  }
+ },
+ "pixels": {
+  "noise": {
+   "diff": 0,
+   "pct": 0
+  },
+  "waterArea": {
+   "diff": 373499,
+   "pct": 36.475
+  }
+ },
+ "http": {
+  "waterSurface": [
+   200
+  ],
+  "roads": [
+   404
+  ]
+ },
+ "allPassed": true
+}

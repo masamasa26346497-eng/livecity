@@ -1,0 +1,186 @@
+{
+ "schema": "livecity.mission136.real-e2e/1",
+ "ward": "sumiyoshi",
+ "stage": "real-buildings+synthetic-layers",
+ "dataKind": "real-buildings+synthetic-layers",
+ "realBuildingsOnly": false,
+ "threeLayersRealVerified": false,
+ "realData24WardsProven": false,
+ "declared": {
+  "totalBuildings": 35031,
+  "tileCount": 52
+ },
+ "checks": {
+  "realFootprintsLoaded_matchDeclared": true,
+  "http200_manifest_and_all_tiles": true,
+  "buildingsLayerReady": true,
+  "buildingsOnOffPixelDiff": true,
+  "alignment_boundsInsideWard": true,
+  "canonicalIdClick": true,
+  "noJsErrors": true,
+  "syntheticRoads200_and_pixels": true,
+  "syntheticWaterLine": true,
+  "syntheticWaterArea": true
+ },
+ "jsErrors": [],
+ "browser": "Chrome/156.0.8078.79",
+ "webgl": true,
+ "layers": {
+  "buildings": {
+   "cls": "ready",
+   "text": "表示中（実フットプリント 35031棟 / 宣言35031）"
+  },
+  "roads": {
+   "cls": "ready",
+   "text": "表示中（2本）"
+  },
+  "waterLine": {
+   "cls": "ready",
+   "text": "表示中（1本）"
+  },
+  "waterArea": {
+   "cls": "ready",
+   "text": "表示中（3面）"
+  }
+ },
+ "buildingSource": "footprints",
+ "footprint": {
+  "declared": 35031,
+  "tiles": 52,
+  "loadedTiles": 52,
+  "buildings": 35031,
+  "skipped": 0,
+  "failedTiles": 0,
+  "bounds": {
+   "minX": -3441.02,
+   "maxX": -120.59,
+   "minZ": -2303.56,
+   "maxZ": 1865.59
+  }
+ },
+ "errors": [],
+ "http": {
+  "manifest": [
+   200
+  ],
+  "tileCount": 52,
+  "tileStatuses": [
+   200
+  ],
+  "tilesetProbe": [
+   404
+  ],
+  "layerStatuses": {
+   "roads": [
+    200
+   ],
+   "waterways": [
+    200
+   ],
+   "water-surface": [
+    200
+   ]
+  }
+ },
+ "alignment": {
+  "boundsInsideWardBbox": true,
+  "bounds": {
+   "minX": -3441.02,
+   "maxX": -120.59,
+   "minZ": -2303.56,
+   "maxZ": 1865.59
+  },
+  "wardBbox": {
+   "minX": -3487.14,
+   "maxX": -123.87,
+   "minZ": -2304.82,
+   "maxZ": 2009.81
+  },
+  "northIsNegativeZ": true
+ },
+ "pixels": {
+  "noise": {
+   "diff": 0,
+   "pct": 0
+  },
+  "buildings": {
+   "diff": 233117,
+   "pct": 22.765
+  },
+  "roads": {
+   "diff": 791,
+   "pct": 0.077
+  },
+  "waterLine": {
+   "diff": 581,
+   "pct": 0.057
+  },
+  "waterArea": {
+   "diff": 835,
+   "pct": 0.082
+  }
+ },
+ "click": {
+  "cameraHeightM": 1200,
+  "samples": 25,
+  "matched": 25,
+  "rate": 1,
+  "examples": [
+   {
+    "id": "bldg_87c1283d-f586-43fa-81fe-87e4e66566b5",
+    "picked": "bldg_87c1283d-f586-43fa-81fe-87e4e66566b5",
+    "x": 1031,
+    "y": 510
+   },
+   {
+    "id": "bldg_c9aee4e8-a3dc-4080-9399-fc2ea3e0b6e5",
+    "picked": "bldg_c9aee4e8-a3dc-4080-9399-fc2ea3e0b6e5",
+    "x": 1064,
+    "y": 290
+   },
+   {
+    "id": "bldg_9b012dde-c022-4572-a834-7a9771eb1851",
+    "picked": "bldg_9b012dde-c022-4572-a834-7a9771eb1851",
+    "x": 1224,
+    "y": 241
+   },
+   {
+    "id": "bldg_71641198-fc8f-4a64-8205-0457a1c2f979",
+    "picked": "bldg_71641198-fc8f-4a64-8205-0457a1c2f979",
+    "x": 1220,
+    "y": 272
+   },
+   {
+    "id": "bldg_260c19e5-32f9-40cc-bc77-171ee795ca4c",
+    "picked": "bldg_260c19e5-32f9-40cc-bc77-171ee795ca4c",
+    "x": 1047,
+    "y": 130
+   }
+  ],
+  "mismatches": []
+ },
+ "pixelsClose": {
+  "noise": {
+   "diff": 0,
+   "pct": 0
+  },
+  "buildings": {
+   "diff": 484865,
+   "pct": 47.35
+  },
+  "roads": {
+   "diff": 2322,
+   "pct": 0.227
+  },
+  "waterLine": {
+   "diff": 1223,
+   "pct": 0.119
+  },
+  "waterArea": {
+   "diff": 12144,
+   "pct": 1.186
+  }
+ },
+ "allPassed": true,
+ "realBuildingsVerified": false
+}
