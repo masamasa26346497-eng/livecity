@@ -107,3 +107,22 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/hirano --lod --lat 34.6150 --lo
 - 必要差分: `.github/workflows/mission213-qa.yml` の編集(管理者作業、App権限なし)。差分案は `docs/mission213/qa-24ward-minimal-diff.patch` を拡張する形。
 - 費用: public repo の標準runnerなら無料想定だが、無料枠の確証は未取得。確証がないため全域ビルドは起動していない。
 - 権利/privateリスク: 出力は公式PLATEAU2025派生で既存Previewと同範囲。artifactには集計JSONのみ(GLB/PNG非掲載)を維持。
+
+
+# Mission218A 第1サイクル（HEAD b23d88f、SwiftShader、実データ）
+
+| タスク | 依存 | 合格条件 | 結果 |
+|---|---|---|---|
+| T1 平野区単独ビルド（LOD2=0） | なし | ビルド成功・ID監査OK | **PASS** 106秒、46,473棟、LOD2=0、doubleDrawn=0、道路13,703、水域377、LOD0 425セル/10タイル、77MB。ツール修正は不要だった（LOD2必須の制約は現HEADに無い） |
+| T2 平野区 `--lod` + カード | T1 | ok、クリックID一致、tileFail=0、カード診断 | **PASS** ok=true、clickSelectsBuilding=true、親→葉(30km 親10/ge40 → 600m 葉3)、全5視点tileFail=0 |
+| T3 カード text=0 の判定 | T2 | tc/rendered で確定 | **偽陰性ではなく「再現せず」**: opened `innerText`=60, `tc`=139, `rendered=true`, `hiddenBy=null`, viewport 1000x557。closed で `rendered=false`(lc-bldg-body:display)。本体欠陥なし。過去の text=0 は旧計測条件の偽陰性（推定。当時の値は未保存で確定不可）。本体HTML未変更 |
+| T4 `lblidle=0/1` 動作 | T1 | ok/クリック/カード/tileFail | 両方 **PASS**（ok=true, click一致, カードtc=139, tileFail=0）。1回ずつ |
+| T5 ラベル最終画素・ラベル表示完了時刻 | T4 | 地名/駅名の最終画素一致 | **NOT_TESTED**（画像差分ツールが無く、E2Eはラベル完了時刻を出力しない） |
+| ESC/検索/区選択/390x844、実GPU、24区一体55地点、Vercel Preview | — | — | **NOT_TESTED**（ESCはカードclose=PASS相当だがキー経由かは未確認） |
+
+所要: lblidle=0 は 110秒、=1 は 94秒（E2E全体、1回ずつ。初建物時刻ではなく誤差範囲かも不明）。
+
+## 次サイクル
+1. E2Eに「ラベル表示完了時刻」と、同一カメラのラベル領域画素差分(PNG→Chromium canvasで比較)を追加。
+2. 北区・西区・平野区で 1366x768 / 390x844 の検索・区選択・ESC。
+3. LOD2あり区を1区ずつ追加（現SHAで）。24区一体はワークフロー分割の管理者承認後。

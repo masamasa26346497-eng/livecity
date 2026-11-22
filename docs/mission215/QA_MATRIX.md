@@ -130,3 +130,14 @@ NOT_TESTED: 実 IME(OS)・実 Safari、`lc-loading` が実 tile で消えるタ�
 - NOT_TESTED: ラベル画素の最終表示(release前非描画/後表示)、区名・駅名の保持、ラベル出現までの時間のA/B、検索・区切替、スマホ390x844/PC1366x768、実GPU、現SHA55地点、保護付きPreview。
 - 採否: 既定OFF維持。ONにする基準 = 実GPUで初回建物表示が改善 + ラベル画素の遅延表示確認 + 検索/クリック回帰PASS。
 - 第7段階: 現行 `mission213-qa.yml` は毎回 `--all-wards --city-lod0` の約1GBフルビルド(実測約10〜15分)をバッチごとに実行する(read-only点検)。実行案: 区別単独ビルド+`--lod`で代表区を確認し、55地点は6バッチをラベルで順次(runner無料枠・各<55分)。1GBビルド結果のキャッシュは権利/容量未確認のため未採用。
+
+
+## Mission218A 高速化候補の分類（HEAD b23d88f）
+| 候補 | 分類 | 根拠 |
+|---|---|---|
+| 遠景LOD0置換(citylod0swap既定ON)・親SSE引下げ・index.json共有Promise | (a) 本体組込済み | 北・西・平野で --lod ok、tileFail=0（SwiftShader） |
+| `?lblidle=1` ラベル遅延 | (b) 試験版・証拠不足、既定OFF維持 | 北区cold 4回 39.8→17.4秒(旧)、平野区でok/クリック/カード維持を1回確認。地名最終画素・検索・モバイル・実GPU未検証。正式採用ゲート=PENDING |
+| dse(dynamicScreenSpaceError) | (c) 不採用 | 斜め/遠景A/Bで効果なし |
+| LC_COARSE_MERGE | (c) 不採用(既定OFF) | 親−8〜−37%、道路被覆トレードオフ |
+
+lblidle 移行基準: 実GPUでcold/warm各N回の初建物・ラベル完了時刻、ラベル領域画素一致、検索/クリック/カード/区切替合格、idle未発火時20s保険の劣化なし。
