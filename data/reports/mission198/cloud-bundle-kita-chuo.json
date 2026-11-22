@@ -1,0 +1,77 @@
+{
+ "schema": "livecity-cloud-bundle/1",
+ "generatedAt": "2026-11-12T13:27:48.336Z",
+ "scope": {
+  "wards": [
+   "kita",
+   "chuo"
+  ],
+  "note": "梅田(北区)・中央区に限定。LOD2 は PLATEAU 2025 の 33 メッシュ(10,698 棟)のうち区に交わるタイルのみ。全棟 LOD2 ではない"
+ },
+ "source": {
+  "package": "plateau-27100-osaka-shi-2025",
+  "license": "PLATEAU Site Policy 「３．著作権について」に拠る",
+  "attribution": "出典：国土交通省 Project PLATEAU（3D都市モデル 大阪市 2025 / CityGML v5）を加工して作成",
+  "etag": "\"3d62380fdfebb6855b11a53eb6a89909\"",
+  "vintage": "2025",
+  "note": "PLATEAU 公式配布 CityGML を Range 取得して変換。旧 45D / 旧年データは非使用"
+ },
+ "rights": {
+  "status": "attribution-required",
+  "basis": "source-lock の license/attribution 欄(PLATEAU サイトポリシー: 商用可・出典表示)",
+  "confirmedByHuman": false,
+  "note": "公開前に出典表示(画面内)と 37G HTML 側の他データ(OSM/駅/写真等)の権利を人が確認すること。本バンドルは 37G HTML と同梱 JS のみで、data JSON(駅/地名/道路)は含めない"
+ },
+ "wards": [
+  {
+   "ward": "kita",
+   "code": "27127",
+   "buildings": 18130,
+   "variant": "complement(LOD2 ID除外)",
+   "vintage": 2025,
+   "excludedLod2Ids": 1471
+  },
+  {
+   "ward": "chuo",
+   "code": "27128",
+   "buildings": 13891,
+   "variant": "complement(LOD2 ID除外)",
+   "vintage": 2025,
+   "excludedLod2Ids": 4764
+  }
+ ],
+ "lod2": {
+  "tiles": 121,
+  "buildings": 6574,
+  "glbBytes": 51807212,
+  "idsUnique": true
+ },
+ "sizes": {
+  "totalBytes": 99824864,
+  "lod1Bytes": 44946639,
+  "lod2Bytes": 51807212,
+  "fileCount": 264,
+  "maxMb": 120
+ },
+ "audit": {
+  "excludedData": [
+   "mission145-data/stations-24.json (OSM/ODbL: 再配布条件を人が確認するまで除外)",
+   "mission145-data/towns-24.json (リポジトリに無い)",
+   "mission37d-data/* (施設・Google Place ID)",
+   "mission49/50-data (道路縁・河川: 出典未確認)",
+   "mission37c-layers (住吉サンプル)"
+  ],
+  "includedNonPlateau": [
+   "mission37g-data/osaka-24-wards.json (国土数値情報 N03, 出典明記)"
+  ],
+  "secretHits": [],
+  "legacyHits": 0,
+  "missingScripts": [],
+  "localOnlyDiag": "/__lod2/diag.json は静的配信では 404(オーバーレイは失敗を無視する想定。E2E で確認)"
+ },
+ "env": {
+  "required": [],
+  "note": "環境変数・トークン不要。Vercel 側は Framework=Other、Build Command なし、Output Directory= このバンドルのルート"
+ },
+ "files": 264
+}

@@ -1,0 +1,172 @@
+{
+ "schema": 1,
+ "mission": "41P",
+ "generatedBy": "hand-written from repository files (no network used)",
+ "note": "Conservative inventory. Every licence text is a CLAIM found in this repo, not a verified approval: approved is false everywhere and the validator rejects approved:true. sourceUrl is only filled when the exact string exists in a repo file named in urlEvidence. reconstructability: confirmed = URL + script + a record inside the repo of a past successful fetch; candidate = URL and/or script exist but no in-repo record of a successful fetch, or the URL is resolved at run time; unknown = no usable public source found in the repo. Nothing here was re-fetched; these labels do not prove a source is still reachable.",
+ "entries": [
+  {
+   "id": "plateau-citygml-bldg", "family": "PLATEAU", "title": "PLATEAU 3D city model, Osaka City (CityGML bldg)",
+   "sourceUrl": "https://www.geospatial.jp/ckan/dataset/plateau-27100-osaka-shi-2024", "urlEvidence": "config/datasets/plateau-osaka-buildings-lod2.json",
+   "reconstructability": "candidate",
+   "basis": "dataset page URL is in config; archive URLs are resolved at run time via CKAN; ward-range fetches were used in earlier missions (see public/mission37h-3dtiles/*/source.json) but this phase did not re-fetch",
+   "scripts": ["tools/mission36k-fetch-citygml-ward-range.mjs", "tools/fetch-plateau.js", "tools/download/plateau-buildings-lod2.js", "tools/mission36k-convert-citygml-runtime.mjs"],
+   "licenceClaim": { "text": "CC BY 4.0 / 政府標準利用規約2.0", "claimedIn": "config/datasets/plateau-osaka-buildings-lod2.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "Public source. If re-fetched online, the large archive need not be moved from a PC. Not shown to reproduce identical bytes."
+  },
+  {
+   "id": "legacy-building-tiles", "family": "derived-from-PLATEAU", "title": "Old Three.js building tiles public/map-data/osaka-city/buildings (24 wards)",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "candidate",
+   "basis": "generator scripts exist and a committed report records per-ward counts, but output equality with the owner's local copy was never compared in this repo",
+   "scripts": ["tools/build-ward-building-datasets.js", "tools/classify-buildings-by-ward.js", "tools/convert-plateau-buildings.js"],
+   "licenceClaim": null, "approved": false, "dependsOn": ["plateau-citygml-bldg", "n03-ward-boundaries"],
+   "trackedArtifacts": ["public/map-data/osaka-city/buildings (Sumiyoshi 52 tiles only; the rest is git-ignored)", "data/reports/building-dataset-generation.json"],
+   "localOnlyRisk": "high", "networkNeededToRebuild": true,
+   "notes": "Only Sumiyoshi is in git. The owner PC also holds OSM-fallback and unclassified folders not covered by the PLATEAU path."
+  },
+  {
+   "id": "osm-building-fallback", "family": "OSM", "title": "OSM building fallback tiles",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "build scripts exist but the input snapshot is not identified in the repo",
+   "scripts": ["tools/build-osm-building-fallback.js", "tools/build-osm-fallback-v3.js"],
+   "licenceClaim": { "text": "ODbL 1.0 (claimed for OSM data in the facilities dataset config)", "claimedIn": "config/datasets/osaka-sumiyoshi-facilities-osm.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": ["osm-overpass-layers"], "trackedArtifacts": [], "localOnlyRisk": "high", "networkNeededToRebuild": true,
+   "notes": "Treat as local-only until the input snapshot is identified."
+  },
+  {
+   "id": "cesium-3dtiles", "family": "derived-from-PLATEAU", "title": "Cesium 3D Tiles built from legacy building tiles",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "candidate",
+   "basis": "converters are deterministic; the 40B test showed the 9 Sumiyoshi tiles convert to the same canonicalIds as committed 37B output, but other wards need the legacy tiles first",
+   "scripts": ["tools/mission37b-build-3dtiles.cjs", "tools/mission40b-legacy-tiles-batch.cjs", "tools/mission37h-build-ward-sample.cjs"],
+   "licenceClaim": null, "approved": false, "dependsOn": ["legacy-building-tiles", "plateau-citygml-bldg"],
+   "trackedArtifacts": ["public/mission37b-3dtiles", "public/mission37h-3dtiles", "public/mission38e-3dtiles"],
+   "localOnlyRisk": "medium", "networkNeededToRebuild": false,
+   "notes": "Outputs are rebuildable from inputs; do not transfer them if the inputs are rebuildable."
+  },
+  {
+   "id": "osm-overpass-layers", "family": "OSM", "title": "OSM roads, parks, railways, waterways (Overpass)",
+   "sourceUrl": "https://overpass-api.de/api/interpreter", "urlEvidence": "tools/lib/overpass-failover.js", "reconstructability": "candidate",
+   "basis": "endpoint and download scripts exist; OSM changes over time so a re-fetch is a different snapshot, not the owner's local bytes",
+   "scripts": ["tools/download/city-tiles.js", "tools/build-city-layer-tiles.js", "tools/lib/overpass-failover.js"],
+   "licenceClaim": { "text": "ODbL 1.0 / © OpenStreetMap contributors", "claimedIn": "config/datasets/osaka-sumiyoshi-facilities-osm.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": ["public/mission37c-layers/osaka-sumiyoshi-9tile (Sumiyoshi sample)"],
+   "localOnlyRisk": "medium", "networkNeededToRebuild": true,
+   "notes": "public/map-data/osaka-city/{roads,parks,railways,waterways} and data/raw caches are git-ignored. Public Overpass instances have usage limits; large pulls need an owner decision."
+  },
+  {
+   "id": "osm-pbf-import", "family": "OSM", "title": "Local OSM PBF import (osm-pbf-city)",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "the importer reads a local PBF; no download URL for the PBF is recorded in the repo",
+   "scripts": ["tools/import/osm-pbf-city.js"],
+   "licenceClaim": null, "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "medium", "networkNeededToRebuild": true,
+   "notes": "Which PBF extract was used is not recorded."
+  },
+  {
+   "id": "osm-facilities", "family": "OSM", "title": "OSM facilities and tourism points",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "candidate",
+   "basis": "dataset config declares Overpass acquisition and scripts exist; no URL is stored in the dataset config itself",
+   "scripts": ["tools/download/facilities.js", "tools/convert/facilities-extended.js", "tools/mission36j-build-facility-ward-shards.mjs"],
+   "licenceClaim": { "text": "ODbL 1.0", "claimedIn": "config/datasets/osaka-sumiyoshi-facilities-osm.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": ["osm-overpass-layers"],
+   "trackedArtifacts": ["public/map-data/osaka-city/facilities", "public/map-data/osaka-sumiyoshi/facilities"],
+   "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "The committed snapshot is already tracked in git."
+  },
+  {
+   "id": "census-osaka-city-2020", "family": "statistics", "title": "Osaka City 2020 census small-area tables (population/households, age)",
+   "sourceUrl": "https://www.city.osaka.lg.jp/toshikeikaku/page/0000562515.html", "urlEvidence": "config/datasets/osaka-census-2020-age-structure.json", "reconstructability": "confirmed",
+   "basis": "config notes state the URL was checked on the official page in 2026-06 and the xlsx structure was inspected; not re-fetched in this phase",
+   "scripts": ["tools/download/census/index.js", "tools/convert/demographics/index.js"],
+   "licenceClaim": { "text": "CC BY 4.0", "claimedIn": "config/datasets/osaka-census-2020-age-structure.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": ["public/map-data/osaka-sumiyoshi/demographics"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": ""
+  },
+  {
+   "id": "census-estat", "family": "statistics", "title": "e-Stat census small-area files (2015, 2020 household composition)",
+   "sourceUrl": "https://www.e-stat.go.jp/stat-search/file-download?fileKind=1&statInfId=000032163488", "urlEvidence": "config/datasets/osaka-census-2020-household-composition.json", "reconstructability": "candidate",
+   "basis": "file-download URL is in config; encoding is resolved at run time; no in-repo record of a successful fetch was checked",
+   "scripts": ["tools/download/census/index.js"],
+   "licenceClaim": { "text": "政府統計の総合窓口（e-Stat）利用規約に準拠（商用利用可）", "claimedIn": "config/datasets/osaka-census-2015-population-households.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": ["public/map-data/osaka-sumiyoshi/demographics"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": ""
+  },
+  {
+   "id": "ipss-and-monthly-estimates", "family": "statistics", "title": "IPSS regional projection; Osaka monthly estimated population",
+   "sourceUrl": "https://www.ipss.go.jp/pp-shicyoson/j/shicyoson23/t-page.asp", "urlEvidence": "config/datasets/ipss-regional-population-projection-2023.json", "reconstructability": "candidate",
+   "basis": "both datasets locate their file by page-link detection at run time; there is no fixed file URL",
+   "scripts": ["tools/download/census/index.js"],
+   "licenceClaim": { "text": "IPSS: attribution required, commercial use to be confirmed (config text); monthly estimate: CC BY 4.0", "claimedIn": "config/datasets/ipss-regional-population-projection-2023.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "Monthly estimate page is recorded in config/datasets/osaka-estimated-population-monthly.json."
+  },
+  {
+   "id": "n03-ward-boundaries", "family": "administrative-boundaries", "title": "Ward polygons from MLIT Kokudo Suuchi N03",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "the repo names N03 (MLIT) as the origin of the committed ward polygons but stores no download URL for the N03 file",
+   "scripts": ["tools/build-ward-polygons.js", "tools/mission37g-build-wards.cjs"],
+   "licenceClaim": { "text": "attribution to MLIT N03 (no licence text recorded)", "claimedIn": "tools/mission37g-build-wards.cjs", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": ["public/map-data/osaka-city/boundaries", "public/mission37g-data/osaka-24-wards.json"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "Derived polygons are committed, so nothing needs to come from a PC."
+  },
+  {
+   "id": "town-boundaries-estat", "family": "administrative-boundaries", "title": "Census small-area (town) boundaries from e-Stat",
+   "sourceUrl": "https://www.e-stat.go.jp/gis/statmap-search/data?dlserveyId=A002005212020&code=27&coordSys=1&format=shape&downloadType=5&datum=2011", "urlEvidence": "tools/download/estat-town-boundaries.js", "reconstructability": "candidate",
+   "basis": "URL is in the downloader script; the repo says official vertex geometry is not committed and the source zip was never committed",
+   "scripts": ["tools/download/estat-town-boundaries.js", "tools/build-official-town-boundaries.js"],
+   "licenceClaim": { "text": "CC BY 4.0 (stated in the 37D report)", "claimedIn": "MISSION37D_SUMIYOSHI_MVP_REPORT.md", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": [], "trackedArtifacts": ["public/mission37d-data/sumiyoshi-towns.json (provisional shapes)"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": ""
+  },
+  {
+   "id": "gsi-basemap-tiles", "family": "GSI", "title": "GSI raster base map tiles (runtime only)",
+   "sourceUrl": "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png", "urlEvidence": "public/mission37g-osaka-24ward-mvp.html", "reconstructability": "confirmed",
+   "basis": "fetched live by the viewer; earlier PR reports record browser QA that loaded it; nothing is stored in the repo",
+   "scripts": [],
+   "licenceClaim": null, "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "low", "networkNeededToRebuild": false,
+   "notes": "Nothing to transfer. Attribution terms not verified here."
+  },
+  {
+   "id": "gsi-vector-derived", "family": "GSI", "title": "GSI building outline / road edge tiles (import experiments)",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "import scripts exist but no download URL is recorded in them",
+   "scripts": ["tools/import-gsi-building-outline.js", "tools/import-gsi-road-edge.js"],
+   "licenceClaim": null, "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "medium", "networkNeededToRebuild": true,
+   "notes": "Origin and licence unverified."
+  },
+  {
+   "id": "wikimedia-commons-dates", "family": "Wikimedia", "title": "Commons imageinfo (photo capture dates)",
+   "sourceUrl": "https://commons.wikimedia.org/w/api.php", "urlEvidence": "tools/mission37f-fetch-photo-dates.cjs", "reconstructability": "confirmed",
+   "basis": "37F PR record: the script fetched 588 files in 12 public GET requests; not re-run in this phase",
+   "scripts": ["tools/mission37f-fetch-photo-dates.cjs", "tools/mission37f-build-adds.cjs"],
+   "licenceClaim": { "text": "per-file licences are stored in the photo index and must be checked per file", "claimedIn": "public/map-data/osaka-city/derived/building-photo-index.json", "verifiedAgainstPrimary": false },
+   "approved": false, "dependsOn": ["building-photo-index"],
+   "trackedArtifacts": ["public/map-data/osaka-city/derived/photo-dates.json", "public/map-data/osaka-city/derived/photo-review.json"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "photo-review.json holds human approvals and cannot be reconstructed from the API."
+  },
+  {
+   "id": "building-photo-index", "family": "Wikimedia/Wikidata", "title": "Building to Commons photo index (36L)",
+   "sourceUrl": "https://query.wikidata.org/sparql", "urlEvidence": "tools/photos/fetch-citywide-wikidata-candidates.mjs", "reconstructability": "candidate",
+   "basis": "build scripts exist; the index also depends on OSM tags and footprints, and Wikidata/Commons content changes over time",
+   "scripts": ["tools/photos/build-building-photo-index.mjs", "tools/photos/fetch-citywide-wikidata-candidates.mjs", "tools/photos/extract-osm-wikidata-tags.mjs"],
+   "licenceClaim": null, "approved": false, "dependsOn": ["osm-overpass-layers", "legacy-building-tiles"],
+   "trackedArtifacts": ["public/map-data/osaka-city/derived/building-photo-index.json"], "localOnlyRisk": "low", "networkNeededToRebuild": true,
+   "notes": "Already tracked."
+  },
+  {
+   "id": "google-places-mapping", "family": "Google (paid, restricted)", "title": "Google Places ID mappings",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "paid API; never re-fetched without per-run owner approval; terms are not reviewed here",
+   "scripts": ["tools/google-places/lib/places-client.mjs"],
+   "licenceClaim": null, "approved": false, "dependsOn": [], "trackedArtifacts": ["public/map-data/osaka-city/derived/google-places-*-mapping.json"], "localOnlyRisk": "medium", "networkNeededToRebuild": true,
+   "notes": "Do not rebuild online. Mission 41P makes no API call."
+  },
+  {
+   "id": "owner-local-unclassified", "family": "owner-local", "title": "Owner PC / OneDrive files not covered by any entry above",
+   "sourceUrl": null, "urlEvidence": null, "reconstructability": "unknown",
+   "basis": "known only from owner-provided counts; GitHub runners cannot read them; OneDrive cloud-only placeholders listed locally do not prove cloud accessibility",
+   "scripts": ["tools/mission41a-inventory.cjs"],
+   "licenceClaim": null, "approved": false, "dependsOn": [], "trackedArtifacts": [], "localOnlyRisk": "high", "networkNeededToRebuild": false,
+   "notes": "Any transfer needs tools/mission41p-transfer-gate.cjs and a separate owner-approved phase."
+  }
+ ]
+}

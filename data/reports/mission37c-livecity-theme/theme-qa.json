@@ -1,0 +1,368 @@
+{
+  "mission": "37C",
+  "url": "http://localhost:8137/mission37c-livecity-theme.html",
+  "browser": "Edg/154.0.4258.53",
+  "generatedAt": "2026-10-08T23:50:17.011Z",
+  "jsErrors": [],
+  "steps": {
+    "afterLoad": {
+      "status": "ready",
+      "settled": true,
+      "firstDisplayMs": 3129.5999999940395,
+      "layers": {
+        "buildings": {
+          "state": "ready",
+          "count": 10546,
+          "visible": true,
+          "error": null
+        },
+        "roads": {
+          "state": "ready",
+          "count": 969,
+          "visible": true,
+          "error": null
+        },
+        "railways": {
+          "state": "ready",
+          "count": 67,
+          "visible": true,
+          "error": null
+        },
+        "waterways": {
+          "state": "ready",
+          "count": 20,
+          "visible": true,
+          "error": null
+        },
+        "parks": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null
+        },
+        "labels": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null
+        }
+      }
+    },
+    "ui": {
+      "cesiumDefaultUi": {
+        "toolbar": "hidden",
+        "timeline": "absent",
+        "animation": "absent",
+        "infoBox": "absent",
+        "selectionIndicator": "absent",
+        "geocoder": "absent",
+        "fullscreen": "absent"
+      },
+      "credits": "visible",
+      "liveCityUi": {
+        "header": "visible",
+        "leftPanel": "visible",
+        "rightPanel": "visible",
+        "headerRect": [
+          1600,
+          52
+        ],
+        "leftOnLeftHalf": true,
+        "rightOnRightHalf": true,
+        "layerRows": 6,
+        "layerToggles": 6,
+        "bgSliders": 5,
+        "brandText": "LIVE CITY"
+      },
+      "rowCounts": [
+        {
+          "layer": "buildings",
+          "state": "ready",
+          "count": "10,546"
+        },
+        {
+          "layer": "roads",
+          "state": "ready",
+          "count": "969"
+        },
+        {
+          "layer": "railways",
+          "state": "ready",
+          "count": "67"
+        },
+        {
+          "layer": "waterways",
+          "state": "ready",
+          "count": "20"
+        },
+        {
+          "layer": "parks",
+          "state": "ready",
+          "count": "26"
+        },
+        {
+          "layer": "labels",
+          "state": "ready",
+          "count": "26"
+        }
+      ]
+    },
+    "appearance": {
+      "toneSelect": "pale",
+      "sseSelect": "16",
+      "basemapSelect": "gsi-blank",
+      "bgValues": [
+        "1.05",
+        "0.95",
+        "0.25",
+        "1.00",
+        "0.85"
+      ],
+      "headerBuildings": "10,546",
+      "measuredFps": "12.7",
+      "firstDisplay": "3130 ms"
+    },
+    "clicks": [
+      {
+        "at": [
+          800,
+          560
+        ],
+        "picked": null,
+        "panelOpen": false,
+        "cid": "—",
+        "usageChip": "—",
+        "height": "—",
+        "usageCode": "—",
+        "ward": "—",
+        "tile": "—",
+        "latlon": "—",
+        "sidecar": "—"
+      },
+      {
+        "at": [
+          760,
+          600
+        ],
+        "picked": null,
+        "panelOpen": false,
+        "cid": "—",
+        "usageChip": "—",
+        "height": "—",
+        "usageCode": "—",
+        "ward": "—",
+        "tile": "—",
+        "latlon": "—",
+        "sidecar": "—"
+      },
+      {
+        "at": [
+          860,
+          600
+        ],
+        "picked": {
+          "canonicalId": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+          "featureId": 856,
+          "sidecar": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+          "sidecarMatches": true,
+          "heightM": 17.7,
+          "usage": "422"
+        },
+        "panelOpen": true,
+        "cid": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+        "usageChip": "大学",
+        "height": "17.7 m",
+        "usageCode": "422",
+        "ward": "住吉区",
+        "tile": "t_-5_-2",
+        "latlon": "34.609619 / 135.501496",
+        "sidecar": "✓ 一致"
+      }
+    ],
+    "toggle": {
+      "before": {
+        "buildings": true,
+        "roads": true,
+        "railways": true,
+        "waterways": true,
+        "parks": true,
+        "labels": true
+      },
+      "roadsAfterOff": false,
+      "roadsAfterOn": true
+    },
+    "perf": {
+      "allLayers": {
+        "avgFps": 10.2,
+        "p95FrameMs": 113.7
+      },
+      "buildingsOnly": {
+        "avgFps": 10.5,
+        "p95FrameMs": 103.6
+      }
+    },
+    "basemaps": {
+      "gsi-blank": {
+        "basemap": "gsi-blank",
+        "sliders": [
+          "1.05",
+          "0.95",
+          "0.25",
+          "1.00",
+          "0.85"
+        ],
+        "credits": "地理院タイル（白地図）Data attribution",
+        "ionLogoVisible": false
+      },
+      "gsi-pale": {
+        "basemap": "gsi-pale",
+        "sliders": [
+          "1.10",
+          "0.92",
+          "0.30",
+          "1.05",
+          "0.80"
+        ],
+        "credits": "地理院タイル（淡色地図）Data attribution",
+        "ionLogoVisible": false
+      },
+      "osm": {
+        "basemap": "osm",
+        "sliders": [
+          "1.30",
+          "0.88",
+          "0.22",
+          "1.15",
+          "0.72"
+        ],
+        "credits": "© OpenStreetMap contributorsData attribution",
+        "ionLogoVisible": false
+      },
+      "none": {
+        "basemap": "none",
+        "sliders": [
+          "—",
+          "—",
+          "—",
+          "—",
+          "—"
+        ],
+        "credits": "Data attribution",
+        "ionLogoVisible": false
+      }
+    },
+    "final": {
+      "mission": "37C",
+      "set": "osaka-sumiyoshi-9tile",
+      "sse": 16,
+      "status": "ready",
+      "fps": 9.8,
+      "p95FrameMs": 120.6,
+      "firstDisplayMs": 3129.5999999940395,
+      "visibleTiles": 9,
+      "visibleBuildings": 10546,
+      "loadedTilesTotal": 11,
+      "layers": {
+        "buildings": {
+          "state": "ready",
+          "count": 10546,
+          "visible": true,
+          "error": null
+        },
+        "roads": {
+          "state": "ready",
+          "count": 969,
+          "visible": true,
+          "error": null
+        },
+        "railways": {
+          "state": "ready",
+          "count": 67,
+          "visible": true,
+          "error": null
+        },
+        "waterways": {
+          "state": "ready",
+          "count": 20,
+          "visible": true,
+          "error": null
+        },
+        "parks": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null
+        },
+        "labels": {
+          "state": "ready",
+          "count": 26,
+          "visible": true,
+          "error": null
+        }
+      },
+      "measure": null,
+      "lastPicked": {
+        "canonicalId": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+        "featureId": 856,
+        "sidecar": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+        "sidecarMatches": true,
+        "heightM": 17.7,
+        "usage": "422"
+      },
+      "errors": [],
+      "basemap": "gsi-blank",
+      "tone": "pale",
+      "tilesetBuildings": 10546
+    }
+  },
+  "summary": {
+    "jsErrors": 0,
+    "cesiumDefaultUiAllHidden": true,
+    "creditsKeptVisible": true,
+    "liveCityUiPresent": true,
+    "layerRows": 6,
+    "bgSliders": 5,
+    "layersReady": [
+      "buildings",
+      "roads",
+      "railways",
+      "waterways",
+      "parks",
+      "labels"
+    ],
+    "layersError": [],
+    "layerCounts": {
+      "buildings": 10546,
+      "roads": 969,
+      "railways": 67,
+      "waterways": 20,
+      "parks": 26,
+      "labels": 26
+    },
+    "firstDisplayMs": 3129.5999999940395,
+    "defaultBasemapIsPale": true,
+    "ionLogoHidden": true,
+    "mapAttributionKept": true,
+    "perf": {
+      "allLayers": {
+        "avgFps": 10.2,
+        "p95FrameMs": 113.7
+      },
+      "buildingsOnly": {
+        "avgFps": 10.5,
+        "p95FrameMs": 103.6
+      }
+    },
+    "vectorLayerFpsCost": 0.3,
+    "canonicalIdOnClick": "bldg_643b1d44-ecbd-4496-ac0a-a496c5d9aaaf",
+    "canonicalIdSidecar": "✓ 一致",
+    "buildingInfoPanel": {
+      "usage": "大学",
+      "height": "17.7 m",
+      "ward": "住吉区",
+      "tile": "t_-5_-2",
+      "latlon": "34.609619 / 135.501496"
+    },
+    "layerToggleWorks": true
+  }
+}

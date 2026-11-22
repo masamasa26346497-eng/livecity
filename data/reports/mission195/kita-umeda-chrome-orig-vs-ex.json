@@ -1,0 +1,152 @@
+{
+ "orig": {
+  "extraMeta": [
+   {
+    "id": "ext-kita",
+    "wardCode": "27127",
+    "buildings": 19601
+   }
+  ],
+  "kita": {
+   "pixelDiff": 506176,
+   "drawn": true,
+   "lastError": null
+  },
+  "lod2at": [
+   135.49652027888573,
+   34.70616228523035
+  ],
+  "cam": {
+   "lon": 135.49652027888573,
+   "lat": 34.70297711954933,
+   "h": 363.5533905930857,
+   "pitchDeg": -44.99999999999997
+  },
+  "pd": {
+   "bothVsLod1Only": 71860,
+   "bothVsLod2Only": 431417,
+   "lod2OnlyVsLod1Only": 499944
+  },
+  "tris": {
+   "both": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    },
+    {
+     "w": "kita",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 5,
+     "tri": 38687
+    }
+   ],
+   "lod1Only": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    },
+    {
+     "w": "kita",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 5,
+     "tri": 38687
+    }
+   ],
+   "lod2Only": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    }
+   ]
+  },
+  "http": {
+   "ok": 123,
+   "bad": 0
+  },
+  "console": [
+   "ERR [37C] layer:towns24 Error: towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）\n    at Object.mount (http://localhost:81"
+  ],
+  "pass": true
+ },
+ "ex": {
+  "extraMeta": [
+   {
+    "id": "ext-kita",
+    "wardCode": "27127",
+    "buildings": 18130
+   }
+  ],
+  "kita": {
+   "pixelDiff": 209383,
+   "drawn": true,
+   "lastError": null
+  },
+  "lod2at": [
+   135.49652027888573,
+   34.70616228523035
+  ],
+  "cam": {
+   "lon": 135.49652027888573,
+   "lat": 34.70297711954933,
+   "h": 363.5533905930857,
+   "pitchDeg": -44.99999999999997
+  },
+  "pd": {
+   "bothVsLod1Only": 369522,
+   "bothVsLod2Only": 199663,
+   "lod2OnlyVsLod1Only": 568740
+  },
+  "tris": {
+   "both": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    },
+    {
+     "w": "kita",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 5,
+     "tri": 31787
+    }
+   ],
+   "lod1Only": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    },
+    {
+     "w": "kita",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 5,
+     "tri": 31787
+    }
+   ],
+   "lod2Only": [
+    {
+     "w": "lod2/unknown",
+     "keys": "ward,show,ready,contentReady,selected,triangles,clipping",
+     "sel": 9,
+     "tri": 32120
+    }
+   ]
+  },
+  "http": {
+   "ok": 133,
+   "bad": 0
+  },
+  "console": [
+   "ERR [37C] layer:towns24 Error: towns-24.json 未接続（生成: node tools/mission141-local-24.mjs --fetch-towns、または node tools/mission145-build-towns.cjs --zip <e-Stat ZIP>）\n    at Object.mount (http://localhost:81"
+  ],
+  "pass": true
+ }
+}

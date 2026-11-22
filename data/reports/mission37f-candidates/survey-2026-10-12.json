@@ -1,0 +1,1936 @@
+{
+ "generatedAt": "2026-10-12T10:34:53.699Z",
+ "note": "調査サンプル。本番の索引・日付表には反映しない。auto-adoptable も人手確認を経て photo-review/索引に取り込む前提。",
+ "sampleSize": 14,
+ "totals": {
+  "candidates": 130,
+  "autoAdoptable": 6,
+  "rejectedReasons": {
+   "no-coordinates": 104,
+   "no-name-in-title-or-description": 78,
+   "not-newer": 49,
+   "non-iso-or-ambiguous": 16,
+   "year-out-of-range": 3,
+   "no-DateTimeOriginal": 8,
+   "coordinates-too-far": 13
+  }
+ },
+ "buildings": [
+  {
+   "canonicalId": "cg_bldg_bldg_c5302129-82bd-4138-831e-f5e3cd326848",
+   "name": "D'グラフォート大阪N.Y.タワーHIGOBASHI",
+   "ward": "nishi",
+   "current": {
+    "file": "D'grafort_Osaka_NY_Tower_Higobashi_Osaka_Japan02-r.jpg",
+    "takenAt": "2015-01-31",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "D'grafort Osaka NY Tower Higobashi Views from Umeda Sky Building IMG 0807 20130112.JPG",
+     "takenAt": "2013-01-12",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:D'grafort%20Osaka%20NY%20Tower%20Higobashi%20Views%20from%20Umeda%20Sky%20Building%20IMG%200807%2020130112.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "D'grafort Osaka NY Tower Higobashi IMG 2961 20130506.JPG",
+     "takenAt": "2013-05-06",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:D'grafort%20Osaka%20NY%20Tower%20Higobashi%20IMG%202961%2020130506.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "D'grafort Osaka NY Tower Higobashi Osaka Japan01-r.jpg",
+     "takenAt": "2015-01-31",
+     "license": "CC BY 2.5",
+     "distanceM": null,
+     "size": "2672x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:D'grafort%20Osaka%20NY%20Tower%20Higobashi%20Osaka%20Japan01-r.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 3,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_6d5d980e-977c-4603-8a04-007c68037bd0",
+   "name": "HEP NAVIO",
+   "ward": "kita",
+   "current": {
+    "file": "Osaka,_hep_navio_01.jpg",
+    "takenAt": "2017-11-09",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Hep-hep riots.jpg",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "576x457",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-hep%20riots.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "HEP NAVIO.JPG",
+     "takenAt": "2009-12-23",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3648x2736",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20NAVIO.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP NAVIO2.JPG",
+     "takenAt": "2010-02-24",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "3648x2736",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20NAVIO2.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP at Night in 201408.JPG",
+     "takenAt": "2014-08-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20at%20Night%20in%20201408.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP-NAVIO in 201409 001.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP-NAVIO%20in%20201409%20001.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP in 201409.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20in%20201409.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP-NAVIO in 201409 002.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2400",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP-NAVIO%20in%20201409%20002.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "TOHO CINEMAS Umeda in 201409.JPG",
+     "takenAt": "2014-09-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3200x2000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:TOHO%20CINEMAS%20Umeda%20in%20201409.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "HEP Navio.JPG",
+     "takenAt": "2015-11-13",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1900x2544",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:HEP%20Navio.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "The frontview of Land Rover RANGE ROVER SPORT SVR (L494) used in \"SPECTRE\" exhibited at HEP NAVIO.JPG",
+     "takenAt": "2015-11-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2456x1772",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The%20frontview%20of%20Land%20Rover%20RANGE%20ROVER%20SPORT%20SVR%20(L494)%20used%20in%20%22SPECTRE%22%20exhibited%20at%20HEP%20NAVIO.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "The rearview of Land Rover RANGE ROVER SPORT SVR (L494) used in \"SPECTRE\" exhibited at HEP NAVIO.JPG",
+     "takenAt": "2015-11-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2480x1808",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The%20rearview%20of%20Land%20Rover%20RANGE%20ROVER%20SPORT%20SVR%20(L494)%20used%20in%20%22SPECTRE%22%20exhibited%20at%20HEP%20NAVIO.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "The frontview of Aston Martin DB9 GT Bond Edition exhibited at HEP NAVIO.JPG",
+     "takenAt": "2015-11-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2504x1842",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The%20frontview%20of%20Aston%20Martin%20DB9%20GT%20Bond%20Edition%20exhibited%20at%20HEP%20NAVIO.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Wendy's First Kitchen Umeda HEP NAVIO store.jpg",
+     "takenAt": "2017-12-31",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Wendy's%20First%20Kitchen%20Umeda%20HEP%20NAVIO%20store.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Wendy's First Kitchen UMEDA HEP NAVIO store.jpg",
+     "takenAt": "2018-02-27",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Wendy's%20First%20Kitchen%20UMEDA%20HEP%20NAVIO%20store.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka, hep navio 03.jpg",
+     "takenAt": "2017-11-09",
+     "license": "CC BY 3.0",
+     "distanceM": null,
+     "size": "5472x3648",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%2C%20hep%20navio%2003.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Karte Hep-Hep-Krawalle 1819.png",
+     "takenAt": "2022-03-14",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x1426",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Karte%20Hep-Hep-Krawalle%201819.png",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hep-Hep-Krawalle Würzburg Senatsbeschluss 1819.jpg",
+     "takenAt": null,
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2065x2526",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-Hep-Krawalle%20W%C3%BCrzburg%20Senatsbeschluss%201819.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "year-out-of-range",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hep-Hep-Krawalle Würzburg Drohbrief 1819.jpg",
+     "takenAt": null,
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2422x4033",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-Hep-Krawalle%20W%C3%BCrzburg%20Drohbrief%201819.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "year-out-of-range",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Hep-Hep-Krawalle Würzburg Aufruf Brendel 1819.jpg",
+     "takenAt": null,
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2602x2114",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Hep-Hep-Krawalle%20W%C3%BCrzburg%20Aufruf%20Brendel%201819.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "year-out-of-range",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_450f76c6-27ff-4f3e-9455-2de17c9b243c",
+   "name": "JMFビル阿倍野01",
+   "ward": "tennoji",
+   "current": {
+    "file": "Echo_Across_Building.JPG",
+    "takenAt": "2012-11-03",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_dd72d36b-57b6-456d-ab4f-a52004954543",
+   "name": "KiKi京橋",
+   "ward": "miyakojima",
+   "current": {
+    "file": "Kiki-Kyobashi01.JPG",
+    "takenAt": "2011-07-31",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Kyobashi-Kagetsu1.jpg",
+     "takenAt": "2010-06",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kyobashi-Kagetsu1.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Kyobashi-Kagetsu2.jpg",
+     "takenAt": "2010-06",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kyobashi-Kagetsu2.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "KiKi Kyobashi.jpg",
+     "takenAt": "2018-03-07",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Kyobashi.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "乾隆鄞縣志(十四).djvu",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1900x3000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E4%B9%BE%E9%9A%86%E9%84%9E%E7%B8%A3%E5%BF%97(%E5%8D%81%E5%9B%9B).djvu",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "敕修兩浙海塘通志(八).djvu",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2000x3000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%95%95%E4%BF%AE%E5%85%A9%E6%B5%99%E6%B5%B7%E5%A1%98%E9%80%9A%E5%BF%97(%E5%85%AB).djvu",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Kiki Kyobashi.jpg",
+     "takenAt": "2019-12-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2431x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kiki%20Kyobashi.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "KiKi Kyōbashi.jpg",
+     "takenAt": "2020-03-03",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x2538",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Ky%C5%8Dbashi.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Kiki Kyōbashi.jpg",
+     "takenAt": "2021-02-24",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kiki%20Ky%C5%8Dbashi.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "KiKi Kyobashi on 8th October 2021.jpg",
+     "takenAt": "2021-10-08",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Kyobashi%20on%208th%20October%202021.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "KiKi Kyobashi on 11th March 2022.jpg",
+     "takenAt": "2022-03-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Kyobashi%20on%2011th%20March%202022.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "京橋花月.JPG",
+     "takenAt": "2009-07-08",
+     "license": "CC BY 3.0",
+     "distanceM": null,
+     "size": "1840x1232",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E4%BA%AC%E6%A9%8B%E8%8A%B1%E6%9C%88.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "KiKi Kyōbashi on 5th May 2024.jpg",
+     "takenAt": "2024-07-05",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1920x2560",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Ky%C5%8Dbashi%20on%205th%20May%202024.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "KiKi Kyōbashi in 202411 001.jpg",
+     "takenAt": "2024-11-17",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2708x3386",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KiKi%20Ky%C5%8Dbashi%20in%20202411%20001.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 13,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_c7635faa-77f4-4732-91a7-ddf73e92333a",
+   "name": "OBP キャッスル タワー",
+   "ward": "chuo",
+   "current": {
+    "file": "OBP_Castle_Tower.jpg",
+    "takenAt": "2006-11-05",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_be6c39b4-f3ef-41dc-99d9-b976a9a1d029",
+   "name": "アゼリア大正",
+   "ward": "taisho",
+   "current": {
+    "file": "Azalea_Taisyou_Hall.JPG",
+    "takenAt": "2014-09-14",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "ミル・クラウン.jpg",
+     "takenAt": "2016-10-16",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "600x800",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E3%83%9F%E3%83%AB%E3%83%BB%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%B3.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Yuma Aoyagi 2018.jpg",
+     "takenAt": "2018-12-06",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Yuma%20Aoyagi%202018.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Kento Miyahara 2018.jpg",
+     "takenAt": "2018-12-06",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kento%20Miyahara%202018.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Azalea Taisho Hall.jpg",
+     "takenAt": "2020-11-15",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "4927x3696",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Azalea%20Taisho%20Hall.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "MJ・ポー.jpg",
+     "takenAt": "2024-02-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 6,
+     "size": "512x691",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:MJ%E3%83%BB%E3%83%9D%E3%83%BC.jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    },
+    {
+     "file": "正田壮史2024.jpg",
+     "takenAt": "2024-02-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 6,
+     "size": "3419x4559",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%AD%A3%E7%94%B0%E5%A3%AE%E5%8F%B22024.jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    },
+    {
+     "file": "納谷幸男2024.jpg",
+     "takenAt": "2024-02-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 11233,
+     "size": "3624x4832",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E7%B4%8D%E8%B0%B7%E5%B9%B8%E7%94%B72024.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:11233m"
+     ]
+    },
+    {
+     "file": "岡谷英樹2023.jpg",
+     "takenAt": "2023-12-09",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 11233,
+     "size": "3411x4549",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E5%B2%A1%E8%B0%B7%E8%8B%B1%E6%A8%B92023.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:11233m"
+     ]
+    },
+    {
+     "file": "樋口和貞2023.jpg",
+     "takenAt": "2023-12-09",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 6,
+     "size": "592x800",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%A8%8B%E5%8F%A3%E5%92%8C%E8%B2%9E2023.jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    },
+    {
+     "file": "正田壮史2024 (cropped).jpg",
+     "takenAt": "2024-02-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 6,
+     "size": "2834x3775",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%AD%A3%E7%94%B0%E5%A3%AE%E5%8F%B22024%20(cropped).jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    }
+   ],
+   "summary": {
+    "found": 10,
+    "autoAdoptable": 4
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_fa4341c1-2d3e-4aff-9d63-7bcd8f905796",
+   "name": "あべのキューズタウン",
+   "ward": "abeno",
+   "current": {
+    "file": "ABENO_Q's_MALL.jpg",
+    "takenAt": "2022-12-19",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Abeno CUES TOWN.JPG",
+     "takenAt": "2014-03-13",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20CUES%20TOWN.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno CUES TOWN at 22th April 2016.JPG",
+     "takenAt": "2016-04-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2398x1652",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20CUES%20TOWN%20at%2022th%20April%202016.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town at 22th April 2016.JPG",
+     "takenAt": "2016-04-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2334x1554",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20at%2022th%20April%202016.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town.JPG",
+     "takenAt": "2016-04-22",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1604",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "あべのキューズタウン Abeno CUES TOWN 2011.7.15 - panoramio.jpg",
+     "takenAt": "2011-07-15",
+     "license": "CC BY-SA 3.0",
+     "distanceM": 133,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E3%81%82%E3%81%B9%E3%81%AE%E3%82%AD%E3%83%A5%E3%83%BC%E3%82%BA%E3%82%BF%E3%82%A6%E3%83%B3%20Abeno%20CUES%20TOWN%202011.7.15%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:133m",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 111,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:111m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (1).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 208,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(1).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:208m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (2).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 140,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(2).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:140m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (3).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 104,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(3).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:104m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (4).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 107,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(4).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:107m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (5).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 109,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(5).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:109m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (6).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 43,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(6).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (7).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 56,
+     "size": "1536x2048",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(7).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town - panoramio (8).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 53,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20-%20panoramio%20(8).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Abeno cues town night view 2014.jpg",
+     "takenAt": "2014-06-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2022x1329",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20cues%20town%20night%20view%202014.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno cues town food court 2014.jpg",
+     "takenAt": "2014-06-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2048x1360",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20cues%20town%20food%20court%202014.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno cues town outdoor garden 201406.jpg",
+     "takenAt": "2014-06-25",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2048x1360",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20cues%20town%20outdoor%20garden%20201406.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Kokumin Drug Abeno Cues Town store.jpg",
+     "takenAt": "2022-12-19",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Kokumin%20Drug%20Abeno%20Cues%20Town%20store.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Abeno Cues Town on 21st May 2024.jpg",
+     "takenAt": "2024-05-21",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Abeno%20Cues%20Town%20on%2021st%20May%202024.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_317c8737-5b3e-49e0-9f49-8a8fb9fccef9",
+   "name": "ウイステ",
+   "ward": "fukushima",
+   "current": {
+    "file": "WISTE.JPG",
+    "takenAt": "2012-02-09",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "WISTE.jpg",
+     "takenAt": "2005-08-17",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2304x1728",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Wiste (AEON Noda-Hanshin).JPG",
+     "takenAt": "2012-02-08",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Wiste%20(AEON%20Noda-Hanshin).JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "WISTE 2.JPG",
+     "takenAt": "2012-06-01",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE%202.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "WISTE 1.JPG",
+     "takenAt": "2012-07-14",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2502x1840",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE%201.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Esnart Wisted, mother-of-four (7513648782).jpg",
+     "takenAt": "2012-05-28",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "5184x3456",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Esnart%20Wisted%2C%20mother-of-four%20(7513648782).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Nl-wiste af.ogg",
+     "takenAt": "2013-11-25",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "0x0",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Nl-wiste%20af.ogg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Nl-wiste.ogg",
+     "takenAt": "2013-11-25",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "0x0",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Nl-wiste.ogg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Nl-wiste uit.ogg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "0x0",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Nl-wiste%20uit.ogg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "WISTE (1).JPG",
+     "takenAt": "2014-07-18",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE%20(1).JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "WISTE - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 66,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "WISTE - panoramio - DVMG.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 73,
+     "size": "1600x1200",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:WISTE%20-%20panoramio%20-%20DVMG.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Nl-wiste weg.ogg",
+     "takenAt": "2019-01-11",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "0x0",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Nl-wiste%20weg.ogg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NM 1951.jpg",
+     "takenAt": "2008-02-18",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2009x1424",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NM%201951.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Mønstringstevne Bislett 1951.jpg",
+     "takenAt": "2008-02-18",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "1389x1983",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:M%C3%B8nstringstevne%20Bislett%201951.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Bislett 1952.jpg",
+     "takenAt": "2008-02-18",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "605x568",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Bislett%201952.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "NM 1951-2.jpg",
+     "takenAt": "2008-02-18",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2009x1424",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NM%201951-2.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Wiste.jpg",
+     "takenAt": "2021-07-15",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Wiste.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Alberta Historical MD of Wiste No 303.svg",
+     "takenAt": "2021-12-11",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "945x1535",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Alberta%20Historical%20MD%20of%20Wiste%20No%20303.svg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Jim Wiste 73-74.png",
+     "takenAt": "1973",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "191x271",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Jim%20Wiste%2073-74.png",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_6f3920e3-bf77-4a53-a65f-6336d3bd6d7f",
+   "name": "エディオンアリーナ大阪(大阪府立体育会館)",
+   "ward": "naniwa",
+   "current": {
+    "file": "Osaka_Prefectural_Gymnasium_20191129.jpg",
+    "takenAt": "2019-11-29",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Namba9.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "640x480",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Namba9.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka Prefectural Gymnasium1.jpg",
+     "takenAt": "2007-11-23",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "2448x3264",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Prefectural%20Gymnasium1.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Yaocho Sumo DSCN1867 20110207.JPG",
+     "takenAt": "2011-02-07",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "1536x2048",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Yaocho%20Sumo%20DSCN1867%2020110207.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "EDION ARENA OSAKA.JPG",
+     "takenAt": "2015-11-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2504x1844",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:EDION%20ARENA%20OSAKA.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "EDION Arena Osaka.JPG",
+     "takenAt": "2015-11-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:EDION%20Arena%20Osaka.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Osaka Prefectural Gymnasium.JPG",
+     "takenAt": "2015-11-11",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Prefectural%20Gymnasium.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "OSAKA PREFECTURAL GYMNASIUM.JPG",
+     "takenAt": "2016-02-10",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:OSAKA%20PREFECTURAL%20GYMNASIUM.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Osaka Prefectural Gymnasium - panoramio.jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 72,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Prefectural%20Gymnasium%20-%20panoramio.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka Prefectural Gymnasium - panoramio (1).jpg",
+     "takenAt": null,
+     "license": "CC BY 3.0",
+     "distanceM": 64,
+     "size": "2048x1536",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Prefectural%20Gymnasium%20-%20panoramio%20(1).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Edion Arena Osaka.png",
+     "takenAt": "2018-05-01",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "323x408",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Edion%20Arena%20Osaka.png",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "OSAKA PREFECTURAL GYMNASIUM (1).jpg",
+     "takenAt": "2021-07-08",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:OSAKA%20PREFECTURAL%20GYMNASIUM%20(1).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "EDION ARENA OSAKA (1).jpg",
+     "takenAt": "2021-07-08",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:EDION%20ARENA%20OSAKA%20(1).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Tiger Mask German Suplex Black Tiger.jpg",
+     "takenAt": "1982-05-26",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "422x248",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tiger%20Mask%20German%20Suplex%20Black%20Tiger.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Tiger Mask WWF Junior Heavyweight Champion 1982.jpg",
+     "takenAt": "1982-05-26",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "487x650",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tiger%20Mask%20WWF%20Junior%20Heavyweight%20Champion%201982.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Black Tiger 1982.jpg",
+     "takenAt": "1982-05-26",
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "169x166",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Black%20Tiger%201982.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "SANADA 2025.jpg",
+     "takenAt": "2025-04-21",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:SANADA%202025.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Ren Narita 2025.jpg",
+     "takenAt": "2025-04-21",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Ren%20Narita%202025.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "EVIL (wrestler) Nov 2021.jpg",
+     "takenAt": "2021-11-06",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:EVIL%20(wrestler)%20Nov%202021.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Yujiro Takahashi 2022.jpg",
+     "takenAt": "2022-11-03",
+     "license": "CC0",
+     "distanceM": null,
+     "size": "600x900",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Yujiro%20Takahashi%202022.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_80620d10-0b9c-4391-8211-0d042480ca94",
+   "name": "キーエンス本社ビル",
+   "ward": "higashiyodogawa",
+   "current": {
+    "file": "Keyence_Head_Office_and_Lab_20090321-002.jpg",
+    "takenAt": "2009-03-21",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Keyence Head Office and Lab 20090321-001.jpg",
+     "takenAt": "2009-03-21",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1525x2288",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Keyence%20Head%20Office%20and%20Lab%2020090321-001.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "KEYENCE Head-Office.jpg",
+     "takenAt": "2008-11",
+     "license": "CC BY 3.0",
+     "distanceM": null,
+     "size": "1200x1600",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:KEYENCE%20Head-Office.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 2,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_osm_1079214457",
+   "name": "ザ パーク フロント ホテル アット ユニバーサル・スタジオ・ジャパン",
+   "ward": "konohana",
+   "current": {
+    "file": "The_Park_Front_Hotel_at_Universal_Studios_Japan_20221008-001.jpg",
+    "takenAt": "2022-10-08",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "The Park Front Hotel at Universal Studios Japan 20221008-002.jpg",
+     "takenAt": "2022-10-08",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3407x5110",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The%20Park%20Front%20Hotel%20at%20Universal%20Studios%20Japan%2020221008-002.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "The parkfronthotel USJ.jpg",
+     "takenAt": "2019-03-23",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1824x2736",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:The%20parkfronthotel%20USJ.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 2,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_14f91f2f-5e33-41e2-8770-58a969e00493",
+   "name": "杏林記念病院",
+   "ward": "nishinari",
+   "current": {
+    "file": "Kyo-rin_memorial_hospital.JPG",
+    "takenAt": "2013-08-11",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "NLC511-023031103010001-77631 盛京時報 第382卷.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "758x1089",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NLC511-023031103010001-77631%20%E7%9B%9B%E4%BA%AC%E6%99%82%E5%A0%B1%20%E7%AC%AC382%E5%8D%B7.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "NLC511-023031103010001-77665 盛京時報 第395卷.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "768x1095",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:NLC511-023031103010001-77665%20%E7%9B%9B%E4%BA%AC%E6%99%82%E5%A0%B1%20%E7%AC%AC395%E5%8D%B7.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00094639869 每日申報 1934-04-26.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2389x3187",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00094639869%20%E6%AF%8F%E6%97%A5%E7%94%B3%E5%A0%B1%201934-04-26.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00120263909 京城日報 1928-03-02.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "2214x3087",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00120263909%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201928-03-02.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "CNTS-00129790554 京城日報 1939-06-02.pdf",
+     "takenAt": null,
+     "license": "Public domain",
+     "distanceM": null,
+     "size": "3091x4183",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:CNTS-00129790554%20%E4%BA%AC%E5%9F%8E%E6%97%A5%E5%A0%B1%201939-06-02.pdf",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-DateTimeOriginal",
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 5,
+    "autoAdoptable": 0
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_osm_143328734",
+   "name": "海遊館",
+   "ward": "minato",
+   "current": {
+    "file": "Osaka_Kaiyukan01s3872.jpg",
+    "takenAt": "2007-09-26",
+    "basis": "verified"
+   },
+   "candidates": [
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09B.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09B.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09A.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09A.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09D.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09D.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09C.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09C.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09F.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09F.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2013-09E.JPG",
+     "takenAt": "2013-09-08",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "6016x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202013-09E.JPG",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Octopus sinensis (Osaka Aquarium KAIYUKAN).jpg",
+     "takenAt": "2013-07-30",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "4608x3072",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Octopus%20sinensis%20(Osaka%20Aquarium%20KAIYUKAN).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Geothelphusa dehaani, tiny crab at Osaka Aquarium Kaiyukan 海遊館のサワガニ.jpg",
+     "takenAt": "2006-04-20",
+     "license": "CC BY-SA 3.0",
+     "distanceM": null,
+     "size": "1000x701",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Geothelphusa%20dehaani%2C%20tiny%20crab%20at%20Osaka%20Aquarium%20Kaiyukan%20%E6%B5%B7%E9%81%8A%E9%A4%A8%E3%81%AE%E3%82%B5%E3%83%AF%E3%82%AC%E3%83%8B.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "not-newer"
+     ]
+    },
+    {
+     "file": "Tempozan Market Place Building and Osaka Aquarium \"Kaiyukan\" 2.jpg",
+     "takenAt": "2019-02-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 289,
+     "size": "3935x2951",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tempozan%20Market%20Place%20Building%20and%20Osaka%20Aquarium%20%22Kaiyukan%22%202.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:289m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium \"Kaiyukan\" 20190201.jpg",
+     "takenAt": "2019-02-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 118,
+     "size": "3961x2971",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20%22Kaiyukan%22%2020190201.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:118m"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium \"Kaiyukan\" 20190201-2.jpg",
+     "takenAt": "2019-02-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 93,
+     "size": "3978x2983",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20%22Kaiyukan%22%2020190201-2.jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    },
+    {
+     "file": "Entrance of Osaka Aquarium \"Kaiyukan\".jpg",
+     "takenAt": "2019-02-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 96,
+     "size": "4032x3024",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Entrance%20of%20Osaka%20Aquarium%20%22Kaiyukan%22.jpg",
+     "verdict": "auto-adoptable",
+     "rejectedBecause": []
+    },
+    {
+     "file": "Tempozan Market Place Building and Osaka Aquarium \"Kaiyukan\".jpg",
+     "takenAt": "2019-02-01",
+     "license": "CC BY-SA 4.0",
+     "distanceM": 251,
+     "size": "3926x2945",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Tempozan%20Market%20Place%20Building%20and%20Osaka%20Aquarium%20%22Kaiyukan%22.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "coordinates-too-far:251m",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan.jpg",
+     "takenAt": "2019-10-19",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "2560x1920",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "SAKURAKO - Osaka Aquarium KAIYUKAN. (8958839437).jpg",
+     "takenAt": "2013-06-02",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "3766x2510",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:SAKURAKO%20-%20Osaka%20Aquarium%20KAIYUKAN.%20(8958839437).jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium Kaiyukan 2022-04-24.jpg",
+     "takenAt": "2022-04-24",
+     "license": "CC BY 2.0",
+     "distanceM": null,
+     "size": "6000x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20Kaiyukan%202022-04-24.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "Jirai-kei girl at Osaka Aquarium Kaiyukan.jpg",
+     "takenAt": "2024-08-20",
+     "license": "CC BY-SA 4.0",
+     "distanceM": null,
+     "size": "3000x4000",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Jirai-kei%20girl%20at%20Osaka%20Aquarium%20Kaiyukan.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates",
+      "no-name-in-title-or-description"
+     ]
+    },
+    {
+     "file": "大阪海遊館俯視圖.jpg",
+     "takenAt": null,
+     "license": "CC BY-SA 4.0",
+     "distanceM": 458,
+     "size": "3264x2448",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:%E5%A4%A7%E9%98%AA%E6%B5%B7%E9%81%8A%E9%A4%A8%E4%BF%AF%E8%A6%96%E5%9C%96.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "non-iso-or-ambiguous",
+      "coordinates-too-far:458m"
+     ]
+    },
+    {
+     "file": "Osaka Aquarium KAIYUKAN and Ferris wheel.jpg",
+     "takenAt": "2026-06-10",
+     "license": "CC BY 4.0",
+     "distanceM": null,
+     "size": "5184x3888",
+     "evidenceUrl": "https://commons.wikimedia.org/wiki/File:Osaka%20Aquarium%20KAIYUKAN%20and%20Ferris%20wheel.jpg",
+     "verdict": "rejected",
+     "rejectedBecause": [
+      "no-coordinates"
+     ]
+    }
+   ],
+   "summary": {
+    "found": 19,
+    "autoAdoptable": 2
+   }
+  },
+  {
+   "canonicalId": "cg_bldg_bldg_92236c9a-98aa-44f7-a077-4b2abb9dc449",
+   "name": "江崎記念館（企業ミュージアム）",
+   "ward": "nishiyodogawa",
+   "current": {
+    "file": "Ezaki_memorial_hall.jpg",
+    "takenAt": "2013-03-13",
+    "basis": "verified"
+   },
+   "candidates": [],
+   "summary": {
+    "found": 0,
+    "autoAdoptable": 0
+   }
+  }
+ ]
+}
