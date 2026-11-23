@@ -262,13 +262,78 @@ function loadFeatures(tileJson) {
   });
 }
 // 簡略 LOD: footprint の軸平行 bbox を押し出し、小建物（bbox 面積 < minArea）は除外
-function coarsen(features, minArea) {
-  const out = [];
+// merge = { cellM, belowArea }: Mission213 試作(opt-in)。bbox 面積 < belowArea の小建物を cellM 四方のバケット(重心基準)ごとに 1 箱へ統合する。
+//   統合箱は「そのバケット内の小建物 bbox の和集合」なので、建物の無い範囲(道路/河川/空地)へは cellM+建物寸法を超えて広がらない(固定格子の再利用ではない)。
+//   高さ=面積加重平均。id は 'lod1c_' 接頭辞(bldg_ ではない=クリック対象外)。既定(merge 無し)の出力はバイト単位で従来と同一。
+// Mission213: 道路ポリゴン(前回ビルドの layers/roads.json、LC_COARSE_ROADS=<layersDir>)が与えられたとき、統合箱の gap(構成建物 bbox の外)が
+//   道路を roadMaxM2(既定 5m²)超えて覆うなら統合しない。merge.roadTest(x,z) は点が道路内か。opt-in。1m 格子サンプリングの近似。
+function gapHitsRoad(c, members, merge) {
+  if (typeof merge.roadTest !== 'function') return false;
+  // 原因調査(Mission213): 旧実装は 1m 格子・許容 5m² で、監査(2m 格子=1点4m²)の 2 点(8m²)が 1m 格子では 5 点以下になり得て、残 1,436m² の一因。
+  // 既定を 0.5m 格子・許容 0(1 点でも道路に掛かれば統合しない)に変更。LC_COARSE_ROAD_STEP / LC_COARSE_ROAD_MAX_M2 で上書き可。
+  const step = merge.roadStep > 0 ? merge.roadStep : 0.5, lim = (merge.roadMaxM2 != null ? merge.roadMaxM2 : 0) / (step * step); let n = 0;
+  for (let x = c.x0 + step / 2; x < c.x1; x += step) for (let z = c.z0 + step / 2; z < c.z1; z += step) {
+    if (members.some((e) => x >= e.x0 && x < e.x1 && z >= e.z0 && z < e.z1)) continue;
+    if (merge.roadTest(x, z) && ++n > lim) return true;
+  }
+  return false;
+}
+const _roadCache = new Map();
+function loadRoadTest(dir) {
+  if (_roadCache.has(dir)) return _roadCache.get(dir);
+  const { buildIndex, inside } = require('./cloud/audit-coarse-overlap.cjs');
+  const I = buildIndex(JSON.parse(fs.readFileSync(path.join(dir, 'roads.json'), 'utf8')).features, 64);
+  const f = (x, z) => inside(x, z, I); _roadCache.set(dir, f); return f;
+}
+function coarsen(features, minArea, merge) {
+  const out = [], buckets = new Map();
+  const mergeOn = merge && merge.cellM > 0 && merge.belowArea > 0;
+  const safe = mergeOn && merge.gapM > 0;   // Mission213: 道路跨ぎ防止フィルタ(opt-in)。gapM 以内で連結する建物だけ統合し、充填率が minFill 未満の箱は統合せず個別 bbox に戻す
   for (const b of features) {
     let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
     for (const p of b.fp) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); z0 = Math.min(z0, p[1]); z1 = Math.max(z1, p[1]); }
-    if ((x1 - x0) * (z1 - z0) < minArea) continue;
+    const area = (x1 - x0) * (z1 - z0);
+    if (mergeOn && area < merge.belowArea) {
+      const k = Math.floor((x0 + x1) / 2 / merge.cellM) + '_' + Math.floor((z0 + z1) / 2 / merge.cellM);
+      let g = buckets.get(k);
+      if (!g) { g = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [], list: [] }; buckets.set(k, g); }
+      if (safe) { g.list.push({ b, x0, x1, z0, z1, area }); continue; }
+      g.x0 = Math.min(g.x0, x0); g.x1 = Math.max(g.x1, x1); g.z0 = Math.min(g.z0, z0); g.z1 = Math.max(g.z1, z1);
+      g.base = Math.min(g.base, b.z0 || 0); g.hs += (b.h || 3) * area; g.as += area; g.n++;
+      if (process.env.LC_COARSE_AUDIT) g.m.push([x0, z0, x1, z1]);   // 監査用: 構成建物 bbox(出力 GLB には影響しない)
+      continue;
+    }
+    if (area < minArea) continue;
     out.push({ ...b, fp: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });
+  }
+  const emit = (g, key) => {
+    const h = Math.max(3, g.as > 0 ? g.hs / g.as : 3);
+    out.push({ id: 'lod1c_' + key, fp: [[g.x0, g.z0], [g.x1, g.z0], [g.x1, g.z1], [g.x0, g.z1]], z0: g.base, top: g.base + h, h, merged: g.n, memberArea: g.as, members: g.m });
+  };
+  for (const k of [...buckets.keys()].sort()) {
+    const g = buckets.get(k);
+    if (!safe) { emit(g, k); continue; }
+    // 連結成分(各 bbox を gapM/2 ずつ膨らませて重なるもの)に分け、成分ごとに統合可否を判定する
+    const L = g.list, par = L.map((_, i) => i), r = merge.gapM / 2;
+    const find = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
+      if (L[i].x0 - r <= L[j].x1 + r && L[j].x0 - r <= L[i].x1 + r && L[i].z0 - r <= L[j].z1 + r && L[j].z0 - r <= L[i].z1 + r) par[find(i)] = find(j);
+    }
+    const comps = new Map();
+    L.forEach((e, i) => { const c = find(i); if (!comps.has(c)) comps.set(c, []); comps.get(c).push(e); });
+    let ci = 0;
+    for (const members of [...comps.values()].sort((p, q) => p[0].x0 - q[0].x0 || p[0].z0 - q[0].z0)) {
+      const c = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity, base: Infinity, hs: 0, as: 0, n: 0, m: [] };
+      for (const e of members) {
+        c.x0 = Math.min(c.x0, e.x0); c.x1 = Math.max(c.x1, e.x1); c.z0 = Math.min(c.z0, e.z0); c.z1 = Math.max(c.z1, e.z1);
+        c.base = Math.min(c.base, e.b.z0 || 0); c.hs += (e.b.h || 3) * e.area; c.as += e.area; c.n++;
+        if (process.env.LC_COARSE_AUDIT) c.m.push([e.x0, e.z0, e.x1, e.z1]);
+      }
+      const boxArea = (c.x1 - c.x0) * (c.z1 - c.z0);
+      if (members.length >= 2 && boxArea > 0 && c.as / boxArea >= merge.minFill && !gapHitsRoad(c, members, merge)) { emit(c, k + '_' + (ci++)); continue; }
+      // フォールバック: 統合せず従来どおり個別 bbox(元 id)
+      for (const e of members) if (e.area >= minArea) out.push({ ...e.b, fp: [[e.x0, e.z0], [e.x1, e.z0], [e.x1, e.z1], [e.x0, e.z1]] });
+    }
   }
   return out;
 }
@@ -276,6 +341,15 @@ const region = (e) => [e.w * D2R, e.s * D2R, e.e * D2R, e.n * D2R, Math.floor(e.
 const mergeExt = (a, b) => ({ w: Math.min(a.w, b.w), e: Math.max(a.e, b.e), s: Math.min(a.s, b.s), n: Math.max(a.n, b.n),
   minH: Math.min(a.minH, b.minH), maxH: Math.max(a.maxH, b.maxH) });
 
+// 環境変数 LC_COARSE_MERGE='cellM:belowArea'(例 '20:150')で opt-in。未設定なら従来どおり。
+function envCoarseMerge() {
+  // 'cellM:belowArea'(従来) または 'cellM:belowArea:gapM:minFill'(道路跨ぎ防止フィルタ付き。例 '20:150:3:0.6')
+  const m = /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)(?::(\d+(?:\.\d+)?):(\d+(?:\.\d+)?))?$/.exec(process.env.LC_COARSE_MERGE || '');
+  if (!m) return null;
+  const o = m[3] ? { cellM: +m[1], belowArea: +m[2], gapM: +m[3], minFill: +m[4] } : { cellM: +m[1], belowArea: +m[2] };
+  if (m[3] && process.env.LC_COARSE_ROADS) { o.roadTest = loadRoadTest(process.env.LC_COARSE_ROADS); if (process.env.LC_COARSE_ROAD_STEP) o.roadStep = +process.env.LC_COARSE_ROAD_STEP; if (process.env.LC_COARSE_ROAD_MAX_M2) o.roadMaxM2 = +process.env.LC_COARSE_ROAD_MAX_M2; }   // opt-in(道路は前回ビルドの出力を参照)
+  return o;
+}
 function build(opts) {
   const dir = opts.srcDir || path.join(__dirname, '..', 'public', 'map-data', 'osaka-city', 'buildings', opts.dataset);
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
@@ -316,8 +390,11 @@ function build(opts) {
       for (const f of feats) if (kept.has(f.id)) gFeatures.push(f);
     }
     if (!leafs.length) continue;
-    const gfRaw = coarsen(gFeatures, opts.coarseMinArea);
+    const gfRaw = coarsen(gFeatures, opts.coarseMinArea, opts.coarseMerge || envCoarseMerge());
     const gframe = makeFrame((gExt.w + gExt.e) / 2, (gExt.s + gExt.n) / 2);
+    if (process.env.LC_COARSE_AUDIT) {   // Mission213: 統合箱の bbox を JSON Lines で書き出す(道路/河川との交差監査用。出力 GLB には影響しない)
+      for (const f of gfRaw) if (f.id.startsWith('lod1c_')) fs.appendFileSync(process.env.LC_COARSE_AUDIT, JSON.stringify({ id: f.id, x0: f.fp[0][0], z0: f.fp[0][1], x1: f.fp[2][0], z1: f.fp[2][1], n: f.merged, memberArea: Math.round(f.memberArea), m: (f.members || []).map((q) => q.map((v) => +v.toFixed(2))) }) + '\n');
+    }
     const cr = buildGlb(gfRaw, gframe);
     const gname = 'g_' + gk;
     const node = {
@@ -370,5 +447,5 @@ function main() {
   if (r.totals.buildings + r.totals.skipped !== r.totals.sourceBuildings) { console.error('building count mismatch'); process.exit(1); }
 }
 
-module.exports = { buildGlb, parseGlb, build, makeFrame, toEnu,frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
+module.exports = { envCoarseMerge, buildGlb, parseGlb, build, makeFrame, toEnu,frameMatrix, relativeMatrix, triangulate, cleanRing, signedArea, loadFeatures, coarsen, localToLon, localToLat };
 if (require.main === module) main();

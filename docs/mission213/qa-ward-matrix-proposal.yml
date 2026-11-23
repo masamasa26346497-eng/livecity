@@ -1,0 +1,54 @@
+# Mission 213 区別 --lod QA(24区 matrix)【適用待ち・未実行・一度も Actions で動かしていない】
+# 適用先(管理者が Web UI で1回): .github/workflows/mission213-qa-wards.yml  ※GitHub App は workflows 編集不可。Claude は適用しない。
+# 目的: 現行 mission213-qa.yml は「24区一括ビルド+--sweep」のみ。区別の親→葉/クリック/tileFail/HTTP は走らない。
+#       本案は 区ごとに独立 runner で 単独ビルド(約20〜100秒)+ `--lod --ward <id>` を実行し、判定 JSON(集計のみ)を残す。
+# 起動: PR ラベル `run-mission213-wards`(同一リポジトリ・PR #68 head のみ)。再実行=ラベルを外して付け直す。
+# 安全: secrets 無し / push・schedule 無し / PLATEAU 原データ・GLB・PNG は artifact にしない(qa JSON の集計のみ、7日) / 各 job 25分上限。
+#       max-parallel 4 × 24 job。public リポジトリの標準 runner は無料(private の場合は分数を消費する: 管理者が確認)。
+name: mission213-qa-wards
+on:
+  pull_request:
+    types: [labeled]
+permissions:
+  contents: read
+concurrency:
+  group: mission213-qa-wards
+  cancel-in-progress: false
+jobs:
+  ward:
+    if: >-
+      github.event.label.name == 'run-mission213-wards' &&
+      github.event.pull_request.head.ref == 'claude/issue-67-20261114-1354' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        ward: [kita, miyakojima, fukushima, konohana, chuo, nishi, minato, taisho, tennoji, naniwa, nishiyodogawa, yodogawa,
+               higashiyodogawa, higashinari, ikuno, asahi, joto, tsurumi, abeno, suminoe, sumiyoshi, higashisumiyoshi, hirano, nishinari]
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: '${{ github.event.pull_request.head.sha }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Chrome
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium || true)"; test -n "$CHROME"
+          echo "CHROME=$CHROME" >> "$GITHUB_ENV"
+      - name: Build one ward (single-pass + LOD0)
+        env: { WARD: '${{ matrix.ward }}' }
+        run: node tools/cloud/build-cloud-preview.mjs --wards "$WARD" --single-pass --city-lod0 --out temp/w 2>&1 | tail -n 5
+      - name: --lod E2E (親→葉 / クリック / tileFail / HTTP)  ※PNG は撮るが artifact にしない
+        env: { WARD: '${{ matrix.ward }}' }
+        run: node tools/cloud/e2e-city-lod0.mjs --static temp/w --chrome "$CHROME" --lod --ward "$WARD" --shots temp/shots --out temp/lod.json
+      - name: Aggregate (no raw data)
+        if: always()
+        env: { WARD: '${{ matrix.ward }}' }
+        run: |
+          node -e "const r=require('./temp/lod.json');const c=r.checks||{};console.log(JSON.stringify({ward:process.env.WARD,ok:r.ok,parentToLeaf:c.lodSwitch&&c.lodSwitch.parentToLeaf,click:c.clickSelectsBuilding,tileFail:(c.lod||[]).map(x=>x.tileFail),sel:(c.lod||[]).map(x=>[x.view,x.selected,x.leaf]),httpErrors:(r.httpErrors||[]).filter(e=>/_city-lod0|\.glb|tileset\.json/.test(e.url||e)).length}))" | tee -a "$GITHUB_STEP_SUMMARY" temp/agg-$WARD.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: 'agg-${{ matrix.ward }}', path: 'temp/agg-*.json', retention-days: 7, if-no-files-found: ignore }
+# 注: --lod は hole を判定しない(hole/区境は --sweep の役割)。24区一体の WebGL は本案でも測れない(一体ビルドは約10〜15分で sweep 側)。

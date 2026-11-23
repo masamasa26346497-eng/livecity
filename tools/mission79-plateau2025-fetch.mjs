@@ -71,7 +71,9 @@ async function main() {
     if (done && fs.existsSync(dest) && fs.statSync(dest).size === e.uncompressedBytes) { console.log('[79 fetch] skip (resume) ' + e.name); continue; }
     const t0 = Date.now();
     const data = await extract(lock.resource.url, e);
-    fs.writeFileSync(dest, data);
+    const tmp = dest + '.part';
+    fs.writeFileSync(tmp, data);
+    fs.renameSync(tmp, dest);
     manifest.files[path.basename(e.name)] = { kind: e.kind, mesh: e.mesh, bytes: data.length, sha256: crypto.createHash('sha256').update(data).digest('hex'), ms: Date.now() - t0 };
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     console.log('[79 fetch] ' + e.name + ' ' + data.length + ' bytes ' + (Date.now() - t0) + 'ms');

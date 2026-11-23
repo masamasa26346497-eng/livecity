@@ -1,0 +1,33 @@
+# 管理者向け最小差分 v2(Mission218F)。適用は管理者。Claude は .github/workflows を編集しない/ラベル未付与。
+# v1(qa-24ward-minimal-diff.patch)からの修正点:
+#  (1) `|| true` を廃止。E2E の失敗は変数に記録して続行し、step 末尾で非0なら job を失敗させる(失敗の握りつぶし防止)。
+#  (2) 区境座標は例示値ではなく、直前の sweep の qa.json(ward-border 行の実 lat/lon)から tools/cloud/qa-border-points.mjs で取得。
+#      区境行が無ければ exit 3 で失敗(偽PASS防止)。
+#  (3) 同一SHA: 各バッチ run の summary に SHA を出す(既存 Summarize)。5バッチ集約は「全 run の SHA が同一」を目視/`gh run list` で確認。
+#      途中で PR にコミットが入ると SHA が変わるので、その場合は index 0 からやり直す。
+# 対象: .github/workflows/mission213-qa.yml の "Sweep E2E" step の直後(Summarize の前)。
+--- a/.github/workflows/mission213-qa.yml
++++ b/.github/workflows/mission213-qa.yml
+@@ Sweep E2E の直後 @@
++      - name: LOD/click/cell-class E2E at real ward-border points (fails the job if any fails; PNG not uploaded)
++        if: always() && steps.build.outcome == 'success' && steps.sweep.outcome != 'skipped'
++        run: |
++          set +e
++          node tools/cloud/qa-border-points.mjs temp/qa.json 2 > temp/border.txt || { echo "区境点なし"; exit 3; }
++          rc=0; i=0
++          while read -r LAT LON WARD; do
++            i=$((i+1))
++            node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" --lod --cells \
++              --lat "$LAT" --lon "$LON" --shots "temp/shots-$i" --out "temp/lod-24-$i.json"
++            e=$?; [ $e -ne 0 ] && rc=1
++            node -e "const r=require('./temp/lod-24-$i.json');console.log(JSON.stringify({ward:'$WARD',exit:$e,ok:r.ok,click:r.checks.clickSelectsBuilding,sw:r.checks.lodSwitch,http:r.httpStat}))" | tee -a "$GITHUB_STEP_SUMMARY" || rc=1
++          done < temp/border.txt
++          exit $rc
+# upload-artifact の path は temp/qa.json と summary.md のみのまま=画像/GLB/shots は公開しない。
+# コスト(実際の属性): リポジトリは PUBLIC(gh repo view で確認済み)。public の標準 runner(ubuntu-latest)は無料。
+#   ただし将来 private 化・larger runner 指定・組織ポリシーで課金され得る。実行前に管理者が Settings > Billing > Usage で
+#   「この workflow の runner が標準で課金0」を確認し、課金表示が出る場合は実行しない。
+# 1 run ≒ ビルド 590〜890秒 + sweep ≤25分 + 本 step ≈ 2×4分(≤55分)。最小は index 0 の1回(区境2点のE2Eが目的ならこれで足りる)。
+# 55点全バッチ(index 0/12/24/36/48 の5回)は all-wards 約1GBを5回再生成=最大約250分。未承認・既定では実行しない。
+# 実行手順(Web UI のみ): 1) PR #68 ブランチで .github/workflows/mission213-qa.yml を編集し上の + 行を挿入してコミット
+#   2) PR #68 にラベル run-mission213-qa を付与(index 0) 3) 完了後ラベルを外す 4) 必要なら :12 :24 :36 :48 を1件ずつ直列に。

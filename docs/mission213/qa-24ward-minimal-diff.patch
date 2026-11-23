@@ -1,0 +1,25 @@
+# 管理者向け最小差分(適用は管理者。Claude は .github/workflows を編集しない / ラベル未付与)
+# 対象: .github/workflows/mission213-qa.yml の "Sweep E2E" step の直後、"Summarize" step の前に追加。
+# 目的: 同一の24区ビルド(temp/cloud-all)に対し、区境付近の2地点以上で --lod(クリック/親→葉/HTTP集計)と
+#       --cells(LOD0 表示セルの実建物有無分類)を現 HEAD で取る。PNG は temp/shots に出るが artifact には含めない。
+# 区境座標: 既存 sweep の qa.json の sweep.rows から kind=ward-border の lon/lat を使うのが正確。下は例(西/中央境付近, 中央/天王寺境付近は要確認)。
+--- a/.github/workflows/mission213-qa.yml
++++ b/.github/workflows/mission213-qa.yml
+@@ sweep step の直後 @@
++      - name: LOD/click/HTTP/cell-class E2E on the 24-ward build (2 border points; PNG not uploaded)
++        if: always() && steps.build.outcome == 'success'
++        run: |
++          i=0
++          for P in "34.6786 135.4900" "34.6606 135.5200"; do
++            set -- $P; i=$((i+1))
++            node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" --lod --cells \
++              --lat "$1" --lon "$2" --shots "temp/shots-$i" --out "temp/lod-24-$i.json" || true
++            node -e "const r=require('./temp/lod-24-$i.json');console.log(JSON.stringify({pt:'$P',ok:r.ok,click:r.checks.clickSelectsBuilding,sw:r.checks.lodSwitch,http:r.httpStat,cells:r.checks.lod.map(x=>({v:x.view,tileFail:x.tileFail,c:x.cells&&{shown:x.cells.shown,real:x.cells.realUnder,noReal:x.cells.noRealUnder}}))}))" | tee -a "$GITHUB_STEP_SUMMARY"
++          done
+# upload-artifact の path は現行の temp/qa.json と summary.md のみのまま(変更しない)=画像/GLB を公開しない。
+# 使い方: PR #68 にラベル run-mission213-qa (index 0 から)を付与。バッチ継続は run-mission213-qa:<n>。再実行=ラベルを外して付け直す。
+# runner 分数: 1回=ビルド実測 590〜890秒 + sweep 最大25分 + 本 step 約2×4分 ≒ 最大約50分(job上限55分)。
+#   24区一体の区境2地点だけが目的なら、ラベルは1回(index 0)で足りる。55点全バッチ(5回)なら最大約250分で、未承認。
+# 残無料枠の確認方法(管理者): Settings > Billing and plans > Usage this month > Actions(GitHub Free は private で月2,000分)。
+#   CLI: gh api /users/<owner>/settings/billing/actions (user PAT に "user" scope 要。org なら /orgs/<org>/settings/billing/actions)。
+#   public リポジトリなら標準 runner は無料。リポジトリの visibility は gh repo view --json visibility で確認。
