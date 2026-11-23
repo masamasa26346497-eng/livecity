@@ -103,6 +103,21 @@ jobs:
             --sweep --alts "$QA_ALTS" --budget-min "$QA_BUDGET" \
             --max-points "$QA_POINTS" --start-point "$QA_START" --out temp/qa.json
 
+      - name: LOD/click/cell-class E2E at real ward-border points (fails the job if any fails; PNG not uploaded)
+        if: always() && steps.build.outcome == 'success' && steps.sweep.outcome != 'skipped'
+        run: |
+          set +e
+          node tools/cloud/qa-border-points.mjs temp/qa.json 2 > temp/border.txt || { echo "区境点なし"; exit 3; }
+          rc=0; i=0
+          while read -r LAT LON WARD; do
+            i=$((i+1))
+            node tools/cloud/e2e-city-lod0.mjs --static temp/cloud-all --chrome "$CHROME" --lod --cells \
+              --lat "$LAT" --lon "$LON" --shots "temp/shots-$i" --out "temp/lod-24-$i.json"
+            e=$?; [ $e -ne 0 ] && rc=1
+            node -e "const r=require('./temp/lod-24-$i.json');console.log(JSON.stringify({ward:'$WARD',exit:$e,ok:r.ok,click:r.checks.clickSelectsBuilding,sw:r.checks.lodSwitch,http:r.httpStat}))" | tee -a "$GITHUB_STEP_SUMMARY" || rc=1
+          done < temp/border.txt
+          exit $rc
+
       - name: Summarize (read-only, aggregates only)
         if: always()
         env:
