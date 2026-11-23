@@ -196,3 +196,33 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/kita --lblab --lblab-size 1366x
 2. ラベル `run-mission213-qa`、`:12`、`:24`、`:36`、`:48` を1件ずつ直列付与(各約10〜15分、public runner無料)。全バッチ同一SHAで揃うまで24区PASSと書かない。
 3. ユーザー実機Chromeで `--lblab`(各5回以上、lblidle 0/1)。要・実GPU端末。
 4. 認証付きPreview: 管理者がログイン状態で現SHAの HTML/tileset/GLB 200 と WebGL を確認(認証は変更しない)。
+
+## Mission218E(2026-11-23)西区ラベル差異の確定(基準 HEAD 8145bb5 + 本コミット、SwiftShader・実データ西区)
+**結論: 218D の「143,785 vs 100,553」等はハーネスの測定タイミング差(偽陽性)。アプリ本体の欠陥ではない。**
+- 原因: 旧 `--lblab` は「最初にラベル画素>0 になった時点」の1回測定で、実建物タイルのロード/選択が進行中だった(実測: 早期測定で `unstablePx` 147,180〜313,117)。lblidle=1 は初建物が早く、測定時のタイル進行段階が異なっていた。
+- 修正(`tools/cloud/e2e-city-lod0.mjs`、本体無変更): 選択タイル数と `tilesLoaded` が3連続で不変になるまで待ち(`settled`)、その後3回測定して `labelRepeat`(最小/中央/最大)・`realShareSettled`・`labelSample`(canvas ラベル文字列)を記録。
+- 日本語フォント: 本 runner は既定で CJK 無し(`jaGlyphRendered=false`)のため `fonts-noto-cjk` を導入して測定(runner のみの操作、repo 無変更)。導入後 `jaGlyphRendered=true`。
+- 結果(西区 34.6786,135.4900、3000m -45°、安定後、選択タイル 39(PC)/25(mobile)で lblidle 0/1 同一):
+| サイズ | 実行 | lblidle 0 bbox内px(3回) | lblidle 1 bbox内px(3回) | 推定bbox px |
+|---|---|---|---|---|
+| 1366 | 1 | 143325×3 | 143325×3 | 183,732 |
+| 1366 | 2 | 141857/143304/143325 | 140886/141856/143331 | 183,732 |
+| 390 | 1 | 62057/72304/72304 | 72304/72304/74816 | 119,697 |
+  安定後の中央値は lblidle 0/1 で一致(PC 143,325 / mobile 72,304)。ばらつきは `unstablePx>0` の1サンプル(アニメーション/フェード由来)で、中央値を採用すれば消える。
+- ラベル文字列: canvas の LabelCollection から「住吉・粉浜・東粉浜・長居・南住吉・帝塚山西・万代…」を取得、lblidle 0/1 で同一。豆腐判定 `sameAsTofuForRare=false`。**PNG による文字の欠字・視認性の目視は未実施**(実データ派生物のため撮影・commit しない)。DOM と canvas の文字列照合は canvas 側のみ(DOM のラベル要素は未対象)。
+- 操作テスト(検索・区選択・クリック・カード・ESC)はこの再実行でも全 `ok=true`(PC 2回、mobile 1回、各 lblidle 0/1)。
+- 採否: **lblidle は既定OFFのまま**(実GPU・5回以上・実Chrome 日本語判読が未確認のため)。citylod0 も既定OFF。本体・座標・LOD は変更なし。
+
+### P1 レビュー(workflow/patch、読み取りのみ。変更なし)
+- `docs/mission213/qa-24ward-minimal-diff.patch` は現 workflow の step 構造(`steps.build`、`$CHROME`、`--cells` フラグの存在)と整合。権限は既存の `contents: read` / `pull-requests: write` のみで追加不要。artifact は `qa.json`+`summary.md` のみで画像/GLB は含まれない。
+- 懸念: (1) 各バッチが ~1GB を再ビルド(実測 590〜890秒)し、1バッチ最大 ~50分(job上限55分)。5バッチ=最大約250分/月(public リポジトリなら標準 runner 無料、private なら月2,000分枠の約12%)。(2) patch 内 `|| true` は E2E 失敗を握りつぶすため、同一SHA PASS の根拠にするには `ok` を summary で必ず読むこと。(3) 区境座標2点は例示で、sweep の `ward-border` 行の lon/lat に置換が望ましい。(4) `--lblab` は patch に含まれない。西区/平野区の lblab を24区ビルドで回すなら `--lblab --ward-name <区> --lat --lon` の step 追加が別途必要。
+- 適用手順(管理者、1回): Web UI で `.github/workflows/mission213-qa.yml` を PR #68 ブランチ上で編集 → patch の `+` 行を "Sweep E2E" の直後に挿入してコミット → PR のラベル `run-mission213-qa`、完了後に外して `:12`、`:24`、`:36`、`:48` を**直列に1件ずつ**付与(同一SHAのまま。途中でコミットが入ると SHA が変わるため新規に0から)。
+- 24区同一SHA PASS は**未実施(NOT_TESTED)**。非workflow経路の代替: 区単独ビルドの `--lod`/`--lblab`(北区・西区は合格済み、平野区は LOD2=0 のため `--lod` 不可)。
+
+### 第7段階を閉じるための最小証拠の分類
+| 区分 | 項目 |
+|---|---|
+| Claude だけでできる(実施済み) | 西区ラベル差異の切り分け(本節)、区単独の lblab/lod/クリック(北・西・平野) |
+| Claude だけでできる(未実施) | 他の区の単独 lblab、平野区以外の LOD2 有区の `--lod`(各約1〜3分) |
+| 管理者の workflow 操作が必要 | patch 適用、ラベル 0/12/24/36/48 の直列付与による24区同一SHAの sweep+`--lod`+`--cells` |
+| ユーザー実GPU/認証Preview が必要 | 実Chrome での lblidle 0/1 各5回以上の初建物・ラベル時刻、日本語ラベルの目視判読、認証付き Preview の現SHA HTML/tileset/GLB 200 と WebGL |

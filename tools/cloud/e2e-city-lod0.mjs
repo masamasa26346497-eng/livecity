@@ -361,6 +361,8 @@ const LBL_MEASURE = `(()=>{const v=window.__v,sc=v.scene,cv=sc.canvas;const cols
  const W=cv.width,H=cv.height,mask=new Uint8Array(W*H);for(const [x0,y0,x1,y1] of bbs){for(let y=Math.max(0,Math.floor(y0));y<Math.min(H,Math.ceil(y1));y++)for(let x=Math.max(0,Math.floor(x0));x<Math.min(W,Math.ceil(x1));x++)mask[y*W+x]=1}
  let diff=0,diffIn=0,maskPx=0,unstable=0;for(let i=0,p=0;i<A.length;i+=4,p++){if(mask[p])maskPx++;if(Math.abs(A[i]-A2[i])+Math.abs(A[i+1]-A2[i+1])+Math.abs(A[i+2]-A2[i+2])>24){unstable++;continue}const d=Math.abs(A[i]-B[i])+Math.abs(A[i+1]-B[i+1])+Math.abs(A[i+2]-B[i+2]);if(d>24){diff++;if(mask[p])diffIn++}}
  return {cols:cols.length,heavyCols,labelsTotal:total,labelsInView:inView,canvas:[W,H],labelDiffPx:diff,labelDiffPxInBBox:diffIn,bboxPx:maskPx,unstablePx:unstable,bboxNote:'bbox は font px×文字数からの推定(実グリフ幅ではない)'}})()`;
+const SETTLE_JS = `(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);return {sel:ps.reduce((a,p)=>a+(p._selectedTiles||[]).length,0),loaded:ps.every(p=>p.tilesLoaded)}})()`;
+const LBL_TEXTS = `(()=>{const cols=${LBL_JS};const t=[];for(const c of cols)for(let i=0;i<c.length&&t.length<12;i++){const l=c.get(i);if(l.show&&l.text&&/[^\\x00-\\x7f]/.test(l.text))t.push(l.text)}const dom=[...document.querySelectorAll('[class*=lbl],[id*=lbl]')].length;return {canvasLabelSamples:t,nonAsciiCount:t.length}})()`;
 const REAL_SEL = `(()=>{const ps=(window.__v.scene.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);return ps.some(p=>(p._selectedTiles||[]).length>0)})()`;
 const REAL_SHARE = `(()=>{const v=window.__v,sc=v.scene,cv=sc.canvas;const grab=()=>{sc.render();const t=document.createElement('canvas');t.width=cv.width;t.height=cv.height;const g=t.getContext('2d');g.drawImage(cv,0,0);return g.getImageData(0,0,t.width,t.height).data};
  const real=(sc.primitives._primitives||[]).filter(p=>p.tilesLoaded!==undefined&&!p._lcCityLod0);const sv=real.map(p=>p.show);const B=grab();real.forEach(p=>p.show=false);const A=grab();real.forEach((p,i)=>p.show=sv[i]);
@@ -389,6 +391,10 @@ async function lblabMode() {
       let tPx = null, tGate = null; const deadline = Date.now() + 60000;
       while (Date.now() < deadline) { await fly(lon0, lat, 3000, pitch); const m = await ev(LBL_MEASURE); if (tPx === null && m.labelDiffPx > 0) tPx = Date.now() - t0; const g = await ev('window.__lblGate?JSON.stringify(window.__lblGate):null'); if (g) { const gj = JSON.parse(g); if (gj.open && tGate === null) tGate = Date.now() - t0; } if (tPx !== null && (lv === '0' || tGate !== null)) break; await sleep(1000); }
       R.labelPixelFirstMs = tPx; R.gateOpenMs = tGate;
+      // Mission218E: 安定待ち(選択タイル数が3連続で同一かつ tilesLoaded)後に 3 回測定し 最小/中央/最大 と 実建物寄与・ラベル文字列サンプルを残す(タイル進行差と bbox 推定差の切り分け)
+      { let prev = -1, same = 0; for (let i = 0; i < 40 && same < 3; i++) { await fly(lon0, lat, 3000, pitch); const st = await ev(SETTLE_JS); const k = st.sel + ':' + st.loaded; if (k === prev && st.loaded) same++; else same = 0; prev = k; await sleep(1000); } R.settled = same >= 3; }
+      R.settleState = await ev(SETTLE_JS); R.realShareSettled = await ev(REAL_SHARE); R.labelSample = await ev(LBL_TEXTS);
+      { const ms = []; for (let i = 0; i < 3; i++) { ms.push(await ev(LBL_MEASURE)); await sleep(500); } const d = ms.map((m) => m.labelDiffPxInBBox).sort((a, b) => a - b); R.labelRepeat = { inBBox: d, diffPx: ms.map((m) => m.labelDiffPx), unstable: ms.map((m) => m.unstablePx), bboxPx: ms[0].bboxPx, inBBoxRatio: +(d[1] / Math.max(1, ms[0].bboxPx)).toFixed(4) }; }
       R.labelsFinal = await ev(LBL_MEASURE); R.gateFinal = await ev('window.__lblGate?JSON.stringify(window.__lblGate):null');
       const lf = R.labelsFinal; R.labelReleasedButNoPixels = !!(lf.labelsInView > 0 && lf.labelDiffPx === 0 && (lv === '0' || (R.gateFinal && JSON.parse(R.gateFinal).open)));
       R.tileFail = await ev('window.__tileFail||0');
