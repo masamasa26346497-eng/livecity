@@ -180,3 +180,14 @@ lblidle 移行基準: 実GPUでcold/warm各N回の初建物・ラベル完了時
 ## Mission218E(2026-11-23)第7段階 更新
 - 西区 `--lblab` の lblidle 0/1 画素差は**測定タイミング差(ハーネス偽陽性)**と確定。安定待ち+3回測定を追加し、安定後の bbox内ラベル画素は 0/1 で一致(PC 143,325、mobile 72,304 中央値)。詳細は `docs/mission217/QA_24WARDS.md` の Mission218E。
 - 未合格/承認待ち: 24区同一SHA(管理者の workflow patch 適用+ラベル直列付与)、実GPU・実Chrome日本語目視、認証付きPreview。lblidle・citylod0 は既定OFF維持。
+
+## Mission218F(2026-11-23)第7段階 更新
+| 項目 | 区分 |
+|---|---|
+| 区単独 `--lblab` PC+390x844×lblidle0/1: 北/西/平野/天王寺(LOD2有)/旭(LOD2無) | PASS(SwiftShader・各1回) |
+| ラベル画素 lblidle 0/1 同等(安定後・中央値) | PASS(天王寺・旭・西) |
+| 日本語ラベルの目視判読 / 実GPU / 実Chrome 5回以上 | NOT_TESTED |
+| 24区同一SHA sweep+`--lod`+`--cells`(workflow v2 patch 適用+ラベル直列付与) | NOT_TESTED(管理者操作待ち) |
+| 認証付き Preview(現SHA HTML/tileset/GLB 200, WebGL) | NOT_TESTED |
+| 複数viewer/destroy 時の patch 安全性 | NOT_TESTED |
+- 最短操作(管理者): `docs/mission213/qa-24ward-minimal-diff-v2.patch` を Web UI で workflow に適用 → ラベル `run-mission213-qa` 付与(index 0 の1回)。ユーザー: 実Chrome(GPU)で Preview を開き lblidle=0/1 を目視。

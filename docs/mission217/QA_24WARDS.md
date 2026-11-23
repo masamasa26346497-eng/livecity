@@ -226,3 +226,23 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/kita --lblab --lblab-size 1366x
 | Claude だけでできる(未実施) | 他の区の単独 lblab、平野区以外の LOD2 有区の `--lod`(各約1〜3分) |
 | 管理者の workflow 操作が必要 | patch 適用、ラベル 0/12/24/36/48 の直列付与による24区同一SHAの sweep+`--lod`+`--cells` |
 | ユーザー実GPU/認証Preview が必要 | 実Chrome での lblidle 0/1 各5回以上の初建物・ラベル時刻、日本語ラベルの目視判読、認証付き Preview の現SHA HTML/tileset/GLB 200 と WebGL |
+
+## Mission218F(2026-11-23)追加2区 `--lblab`(基準 HEAD f000ad8、SwiftShader・各1回・実PLATEAU2025・fonts-noto-cjk 導入、`jaGlyphRendered=true`)
+区選択: 天王寺区(LOD2あり 2,578棟 / LOD1 14,235 / ビルド66秒 49.3MB)、旭区(LOD2なし / LOD1 24,962 / 44.3MB)。単独区ビルド→`--lblab`。
+```
+node tools/cloud/build-cloud-preview.mjs --wards tennoji --single-pass --city-lod0 --out temp/tennoji
+node tools/cloud/e2e-city-lod0.mjs --static temp/tennoji --lblab --lblab-size 1366x768|390x844 --ward-name 天王寺区 --lat 34.66062 --lon 135.52005
+(旭区も同様: --ward-name 旭区 --lat 34.72772 --lon 135.54763)
+```
+| 項目 | 天王寺 PC | 天王寺 390x844 | 旭 PC | 旭 390x844 |
+|---|---|---|---|---|
+| lblidle 0 / 1 | PASS/PASS | PASS/PASS | PASS/PASS | PASS/PASS |
+| tileFail / held 3000m | 0 / 3000 | 0 / 3000 | 0 / 3000 | 0 / 3000 |
+| 検索(結果6件)→選択飛行 | PASS | PASS | PASS | PASS |
+| 区選択→飛行 | PASS | PASS | PASS | PASS |
+| クリック canonicalId 一致 / カード本文 / ESC閉 | PASS | PASS | PASS(LOD1 fallback) | PASS(LOD1 fallback) |
+| bbox内ラベル画素 中央値 lblidle0 対 1 | 113,476 対 113,472〜113,476(同等) | 79,321 対 79,321(同一) | 39,842 対 39,842 | 37,387 対 37,387 |
+| 安定後 実建物寄与 | 0.192 | 0.162 | 0.271 | 0.215 |
+- 判定: LOD2あり/なし各1区で 218D/E と同じ結論(lblidle 0/1 で画素・操作が同等)。PNG の目視・日本語ラベルの判読は **NOT_TESTED**(画像未撮影)。
+- 実GPU・24区同一SHA110視点・認証付きPreview・複数viewer/destroy安全性は **NOT_TESTED**。lblidle/citylod0 は既定OFFのまま。本体変更なし。
+- P2: `docs/mission213/qa-24ward-minimal-diff-v2.patch` を追加(`|| true` 廃止→失敗で job 失敗、区境座標は qa.json の ward-border 実座標 `tools/cloud/qa-border-points.mjs`、同一SHA確認手順、実リポジトリ属性: PUBLIC)。v1 は残置。回帰テスト `tests/mission218f-border-points.test.cjs` 1件 pass。
