@@ -164,3 +164,15 @@ lblidle 移行基準: 実GPUでcold/warm各N回の初建物・ラベル完了時
 - `--lblab` mobile 390x844: 0/1 とも ok=true。
 - **390x844 lblidle=1 の区選択 1.0km の原因 = ハーネス欠陥**: 飛行量を「100m超えた最初の1秒ポーリング」で採取しており飛行途中の値だった(再測で 5.4km、さらに修正後 0/1 とも 11,122m で完全一致)。本体修正なし。修正: `e2e-city-lod0.mjs` を飛行が止まるまで待つよう変更。
 - 複数viewer/destroy 時の patch 安全性: 未実施(NOT_TESTED)。
+
+## Mission218D(2026-11-23)西区・平野区 lblab 実測
+詳細は docs/mission217/QA_24WARDS.md 末尾。SwiftShader・各1回・実データ。
+| 項目 | 西区 | 平野区(LOD2=0) |
+|---|---|---|
+| PC 1366×768 / mobile 390×844 × lblidle 0/1 | PASS×4 | PASS×4 |
+| 検索→結果選択飛行 / 区選択飛行 | PASS | PASS |
+| 建物クリック canonicalId / カード本文 / ESC | PASS | PASS(LOD1 fallback) |
+| tileFail | 0 | 0 |
+| ラベル画素 lblidle 0/1 一致 | NOT_CONFIRMED(差大) | PASS相当(差<1%) |
+| 日本語文字の判読目視 | NOT_TESTED | NOT_TESTED |
+| 実GPU / 24区110視点 / Vercel Preview | NOT_TESTED | NOT_TESTED |

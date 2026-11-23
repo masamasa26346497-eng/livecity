@@ -174,3 +174,25 @@ node tools/cloud/e2e-city-lod0.mjs --static temp/kita --lblab --lblab-size 1366x
 **ユーザー実機確認待ち**: 実GPUでの cold/warm 各5回以上の初建物・ラベル完了時刻(lblidle 0/1)、実Chrome での日本語ラベル判読、認証付き Vercel Preview(現行SHA の HTML/tileset/GLB 200 と WebGL)。合格条件: ラベル領域画素が lblidle 0/1 で同等、操作 PASS、tileFail=0、初建物時刻が悪化しない。
 **阻害要因**: (1) 24区同一SHA 110視点+24区クリックは 1GB ビルド(約10〜15分)と 55 地点バッチ(約5ジョブ)が必要。前景10分上限・`.github/workflows` 編集不可。今回起動していない=**NOT_TESTED**。364ae1e の過去 sweep は別SHAで現HEADのPASSではない。(2) 西区/平野区の `--lblab`・複数viewer patch・Preview は今回未実施(NOT_TESTED)。
 **P2 最短策**: 既存ラベル `run-mission213-qa:<n>` を 0/12/24/36/48 の順に1件ずつ付与(各バッチは自前ビルド約10〜15分・無料public runner)。現 workflow は `--lod`/`--lblab` を呼ばないため、置換後の24区クリックには管理者による `docs/mission213/qa-24ward-minimal-diff.patch` 方式の更新が必要(承認事項)。同一SHAで全バッチを揃えるまで「24区PASS」とは書かない。
+
+## Mission218D(2026-11-23)西区・平野区 `--lblab` 実データ(基準 HEAD d9c4b79、SwiftShader・各1回・日本語フォント Noto CJK 導入済み)
+ビルド(区単独・直列): 西区 60秒/41.9MB(LOD1 12,603=補完12,425+LOD2同ID除外178、LOD2 1,767、doubleDrawn=0)、平野区 90秒/77.3MB(LOD1 46,473、LOD2=0 `single-pass-no-lod2`、doubleDrawn=0)。実データ(fixtureではない)。
+コマンド: `e2e-city-lod0.mjs --static temp/<区> --lblab --lblab-size <WxH> --lat --lon --ward-name <区名>`(西区 34.6786,135.4900 / 平野区 34.6156,135.5639)。
+| 区 | サイズ | lblidle | 結果 | tileFail | 初建物ms | ラベル画素初出ms | ラベル差分px(bbox内) | 区選択m | 検索結果/飛行m | クリックID一致 | カード本文tc | ESC閉 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 西 | 1366 | 0/1 | PASS/PASS | 0/0 | 24664/13990 | 41168/31058 | 143,785/100,553 | 12554 | 6/17006,16994 | 一致 | 141 | PASS |
+| 西 | 390 | 0/1 | PASS/PASS | 0/0 | 11644/8231 | 20323/18684 | 30,873/36,555 | 7156 | 6/8360,3177 | 一致 | 141 | PASS |
+| 平野(LOD2=0) | 1366 | 0/1 | PASS/PASS | 0/0 | 25512/12462 | 41617/29297 | 22,959/23,011 | 24787 | 6/33554,32792 | 一致 | 139 | PASS |
+| 平野(LOD2=0) | 390 | 0/1 | PASS/PASS | 0/0 | 11751/9804 | 24680/23497 | 15,943/15,814 | 15144 | 6/23910,24582 | 一致 | 139 | PASS |
+- 平野区: ラベル画素は lblidle 0/1 でほぼ一致(差0.2〜0.8%)。LOD2=0でも実建物クリック(LOD1 fallback)・カード本文(tc=139>0)・ESC PASS。
+- 西区: ラベル画素は lblidle 0/1 で差が大きい(1366: 143,785 vs 100,553、390: 逆向き)。不安定画素・タイル進行差の可能性があるが原因未確定。画素一致は**確証なし**(lblidle は既定OFF維持)。
+- 初建物時刻は lblidle=1 が全4条件で早い(各1回のためばらつき未評価。改善とは断定しない)。
+- `labelReleasedButNoPixels` は全条件 false、`jaGlyphRendered=true`(豆腐ではない)。文字の判読・欠字の目視は未実施(PNG未撮影)。
+- 本体不具合: 検出なし。ハーネス問題の再発なし。コード変更なし。
+- NOT_TESTED: 実GPU、複数viewer monkey patch、24区同一SHA110視点、Vercel認証付きPreview。
+
+### 第7段階 残ゲート(最短順)
+1. (管理者・1回)`docs/mission213/qa-24ward-minimal-diff.patch` を `.github/workflows/mission213-qa.yml` へ適用(App は workflows 権限なし)。
+2. ラベル `run-mission213-qa`、`:12`、`:24`、`:36`、`:48` を1件ずつ直列付与(各約10〜15分、public runner無料)。全バッチ同一SHAで揃うまで24区PASSと書かない。
+3. ユーザー実機Chromeで `--lblab`(各5回以上、lblidle 0/1)。要・実GPU端末。
+4. 認証付きPreview: 管理者がログイン状態で現SHAの HTML/tileset/GLB 200 と WebGL を確認(認証は変更しない)。
