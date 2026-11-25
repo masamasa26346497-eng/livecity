@@ -1563,8 +1563,63 @@
       : stats.buildingState === 'unavailable' ? '3D建物未整備（区境界・道路・施設は使えます）' : stats.buildingState === 'error' ? '3D建物の読み込みに失敗しました' : '3D建物は非表示（区を選ぶと表示）';
   }
   function ensureExtraMeta() {
+    if (WG_ON) {   // 220A: ?wardgroups=1 は定義(index/published)だけ先に読み、メタ JSON は選択グループの区だけ並行数上限つきで取得
+      if (!extraReady) extraReady = loadExtraDefsOnly();
+      return extraReady.then(() => loadGroupMeta());
+    }
     if (!extraReady) extraReady = loadExtraMeta();
     return extraReady;
+  }
+  function postExtraMeta() {
+    if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
+    stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
+    const opt = document.querySelector('#sel-bldg-mode option[value="all"]');
+    if (opt && extraMeta.some((m) => m.external)) opt.disabled = false;
+  }
+  async function loadExtraDefsOnly() {
+    if (q.get('extra') === '0') return;
+    await loadPublishedDefs();
+    await loadExt45Defs();
+    if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
+  }
+  // 220A: def 単位のキャッシュ。成功は永続、失敗は wgRetryMeta() で消すまで再取得しない(allTick ごとの再試行ストームを避ける)。
+  const metaTasks = new Map();   // def.id -> Promise<boolean>
+  const metaNet = stats.metaNet = { requests: 0, inflightMax: 0, inflight: 0, failed: 0, wards: [] };
+  function loadOneMeta(def) {
+    if (metaTasks.has(def.id)) return metaTasks.get(def.id);
+    const p = (async () => {
+      metaNet.inflight++; metaNet.inflightMax = Math.max(metaNet.inflightMax, metaNet.inflight);
+      try {
+        metaNet.requests += 2;
+        const [src, rep] = await Promise.all([
+          fetch(def.base + 'source.json').then((r) => { if (!r.ok) throw new Error('source.json HTTP ' + r.status); return r.json(); }),
+          fetch(def.base + 'build-report.json').then((r) => { if (!r.ok) throw new Error('build-report.json HTTP ' + r.status); return r.json(); }),
+        ]);
+        if (!extraMeta.some((m) => m.id === def.id)) extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external, verified45: def.verified45 === true });
+        metaNet.wards.push(def.id); return true;
+      } catch (e) { metaNet.failed++; fail('extra-meta ' + def.id, e); return false; }
+      finally { metaNet.inflight--; }
+    })();
+    metaTasks.set(def.id, p); return p;
+  }
+  function wgRetryMeta() {   // 失敗した def だけキャッシュから外す(成功分は再取得しない)
+    for (const [id, p] of Array.from(metaTasks)) { if (p.__failed) metaTasks.delete(id); }
+  }
+  async function loadGroupMeta() {
+    if (!WGS || !WGS.selected || q.get('extra') === '0') return;
+    const wd = await WardUI.load();
+    const idOf = new Map(wd.wards.map((w) => [w.wardCode, w.wardId]));
+    const wardIds = new Set(Array.from(WGS.allowed).map((c) => idOf.get(c)).filter(Boolean));
+    const defs = EXTRA_SET_DEFS.filter((d) => wardIds.has(d.base.replace(/\/$/, '').split('/').pop()));
+    const queue = defs.filter((d) => !metaTasks.has(d.id) || !extraMeta.some((m) => m.id === d.id));
+    let idx = 0, failedAny = false;
+    const worker = async () => { while (idx < queue.length) { const d = queue[idx++]; const ok = await loadOneMeta(d); if (!ok) { failedAny = true; const p = metaTasks.get(d.id); if (p) p.__failed = true; } } };
+    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, worker));
+    // 既に失敗キャッシュ済みの def も失敗として報告する
+    for (const d of defs) { const p = metaTasks.get(d.id); if (p && p.__failed) failedAny = true; }
+    postExtraMeta();
+    if (queue.length && stats.wg) stats.wg.metaReadyMs = Math.round(performance.now() - wgSelectedAt);
+    if (failedAny) stats.allMode.lastError = 'meta failed (再試行できます)';
   }
   async function loadExtraMeta() {
     if (q.get('extra') === '0') return;
@@ -1805,6 +1860,18 @@
   async function lod0Sync() {
     if (!EXT45 || q.get('lod0') === '0' || !lod0Wards.length) return;
     const show = (code) => !allSets.has(code) && allMode;
+    // 220A: ?wardgroups=1 では未ロード区の fromUrl を並行数 4 で実行(従来は 1 区ずつ直列)。既定モードは従来どおり。
+    if (WG_ON && allMode) {
+      const todo = lod0Wards.filter((c) => !lod0Sets.has(c) && !lod0Pending.has(c));
+      todo.forEach((c) => { lod0Pending.add(c); lod0Sets.set(c, null); });
+      let i = 0;
+      const worker = async () => { while (i < todo.length) { const code = todo[i++]; try {
+        const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/_lod0/' + code + '/tileset.json', { maximumScreenSpaceError: 16 });
+        t._lcLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
+        scene.primitives.add(t); lod0Sets.set(code, t); t.show = show(code); scene.requestRender();
+      } catch (e) { lod0Sets.delete(code); } finally { lod0Pending.delete(code); } } };
+      await Promise.all(Array.from({ length: Math.min(4, todo.length) }, worker));
+    }
     for (const code of lod0Wards) {
       let t = lod0Sets.get(code);
       if (!t && allMode && !lod0Pending.has(code)) {   // 45H: pending 中の二重 fromUrl を防ぐ
@@ -3998,6 +4065,7 @@
     if (!WGDEF) return;
     if (!id) { wgClear(); return; }
     if (WGS.selected && WGS.selected.id === id && stats.wg.state !== 'failed' && !opt.force) { if (opt.fly) wgFly(); return; }
+    if (opt.force) wgRetryMeta();   // 220A: 失敗したメタだけ再取得
     WGS.select(id);   // 世代トークンを進める
     ++bldgGen;        // 進行中の mount / vec 構築を無効化（旧グループの遅延描画を防ぐ）
     clearBuildingPick();
@@ -4114,7 +4182,7 @@
           const s = stats.wg;
           return { groupId: s.groupId, state: s.state, allowedWards: Array.from(WGS.allowed), loadedWards: Array.from(allSets.keys()), loadedTilesets: extraSets.length, mountsTotal: stats.allMode.mountsTotal, dropsTotal: stats.allMode.dropsTotal,
             vecDrops: stats.vec45i.dropsTotal, prunedWards: s.prunedWards, selects: s.selects, switches: s.switches, deferredMoving: s.deferredMoving, firstBuildingMs: s.firstBuildingMs, lastError: s.lastError,
-            initialAssert: s.initialAssert, validation: s.validation, net: LC219B.summarizeNet(wgNetUrls()), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
+            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
         },
         select: (id) => wgSelect(id, { fly: true, via: 'debug' }), clear: () => wgSelect(null), netUrls: wgNetUrls,
       };
