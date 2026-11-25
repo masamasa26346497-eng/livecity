@@ -1125,11 +1125,21 @@
   const extraMeta = [];   // { id, base, source, report }
   const extraSets = [];   // 現在 mount 中の追加区: { id, base, tileset, source, report }
   const BASE_WARD = '27120';   // 住吉区: 基本 tileset（TILES_BASE）
+  let wgLod2Timer = 0;
   let bldgGen = 0, bldgWard = null;   // generation token / 現在の建物表示区
   async function mountTileset(base, gen) {
     // Mission213 Phase2(opt-in ?dse=1): Cesium の dynamicScreenSpaceError。カメラから遠い(地平線側)実タイルの SSE を動的に緩め、斜め視で遠方の細部を先読みしすぎない。既定OFF=従来どおり。
     const dseOpt = q.get('dse') === '1' ? { dynamicScreenSpaceError: true, dynamicScreenSpaceErrorDensity: Number(q.get('dsed')) || 2.0e-4, dynamicScreenSpaceErrorFactor: Number(q.get('dsef')) || 24 } : {};
-    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, dseOpt));
+    // Mission221A(各 opt-in・既定OFF=従来どおり): fovcone/fovrelax/fovdelay=foveatedScreenSpaceError 系, skiplod=1/0=skipLevelOfDetail, cachemb=N=cacheBytes。個別に A/B する。
+    const tOpt = {};
+    if (q.get('fovcone') != null) tOpt.foveatedConeSize = +q.get('fovcone');
+    if (q.get('fovrelax') != null) tOpt.foveatedMinimumScreenSpaceErrorRelaxation = +q.get('fovrelax');
+    if (q.get('fovdelay') != null) tOpt.foveatedTimeDelay = +q.get('fovdelay');
+    if (q.get('skiplod') != null) tOpt.skipLevelOfDetail = q.get('skiplod') === '1';
+    if (+q.get('cachemb') > 0) tOpt.cacheBytes = Math.round(+q.get('cachemb') * 1048576);
+    for (const k of Object.keys(tOpt)) if (!Number.isFinite(+tOpt[k]) && typeof tOpt[k] !== 'boolean') delete tOpt[k];
+    stats.tileOpts = Object.assign({}, tOpt, dseOpt);
+    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, tOpt, dseOpt));
     if (gen !== bldgGen) { try { ts.destroy(); } catch (e) { /* noop */ } return null; }   // 待機中に別の区が選ばれた: 破棄して再表示しない
     ts._lcBase = base;
     scene.primitives.add(ts);
@@ -4072,7 +4082,17 @@
     stats.wg.groupId = id; stats.wg.state = 'loading'; stats.wg.lastError = null; stats.allMode.lastError = null; stats.wg.firstBuildingMs = null;
     stats.wg.selects = WGS.log.selects; stats.wg.switches = WGS.log.switches; stats.wg.via = opt.via || null;
     wgSelectedAt = performance.now();
-    if (typeof window.__lcLod2Start === 'function') window.__lcLod2Start();   // LOD2 オーバーレイは最初の選択まで読まない
+    if (typeof window.__lcLod2Start === 'function') {   // LOD2 オーバーレイは最初の選択まで読まない
+      if (q.get('lod2idle') === '1') {   // 221A opt-in: LOD1 の初建物が出て、操作が止まって1.5秒たってから(最大25秒で必ず)LOD2(都市全体 tileset)を起動。既定は従来どおり選択直後。
+        if (!window.__lcLod2Started && !wgLod2Timer) {
+          const t0 = performance.now();
+          wgLod2Timer = setInterval(() => {
+            const waited = performance.now() - t0, ready = stats.wg.firstBuildingMs != null && !isMoving();
+            if ((ready && waited > 1500) || waited > 25000) { clearInterval(wgLod2Timer); wgLod2Timer = 0; stats.wg.lod2StartMs = Math.round(performance.now() - T0); window.__lcLod2Start(); }
+          }, 500);
+        }
+      } else { stats.wg.lod2StartMs = Math.round(performance.now() - T0); window.__lcLod2Start(); }
+    }
     wgPrune(); wgHideBanner();
     if (opt.fly !== false) wgFly();
     wgSetStatus('「' + WGS.selected.name + '」を読み込み中…', 'loading');
@@ -4177,12 +4197,17 @@
         stats.wg.initialAssert = WGS.selected || stats.wg.selects ? { skipped: 'group-selected-before-assert' } : Object.assign({ atMs: Math.round(performance.now() - T0) }, LC219B.assertNoInitialDetail(wgNetUrls()));
         if (stats.wg.initialAssert.pass === false) console.error('[219B] 起動時に詳細3D要求が発生', JSON.stringify(stats.wg.initialAssert));
       }, 4000);
+      function wgTransfer() {   // 221A: 読み取り専用。件数とバイト数のみ(URLは出さない)
+        const o = { glb: { n: 0, bytes: 0 }, tileset: { n: 0, bytes: 0 }, other: { n: 0, bytes: 0 } };
+        try { for (const e of performance.getEntriesByType('resource')) { const k = /\.(glb|b3dm)(\?|$)/i.test(e.name) ? 'glb' : /tileset\.json/i.test(e.name) ? 'tileset' : 'other'; o[k].n++; o[k].bytes += e.transferSize || 0; } } catch (er) { /* noop */ }
+        return o;
+      }
       if (q.get('wgdebug') === '1') window.__lcWG = {
         snapshot() {
           const s = stats.wg;
           return { groupId: s.groupId, state: s.state, allowedWards: Array.from(WGS.allowed), loadedWards: Array.from(allSets.keys()), loadedTilesets: extraSets.length, mountsTotal: stats.allMode.mountsTotal, dropsTotal: stats.allMode.dropsTotal,
             vecDrops: stats.vec45i.dropsTotal, prunedWards: s.prunedWards, selects: s.selects, switches: s.switches, deferredMoving: s.deferredMoving, firstBuildingMs: s.firstBuildingMs, lastError: s.lastError,
-            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
+            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
         },
         select: (id) => wgSelect(id, { fly: true, via: 'debug' }), clear: () => wgSelect(null), netUrls: wgNetUrls,
       };
