@@ -123,3 +123,13 @@ test('221B: res=speed の動的解像度は wardgroups+明示 res のときだ�
   assert.ok(/!\(\+q\.get\('cachemb'\) > 0\)\) t\.cacheBytes/.test(html));
   assert.ok(/clampOpt\('foveatedConeSize', 0, 1\)/.test(html));
 });
+
+test('221C: メタは全区完了を待たず区ごとに mount 再計画 / 未完了を「完了」と言わない / 操作中は道路構築を後送', () => {
+  const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'mission37g-osaka-24ward-mvp.html'), 'utf8');
+  assert.match(html, /loadGroupMeta\(\)\.catch\(/, 'ensureExtraMeta は loadGroupMeta を await しない');
+  assert.match(html, /if \(allMode\) scheduleAll\(\);/, '区のメタ到着ごとに再計画');
+  assert.match(html, /wgMeta\.queued > 0 \|\| metaNet\.inflight > 0/, 'メタ未完了の判定');
+  assert.match(html, /wgMetaPending\(\)\) \{/, 'wgEvaluate はメタ取得中は loading');
+  assert.match(html, /if \(WG_ON && isMoving\(\)\) stats\.wg\.vecDeferred[^\n]*\n\s*else vecTick\(/, '操作中は vecTick を後送');
+  assert.match(html, /WGS\.isStale\(tk\) && !WGS\.allows\(/, '対象外になった区のメタは取得しない');
+});

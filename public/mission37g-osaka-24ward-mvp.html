@@ -1504,7 +1504,8 @@
       const c = ctr ? cartToLocal(ctr) : pos;
       if (WG_ON) wgPrune();   // 219B: 選択グループ外の区を破棄(切替時の旧グループ・GPU 解放)
       vecViewSync(c, pos.h);   // 45K: 視野セルの GPU 常駐を更新
-      vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
+      if (WG_ON && isMoving()) stats.wg.vecDeferred = (stats.wg.vecDeferred | 0) + 1;   // 221C: 操作中は道路の構築(重い primitive 生成)を止まるまで後送。停止後 350ms の再計画で必ず実行。
+      else vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
       if (WG_ON && isMoving()) { stats.wg.deferredMoving++; stats.wg.pendingRetry = true; clearTimeout(allT); allT = setTimeout(allTick, 350); return; }   // 219B: ドラッグ/ズーム中は新規 mount を始めず、止まってから順次追加
       const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
       const cand = wd.wards.filter((w) => extCodes.has(w.wardCode) && (!WG_ON || WGS.allows(w.wardCode)));
@@ -1578,7 +1579,8 @@
   function ensureExtraMeta() {
     if (WG_ON) {   // 220A: ?wardgroups=1 は定義(index/published)だけ先に読み、メタ JSON は選択グループの区だけ並行数上限つきで取得
       if (!extraReady) extraReady = loadExtraDefsOnly();
-      return extraReady.then(() => loadGroupMeta());
+      // 221C: メタは待たない。区ごとに届き次第 scheduleAll() で mount を再計画する(初建物を全区のメタ完了から切り離す)。
+      return extraReady.then(() => { loadGroupMeta().catch((e) => { stats.allMode.lastError = 'meta: ' + String(e && e.message || e); fail('loadGroupMeta', e); }); });
     }
     if (!extraReady) extraReady = loadExtraMeta();
     return extraReady;
@@ -1618,21 +1620,45 @@
   function wgRetryMeta() {   // 失敗した def だけキャッシュから外す(成功分は再取得しない)
     for (const [id, p] of Array.from(metaTasks)) { if (p.__failed) metaTasks.delete(id); }
   }
+  // 221C: 選択グループの区メタを「画面中心に近い順」に同時3で取得し、1区届くたびに mount を再計画する。
+  //   pending(キュー+取得中)がある間は wgEvaluate が「完了」と言わない。世代が変わって対象外になった区は取得しない。
+  const wgMeta = { queued: 0 };
+  const wgMetaPending = () => wgMeta.queued > 0 || metaNet.inflight > 0;
   async function loadGroupMeta() {
     if (!WGS || !WGS.selected || q.get('extra') === '0') return;
     const wd = await WardUI.load();
-    const idOf = new Map(wd.wards.map((w) => [w.wardCode, w.wardId]));
-    const wardIds = new Set(Array.from(WGS.allowed).map((c) => idOf.get(c)).filter(Boolean));
+    const codeOfId = new Map(wd.wards.map((w) => [w.wardId, w.wardCode]));
+    const wardIds = new Set(Array.from(WGS.allowed).map((c) => (wd.wards.find((w) => w.wardCode === c) || {}).wardId).filter(Boolean));
+    const codeOfDef = (d) => codeOfId.get(d.base.replace(/\/$/, '').split('/').pop());
     const defs = EXTRA_SET_DEFS.filter((d) => wardIds.has(d.base.replace(/\/$/, '').split('/').pop()));
     const queue = defs.filter((d) => !metaTasks.has(d.id) || !extraMeta.some((m) => m.id === d.id));
-    let idx = 0, failedAny = false;
-    const worker = async () => { while (idx < queue.length) { const d = queue[idx++]; const ok = await loadOneMeta(d); if (!ok) { failedAny = true; const p = metaTasks.get(d.id); if (p) p.__failed = true; } } };
+    let cc = null;
+    try {
+      const cam = viewer.camera, ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      cc = cartToLocal(ctr || cam.positionWC);
+    } catch (e) { /* 中心不明: 定義順 */ }
+    if (cc) {
+      const dist = (d) => { const w = wd.wards.find((x) => x.wardCode === codeOfDef(d)); return w ? Math.hypot((w.bbox.minX + w.bbox.maxX) / 2 - cc.x, (w.bbox.minZ + w.bbox.maxZ) / 2 - cc.z) : 1e12; };
+      queue.sort((a, b) => dist(a) - dist(b));
+    }
+    wgMeta.queued += queue.length;
+    const tk = WGS.token;
+    let idx = 0, firstArrived = false;
+    const worker = async () => {
+      while (idx < queue.length) {
+        const d = queue[idx++]; wgMeta.queued--;
+        if (WGS.isStale(tk) && !WGS.allows(codeOfDef(d))) continue;   // 切替で対象外になった区は取得しない
+        const ok = await loadOneMeta(d);
+        if (!ok) { const p = metaTasks.get(d.id); if (p) p.__failed = true; if (WGS.allows(codeOfDef(d))) stats.allMode.lastError = 'meta failed (再試行できます)'; continue; }
+        postExtraMeta();
+        if (!firstArrived) { firstArrived = true; if (stats.wg && stats.wg.firstMetaMs == null) stats.wg.firstMetaMs = Math.round(performance.now() - wgSelectedAt); }
+        if (allMode) scheduleAll();   // 届いた区から mount を再計画(視点に近い区が先に届く)
+      }
+    };
     await Promise.all(Array.from({ length: Math.min(3, queue.length) }, worker));
-    // 既に失敗キャッシュ済みの def も失敗として報告する
-    for (const d of defs) { const p = metaTasks.get(d.id); if (p && p.__failed) failedAny = true; }
-    postExtraMeta();
     if (queue.length && stats.wg) stats.wg.metaReadyMs = Math.round(performance.now() - wgSelectedAt);
-    if (failedAny) stats.allMode.lastError = 'meta failed (再試行できます)';
+    if (defs.some((d) => { const p = metaTasks.get(d.id); return p && p.__failed; })) stats.allMode.lastError = 'meta failed (再試行できます)';
+    if (typeof wgEvaluate === 'function') wgEvaluate();
   }
   async function loadExtraMeta() {
     if (q.get('extra') === '0') return;
@@ -4066,7 +4092,7 @@
   function wgEvaluate() {
     const g = WGS.selected;
     if (!g) { clearInterval(wgPollT); wgPollT = 0; stats.wg.state = 'idle'; wgSetStatus('地域グループ未選択（区境と地名のみ表示中・詳細3Dは未読み込み）', 'idle'); return; }
-    if (stats.wg.pendingRetry || allBusy) { wgSetStatus('「' + g.name + '」を読み込み中…', 'loading'); return; }
+    if (stats.wg.pendingRetry || allBusy || wgMetaPending()) { if (stats.allMode.lastError && !wgMetaPending() && !allBusy) { /* 失敗確定は下で報告 */ } else { wgSetStatus('「' + g.name + '」を読み込み中…', 'loading'); return; } }
     const sets = extraSets.filter((e) => allSets.has(e.source.wardCode) && e.tileset && !e.tileset.isDestroyed()).map((e) => e.tileset);
     const pend = sets.filter((t) => !t.tilesLoaded).length;
     if (stats.allMode.lastError) { stats.wg.state = 'failed'; stats.wg.lastError = stats.allMode.lastError; clearInterval(wgPollT); wgPollT = 0; wgSetStatus('「' + g.name + '」の読み込みに失敗しました（' + stats.wg.lastError + '）', 'failed'); return; }
@@ -4229,7 +4255,7 @@
           const s = stats.wg;
           return { groupId: s.groupId, state: s.state, allowedWards: Array.from(WGS.allowed), loadedWards: Array.from(allSets.keys()), loadedTilesets: extraSets.length, mountsTotal: stats.allMode.mountsTotal, dropsTotal: stats.allMode.dropsTotal,
             vecDrops: stats.vec45i.dropsTotal, prunedWards: s.prunedWards, selects: s.selects, switches: s.switches, deferredMoving: s.deferredMoving, firstBuildingMs: s.firstBuildingMs, lastError: s.lastError,
-            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, sseMove: stats.sseMoveState ? Object.assign({}, stats.sseMoveState) : null, resolution: { preset: RES_PRESET, scale: perf.resolutionScale == null ? null : perf.resolutionScale, changes: perf.resolutionChanges }, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
+            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, firstMetaMs: s.firstMetaMs == null ? null : s.firstMetaMs, vecDeferred: s.vecDeferred | 0, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, sseMove: stats.sseMoveState ? Object.assign({}, stats.sseMoveState) : null, resolution: { preset: RES_PRESET, scale: perf.resolutionScale == null ? null : perf.resolutionScale, changes: perf.resolutionChanges }, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
         },
         select: (id) => wgSelect(id, { fly: true, via: 'debug' }), clear: () => wgSelect(null), netUrls: wgNetUrls,
       };
