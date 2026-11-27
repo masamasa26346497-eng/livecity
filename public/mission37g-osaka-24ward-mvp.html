@@ -472,6 +472,7 @@
 <script src="mission45p-areacull.js"></script>
 <script src="mission45l-interaction.js"></script>
 <script src="mission45y-gfp.js"></script>
+<script src="mission219b-ward-groups.js"></script>
 <script src="mission138-footprints.js"></script>
 <script src="./mission37e-places-ui-kit.js"></script>
 <script>
@@ -480,6 +481,9 @@
   const T0 = performance.now();
   const q = new URLSearchParams(location.search);
   const SET = q.get('set') || 'osaka-sumiyoshi-9tile';
+  // Mission 219B: ?wardgroups=1 — 起動時は詳細3D 0区。地域グループを選んだときだけ、その所属区の詳細(LOD1/LOD2・道路等)を遅延ロードする。既定(未指定)の挙動は不変。
+  const WG_ON = q.get('wardgroups') === '1' && typeof LC219B !== 'undefined';
+  if (WG_ON) { try { performance.setResourceTimingBufferSize(20000); } catch (e) { /* 診断用: 既定 250 件だと要求数を数え落とす */ } }
   const SSE0 = [8, 16, 32].includes(+q.get('sse')) ? +q.get('sse') : 16;
   const TILES_BASE = 'mission37b-3dtiles/' + SET + '/';   // Mission 37B の生成物（読むだけ）
   const LAYER_BASE = 'mission37c-layers/' + SET + '/';    // Mission 37C のレイヤー束
@@ -568,10 +572,14 @@
   }
   // Mission 161 (PR#50): LOD2 オーバーレイ opt-in。localhost かつ ?lod2=1 のときだけ /lod2-preview/overlay.js を読む。公開ホストでは何もしない。
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && q.get('lod2') === '1') {
+   window.__lcLod2Start = function () {   // 219B: グループモードでは最初のグループ選択まで LOD2 オーバーレイ(都市全体 tileset)を読み込まない
+    if (window.__lcLod2Started) return; window.__lcLod2Started = true;
     const s152 = document.createElement('script'); s152.src = '/lod2-preview/overlay.js';
     s152.onload = () => window.LC152 && window.LC152.attach({ Cesium, viewer });
     s152.onerror = () => { window.__lc152 = { state: { status: 'error', error: 'overlay.js を読み込めません(LOD2 用サーバ以外で開いています)' } }; const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;background:#7a1f1f;color:#fff;font:13px/1.5 sans-serif;padding:8px 12px;border-radius:6px;max-width:380px'; d.textContent = 'LOD2 を表示できません: LOD2 用サーバ経由で開いていません。Start-LOD2-Preview.ps1 を実行して表示されたURLを開いてください。'; document.body.appendChild(d); };
     document.body.appendChild(s152);
+   };
+   if (!WG_ON) window.__lcLod2Start();
   }
   scene.skyAtmosphere.show = false;
   scene.sun.show = false;
@@ -1117,11 +1125,24 @@
   const extraMeta = [];   // { id, base, source, report }
   const extraSets = [];   // 現在 mount 中の追加区: { id, base, tileset, source, report }
   const BASE_WARD = '27120';   // 住吉区: 基本 tileset（TILES_BASE）
+  let wgLod2Timer = 0;
   let bldgGen = 0, bldgWard = null;   // generation token / 現在の建物表示区
   async function mountTileset(base, gen) {
     // Mission213 Phase2(opt-in ?dse=1): Cesium の dynamicScreenSpaceError。カメラから遠い(地平線側)実タイルの SSE を動的に緩め、斜め視で遠方の細部を先読みしすぎない。既定OFF=従来どおり。
     const dseOpt = q.get('dse') === '1' ? { dynamicScreenSpaceError: true, dynamicScreenSpaceErrorDensity: Number(q.get('dsed')) || 2.0e-4, dynamicScreenSpaceErrorFactor: Number(q.get('dsef')) || 24 } : {};
-    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, dseOpt));
+    // Mission221A(各 opt-in・既定OFF=従来どおり): fovcone/fovrelax/fovdelay=foveatedScreenSpaceError 系, skiplod=1/0=skipLevelOfDetail, cachemb=N=cacheBytes。個別に A/B する。
+    const tOpt = {};
+    if (q.get('fovcone') != null) tOpt.foveatedConeSize = +q.get('fovcone');
+    if (q.get('fovrelax') != null) tOpt.foveatedMinimumScreenSpaceErrorRelaxation = +q.get('fovrelax');
+    if (q.get('fovdelay') != null) tOpt.foveatedTimeDelay = +q.get('fovdelay');
+    if (q.get('skiplod') != null) tOpt.skipLevelOfDetail = q.get('skiplod') === '1';
+    if (+q.get('cachemb') > 0) tOpt.cacheBytes = Math.round(+q.get('cachemb') * 1048576);
+    // 221B: Cesium 1.121 の有効範囲へ丸める(不正値は破棄)。foveatedConeSize 0..1 / foveatedMinimumScreenSpaceErrorRelaxation 0..SSE / foveatedTimeDelay 0..5s / cacheBytes 64..4096MB。
+    const clampOpt = (k, lo, hi) => { if (!(k in tOpt)) return; const v = +tOpt[k]; if (!Number.isFinite(v)) { delete tOpt[k]; return; } tOpt[k] = Math.min(hi, Math.max(lo, v)); };
+    clampOpt('foveatedConeSize', 0, 1); clampOpt('foveatedMinimumScreenSpaceErrorRelaxation', 0, stats.sse || SSE0); clampOpt('foveatedTimeDelay', 0, 5); clampOpt('cacheBytes', 64 * 1048576, 4096 * 1048576);
+    for (const k of Object.keys(tOpt)) if (!Number.isFinite(+tOpt[k]) && typeof tOpt[k] !== 'boolean') delete tOpt[k];
+    stats.tileOpts = Object.assign({}, tOpt, dseOpt);
+    const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, tOpt, dseOpt));
     if (gen !== bldgGen) { try { ts.destroy(); } catch (e) { /* noop */ } return null; }   // 待機中に別の区が選ばれた: 破棄して再表示しない
     ts._lcBase = base;
     scene.primitives.add(ts);
@@ -1295,7 +1316,7 @@
     if (vecBusy) { vecDirty = true; return; }
     vecBusy = true;
     try {
-      const cand = (await WardUI.load()).wards.filter((w) => vecWards.has(w.wardId));
+      const cand = (await WardUI.load()).wards.filter((w) => vecWards.has(w.wardId) && (!WG_ON || WGS.allows(w.wardCode)));   // 219B: グループモードでは選択グループの区だけ
       const cur = {}; for (const [k, r] of vecAll) cur[k] = r.level;
       const p = LC45I.plan({ x: c.x, z: c.z, height }, cand, cur);
       stats.vec45i.ticks++; stats.vec45i.lastPlan = p.want;
@@ -1422,6 +1443,8 @@
   let allMode = false, allBusy = false, allDirty = false, allT = 0;
   const allSets = new Map();   // wardCode → { level: 'detail'|'coarse', entries: [extraSets の要素] }
   stats.allMode = { on: false, mounted: {}, mountsTotal: 0, dropsTotal: 0, ticks: 0, buildings: 0, lastError: null };
+  let WGDEF = null, WGS = { selected: null, allowed: new Set(), allows: () => false, isStale: () => false };   // 219B: グループ定義/選択状態(wgStart で本物に置換)
+  stats.wg = { on: WG_ON, groupId: null, state: 'idle', deferredMoving: 0, selects: 0, switches: 0, wardMountsAfterSelect: 0, prunedWards: 0, firstBuildingMs: null, lastError: null, initialAssert: null };
   const cartToLocal = (c) => { const g = Cesium.Cartographic.fromCartesian(c); return { x: (Cesium.Math.toDegrees(g.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd, z: -(Cesium.Math.toDegrees(g.latitude) - PROJ.clat) * PROJ.mpd, h: g.height }; };
   const lvlSse = (lvl) => (lvl === 'coarse' ? LC45F.DEFAULTS.coarseSse : (stats.sse || SSE0));
   function allSync() {
@@ -1470,7 +1493,7 @@
   async function allTick() {
     if (!allMode) return;
     if (allBusy) { allDirty = true; return; }   // 実行中に来た要求は 1 回にまとめて再実行（レース・多重 mount を防ぐ）
-    allBusy = true; const gen = bldgGen;
+    allBusy = true; const gen = bldgGen; if (WG_ON) stats.wg.pendingRetry = false;
     try {
       try { await ensureExtraMeta(); } catch (e) { /* fail 済み */ }
       const wd = await WardUI.load();
@@ -1479,10 +1502,13 @@
       const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
       const pos = cartToLocal(cam.positionWC);
       const c = ctr ? cartToLocal(ctr) : pos;
+      if (WG_ON) wgPrune();   // 219B: 選択グループ外の区を破棄(切替時の旧グループ・GPU 解放)
       vecViewSync(c, pos.h);   // 45K: 視野セルの GPU 常駐を更新
-      vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
+      if (WG_ON && isMoving()) stats.wg.vecDeferred = (stats.wg.vecDeferred | 0) + 1;   // 221C: 操作中は道路の構築(重い primitive 生成)を止まるまで後送。停止後 350ms の再計画で必ず実行。
+      else vecTick(c, pos.h, gen);   // 45I: 道路などのベクタは建物 mount を待たず独立に計画（内部で直列化・世代 token で無効化）
+      if (WG_ON && isMoving()) { stats.wg.deferredMoving++; stats.wg.pendingRetry = true; clearTimeout(allT); allT = setTimeout(allTick, 350); return; }   // 219B: ドラッグ/ズーム中は新規 mount を始めず、止まってから順次追加
       const extCodes = new Set(extraMeta.filter((m) => m.external).map((m) => m.source.wardCode));
-      const cand = wd.wards.filter((w) => extCodes.has(w.wardCode));
+      const cand = wd.wards.filter((w) => extCodes.has(w.wardCode) && (!WG_ON || WGS.allows(w.wardCode)));
       const mounted = {}; for (const [k, r] of allSets) mounted[k] = r.level;
       let p = LC45F.plan({ x: c.x, z: c.z, height: pos.h }, cand, mounted);
       if (EXT45 && q.get('cull') !== '0') {   // 45G: 斜め視点で画面外の粗 LOD 区は mount しない（詳細区は対象外）
@@ -1506,7 +1532,7 @@
       }
       allSync(); scene.requestRender();
     } catch (e) { stats.allMode.lastError = String(e && e.message || e); fail('allTick', e); }
-    finally { allBusy = false; if (allDirty && allMode) { allDirty = false; allTick(); } }
+    finally { allBusy = false; if (allDirty && allMode) { allDirty = false; allTick(); } else if (WG_ON) wgAfterTick(); }
   }
   function scheduleAll() { if (!allMode) return; clearTimeout(allT); allT = setTimeout(allTick, 200); }
   async function setAllMode(on) {
@@ -1551,8 +1577,88 @@
       : stats.buildingState === 'unavailable' ? '3D建物未整備（区境界・道路・施設は使えます）' : stats.buildingState === 'error' ? '3D建物の読み込みに失敗しました' : '3D建物は非表示（区を選ぶと表示）';
   }
   function ensureExtraMeta() {
+    if (WG_ON) {   // 220A: ?wardgroups=1 は定義(index/published)だけ先に読み、メタ JSON は選択グループの区だけ並行数上限つきで取得
+      if (!extraReady) extraReady = loadExtraDefsOnly();
+      // 221C: メタは待たない。区ごとに届き次第 scheduleAll() で mount を再計画する(初建物を全区のメタ完了から切り離す)。
+      return extraReady.then(() => { loadGroupMeta().catch((e) => { stats.allMode.lastError = 'meta: ' + String(e && e.message || e); fail('loadGroupMeta', e); }); });
+    }
     if (!extraReady) extraReady = loadExtraMeta();
     return extraReady;
+  }
+  function postExtraMeta() {
+    if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
+    stats.extraMeta = extraMeta.map((m) => ({ id: m.id, wardCode: m.source.wardCode, buildings: m.report.totals.buildings }));
+    const opt = document.querySelector('#sel-bldg-mode option[value="all"]');
+    if (opt && extraMeta.some((m) => m.external)) opt.disabled = false;
+  }
+  async function loadExtraDefsOnly() {
+    if (q.get('extra') === '0') return;
+    await loadPublishedDefs();
+    await loadExt45Defs();
+    if (publishedWards.length) { try { updateSources(); } catch (e) { /* noop */ } }
+  }
+  // 220A: def 単位のキャッシュ。成功は永続、失敗は wgRetryMeta() で消すまで再取得しない(allTick ごとの再試行ストームを避ける)。
+  const metaTasks = new Map();   // def.id -> Promise<boolean>
+  const metaNet = stats.metaNet = { requests: 0, inflightMax: 0, inflight: 0, failed: 0, wards: [] };
+  function loadOneMeta(def) {
+    if (metaTasks.has(def.id)) return metaTasks.get(def.id);
+    const p = (async () => {
+      metaNet.inflight++; metaNet.inflightMax = Math.max(metaNet.inflightMax, metaNet.inflight);
+      try {
+        metaNet.requests += 2;
+        const [src, rep] = await Promise.all([
+          fetch(def.base + 'source.json').then((r) => { if (!r.ok) throw new Error('source.json HTTP ' + r.status); return r.json(); }),
+          fetch(def.base + 'build-report.json').then((r) => { if (!r.ok) throw new Error('build-report.json HTTP ' + r.status); return r.json(); }),
+        ]);
+        if (!extraMeta.some((m) => m.id === def.id)) extraMeta.push({ id: def.id, base: def.base, source: src, report: rep, external: !!def.external, verified45: def.verified45 === true });
+        metaNet.wards.push(def.id); return true;
+      } catch (e) { metaNet.failed++; fail('extra-meta ' + def.id, e); return false; }
+      finally { metaNet.inflight--; }
+    })();
+    metaTasks.set(def.id, p); return p;
+  }
+  function wgRetryMeta() {   // 失敗した def だけキャッシュから外す(成功分は再取得しない)
+    for (const [id, p] of Array.from(metaTasks)) { if (p.__failed) metaTasks.delete(id); }
+  }
+  // 221C: 選択グループの区メタを「画面中心に近い順」に同時3で取得し、1区届くたびに mount を再計画する。
+  //   pending(キュー+取得中)がある間は wgEvaluate が「完了」と言わない。世代が変わって対象外になった区は取得しない。
+  const wgMeta = { queued: 0 };
+  const wgMetaPending = () => wgMeta.queued > 0 || metaNet.inflight > 0;
+  async function loadGroupMeta() {
+    if (!WGS || !WGS.selected || q.get('extra') === '0') return;
+    const wd = await WardUI.load();
+    const codeOfId = new Map(wd.wards.map((w) => [w.wardId, w.wardCode]));
+    const wardIds = new Set(Array.from(WGS.allowed).map((c) => (wd.wards.find((w) => w.wardCode === c) || {}).wardId).filter(Boolean));
+    const codeOfDef = (d) => codeOfId.get(d.base.replace(/\/$/, '').split('/').pop());
+    const defs = EXTRA_SET_DEFS.filter((d) => wardIds.has(d.base.replace(/\/$/, '').split('/').pop()));
+    const queue = defs.filter((d) => !metaTasks.has(d.id) || !extraMeta.some((m) => m.id === d.id));
+    let cc = null;
+    try {
+      const cam = viewer.camera, ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+      cc = cartToLocal(ctr || cam.positionWC);
+    } catch (e) { /* 中心不明: 定義順 */ }
+    if (cc) {
+      const dist = (d) => { const w = wd.wards.find((x) => x.wardCode === codeOfDef(d)); return w ? Math.hypot((w.bbox.minX + w.bbox.maxX) / 2 - cc.x, (w.bbox.minZ + w.bbox.maxZ) / 2 - cc.z) : 1e12; };
+      queue.sort((a, b) => dist(a) - dist(b));
+    }
+    wgMeta.queued += queue.length;
+    const tk = WGS.token;
+    let idx = 0, firstArrived = false;
+    const worker = async () => {
+      while (idx < queue.length) {
+        const d = queue[idx++]; wgMeta.queued--;
+        if (WGS.isStale(tk) && !WGS.allows(codeOfDef(d))) continue;   // 切替で対象外になった区は取得しない
+        const ok = await loadOneMeta(d);
+        if (!ok) { const p = metaTasks.get(d.id); if (p) p.__failed = true; if (WGS.allows(codeOfDef(d))) stats.allMode.lastError = 'meta failed (再試行できます)'; continue; }
+        postExtraMeta();
+        if (!firstArrived) { firstArrived = true; if (stats.wg && stats.wg.firstMetaMs == null) stats.wg.firstMetaMs = Math.round(performance.now() - wgSelectedAt); }
+        if (allMode) scheduleAll();   // 届いた区から mount を再計画(視点に近い区が先に届く)
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, worker));
+    if (queue.length && stats.wg) stats.wg.metaReadyMs = Math.round(performance.now() - wgSelectedAt);
+    if (defs.some((d) => { const p = metaTasks.get(d.id); return p && p.__failed; })) stats.allMode.lastError = 'meta failed (再試行できます)';
+    if (typeof wgEvaluate === 'function') wgEvaluate();
   }
   async function loadExtraMeta() {
     if (q.get('extra') === '0') return;
@@ -1696,14 +1802,16 @@
     if (ts.length === lastBudgetN) return;
     lastBudgetN = ts.length;
     const b = LC45G.cacheBudget(ts.length || 1, q.get('cacheMB') ? { cacheTotalMB: +q.get('cacheMB') || 768 } : {});
-    for (const t of ts) { if ('cacheBytes' in t) t.cacheBytes = b.cacheBytes; if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
+    for (const t of ts) { if ('cacheBytes' in t && !(+q.get('cachemb') > 0)) t.cacheBytes = b.cacheBytes;   // 221B: ?cachemb=N 指定時は予算ロジックで上書きしない
+       if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
     perf.cachePerTilesetMB = b.perMB;
   }
   // 45H: プリセット。balanced(既定: 下限 0.8) / speed(下限 0.6) / quality(?res=fixed|quality: 常に 1.0)。いずれも静止後 700ms で必ず 1.0 に戻す。
   // 45M: ext45 の既定は固定解像度（実 PC で rr=0&res=fixed が軽かったため）。動的解像度は ?res=auto|balanced で opt-in。
   const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'auto' || q.get('res') === 'balanced') ? 'balanced' : (q.get('res') === 'fixed' || q.get('res') === 'quality' || EXT45) ? 'quality' : 'balanced';
   perf.preset = RES_PRESET;
-  const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
+  // 221B: Preview(非localhost)は従来 fixed。?wardgroups=1 かつ res=speed|auto|balanced を明示したときだけ動的解像度(静止後 1.0 へ復元)
+  const resCtl = LC45G.createResolutionController({ fixed: !(EXT45 || (WG_ON && /^(speed|auto|balanced)$/.test(q.get('res') || ''))) || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
   function applyRes(s) { if (s === null) return; if (SMOOTH && !IX.allowResChange(performance.now(), s >= viewer.resolutionScale)) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
   let resT = 0;
   viewer.camera.moveEnd.addEventListener(() => { clearTimeout(resT); resT = setTimeout(() => applyRes(resCtl.tick(performance.now(), false)), LC45G.DEFAULTS.restoreMs + 50); });
@@ -1793,6 +1901,18 @@
   async function lod0Sync() {
     if (!EXT45 || q.get('lod0') === '0' || !lod0Wards.length) return;
     const show = (code) => !allSets.has(code) && allMode;
+    // 220A: ?wardgroups=1 では未ロード区の fromUrl を並行数 4 で実行(従来は 1 区ずつ直列)。既定モードは従来どおり。
+    if (WG_ON && allMode) {
+      const todo = lod0Wards.filter((c) => !lod0Sets.has(c) && !lod0Pending.has(c));
+      todo.forEach((c) => { lod0Pending.add(c); lod0Sets.set(c, null); });
+      let i = 0;
+      const worker = async () => { while (i < todo.length) { const code = todo[i++]; try {
+        const t = await Cesium.Cesium3DTileset.fromUrl('ext-3dtiles/_lod0/' + code + '/tileset.json', { maximumScreenSpaceError: 16 });
+        t._lcLod0 = true; t.style = new Cesium.Cesium3DTileStyle({ color: "color('#c9d4e2')" });
+        scene.primitives.add(t); lod0Sets.set(code, t); t.show = show(code); scene.requestRender();
+      } catch (e) { lod0Sets.delete(code); } finally { lod0Pending.delete(code); } } };
+      await Promise.all(Array.from({ length: Math.min(4, todo.length) }, worker));
+    }
     for (const code of lod0Wards) {
       let t = lod0Sets.get(code);
       if (!t && allMode && !lod0Pending.has(code)) {   // 45H: pending 中の二重 fromUrl を防ぐ
@@ -1866,13 +1986,30 @@
   setTimeout(roadScaleSync, 0);
   // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
   //   既定では建物の品質・表示範囲を変えない。操作中は粗くなる（画質トレードオフ）ため、測ってから採否を決める。
-  const SSE_MOVE = Math.max(0, +q.get('sseMove') || 0);
-  if (EXT45 && SSE_MOVE > 0) {
-    const orig = new WeakMap(); let raised = false, restoreT = 0;
-    const restore = () => { raised = false; for (const t of allTilesetsNow()) { if (orig.has(t)) { t.maximumScreenSpaceError = orig.get(t); orig.delete(t); } } scene.requestRender(); };
-    const raise = () => { clearTimeout(restoreT); if (!raised) { raised = true; for (const t of allTilesetsNow()) { orig.set(t, t.maximumScreenSpaceError); if (SSE_MOVE > t.maximumScreenSpaceError) t.maximumScreenSpaceError = SSE_MOVE; } } restoreT = setTimeout(restore, 400); };
-    viewer.camera.moveStart.addEventListener(raise); viewer.camera.changed.addEventListener(raise);
+  // 221B: ガードは「localhost+ext45=1」または「?wardgroups=1」(Preview 含む)。不正値は無視、有効値は 8..128 に丸める。旧モード/flag なしは無変更。
+  const SSE_MOVE_RAW = +q.get('sseMove') || 0;
+  const SSE_MOVE = SSE_MOVE_RAW > 0 && Number.isFinite(SSE_MOVE_RAW) ? Math.min(128, Math.max(8, SSE_MOVE_RAW)) : 0;
+  const sseSt = { enabled: false, value: SSE_MOVE, raises: 0, restores: 0, raised: false, tilesRaised: 0, lastRestoreMs: null };
+  stats.sseMoveState = sseSt;
+  if ((EXT45 || WG_ON) && SSE_MOVE > 0) {
+    sseSt.enabled = true;
+    const orig = new Map(); let restoreT = 0;   // tileset -> { o: 元の値, r: 引き上げ後の値 }
+    const restore = () => {
+      for (const [t, v] of orig) { if (!t.isDestroyed() && t.maximumScreenSpaceError === v.r) t.maximumScreenSpaceError = v.o; }   // 他所で変更済みなら上書きしない
+      orig.clear(); sseSt.raised = false; sseSt.restores++; sseSt.lastRestoreMs = Math.round(performance.now()); scene.requestRender();
+    };
+    const raise = () => {
+      clearTimeout(restoreT);
+      for (const t of allTilesetsNow()) {   // 操作中に mount された tileset も次のイベントで拾う。破棄済みは除外
+        if (orig.has(t) || t.maximumScreenSpaceError >= SSE_MOVE) continue;
+        orig.set(t, { o: t.maximumScreenSpaceError, r: SSE_MOVE }); t.maximumScreenSpaceError = SSE_MOVE; sseSt.tilesRaised++;
+      }
+      if (!sseSt.raised) { sseSt.raised = true; sseSt.raises++; }
+      restoreT = setTimeout(restore, 400);
+    };
+    viewer.camera.moveStart.addEventListener(raise); viewer.camera.changed.addEventListener(raise); viewer.camera.moveEnd.addEventListener(() => { clearTimeout(restoreT); restoreT = setTimeout(restore, 400); });
     stats.sseMove = SSE_MOVE;
+    window.__lcSseMove = { state: () => Object.assign({}, sseSt, { current: allTilesetsNow().map((t) => t.maximumScreenSpaceError) }) };
   }
   if (EXT45 && q.get('perf') === '1') {
     const el = document.createElement('pre');
@@ -3007,7 +3144,7 @@
       if (!c) return null;
       const g = Cesium.Cartographic.fromCartesian(c);
       const w = hit((Cesium.Math.toDegrees(g.longitude) - PROJ.clon) * COS_CLAT * PROJ.mpd, -(Cesium.Math.toDegrees(g.latitude) - PROJ.clat) * PROJ.mpd);
-      if (w) select(w, false);
+      if (w) { if (WG_ON && !WGS.selected && WGDEF) wgSelect(LC219B.groupOfCode(WGDEF, w.wardCode).id, { fly: true, via: 'map' }); select(w, false); }
       return w;
     }
     function clear() {
@@ -3019,6 +3156,7 @@
     function select(w, fly) {
       clear();
       selected = w;
+      if (WG_ON) wgOnWardSelect(w, fly);   // 219B: 区を選ぶ=その区が属するグループの詳細ロード(または他グループへの切替案内)
       // 44A: 区を選ぶだけで建物が見えるように、3D が実際に mount できたら、建物データのある範囲（tileset の境界球）へ寄せる。
       //   区全体の俯瞰（下の flyToBoundingSphere）では、一部メッシュだけの 3D が小さすぎて「建物がない」ように見えるため。
       //   45F: 全域3Dモードでは区の選択で mount を切り替えない（視点に応じたストリーミングが担当）。区全域 fit だけ行う。
@@ -3915,6 +4053,7 @@
     }
     // 39B: 区境界が読めなかったときだけ、住吉区の建物を従来どおり既定で出す（空の地図で止めない）
     if (!cityHome) { await setBuildingWard(BASE_WARD); resetCamera(); }
+    else if (WG_ON) { await wgStart(); }   // 219B: グループモード(起動時は詳細0区)
     else if (q.get('bw')) { await setBuildingWard(q.get('bw')); }   // ?bw=<区コード>: 起動時に建物を出す区を指定（QA・共有リンク用）
     if (stats.status !== 'error') {
       if (stats.firstDisplayMs == null) {
@@ -3927,6 +4066,201 @@
     }
     console.log('[37D] layers', JSON.stringify(stats.layers));
   })();
+
+  // ══════════════════════════════════════════════════════════════
+  // Mission 219B: 地域グループ選択 → 選択範囲だけ詳細3Dを遅延ロード（?wardgroups=1・既定OFF）
+  //   起動時: 24区の区境・地名・軽量LOD0(あれば)のみ。LOD1/LOD2建物の tileset/GLB・道路レイヤー・LOD2オーバーレイは要求しない。
+  //   選択時: allTick/vecTick の対象区を「選択グループの所属区」に限定。切替時は世代トークン(bldgGen)で旧要求を無効化し、旧グループの区を破棄(GPU解放)。
+  //   操作中(isMoving)は新規 mount を始めず、停止後に順次追加。既存の LC45F 計画(詳細≤2区・粗LOD≤8区)・親SSE・Promiseキャッシュはそのまま使う。
+  // ══════════════════════════════════════════════════════════════
+  let wgUiEls = null, wgPollT = 0, wgMoveT = 0, wgGoT = 0, wgSelectedAt = 0, wgLabelsC = null, wgLinesC = null;
+  const wgLong = { count: 0, maxMs: 0, totalMs: 0 };
+  const wgNetUrls = () => { try { return performance.getEntriesByType('resource').map((e) => e.name); } catch (e) { return []; } };
+  function wgPrune() {
+    let n = 0;
+    for (const code of Array.from(allSets.keys())) if (!WGS.allows(code)) { allDrop(code); n++; }
+    for (const code of Array.from(vecAll.keys())) if (!WGS.allows(code)) { vecDrop(code); n++; }
+    if (n) { stats.wg.prunedWards += n; allSync(); }
+  }
+  function wgSetStatus(text, kind) {
+    if (!wgUiEls) return;
+    wgUiEls.status.textContent = text; wgUiEls.status.parentNode.dataset.kind = kind || '';
+    wgUiEls.retry.style.display = kind === 'failed' ? '' : 'none';
+    wgUiEls.clear.style.display = WGS.selected ? '' : 'none';
+    for (const b of wgUiEls.btns) b.setAttribute('aria-pressed', String(!!WGS.selected && WGS.selected.id === b.dataset.group));
+  }
+  function wgEvaluate() {
+    const g = WGS.selected;
+    if (!g) { clearInterval(wgPollT); wgPollT = 0; stats.wg.state = 'idle'; wgSetStatus('地域グループ未選択（区境と地名のみ表示中・詳細3Dは未読み込み）', 'idle'); return; }
+    if (stats.wg.pendingRetry || allBusy || wgMetaPending()) { if (stats.allMode.lastError && !wgMetaPending() && !allBusy) { /* 失敗確定は下で報告 */ } else { wgSetStatus('「' + g.name + '」を読み込み中…', 'loading'); return; } }
+    const sets = extraSets.filter((e) => allSets.has(e.source.wardCode) && e.tileset && !e.tileset.isDestroyed()).map((e) => e.tileset);
+    const pend = sets.filter((t) => !t.tilesLoaded).length;
+    if (stats.allMode.lastError) { stats.wg.state = 'failed'; stats.wg.lastError = stats.allMode.lastError; clearInterval(wgPollT); wgPollT = 0; wgSetStatus('「' + g.name + '」の読み込みに失敗しました（' + stats.wg.lastError + '）', 'failed'); return; }
+    if (sets.length && stats.wg.firstBuildingMs == null && sets.some((t) => t.tilesLoaded)) stats.wg.firstBuildingMs = Math.round(performance.now() - wgSelectedAt);
+    if (!sets.length) { stats.wg.state = 'done'; clearInterval(wgPollT); wgPollT = 0; wgSetStatus('「' + g.name + '」: 3D建物データは未配信です（区境・地名のみ）', 'done'); return; }
+    if (pend) { stats.wg.state = 'loading'; wgSetStatus('「' + g.name + '」を読み込み中…（' + sets.length + '区分 / 残 ' + pend + '）', 'loading'); return; }
+    stats.wg.state = 'done'; clearInterval(wgPollT); wgPollT = 0;
+    wgSetStatus('「' + g.name + '」読み込み完了（詳細表示 ' + sets.length + '区分・視点に近い区から順次）', 'done');
+  }
+  function wgAfterTick() { wgEvaluate(); }
+  function wgFly() {
+    const d = WardUI.data, g = WGS.selected; if (!d || !g) return;
+    viewer.camera.cancelFlight();
+    fitWard({ bbox: LC219B.unionBBox(d.wards, g.wards), wardCode: g.id }, null);
+  }
+  function wgHideBanner() { if (wgUiEls) wgUiEls.banner.style.display = 'none'; }
+  function wgShowBanner(g, msg) {
+    if (!wgUiEls) return;
+    const b = wgUiEls.banner; b.textContent = '';
+    const t = document.createElement('span'); t.textContent = msg + ' '; b.appendChild(t);
+    const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'lc-btn'; bt.textContent = '「' + g.name + '」に切り替え';
+    bt.onclick = () => wgSelect(g.id, { fly: true, via: 'banner' }); b.appendChild(bt);
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'lc-btn'; x.textContent = '×'; x.setAttribute('aria-label', '閉じる'); x.onclick = wgHideBanner; b.appendChild(x);
+    b.style.display = '';
+  }
+  function wgSelect(id, opt) {
+    opt = opt || {};
+    if (!WGDEF) return;
+    if (!id) { wgClear(); return; }
+    if (WGS.selected && WGS.selected.id === id && stats.wg.state !== 'failed' && !opt.force) { if (opt.fly) wgFly(); return; }
+    if (opt.force) wgRetryMeta();   // 220A: 失敗したメタだけ再取得
+    WGS.select(id);   // 世代トークンを進める
+    ++bldgGen;        // 進行中の mount / vec 構築を無効化（旧グループの遅延描画を防ぐ）
+    clearBuildingPick();
+    stats.wg.groupId = id; stats.wg.state = 'loading'; stats.wg.lastError = null; stats.allMode.lastError = null; stats.wg.firstBuildingMs = null;
+    stats.wg.selects = WGS.log.selects; stats.wg.switches = WGS.log.switches; stats.wg.via = opt.via || null;
+    wgSelectedAt = performance.now();
+    if (typeof window.__lcLod2Start === 'function') {   // LOD2 オーバーレイは最初の選択まで読まない
+      if (q.get('lod2idle') === '1') {   // 221A opt-in: LOD1 の初建物が出て、操作が止まって1.5秒たってから(最大25秒で必ず)LOD2(都市全体 tileset)を起動。既定は従来どおり選択直後。
+        if (!window.__lcLod2Started && !wgLod2Timer) {
+          const t0 = performance.now();
+          wgLod2Timer = setInterval(() => {
+            const waited = performance.now() - t0, ready = stats.wg.firstBuildingMs != null && !isMoving();
+            if ((ready && waited > 1500) || waited > 25000) { clearInterval(wgLod2Timer); wgLod2Timer = 0; stats.wg.lod2StartMs = Math.round(performance.now() - T0); window.__lcLod2Start(); }
+          }, 500);
+        }
+      } else { stats.wg.lod2StartMs = Math.round(performance.now() - T0); window.__lcLod2Start(); }
+    }
+    wgPrune(); wgHideBanner();
+    if (opt.fly !== false) wgFly();
+    wgSetStatus('「' + WGS.selected.name + '」を読み込み中…', 'loading');
+    if (!wgPollT) wgPollT = setInterval(wgEvaluate, 500);
+    // 急速な連続選択では最後の選択だけを読み込む(途中グループの tileset 要求を発行しない)。250ms 静止後に開始
+    clearTimeout(wgGoT); const tk = WGS.token; stats.wg.pendingRetry = true;
+    wgGoT = setTimeout(() => { if (WGS.isStale(tk)) return; stats.wg.pendingRetry = false; if (allBusy) allDirty = true; else allTick(); }, 250);
+    scene.requestRender();
+  }
+  function wgClear() {
+    WGS.clear(); clearTimeout(wgGoT); ++bldgGen; stats.wg.groupId = null; stats.wg.state = 'idle'; stats.wg.pendingRetry = false;
+    wgPrune(); wgHideBanner(); clearBuildingPick();
+    const v = cityHome; if (v) { viewer.camera.cancelFlight(); viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(v.center, v.range / 2.2), { duration: 1.2, offset: new Cesium.HeadingPitchRange(0, v.pitch, v.range) }); }
+    wgEvaluate(); allSync(); scene.requestRender();
+  }
+  function wgOnWardSelect(w, fly) {
+    if (!WGDEF) return;
+    const g = LC219B.groupOfCode(WGDEF, w.wardCode); if (!g) return;
+    if (!WGS.selected) { wgSelect(g.id, { fly: false, via: 'ward' }); return; }
+    if (WGS.selected.id === g.id) return;
+    if (fly) wgSelect(g.id, { fly: false, via: 'ward-list' });
+    else wgShowBanner(g, '「' + w.wardName + '」は「' + g.name + '」グループです。');
+  }
+  function wgCheckRange() {
+    const d = WardUI.data, g = WGS.selected; if (!d || !g || isMoving()) return;
+    const cam = viewer.camera;
+    const ctr = cam.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2), scene.globe.ellipsoid);
+    if (!ctr) return;
+    const l = cartToLocal(ctr), w = WardUI.hit(l.x, l.z);
+    const og = w ? LC219B.groupOfCode(WGDEF, w.wardCode) : null;
+    if (og && og.id !== g.id && cam.positionCartographic.height < 30000) wgShowBanner(og, 'この付近は「' + og.name + '」グループの範囲です（詳細3Dは未読み込み）。'); else wgHideBanner();
+  }
+  function wgBuildUi() {
+    const css = document.createElement('style');
+    css.textContent = '#wg-bar{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:96vw}'
+      + '#wg-row{display:flex;gap:6px;overflow-x:auto;max-width:96vw;padding:2px}'
+      + '#wg-row button{white-space:nowrap;background:rgba(10,24,48,.88);color:#e8f1ff;border:1px solid #3d7fd6;border-radius:14px;padding:5px 10px;font:12px sans-serif;cursor:pointer;min-height:32px}'
+      + '#wg-row button[aria-pressed=true]{background:#1d5fb8;border-color:#9cc8ff;font-weight:700}'
+      + '#wg-status{background:rgba(10,24,48,.88);color:#cfe3ff;font:12px/1.4 sans-serif;padding:4px 10px;border-radius:10px;display:flex;gap:6px;align-items:center}'
+      + '#wg-status[data-kind=failed]{background:#7a1f1f;color:#fff}#wg-status[data-kind=done]{color:#aef0c3}'
+      + '#wg-banner{position:fixed;left:50%;top:calc(var(--lc-header-h,48px) + 8px);transform:translateX(-50%);z-index:61;background:rgba(10,24,48,.92);color:#fff;font:12px/1.5 sans-serif;padding:6px 10px;border-radius:8px;display:none;max-width:94vw}'
+      + '#wg-banner button{margin-left:6px}.wg-sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}'
+      + '#wg-sec .wg-item{display:block;width:100%;text-align:left;margin:0 0 4px;background:rgba(80,160,255,.08);border:1px solid var(--lc-line);color:var(--lc-text);border-radius:6px;padding:5px 8px;font:12px var(--lc-font);cursor:pointer}'
+      + '#wg-sec .wg-item[aria-pressed=true]{border-color:#9cc8ff;background:rgba(80,160,255,.28)}#wg-sec .wg-sub{display:block;color:var(--lc-text-mute);font-size:11px}';
+    document.head.appendChild(css);
+    const byCode = new Map(WardUI.data.wards.map((w) => [w.wardCode, w]));
+    const bar = document.createElement('div'); bar.id = 'wg-bar';
+    const status = document.createElement('div'); status.id = 'wg-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+    const stx = document.createElement('span'); status.appendChild(stx);
+    const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'lc-btn'; retry.textContent = '再試行'; retry.style.display = 'none'; retry.onclick = () => { if (WGS.selected) wgSelect(WGS.selected.id, { force: true, fly: false, via: 'retry' }); };
+    const clr = document.createElement('button'); clr.type = 'button'; clr.className = 'lc-btn'; clr.textContent = '全体に戻る'; clr.style.display = 'none'; clr.onclick = () => wgSelect(null);
+    status.appendChild(retry); status.appendChild(clr);
+    const row = document.createElement('div'); row.id = 'wg-row'; row.setAttribute('role', 'group'); row.setAttribute('aria-label', '地域グループ');
+    const btns = [], items = [];
+    const sec = document.createElement('div'); sec.className = 'lc-sec'; sec.id = 'wg-sec';
+    const h2 = document.createElement('h2'); h2.textContent = '地域グループ（選んだ範囲だけ3D詳細を読み込み）'; sec.appendChild(h2);
+    for (const g of WGDEF.groups) {
+      const names = g.wards.map((c) => (byCode.get(c) || {}).wardName).filter(Boolean);
+      const mk = (cls) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.group = g.id; b.setAttribute('aria-pressed', 'false'); if (cls) b.className = cls; b.onclick = () => { wgSelect(g.id, { fly: true, via: 'list' }); document.body.classList.remove('show-left'); }; return b; };
+      const b1 = mk(); const sw = document.createElement('span'); sw.className = 'wg-sw'; sw.style.background = g.color; b1.appendChild(sw); b1.appendChild(document.createTextNode(g.name + '（' + g.wards.length + '区）')); b1.title = names.join('・'); row.appendChild(b1); btns.push(b1);
+      const b2 = mk('wg-item'); const sw2 = sw.cloneNode(); b2.appendChild(sw2); b2.appendChild(document.createTextNode(g.name)); const sub = document.createElement('span'); sub.className = 'wg-sub'; sub.textContent = names.join('・'); b2.appendChild(sub); sec.appendChild(b2); btns.push(b2);
+    }
+    bar.appendChild(status); bar.appendChild(row); document.body.appendChild(bar);
+    const left = $('lc-left'); if (left) left.insertBefore(sec, left.firstChild);
+    const banner = document.createElement('div'); banner.id = 'wg-banner'; banner.setAttribute('role', 'status'); document.body.appendChild(banner);
+    wgUiEls = { bar, status: stx, retry, clear: clr, btns, banner, items };
+    // 旧「3D表示モード / 建物を表示する区」セレクタはグループモードでは使わない（グループ選択が置き換える）
+    for (const id of ['sel-bldg-mode', 'sel-bldg-ward']) { const r = $(id) && $(id).closest('.lc-row'); if (r) r.style.display = 'none'; }
+    const note = $('bldg-ward-note'); if (note) note.textContent = '地域グループを選ぶと、その範囲の3D建物だけを読み込みます';
+    const wc = $('ward-cov-note'); if (wc) wc.textContent = '起動時は区境・地名のみ。下の地域グループ（または地図上の区）を選ぶと、そのグループの3D建物・道路を読み込みます。';
+    // 地図上のグループ境界(グループ色の太線)と名称
+    wgLinesC = scene.primitives.add(new Cesium.PolylineCollection());
+    wgLabelsC = scene.primitives.add(new Cesium.LabelCollection());
+    for (const g of WGDEF.groups) {
+      let cx = 0, cz = 0, n = 0;
+      for (const c of g.wards) {
+        const w = byCode.get(c); if (!w) continue;
+        cx += w.centroid[0]; cz += w.centroid[1]; n++;
+        for (const p of w.polygons) { const pts = p.outer.map((q) => toCart(q[0], q[1], 7)); pts.push(pts[0]); wgLinesC.add({ positions: pts, width: 3, material: solidMat(g.color) }); }
+      }
+      if (n) wgLabelsC.add({ position: toCart(cx / n, cz / n, 40), text: g.name, font: '700 22px sans-serif', fillColor: Cesium.Color.fromCssColorString(g.color), outlineColor: Cesium.Color.fromCssColorString('#0a1220'), outlineWidth: 4, style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM, horizontalOrigin: Cesium.HorizontalOrigin.CENTER, disableDepthTestDistance: Number.POSITIVE_INFINITY, distanceDisplayCondition: new Cesium.DistanceDisplayCondition(9000, 900000) });
+    }
+  }
+  async function wgStart() {
+    try {
+      const r = await fetch('mission37g-data/ward-groups.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error('ward-groups.json HTTP ' + r.status);
+      WGDEF = await r.json();
+      const d = await WardUI.load();
+      const v = LC219B.validateGroups(WGDEF, d.wards, { skipAdjacency: true });   // 連結性(O(n^2))は Node テストで検証。実行時は欠落/重複のみ
+      stats.wg.validation = { ok: v.ok, problems: v.problems, groups: v.groupCount, assigned: v.assigned };
+      if (!v.ok) throw new Error('グループ定義の検証失敗: ' + v.problems.join(' / '));
+      WGS = LC219B.createSelector(WGDEF);
+      wgBuildUi();
+      try { new PerformanceObserver((l) => { for (const e of l.getEntries()) { wgLong.count++; wgLong.totalMs += e.duration; wgLong.maxMs = Math.max(wgLong.maxMs, e.duration); } }).observe({ type: 'longtask', buffered: true }); } catch (e) { /* 非対応環境 */ }
+      viewer.camera.moveEnd.addEventListener(() => { clearTimeout(wgMoveT); wgMoveT = setTimeout(wgCheckRange, 500); });
+      await setAllMode(true);   // メタ(source/build-report JSON)のみ取得。区は未選択なので建物 tileset/GLB・道路は要求しない。遠景LOD0(あれば)は lod0Sync が表示
+      if (cityHome) { viewer.camera.cancelFlight(); }
+      wgEvaluate();
+      setTimeout(() => {   // 起動時に詳細(LOD1/LOD2 GLB・tileset・道路)が 0 件であることの自動アサート。その間にユーザーが選択したら対象外
+        stats.wg.initialAssert = WGS.selected || stats.wg.selects ? { skipped: 'group-selected-before-assert' } : Object.assign({ atMs: Math.round(performance.now() - T0) }, LC219B.assertNoInitialDetail(wgNetUrls()));
+        if (stats.wg.initialAssert.pass === false) console.error('[219B] 起動時に詳細3D要求が発生', JSON.stringify(stats.wg.initialAssert));
+      }, 4000);
+      function wgTransfer() {   // 221A: 読み取り専用。件数とバイト数のみ(URLは出さない)
+        const o = { glb: { n: 0, bytes: 0 }, tileset: { n: 0, bytes: 0 }, other: { n: 0, bytes: 0 } };
+        try { for (const e of performance.getEntriesByType('resource')) { const k = /\.(glb|b3dm)(\?|$)/i.test(e.name) ? 'glb' : /tileset\.json/i.test(e.name) ? 'tileset' : 'other'; o[k].n++; o[k].bytes += e.transferSize || 0; } } catch (er) { /* noop */ }
+        return o;
+      }
+      if (q.get('wgdebug') === '1') window.__lcWG = {
+        snapshot() {
+          const s = stats.wg;
+          return { groupId: s.groupId, state: s.state, allowedWards: Array.from(WGS.allowed), loadedWards: Array.from(allSets.keys()), loadedTilesets: extraSets.length, mountsTotal: stats.allMode.mountsTotal, dropsTotal: stats.allMode.dropsTotal,
+            vecDrops: stats.vec45i.dropsTotal, prunedWards: s.prunedWards, selects: s.selects, switches: s.switches, deferredMoving: s.deferredMoving, firstBuildingMs: s.firstBuildingMs, lastError: s.lastError,
+            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, firstMetaMs: s.firstMetaMs == null ? null : s.firstMetaMs, vecDeferred: s.vecDeferred | 0, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, sseMove: stats.sseMoveState ? Object.assign({}, stats.sseMoveState) : null, resolution: { preset: RES_PRESET, scale: perf.resolutionScale == null ? null : perf.resolutionScale, changes: perf.resolutionChanges }, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
+        },
+        select: (id) => wgSelect(id, { fly: true, via: 'debug' }), clear: () => wgSelect(null), netUrls: wgNetUrls,
+      };
+    } catch (e) { stats.wg.lastError = String(e && e.message || e); stats.wg.state = 'error'; fail('wardgroups', e); }
+  }
 
   // ══════════════════════════════════════════════════════════════
   // モードタブ（観光/不動産/人口・統計/防災/ビジネス）— 現段階は安全なダミー表示
