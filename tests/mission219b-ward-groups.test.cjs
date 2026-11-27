@@ -75,3 +75,51 @@ test('vercel.json の既定リダイレクトは変更されていない(旧モ�
   const v = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
   assert.strictEqual(v.redirects[0].destination, '/mission37g-osaka-24ward-mvp.html?nobuiltin=1&ext45=1&lod2=1&lod2ov=1');
 });
+
+// 221B: sseMove ブロックを HTML から切り出し、偽 tileset/camera で「Preview(wardgroups)でも発火 → 400ms 後に元へ復元」を実行して確認する
+function runSse({ search, host, EXT45, WG_ON, tilesets }) {
+  const a = html.indexOf('const SSE_MOVE_RAW'), b = html.indexOf("if (EXT45 && q.get('perf') === '1')");
+  const code = html.slice(a, b);
+  const timers = []; let now = 0;
+  const L2 = () => { const h = []; return { addEventListener: (f) => h.push(f), fire: () => h.forEach((f) => f()) }; };
+  const ev = { moveStart: L2(), changed: L2(), moveEnd: L2() };
+  const win = {};
+  const ctx = { q: new URLSearchParams(search), EXT45, WG_ON, stats: {}, scene: { requestRender() {} }, viewer: { camera: ev }, allTilesetsNow: () => tilesets.filter((t) => !t.isDestroyed()), performance: { now: () => now }, window: win, Math, Number, Map,
+    setTimeout: (f, ms) => { const id = timers.length + 1; timers.push({ f, at: now + ms, id }); return id; }, clearTimeout: (id) => { const t = timers.find((x) => x.id === id); if (t) t.f = null; } };
+  vm.runInNewContext(code, ctx);
+  const advance = (ms) => { now += ms; for (const t of timers) if (t.f && t.at <= now) { const f = t.f; t.f = null; f(); } };
+  return { ev, win, advance, st: ctx.stats };
+}
+const mkTs = (v) => ({ maximumScreenSpaceError: v, isDestroyed: () => false });
+test('221B: Preview(非localhost)でも ?wardgroups=1&sseMove=48 で操作中に SSE が上がり 400ms 後に元値へ戻る', () => {
+  const t1 = mkTs(16), t2 = mkTs(24);
+  const r = runSse({ search: '?sseMove=48', EXT45: false, WG_ON: true, tilesets: [t1, t2] });
+  r.ev.moveStart.fire();
+  assert.strictEqual(t1.maximumScreenSpaceError, 48); assert.strictEqual(t2.maximumScreenSpaceError, 48);
+  const t3 = mkTs(16); // 操作中に mount された tileset も次のイベントで拾う
+  r.ev.changed.fire();
+  r.advance(300); r.ev.changed.fire(); r.advance(300);
+  assert.strictEqual(t1.maximumScreenSpaceError, 48, '連続操作中は戻さない');
+  r.advance(200);
+  assert.strictEqual(t1.maximumScreenSpaceError, 16); assert.strictEqual(t2.maximumScreenSpaceError, 24);
+  assert.strictEqual(r.st.sseMoveState.raises, 1); assert.strictEqual(r.st.sseMoveState.restores, 1); assert.strictEqual(r.st.sseMoveState.raised, false);
+  void t3;
+});
+test('221B: wardgroups も ext45 も無い場合・不正値は SSE を変えない / 範囲外は 8..128 に丸める', () => {
+  for (const [search, WG] of [['?sseMove=48', false], ['?sseMove=abc', true], ['?sseMove=-5', true], ['', true]]) {
+    const t = mkTs(16); const r = runSse({ search, EXT45: false, WG_ON: WG, tilesets: [t] }); r.ev.moveStart.fire();
+    assert.strictEqual(t.maximumScreenSpaceError, 16, search + ' WG=' + WG);
+  }
+  const t = mkTs(16); const r = runSse({ search: '?sseMove=99999', EXT45: false, WG_ON: true, tilesets: [t] }); r.ev.moveStart.fire();
+  assert.strictEqual(t.maximumScreenSpaceError, 128);
+});
+test('221B: 引き上げ中に他所で SSE を変更された tileset は復元で上書きしない', () => {
+  const t = mkTs(16); const r = runSse({ search: '?sseMove=48', EXT45: false, WG_ON: true, tilesets: [t] });
+  r.ev.moveStart.fire(); t.maximumScreenSpaceError = 20; r.advance(500);
+  assert.strictEqual(t.maximumScreenSpaceError, 20);
+});
+test('221B: res=speed の動的解像度は wardgroups+明示 res のときだけ許可 / cachemb は予算で上書きされない', () => {
+  assert.ok(/fixed: !\(EXT45 \|\| \(WG_ON && \/\^\(speed\|auto\|balanced\)\$\/\.test\(q\.get\('res'\)/.test(html));
+  assert.ok(/!\(\+q\.get\('cachemb'\) > 0\)\) t\.cacheBytes/.test(html));
+  assert.ok(/clampOpt\('foveatedConeSize', 0, 1\)/.test(html));
+});

@@ -1137,6 +1137,9 @@
     if (q.get('fovdelay') != null) tOpt.foveatedTimeDelay = +q.get('fovdelay');
     if (q.get('skiplod') != null) tOpt.skipLevelOfDetail = q.get('skiplod') === '1';
     if (+q.get('cachemb') > 0) tOpt.cacheBytes = Math.round(+q.get('cachemb') * 1048576);
+    // 221B: Cesium 1.121 の有効範囲へ丸める(不正値は破棄)。foveatedConeSize 0..1 / foveatedMinimumScreenSpaceErrorRelaxation 0..SSE / foveatedTimeDelay 0..5s / cacheBytes 64..4096MB。
+    const clampOpt = (k, lo, hi) => { if (!(k in tOpt)) return; const v = +tOpt[k]; if (!Number.isFinite(v)) { delete tOpt[k]; return; } tOpt[k] = Math.min(hi, Math.max(lo, v)); };
+    clampOpt('foveatedConeSize', 0, 1); clampOpt('foveatedMinimumScreenSpaceErrorRelaxation', 0, stats.sse || SSE0); clampOpt('foveatedTimeDelay', 0, 5); clampOpt('cacheBytes', 64 * 1048576, 4096 * 1048576);
     for (const k of Object.keys(tOpt)) if (!Number.isFinite(+tOpt[k]) && typeof tOpt[k] !== 'boolean') delete tOpt[k];
     stats.tileOpts = Object.assign({}, tOpt, dseOpt);
     const ts = await Cesium.Cesium3DTileset.fromUrl(base + 'tileset.json', Object.assign({ maximumScreenSpaceError: stats.sse || SSE0 }, tOpt, dseOpt));
@@ -1773,14 +1776,16 @@
     if (ts.length === lastBudgetN) return;
     lastBudgetN = ts.length;
     const b = LC45G.cacheBudget(ts.length || 1, q.get('cacheMB') ? { cacheTotalMB: +q.get('cacheMB') || 768 } : {});
-    for (const t of ts) { if ('cacheBytes' in t) t.cacheBytes = b.cacheBytes; if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
+    for (const t of ts) { if ('cacheBytes' in t && !(+q.get('cachemb') > 0)) t.cacheBytes = b.cacheBytes;   // 221B: ?cachemb=N 指定時は予算ロジックで上書きしない
+       if ('maximumCacheOverflowBytes' in t) t.maximumCacheOverflowBytes = b.maximumCacheOverflowBytes; }
     perf.cachePerTilesetMB = b.perMB;
   }
   // 45H: プリセット。balanced(既定: 下限 0.8) / speed(下限 0.6) / quality(?res=fixed|quality: 常に 1.0)。いずれも静止後 700ms で必ず 1.0 に戻す。
   // 45M: ext45 の既定は固定解像度（実 PC で rr=0&res=fixed が軽かったため）。動的解像度は ?res=auto|balanced で opt-in。
   const RES_PRESET = q.get('res') === 'speed' ? 'speed' : (q.get('res') === 'auto' || q.get('res') === 'balanced') ? 'balanced' : (q.get('res') === 'fixed' || q.get('res') === 'quality' || EXT45) ? 'quality' : 'balanced';
   perf.preset = RES_PRESET;
-  const resCtl = LC45G.createResolutionController({ fixed: !EXT45 || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
+  // 221B: Preview(非localhost)は従来 fixed。?wardgroups=1 かつ res=speed|auto|balanced を明示したときだけ動的解像度(静止後 1.0 へ復元)
+  const resCtl = LC45G.createResolutionController({ fixed: !(EXT45 || (WG_ON && /^(speed|auto|balanced)$/.test(q.get('res') || ''))) || RES_PRESET === 'quality', minScale: RES_PRESET === 'speed' ? 0.6 : LC45G.DEFAULTS.minScale });
   function applyRes(s) { if (s === null) return; if (SMOOTH && !IX.allowResChange(performance.now(), s >= viewer.resolutionScale)) return; viewer.resolutionScale = s; perf.resolutionScale = s; perf.resolutionChanges++; scene.requestRender(); }
   let resT = 0;
   viewer.camera.moveEnd.addEventListener(() => { clearTimeout(resT); resT = setTimeout(() => applyRes(resCtl.tick(performance.now(), false)), LC45G.DEFAULTS.restoreMs + 50); });
@@ -1955,13 +1960,30 @@
   setTimeout(roadScaleSync, 0);
   // 45R: opt-in の比較スイッチ ?sseMove=N（既定 OFF）。操作中だけ全 tileset の maximumScreenSpaceError を N（現在値より大きいときのみ）へ上げ、止まって 400ms で元の値に戻す。
   //   既定では建物の品質・表示範囲を変えない。操作中は粗くなる（画質トレードオフ）ため、測ってから採否を決める。
-  const SSE_MOVE = Math.max(0, +q.get('sseMove') || 0);
-  if (EXT45 && SSE_MOVE > 0) {
-    const orig = new WeakMap(); let raised = false, restoreT = 0;
-    const restore = () => { raised = false; for (const t of allTilesetsNow()) { if (orig.has(t)) { t.maximumScreenSpaceError = orig.get(t); orig.delete(t); } } scene.requestRender(); };
-    const raise = () => { clearTimeout(restoreT); if (!raised) { raised = true; for (const t of allTilesetsNow()) { orig.set(t, t.maximumScreenSpaceError); if (SSE_MOVE > t.maximumScreenSpaceError) t.maximumScreenSpaceError = SSE_MOVE; } } restoreT = setTimeout(restore, 400); };
-    viewer.camera.moveStart.addEventListener(raise); viewer.camera.changed.addEventListener(raise);
+  // 221B: ガードは「localhost+ext45=1」または「?wardgroups=1」(Preview 含む)。不正値は無視、有効値は 8..128 に丸める。旧モード/flag なしは無変更。
+  const SSE_MOVE_RAW = +q.get('sseMove') || 0;
+  const SSE_MOVE = SSE_MOVE_RAW > 0 && Number.isFinite(SSE_MOVE_RAW) ? Math.min(128, Math.max(8, SSE_MOVE_RAW)) : 0;
+  const sseSt = { enabled: false, value: SSE_MOVE, raises: 0, restores: 0, raised: false, tilesRaised: 0, lastRestoreMs: null };
+  stats.sseMoveState = sseSt;
+  if ((EXT45 || WG_ON) && SSE_MOVE > 0) {
+    sseSt.enabled = true;
+    const orig = new Map(); let restoreT = 0;   // tileset -> { o: 元の値, r: 引き上げ後の値 }
+    const restore = () => {
+      for (const [t, v] of orig) { if (!t.isDestroyed() && t.maximumScreenSpaceError === v.r) t.maximumScreenSpaceError = v.o; }   // 他所で変更済みなら上書きしない
+      orig.clear(); sseSt.raised = false; sseSt.restores++; sseSt.lastRestoreMs = Math.round(performance.now()); scene.requestRender();
+    };
+    const raise = () => {
+      clearTimeout(restoreT);
+      for (const t of allTilesetsNow()) {   // 操作中に mount された tileset も次のイベントで拾う。破棄済みは除外
+        if (orig.has(t) || t.maximumScreenSpaceError >= SSE_MOVE) continue;
+        orig.set(t, { o: t.maximumScreenSpaceError, r: SSE_MOVE }); t.maximumScreenSpaceError = SSE_MOVE; sseSt.tilesRaised++;
+      }
+      if (!sseSt.raised) { sseSt.raised = true; sseSt.raises++; }
+      restoreT = setTimeout(restore, 400);
+    };
+    viewer.camera.moveStart.addEventListener(raise); viewer.camera.changed.addEventListener(raise); viewer.camera.moveEnd.addEventListener(() => { clearTimeout(restoreT); restoreT = setTimeout(restore, 400); });
     stats.sseMove = SSE_MOVE;
+    window.__lcSseMove = { state: () => Object.assign({}, sseSt, { current: allTilesetsNow().map((t) => t.maximumScreenSpaceError) }) };
   }
   if (EXT45 && q.get('perf') === '1') {
     const el = document.createElement('pre');
@@ -4207,7 +4229,7 @@
           const s = stats.wg;
           return { groupId: s.groupId, state: s.state, allowedWards: Array.from(WGS.allowed), loadedWards: Array.from(allSets.keys()), loadedTilesets: extraSets.length, mountsTotal: stats.allMode.mountsTotal, dropsTotal: stats.allMode.dropsTotal,
             vecDrops: stats.vec45i.dropsTotal, prunedWards: s.prunedWards, selects: s.selects, switches: s.switches, deferredMoving: s.deferredMoving, firstBuildingMs: s.firstBuildingMs, lastError: s.lastError,
-            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
+            initialAssert: s.initialAssert, validation: s.validation, metaNet: Object.assign({}, stats.metaNet), metaReadyMs: s.metaReadyMs, net: LC219B.summarizeNet(wgNetUrls()), tileOpts: stats.tileOpts || {}, sseMove: stats.sseMoveState ? Object.assign({}, stats.sseMoveState) : null, resolution: { preset: RES_PRESET, scale: perf.resolutionScale == null ? null : perf.resolutionScale, changes: perf.resolutionChanges }, lod2: { started: !!window.__lcLod2Started, startMs: s.lod2StartMs == null ? null : s.lod2StartMs, idle: q.get('lod2idle') === '1' }, transfer: wgTransfer(), longTasks: Object.assign({}, wgLong), perf: typeof perfSnapshot === 'function' ? perfSnapshot() : null, sinceStartMs: Math.round(performance.now() - T0) };
         },
         select: (id) => wgSelect(id, { fly: true, via: 'debug' }), clear: () => wgSelect(null), netUrls: wgNetUrls,
       };
